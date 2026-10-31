@@ -6,12 +6,12 @@ import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT } from "../../game/presentation/a
 import { facingYaw } from "../../game/render/effects";
 import { DAMAGE_BLEND_PROBE_MODELS } from "../../platform/damageBlendProbeModels";
 import { createTimer, startTimer } from "wisp/game/clock";
-import { createEffect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
-import { setCameraField, setCameraPosition } from "wisp/game/view";
+import { createEffect, Effect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { CameraField, setCameraField, setCameraPosition } from "wisp/game/view";
 import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
 
 interface Case {
-  readonly model: effect;
+  readonly model: Effect;
   readonly sourceSeconds: number;
   readonly clock: number;
 }
@@ -40,12 +40,12 @@ export function start(this: void): void {
       }
     }
   }
-  setCameraField(CAMERA_FIELD_ROTATION, ARENA_CAMERA.rotation, 0.0);
-  setCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, ARENA_CAMERA.angleOfAttack, 0.0);
-  setCameraField(CAMERA_FIELD_TARGET_DISTANCE, 1450.0, 0.0);
-  setCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + 50.0, 0.0);
-  setCameraField(CAMERA_FIELD_FIELD_OF_VIEW, 70.0, 0.0);
-  setCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0, { distance: 1450.0, z: 50.0 }), 0.0);
+  setCameraField(CameraField.rotation, ARENA_CAMERA.rotation, 0.0);
+  setCameraField(CameraField.angleOfAttack, ARENA_CAMERA.angleOfAttack, 0.0);
+  setCameraField(CameraField.targetDistance, 1450.0, 0.0);
+  setCameraField(CameraField.zOffset, FLOOR_HEIGHT + 50.0, 0.0);
+  setCameraField(CameraField.fieldOfView, 70.0, 0.0);
+  setCameraField(CameraField.farZ, arenaFarZ(0, { distance: 1450.0, z: 50.0 }), 0.0);
   setCameraPosition(0.0, 0.0);
   let frame = 0;
   startTimer(createTimer(), f32(1.0 / 60.0), true, () => {

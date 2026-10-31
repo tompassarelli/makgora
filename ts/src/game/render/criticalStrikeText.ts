@@ -3,14 +3,14 @@ import { at } from "wisp/src/runtime/lookup";
 import { floorMod } from "wisp/src/sim/intMath";
 import { CRITICAL_STRIKE_COLOUR, CRITICAL_STRIKE_FRAMES, CRITICAL_STRIKE_HEAD, CRITICAL_STRIKE_RISE, criticalStrikeAlpha, criticalStrikeHeight, criticalStrikeText } from "../presentation/criticalStrike";
 import type { WorldOrigin } from "./effects";
-import { createFloatingText, setFloatingText, setFloatingTextColor, setFloatingTextPermanent, setFloatingTextPosition, setFloatingTextVisible } from "wisp/game/effects";
+import { createFloatingText, FloatingText, setFloatingText, setFloatingTextColor, setFloatingTextPermanent, setFloatingTextPosition, setFloatingTextVisible } from "wisp/game/effects";
 
 const POOL = 4;
 
 interface ShownCritical { age: number; x: number; z: number }
 
 export class CriticalStrikeText {
-  private readonly tags: texttag[] = [];
+  private readonly tags: FloatingText[] = [];
   private readonly shown: (ShownCritical | undefined)[] = [];
   private next = 0;
 

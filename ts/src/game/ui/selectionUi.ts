@@ -71,10 +71,10 @@ import { panelButton } from "./infoPanel";
 import type { LobbyNet, SelectionActions } from "./selectionActions";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
 import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus, createCpuSettings, showCpuSettings } from "./selectionCpuSettings";
-import { destroyEvents } from "wisp/game/events";
-import { createFrameByType, destroyFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
-import { mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, showCursor } from "wisp/game/input";
-import { localPlayer, player as playerOf } from "wisp/game/players";
+import { destroyEvents, Events } from "wisp/game/events";
+import { createFrameByType, destroyFrame, Frame, FramePoint, screenHeight, screenWidth, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
+import { MouseButton, mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, showCursor } from "wisp/game/input";
+import { localPlayer, Player, player as playerOf } from "wisp/game/players";
 import { sendSync } from "wisp/game/sync";
 import { formatInt, toReal } from "wisp/game/text";
 
@@ -145,20 +145,20 @@ export interface MenuControlHit {
 }
 
 export class SelectionPanel {
-  private readonly tiles: framehandle[][] = [];
-  private readonly tilePortraits: framehandle[] = [];
+  private readonly tiles: Frame[][] = [];
+  private readonly tilePortraits: Frame[] = [];
   private shownTilePalette: number | undefined;
-  private readonly tileButtons: framehandle[] = [];
-  private readonly root: framehandle;
-  private readonly backdrop: framehandle;
-  private readonly confirm: framehandle;
-  private readonly settingsLabel: framehandle;
-  private readonly movesLabel: framehandle;
+  private readonly tileButtons: Frame[] = [];
+  private readonly root: Frame;
+  private readonly backdrop: Frame;
+  private readonly confirm: Frame;
+  private readonly settingsLabel: Frame;
+  private readonly movesLabel: Frame;
   private readonly cards: readonly CardFrames[];
   private readonly clicks: ButtonClicks<SelectionButton>;
-  private readonly syncTriggers: readonly trigger[];
+  private readonly syncTriggers: readonly Events[];
   private readonly drag = selectionDrag();
-  private readonly bullseye: framehandle;
+  private readonly bullseye: Frame;
   private readonly hands: Slots<HandFrames>;
   private readonly handChannel: SelectionHands;
   private localHand: HandPose = HIDDEN_HAND;
@@ -180,18 +180,18 @@ export class SelectionPanel {
   private movesOpen = false;
   private movesCharacter: number = DEFAULT_FIGHTER;
   private shownMoves = -1;
-  private readonly movesFrames: readonly framehandle[];
-  private readonly movesTitle: framehandle;
-  private readonly movesBody: framehandle;
+  private readonly movesFrames: readonly Frame[];
+  private readonly movesTitle: Frame;
+  private readonly movesBody: Frame;
   private readonly delay: DelayFrames;
   private net: LobbyNet = { delayText: "", hostControl: false, echoes: PARTICIPANT_SLOTS.map(() => "") };
 
-  private readonly modeLabel: framehandle;
+  private readonly modeLabel: Frame;
   private readonly rules: RuleFrames;
 
   private shownRules: string | undefined;
-  private readonly help: framehandle;
-  private readonly helpText: framehandle;
+  private readonly help: Frame;
+  private readonly helpText: Frame;
   private shownHelp: string | undefined;
   private cpuSlot: number | undefined;
   private cpuFocus: 0 | 1 | 2 = 0;
@@ -259,19 +259,19 @@ export class SelectionPanel {
     this.confirm = headerButton(START_BUTTON, "", { kind: "start" });
     this.settingsLabel = headerButton(SETTINGS_BOX, "Controls (F1)", { kind: "settings" });
     this.movesLabel = headerButton(MOVES_BOX, "Moves", { kind: "moves" });
-    const page = (frame: framehandle, x: number, y: number, width: number, height: number) => {
+    const page = (frame: Frame, x: number, y: number, width: number, height: number) => {
       placeTopLeft(frame, x, y);
       setFrameSize(frame, width, height);
       setFrameVisible(frame, false);
       return frame;
     };
-    const at = (frame: framehandle, box: TextBox) => page(frame, box.left, box.top, box.width, box.height);
+    const at = (frame: Frame, box: TextBox) => page(frame, box.left, box.top, box.width, box.height);
     this.movesTitle = at(createText(`MeleeMovesTitle${suffix}`, gameUi(), 470 + participantId), MOVES_TITLE_BOX);
     setFrameFont(this.movesTitle, MENU_FONT, f32(0.016), 0);
-    setFrameTextAlignment(this.movesTitle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    setFrameTextAlignment(this.movesTitle, TextAlignment.middle, TextAlignment.center);
     this.movesBody = at(createText(`MeleeMovesBody${suffix}`, gameUi(), 474 + participantId), MOVES_BODY_BOX);
     setFrameFont(this.movesBody, MENU_FONT, f32(0.012), 0);
-    setFrameTextAlignment(this.movesBody, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+    setFrameTextAlignment(this.movesBody, TextAlignment.top, TextAlignment.left);
     const pageButton = (name: string, x: number, width: number, text: string, target: SelectionButton) => {
       const frame = page(createFrameByType("GLUETEXTBUTTON", name, gameUi(), "ScriptDialogButton", 0), x, MOVES_BUTTON_TOP, width, MOVES_BUTTON_HEIGHT);
       setMenuText(frame, text);
@@ -280,7 +280,7 @@ export class SelectionPanel {
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
     sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), RULE_HEIGHT);
     placeTopLeft(this.modeLabel, headerLeft, RULE_ROWS[1]);
-    setFrameTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
+    setFrameTextAlignment(this.modeLabel, TextAlignment.middle, TextAlignment.left);
     setFrameEnabled(this.modeLabel, false);
     setMenuText(this.modeLabel, `${MENU_STYLE.gold}${MOVES_HEADER}|r`);
     this.movesFrames = [
@@ -291,7 +291,7 @@ export class SelectionPanel {
     ];
 
     this.cpu = createCpuSettings(participantId, (frame, target, text, box) => this.clicks.add(frame, target, text, "native", box));
-    const ruleClick = (frame: framehandle, target: RuleButton) => this.clicks.add(frame, target, undefined, "native");
+    const ruleClick = (frame: Frame, target: RuleButton) => this.clicks.add(frame, target, undefined, "native");
     const matchRules = createMatchRules(root, suffix, ruleClick);
     this.delay = createDelayControls(root, ruleClick, DELAY_TEXT_SIZE);
     presentDelayControls(this.delay, false);
@@ -309,10 +309,10 @@ export class SelectionPanel {
     setFrameLevel(this.help, SELECT_LEVELS.ruleHelp);
     setFrameEnabled(this.help, false);
     this.helpText = createText(`MeleeRuleHelpText${suffix}`, this.help, 0);
-    setFramePoint(this.helpText, FRAMEPOINT_TOPLEFT, this.help, FRAMEPOINT_TOPLEFT, f32(0.008), f32(-0.006));
-    setFramePoint(this.helpText, FRAMEPOINT_BOTTOMRIGHT, this.help, FRAMEPOINT_BOTTOMRIGHT, f32(-0.008), f32(0.006));
+    setFramePoint(this.helpText, FramePoint.topLeft, this.help, FramePoint.topLeft, f32(0.008), f32(-0.006));
+    setFramePoint(this.helpText, FramePoint.bottomRight, this.help, FramePoint.bottomRight, f32(-0.008), f32(0.006));
     setFrameFont(this.helpText, MENU_FONT, f32(0.0095), 0);
-    setFrameTextAlignment(this.helpText, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
+    setFrameTextAlignment(this.helpText, TextAlignment.middle, TextAlignment.left);
     setFrameEnabled(this.helpText, false);
     setFrameVisible(this.help, false);
     const owner = [participantId];
@@ -362,7 +362,7 @@ export class SelectionPanel {
     destroyFrame(this.backdrop);
   }
 
-  private click(button: SelectionButton, clicker: player): void {
+  private click(button: SelectionButton, clicker: Player): void {
     if (clicker !== playerOf(this.participantId)) return;
     if (this.cpuSlot !== undefined && button.kind !== "cpuStep" && button.kind !== "cpuClose") return;
     if (button.kind === "tile") this.clickTile(button.tile);
@@ -771,7 +771,7 @@ export class SelectionPanel {
       if ((slot === participantId && humanFighterActive(game, slot)) || canChooseComputer(game, participantId, slot)) selectable |= 1 << slot;
     }
     this.roster.selectable = selectable;
-    const placement = updateSelectionDrag(drag, this.roster, mouseDown(MOUSE_BUTTON_TYPE_LEFT), x, y);
+    const placement = updateSelectionDrag(drag, this.roster, mouseDown(MouseButton.left), x, y);
     if (placement !== undefined) this.sendPlacement(placement);
   }
 

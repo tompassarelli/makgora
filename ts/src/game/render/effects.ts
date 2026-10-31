@@ -5,7 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH } from "../presentation/arenaCamera";
 import { Character } from "../sim/codes";
 import { EffectMotion } from "./motion";
-import { setEffectPosition, setEffectScale, setEffectTimeScale } from "wisp/game/effects";
+import { Effect, setEffectPosition, setEffectScale, setEffectTimeScale } from "wisp/game/effects";
 
 
 export interface WorldOrigin {
@@ -44,7 +44,7 @@ export function facingYaw(facing: number): number {
 
 
 
-export function hideEffect(model: effect, origin: Readonly<WorldOrigin>): void {
+export function hideEffect(model: Effect, origin: Readonly<WorldOrigin>): void {
   effectMotion().release(model);
   setEffectScale(model, 0.0);
   setEffectPosition(model, origin.x, origin.y, origin.z - FLOOR_HEIGHT - HIDDEN_EFFECT_DEPTH);
@@ -62,7 +62,7 @@ export function hideEffect(model: effect, origin: Readonly<WorldOrigin>): void {
 export type ParkedFlags = boolean[];
 
 
-export function parkOnce(model: effect, origin: Readonly<WorldOrigin>, parked: ParkedFlags, index: number): boolean {
+export function parkOnce(model: Effect, origin: Readonly<WorldOrigin>, parked: ParkedFlags, index: number): boolean {
   if (parked[index] === true) return false;
   hideEffect(model, origin);
   parked[index] = true;
@@ -71,7 +71,7 @@ export function parkOnce(model: effect, origin: Readonly<WorldOrigin>, parked: P
 
 export const PARKED_CUE_TIME_SCALE = 16.0;
 
-export function parkCue(model: effect, origin: Readonly<WorldOrigin>, parked: ParkedFlags, index: number): boolean {
+export function parkCue(model: Effect, origin: Readonly<WorldOrigin>, parked: ParkedFlags, index: number): boolean {
   if (!parkOnce(model, origin, parked, index)) return false;
   setEffectTimeScale(model, PARKED_CUE_TIME_SCALE);
   return true;
@@ -79,15 +79,15 @@ export function parkCue(model: effect, origin: Readonly<WorldOrigin>, parked: Pa
 
 declare global {
 
-  var __smashcraftEffectMotion: EffectMotion<effect> | undefined;
+  var __smashcraftEffectMotion: EffectMotion<Effect> | undefined;
 }
 
 
-export function effectMotion(): EffectMotion<effect> {
-  return (globalThis.__smashcraftEffectMotion ??= new EffectMotion<effect>((model, x, y, z) => setEffectPosition(model, x, y, z)));
+export function effectMotion(): EffectMotion<Effect> {
+  return (globalThis.__smashcraftEffectMotion ??= new EffectMotion<Effect>((model, x, y, z) => setEffectPosition(model, x, y, z)));
 }
 
 
-export function placeEffect(model: effect, x: number, y: number, z: number): void {
+export function placeEffect(model: Effect, x: number, y: number, z: number): void {
   effectMotion().place(model, x, y, z);
 }

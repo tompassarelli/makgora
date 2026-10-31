@@ -18,7 +18,7 @@ export const AIR_DODGE_DECAY = 0.8999999761581421;
 
 export const AIR_DODGE_DECAY_FRAMES = 29;
 export const AIR_DODGE_ANIMATION_FRAMES = 49;
-// Cos and Sin of 18 * bj_DEGTORAD, as the Wurst interpreter evaluates them in binary32.
+// Cos and Sin of 18 degrees in radians (Blizzard.j's degrees-to-radians factor), as the Wurst interpreter evaluates them in binary32.
 const SHALLOW_DODGE_COS = 0.9510565996170044;
 const SHALLOW_DODGE_SIN = 0.30901676416397095;
 

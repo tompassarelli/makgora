@@ -23,7 +23,7 @@ import { fighterModelReplaced } from "../presentation/fighterForm";
 import type { FighterDraw } from "../presentation/fighterDraw";
 import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
 import { costumeClipModel } from "../roster/costumes";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectOrientation, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectOrientation, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { player } from "wisp/game/players";
 
 const PETRIFIED_GREY = 150;
@@ -34,8 +34,8 @@ const HELD = 0.0;
 const CHILL_TINT = { red: 120, green: 190, blue: 255 };
 
 export class FighterPoolPresentation {
-  private readonly clips: effect[] = [];
-  private readonly light: effect | undefined;
+  private readonly clips: Effect[] = [];
+  private readonly light: Effect | undefined;
   private readonly scale: number;
   private lightVisible = false;
   private visible: number | undefined;
@@ -92,7 +92,7 @@ export class FighterPoolPresentation {
   }
 
 
-  private suppress(light: effect): void {
+  private suppress(light: Effect): void {
     setEffectAnimation(light, ORIGINAL_LIGHT_INACTIVE_ANIMATION);
     setEffectTime(light, ORIGINAL_LIGHT_GATE_SECONDS);
   }
@@ -103,7 +103,7 @@ export class FighterPoolPresentation {
     this.blendFrom = undefined;
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     for (const model of this.clips) into.push(model);
     if (this.light !== undefined) into.push(this.light);
   }

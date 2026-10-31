@@ -12,10 +12,10 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { edgeStampFile, responsePageFile } from "../../game/core/gameFiles";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/input/participants";
 import type { MatchCamera } from "../../game/sim/matchCamera";
-import { createTimer, localElapsed, startTimer } from "wisp/game/clock";
-import { createFrameByType, originFrame, setFrameAbsPoint, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
+import { createTimer, localElapsed, startTimer, Timer } from "wisp/game/clock";
+import { createFrameByType, Frame, FramePoint, originFrame, OriginFrame, setFrameAbsPoint, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 import { windowFocused } from "wisp/game/input";
-import { cameraField, cameraTargetX } from "wisp/game/view";
+import { cameraField, CameraField, cameraTargetX } from "wisp/game/view";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { formatReal } from "wisp/game/text";
 
@@ -89,12 +89,12 @@ export interface ResponseProbe {
   captures: number;
   advances: number;
   presentations: number;
-  readonly clock: timer;
-  readonly exportTimer: timer;
+  readonly clock: Timer;
+  readonly exportTimer: Timer;
   clockPeriods: number;
   startedAt: number;
 
-  readonly marker: framehandle;
+  readonly marker: Frame;
   readonly service: ServiceRow[];
   readonly integrity: string[];
   integrityDropped: number;
@@ -127,10 +127,10 @@ const vacantStamp = (): TransportStamp => ({ epoch: undefined, frame: 0, sendMs:
 
 
 export function createResponseProbe(build: string): ResponseProbe {
-  const marker = createFrameByType("TEXT", "ResponseServiceMarker", originFrame(ORIGIN_FRAME_GAME_UI, 0), "", 966);
+  const marker = createFrameByType("TEXT", "ResponseServiceMarker", originFrame(OriginFrame.gameUi, 0), "", 966);
   setFrameText(marker, "|cffff00ffI|r");
   setFrameSize(marker, f32(0.012), f32(0.016));
-  setFrameAbsPoint(marker, FRAMEPOINT_TOPLEFT, f32(0.04), f32(0.595));
+  setFrameAbsPoint(marker, FramePoint.topLeft, f32(0.04), f32(0.595));
   setFrameVisible(marker, false);
   const probe: ResponseProbe = {
     build, recording: false, exporting: false, edgeStamps: false, previousHeld: undefined, edgePairs: 0, edgeDropped: 0,
@@ -374,9 +374,9 @@ export function probeCamera(probe: ResponseProbe | undefined, simulated: Readonl
   values[6] = projected.distance;
   values[7] = projected.tangent;
   values[8] = cameraTargetX() - originX;
-  values[9] = cameraField(CAMERA_FIELD_ZOFFSET) - floor;
-  values[10] = cameraField(CAMERA_FIELD_TARGET_DISTANCE);
-  values[11] = cameraField(CAMERA_FIELD_FIELD_OF_VIEW);
+  values[9] = cameraField(CameraField.zOffset) - floor;
+  values[10] = cameraField(CameraField.targetDistance);
+  values[11] = cameraField(CameraField.fieldOfView);
 }
 
 export function probePresent(probe: ResponseProbe | undefined, confirmedShield: boolean, predictedShield: boolean, poseSerial: number): void {
@@ -390,7 +390,7 @@ export function probePresent(probe: ResponseProbe | undefined, confirmedShield: 
   // Separate grid cells survive native rasterization; adjacent positions in one strip alias.
   const column = floorMod(probe.row, 32);
   const line = floorMod(floorDiv(probe.row, 32), 4);
-  setFrameAbsPoint(probe.marker, FRAMEPOINT_TOPLEFT, f32(0.04) + column * f32(0.0032), f32(0.595) - line * f32(0.01));
+  setFrameAbsPoint(probe.marker, FramePoint.topLeft, f32(0.04) + column * f32(0.0032), f32(0.595) - line * f32(0.01));
   if (probe.pendingEdgeRow === probe.row) {
     stampEdge(probe, "present");
     probe.pendingEdgeRow = undefined;

@@ -5,7 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { ESCAPE_METER_BORDER, ESCAPE_METER_HEIGHT, ESCAPE_METER_SEGMENTS, type EscapeMeterView, escapeMeterFill } from "../presentation/escapeMeter";
 import { createBackdrop, consoleUi } from "./frames";
 import { PANEL_TEXTURE } from "./hudLayout";
-import { destroyFrame, setFrameAbsPoint, setFrameEnabled, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { destroyFrame, Frame, FramePoint, setFrameAbsPoint, setFrameEnabled, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
 const WIDTH = f32(0.07);
@@ -19,10 +19,10 @@ const FILL = "ReplaceableTextures\\TeamColor\\TeamColor04.blp";
 const MARK = "ReplaceableTextures\\TeamColor\\TeamColor00.blp";
 
 export class EscapeMeter {
-  private readonly back: framehandle;
-  private readonly fill: framehandle;
-  private readonly lines: readonly framehandle[];
-  private readonly mark: framehandle;
+  private readonly back: Frame;
+  private readonly fill: Frame;
+  private readonly lines: readonly Frame[];
+  private readonly mark: Frame;
   private visible = false;
   private markVisible = false;
 
@@ -32,7 +32,7 @@ export class EscapeMeter {
     const context = 1100 + slot * 20;
     this.back = createBackdrop(`EscapeMeterBack${formatInt(slot)}`, parent, context);
     this.fill = createBackdrop(`EscapeMeterFill${formatInt(slot)}`, parent, context + 1);
-    const lines: framehandle[] = [];
+    const lines: Frame[] = [];
     for (let line = 1; line < SEGMENTS; line++) lines.push(createBackdrop(`EscapeMeterLine${formatInt(slot)}`, parent, context + 1 + line));
     this.lines = lines;
     this.mark = createBackdrop(`EscapeMeterMark${formatInt(slot)}`, parent, context + 1 + SEGMENTS);
@@ -68,13 +68,13 @@ export class EscapeMeter {
     const centerX = f32(0.4) + (column - 0.5) * aspect * f32(0.6);
     const centerY = (1.0 - row) * f32(0.6);
     const left = centerX - WIDTH / 2.0;
-    setFrameAbsPoint(this.back, FRAMEPOINT_CENTER, centerX, centerY);
+    setFrameAbsPoint(this.back, FramePoint.center, centerX, centerY);
     setFrameSize(this.fill, Math.max(LINE_WIDTH, WIDTH * escapeMeterFill(view)), HEIGHT);
-    setFrameAbsPoint(this.fill, FRAMEPOINT_LEFT, left, centerY);
+    setFrameAbsPoint(this.fill, FramePoint.left, left, centerY);
     this.lines.forEach((line, index) => {
-      setFrameAbsPoint(line, FRAMEPOINT_CENTER, left + (WIDTH * (index + 1)) / SEGMENTS, centerY);
+      setFrameAbsPoint(line, FramePoint.center, left + (WIDTH * (index + 1)) / SEGMENTS, centerY);
     });
-    if (markShown) setFrameAbsPoint(this.mark, FRAMEPOINT_CENTER, left + WIDTH * Math.min(1.0, view.pummel / view.full), centerY);
+    if (markShown) setFrameAbsPoint(this.mark, FramePoint.center, left + WIDTH * Math.min(1.0, view.pummel / view.full), centerY);
   }
 
   destroy(): void {

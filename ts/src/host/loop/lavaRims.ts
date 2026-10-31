@@ -1,4 +1,4 @@
-import { createEffect, destroyEffect, playEffectAnimation, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, EffectAnimation, playEffectAnimation, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale } from "wisp/game/effects";
 import { hideEffect } from "../../game/render/effects";
 import { drawnScale, lavaRimPiece } from "../../game/presentation/stageScenery";
 import type { ShellState } from "./state";
@@ -13,7 +13,7 @@ export function createLavaRims(s: ShellState): void {
     setEffectScale(effect, drawn.scale);
     if (drawn.matrixScale !== undefined) setEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
     setEffectColor(effect, 84, 40, 28);
-    playEffectAnimation(effect, ANIM_TYPE_STAND);
+    playEffectAnimation(effect, EffectAnimation.stand);
     s.stageLavaRims.push(effect);
   }
 }

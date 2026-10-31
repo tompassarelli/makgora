@@ -2,13 +2,13 @@ import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { hideEffect, type WorldOrigin } from "./effects";
-import { createEffect, playEffectAnimation, setEffectPosition, setEffectScale } from "wisp/game/effects";
+import { createEffect, Effect, EffectAnimation, playEffectAnimation, setEffectPosition, setEffectScale } from "wisp/game/effects";
 
 export const AURA_CLOUD_MODEL = "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx";
 const CLOUD_SCALE = f32(1.4);
 
 interface Cloud {
-  readonly model: effect;
+  readonly model: Effect;
   shown: boolean;
 }
 
@@ -31,7 +31,7 @@ export class AuraPresentation {
       if (fighter !== undefined && fighter.status.aura && !fighter.status.out) {
         setEffectPosition(cloud.model, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
         setEffectScale(cloud.model, CLOUD_SCALE);
-        if (!cloud.shown) playEffectAnimation(cloud.model, ANIM_TYPE_STAND);
+        if (!cloud.shown) playEffectAnimation(cloud.model, EffectAnimation.stand);
         cloud.shown = true;
       } else if (cloud.shown) {
         hideEffect(cloud.model, this.origin);

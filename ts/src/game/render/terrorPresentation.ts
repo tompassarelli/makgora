@@ -6,7 +6,7 @@ import { terrorResisted } from "../presentation/terrorCues";
 import { HeroStatusKind } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, hideEffect, parkOnce, placeEffect } from "./effects";
-import { createEffect, destroyEffect, resetEffectMatrix, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, resetEffectMatrix, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 export const HOWL_TARGET_MODEL = "Abilities\\Spells\\Other\\HowlOfTerror\\HowlTarget.mdx";
 export const RESIST_FLASH_MODEL = "Abilities\\Spells\\Items\\SpellShieldAmulet\\SpellShieldCaster.mdx";
@@ -18,9 +18,9 @@ const RIM_HEIGHT = f32(0.6);
 const RESIST_FRAMES = 18;
 
 export class TerrorPresentation {
-  private readonly ring: effect;
-  private readonly fear: effect;
-  private readonly resist: effect;
+  private readonly ring: Effect;
+  private readonly fear: Effect;
+  private readonly resist: Effect;
   private readonly parked: ParkedFlags = [];
   private readonly pose: ShockwaveRing = { x: 0.0, z: 0.0, radius: 0.0, alpha: 0 };
   private hits = 0;

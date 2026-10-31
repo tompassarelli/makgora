@@ -14,7 +14,7 @@ import { MENU_FONT } from "./hudLayout";
 import { type ClickBox, createBackdrop, createText, placeTopLeft, styleMenuPanel } from "./frames";
 import { TUTORIAL_BOX } from "./selectionLayout";
 import type { SelectionActions } from "./selectionActions";
-import { createFrame, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible } from "wisp/game/frames";
+import { createFrame, Frame, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { sendSync } from "wisp/game/sync";
 
 export type TutorialButton = { kind: "tutorialOpen" } | { kind: "tutorialStep"; direction: -1 | 1 } | { kind: "tutorialStart" } | { kind: "tutorialClose" };
@@ -25,23 +25,23 @@ export const NOT_NOW_LABEL = "Not now";
 export const NOT_NOW_BOX = { x: f32(0.41), y: f32(0.315), width: f32(0.16), height: f32(0.035) } as const;
 
 export interface TutorialMenuFrames {
-  readonly root: framehandle;
-  readonly lesson: framehandle;
+  readonly root: Frame;
+  readonly lesson: Frame;
 
-  readonly open: framehandle;
+  readonly open: Frame;
 }
 
-function text(parent: framehandle, name: string, x: number, y: number, width: number, height: number, size: number): framehandle {
+function text(parent: Frame, name: string, x: number, y: number, width: number, height: number, size: number): Frame {
   const frame = createText(name, parent, 0);
   placeTopLeft(frame, x, y);
   setFrameSize(frame, width, height);
   setFrameFont(frame, MENU_FONT, size, 0);
-  setFrameTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+  setFrameTextAlignment(frame, TextAlignment.middle, TextAlignment.center);
   setFrameEnabled(frame, false);
   return frame;
 }
 
-function button(parent: framehandle, x: number, y: number, width: number, height: number, label: string, target: TutorialButton, add: (frame: framehandle, target: TutorialButton, box: ClickBox) => framehandle): framehandle {
+function button(parent: Frame, x: number, y: number, width: number, height: number, label: string, target: TutorialButton, add: (frame: Frame, target: TutorialButton, box: ClickBox) => Frame): Frame {
   const frame = createFrame("ScriptDialogButton", parent, 0, 0);
   placeTopLeft(frame, x, y);
   setFrameSize(frame, width, height);
@@ -50,7 +50,7 @@ function button(parent: framehandle, x: number, y: number, width: number, height
 }
 
 
-export function createTutorialMenu(owner: framehandle, rules: framehandle, suffix: string, add: (frame: framehandle, target: TutorialButton, box: ClickBox) => framehandle): TutorialMenuFrames {
+export function createTutorialMenu(owner: Frame, rules: Frame, suffix: string, add: (frame: Frame, target: TutorialButton, box: ClickBox) => Frame): TutorialMenuFrames {
   const root = createBackdrop(`MeleeTutorialMenu${suffix}`, owner, 0);
   styleMenuPanel(root, `MeleeTutorialPanel${suffix}`);
   placeTopLeft(root, f32(0.2), f32(0.47));

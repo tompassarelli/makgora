@@ -5,14 +5,14 @@ import { SHIELD_P1_MODEL, SHIELD_P2_MODEL, SHIELD_P3_MODEL, SHIELD_P4_MODEL } fr
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
 import { projectedShield } from "../presentation/shieldPose";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 function shieldModel(slot: number): string {
   return slot === 0 ? SHIELD_P1_MODEL : slot === 1 ? SHIELD_P2_MODEL : slot === 2 ? SHIELD_P3_MODEL : SHIELD_P4_MODEL;
 }
 
 export class ShieldPresentation {
-  private readonly model: effect;
+  private readonly model: Effect;
   private parked: ParkedFlags | undefined;
 
   constructor(
@@ -44,7 +44,7 @@ export class ShieldPresentation {
     setEffectAlpha(this.model, 255);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     into.push(this.model);
   }
 

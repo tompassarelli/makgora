@@ -9,7 +9,7 @@ import { readChunk, readChunks, writeChunks } from "wisp/src/platform/fileio";
 import { LOBBY_COUNTER_FILE, PLAYER_FILE_CHUNK } from "../../game/core/gameFiles";
 import { departPlayerFiles, enqueuePlayerFile, lobbyCounter, receiveLobbyCounter, receivePlayerFileChunk, type PlayerFileQueue } from "./playerFileQueue";
 import { createEvents, onEvents } from "wisp/game/events";
-import { eventPlayer, localPlayer, player, playerSlot, playerSlotState } from "wisp/game/players";
+import { eventPlayer, localPlayer, player, playerSlot, playerSlotState, PlayerSlotState } from "wisp/game/players";
 import { addSyncEvent, sendSync, syncData, syncPrefix } from "wisp/game/sync";
 import { parseInt } from "wisp/game/text";
 
@@ -92,7 +92,7 @@ function chunks(text: string): string[] {
 
 export const bindingFiles: BindingPersistence = {
   load(owner, complete) {
-    if (playerSlotState(player(owner)) !== PLAYER_SLOT_STATE_PLAYING) {
+    if (playerSlotState(player(owner)) !== PlayerSlotState.playing) {
       complete({ kind: "unavailable" });
       return;
     }

@@ -7,41 +7,41 @@ import { type TutorialMenuFrames, showTutorialLesson } from "./tutorialMenu";
 import { placeTopLeft, setMenuText } from "./frames";
 import { label } from "./selectionFrames";
 import type { SelectionActions } from "./selectionActions";
-import { createFrame, namedFrame, setFrameEnabled, setFrameFont, setFrameSize, setFrameVisible } from "wisp/game/frames";
+import { createFrame, Frame, namedFrame, setFrameEnabled, setFrameFont, setFrameSize, setFrameVisible } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
 export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
   | { kind: "items" } | { kind: "ultimates" } | { kind: "itemKind"; item: ItemKind } | { kind: "training" } | { kind: "partner"; setting: TrainingSetting; direction: -1 | 1 } | { kind: "hitAreas" } | { kind: "speed" }
   | { kind: "classicTier"; direction: -1 | 1 } | { kind: "inputDelay"; step: -1 | 0 | 1 };
 
-type AddRule = (frame: framehandle, target: RuleButton) => framehandle;
+type AddRule = (frame: Frame, target: RuleButton) => Frame;
 
 export interface MatchRuleFrames {
-  readonly steps: readonly framehandle[];
-  readonly stockValue: framehandle;
-  readonly timeValue: framehandle;
-  readonly teamToggle: framehandle;
-  readonly friendlyFireToggle: framehandle;
-  readonly endlessToggle: framehandle;
-  readonly rematchToggle: framehandle;
-  readonly itemsToggle: framehandle;
-  readonly ultimatesToggle: framehandle;
-  readonly itemToggles: readonly framehandle[];
-  readonly trainingToggle: framehandle;
-  readonly hitAreasToggle: framehandle;
-  readonly speedToggle: framehandle;
-  readonly partnerValues: readonly framehandle[];
-  readonly trainingFrames: readonly framehandle[];
+  readonly steps: readonly Frame[];
+  readonly stockValue: Frame;
+  readonly timeValue: Frame;
+  readonly teamToggle: Frame;
+  readonly friendlyFireToggle: Frame;
+  readonly endlessToggle: Frame;
+  readonly rematchToggle: Frame;
+  readonly itemsToggle: Frame;
+  readonly ultimatesToggle: Frame;
+  readonly itemToggles: readonly Frame[];
+  readonly trainingToggle: Frame;
+  readonly hitAreasToggle: Frame;
+  readonly speedToggle: Frame;
+  readonly partnerValues: readonly Frame[];
+  readonly trainingFrames: readonly Frame[];
 }
 
 export interface RuleFrames extends MatchRuleFrames {
-  readonly classicFrames: readonly framehandle[];
-  readonly classicTierValue: framehandle;
-  readonly classicRoute: framehandle;
-  readonly matchRuleFrames: readonly framehandle[];
+  readonly classicFrames: readonly Frame[];
+  readonly classicTierValue: Frame;
+  readonly classicRoute: Frame;
+  readonly matchRuleFrames: readonly Frame[];
 }
 
-function ruleButton(root: framehandle, add: AddRule, box: RuleBox, target: RuleButton, text: string): framehandle {
+function ruleButton(root: Frame, add: AddRule, box: RuleBox, target: RuleButton, text: string): Frame {
   const frame = createFrame("ScriptDialogButton", root, 0, 0);
   placeTopLeft(frame, box.x, box.y);
   setFrameSize(frame, box.width, box.height);
@@ -51,7 +51,7 @@ function ruleButton(root: framehandle, add: AddRule, box: RuleBox, target: RuleB
   return add(frame, target);
 }
 
-export function createMatchRules(root: framehandle, suffix: string, add: AddRule): MatchRuleFrames {
+export function createMatchRules(root: Frame, suffix: string, add: AddRule): MatchRuleFrames {
   const { fewerStocks, moreStocks, lessTime, moreTime, endless, automaticRematch } = RULE_BUTTONS;
   const steps = [
     ruleButton(root, add, fewerStocks, { kind: "stocks", direction: -1 }, "−"),
@@ -82,7 +82,7 @@ export function createMatchRules(root: framehandle, suffix: string, add: AddRule
     ["tech", RULE_BUTTONS.lessTech, RULE_BUTTONS.moreTech],
     ["damage", RULE_BUTTONS.lessDamage, RULE_BUTTONS.moreDamage],
   ];
-  const partnerFrames: framehandle[] = [hitAreasToggle, speedToggle];
+  const partnerFrames: Frame[] = [hitAreasToggle, speedToggle];
   const partnerValues = partnerRows.map(([setting, less, more]) => {
     partnerFrames.push(ruleButton(root, add, less, { kind: "partner", setting, direction: -1 }, "−"), ruleButton(root, add, more, { kind: "partner", setting, direction: 1 }, "+"));
     const value = label(root, `MeleeTraining${setting}${suffix}`, less.x + less.width, less.y, more.x - less.x - less.width, RULE_HEIGHT, f32(0.009));
@@ -95,7 +95,7 @@ export function createMatchRules(root: framehandle, suffix: string, add: AddRule
   };
 }
 
-export function createClassicRules(root: framehandle, suffix: string, add: AddRule, match: MatchRuleFrames): RuleFrames {
+export function createClassicRules(root: Frame, suffix: string, add: AddRule, match: MatchRuleFrames): RuleFrames {
   const { easierClassic, harderClassic } = RULE_BUTTONS;
   const classicTierValue = label(root, `MeleeClassicTier${suffix}`, easierClassic.x + easierClassic.width, easierClassic.y, harderClassic.x - easierClassic.x - easierClassic.width, RULE_HEIGHT, f32(0.011));
   const classicRoute = label(root, `MeleeClassicRoute${suffix}`, CLASSIC_ROUTE_BOX.x, CLASSIC_ROUTE_BOX.y, CLASSIC_ROUTE_BOX.width, RULE_HEIGHT, f32(0.0085));
@@ -109,11 +109,11 @@ export function createClassicRules(root: framehandle, suffix: string, add: AddRu
 }
 
 export interface DelayFrames {
-  readonly steps: readonly framehandle[];
-  readonly line: framehandle;
+  readonly steps: readonly Frame[];
+  readonly line: Frame;
 }
 
-export function createDelayControls(root: framehandle, add: AddRule, textSize: number): DelayFrames {
+export function createDelayControls(root: Frame, add: AddRule, textSize: number): DelayFrames {
   const { less, more, auto } = DELAY_CONTROLS;
   const line = ruleButton(root, add, auto, { kind: "inputDelay", step: 0 }, "");
   setFrameFont(namedFrame("ScriptDialogButtonText", 0), MENU_STYLE.font, textSize, 0);

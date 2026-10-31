@@ -5,11 +5,11 @@ import type { Fighter } from "../sim/fighter";
 import { type MeterCue, type MeterCueFit, type MeterCueState, type MeterCueView, ULTIMATE_BURST, ULTIMATE_BURST_FRAMES, ultimateBurst, ULTIMATE_CAST_VOLUME, clearCastCue, clearMeterCueState, confirmCastCue, createCastCue, createMeterCueState, hideCastCue, meterCueFit, observeMeterCues, presentCastCue, ultimateCastFrame, ultimateFirstEffectFrame } from "../presentation/meterCues";
 import { type WorldOrigin, effectMotion, hideEffect, placeEffect } from "./effects";
 import { ultimateCastSound } from "../presentation/moveSounds";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
-import { playSound, releaseWhenDone, setSoundPosition, setSoundVolume, soundFromLabel, stopSound } from "wisp/game/sound";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { playSound, releaseWhenDone, setSoundPosition, setSoundVolume, Sound, soundFromLabel, stopSound } from "wisp/game/sound";
 
 class MeterCueModel {
-  private model: effect | undefined;
+  private model: Effect | undefined;
   private shown = false;
   private seekAgain = false;
 
@@ -54,7 +54,7 @@ class MeterCueModel {
     this.seekAgain = false;
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     if (this.shown && this.model !== undefined) into.push(this.model);
   }
 
@@ -74,7 +74,7 @@ class MeterCueModel {
     this.model = undefined;
   }
 
-  private restart(model: effect): void {
+  private restart(model: Effect): void {
     if (this.cue.sequence !== undefined) setEffectAnimation(model, this.cue.sequence);
     setEffectTime(model, 0.0);
     this.seekAgain = true;
@@ -107,7 +107,7 @@ export class MeterCueEffects {
   private readonly burstCast = createCastCue(ULTIMATE_BURST_FRAMES);
   private readonly traced: MeterCueView = createMeterCueState().view;
   private readonly burst: MeterCueModel;
-  private readonly ultimateSound: sound;
+  private readonly ultimateSound: Sound;
   private readonly ultimateLabel: string;
   private readonly front: number;
   private lit: { readonly frame: number; readonly line: string } | undefined;
@@ -169,7 +169,7 @@ export class MeterCueEffects {
     bind(this.burst, MeterCueModel.prototype);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     this.burst.drawnEffects(into);
   }
 
@@ -203,7 +203,7 @@ export class MeterCueEffects {
     releaseWhenDone(this.ultimateSound);
   }
 
-  private play(cue: sound, fighter: Readonly<Fighter>, volume: number): void {
+  private play(cue: Sound, fighter: Readonly<Fighter>, volume: number): void {
     stopSound(cue, false, false);
     setSoundPosition(cue, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
     setSoundVolume(cue, volume);

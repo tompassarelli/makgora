@@ -5,7 +5,7 @@ import { authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { DISJOINT_CUES, disjointNormals, flareRegionShown, hitAreaPose, normalAreaPose, specialAreaRegion, type HitAreaPose } from "../presentation/disjointCues";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, facingYaw, parkCue } from "./effects";
-import { clearEffectSubAnimations, createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectAnimation, setEffectPitch, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { clearEffectSubAnimations, createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, setEffectAlpha, setEffectAnimation, setEffectPitch, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 
 export const HIT_AREA_EFFECT_CAPACITY = 12;
@@ -15,7 +15,7 @@ export const CUE_FRONT = -14.0;
 
 
 export class HitAreaEffects {
-  private readonly models: effect[] = [];
+  private readonly models: Effect[] = [];
   private frame = 0;
   private readonly styles;
   private readonly parked: ParkedFlags = [];
@@ -62,7 +62,7 @@ export class HitAreaEffects {
         if (cue?.birth === undefined) setEffectAnimation(model, cue?.sequence ?? ACCENT_SEQUENCE);
         else if (starts || (cue.birth.eachFrame && fighter.special.frame !== this.frame)) {
           clearEffectSubAnimations(model);
-          if (cue.sequence === "birth") playEffectAnimation(model, ANIM_TYPE_BIRTH);
+          if (cue.sequence === "birth") playEffectAnimation(model, EffectAnimation.birth);
           else setEffectAnimation(model, cue.sequence ?? ACCENT_SEQUENCE);
         }
         setEffectTime(model, cue?.seconds ?? ACCENT_SECONDS);
@@ -84,7 +84,7 @@ export class HitAreaEffects {
     }
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     for (const model of this.models) into.push(model);
   }
 

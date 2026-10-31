@@ -16,7 +16,7 @@ import { unitsForPixels } from "./portraitFrames";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, hudPlateTexture } from "./hudLayout";
 import { clockHundredths, clockMain, clockSeconds, hundredthsLabel } from "./clockReadout";
-import { createFrame, destroyFrame, setFrameEnabled, setFrameFont, setFrameLevel, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { createFrame, destroyFrame, Frame, setFrameEnabled, setFrameFont, setFrameLevel, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
 
@@ -40,20 +40,20 @@ interface ClockBox {
 }
 
 class ClockDigits {
-  private readonly label: framehandle;
-  private readonly rim: readonly framehandle[];
+  private readonly label: Frame;
+  private readonly rim: readonly Frame[];
 
-  constructor(context: number, size: number, box: ClockBox, left: number, top: number, horizontal: textaligntype) {
+  constructor(context: number, size: number, box: ClockBox, left: number, top: number, horizontal: TextAlignment) {
     const scale = f32(size / CLOCK_TEMPLATE_SIZE);
     this.rim = createTemplateOutline("SmashcraftDamageOutline", gameUi(), context, CLOCK_LEVEL, scale);
     this.label = createFrame("SmashcraftDamage", gameUi(), 0, context);
     setFrameScale(this.label, scale);
     setFrameSize(this.label, f32(box.width / scale), f32(box.height / scale));
     placeTopLeft(this.label, left, top);
-    setFrameTextAlignment(this.label, TEXT_JUSTIFY_BOTTOM, horizontal);
+    setFrameTextAlignment(this.label, TextAlignment.bottom, horizontal);
     setFrameLevel(this.label, CLOCK_LEVEL);
     setFrameEnabled(this.label, false);
-    attachOutline(this.rim, this.label, f32(CLOCK_OUTLINE_PX / scale), TEXT_JUSTIFY_BOTTOM, horizontal);
+    attachOutline(this.rim, this.label, f32(CLOCK_OUTLINE_PX / scale), TextAlignment.bottom, horizontal);
     this.show(false);
   }
 
@@ -74,8 +74,8 @@ class ClockDigits {
 }
 
 export class MatchClock {
-  private readonly main = new ClockDigits(890, CLOCK_DIGIT_SIZE, CLOCK_MAIN_BOX, f32(CLOCK_SPLIT_X - CLOCK_MAIN_BOX.width), CLOCK_TOP, TEXT_JUSTIFY_RIGHT);
-  private readonly hundredths = new ClockDigits(891, CLOCK_HUNDREDTHS_SIZE, CLOCK_HUNDREDTHS_BOX, f32(CLOCK_SPLIT_X + CLOCK_GAP), f32(CLOCK_TOP - CLOCK_MAIN_BOX.height + CLOCK_HUNDREDTHS_BOX.height + CLOCK_BASELINE_LIFT), TEXT_JUSTIFY_LEFT);
+  private readonly main = new ClockDigits(890, CLOCK_DIGIT_SIZE, CLOCK_MAIN_BOX, f32(CLOCK_SPLIT_X - CLOCK_MAIN_BOX.width), CLOCK_TOP, TextAlignment.right);
+  private readonly hundredths = new ClockDigits(891, CLOCK_HUNDREDTHS_SIZE, CLOCK_HUNDREDTHS_BOX, f32(CLOCK_SPLIT_X + CLOCK_GAP), f32(CLOCK_TOP - CLOCK_MAIN_BOX.height + CLOCK_HUNDREDTHS_BOX.height + CLOCK_BASELINE_LIFT), TextAlignment.left);
   private shownVisible = false;
   private shownSeconds: number | undefined;
   private shownHundredths: number | undefined;
@@ -109,18 +109,18 @@ export class MatchClock {
 const OUTLINE_PX = 2;
 
 export class FighterHud {
-  private readonly plate: framehandle;
-  private readonly portrait: framehandle;
-  private readonly damage: framehandle;
-  private readonly percent: framehandle;
-  private readonly name: framehandle;
-  private readonly stocks: readonly framehandle[];
+  private readonly plate: Frame;
+  private readonly portrait: Frame;
+  private readonly damage: Frame;
+  private readonly percent: Frame;
+  private readonly name: Frame;
+  private readonly stocks: readonly Frame[];
 
-  private readonly stockCount: framehandle;
-  private readonly doomMark: framehandle;
+  private readonly stockCount: Frame;
+  private readonly doomMark: Frame;
   private shownCursed: boolean | undefined;
 
-  private readonly body: readonly framehandle[];
+  private readonly body: readonly Frame[];
   private shownCharacter: number | undefined;
   private shownColor: number | undefined;
   private shownTint: CostumeTint | undefined;
@@ -138,8 +138,8 @@ export class FighterHud {
   private left = 0.0;
   private panel: PanelLayout = panelLayout(0, 1);
   private readonly jolt: NumberJolt = numberJolt();
-  private readonly damageOutline: readonly framehandle[];
-  private readonly percentOutline: readonly framehandle[];
+  private readonly damageOutline: readonly Frame[];
+  private readonly percentOutline: readonly Frame[];
 
 
   constructor(private readonly slot: number, count: number) {
@@ -157,12 +157,12 @@ export class FighterHud {
     setFrameEnabled(this.damage, false);
     this.percent = createText(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN);
     setFrameFont(this.percent, MENU_FONT, f32(0.016), 1);
-    setFrameTextAlignment(this.percent, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
+    setFrameTextAlignment(this.percent, TextAlignment.bottom, TextAlignment.left);
     setFrameEnabled(this.percent, false);
     this.name = createText(`FighterHUDName${suffix}`, parent, context + 3);
     setFrameFont(this.name, MENU_FONT, f32(0.0072), 1);
     setFrameEnabled(this.name, false);
-    const stocks: framehandle[] = [];
+    const stocks: Frame[] = [];
     for (let index = 0; index < STOCK_ICONS_SHOWN; index++) {
       const icon = createBackdrop(`FighterHUDStock${suffix}_${formatInt(index)}`, parent, context + 5 + index);
       setFrameEnabled(icon, false);
@@ -177,8 +177,8 @@ export class FighterHud {
     setFrameEnabled(this.doomMark, false);
     this.body = [this.plate, this.portrait, this.damage, this.percent, this.name];
     for (const frame of [...this.body, ...this.stocks, this.stockCount, this.doomMark]) setFrameLevel(frame, 21);
-    attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
-    attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
+    attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TextAlignment.middle, TextAlignment.right);
+    attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TextAlignment.bottom, TextAlignment.left);
     this.layout(slot, count);
     this.update(false, DEFAULT_FIGHTER, slot, 0.0, 0);
   }
@@ -198,21 +198,21 @@ export class FighterHud {
     const panel = panelLayout(position, count);
     this.left = left;
     this.panel = panel;
-    const inner = panel.mirrored ? TEXT_JUSTIFY_RIGHT : TEXT_JUSTIFY_LEFT;
+    const inner = panel.mirrored ? TextAlignment.right : TextAlignment.left;
     placeTopLeft(this.plate, left, PLATE_TOP);
     placeBox(this.portrait, left, panel.bust);
     placeBox(this.damage, left, panel.damage);
-    setFrameTextAlignment(this.damage, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
+    setFrameTextAlignment(this.damage, TextAlignment.middle, TextAlignment.right);
     placeBox(this.percent, left, panel.percent);
     placeBox(this.doomMark, left, panel.doom);
     placeBox(this.name, left, panel.name);
-    setFrameTextAlignment(this.name, TEXT_JUSTIFY_MIDDLE, inner);
+    setFrameTextAlignment(this.name, TextAlignment.middle, inner);
     this.stocks.forEach((icon, index) => {
       const box = panel.stocks[index];
       if (box !== undefined) placeBox(icon, left, box);
     });
     placeBox(this.stockCount, left, panel.stockCount);
-    setFrameTextAlignment(this.stockCount, TEXT_JUSTIFY_MIDDLE, inner);
+    setFrameTextAlignment(this.stockCount, TextAlignment.middle, inner);
     this.placeNumber(0.0, 0.0);
   }
 
@@ -294,7 +294,7 @@ export class FighterHud {
   }
 }
 
-function placeBox(frame: framehandle, left: number, box: PlateBox): void {
+function placeBox(frame: Frame, left: number, box: PlateBox): void {
   setFrameSize(frame, unitsForPixels(box.width), unitsForPixels(box.height));
   placeTopLeft(frame, boxLeft(left, box), boxTop(box));
 }

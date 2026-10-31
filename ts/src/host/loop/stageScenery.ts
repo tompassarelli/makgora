@@ -5,7 +5,7 @@ import { hideEffect } from "../../game/render/effects";
 import type { ShellState, StageDrifter } from "./state";
 import { clockSeconds } from "./trace";
 import { arenaFogOffset, arenaFogEnd, cameraZOverride } from "../../game/presentation/arenaCamera";
-import { createEffect, destroyEffect, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { resetTerrainFog, setDayNightModels, setShadowLightCount, setSkyModel, setTerrainFog, setTerrainFogHeight, setTerrainFogMaxDensity, setTerrainFogOverSky, showSky, showTerrain } from "wisp/game/view";
 import { parseInt, parseReal } from "wisp/game/text";
 
@@ -38,7 +38,7 @@ function drawStageFog(s: ShellState): void {
 }
 
 
-function addPiece(s: ShellState, piece: Readonly<SceneryPiece>, animation: animtype): effect {
+function addPiece(s: ShellState, piece: Readonly<SceneryPiece>, animation: EffectAnimation): Effect {
   const x = s.origin.x + piece.x;
   const y = s.origin.y + piece.y;
   const effect = createEffect(piece.model, x, y);
@@ -55,7 +55,7 @@ function addPiece(s: ShellState, piece: Readonly<SceneryPiece>, animation: animt
 
 function addDrifter(s: ShellState, piece: Readonly<DriftingPiece>): StageDrifter {
   const pose = driftPose(piece, clockSeconds(s.trace));
-  const effect = addPiece(s, { ...piece, x: pose.x, z: pose.z, yaw: 0.0 }, ANIM_TYPE_WALK);
+  const effect = addPiece(s, { ...piece, x: pose.x, z: pose.z, yaw: 0.0 }, EffectAnimation.walk);
   setEffectYaw(effect, pose.yaw);
   return { effect, piece };
 }
@@ -92,7 +92,7 @@ export function drawStageScenery(s: ShellState): void {
   const shadows = shadowCastingLights(s.game.stageChoice);
   if (shadows > 0 || s.shadowLightsRaised) setShadowLightCount(shadows);
   s.shadowLightsRaised = shadows > 0;
-  s.stageScenery = placedPieces(s.game.stageChoice).map(piece => addPiece(s, piece, ANIM_TYPE_STAND));
+  s.stageScenery = placedPieces(s.game.stageChoice).map(piece => addPiece(s, piece, EffectAnimation.stand));
   s.stageDrifters = driftingPieces(s.game.stageChoice).map(piece => addDrifter(s, piece));
 }
 

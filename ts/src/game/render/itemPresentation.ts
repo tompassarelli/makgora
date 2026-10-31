@@ -9,7 +9,7 @@ import { mainDeckZAt } from "../sim/stage";
 import { AvatarView, avatarView } from "../presentation/ultimateVoice";
 import { AVATAR_ALPHA, AVATAR_COLOR, AVATAR_MODEL, AVATAR_SECONDS, ITEM_MODELS, type ItemColor, itemBlinkOff, itemColor, itemTelegraphAlpha, itemTelegraphScale } from "../presentation/itemLook";
 import { hideEffect, type WorldOrigin } from "./effects";
-import { createEffect, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 
 const BURST_FRAMES = 45;
@@ -18,16 +18,16 @@ const AVATAR_CAST_COLOR: ItemColor = { red: 255, green: 255, blue: 255 };
 const SPIN_PER_FRAME = f32(0.05);
 
 interface Burst {
-  readonly model: effect;
+  readonly model: Effect;
   start: number;
   shown: boolean;
 }
 
 interface Carrier {
-  readonly ring: effect;
-  readonly trail: effect;
-  readonly shell: effect;
-  readonly avatar: effect | undefined;
+  readonly ring: Effect;
+  readonly trail: Effect;
+  readonly shell: Effect;
+  readonly avatar: Effect | undefined;
   readonly pickup: Burst;
   readonly end: Burst;
   buffFrames: number;
@@ -37,19 +37,19 @@ interface Carrier {
   avatarShown: boolean;
 }
 
-function create(path: string, origin: Readonly<WorldOrigin>): effect {
+function create(path: string, origin: Readonly<WorldOrigin>): Effect {
   const model = createEffect(path, origin.x, origin.y);
   hideEffect(model, origin);
   return model;
 }
 
-const paint = (model: effect, color: ItemColor) => setEffectColor(model, color.red, color.green, color.blue);
+const paint = (model: Effect, color: ItemColor) => setEffectColor(model, color.red, color.green, color.blue);
 
 export class ItemPresentation {
-  private readonly speedPickup: effect;
-  private readonly heavyPickup: effect;
-  private readonly glow: effect;
-  private readonly telegraph: effect;
+  private readonly speedPickup: Effect;
+  private readonly heavyPickup: Effect;
+  private readonly glow: Effect;
+  private readonly telegraph: Effect;
   private readonly spawn: Burst;
   private readonly carriers: readonly Carrier[];
   private shownKind: number = ItemKind.none;
@@ -79,7 +79,7 @@ export class ItemPresentation {
     }));
   }
 
-  private place(model: effect, x: number, z: number, scale: number): void {
+  private place(model: Effect, x: number, z: number, scale: number): void {
     setEffectPosition(model, this.origin.x + x, this.origin.y, this.origin.z + z);
     setEffectScale(model, scale);
   }

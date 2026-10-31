@@ -5,7 +5,7 @@ import { STAMP_CELL, STAMP_CELLS, type StampCell, stampCells } from "../../game/
 import { createBackdrop, gameUi, placeTopLeft } from "../../game/ui/frames";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
-import { setFrameLevel, setFrameSize, setFrameTexture } from "wisp/game/frames";
+import { Frame, setFrameLevel, setFrameSize, setFrameTexture } from "wisp/game/frames";
 
 const TEXTURES: Readonly<Record<StampCell, string>> = {
   guard: "ReplaceableTextures\\TeamColor\\TeamColor06.blp",
@@ -14,7 +14,7 @@ const TEXTURES: Readonly<Record<StampCell, string>> = {
 };
 
 interface Stamp {
-  readonly cells: framehandle[];
+  readonly cells: Frame[];
   readonly shown: (StampCell | undefined)[];
 }
 
@@ -23,7 +23,7 @@ declare global { var __smashcraftDrawnStamp: Stamp | undefined; }
 function stamp(): Stamp {
   const existing = globalThis.__smashcraftDrawnStamp;
   if (existing !== undefined) return existing;
-  const cells: framehandle[] = [];
+  const cells: Frame[] = [];
   for (let index = 0; index < 2 * STAMP_CELLS; index++) {
     const cell = createBackdrop("SmashcraftDrawnStamp", gameUi(), index);
     setFrameSize(cell, STAMP_CELL, STAMP_CELL);

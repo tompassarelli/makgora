@@ -4,9 +4,9 @@ import { type BearFeedbackCursor, BEAR_IMPACT_MODEL, BEAR_ROAR_MODEL, advanceBea
 import { type Fighter, placedObject } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
 import { SoundBank, SoundKind } from "./soundBank";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
-interface BearFeedbackSlot { roar: effect; impact: effect; cursor: BearFeedbackCursor }
+interface BearFeedbackSlot { roar: Effect; impact: Effect; cursor: BearFeedbackCursor }
 
 export class BearFeedback {
   private readonly slots: readonly BearFeedbackSlot[];

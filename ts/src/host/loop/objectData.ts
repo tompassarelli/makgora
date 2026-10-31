@@ -6,7 +6,11 @@ import { confirmedChecksum } from "./diagnostics";
 import { shellState } from "./state";
 import { objectDataReceiptFile } from "../../game/core/gameFiles";
 import { localPlayer, playerSlot } from "wisp/game/players";
-import { bodyAttackCooldown, bodyKind, bodyMoveSpeed } from "wisp/game/bodies";
+import { Body, bodyAttackCooldown, bodyKind, bodyMoveSpeed } from "wisp/game/bodies";
+
+declare global {
+  function GetHandleId(handle: Body): number;
+}
 
 // install() runs on the same synchronized frame on every client.
 export function installObjectData(): void {

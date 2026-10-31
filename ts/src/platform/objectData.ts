@@ -1,8 +1,8 @@
 import { FILE_IO_OBJECT, type FighterObject } from "../game/objectData";
-import { setAbilityTooltip, setBodyAttackCooldown, setBodyBlendTime, setBodyMoveSpeed, setBodyName, setBodyScale, setBodySelectionScale } from "wisp/game/bodies";
+import { Body, setAbilityTooltip, setBodyAttackCooldown, setBodyBlendTime, setBodyMoveSpeed, setBodyName, setBodyScale, setBodySelectionScale } from "wisp/game/bodies";
 
 
-export function applyFighterObject(whichUnit: unit, definition: FighterObject): void {
+export function applyFighterObject(whichUnit: Body, definition: FighterObject): void {
   setBodyName(whichUnit, definition.name);
   setBodyScale(whichUnit, definition.scale, definition.scale, definition.scale);
   setBodyBlendTime(whichUnit, definition.blendTime);

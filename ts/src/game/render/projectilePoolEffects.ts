@@ -1,9 +1,9 @@
 import { PROJECTILE_DRAW_OFFSETS } from "../presentation/projectileArt";
 import type { WorldOrigin } from "./effects";
-import { createEffect, setEffectAnimation, setEffectTime } from "wisp/game/effects";
+import { createEffect, Effect, setEffectAnimation, setEffectTime } from "wisp/game/effects";
 
 /** Makes one parked projectile effect at the draw's first pose and returns its index in models. */
-export function addPoolEffect(models: effect[], visible: boolean[], drawn: string, origin: WorldOrigin): number {
+export function addPoolEffect(models: Effect[], visible: boolean[], drawn: string, origin: WorldOrigin): number {
   const index = models.length;
   const model = createEffect(drawn, origin.x, origin.y);
   models.push(model);
@@ -16,7 +16,7 @@ export function addPoolEffect(models: effect[], visible: boolean[], drawn: strin
   return index;
 }
 
-export function addPoolEffects(models: effect[], visible: boolean[], drawn: string, origin: WorldOrigin, count: number): number[] {
+export function addPoolEffects(models: Effect[], visible: boolean[], drawn: string, origin: WorldOrigin, count: number): number[] {
   const effects: number[] = [];
   for (let slot = 0; slot < count; slot++) effects.push(addPoolEffect(models, visible, drawn, origin));
   return effects;

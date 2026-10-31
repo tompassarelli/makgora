@@ -2,14 +2,14 @@ import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { type EyeBeamStreak, eyeBeamStreak } from "../presentation/eyeBeamStreak";
 import type { WorldOrigin } from "./effects";
-import { createBeam, destroyBeam, moveBeam, setBeamColor } from "wisp/game/effects";
+import { Beam, createBeam, destroyBeam, moveBeam, setBeamColor } from "wisp/game/effects";
 
 const EYE_BEAM_LIGHTNING = "CLPB";
 const PARKED_LINE_DEPTH = 4096.0;
 
 /** Illidan's Eye Beam streak: one fel-green lightning from his eyes to the live beam's head. */
 export class EyeBeamLine {
-  private readonly line: lightning;
+  private readonly line: Beam;
   private shown = false;
   private readonly streak: EyeBeamStreak = { tailX: 0.0, headX: 0.0, z: 0.0 };
 

@@ -6,14 +6,14 @@ import { trampoline } from "wisp/src/platform/dispatch";
 import { readChunk, writeLine } from "wisp/src/platform/fileio";
 import { nativeChatFile } from "../game/core/gameFiles";
 import { createEvents, onEvents } from "wisp/game/events";
-import { addFrameEvent, createFrameByType, frameChild, frameChildCount, frameName, frameText, frameTextLimit, frameVisible, originFrame, setFrameAbsPoint, setFrameAlpha, setFrameFocus, setFrameSize, setFrameText, setFrameTextLimit, setFrameVisible } from "wisp/game/frames";
+import { addFrameEvent, createFrameByType, Frame, frameChild, frameChildCount, FrameEvent, frameName, FramePoint, frameText, frameTextLimit, frameVisible, originFrame, OriginFrame, setFrameAbsPoint, setFrameAlpha, setFrameFocus, setFrameSize, setFrameText, setFrameTextLimit, setFrameVisible } from "wisp/game/frames";
 import { windowFocused } from "wisp/game/input";
 
 
 export const EDITBOX_ENTER = "journal.editboxEnter";
 
 // Warcraft 3.0 chat entry shape: recipient leaf plus four-child edit box whose first child has five.
-function isChatEntry(frame: framehandle): boolean {
+function isChatEntry(frame: Frame): boolean {
   if (frameName(frame) !== "" || frameChildCount(frame) !== 2) return false;
   const label = frameChild(frame, 0);
   const entry = frameChild(frame, 1);
@@ -24,8 +24,8 @@ function isChatEntry(frame: framehandle): boolean {
 }
 
 
-function chatEntry(gameUi: framehandle): framehandle | undefined {
-  let found: framehandle | undefined;
+function chatEntry(gameUi: Frame): Frame | undefined {
+  let found: Frame | undefined;
   const count = frameChildCount(gameUi);
   for (let index = 0; index < count; index++) {
     const candidate = frameChild(gameUi, index);
@@ -36,11 +36,11 @@ function chatEntry(gameUi: framehandle): framehandle | undefined {
   return found;
 }
 
-export function findWarcraftChat(): framehandle | false {
-  return chatEntry(originFrame(ORIGIN_FRAME_GAME_UI, 0)) ?? false;
+export function findWarcraftChat(): Frame | false {
+  return chatEntry(originFrame(OriginFrame.gameUi, 0)) ?? false;
 }
 
-export function warcraftChatOpen(chat: framehandle | false | undefined): boolean {
+export function warcraftChatOpen(chat: Frame | false | undefined): boolean {
   return chat !== undefined && chat !== false && frameVisible(chat);
 }
 
@@ -50,29 +50,29 @@ export function warcraftChatOpen(chat: framehandle | false | undefined): boolean
 
 
 export class EditboxIngress {
-  private readonly box: framehandle;
-  private readonly hint: framehandle;
-  private readonly chat: framehandle | undefined;
+  private readonly box: Frame;
+  private readonly hint: Frame;
+  private readonly chat: Frame | undefined;
   private session: EditboxSession | undefined;
   private observedChat: boolean | undefined;
   private chatEpoch: number | undefined;
   private chatRevision = 0;
 
   constructor() {
-    const gameUi = originFrame(ORIGIN_FRAME_GAME_UI, 0);
+    const gameUi = originFrame(OriginFrame.gameUi, 0);
     this.chat = chatEntry(gameUi);
     this.box = createFrameByType("EDITBOX", "JournalControllerInput", gameUi, "EscMenuEditBoxTemplate", 969);
-    setFrameAbsPoint(this.box, FRAMEPOINT_TOPLEFT, 0.03999999910593033, 0.550000011920929);
+    setFrameAbsPoint(this.box, FramePoint.topLeft, 0.03999999910593033, 0.550000011920929);
     setFrameSize(this.box, 0.7200000286102295, 0.03500000014901161);
     setFrameTextLimit(this.box, EDITBOX_CAPACITY);
     setFrameAlpha(this.box, 0);
     setFrameVisible(this.box, false);
     this.hint = createFrameByType("TEXT", "JournalPauseHelp", gameUi, "", 970);
-    setFrameAbsPoint(this.hint, FRAMEPOINT_TOPLEFT, 0.6100000143051147, 0.49000000953674316);
+    setFrameAbsPoint(this.hint, FramePoint.topLeft, 0.6100000143051147, 0.49000000953674316);
     setFrameSize(this.hint, 0.15000000596046448, 0.02500000037252903);
     setFrameVisible(this.hint, false);
     const entered = createEvents();
-    addFrameEvent(entered, this.box, FRAMEEVENT_EDITBOX_ENTER);
+    addFrameEvent(entered, this.box, FrameEvent.editboxEnter);
     onEvents(entered, trampoline(EDITBOX_ENTER));
   }
 

@@ -4,14 +4,14 @@ import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { type WorldOrigin, hideEffect, placeEffect } from "./effects";
 import { RESIST_FLASH_MODEL } from "./terrorPresentation";
-import { createEffect, destroyEffect, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 export const SPELL_PASS_FRAMES = 18;
 const FLASH_HEIGHT = 60.0;
 const FLASH_SCALE = f32(0.8);
 
 export class SpellPassPresentation {
-  private readonly flash: effect[] = [];
+  private readonly flash: Effect[] = [];
   private readonly seen: number[] = [];
   private readonly left: number[] = [];
 

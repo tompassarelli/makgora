@@ -8,7 +8,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { type ParticipantSlot, type Slots, isParticipantSlot } from "../../game/input/participants";
 import { writeLines } from "wisp/src/platform/fileio";
 import type { StateChecksumFold } from "../../game/replay/canonical";
-import { createTimer, localElapsed, startTimer } from "wisp/game/clock";
+import { createTimer, localElapsed, startTimer, Timer } from "wisp/game/clock";
 import { formatReal } from "wisp/game/text";
 
 const ECHO_CAPACITY = 256;
@@ -79,7 +79,7 @@ export interface InputTrace {
 
 
 
-  readonly clock: timer;
+  readonly clock: Timer;
 
   clockPeriods: number;
 

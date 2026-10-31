@@ -4,7 +4,7 @@ import { type HintDevice, hintRows, hintText } from "./hintLines";
 import { HINT_STRIP_CELL, hintStripLeft } from "./plateLayout";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
-import { destroyFrame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { destroyFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 
 const STRIP_WIDTH = f32(0.104);
 const STRIP_HEIGHT = f32(0.108);
@@ -13,8 +13,8 @@ const STRIP_MARGIN = f32(0.004);
 const STRIP_ALPHA = 204;
 
 export class HintStrip {
-  private readonly panel: framehandle;
-  private readonly label: framehandle;
+  private readonly panel: Frame;
+  private readonly label: Frame;
   private shown = false;
   private shownKey: number | undefined;
   laidFor: boolean | undefined;
@@ -29,7 +29,7 @@ export class HintStrip {
     this.label = createText("NewPlayerHints", this.panel, 894);
     setFrameSize(this.label, f32(STRIP_WIDTH - 2 * STRIP_MARGIN), f32(STRIP_HEIGHT - 2 * STRIP_MARGIN));
     setFrameFont(this.label, MENU_FONT, f32(0.0074), 1);
-    setFrameTextAlignment(this.label, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+    setFrameTextAlignment(this.label, TextAlignment.top, TextAlignment.left);
     setFrameEnabled(this.label, false);
   }
 

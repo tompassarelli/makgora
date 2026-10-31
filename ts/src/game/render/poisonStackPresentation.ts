@@ -4,7 +4,7 @@ import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { STOCK_MODELS, type WorldOrigin, hideEffect, placeEffect } from "./effects";
 import { SoundBank, SoundKind } from "./soundBank";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 export const POISON_BURST_MODEL = "Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdx";
 export const POISON_BURST_SOUND = "PoisonArrowHit";
@@ -18,8 +18,8 @@ const BURST_HEIGHT = 110.0;
 const BURST_SCALE = f32(1.7);
 
 export class PoisonStackPresentation {
-  private readonly glow: effect[] = [];
-  private readonly burst: effect[] = [];
+  private readonly glow: Effect[] = [];
+  private readonly burst: Effect[] = [];
   private readonly seenPops: number[] = [];
   private readonly burstLeft: number[] = [];
   private readonly shown: boolean[] = [];

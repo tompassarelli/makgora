@@ -22,14 +22,14 @@ import { fighterName } from "../roster/kits";
 import { f32 } from "wisp/src/sim/f32";
 import { specialAreaRegion } from "../presentation/disjointCues";
 import { CueLinger, type CuePlace } from "../presentation/cueLinger";
-import { clearEffectSubAnimations, createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectPitch, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { clearEffectSubAnimations, createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectPitch, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { displayTimedText } from "wisp/game/frames";
 import { localPlayer } from "wisp/game/players";
-import { playSound, releaseWhenDone, setSoundPosition, setSoundVolume, soundFromLabel, stopSound } from "wisp/game/sound";
+import { playSound, releaseWhenDone, setSoundPosition, setSoundVolume, Sound, soundFromLabel, stopSound } from "wisp/game/sound";
 
 interface CueModel {
   readonly cue: Cue;
-  readonly model: effect;
+  readonly model: Effect;
 }
 
 export const POPCORN_VOICES = 2;
@@ -37,13 +37,13 @@ export const POPCORN_VOICES = 2;
 const cueKey = (fighter: Readonly<Fighter>): number => fighter.special.action * 100 + fighter.special.form + fighter.special.variant * 100000;
 
 interface PopcornVoices {
-  readonly models: effect[];
+  readonly models: Effect[];
   next: number;
 }
 
 interface PopcornCue {
   readonly cue: Cue;
-  readonly model: effect;
+  readonly model: Effect;
   readonly born: number;
   readonly position: WorldOrigin;
   readonly facing: number;
@@ -59,7 +59,7 @@ interface CuePlacement {
 }
 
 export class SpecialCueEffects {
-  private readonly missing: effect;
+  private readonly missing: Effect;
   private readonly missingParked: ParkedFlags = [];
   private readonly reported: Record<string, boolean | undefined> = {};
   private readonly areas: HitAreaEffects;
@@ -82,7 +82,7 @@ export class SpecialCueEffects {
   private readonly confirmedAttack: AttackCueState = { cue: undefined, x: 0.0, z: 0.0, key: 0 };
   private readonly voices: { [model: string]: PopcornVoices | undefined } = {};
   private readonly placed: CuePlacement = { x: 0.0, z: 0.0, scale: 0.0 };
-  private readonly cueSounds: { [name: string]: sound | undefined } = {};
+  private readonly cueSounds: { [name: string]: Sound | undefined } = {};
   private readonly linger = new CueLinger();
   private readonly heldPlace: CuePlace = { x: 0.0, y: 0.0, z: 0.0, facing: 1, scale: 1.0 };
 
@@ -99,7 +99,7 @@ export class SpecialCueEffects {
       if (cue.sound !== undefined && this.cueSounds[cue.sound] === undefined) this.cueSounds[cue.sound] = soundFromLabel(cue.sound, false, true, true, 10, 10);
       if (POPCORN_CUE_MODELS[cue.model] !== true) this.cues.push({ cue, model: createEffect(cue.model, origin.x, origin.y) });
       else if (shared && this.voices[cue.model] === undefined) {
-        const models: effect[] = [];
+        const models: Effect[] = [];
         for (let voice = 0; voice < (cue.birth?.voices ?? POPCORN_VOICES); voice++) {
           const model = createEffect(cue.model, origin.x, origin.y);
           this.parkPopcorn(model);
@@ -351,7 +351,7 @@ export class SpecialCueEffects {
     return true;
   }
 
-  private popcornModel(cue: Cue, position: WorldOrigin, facing: number, scale: number): effect | undefined {
+  private popcornModel(cue: Cue, position: WorldOrigin, facing: number, scale: number): Effect | undefined {
     const path = cue.model;
     if (!this.shared) {
       const model = createEffect(path, position.x, position.y);
@@ -360,7 +360,7 @@ export class SpecialCueEffects {
       setEffectYaw(model, cue.yaw ?? facingYaw(facing));
       setEffectPitch(model, cue.pitch ?? 0.0);
       setEffectRoll(model, cue.roll ?? 0.0);
-      playEffectAnimation(model, ANIM_TYPE_BIRTH);
+      playEffectAnimation(model, EffectAnimation.birth);
       return model;
     }
     const voices = this.voices[path];
@@ -375,16 +375,16 @@ export class SpecialCueEffects {
     setEffectRoll(model, cue.roll ?? 0.0);
     setEffectTimeScale(model, 1.0);
     clearEffectSubAnimations(model);
-    playEffectAnimation(model, ANIM_TYPE_BIRTH);
+    playEffectAnimation(model, EffectAnimation.birth);
     return model;
   }
 
-  private retirePopcorn(model: effect): void {
+  private retirePopcorn(model: Effect): void {
     this.parkPopcorn(model);
     if (!this.shared) destroyEffect(model);
   }
 
-  private parkPopcorn(model: effect): void {
+  private parkPopcorn(model: Effect): void {
     parkCue(model, this.origin, [], 0);
   }
 
@@ -400,13 +400,13 @@ export class SpecialCueEffects {
     for (const { model } of this.popcorn) setEffectTimeScale(model, paused ? 0.0 : 1.0);
   }
 
-  weaponEffects(into: effect[]): void {
+  weaponEffects(into: Effect[]): void {
     this.areas.drawnEffects(into);
     this.rings.drawnEffects(into);
     this.banish?.drawnEffects(into);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     into.push(this.missing);
     for (const { model } of this.cues) into.push(model);
     for (const { model } of this.popcorn) into.push(model);

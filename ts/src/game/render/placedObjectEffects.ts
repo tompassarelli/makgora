@@ -15,7 +15,7 @@ import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./eff
 import { bearState } from "../presentation/bearFeedback";
 import { BearFeedback } from "./bearFeedback";
 import { bindPrototype } from "../../platform/rebind";
-import { createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectBlendTime, setEffectPitch, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, setEffectAlpha, setEffectBlendTime, setEffectPitch, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { player } from "wisp/game/players";
 
 
@@ -64,7 +64,7 @@ function placedAlpha(placed: Resting<PlacedObject>, spec: Readonly<SpecialPlacem
 }
 
 export class PlacedObjectEffects {
-  private readonly models: effect[];
+  private readonly models: Effect[];
   private readonly paths: string[];
 
   private readonly anims: number[] = [];
@@ -72,7 +72,7 @@ export class PlacedObjectEffects {
   private readonly lastX: number[] = [];
   private parked: ParkedFlags | undefined;
   private feedback: BearFeedback;
-  private prepared: ({ [path: string]: effect | undefined } | undefined)[] | undefined;
+  private prepared: ({ [path: string]: Effect | undefined } | undefined)[] | undefined;
 
   constructor(private readonly origin: WorldOrigin) {
     this.feedback = new BearFeedback(origin);
@@ -96,7 +96,7 @@ export class PlacedObjectEffects {
       const index = slot * ANIMALS + animal;
       const current = this.models[index];
       for (const model of Object.values(prepared[index] ?? {})) if (model !== undefined && model !== current) destroyEffect(model);
-      const looks: { [path: string]: effect | undefined } = {};
+      const looks: { [path: string]: Effect | undefined } = {};
       if (current !== undefined) looks[this.paths[index] ?? PLACED_OBJECT_MODEL] = current;
       for (const path of paths) {
         let model = looks[path];
@@ -114,7 +114,7 @@ export class PlacedObjectEffects {
     }
   }
 
-  private modelFor(slot: number, path: string): effect | undefined {
+  private modelFor(slot: number, path: string): Effect | undefined {
     const current = this.models[slot];
     if (current === undefined || this.paths[slot] === path) return current;
     const model = this.prepared?.[slot]?.[path];
@@ -127,7 +127,7 @@ export class PlacedObjectEffects {
     return model;
   }
 
-  slotEffects(slot: number, into: effect[]): void {
+  slotEffects(slot: number, into: Effect[]): void {
     for (let animal = 0; animal < ANIMALS; animal++) {
       const model = this.models[slot * ANIMALS + animal];
       if (model !== undefined) into.push(model);
@@ -194,7 +194,7 @@ export class PlacedObjectEffects {
     setEffectAlpha(model, placedAlpha(placed, spec, look));
   }
 
-  private pose(model: effect, slot: number, placed: Resting<PlacedObject>, spec: Readonly<SpecialPlacement>, look: PlacedLook, bear: ReturnType<typeof bearState>): void {
+  private pose(model: Effect, slot: number, placed: Resting<PlacedObject>, spec: Readonly<SpecialPlacement>, look: PlacedLook, bear: ReturnType<typeof bearState>): void {
     if (look.casts === true) this.cast(model, slot, placed, spec.crumble ?? 0);
     else if (spec.companion !== undefined) this.animate(model, slot, placed, bear);
     else if (spec.crumble !== undefined) this.build(model, slot, placed, spec.crumble, spec.fireAges[0] ?? 1);
@@ -202,7 +202,7 @@ export class PlacedObjectEffects {
     else this.animate(model, slot, placed, bear);
   }
 
-  private cast(model: effect, slot: number, placed: Resting<PlacedObject>, crumble: number): void {
+  private cast(model: Effect, slot: number, placed: Resting<PlacedObject>, crumble: number): void {
     let anim = placed.life <= crumble ? 3 : placed.age < SPIRIT_BIRTH_FRAMES ? 4 : 0;
     let start = placed.serial;
     if (anim === 0) for (const fire of placed.spec?.fireAges ?? []) if (placed.age >= fire && placed.age < fire + SPIRIT_CAST_FRAMES) {
@@ -213,22 +213,22 @@ export class PlacedObjectEffects {
     if (this.anims[slot] === anim && attackStarts[slot] === start) return;
     this.anims[slot] = anim;
     attackStarts[slot] = start;
-    playEffectAnimation(model, anim === 3 ? ANIM_TYPE_DEATH : anim === 4 ? ANIM_TYPE_BIRTH : anim === 2 ? ANIM_TYPE_SPELL : ANIM_TYPE_STAND);
+    playEffectAnimation(model, anim === 3 ? EffectAnimation.death : anim === 4 ? EffectAnimation.birth : anim === 2 ? EffectAnimation.spell : EffectAnimation.stand);
     setEffectTimeScale(model, anim === 4 ? f32(SPIRIT_BIRTH_SECONDS / f32(SPIRIT_BIRTH_FRAMES / 60.0)) : 1.0);
   }
 
 
-  private build(model: effect, slot: number, placed: Resting<PlacedObject>, crumble: number, built: number): void {
+  private build(model: Effect, slot: number, placed: Resting<PlacedObject>, crumble: number, built: number): void {
     const anim = placed.life <= crumble ? 3 : placed.age < built ? 4 : 0;
     const attackStarts = (this.attackStarts ??= []);
     if (this.anims[slot] === anim && attackStarts[slot] === placed.serial) return;
     this.anims[slot] = anim;
     attackStarts[slot] = placed.serial;
-    playEffectAnimation(model, anim === 3 ? ANIM_TYPE_DEATH : anim === 4 ? ANIM_TYPE_BIRTH : ANIM_TYPE_STAND);
+    playEffectAnimation(model, anim === 3 ? EffectAnimation.death : anim === 4 ? EffectAnimation.birth : EffectAnimation.stand);
     setEffectTimeScale(model, anim === 3 ? f32(DEATH_SECONDS / f32(crumble / 60.0)) : anim === 4 ? f32(BIRTH_SECONDS / f32(built / 60.0)) : 1.0);
   }
 
-  private animate(model: effect, slot: number, placed: Resting<PlacedObject>, bear: ReturnType<typeof bearState>): void {
+  private animate(model: Effect, slot: number, placed: Resting<PlacedObject>, bear: ReturnType<typeof bearState>): void {
     const { x, mode } = placed;
     const partner = placed.spec?.companion;
     let attackStart = -1;
@@ -268,7 +268,7 @@ export class PlacedObjectEffects {
     if (this.anims[slot] === anim && attackStarts[slot] === attackStart) return;
     this.anims[slot] = anim;
     attackStarts[slot] = attackStart;
-    playEffectAnimation(model, anim === 2 ? ANIM_TYPE_ATTACK : anim === 1 ? ANIM_TYPE_WALK : ANIM_TYPE_STAND);
+    playEffectAnimation(model, anim === 2 ? EffectAnimation.attack : anim === 1 ? EffectAnimation.walk : EffectAnimation.stand);
     if (bear === "ATTACKING") setEffectTime(model, f32(0.5));
   }
 

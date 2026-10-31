@@ -3,11 +3,11 @@ import { fitFighterPlacement } from "../presentation/fighterPlacement";
 import type { FlightLook } from "../presentation/model/look";
 import type { Fighter } from "../sim/fighter";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
-import { createEffect, destroyEffect, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 export class FlightPresentation {
-  private readonly flames: effect;
-  private readonly egg: effect;
+  private readonly flames: Effect;
+  private readonly egg: Effect;
   private readonly pose: FlightPose = emptyFlightPose();
   private readonly placement = { x: 0.0, z: 0.0 };
   private flamesShown = false;
@@ -27,7 +27,7 @@ export class FlightPresentation {
     this.eggShown = this.place(this.egg, fighter, egg, stage, paused, this.eggShown);
   }
 
-  private place(model: effect, fighter: Readonly<Fighter> | undefined, pose: Readonly<FlightPose> | undefined, stage: number, paused: boolean, shown: boolean): boolean {
+  private place(model: Effect, fighter: Readonly<Fighter> | undefined, pose: Readonly<FlightPose> | undefined, stage: number, paused: boolean, shown: boolean): boolean {
     if (fighter === undefined || pose === undefined || !pose.visible) {
       if (shown) hideEffect(model, this.origin);
       return false;
@@ -44,7 +44,7 @@ export class FlightPresentation {
     this.present(undefined, 0, false);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     into.push(this.flames, this.egg);
   }
 

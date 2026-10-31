@@ -4,7 +4,7 @@ import { trampoline } from "wisp/src/platform/dispatch";
 import { localParticipantSlot } from "./diagnostics";
 import type { ShellState } from "./state";
 import { createEvents, onEvents } from "wisp/game/events";
-import { createQuest, displayTimedText, setQuestCompleted, setQuestDescription, setQuestDiscovered, setQuestIcon, setQuestRequired, setQuestTitle } from "wisp/game/frames";
+import { createQuest, displayTimedText, Quest, setQuestCompleted, setQuestDescription, setQuestDiscovered, setQuestIcon, setQuestRequired, setQuestTitle } from "wisp/game/frames";
 import { addChatEvent } from "wisp/game/input";
 import { eventPlayer, player, playerSlot } from "wisp/game/players";
 
@@ -13,10 +13,10 @@ export const HELP_EVENT = "shell.help";
 const HELP_SECONDS = 30.0;
 
 declare global {
-  var __smashcraftHelpQuests: { readonly controls: quest; revision: number } | undefined;
+  var __smashcraftHelpQuests: { readonly controls: Quest; revision: number } | undefined;
 }
 
-function addQuest(title: string, description: string, icon: string, required: boolean): quest {
+function addQuest(title: string, description: string, icon: string, required: boolean): Quest {
   const entry = createQuest();
   setQuestTitle(entry, title);
   setQuestDescription(entry, description);

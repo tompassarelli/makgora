@@ -9,7 +9,7 @@ import type { Fighter } from "../sim/fighter";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { squareRoot } from "../sim/warcraftMath";
 import type { WorldOrigin } from "./effects";
-import { createBeam, destroyBeam, moveBeam, setBeamColor } from "wisp/game/effects";
+import { Beam, createBeam, destroyBeam, moveBeam, setBeamColor } from "wisp/game/effects";
 
 
 const MAX_SHAPES = 16;
@@ -21,7 +21,7 @@ const LIGHTNING = "LEAS";
 const DEPTH = -60.0;
 
 export class HitAreaPresentation {
-  private readonly lines: lightning[] = [];
+  private readonly lines: Beam[] = [];
   private readonly list: HitAreaList = createHitAreaList();
   private drawnSegments = 0;
 

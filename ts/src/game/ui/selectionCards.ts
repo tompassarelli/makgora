@@ -37,7 +37,7 @@ import { paintCostume } from "./costumeTint";
 import { placeTopLeft, setMenuText } from "./frames";
 import { presentLiveFighter } from "./liveCard";
 import { BAR_HEIGHT, BAR_TEXT, BOTTOM_BAR_TOP, TAG_SCALE, TAG_SIZE, art, hotspot, label, modeBox, nameText, placeBottomBar, portraitTexture, tileOfCharacter, titleCase } from "./selectionFrames";
-import { createFrame, createFrameByType, setFrameAlpha, setFrameEnabled, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { createFrame, createFrameByType, Frame, setFrameAlpha, setFrameEnabled, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
 export const selectionCardTexture = (color: string): string => `war3mapImported\\SelectionCard${color}.tga`;
@@ -72,25 +72,25 @@ function cpuCardSummary(game: Readonly<MatchState>, slot: number, defaults: CpuD
 
 
 export interface CardFrames {
-  readonly card: framehandle;
-  readonly tag: framehandle;
-  readonly mode: framehandle;
-  readonly team: framehandle;
-  readonly teamLabel: framehandle;
-  readonly portrait: framehandle;
-  readonly render: framehandle;
-  readonly costume: framehandle;
-  readonly dots: readonly framehandle[];
-  readonly name: framehandle;
-  readonly status: framehandle;
+  readonly card: Frame;
+  readonly tag: Frame;
+  readonly mode: Frame;
+  readonly team: Frame;
+  readonly teamLabel: Frame;
+  readonly portrait: Frame;
+  readonly render: Frame;
+  readonly costume: Frame;
+  readonly dots: readonly Frame[];
+  readonly name: Frame;
+  readonly status: Frame;
   readonly wins: SessionWinsFrames;
-  readonly chip: framehandle;
-  readonly summary: framehandle;
-  readonly settings: framehandle;
-  readonly settingsLabel: framehandle;
+  readonly chip: Frame;
+  readonly summary: Frame;
+  readonly settings: Frame;
+  readonly settingsLabel: Frame;
 }
 
-export function createCard(root: framehandle, suffix: string, slot: number, add: (frame: framehandle, target: CardButton) => framehandle): CardFrames {
+export function createCard(root: Frame, suffix: string, slot: number, add: (frame: Frame, target: CardButton) => Frame): CardFrames {
   const x = cardX(slot);
   const name = `${suffix}_${formatInt(slot)}`;
   const card = art(root, `MeleeCard${name}`, selectionCardTexture("Gray"), x, CARD_TOP, CARD_WIDTH, CARD_HEIGHT);

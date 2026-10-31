@@ -1,10 +1,10 @@
 import { warcraftChatOpen } from "../../platform/editboxJournal";
 import type { ShellState } from "./state";
-import { frameVisible, namedFrame } from "wisp/game/frames";
+import { Frame, frameVisible, namedFrame } from "wisp/game/frames";
 
 const ESCAPE_MENU_FRAMES = ["EscMenuMainPanel", "EscMenuOptionsPanel", "EscMenuOptionsConfirmDialog"] as const;
 
-let escapeMenuFrames: readonly framehandle[] = [];
+let escapeMenuFrames: readonly Frame[] = [];
 
 // Every client looks the frames up on the same frame: the headless desync guard compares native calls.
 export function findWarcraftMenuFrames(): void {

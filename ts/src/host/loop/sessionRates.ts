@@ -8,8 +8,8 @@ import { secondFps } from "wisp/src/netcode/rate";
 import { noteLocalSecond, takeNetRates } from "./netDelay";
 import { type Rollback, activeRollback, shellState } from "./state";
 import { knownFrame } from "wisp/src/netcode/shadowSchedule";
-import { createTimer, gameSpeed as clockGameSpeed, localElapsed, startTimer } from "wisp/game/clock";
-import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
+import { createTimer, GameSpeed, gameSpeed as clockGameSpeed, localElapsed, startTimer, Timer } from "wisp/game/clock";
+import { eventPlayer, localPlayer, Player, playerSlot } from "wisp/game/players";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -95,7 +95,7 @@ interface SessionRates {
   botRepeated: number;
   botRerun: number;
   heap: number;
-  gameClock: timer | undefined;
+  gameClock: Timer | undefined;
   gamePeriods: number;
   lastGame: number;
   tags: Record<number, string | undefined>;
@@ -131,7 +131,7 @@ function shortName(rates: SessionRates, path: unknown): string {
 
 function tagFor(rates: SessionRates, kind: Kind, source: unknown): string | undefined {
   if (kind === "eff" || kind === "snd") return `${kind === "eff" ? "e" : "s"}:${shortName(rates, source)}`;
-  if (kind === "unit") return `u:p${source === undefined ? "?" : playerSlot(source as player)}`;
+  if (kind === "unit") return `u:p${source === undefined ? "?" : playerSlot(source as Player)}`;
   return undefined;
 }
 
@@ -159,7 +159,7 @@ function released(rates: SessionRates, kind: Kind, value: unknown): void {
   rates.live[tag] = (rates.live[tag] ?? 1) - 1;
 }
 
-const gameSpeeds = (): readonly gamespeed[] => [MAP_SPEED_SLOWEST, MAP_SPEED_SLOW, MAP_SPEED_NORMAL, MAP_SPEED_FAST, MAP_SPEED_FASTEST];
+const gameSpeeds = (): readonly GameSpeed[] => [GameSpeed.slowest, GameSpeed.slow, GameSpeed.normal, GameSpeed.fast, GameSpeed.fastest];
 
 function gameSpeed(): string {
   const speed = clockGameSpeed();

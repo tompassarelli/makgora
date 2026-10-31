@@ -5,35 +5,39 @@
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
 import { MENU_STYLE, NATIVE_TEXT_BASE } from "./hudLayout";
-import { createEvents, destroyEvents, onEvents } from "wisp/game/events";
-import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, frameEnabled, frameVisible, namedFrame, originFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTexture } from "wisp/game/frames";
-import { eventPlayer, localPlayer, player as playerOf, playerSlot } from "wisp/game/players";
+import { createEvents, destroyEvents, Events, onEvents } from "wisp/game/events";
+import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, Frame, frameEnabled, FrameEvent, FramePoint, frameVisible, namedFrame, originFrame, OriginFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTexture } from "wisp/game/frames";
+import { eventPlayer, localPlayer, Player, player as playerOf, playerSlot } from "wisp/game/players";
 import { addSyncEvent, syncData } from "wisp/game/sync";
 import { toReal } from "wisp/game/text";
+
+declare global {
+  function GetHandleId(handle: Frame): number;
+}
 
 
 export type MenuControls = "journal" | "keyboard";
 
-const plainFrameText = new Map<framehandle, string>();
+const plainFrameText = new Map<Frame, string>();
 
-export function gameUi(): framehandle {
-  return originFrame(ORIGIN_FRAME_GAME_UI, 0);
+export function gameUi(): Frame {
+  return originFrame(OriginFrame.gameUi, 0);
 }
 
-export function consoleUi(): framehandle {
+export function consoleUi(): Frame {
   return namedFrame("ConsoleUIBackdrop", 0);
 }
 
-export function createBackdrop(name: string, owner: framehandle, context: number): framehandle {
+export function createBackdrop(name: string, owner: Frame, context: number): Frame {
   return createFrameByType("BACKDROP", name, owner, "", context);
 }
 
-export function createText(name: string, owner: framehandle, context: number): framehandle {
+export function createText(name: string, owner: Frame, context: number): Frame {
   return createFrameByType("TEXT", name, owner, "", context);
 }
 
 // Warcraft scales relative point offsets too; divide them by the returned scale.
-export function sizeText(frame: framehandle, size: number, width: number, height: number): number {
+export function sizeText(frame: Frame, size: number, width: number, height: number): number {
   const scale = f32(size / NATIVE_TEXT_BASE);
   setFrameScale(frame, scale);
   setFrameSize(frame, f32(width / scale), f32(height / scale));
@@ -41,34 +45,34 @@ export function sizeText(frame: framehandle, size: number, width: number, height
   return scale;
 }
 
-export function styleMenuPanel(frame: framehandle, name: string): framehandle {
+export function styleMenuPanel(frame: Frame, name: string): Frame {
   setFrameTexture(frame, MENU_STYLE.borderTexture, 0, true);
   setFrameAlpha(frame, 255);
   const backing = createBackdrop(`${name}Backing`, frame, 0);
   setFrameTexture(backing, MENU_STYLE.panelTexture, 0, true);
   setFrameAlpha(backing, 255);
-  setFramePoint(backing, FRAMEPOINT_TOPLEFT, frame, FRAMEPOINT_TOPLEFT, f32(0.012), f32(-0.012));
-  setFramePoint(backing, FRAMEPOINT_BOTTOMRIGHT, frame, FRAMEPOINT_BOTTOMRIGHT, f32(-0.012), f32(0.012));
+  setFramePoint(backing, FramePoint.topLeft, frame, FramePoint.topLeft, f32(0.012), f32(-0.012));
+  setFramePoint(backing, FramePoint.bottomRight, frame, FramePoint.bottomRight, f32(-0.012), f32(0.012));
   setFrameEnabled(backing, false);
   return backing;
 }
 
-export function placeTopLeft(frame: framehandle, x: number, y: number): void {
-  setFrameAbsPoint(frame, FRAMEPOINT_TOPLEFT, x, y);
+export function placeTopLeft(frame: Frame, x: number, y: number): void {
+  setFrameAbsPoint(frame, FramePoint.topLeft, x, y);
 }
 
 
-const fittedSize = new Map<framehandle, number>();
+const fittedSize = new Map<Frame, number>();
 
 // Engine: Warcraft draws no child of the game UI outside the centred 4:3 area, so a full-window backdrop hangs off ConsoleUIBackdrop.
-export function createWindowBackdrop(name: string, texture: string, context: number): framehandle {
+export function createWindowBackdrop(name: string, texture: string, context: number): Frame {
   const frame = createBackdrop(name, consoleUi(), context);
   setFrameTexture(frame, texture, 0, false);
   fitToWindow(frame);
   return frame;
 }
 
-export function fitToWindow(frame: framehandle): void {
+export function fitToWindow(frame: Frame): void {
   const pixelWidth = screenWidth();
   const pixelHeight = screenHeight();
   const key = pixelWidth * 65536 + pixelHeight;
@@ -76,11 +80,11 @@ export function fitToWindow(frame: framehandle): void {
   fittedSize.set(frame, key);
   const aspect = pixelHeight <= 0 ? f32(4.0 / 3.0) : toReal(pixelWidth) / toReal(pixelHeight);
   setFrameSize(frame, f32(Math.max(f32(0.8), aspect * f32(0.6)) + f32(0.02)), f32(Math.max(f32(0.6), f32(0.8) / aspect) + f32(0.02)));
-  setFrameAbsPoint(frame, FRAMEPOINT_CENTER, f32(0.4), f32(0.3));
+  setFrameAbsPoint(frame, FramePoint.center, f32(0.4), f32(0.3));
 }
 
 
-function releaseFocus(frame: framehandle, clicker: player): void {
+function releaseFocus(frame: Frame, clicker: Player): void {
   if (localPlayer() !== clicker) return;
   const enabled = frameEnabled(frame);
   setFrameEnabled(frame, !enabled);
@@ -88,12 +92,12 @@ function releaseFocus(frame: framehandle, clicker: player): void {
   setFrameFocus(frame, false);
 }
 
-export function setMenuText(frame: framehandle, text: string): void {
+export function setMenuText(frame: Frame, text: string): void {
   plainFrameText.set(frame, text);
   setFrameText(frame, text);
 }
 
-export function highlightText(frame: framehandle, highlighted: boolean): void {
+export function highlightText(frame: Frame, highlighted: boolean): void {
   const plain = plainFrameText.get(frame) ?? "";
   const colored = highlighted && plain !== "" ? `|cffffcc00${plain}|r` : plain;
   setFrameText(frame, colored);
@@ -108,7 +112,7 @@ export interface ClickBox {
 
 interface Button<T> {
   readonly id: number;
-  readonly frame: framehandle;
+  readonly frame: Frame;
   readonly target: T;
   readonly box: ClickBox | undefined;
 }
@@ -121,15 +125,15 @@ export class ButtonClicks<T> {
   private readonly trigger = createEvents();
   private readonly buttons: Button<T>[] = [];
   private hovered: Button<T> | undefined;
-  private hover: ((target: T | undefined, clicker: player) => void) | undefined;
+  private hover: ((target: T | undefined, clicker: Player) => void) | undefined;
 
-  constructor(private readonly name: string, handle: (target: T, clicker: player) => void, hover?: (target: T | undefined, clicker: player) => void) {
+  constructor(private readonly name: string, handle: (target: T, clicker: Player) => void, hover?: (target: T | undefined, clicker: Player) => void) {
     this.hover = hover;
     onEvents(this.trigger, trampoline(name));
     this.bindHandler(handle);
   }
 
-  bindHandler(handle: (target: T, clicker: player) => void, hover = this.hover): void {
+  bindHandler(handle: (target: T, clicker: Player) => void, hover = this.hover): void {
     this.hover = hover;
     on(this.name, () => {
       const id = GetHandleId(eventFrame());
@@ -137,10 +141,10 @@ export class ButtonClicks<T> {
       for (const button of this.buttons) {
         if (button.id !== id) continue;
         const event = eventFrameEvent();
-        if (event !== FRAMEEVENT_CONTROL_CLICK) {
+        if (event !== FrameEvent.controlClick) {
           if (localPlayer() !== clicker) return;
           if (this.hovered !== undefined) highlightText(this.hovered.frame, false);
-          this.hovered = event === FRAMEEVENT_MOUSE_ENTER ? button : undefined;
+          this.hovered = event === FrameEvent.mouseEnter ? button : undefined;
           this.refreshHover();
           this.hover?.(this.hovered?.target, clicker);
           return;
@@ -152,13 +156,13 @@ export class ButtonClicks<T> {
     });
   }
 
-  add(frame: framehandle, target: T, text?: string, hover: "events" | "native" = "events", box?: ClickBox): framehandle {
+  add(frame: Frame, target: T, text?: string, hover: "events" | "native" = "events", box?: ClickBox): Frame {
     if (text !== undefined) setMenuText(frame, text);
-    addFrameEvent(this.trigger, frame, FRAMEEVENT_CONTROL_CLICK);
+    addFrameEvent(this.trigger, frame, FrameEvent.controlClick);
     // Warcraft dialog-button hover events displace the cursor and loop; use the built-in hover on those frames.
     if (hover === "events") {
-      addFrameEvent(this.trigger, frame, FRAMEEVENT_MOUSE_ENTER);
-      addFrameEvent(this.trigger, frame, FRAMEEVENT_MOUSE_LEAVE);
+      addFrameEvent(this.trigger, frame, FrameEvent.mouseEnter);
+      addFrameEvent(this.trigger, frame, FrameEvent.mouseLeave);
     }
     this.buttons.push({ id: GetHandleId(frame), frame, target, box });
     return frame;
@@ -185,7 +189,7 @@ export class ButtonClicks<T> {
 }
 
 
-export function createSyncTrigger(name: string, prefix: string, senders: readonly number[], handle: (sender: number, data: string) => void): trigger {
+export function createSyncTrigger(name: string, prefix: string, senders: readonly number[], handle: (sender: number, data: string) => void): Events {
   const trigger = createEvents();
   for (const sender of senders) addSyncEvent(trigger, playerOf(sender), prefix);
   onEvents(trigger, trampoline(name));

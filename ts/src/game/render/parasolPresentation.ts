@@ -3,11 +3,11 @@ import type { FighterDraw } from "../presentation/fighterDraw";
 import { PARASOL_FOLD_FRAMES, PARASOL_GRIP, PARASOL_MODEL, parasolShown } from "../presentation/parasolLook";
 import type { Fighter } from "../sim/fighter";
 import { hideEffect, placeEffect, type WorldOrigin } from "./effects";
-import { createEffect, destroyEffect, playEffectAnimation, setEffectScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, setEffectScale } from "wisp/game/effects";
 
 export class ParasolPresentation {
   // Online, Warcraft handles must be born on the same turn on every client, so the parasol is made at setup and only shown and hidden on presented frames.
-  private readonly parasol: effect;
+  private readonly parasol: Effect;
   private shown = false;
   private foldFrame: number | undefined;
 
@@ -24,14 +24,14 @@ export class ParasolPresentation {
     }
     if (parasolShown(fighter)) {
       if (this.foldFrame !== undefined) this.hide();
-      if (!this.shown) playEffectAnimation(this.parasol, ANIM_TYPE_BIRTH);
+      if (!this.shown) playEffectAnimation(this.parasol, EffectAnimation.birth);
       this.shown = true;
       this.place(fighter, draw);
       return;
     }
     if (!this.shown) return;
     if (this.foldFrame === undefined) {
-      playEffectAnimation(this.parasol, ANIM_TYPE_DEATH);
+      playEffectAnimation(this.parasol, EffectAnimation.death);
       this.foldFrame = frame;
     } else if (frame < this.foldFrame || frame - this.foldFrame >= PARASOL_FOLD_FRAMES) {
       this.hide();
@@ -46,7 +46,7 @@ export class ParasolPresentation {
     placeEffect(this.parasol, this.origin.x + draw.x + draw.facing * PARASOL_GRIP.x * scale, this.origin.y + draw.y, this.origin.z + draw.z + PARASOL_GRIP.z * scale);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     if (this.shown) into.push(this.parasol);
   }
 

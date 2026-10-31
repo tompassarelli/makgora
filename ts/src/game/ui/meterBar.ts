@@ -3,7 +3,7 @@ import { type MeterFeedback, advanceMeterFeedback, meterDisplay, meterDrainLit, 
 import type { PlateRect } from "./plateLayout";
 import { createBackdrop } from "./frames";
 import { PANEL_TEXTURE } from "./hudLayout";
-import { destroyFrame, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameLevel, setFramePoint, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { destroyFrame, Frame, FramePoint, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameLevel, setFramePoint, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
 const LINE_WIDTH = f32(0.0006);
@@ -15,10 +15,10 @@ const DRAIN_ALPHA = 210;
 const FRAME_LEVELS = [22, 23, 24, 25] as const;
 
 export class MeterBar {
-  private readonly ultimateBack: framehandle;
-  private readonly ultimateFill: framehandle;
-  private readonly ultimatePulse: framehandle;
-  private readonly drain: framehandle;
+  private readonly ultimateBack: Frame;
+  private readonly ultimateFill: Frame;
+  private readonly ultimatePulse: Frame;
+  private readonly drain: Frame;
   private readonly feedback: MeterFeedback = meterFeedback();
   private barWidth = -1.0;
   private barHeight = -1.0;
@@ -30,7 +30,7 @@ export class MeterBar {
   private shownPulse = -1;
   private tick = 0;
 
-  constructor(name: string, slot: number, parent: framehandle, context: number) {
+  constructor(name: string, slot: number, parent: Frame, context: number) {
     const suffix = `${name}${formatInt(slot)}`;
     this.ultimateBack = createBackdrop(`MeterUltimateBack${suffix}`, parent, context);
     this.ultimateFill = createBackdrop(`MeterUltimateFill${suffix}`, parent, context + 1);
@@ -41,9 +41,9 @@ export class MeterBar {
     setFrameTexture(this.ultimatePulse, ULTIMATE_PULSE, 0, true);
     setFrameTexture(this.drain, DRAIN, 0, true);
     setFrameAlpha(this.drain, DRAIN_ALPHA);
-    setFramePoint(this.ultimateFill, FRAMEPOINT_LEFT, this.ultimateBack, FRAMEPOINT_LEFT, 0.0, 0.0);
-    setFramePoint(this.ultimatePulse, FRAMEPOINT_CENTER, this.ultimateBack, FRAMEPOINT_CENTER, 0.0, 0.0);
-    setFramePoint(this.drain, FRAMEPOINT_CENTER, this.ultimateBack, FRAMEPOINT_CENTER, 0.0, 0.0);
+    setFramePoint(this.ultimateFill, FramePoint.left, this.ultimateBack, FramePoint.left, 0.0, 0.0);
+    setFramePoint(this.ultimatePulse, FramePoint.center, this.ultimateBack, FramePoint.center, 0.0, 0.0);
+    setFramePoint(this.drain, FramePoint.center, this.ultimateBack, FramePoint.center, 0.0, 0.0);
     this.frames().forEach((frame, index) => {
       setFrameEnabled(frame, false);
       setFrameVisible(frame, false);
@@ -51,7 +51,7 @@ export class MeterBar {
     });
   }
 
-  private frames(): framehandle[] {
+  private frames(): Frame[] {
     return [this.ultimateBack, this.ultimateFill, this.ultimatePulse, this.drain];
   }
 
@@ -67,7 +67,7 @@ export class MeterBar {
     if (ultimateBar.left !== this.barX || ultimateBar.centerY !== this.barY) {
       this.barX = ultimateBar.left;
       this.barY = ultimateBar.centerY;
-      setFrameAbsPoint(this.ultimateBack, FRAMEPOINT_CENTER, ultimateBar.left + ultimateBar.width / 2.0, ultimateBar.centerY);
+      setFrameAbsPoint(this.ultimateBack, FramePoint.center, ultimateBar.left + ultimateBar.width / 2.0, ultimateBar.centerY);
     }
   }
 

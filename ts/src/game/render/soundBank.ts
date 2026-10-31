@@ -1,4 +1,4 @@
-import { createSound, playSound, setSoundCutoff, setSoundDistances, setSoundDuration, setSoundPitch, setSoundPosition, setSoundVolume, soundFileDuration, soundFromLabel, stopSound } from "wisp/game/sound";
+import { createSound, playSound, setSoundCutoff, setSoundDistances, setSoundDuration, setSoundPitch, setSoundPosition, setSoundVolume, Sound, soundFileDuration, soundFromLabel, stopSound } from "wisp/game/sound";
 export const SoundKind = { combatFile: 0, combatLabel: 1, label: 2, flatLabel: 3, interfaceFile: 4 } as const;
 export type SoundKind = (typeof SoundKind)[keyof typeof SoundKind];
 
@@ -6,11 +6,11 @@ const KIND_COUNT = 5;
 const VOICES = 2;
 
 interface Ring {
-  readonly voices: sound[];
+  readonly voices: Sound[];
   next: number;
 }
 
-function createVoice(kind: SoundKind, name: string): sound {
+function createVoice(kind: SoundKind, name: string): Sound {
   switch (kind) {
     case SoundKind.combatFile: {
       const cue = createSound(name, false, true, true, 10, 10, "CombatSoundsEAX");
@@ -41,13 +41,13 @@ export class SoundBank {
     if (rings === undefined) return;
     for (const name of names) {
       if (rings[name] !== undefined) continue;
-      const voices: sound[] = [];
+      const voices: Sound[] = [];
       for (let voice = 0; voice < VOICES; voice++) voices.push(createVoice(kind, name));
       rings[name] = { voices, next: 0 };
     }
   }
 
-  private take(kind: SoundKind, name: string): sound | undefined {
+  private take(kind: SoundKind, name: string): Sound | undefined {
     const ring = this.rings[kind]?.[name];
     if (ring === undefined) return undefined;
     const cue = ring.voices[ring.next];
@@ -56,7 +56,7 @@ export class SoundBank {
     return cue;
   }
 
-  playAt(kind: SoundKind, name: string, x: number, y: number, z: number, volume?: number, pitch?: number): sound | undefined {
+  playAt(kind: SoundKind, name: string, x: number, y: number, z: number, volume?: number, pitch?: number): Sound | undefined {
     const cue = this.take(kind, name);
     if (cue === undefined) return undefined;
     setSoundPosition(cue, x, y, z);
@@ -66,7 +66,7 @@ export class SoundBank {
     return cue;
   }
 
-  play(kind: SoundKind, name: string, volume?: number): sound | undefined {
+  play(kind: SoundKind, name: string, volume?: number): Sound | undefined {
     const cue = this.take(kind, name);
     if (cue === undefined) return undefined;
     if (volume !== undefined) setSoundVolume(cue, volume);

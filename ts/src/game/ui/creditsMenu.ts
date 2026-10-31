@@ -5,28 +5,28 @@ import { ButtonClicks, createBackdrop, placeTopLeft, styleMenuPanel } from "./fr
 import { InfoPanelState } from "./infoPanelState";
 import { panelButton, panelText } from "./infoPanel";
 import { CREDITS_BOX } from "./selectionLayout";
-import { destroyFrame, setFrameLevel, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
-import { player as playerOf } from "wisp/game/players";
+import { destroyFrame, Frame, setFrameLevel, setFrameSize, setFrameText, setFrameVisible, TextAlignment } from "wisp/game/frames";
+import { Player, player as playerOf } from "wisp/game/players";
 
 const CLOSE_BOX = { x: f32(0.32), y: f32(0.115), width: f32(0.16), height: f32(0.035) } as const;
 
 export type CreditsButton = { kind: "creditsOpen" } | { kind: "creditsClose" };
 
 export class CreditsMenu {
-  readonly root: framehandle;
+  readonly root: Frame;
   onOpen: () => void = () => {};
   private readonly state = new InfoPanelState();
   private readonly clicks: ButtonClicks<CreditsButton>;
 
-  constructor(owner: framehandle, rules: framehandle, suffix: string, version: string, private readonly participantId: number) {
+  constructor(owner: Frame, rules: Frame, suffix: string, version: string, private readonly participantId: number) {
     this.clicks = new ButtonClicks(`ui.credits.${suffix}.click`, (target, clicker) => this.click(target, clicker));
     this.root = createBackdrop(`MeleeCreditsMenu${suffix}`, owner, 0);
     styleMenuPanel(this.root, `MeleeCreditsPanel${suffix}`);
     placeTopLeft(this.root, f32(0.1), f32(0.53));
     setFrameSize(this.root, f32(0.6), f32(0.46));
     setFrameLevel(this.root, SELECT_LEVELS.credits);
-    setFrameText(panelText(this.root, `MeleeCreditsTitle${suffix}`, f32(0.11), f32(0.52), f32(0.58), f32(0.03), f32(0.018), TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER), CREDITS_TITLE);
-    setFrameText(panelText(this.root, `MeleeCreditsBody${suffix}`, f32(0.12), f32(0.485), f32(0.56), f32(0.34), f32(0.0105), TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT), creditsBody(version));
+    setFrameText(panelText(this.root, `MeleeCreditsTitle${suffix}`, f32(0.11), f32(0.52), f32(0.58), f32(0.03), f32(0.018), TextAlignment.middle, TextAlignment.center), CREDITS_TITLE);
+    setFrameText(panelText(this.root, `MeleeCreditsBody${suffix}`, f32(0.12), f32(0.485), f32(0.56), f32(0.34), f32(0.0105), TextAlignment.top, TextAlignment.left), creditsBody(version));
     this.clicks.add(panelButton(this.root, CLOSE_BOX.x, CLOSE_BOX.y, CLOSE_BOX.width, CLOSE_BOX.height, "Close"), { kind: "creditsClose" }, "Close", "native", CLOSE_BOX);
     setFrameVisible(this.root, false);
     this.clicks.add(panelButton(rules, CREDITS_BOX.x, CREDITS_BOX.y, CREDITS_BOX.width, CREDITS_BOX.height, CREDITS_TITLE), { kind: "creditsOpen" }, CREDITS_TITLE, "native", CREDITS_BOX);
@@ -36,7 +36,7 @@ export class CreditsMenu {
     this.clicks.bindHandler((target, clicker) => this.click(target, clicker));
   }
 
-  private click(button: CreditsButton, clicker: player): void {
+  private click(button: CreditsButton, clicker: Player): void {
     if (clicker !== playerOf(this.participantId)) return;
     if (button.kind === "creditsOpen") {
       this.state.open();

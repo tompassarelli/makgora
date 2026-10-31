@@ -5,12 +5,12 @@ import type { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { CUE_FRONT } from "./hitAreaEffects";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, parkCue } from "./effects";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectPitch, setEffectPosition, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectPitch, setEffectPosition, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 const HALF_TURN = f32(3.141592654);
 
 export class OrbitRingEffects {
-  private readonly models: effect[] = [];
+  private readonly models: Effect[] = [];
   private readonly parked: ParkedFlags = [];
 
   constructor(private readonly character: Character, private readonly origin: WorldOrigin) {
@@ -59,7 +59,7 @@ export class OrbitRingEffects {
     }
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     for (const model of this.models) into.push(model);
   }
 

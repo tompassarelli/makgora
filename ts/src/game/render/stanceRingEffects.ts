@@ -4,13 +4,13 @@ import { DuoOrder, DuoRole } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { STANCE_RING_MODEL } from "../presentation/specialCues";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 const RING_SCALE = f32(0.4);
 
 /** A ring on the floor under a partner holding its ground. */
 export class StanceRingEffects {
-  private readonly rings: readonly effect[];
+  private readonly rings: readonly Effect[];
 
   private parked: ParkedFlags | undefined;
 

@@ -2,12 +2,12 @@ import { FighterAgencyForecast, type FighterAgency } from "../presentation/fight
 import type { Fighter } from "../sim/fighter";
 import { hideEffect, type WorldOrigin, placeEffect } from "./effects";
 import { f32 } from "wisp/src/sim/f32";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 
 export class AgencyMarker {
   readonly forecast = new FighterAgencyForecast();
-  private readonly halo: effect;
+  private readonly halo: Effect;
   private shown = false;
 
   constructor(private readonly origin: WorldOrigin) {
@@ -40,7 +40,7 @@ export class AgencyMarker {
     this.shown = false;
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     into.push(this.halo);
   }
 

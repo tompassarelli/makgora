@@ -4,6 +4,7 @@ import { Phase, ResultPick } from "../src/game/lobby/lobbyState";
 import { pickResult } from "../src/host/loop/menus";
 import { shell } from "../src/host/loop/state";
 import { NEUTRAL_INPUT, createStandaloneSession } from "../scripts/wisp/standalone";
+import { CameraField } from "wisp/game/view";
 
 const MATCH_FRAME_LIMIT = 20000;
 const RESULT_FRAMES = 700;
@@ -13,7 +14,7 @@ type Session = Awaited<ReturnType<typeof createStandaloneSession>>;
 const read = (session: Session): number[] => {
   let fields: number[] = [];
   session.client.run(() => {
-    fields = [CAMERA_FIELD_ROTATION, CAMERA_FIELD_ANGLE_OF_ATTACK, CAMERA_FIELD_TARGET_DISTANCE, CAMERA_FIELD_ZOFFSET, CAMERA_FIELD_FIELD_OF_VIEW].map(field => GetCameraField(field));
+    fields = [CameraField.rotation, CameraField.angleOfAttack, CameraField.targetDistance, CameraField.zOffset, CameraField.fieldOfView].map(field => GetCameraField(field));
     fields.push(GetCameraTargetPositionX());
   });
   return fields;

@@ -4,7 +4,8 @@ import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, size
 import { GAME_TITLE } from "./title";
 import { MENU_STYLE } from "./hudLayout";
 import { boxContains } from "./selectionLayout";
-import { createFrameByType, setFrameEnabled, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible } from "wisp/game/frames";
+import { createFrameByType, Frame, setFrameEnabled, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible, TextAlignment } from "wisp/game/frames";
+import type { Player } from "wisp/game/players";
 
 const ROW_LEFT = f32(f32(0.092) + MENU_STYLE.bodyInset);
 const ROW_WIDTH = f32(f32(0.616) - 2 * MENU_STYLE.bodyInset);
@@ -12,13 +13,13 @@ const ROW_HEIGHT = f32(0.036);
 const ROW_TOP = f32(0.323);
 
 export class PauseMenu {
-  private readonly root: framehandle;
-  private readonly option: framehandle;
+  private readonly root: Frame;
+  private readonly option: Frame;
   private readonly clicks: ButtonClicks<number>;
   private hovered = false;
   private shown = false;
 
-  constructor(select: (choice: number, clicker: player) => void) {
+  constructor(select: (choice: number, clicker: Player) => void) {
     this.clicks = new ButtonClicks("ui.pause.click", select, choice => this.highlight(choice !== undefined));
     this.root = createBackdrop("SmashcraftPause", consoleUi(), 1800);
     placeTopLeft(this.root, f32(0.08), f32(0.53));
@@ -29,7 +30,7 @@ export class PauseMenu {
       const frame = createText(name, parent, 1801);
       placeTopLeft(frame, ROW_LEFT, y);
       sizeText(frame, size, ROW_WIDTH, height);
-      setFrameTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+      setFrameTextAlignment(frame, TextAlignment.middle, TextAlignment.center);
       setFrameEnabled(frame, false);
       if (parent === this.root) setFrameLevel(frame, 21);
       return frame;
@@ -49,7 +50,7 @@ export class PauseMenu {
     return this.shown && boxContains({ x: ROW_LEFT, y: ROW_TOP, width: ROW_WIDTH, height: ROW_HEIGHT }, x, y);
   }
 
-  bindActions(select: (choice: number, clicker: player) => void): void {
+  bindActions(select: (choice: number, clicker: Player) => void): void {
     bindPrototype(this.clicks, ButtonClicks.prototype);
     this.clicks.bindHandler(select, choice => this.highlight(choice !== undefined));
   }

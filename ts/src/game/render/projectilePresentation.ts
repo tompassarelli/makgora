@@ -20,7 +20,7 @@ import { cameraLift } from "./cameraLift";
 import { tintProjectile } from "./projectileTint";
 import { addPoolEffect, addPoolEffects } from "./projectilePoolEffects";
 import { EyeBeamLine } from "./eyeBeamLine";
-import { clearEffectSubAnimations, createBeam, createEffect, destroyBeam, destroyEffect, moveBeam, playEffectAnimation, resetEffectMatrix, setBeamColor, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPitch, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { Beam, clearEffectSubAnimations, createBeam, createEffect, destroyBeam, destroyEffect, Effect, EffectAnimation, moveBeam, playEffectAnimation, resetEffectMatrix, setBeamColor, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPitch, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx",
@@ -79,7 +79,7 @@ interface Pool {
 }
 
 export class ProjectilePresentation {
-  readonly models: effect[] = [];
+  readonly models: Effect[] = [];
   private readonly visible: boolean[] = [];
   private readonly pools: Pool[] = [];
 
@@ -95,7 +95,7 @@ export class ProjectilePresentation {
   private readonly risen: (Risen | undefined)[] = [];
   private readonly risenAge: number[] = [];
   private parked: ParkedFlags | undefined;
-  private readonly aimedShot: lightning[] = [];
+  private readonly aimedShot: Beam[] = [];
   private readonly lineShown: boolean[] = [];
   private readonly eyeBeam: EyeBeamLine;
   private readonly disc: DiscLook = { lift: 0.0, radius: 0.0, red: 0, green: 0, blue: 0, alpha: 0 };
@@ -165,7 +165,7 @@ export class ProjectilePresentation {
   }
 
 
-  private hide(model: effect, parked: ParkedFlags, index: number): void {
+  private hide(model: Effect, parked: ParkedFlags, index: number): void {
     if (!parkCue(model, this.origin, parked, index)) return;
     for (const pool of this.pools) if (pool.park !== undefined && pool.effects.includes(index)) setEffectAnimation(model, pool.park);
   }
@@ -187,7 +187,7 @@ export class ProjectilePresentation {
     for (let index = 0; index < this.assigned.length; index++) this.assigned[index] = -1;
   }
 
-  drawnModel(index: number): effect | undefined {
+  drawnModel(index: number): Effect | undefined {
     return this.models[this.assigned[index] ?? -1];
   }
 
@@ -364,7 +364,7 @@ export class ProjectilePresentation {
       }
       if (rebirth) {
         clearEffectSubAnimations(model);
-        playEffectAnimation(model, ANIM_TYPE_BIRTH);
+        playEffectAnimation(model, EffectAnimation.birth);
       }
       if (!paused && projectile !== undefined) this.lives[slot] = projectile.life;
       if (risen) {

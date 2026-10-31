@@ -11,8 +11,8 @@ import { fighterPortrait } from "../roster/looks";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "../ui/frames";
 import { MENU_FONT, PANEL_TEXTURE } from "../ui/hudLayout";
 import { type ParkedFlags, type WorldOrigin, parkOnce } from "./effects";
-import { createEffect, destroyEffect, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
-import { destroyFrame, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { destroyFrame, Frame, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 
 
 const ZONE_EFFECTS = 4;
@@ -25,17 +25,17 @@ const moment: BossMoment = { strike: -1, index: 0, phase: BossPhase.opening, fra
 
 export class ClassicPresentation {
   private boss: BossDefinition | undefined;
-  private body: effect | undefined;
-  private tells: effect[] = [];
-  private hits: effect[] = [];
+  private body: Effect | undefined;
+  private tells: Effect[] = [];
+  private hits: Effect[] = [];
   private readonly parked: ParkedFlags = [];
   private lastStrike = -1;
   private lastPhase: BossPhase = BossPhase.opening;
-  private readonly card: framehandle;
-  private readonly portrait: framehandle;
-  private readonly speaker: framehandle;
-  private readonly lines: framehandle;
-  private readonly results: framehandle;
+  private readonly card: Frame;
+  private readonly portrait: Frame;
+  private readonly speaker: Frame;
+  private readonly lines: Frame;
+  private readonly results: Frame;
   private cardText = "";
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
@@ -48,12 +48,12 @@ export class ClassicPresentation {
     placeTopLeft(this.portrait, f32(0.165), f32(0.455));
     setFrameSize(this.portrait, f32(0.12), f32(0.17));
     setFrameEnabled(this.portrait, false);
-    const text = (name: string, context: number, top: number, height: number, size: number): framehandle => {
+    const text = (name: string, context: number, top: number, height: number, size: number): Frame => {
       const frame = createText(name, this.card, context);
       placeTopLeft(frame, f32(0.3), top);
       setFrameSize(frame, f32(0.335), height);
       setFrameFont(frame, MENU_FONT, size, 0);
-      setFrameTextAlignment(frame, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+      setFrameTextAlignment(frame, TextAlignment.top, TextAlignment.left);
       setFrameEnabled(frame, false);
       return frame;
     };
@@ -114,9 +114,9 @@ export class ClassicPresentation {
     const now = bossMoment(boss, clock, moment);
     const strike = boss.strikes[now.index];
     if (now.strike !== this.lastStrike || now.phase !== this.lastPhase) {
-      if (now.phase === BossPhase.tell) playEffectAnimation(body, ANIM_TYPE_SPELL);
-      else if (now.phase === BossPhase.active) playEffectAnimation(body, ANIM_TYPE_ATTACK);
-      else if (now.phase === BossPhase.rest) playEffectAnimation(body, ANIM_TYPE_STAND);
+      if (now.phase === BossPhase.tell) playEffectAnimation(body, EffectAnimation.spell);
+      else if (now.phase === BossPhase.active) playEffectAnimation(body, EffectAnimation.attack);
+      else if (now.phase === BossPhase.rest) playEffectAnimation(body, EffectAnimation.stand);
       this.lastStrike = now.strike;
       this.lastPhase = now.phase;
     }

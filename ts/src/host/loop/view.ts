@@ -66,9 +66,9 @@ import { clockSeconds } from "./trace";
 import { frameCaptureStage } from "../../platform/captureStage";
 import { markLoreClear, presentMatchPanels, presentMessages, updateSlotHud } from "./viewHud";
 import { presentHydra, presentSlot, presentStageMotion } from "./viewPresentation";
-import { createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectYaw } from "wisp/game/effects";
-import { clearTextMessages, createFrameByType, originFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameFont, setFrameSize, setFrameTextAlignment } from "wisp/game/frames";
-import { panCameraTo, setCameraBounds, setCameraField, setCameraPosition } from "wisp/game/view";
+import { createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectYaw } from "wisp/game/effects";
+import { clearTextMessages, createFrameByType, Frame, FramePoint, originFrame, OriginFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameFont, setFrameSize, setFrameTextAlignment, TextAlignment } from "wisp/game/frames";
+import { CameraField, panCameraTo, setCameraBounds, setCameraField, setCameraPosition } from "wisp/game/view";
 import { setBodyAnimation, setBodyAnimationIndex, setBodyTimeScale, showBody } from "wisp/game/bodies";
 import { formatReal, toReal } from "wisp/game/text";
 
@@ -103,12 +103,12 @@ export function announce(s: ShellState, text: string): void {
 }
 
 
-function createStatusText(name: string, x: number, y: number, width: number, height: number, size: number): framehandle {
-  const frame = createFrameByType("TEXT", name, originFrame(ORIGIN_FRAME_GAME_UI, 0), "", 0);
-  setFrameAbsPoint(frame, FRAMEPOINT_TOPLEFT, x, y);
+function createStatusText(name: string, x: number, y: number, width: number, height: number, size: number): Frame {
+  const frame = createFrameByType("TEXT", name, originFrame(OriginFrame.gameUi, 0), "", 0);
+  setFrameAbsPoint(frame, FramePoint.topLeft, x, y);
   setFrameSize(frame, width, height);
   setFrameFont(frame, "Fonts\\FRIZQT__.TTF", size, 0);
-  setFrameTextAlignment(frame, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+  setFrameTextAlignment(frame, TextAlignment.top, TextAlignment.left);
   return frame;
 }
 
@@ -153,7 +153,7 @@ function clearStageDecks(s: ShellState): void {
   s.stageDeckParts.length = 0;
 }
 
-function placePart(deck: effect, part: Readonly<PlatformPart>, x: number, y: number, z: number): void {
+function placePart(deck: Effect, part: Readonly<PlatformPart>, x: number, y: number, z: number): void {
   setEffectPosition(deck, x + part.x, y + part.y, z + part.z);
   // Native yaw discards an earlier matrix scale (0.0.103 drew Frozen Throne's floes unsquashed), so the scale goes last.
   setEffectYaw(deck, part.yaw * (Math.PI / 180.0));
@@ -202,7 +202,7 @@ export function drawStage(s: ShellState): void {
     setEffectPosition(effect, origin.x + light.x, origin.y + light.y, origin.z + light.z);
     setEffectScale(effect, 0.75);
     setEffectColor(effect, 96, 255, 64);
-    playEffectAnimation(effect, ANIM_TYPE_STAND);
+    playEffectAnimation(effect, EffectAnimation.stand);
     s.stageDeckParts.push(effect);
   }
   if (hasLava(stage)) {
@@ -213,7 +213,7 @@ export function drawStage(s: ShellState): void {
     const drawn = drawnScale(piece);
     setEffectScale(s.stageLava, drawn.scale);
     if (drawn.matrixScale !== undefined) setEffectMatrixScale(s.stageLava, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
-    playEffectAnimation(s.stageLava, ANIM_TYPE_STAND);
+    playEffectAnimation(s.stageLava, EffectAnimation.stand);
     presentLava(s, stage, stageFrame);
   }
   s.drawnStage = stage;
@@ -460,13 +460,13 @@ function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect:
     const right = centerX + bounds.right;
     setCameraBounds(left, centerY, right, centerY, left, centerY, right, centerY);
   } else setCameraBounds(targetX, centerY, targetX, centerY, targetX, centerY, targetX, centerY);
-  setCameraField(CAMERA_FIELD_ROTATION, ARENA_CAMERA.rotation, 0.0);
-  setCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, angle, 0.0);
-  setCameraField(CAMERA_FIELD_TARGET_DISTANCE, framing.distance, duration);
-  setCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + framing.z, duration);
-  setCameraField(CAMERA_FIELD_ROLL, 0.0, 0.0);
-  setCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(framing, aspect), duration);
-  setCameraField(CAMERA_FIELD_FARZ, arenaFarZ(s.game.stageChoice, framing), 0.0);
+  setCameraField(CameraField.rotation, ARENA_CAMERA.rotation, 0.0);
+  setCameraField(CameraField.angleOfAttack, angle, 0.0);
+  setCameraField(CameraField.targetDistance, framing.distance, duration);
+  setCameraField(CameraField.zOffset, FLOOR_HEIGHT + framing.z, duration);
+  setCameraField(CameraField.roll, 0.0, 0.0);
+  setCameraField(CameraField.fieldOfView, cameraFieldOfView(framing, aspect), duration);
+  setCameraField(CameraField.farZ, arenaFarZ(s.game.stageChoice, framing), 0.0);
   if (duration > 0.0) panCameraTo(targetX, centerY, duration);
   else setCameraPosition(targetX, centerY);
 }
@@ -503,10 +503,10 @@ export function lockArenaCamera(s: ShellState): void {
   if (s.build.analogPadDiagnostic === true) {
 
     setCameraBounds(centerX, centerY, centerX, centerY, centerX, centerY, centerX, centerY);
-    setCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, 270.0, 0.0);
-    setCameraField(CAMERA_FIELD_TARGET_DISTANCE, 3200.0, 0.0);
-    setCameraField(CAMERA_FIELD_ZOFFSET, 0.0, 0.0);
-    setCameraField(CAMERA_FIELD_FIELD_OF_VIEW, 70.0, 0.0);
+    setCameraField(CameraField.angleOfAttack, 270.0, 0.0);
+    setCameraField(CameraField.targetDistance, 3200.0, 0.0);
+    setCameraField(CameraField.zOffset, 0.0, 0.0);
+    setCameraField(CameraField.fieldOfView, 70.0, 0.0);
     setCameraPosition(centerX, centerY);
   }
   views(s).items.present(game, world);

@@ -2,7 +2,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../../game/input/partic
 import { isActive } from "../../game/sim/roster";
 import { hideEffect } from "../../game/render/effects";
 import type { ShellState } from "./state";
-import { effectScale, effectX, effectY, effectZ, setEffectPosition, setEffectScale } from "wisp/game/effects";
+import { Effect, effectScale, effectX, effectY, effectZ, setEffectPosition, setEffectScale } from "wisp/game/effects";
 import { bodyHidden, setBodyTeamGlow, showBody } from "wisp/game/bodies";
 import { formatInt } from "wisp/game/text";
 
@@ -15,11 +15,11 @@ export interface HiddenFighter {
 
 export type CloakPart = "fighter" | "cues";
 
-const drawn: effect[] = [];
+const drawn: Effect[] = [];
 interface Placement { readonly scale: number; readonly x: number; readonly y: number; readonly z: number }
-const concealedCues: { readonly models: effect[]; readonly places: Placement[] }[] = PARTICIPANT_SLOTS.map(() => ({ models: [], places: [] }));
+const concealedCues: { readonly models: Effect[]; readonly places: Placement[] }[] = PARTICIPANT_SLOTS.map(() => ({ models: [], places: [] }));
 
-function fighterEffects(s: ShellState, slot: ParticipantSlot): effect[] {
+function fighterEffects(s: ShellState, slot: ParticipantSlot): Effect[] {
   drawn.length = 0;
   const renderers = s.ui?.fighters[slot];
   const body = s.participants[slot].body;
@@ -40,7 +40,7 @@ function fighterEffects(s: ShellState, slot: ParticipantSlot): effect[] {
   return drawn;
 }
 
-function cueEffects(s: ShellState, slot: ParticipantSlot): effect[] {
+function cueEffects(s: ShellState, slot: ParticipantSlot): Effect[] {
   drawn.length = 0;
   const renderers = s.ui?.fighters[slot];
   if (renderers === undefined) return drawn;

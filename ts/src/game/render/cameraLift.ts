@@ -1,6 +1,6 @@
 import { ARENA_CAMERA } from "../presentation/arenaCamera";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
-import { cameraField, cameraTargetX } from "wisp/game/view";
+import { cameraField, CameraField, cameraTargetX } from "wisp/game/view";
 
 export interface CameraLift {
   readonly eyeX: number;
@@ -12,9 +12,9 @@ export interface CameraLift {
 
 export function cameraLift(front: number): CameraLift {
   const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
-  const distance = cameraField(CAMERA_FIELD_TARGET_DISTANCE);
+  const distance = cameraField(CameraField.targetDistance);
   const eyeX = cameraTargetX() - cosineTurns(yaw) * cosineTurns(pitch) * distance;
-  const eyeZ = cameraField(CAMERA_FIELD_ZOFFSET) - sineTurns(pitch) * distance;
+  const eyeZ = cameraField(CameraField.zOffset) - sineTurns(pitch) * distance;
   const toward = sineTurns(yaw) * cosineTurns(pitch) * distance;
   const lift = toward > front * 2.0 ? front / toward : 0.0;
   return { eyeX, eyeZ, lift, front: lift > 0.0 ? front : 0.0 };

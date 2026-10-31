@@ -65,7 +65,9 @@ import { PauseMenu } from "../../game/ui/pauseMenu";
 import { PauseScreen } from "../../game/ui/pauseScreen";
 import { HintStrip } from "../../game/ui/hintStrip";
 import { duoRole } from "../../game/sim/fighter";
-import { player as playerOf, playerControl, playerSlotState } from "wisp/game/players";
+import { Player, player as playerOf, playerControl, PlayerControl, playerSlotState, PlayerSlotState } from "wisp/game/players";
+import type { Frame } from "wisp/game/frames";
+import type { Effect } from "wisp/game/effects";
 
 
 interface FighterRenderers {
@@ -156,7 +158,7 @@ function menuControls(s: Readonly<ShellState>): MenuControls {
 }
 
 // Create shared panels, HUD plates and effect pools in the same order on every client.
-export function createUi(s: ShellState, actions: PanelActions, selectPause: (choice: number, clicker: player) => void): UiObjects {
+export function createUi(s: ShellState, actions: PanelActions, selectPause: (choice: number, clicker: Player) => void): UiObjects {
   const controls = menuControls(s);
   let combat: CombatEffects;
   const results = new ResultsBanner();
@@ -229,7 +231,7 @@ function sharedPlay(): boolean {
   let humans = 0;
   for (const slot of PARTICIPANT_SLOTS) {
     const player = playerOf(slot);
-    if (playerControl(player) === MAP_CONTROL_USER && playerSlotState(player) === PLAYER_SLOT_STATE_PLAYING) humans++;
+    if (playerControl(player) === PlayerControl.user && playerSlotState(player) === PlayerSlotState.playing) humans++;
   }
   return humans > 1;
 }
@@ -281,7 +283,7 @@ export function layoutHuds(s: ShellState, hints: boolean): void {
 }
 
 
-function rebindScreens(ui: UiObjects, selectPause: (choice: number, clicker: player) => void, origin: ShellState["origin"]): void {
+function rebindScreens(ui: UiObjects, selectPause: (choice: number, clicker: Player) => void, origin: ShellState["origin"]): void {
   if (ui.pause === undefined) ui.pause = new PauseMenu(selectPause);
   else {
     bindPrototype(ui.pause, PauseMenu.prototype);
@@ -325,7 +327,7 @@ function rebindSlotPanels(s: ShellState, ui: UiObjects, actions: PanelActions, s
     ui.selections[slot] = new SelectionPanel(actions.selection, slot, menuControls(s), sourceVersion());
   } else ui.selections[slot].bindActions(actions.selection);
   bindPrototype(ui.settings[slot], SettingsPanel.prototype);
-  const retainedSettings: { readonly root?: framehandle } = ui.settings[slot];
+  const retainedSettings: { readonly root?: Frame } = ui.settings[slot];
   if (retainedSettings.root === undefined) ui.settings[slot] = new SettingsPanel(s.participants[slot].bindings, actions.settings, slot);
   else ui.settings[slot].bindActions(actions.settings);
 }
@@ -359,7 +361,7 @@ function rebindMatchPanels(s: ShellState, ui: UiObjects): void {
   if (retained.match === undefined) ui.match = new MatchPresentation(s.origin, ui.results);
   else bindPrototype(ui.match, MatchPresentation.prototype);
 
-  const retainedElements: { readonly elements?: { readonly hitCues?: readonly effect[] } } = ui;
+  const retainedElements: { readonly elements?: { readonly hitCues?: readonly Effect[] } } = ui;
   if (retainedElements.elements === undefined) ui.elements = new ElementEffects(s.origin);
   else if (retainedElements.elements.hitCues === undefined) {
     ui.elements.destroy();
@@ -393,7 +395,7 @@ function rebindFighterRenderers(renderers: FighterRenderers): void {
   bindPrototype(renderers.seaSplash, SeaSplashPresentation.prototype);
 }
 
-export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (choice: number, clicker: player) => void): void {
+export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (choice: number, clicker: Player) => void): void {
   const ui = s.ui;
   if (ui === undefined) return;
   rebindScreens(ui, selectPause, s.origin);

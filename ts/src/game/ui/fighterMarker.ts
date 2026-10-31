@@ -5,7 +5,7 @@ import { slotColor } from "./slotColors";
 import { createBackdrop, createText, consoleUi } from "./frames";
 import { MENU_FONT, markerArrowTexture } from "./hudLayout";
 import { attachOutline, createOutline, createTemplateOutline, setOutlineText } from "./textOutline";
-import { createFrame, createFrameByType, destroyFrame, setFrameAbsPoint, setFrameEnabled, setFrameFont, setFrameLevel, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { createFrame, createFrameByType, destroyFrame, Frame, FramePoint, setFrameAbsPoint, setFrameEnabled, setFrameFont, setFrameLevel, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { player, playerName as playerNameOf } from "wisp/game/players";
 import { formatInt } from "wisp/game/text";
 
@@ -59,13 +59,13 @@ export function spreadMarkers(x: number[], y: readonly number[], shown: readonly
 
 
 export class FighterMarker {
-  private readonly root: framehandle;
-  private readonly damageOutline: readonly framehandle[];
-  private readonly percentOutline: readonly framehandle[];
-  private readonly damage: framehandle;
-  private readonly percent: framehandle;
-  private readonly name: framehandle;
-  private readonly arrow: framehandle;
+  private readonly root: Frame;
+  private readonly damageOutline: readonly Frame[];
+  private readonly percentOutline: readonly Frame[];
+  private readonly damage: Frame;
+  private readonly percent: Frame;
+  private readonly name: Frame;
+  private readonly arrow: Frame;
   private readonly jolt: NumberJolt = numberJolt();
   private shown = false;
   private shownColor: number | undefined;
@@ -93,15 +93,15 @@ export class FighterMarker {
     setFrameSize(this.arrow, unitsForPixels(ARROW_WIDTH_PX), unitsForPixels(ARROW_HEIGHT_PX));
     setFrameEnabled(this.arrow, false);
     setFrameLevel(this.arrow, LEVEL);
-    setFramePoint(this.arrow, FRAMEPOINT_BOTTOM, this.root, FRAMEPOINT_BOTTOM, 0.0, 0.0);
-    setFramePoint(this.name, FRAMEPOINT_BOTTOM, this.root, FRAMEPOINT_BOTTOM, 0.0, unitsForPixels(ARROW_HEIGHT_PX));
-    setFrameTextAlignment(this.name, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_CENTER);
-    setFrameTextAlignment(this.damage, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
-    setFrameTextAlignment(this.percent, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
-    setFramePoint(this.percent, FRAMEPOINT_BOTTOMLEFT, this.damage, FRAMEPOINT_BOTTOMRIGHT, 0.0, unitsForPixels(10));
+    setFramePoint(this.arrow, FramePoint.bottom, this.root, FramePoint.bottom, 0.0, 0.0);
+    setFramePoint(this.name, FramePoint.bottom, this.root, FramePoint.bottom, 0.0, unitsForPixels(ARROW_HEIGHT_PX));
+    setFrameTextAlignment(this.name, TextAlignment.bottom, TextAlignment.center);
+    setFrameTextAlignment(this.damage, TextAlignment.bottom, TextAlignment.right);
+    setFrameTextAlignment(this.percent, TextAlignment.bottom, TextAlignment.left);
+    setFramePoint(this.percent, FramePoint.bottomLeft, this.damage, FramePoint.bottomRight, 0.0, unitsForPixels(10));
     this.placeNumber();
-    attachOutline(this.damageOutline, this.damage, OUTLINE_PX / NUMBER_SCALE, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
-    attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
+    attachOutline(this.damageOutline, this.damage, OUTLINE_PX / NUMBER_SCALE, TextAlignment.bottom, TextAlignment.right);
+    attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TextAlignment.bottom, TextAlignment.left);
     setFrameVisible(this.root, false);
   }
 
@@ -134,7 +134,7 @@ export class FighterMarker {
     if (moved) {
       this.shownX = x;
       this.shownY = y;
-      setFrameAbsPoint(this.root, FRAMEPOINT_BOTTOM, x, y);
+      setFrameAbsPoint(this.root, FramePoint.bottom, x, y);
     }
     if (moved || jolted) this.placeNumber();
   }
@@ -160,10 +160,10 @@ export class FighterMarker {
   private placeNumber(): void {
     const right = this.shownX + unitsForPixels(NUMBER_RIGHT_PX + this.jolt.dx);
     const bottom = this.shownY + unitsForPixels(markerNumberRisePx(this.shownPartner === true) - this.jolt.dy);
-    setFrameAbsPoint(this.damage, FRAMEPOINT_BOTTOMRIGHT, right, bottom);
+    setFrameAbsPoint(this.damage, FramePoint.bottomRight, right, bottom);
   }
 
-  private text(name: string, context: number, size: number, width: number, height: number): framehandle {
+  private text(name: string, context: number, size: number, width: number, height: number): Frame {
     const frame = createText(name, this.root, context);
     setFrameFont(frame, MENU_FONT, size, 1);
     setFrameSize(frame, unitsForPixels(width), unitsForPixels(height));
@@ -172,7 +172,7 @@ export class FighterMarker {
     return frame;
   }
 
-  private number(context: number): framehandle {
+  private number(context: number): Frame {
     const frame = createFrame("SmashcraftDamage", this.root, 0, context);
     setFrameScale(frame, NUMBER_SCALE);
     setFrameSize(frame, unitsForPixels(NUMBER_WIDTH_PX) / NUMBER_SCALE, unitsForPixels(NUMBER_HEIGHT_PX) / NUMBER_SCALE);

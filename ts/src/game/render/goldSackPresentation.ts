@@ -4,10 +4,10 @@ import { GOLD_SACK_MODEL, GOLD_SACK_FULL_SCALE, GOLD_SACK_ON_BACK, goldSackStore
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
-import { createEffect, destroyEffect, setEffectScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectScale, setEffectYaw } from "wisp/game/effects";
 
 export class GoldSackPresentation {
-  private readonly sack: effect;
+  private readonly sack: Effect;
   private readonly placement = { x: 0.0, z: 0.0 };
   private shown = false;
 
@@ -30,7 +30,7 @@ export class GoldSackPresentation {
     setEffectScale(this.sack, GOLD_SACK_FULL_SCALE * scale);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     into.push(this.sack);
   }
 

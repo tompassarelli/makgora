@@ -7,7 +7,7 @@ import { createOpponentSettings } from "./opponentSettingsFrames";
 import { type ClickBox, gameUi, setMenuText } from "./frames";
 import { CPU_SETTINGS_BOXES } from "./cpuSettingsLayout";
 import { titleCase } from "./selectionFrames";
-import { setFrameEnabled, setFrameLevel, setFrameVisible } from "wisp/game/frames";
+import { Frame, setFrameEnabled, setFrameLevel, setFrameVisible } from "wisp/game/frames";
 
 export interface CpuDefaults {
   readonly opponent: MatchState["cpuOpponents"][number];
@@ -17,21 +17,21 @@ export interface CpuDefaults {
 export type CpuButton = { kind: "cpuStep"; row: 0 | 1; direction: -1 | 1 } | { kind: "cpuClose" };
 
 export interface CpuSettingsFrames {
-  readonly root: framehandle;
-  readonly title: framehandle;
-  readonly values: readonly framehandle[];
-  readonly preview: framehandle;
-  readonly prompt: framehandle;
-  readonly done: framehandle;
-  readonly steps: readonly framehandle[];
+  readonly root: Frame;
+  readonly title: Frame;
+  readonly values: readonly Frame[];
+  readonly preview: Frame;
+  readonly prompt: Frame;
+  readonly done: Frame;
+  readonly steps: readonly Frame[];
 }
 
-export function createCpuSettings(participantId: number, add: (frame: framehandle, target: CpuButton, text: string, box: ClickBox) => framehandle): CpuSettingsFrames {
+export function createCpuSettings(participantId: number, add: (frame: Frame, target: CpuButton, text: string, box: ClickBox) => Frame): CpuSettingsFrames {
   const cpu = createOpponentSettings(gameUi(), participantId);
   if (cpu === undefined) throw new Error("the Opponent settings frames did not load");
   setFrameLevel(cpu.root, SELECT_LEVELS.cpuSettings);
-  const steps: framehandle[] = [];
-  const cpuButton = (frame: framehandle, button: CpuButton, box: ClickBox) => {
+  const steps: Frame[] = [];
+  const cpuButton = (frame: Frame, button: CpuButton, box: ClickBox) => {
     if (button.kind === "cpuStep") steps.push(frame);
     return add(frame, button, button.kind === "cpuStep" ? button.direction < 0 ? "<" : ">" : frame === cpu.close ? "Close" : "Done", box);
   };

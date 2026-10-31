@@ -4,8 +4,9 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { ResultRow } from "../presentation/matchCues";
 import { ButtonClicks, createBackdrop, createText, gameUi, highlightText, placeTopLeft, setMenuText, sizeText, styleMenuPanel } from "./frames";
 import { MENU_STYLE } from "./hudLayout";
-import { createFrame, setFrameEnabled, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible } from "wisp/game/frames";
+import { createFrame, Frame, setFrameEnabled, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
+import type { Player } from "wisp/game/players";
 
 export const RESULT_CHOICE_NAMES = ["Rematch", "New stage", "Character select"] as const;
 
@@ -21,11 +22,11 @@ export const choiceLeft = (choice: number): number =>
   f32(f32(0.4) - f32(f32(RESULT_CHOICE_NAMES.length * BUTTON_WIDTH + (RESULT_CHOICE_NAMES.length - 1) * BUTTON_GAP) / 2) + choice * f32(BUTTON_WIDTH + BUTTON_GAP));
 
 export class ResultsBanner {
-  private readonly root: framehandle;
-  private readonly heading: framehandle;
-  private readonly columns: framehandle[] = [];
-  private readonly buttons: framehandle[] = [];
-  private readonly help: framehandle;
+  private readonly root: Frame;
+  private readonly heading: Frame;
+  private readonly columns: Frame[] = [];
+  private readonly buttons: Frame[] = [];
+  private readonly help: Frame;
   readonly clicks: ButtonClicks<number>;
 
   constructor() {
@@ -40,7 +41,7 @@ export class ResultsBanner {
       const frame = createText(name, owner, 0);
       placeTopLeft(frame, x, y);
       sizeText(frame, size, width, height);
-      setFrameTextAlignment(frame, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER);
+      setFrameTextAlignment(frame, TextAlignment.top, TextAlignment.center);
       setFrameEnabled(frame, false);
       return frame;
     };
@@ -62,7 +63,7 @@ export class ResultsBanner {
     return this.clicks.over(x, y);
   }
 
-  bindActions(select: (choice: number, clicker: player) => void): void {
+  bindActions(select: (choice: number, clicker: Player) => void): void {
     this.clicks.bindHandler(select);
   }
 

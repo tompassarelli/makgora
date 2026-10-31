@@ -16,7 +16,7 @@ import { type MachineRate, machineRate, noteMachineSecond } from "wisp/src/netco
 import { type Roster, isActive } from "../../game/sim/roster";
 import { LEDGER_MARK, handleLedger, receiveLedgerReport, takeLedgerReport } from "./handleLedger";
 import { createEvents, onEvents } from "wisp/game/events";
-import { setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
+import { Frame, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 import { eventPlayer, localPlayer, player, playerSlot } from "wisp/game/players";
 import { addSyncEvent, sendSync, syncData } from "wisp/game/sync";
 import { formatInt, parseInt } from "wisp/game/text";
@@ -53,7 +53,7 @@ export interface NetDelay {
   proposed: number;
   depth: number;
   shownDepth: number;
-  indicator: framehandle | undefined;
+  indicator: Frame | undefined;
   shownText: string;
   readonly arrivals: number[];
   readonly lateSum: number[];

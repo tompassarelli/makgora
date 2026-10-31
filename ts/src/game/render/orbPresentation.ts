@@ -1,11 +1,11 @@
 import { ORB_HEIGHT, type OrbClock, orbPoint, orbWarned, orbWarningFrames } from "../sim/orbs";
 import { ORB_MARKER_SCALE_END, ORB_SCALE, type OrbSighting, createOrbSighting, orbMarkerAlpha, orbMarkerScale, sightOrb } from "../presentation/orbLook";
 import { hideEffect, STOCK_MODELS, type WorldOrigin } from "./effects";
-import { createEffect, playEffectAnimation, setEffectAlpha, setEffectPosition, setEffectScale } from "wisp/game/effects";
+import { createEffect, Effect, EffectAnimation, playEffectAnimation, setEffectAlpha, setEffectPosition, setEffectScale } from "wisp/game/effects";
 
 export class OrbPresentation {
-  private readonly marker: effect;
-  private readonly orb: effect;
+  private readonly marker: Effect;
+  private readonly orb: Effect;
   private markerShown = false;
   private shown = false;
   private bursting = false;
@@ -40,7 +40,7 @@ export class OrbPresentation {
     if (live) {
       setEffectPosition(this.orb, this.origin.x + point.x, this.origin.y, this.origin.z + point.z + ORB_HEIGHT);
       setEffectScale(this.orb, ORB_SCALE);
-      playEffectAnimation(this.orb, bursting ? ANIM_TYPE_DEATH : ANIM_TYPE_STAND);
+      playEffectAnimation(this.orb, bursting ? EffectAnimation.death : EffectAnimation.stand);
     }
     this.shown = live;
     this.bursting = bursting;

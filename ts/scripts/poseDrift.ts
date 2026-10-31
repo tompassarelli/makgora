@@ -18,6 +18,7 @@ import { Effects } from "../node_modules/wisp/src/game/native/effectStore";
 import { FRAMES_PER_SECOND } from "../node_modules/wisp/src/game/native/frameRate";
 import { bindWorld, type World } from "../node_modules/wisp/src/game/native/world";
 import type { Handle } from "../node_modules/wisp/src/game/native/types";
+import type { Effect } from "wisp/game/effects";
 
 const FRAME_SECONDS = 1 / FRAMES_PER_SECOND;
 const NEUTRAL = neutralControls();
@@ -53,7 +54,7 @@ for (const [index, character] of characters.entries()) {
   if (!pool.admitted()) throw new Error(`${fighterSlug(character)}: no pooled body`);
   const draw = createFighterDraw();
   const report: Report = { name: fighterSlug(character), frames: 0, openingFrames: 0, openingDrift: 0, minDrift: Infinity, maxDrift: -Infinity, clockRuns: false };
-  const bodies: effect[] = [];
+  const bodies: Effect[] = [];
   pool.drawnEffects(bodies);
   effects.draw(FRAME_SECONDS);
   let clock: number | undefined;

@@ -27,9 +27,9 @@ import { ButtonClicks, createBackdrop, createText, gameUi, placeTopLeft, setMenu
 import { MENU_FONT, MENU_STYLE } from "./hudLayout";
 import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
 import { START_HINT } from "./helpText";
-import { createEvents, destroyEvents, onEvents } from "wisp/game/events";
-import { addFrameEvent, createFrameByType, destroyFrame, eventFrameEvent, eventFrameText, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTextLimit, setFrameTexture, setFrameVisible } from "wisp/game/frames";
-import { eventPlayer, localPlayer, player as playerOf } from "wisp/game/players";
+import { createEvents, destroyEvents, Events, onEvents } from "wisp/game/events";
+import { addFrameEvent, createFrameByType, destroyFrame, eventFrameEvent, eventFrameText, Frame, FrameEvent, FramePoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTextLimit, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
+import { eventPlayer, localPlayer, Player, player as playerOf } from "wisp/game/players";
 import { formatInt } from "wisp/game/text";
 
 export interface SettingsActions {
@@ -40,9 +40,9 @@ type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "custo
 
 interface KeyButton {
   readonly key: number;
-  readonly frame: framehandle;
-  readonly action: framehandle;
-  readonly clear: readonly framehandle[];
+  readonly frame: Frame;
+  readonly action: Frame;
+  readonly clear: readonly Frame[];
 }
 
 export const PICKER_DONE = { x: f32(0.23), y: f32(0.155), width: f32(0.105), height: f32(0.032) } as const;
@@ -60,9 +60,9 @@ const DIM_KEY = 105;
 const LIT_KEY = 255;
 const CLEAR_SIZE = f32(0.012);
 
-type SlotButton = { readonly frames: readonly framehandle[]; readonly label: framehandle };
+type SlotButton = { readonly frames: readonly Frame[]; readonly label: Frame };
 
-function createNameBox(root: framehandle, participantId: number): framehandle {
+function createNameBox(root: Frame, participantId: number): Frame {
   const box = createFrameByType("EDITBOX", `MeleeSettingsNameBox${formatInt(participantId)}`, root, "EscMenuEditBoxTemplate", participantId);
   placeTopLeft(box, NAME_BOX.x, NAME_BOX.y);
   setFrameSize(box, NAME_BOX.width, NAME_BOX.height);
@@ -72,7 +72,7 @@ function createNameBox(root: framehandle, participantId: number): framehandle {
   return box;
 }
 
-function profileSlots(button: (slot: number, x: number, y: number, width: number, height: number) => { readonly art: framehandle; readonly label: framehandle; readonly hotspot: framehandle }): readonly SlotButton[] {
+function profileSlots(button: (slot: number, x: number, y: number, width: number, height: number) => { readonly art: Frame; readonly label: Frame; readonly hotspot: Frame }): readonly SlotButton[] {
   const slots: SlotButton[] = [];
   for (let slot = 0; slot < CUSTOM_SLOT_COUNT; slot++) {
     const { x, y, width, height } = profileSlotButton(slot);
@@ -88,21 +88,21 @@ function leaveSlotModes(settings: BindingSettings, kind: SettingsButton["kind"])
 }
 
 export class SettingsPanel {
-  readonly root: framehandle;
-  private readonly hint: framehandle;
-  private readonly help: framehandle;
-  private readonly status: framehandle;
-  private readonly presets: readonly (readonly [BindingPreset, framehandle])[];
+  readonly root: Frame;
+  private readonly hint: Frame;
+  private readonly help: Frame;
+  private readonly status: Frame;
+  private readonly presets: readonly (readonly [BindingPreset, Frame])[];
   private readonly keys: readonly KeyButton[];
   private readonly clicks: ButtonClicks<SettingsButton>;
-  private readonly profileButton: framehandle;
+  private readonly profileButton: Frame;
   private readonly slotButtons: readonly SlotButton[];
-  private readonly nameButton: framehandle;
-  private readonly customOnly: readonly framehandle[];
-  private readonly nameBox: framehandle;
-  private readonly nameEvents: trigger;
-  private readonly hintsButton: framehandle;
-  private readonly bindButton: { readonly frames: readonly framehandle[]; readonly label: framehandle };
+  private readonly nameButton: Frame;
+  private readonly customOnly: readonly Frame[];
+  private readonly nameBox: Frame;
+  private readonly nameEvents: Events;
+  private readonly hintsButton: Frame;
+  private readonly bindButton: { readonly frames: readonly Frame[]; readonly label: Frame };
   private open = false;
   private nameShown = false;
   private lastSignature = "";
@@ -122,7 +122,7 @@ export class SettingsPanel {
     setFrameSize(root, f32(0.66), f32(0.53));
     setFrameLevel(root, 30);
     this.root = root;
-    const text = (name: string, parent: framehandle, size: number, width: number, height: number): framehandle => {
+    const text = (name: string, parent: Frame, size: number, width: number, height: number): Frame => {
       const frame = createText(`${name}${suffix}`, parent, participantId);
       setFrameSize(frame, width, height);
       setFrameFont(frame, MENU_FONT, size, 0);
@@ -130,12 +130,12 @@ export class SettingsPanel {
       setFrameLevel(frame, parent === root ? 31 : 32);
       return frame;
     };
-    const line = (name: string, x: number, y: number, width: number, height: number, size = f32(0.011)): framehandle => {
+    const line = (name: string, x: number, y: number, width: number, height: number, size = f32(0.011)): Frame => {
       const frame = text(name, root, size, width, height);
       placeTopLeft(frame, x, y);
       return frame;
     };
-    const button = (name: string, x: number, y: number, width: number, height: number, caption: string, target: SettingsButton, size = f32(0.011), level = 31): { readonly art: framehandle; readonly label: framehandle; readonly hotspot: framehandle } => {
+    const button = (name: string, x: number, y: number, width: number, height: number, caption: string, target: SettingsButton, size = f32(0.011), level = 31): { readonly art: Frame; readonly label: Frame; readonly hotspot: Frame } => {
       const art = createBackdrop(`${name}Art${suffix}`, root, participantId);
       setFrameTexture(art, BUTTON_TEXTURE, 0, true);
       placeTopLeft(art, x, y);
@@ -143,8 +143,8 @@ export class SettingsPanel {
       setFrameEnabled(art, false);
       setFrameLevel(art, level);
       const label = text(name, art, size, width, height);
-      setFramePoint(label, FRAMEPOINT_CENTER, art, FRAMEPOINT_CENTER, 0.0, 0.0);
-      setFrameTextAlignment(label, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+      setFramePoint(label, FramePoint.center, art, FramePoint.center, 0.0, 0.0);
+      setFrameTextAlignment(label, TextAlignment.middle, TextAlignment.center);
       setMenuText(label, caption);
       const hotspot = createFrameByType("BUTTON", `${name}Hit${suffix}`, root, "", participantId);
       placeTopLeft(hotspot, x, y);
@@ -154,7 +154,7 @@ export class SettingsPanel {
       return { art, label, hotspot };
     };
     setFrameText(line("MeleeSettingsTitle", f32(0.12), f32(0.578), f32(0.3), f32(0.026), f32(0.016)), `${MENU_STYLE.gold}CONTROLS|r`);
-    this.presets = BINDING_PRESETS.map((preset, index): readonly [BindingPreset, framehandle] => {
+    this.presets = BINDING_PRESETS.map((preset, index): readonly [BindingPreset, Frame] => {
       const { x, y, width, height } = presetButton(index);
       return [preset, button(`MeleeSettingsPreset${formatInt(index)}`, x, y, width, height, PRESET_NAMES[preset], { kind: "preset", preset }).label];
     });
@@ -171,12 +171,12 @@ export class SettingsPanel {
       const { art } = button(`MeleeSettingsKey${formatInt(key)}`, x, y, width, KEY_CAP_HEIGHT, "", { kind: "key", key });
       const clear = this.clearCross(root, key, f32(f32(x + width) - CLEAR_SIZE), y);
       const name = text(`MeleeSettingsKeyName${formatInt(key)}`, art, f32(0.011), width, f32(0.016));
-      setFramePoint(name, FRAMEPOINT_TOP, art, FRAMEPOINT_TOP, 0.0, f32(-0.007));
-      setFrameTextAlignment(name, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+      setFramePoint(name, FramePoint.top, art, FramePoint.top, 0.0, f32(-0.007));
+      setFrameTextAlignment(name, TextAlignment.middle, TextAlignment.center);
       setFrameText(name, keyLabel(key));
       const action = text(`MeleeSettingsKeyAction${formatInt(key)}`, art, f32(0.0075), width, f32(0.013));
-      setFramePoint(action, FRAMEPOINT_BOTTOM, art, FRAMEPOINT_BOTTOM, 0.0, f32(0.007));
-      setFrameTextAlignment(action, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+      setFramePoint(action, FramePoint.bottom, art, FramePoint.bottom, 0.0, f32(0.007));
+      setFrameTextAlignment(action, TextAlignment.middle, TextAlignment.center);
       return { key, frame: art, action, clear };
     });
     this.status = line("MeleeSettingsStatus", f32(0.12), f32(0.218), f32(0.6), f32(0.018));
@@ -193,14 +193,14 @@ export class SettingsPanel {
     return this.open && this.clicks.over(x, y);
   }
 
-  private clearCross(root: framehandle, key: number, x: number, y: number): readonly framehandle[] {
+  private clearCross(root: Frame, key: number, x: number, y: number): readonly Frame[] {
     const cross = createText(`MeleeSettingsKeyClear${formatInt(key)}${formatInt(this.participantId)}`, root, this.participantId);
     setFrameSize(cross, CLEAR_SIZE, CLEAR_SIZE);
     setFrameFont(cross, MENU_FONT, f32(0.009), 0);
     setFrameEnabled(cross, false);
     placeTopLeft(cross, x, y);
     setFrameLevel(cross, 34);
-    setFrameTextAlignment(cross, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    setFrameTextAlignment(cross, TextAlignment.middle, TextAlignment.center);
     setFrameText(cross, "|cffff6060x|r");
     const hit = createFrameByType("BUTTON", `MeleeSettingsKeyClearHit${formatInt(key)}`, root, "", this.participantId);
     placeTopLeft(hit, x, y);
@@ -210,10 +210,10 @@ export class SettingsPanel {
     return [cross, hit];
   }
 
-  private nameTrigger(): trigger {
+  private nameTrigger(): Events {
     const trigger = createEvents();
-    addFrameEvent(trigger, this.nameBox, FRAMEEVENT_EDITBOX_TEXT_CHANGED);
-    addFrameEvent(trigger, this.nameBox, FRAMEEVENT_EDITBOX_ENTER);
+    addFrameEvent(trigger, this.nameBox, FrameEvent.editboxTextChanged);
+    addFrameEvent(trigger, this.nameBox, FrameEvent.editboxEnter);
     onEvents(trigger, trampoline(this.nameEvent()));
     this.bindNameEvents();
     return trigger;
@@ -227,7 +227,7 @@ export class SettingsPanel {
     on(this.nameEvent(), () => {
       if (eventPlayer() !== playerOf(this.participantId)) return;
       nameSlot(this.settings, eventFrameText());
-      if (eventFrameEvent() === FRAMEEVENT_EDITBOX_ENTER) endNaming(this.settings);
+      if (eventFrameEvent() === FrameEvent.editboxEnter) endNaming(this.settings);
     });
   }
 
@@ -244,7 +244,7 @@ export class SettingsPanel {
     destroyFrame(this.root);
   }
 
-  private click(button: SettingsButton, clicker: player): void {
+  private click(button: SettingsButton, clicker: Player): void {
     const { settings } = this;
     if (clicker !== playerOf(this.participantId) || !settings.ready) return;
     leaveSlotModes(settings, button.kind);

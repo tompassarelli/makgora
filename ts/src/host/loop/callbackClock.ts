@@ -5,7 +5,7 @@ import { RATES_RECORD_CHARS } from "./sessionRates";
 import { KEY_DOWN, KEY_UP } from "./keyEvents";
 import { DRAW_EVENT, burstAlpha, drawnAlpha } from "./betweenFrames";
 import { activeRollback, shellState } from "./state";
-import { createTimer, destroyTimer, localElapsed, startTimer } from "wisp/game/clock";
+import { createTimer, destroyTimer, localElapsed, startTimer, Timer } from "wisp/game/clock";
 import { displayText } from "wisp/game/frames";
 import { eventKey } from "wisp/game/input";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
@@ -31,7 +31,7 @@ interface CallbackClock {
   readonly run: number;
   readonly key: number;
   readonly limit: number;
-  readonly gameClock: timer;
+  readonly gameClock: Timer;
   readonly records: string[];
   readonly rollbacks: string[];
   readonly events: string[];

@@ -4,10 +4,10 @@ import { SHURIKEN_GLOW_COLOR, SHURIKEN_GLOW_MODEL, SHURIKEN_GLOW_ON_HAND, shurik
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
-import { createEffect, destroyEffect, setEffectColor, setEffectScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectColor, setEffectScale, setEffectYaw } from "wisp/game/effects";
 
 export class ShurikenGlowPresentation {
-  private readonly glow: effect;
+  private readonly glow: Effect;
   private readonly placement = { x: 0.0, z: 0.0 };
   private shown = false;
 
@@ -31,7 +31,7 @@ export class ShurikenGlowPresentation {
     setEffectColor(this.glow, SHURIKEN_GLOW_COLOR[0], SHURIKEN_GLOW_COLOR[1], SHURIKEN_GLOW_COLOR[2]);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     into.push(this.glow);
   }
 

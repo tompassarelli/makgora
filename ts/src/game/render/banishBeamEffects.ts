@@ -3,11 +3,11 @@ import type { Fighter } from "../sim/fighter";
 import { BANISH_SWIRL_COUNT, BANISH_SWIRL_MODEL, BANISH_SWIRL_SCALE, BANISH_SWIRL_TINT } from "../fighters/kaelthas/look";
 import { type BanishSwirl, banishSwirl } from "../presentation/banishBeam";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, facingYaw, parkCue, placeEffect } from "./effects";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 /** Banish's beam: stock Banish swirls spread along the live beam region from Kael's hand. */
 export class BanishBeamEffects {
-  private readonly models: effect[] = [];
+  private readonly models: Effect[] = [];
   private readonly parked: ParkedFlags = [];
   private readonly swirl: BanishSwirl = { x: 0.0, z: 0.0 };
 
@@ -50,7 +50,7 @@ export class BanishBeamEffects {
     }
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     for (const model of this.models) into.push(model);
   }
 

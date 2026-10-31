@@ -4,12 +4,12 @@ import { type Roster, fighterAt } from "../sim/roster";
 import { HOOK_LINK_COUNT, HOOK_LINK_LENGTH, HOOK_LINK_MODEL, HOOK_LINK_ROLL, HOOK_LINK_SCALE, HOOK_LINK_SPACING, type HookChainSpan, emptyHookChainSpan, hookChainLength, hookChainSpan, hookLinkCount } from "../presentation/hookChain";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { hideEffect, placeEffect, type WorldOrigin } from "./effects";
-import { createEffect, destroyEffect, setEffectPitch, setEffectRoll, setEffectScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectPitch, setEffectRoll, setEffectScale } from "wisp/game/effects";
 
 /** The Butcher's hook chain: evenly spaced links from his hand to the hook, or to the foe he reels in. */
 export class HookChainPresentation {
   // Online, Warcraft handles must be born on the same turn on every client, so every link is made at setup and only placed and hidden on presented frames.
-  private readonly links: effect[] = [];
+  private readonly links: Effect[] = [];
   private shown = 0;
   private readonly span: HookChainSpan = emptyHookChainSpan();
 
@@ -50,7 +50,7 @@ export class HookChainPresentation {
     this.shown = count;
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     for (let index = 0; index < this.shown; index++) {
       const link = this.links[index];
       if (link !== undefined) into.push(link);

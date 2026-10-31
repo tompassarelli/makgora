@@ -8,6 +8,7 @@ import type { Fighter } from "../sim/fighter";
 import type { MatchCamera } from "../sim/matchCamera";
 import type { WorldOrigin } from "./effects";
 import { PosedWhiteModel } from "./posedWhiteModel";
+import type { Effect } from "wisp/game/effects";
 
 const FLASH_LIFT = 8.0;
 
@@ -32,7 +33,7 @@ export class BodyFlash {
     this.model.tint(alpha, tint?.red ?? 255, tint?.green ?? 255, tint?.blue ?? 255);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     this.model.drawnEffects(into);
   }
 

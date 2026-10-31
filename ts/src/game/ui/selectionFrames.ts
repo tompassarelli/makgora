@@ -8,7 +8,7 @@ import { Character } from "../sim/codes";
 import { createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
 import { SELECT_GRID_ORDER } from "./selectionLayout";
 import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
-import { createFrame, setFrameAlpha, setFrameEnabled, setFrameSize, setFrameTextAlignment, setFrameTexture } from "wisp/game/frames";
+import { createFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameSize, setFrameTextAlignment, setFrameTexture, TextAlignment } from "wisp/game/frames";
 import { formatInt, parseInt, textLength, toReal } from "wisp/game/text";
 
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
@@ -34,7 +34,7 @@ export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
   [Character.ladyVashj]: "Vashj",
 };
 
-export function art(parent: framehandle, name: string, texture: string, x: number, y: number, width: number, height: number): framehandle {
+export function art(parent: Frame, name: string, texture: string, x: number, y: number, width: number, height: number): Frame {
   const frame = createBackdrop(name, parent, 0);
   setFrameTexture(frame, texture, 0, true);
   placeTopLeft(frame, x, y);
@@ -43,11 +43,11 @@ export function art(parent: framehandle, name: string, texture: string, x: numbe
   return frame;
 }
 
-export function label(parent: framehandle, name: string, x: number, y: number, width: number, height: number, size: number): framehandle {
+export function label(parent: Frame, name: string, x: number, y: number, width: number, height: number, size: number): Frame {
   const frame = createText(name, parent, 0);
   placeTopLeft(frame, x, y);
   sizeText(frame, size, width, height);
-  setFrameTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+  setFrameTextAlignment(frame, TextAlignment.middle, TextAlignment.center);
   setFrameEnabled(frame, false);
   return frame;
 }
@@ -63,13 +63,13 @@ const BAR_GAP = cardSize(f32(0.003));
 const BAR_LABEL_GAP = cardSize(f32(0.006));
 const BAR_CHAR_WIDTH = cardSize(f32(0.0055));
 
-export function placeBottomBar(frames: { readonly status: framehandle; readonly wins: SessionWinsFrames }, slot: number, winsShown: boolean, statusText: string, countText: string): void {
+export function placeBottomBar(frames: { readonly status: Frame; readonly wins: SessionWinsFrames }, slot: number, winsShown: boolean, statusText: string, countText: string): void {
   const left = cardRight(slot, f32(0.014));
   const width = cardSize(f32(0.132));
   if (!winsShown) {
     placeTopLeft(frames.status, left, BOTTOM_BAR_TOP);
     setFrameSize(frames.status, width, BAR_HEIGHT);
-    setFrameTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    setFrameTextAlignment(frames.status, TextAlignment.middle, TextAlignment.center);
     return;
   }
   const statusWidth = f32(toReal(textLength(statusText)) * BAR_CHAR_WIDTH);
@@ -79,13 +79,13 @@ export function placeBottomBar(frames: { readonly status: framehandle; readonly 
   const coinLeft = f32(statusRight + BAR_LABEL_GAP);
   placeTopLeft(frames.status, left, BOTTOM_BAR_TOP);
   setFrameSize(frames.status, f32(statusRight - left), BAR_HEIGHT);
-  setFrameTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
+  setFrameTextAlignment(frames.status, TextAlignment.middle, TextAlignment.right);
   placeTopLeft(frames.wins.coin, coinLeft, f32(BOTTOM_BAR_TOP + f32(f32(BAR_COIN - BAR_HEIGHT) / 2)));
   setFrameSize(frames.wins.coin, BAR_COIN, BAR_COIN);
   placeTopLeft(frames.wins.count, f32(f32(coinLeft + BAR_COIN) + BAR_GAP), BOTTOM_BAR_TOP);
 }
 
-export function hotspot(parent: framehandle, x: number, y: number, width: number, height: number): framehandle {
+export function hotspot(parent: Frame, x: number, y: number, width: number, height: number): Frame {
   const frame = createFrame("ScriptDialogButton", parent, 0, 0);
   placeTopLeft(frame, x, y);
   setFrameSize(frame, width, height);

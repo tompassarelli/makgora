@@ -6,12 +6,12 @@ import { SELECT_LEVELS } from "./selectLevels";
 import { art } from "./selectionFrames";
 import { consoleUi, gameUi, placeTopLeft } from "./frames";
 import type { DrawnHand } from "./selectionHands";
-import { destroyFrame, setFrameLevel, setFrameVisible } from "wisp/game/frames";
+import { destroyFrame, Frame, setFrameLevel, setFrameVisible } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
 interface HandLayer {
-  readonly states: Readonly<Record<HandState, framehandle>>;
-  readonly badge: framehandle;
+  readonly states: Readonly<Record<HandState, Frame>>;
+  readonly badge: Frame;
 }
 
 // Engine: Warcraft squeezes a game-UI child whose frame crosses the edge of the 4:3 area, but draws a ConsoleUIBackdrop child under every game-UI child; so the hand is drawn in the game UI, over the roster, until it crosses an edge, and then in the console layer, at full size, running off the edge like an OS cursor.
@@ -40,7 +40,7 @@ export function handBadgeBox(left: number, top: number, size: number): { readonl
 
 export const handCrossesEdge = (left: number, top: number, size: number): boolean => left < 0 || top > UI_HEIGHT || f32(left + size) > UI_WIDTH || f32(top - size) < 0;
 
-function createLayer(parent: framehandle, grid: RosterGrid, tag: string, suffix: string, slot: number): HandLayer {
+function createLayer(parent: Frame, grid: RosterGrid, tag: string, suffix: string, slot: number): HandLayer {
   const size = handSize(grid);
   const state = (hand: HandState) => {
     const frame = art(parent, `MeleeHand${TEXTURE_NAMES[hand]}${tag}${suffix}_${formatInt(slot)}`, `war3mapImported\\SelectionHand${TEXTURE_NAMES[hand]}.tga`, 0.0, 0.0, size, size);

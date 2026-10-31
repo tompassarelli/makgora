@@ -1,7 +1,7 @@
 import { trampoline } from "wisp/src/platform/dispatch";
 import { FRAME_SECONDS } from "../../game/presentation/frameClock";
 import { effectMotion } from "../../game/render/effects";
-import { createTimer, localElapsed, startTimer } from "wisp/game/clock";
+import { createTimer, localElapsed, startTimer, Timer } from "wisp/game/clock";
 
 
 export const DRAW_EVENT = "shell.draw";
@@ -16,7 +16,7 @@ const DRAW_STEP = 0.25;
 
 interface BetweenFrames {
 
-  tick: timer | undefined;
+  tick: Timer | undefined;
   drawing: boolean;
   drawsSinceTick: number;
 
@@ -33,7 +33,7 @@ function state(): BetweenFrames {
 }
 
 
-export function startFrameClock(tick: timer): void {
+export function startFrameClock(tick: Timer): void {
   state().tick = tick;
 }
 

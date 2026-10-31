@@ -14,14 +14,14 @@ import { settingsOpen } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { beginKeyPoll, osKeyDown, polledKeyDown } from "../../platform/osKeys";
 import { windowFocused } from "wisp/game/input";
-import { player as playerOf, playerControl, playerSlotState } from "wisp/game/players";
+import { player as playerOf, playerControl, PlayerControl, playerSlotState, PlayerSlotState } from "wisp/game/players";
 
 
 export function currentHumanMask(departed: number): number {
   let mask = 0;
   for (const slot of PARTICIPANT_SLOTS) {
     const player = playerOf(slot);
-    if (playerControl(player) === MAP_CONTROL_USER && playerSlotState(player) === PLAYER_SLOT_STATE_PLAYING && !participantActive(departed, slot)) mask |= 1 << slot;
+    if (playerControl(player) === PlayerControl.user && playerSlotState(player) === PlayerSlotState.playing && !participantActive(departed, slot)) mask |= 1 << slot;
   }
   return mask;
 }
@@ -30,7 +30,7 @@ export function currentComputerMask(): number {
   let mask = 0;
   for (const slot of PARTICIPANT_SLOTS) {
     const player = playerOf(slot);
-    if (playerControl(player) === MAP_CONTROL_COMPUTER && playerSlotState(player) === PLAYER_SLOT_STATE_PLAYING) mask |= 1 << slot;
+    if (playerControl(player) === PlayerControl.computer && playerSlotState(player) === PlayerSlotState.playing) mask |= 1 << slot;
   }
   return mask;
 }

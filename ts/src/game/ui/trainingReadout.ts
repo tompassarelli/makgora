@@ -9,13 +9,13 @@ import type { KeyBindings } from "../input/keyBindings";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
 import { TRAINING_READOUT_BOX, TRAINING_READOUT_PANEL, TRAINING_READOUT_PANEL_ALPHA } from "./hudLayout";
-import { destroyFrame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { destroyFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 
 
 
 export class TrainingReadout {
-  private readonly panel: framehandle;
-  private readonly label: framehandle;
+  private readonly panel: Frame;
+  private readonly label: Frame;
 
   private readonly shown = createTrainingState();
   private built = false;
@@ -35,7 +35,7 @@ export class TrainingReadout {
     placeTopLeft(this.label, TRAINING_READOUT_BOX.left, TRAINING_READOUT_BOX.top);
     setFrameSize(this.label, TRAINING_READOUT_BOX.width, TRAINING_READOUT_BOX.height);
     setFrameFont(this.label, MENU_FONT, f32(0.011), 1);
-    setFrameTextAlignment(this.label, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+    setFrameTextAlignment(this.label, TextAlignment.top, TextAlignment.left);
     setFrameEnabled(this.label, false);
   }
 

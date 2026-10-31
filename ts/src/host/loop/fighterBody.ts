@@ -14,7 +14,7 @@ import { applyFighterObject } from "../../platform/objectData";
 import { fitFighterPlacement } from "../../game/presentation/fighterPlacement";
 import { fighterModelScale } from "../../game/presentation/fighterScale";
 import { createEffect, destroyEffect, setEffectPosition, setEffectScale } from "wisp/game/effects";
-import { player as playerOf, setPlayerColor } from "wisp/game/players";
+import { Player, player as playerOf, setPlayerColor } from "wisp/game/players";
 import { addBodyAbility, createBody, pauseBody, removeBody, removeBodyAbility, setBodyColor, setBodyFacing, setBodyHeight, setBodyInvulnerable, setBodyPathing, setBodyScale, setBodyTint, setBodyX, setBodyY } from "wisp/game/bodies";
 
 
@@ -48,7 +48,7 @@ export function placeFighterBody(body: FighterBody, fighter: Readonly<Fighter>, 
   setBodyFacing(body.unit, fighterPoseFacing(fighter) > 0 ? 0.0 : 180.0);
 }
 
-export function createFighterBody(owner: player, fighter: Readonly<Fighter>, origin: WorldOrigin): FighterBody {
+export function createFighterBody(owner: Player, fighter: Readonly<Fighter>, origin: WorldOrigin): FighterBody {
   const definition = FIGHTER_OBJECTS[fighter.character];
   const unit = createBody(owner, definition.id, origin.x + fighter.motion.x, origin.y, fighter.facing > 0 ? 0.0 : 180.0);
   applyFighterObject(unit, definition);

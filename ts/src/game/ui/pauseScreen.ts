@@ -3,8 +3,9 @@ import { imod } from "wisp/src/sim/intMath";
 import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
 import { MENU_STYLE } from "./hudLayout";
 import type { ChordLabels } from "../input/pauseChord";
-import { createFrameByType, screenHeight, screenWidth, setFrameAlpha, setFrameEnabled, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { createFrameByType, Frame, screenHeight, screenWidth, setFrameAlpha, setFrameEnabled, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
+import type { Player } from "wisp/game/players";
 
 const PLATE = "war3mapImported\\SelectionAction.tga";
 const FRAME = "war3mapImported\\SelectionTileFrame.tga";
@@ -41,7 +42,7 @@ export interface PauseView {
 type Place = (edges: Edges) => readonly [number, number, number, number];
 
 interface Part {
-  readonly frame: framehandle;
+  readonly frame: Frame;
   readonly place: Place;
 }
 
@@ -62,18 +63,18 @@ export const resetPlateBox = (edges: Edges): readonly [number, number, number, n
   [f32(edges.right - MARGIN - RESET_WIDTH), f32(edges.bottom + MARGIN + RESET_HEIGHT), RESET_WIDTH, RESET_HEIGHT];
 
 export class PauseScreen {
-  private readonly root: framehandle;
+  private readonly root: Frame;
   private readonly parts: Part[] = [];
-  private readonly nameText: framehandle;
-  private readonly clockText: framehandle;
-  private readonly menuText: framehandle;
-  private readonly cameraText: framehandle;
-  private readonly resetText: framehandle;
-  private readonly scales = new Map<framehandle, number>();
-  private readonly caps: framehandle[] = [];
-  private readonly capText: framehandle[] = [];
-  private readonly joins: framehandle[] = [];
-  private readonly button: framehandle;
+  private readonly nameText: Frame;
+  private readonly clockText: Frame;
+  private readonly menuText: Frame;
+  private readonly cameraText: Frame;
+  private readonly resetText: Frame;
+  private readonly scales = new Map<Frame, number>();
+  private readonly caps: Frame[] = [];
+  private readonly capText: Frame[] = [];
+  private readonly joins: Frame[] = [];
+  private readonly button: Frame;
   private readonly clicks: ButtonClicks<number>;
   private edges: Edges = windowEdges(0, 0);
   private size = -1;
@@ -81,7 +82,7 @@ export class PauseScreen {
   private labels = "";
   private context = 1820;
 
-  constructor(select: (choice: number, clicker: player) => void) {
+  constructor(select: (choice: number, clicker: Player) => void) {
     this.clicks = new ButtonClicks("ui.pauseScreen.click", select);
     this.root = createBackdrop(NAME, consoleUi(), 1810);
     setFrameLevel(this.root, 20);
@@ -97,18 +98,18 @@ export class PauseScreen {
         return [side === 0 ? f32(left + f32(0.018)) : f32(left + NAME_WIDTH - f32(0.026)), f32(edges.top - f32(MARGIN + f32(0.05)) - f32(0.0165)), f32(0.008), f32(0.008)];
       });
     }
-    this.nameText = this.label("NameText", f32(MENU_STYLE.headerSize * 1.5), edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.05)) - f32(0.008)), NAME_WIDTH, f32(0.03)], TEXT_JUSTIFY_CENTER);
-    this.clockText = this.label("Clock", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.022))), NAME_WIDTH, f32(0.02)], TEXT_JUSTIFY_RIGHT);
-    this.menuText = this.label("Menu", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.1))), NAME_WIDTH, f32(0.034)], TEXT_JUSTIFY_RIGHT);
+    this.nameText = this.label("NameText", f32(MENU_STYLE.headerSize * 1.5), edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.05)) - f32(0.008)), NAME_WIDTH, f32(0.03)], TextAlignment.center);
+    this.clockText = this.label("Clock", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.022))), NAME_WIDTH, f32(0.02)], TextAlignment.right);
+    this.menuText = this.label("Menu", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.1))), NAME_WIDTH, f32(0.034)], TextAlignment.right);
     this.emblem();
-    this.cameraText = this.label("Camera", MENU_STYLE.bodySize, edges => [f32(edges.left + MARGIN + f32(0.1)), f32(edges.bottom + MARGIN + f32(0.062)), f32(0.3), f32(0.04)], TEXT_JUSTIFY_LEFT);
+    this.cameraText = this.label("Camera", MENU_STYLE.bodySize, edges => [f32(edges.left + MARGIN + f32(0.1)), f32(edges.bottom + MARGIN + f32(0.062)), f32(0.3), f32(0.04)], TextAlignment.left);
     this.plate("Reset", PLATE, edges => resetPlateBox(edges));
     this.fixed("ResetBar", PLATE, edges => resetBarBox(edges));
-    this.resetText = this.label("ResetText", f32(MENU_STYLE.headerSize * 1.25), edges => resetBarBox(edges), TEXT_JUSTIFY_CENTER);
+    this.resetText = this.label("ResetText", f32(MENU_STYLE.headerSize * 1.25), edges => resetBarBox(edges), TextAlignment.center);
     for (let index = 0; index < 4; index++) {
       this.caps.push(this.cap(index));
-      this.capText.push(this.label(`Cap${formatInt(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TEXT_JUSTIFY_CENTER));
-      if (index < 3) this.joins.push(this.label(`Join${formatInt(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TEXT_JUSTIFY_CENTER));
+      this.capText.push(this.label(`Cap${formatInt(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TextAlignment.center));
+      if (index < 3) this.joins.push(this.label(`Join${formatInt(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TextAlignment.center));
     }
     this.button = createFrameByType("BUTTON", `${NAME}Button`, this.root, "", 1811);
     this.parts.push({ frame: this.button, place: edges => resetPlateBox(edges) });
@@ -116,7 +117,7 @@ export class PauseScreen {
     setFrameVisible(this.root, false);
   }
 
-  bindActions(select: (choice: number, clicker: player) => void): void {
+  bindActions(select: (choice: number, clicker: Player) => void): void {
     this.clicks.bindHandler(select);
   }
 
@@ -175,7 +176,7 @@ export class PauseScreen {
     }
   }
 
-  private set(frame: framehandle, [left, top, width, height]: readonly [number, number, number, number]): void {
+  private set(frame: Frame, [left, top, width, height]: readonly [number, number, number, number]): void {
     const scale = this.scales.get(frame) ?? 1.0;
     placeTopLeft(frame, left, top);
     setFrameSize(frame, f32(width / scale), f32(height / scale));
@@ -185,7 +186,7 @@ export class PauseScreen {
     return { name: `${NAME}${name}`, context: this.context++ };
   }
 
-  private fixed(name: string, texture: string, place: Place, alpha = 255): framehandle {
+  private fixed(name: string, texture: string, place: Place, alpha = 255): Frame {
     const { name: full, context } = this.next(name);
     const frame = createBackdrop(full, this.root, context);
     setFrameTexture(frame, texture, 0, true);
@@ -199,15 +200,15 @@ export class PauseScreen {
     this.fixed(name, texture, place);
   }
 
-  private cap(index: number): framehandle {
+  private cap(index: number): Frame {
     return this.fixed(`CapFace${formatInt(index)}`, FRAME, () => [0, 0, 0, 0]);
   }
 
-  private label(name: string, size: number, place: Place, justify: textaligntype, parent = this.root): framehandle {
+  private label(name: string, size: number, place: Place, justify: TextAlignment, parent = this.root): Frame {
     const { name: full, context } = this.next(name);
     const frame = createText(full, parent, context);
     this.scales.set(frame, sizeText(frame, size, f32(0.2), f32(0.02)));
-    setFrameTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, justify);
+    setFrameTextAlignment(frame, TextAlignment.middle, justify);
     setFrameEnabled(frame, false);
     this.parts.push({ frame, place });
     return frame;

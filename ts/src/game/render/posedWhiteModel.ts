@@ -7,11 +7,11 @@ import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { squareRoot } from "../sim/warcraftMath";
 import type { MatchCamera } from "../sim/matchCamera";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectOrientation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectOrientation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 /** A white copy of the fighter's model held on the fighter's pose, moved `lift` units toward the camera (away when negative) and grown by `grow` round the body's middle. */
 export class PosedWhiteModel {
-  private readonly model: effect;
+  private readonly model: Effect;
   private shown = false;
 
   constructor(private readonly character: Character, private readonly origin: WorldOrigin, private readonly bodyScale: number) {
@@ -52,7 +52,7 @@ export class PosedWhiteModel {
     this.shown = false;
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     into.push(this.model);
   }
 

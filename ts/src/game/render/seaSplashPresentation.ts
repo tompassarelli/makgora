@@ -3,7 +3,7 @@ import { fighterModelScale } from "../presentation/fighterScale";
 import type { Fighter } from "../sim/fighter";
 import { SEA_SURFACE_Z, hasTide } from "../sim/stageHazards";
 import { type ParkedFlags, type WorldOrigin, hideEffect, parkOnce, placeEffect } from "./effects";
-import { createEffect, destroyEffect, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 export const SEA_SPLASH_MODEL = "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx";
 /** Frames the splash model plays before it is parked again; the native window's rings and foam outlast it. */
@@ -15,7 +15,7 @@ const SPLASH = 0;
 
 /** The spray a fighter throws where it crosses the sea's surface, in or out; presentation only, read from the sim's own in-water flag. */
 export class SeaSplashPresentation {
-  private readonly splash: effect;
+  private readonly splash: Effect;
   private readonly parked: ParkedFlags = [];
   private wet = false;
   private age = SPLASH_FRAMES;

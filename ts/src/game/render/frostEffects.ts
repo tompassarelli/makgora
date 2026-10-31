@@ -8,12 +8,12 @@ import type { Fighter } from "../sim/fighter";
 import { FROST_ARMOR_SHELL_MODEL } from "../presentation/specialCues";
 import { frostShellScale } from "../presentation/frostShell";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime } from "wisp/game/effects";
 
 interface FrostSlot {
-  readonly trap: effect;
-  readonly ice: effect;
-  readonly shell: effect;
+  readonly trap: Effect;
+  readonly ice: Effect;
+  readonly shell: Effect;
 }
 
 const SHELL_HEIGHT = 60.0;

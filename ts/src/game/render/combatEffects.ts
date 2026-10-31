@@ -43,11 +43,11 @@ import { KO_BLUR_DISTANCE, type KoFlash, createKoFlash, endKoFlash, koFlashLevel
 import type { Fighter } from "../sim/fighter";
 import { heroLook } from "../roster/looks";
 import { bodyCostume, bodyVariants, costumeClipModel } from "../roster/costumes";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectPitch, setEffectRoll, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
-import { setCameraField, setFilterBlendMode, setFilterDuration, setFilterEndColor, setFilterEndUV, setFilterStartColor, setFilterStartUV, setFilterTexMapFlags, setFilterTexture, showFilter } from "wisp/game/view";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectPitch, setEffectRoll, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { CameraField, FilterBlendMode, FilterTexMapFlags, setCameraField, setFilterBlendMode, setFilterDuration, setFilterEndColor, setFilterEndUV, setFilterStartColor, setFilterStartUV, setFilterTexMapFlags, setFilterTexture, showFilter } from "wisp/game/view";
 import { player } from "wisp/game/players";
 import { preloadAsset } from "wisp/game/files";
-import { stopSound } from "wisp/game/sound";
+import { Sound, stopSound } from "wisp/game/sound";
 
 const KO_VARIANTS = bodyVariants(RENDERED_FIGHTERS);
 const KO_FIGHTERS = KO_VARIANTS.length;
@@ -74,8 +74,8 @@ export function fighterModel(character: number): string {
 }
 
 export class CombatEffects {
-  private readonly impacts: effect[] = [];
-  private readonly koBodies: effect[] = [];
+  private readonly impacts: Effect[] = [];
+  private readonly koBodies: Effect[] = [];
   readonly sounds = new SoundBank();
 
   private soundFrames: number[] = [];
@@ -92,7 +92,7 @@ export class CombatEffects {
 
   private readonly voices = createVoiceBudget();
 
-  private readonly voiceHandles: (sound | undefined)[] = [];
+  private readonly voiceHandles: (Sound | undefined)[] = [];
 
   private shownAges: (number | undefined)[] | undefined;
 
@@ -205,29 +205,29 @@ export class CombatEffects {
     if (!this.koFlashShown) {
       if (this.cineFilter) {
         setFilterTexture("ReplaceableTextures\\CameraMasks\\White_Mask.blp");
-        setFilterBlendMode(BLEND_MODE_BLEND);
-        setFilterTexMapFlags(TEXMAP_FLAG_NONE);
+        setFilterBlendMode(FilterBlendMode.blend);
+        setFilterTexMapFlags(FilterTexMapFlags.none);
         setFilterStartUV(0.0, 0.0, 1.0, 1.0);
         setFilterEndUV(0.0, 0.0, 1.0, 1.0);
         setFilterDuration(0.0);
         showFilter(true);
       }
-      setCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_DISTANCE, KO_BLUR_DISTANCE, 0.0);
+      setCameraField(CameraField.depthOfFieldDistance, KO_BLUR_DISTANCE, 0.0);
       this.koFlashShown = true;
     }
     if (this.cineFilter) {
       setFilterStartColor(levels.colour, levels.colour, levels.colour, levels.alpha);
       setFilterEndColor(levels.colour, levels.colour, levels.colour, levels.alpha);
     }
-    setCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_SCALE, levels.blur, 0.0);
+    setCameraField(CameraField.depthOfFieldScale, levels.blur, 0.0);
   }
 
   private hideKoFlash(): void {
     if (!this.koFlashShown) return;
     this.koFlashShown = false;
     showFilter(false);
-    setCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_DISTANCE, 0.0, 0.0);
-    setCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_SCALE, 0.0, 0.0);
+    setCameraField(CameraField.depthOfFieldDistance, 0.0, 0.0);
+    setCameraField(CameraField.depthOfFieldScale, 0.0, 0.0);
   }
 
 
@@ -355,7 +355,7 @@ export class CombatEffects {
     return parked[i] === true && state.ages[i] === undefined && confirmed.ages[i] === undefined && shownAges[i] === undefined && this.shownEmissions[i] === undefined;
   }
 
-  private showImpact(model: effect, i: number, kind: number, age: number | undefined, frame: number, shownAges: (number | undefined)[]): void {
+  private showImpact(model: Effect, i: number, kind: number, age: number | undefined, frame: number, shownAges: (number | undefined)[]): void {
     const last = shownAges[i];
     if (last !== undefined && age !== undefined && age < last) hideEffect(model, this);
     if (last === undefined || age !== undefined && age < last) {
@@ -409,13 +409,13 @@ export class CombatEffects {
     }
   }
 
-  private colourKo(model: effect, i: number, owner: number): void {
+  private colourKo(model: Effect, i: number, owner: number): void {
     if (this.koOwners[i] === owner) return;
     this.koOwners[i] = owner;
     setEffectTeamColor(model, player(owner));
   }
 
-  private tint(model: effect, i: number, kind: number, strength: number): void {
+  private tint(model: Effect, i: number, kind: number, strength: number): void {
     const colour = impactColour(kind, strength);
     const tints = (this.tints ??= []);
     if (colour === undefined || tints[i] === colour) return;
@@ -423,7 +423,7 @@ export class CombatEffects {
     setEffectColor(model, colour[0] ?? 255, colour[1] ?? 255, colour[2] ?? 255);
   }
 
-  private place(model: effect, i: number, kind: number, pose: ReturnType<typeof projectImpact>, strength: number): void {
+  private place(model: Effect, i: number, kind: number, pose: ReturnType<typeof projectImpact>, strength: number): void {
     const parked = (this.parked ??= []);
     parked[i] = false;
     this.busyKinds[kind] = true;

@@ -7,7 +7,7 @@ import { RANDOM_STAGE, stageInfo } from "../menu/stageCatalog";
 import { STAGE_SILHOUETTES, SILHOUETTE_PIECES } from "../../generated/stages/stageSilhouettes";
 import { createBackdrop, createText, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
-import { setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { Frame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
 export const STAGE_CARD_COAL = "ReplaceableTextures\\TeamColor\\TeamColor20.blp";
@@ -15,15 +15,15 @@ export const STAGE_CARD_SNOW = "ReplaceableTextures\\TeamColor\\TeamColor21.blp"
 export const STAGE_CHIP_TEXTURE = "war3mapImported\\StageChip.tga";
 
 export class StageCard {
-  private readonly panel: framehandle;
-  private readonly picture: framehandle;
-  private readonly pieces: framehandle[] = [];
-  private readonly name: framehandle | undefined;
+  private readonly panel: Frame;
+  private readonly picture: Frame;
+  private readonly pieces: Frame[] = [];
+  private readonly name: Frame | undefined;
   private readonly boxLeft: number;
   private readonly boxTop: number;
   private readonly boxWidth: number;
 
-  constructor(parent: framehandle, id: string, left: number, top: number, width: number, height: number, private readonly banner: boolean) {
+  constructor(parent: Frame, id: string, left: number, top: number, width: number, height: number, private readonly banner: boolean) {
     const panel = createBackdrop(`${id}Panel`, parent, 0);
     this.panel = panel;
     setFrameTexture(panel, STAGE_CARD_COAL, 0, true);
@@ -56,7 +56,7 @@ export class StageCard {
       placeTopLeft(name, f32(left + height * f32(0.06)), f32(top - height * f32(0.78)));
       setFrameSize(name, f32(width - height * f32(0.08)), f32(height * f32(0.22)));
       setFrameFont(name, MENU_FONT, f32(height * f32(0.13)), 0);
-      setFrameTextAlignment(name, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
+      setFrameTextAlignment(name, TextAlignment.middle, TextAlignment.left);
       setFrameEnabled(name, false);
       this.name = name;
     }

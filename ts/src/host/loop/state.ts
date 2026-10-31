@@ -55,16 +55,20 @@ import type { NativePadCapture } from "./analogPad";
 import type { HiddenFighter } from "./fighterCloak";
 import { type KeyTracker, keyTracker } from "../../platform/osKeys";
 import { localPlayer, playerSlot } from "wisp/game/players";
+import type { Effect } from "wisp/game/effects";
+import type { Body } from "wisp/game/bodies";
+import type { Frame } from "wisp/game/frames";
+import type { Events } from "wisp/game/events";
 
 
 export interface StageDrifter {
-  readonly effect: effect;
+  readonly effect: Effect;
   readonly piece: Readonly<DriftingPiece>;
 }
 
 export interface FighterBody {
-  readonly unit: unit;
-  readonly dizzy: effect;
+  readonly unit: Body;
+  readonly dizzy: Effect;
   dizzyShown: boolean;
 
   renderedSelection: number;
@@ -227,8 +231,8 @@ export interface Rollback {
 }
 
 export interface StatusFrames {
-  readonly help: framehandle;
-  readonly notice: framehandle;
+  readonly help: Frame;
+  readonly notice: Frame;
 }
 
 interface StatusLine {
@@ -268,8 +272,8 @@ export const replayRecording = (): ReplayRecording => ({ recorder: createMatchRe
 
 
 interface KeyEvents {
-  down: trigger | undefined;
-  up: trigger | undefined;
+  down: Events | undefined;
+  up: Events | undefined;
   enabled: boolean;
   escapeOnly: boolean;
   paused: boolean;
@@ -286,7 +290,7 @@ export interface ShellState {
   pauseSelection?: MatchState;
   pauseKeysHeld?: number[];
   chatOpen?: () => boolean;
-  chatFrame?: framehandle | false;
+  chatFrame?: Frame | false;
   menuPublication?: { phase: MenuPhase; ticks: number };
   readonly pad: NativePadCapture | undefined;
 
@@ -317,18 +321,18 @@ export interface ShellState {
   readonly participants: Slots<Participant>;
   readonly status: StatusLine;
   readonly frames: StatusFrames;
-  readonly stageDecks: effect[];
+  readonly stageDecks: Effect[];
 
-  readonly stageDeckParts: effect[];
+  readonly stageDeckParts: Effect[];
 
   drawnStage: number;
-  stageCannon: effect | undefined;
+  stageCannon: Effect | undefined;
 
-  stageLava: effect | undefined;
-  readonly stageLavaRims: effect[];
-  stageWind: effect[];
-  stageHydra?: effect[];
-  stageScenery: effect[] | undefined;
+  stageLava: Effect | undefined;
+  readonly stageLavaRims: Effect[];
+  stageWind: Effect[];
+  stageHydra?: Effect[];
+  stageScenery: Effect[] | undefined;
   stageDrifters: StageDrifter[];
   stageFogHidden?: boolean;
   stageFogOverride?: true | undefined;
@@ -343,7 +347,7 @@ export interface ShellState {
   koZoom: KoZoom | undefined;
   lastKo: { readonly frame: number; readonly x: number; readonly z: number } | undefined;
   showcaseDemo: Character | undefined;
-  readonly showcaseMarkers: effect[];
+  readonly showcaseMarkers: Effect[];
   readonly capture: CaptureStage;
   readonly captureBodies: Slots<{ readonly body: FighterBody; loop: number } | undefined>;
 

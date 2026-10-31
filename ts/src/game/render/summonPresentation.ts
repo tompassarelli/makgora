@@ -3,10 +3,10 @@
 import { summonClip, summonClipCount } from "../presentation/summonClipInfo";
 import type { SummonProjection } from "../presentation/summonState";
 import { type WorldOrigin, hideEffect, placeEffect } from "./effects";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 export class SummonPresentation {
-  private readonly clips: effect[] = [];
+  private readonly clips: Effect[] = [];
   private visible: number | undefined;
 
   constructor(

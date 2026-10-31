@@ -1,7 +1,7 @@
-import { keyDown, osKey } from "wisp/game/input";
-const types: oskeytype[] = [];
+import { keyDown, osKey, OsKey } from "wisp/game/input";
+const types: OsKey[] = [];
 
-export function osKeyType(key: number): oskeytype {
+export function osKeyType(key: number): OsKey {
   const known = types[key];
   if (known !== undefined) return known;
   const type = osKey(key);

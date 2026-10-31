@@ -2,10 +2,10 @@ import { type SpherePose, emptySpherePose, spherePose } from "../presentation/sp
 import type { OrbitLook } from "../presentation/model/look";
 import type { Fighter } from "../sim/fighter";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
-import { createEffect, destroyEffect, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 export class SpherePresentation {
-  private readonly spheres: effect[] = [];
+  private readonly spheres: Effect[] = [];
   private readonly pose: SpherePose = emptySpherePose();
   private shown = false;
 
@@ -40,7 +40,7 @@ export class SpherePresentation {
     this.present(undefined, 0, false);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     for (const model of this.spheres) into.push(model);
   }
 

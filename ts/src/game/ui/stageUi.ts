@@ -17,9 +17,9 @@ import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, creat
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { STAGE_CHIP_TEXTURE, StageCard } from "./stageCard";
 import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, START_BUTTON, startButtonContains } from "./selectionLayout";
-import { destroyEvents } from "wisp/game/events";
-import { createFrame, createFrameByType, destroyFrame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
-import { mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, setPointer } from "wisp/game/input";
+import { destroyEvents, Events } from "wisp/game/events";
+import { createFrame, createFrameByType, destroyFrame, Frame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
+import { MouseButton, mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, setPointer } from "wisp/game/input";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { sendSync } from "wisp/game/sync";
 import { formatInt, parseInt, toReal, truncate } from "wisp/game/text";
@@ -44,17 +44,17 @@ export const ORBS_BUTTON = { x: f32(0.625), y: HEADER_BUTTON_TOP, width: f32(0.1
 export const STAGE_POOL_BUTTON = { x: f32(0.49), y: f32(0.518), width: f32(0.298), height: f32(0.027) } as const;
 
 
-function stageText(parent: framehandle, name: string, x: number, y: number, width: number, height: number, fontSize: number, text: string): framehandle {
+function stageText(parent: Frame, name: string, x: number, y: number, width: number, height: number, fontSize: number, text: string): Frame {
   const label = createText(name, parent, 0);
   placeTopLeft(label, x, y);
   sizeText(label, fontSize, width, height);
   setMenuText(label, text);
   setFrameEnabled(label, false);
-  setFrameTextAlignment(label, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
+  setFrameTextAlignment(label, TextAlignment.middle, TextAlignment.left);
   return label;
 }
 
-function stageButton(parent: framehandle, x: number, y: number, width: number, height: number, text: string): framehandle {
+function stageButton(parent: Frame, x: number, y: number, width: number, height: number, text: string): Frame {
   const control = createFrame("ScriptDialogButton", parent, 0, 0);
   placeTopLeft(control, x, y);
   setFrameSize(control, width, height);
@@ -65,23 +65,23 @@ function stageButton(parent: framehandle, x: number, y: number, width: number, h
 }
 
 export class StagePanel {
-  private readonly root: framehandle;
-  private readonly backdrop: framehandle;
+  private readonly root: Frame;
+  private readonly backdrop: Frame;
   private readonly preview: StageCard;
-  private readonly previewName: framehandle;
-  private readonly previewDescription: framehandle;
-  private readonly ruleLabel: framehandle;
-  private readonly chip: framehandle;
-  private readonly hazardsToggle: framehandle;
-  private readonly orbsToggle: framehandle;
-  private readonly startButton: framehandle;
+  private readonly previewName: Frame;
+  private readonly previewDescription: Frame;
+  private readonly ruleLabel: Frame;
+  private readonly chip: Frame;
+  private readonly hazardsToggle: Frame;
+  private readonly orbsToggle: Frame;
+  private readonly startButton: Frame;
   private readonly clicks: ButtonClicks<StageButton>;
-  private readonly tileNames: framehandle[] = [];
-  private readonly sync: trigger;
-  private readonly poolRoot: framehandle;
-  private readonly poolMode: framehandle;
-  private readonly poolSummary: framehandle;
-  private readonly poolStages: readonly framehandle[];
+  private readonly tileNames: Frame[] = [];
+  private readonly sync: Events;
+  private readonly poolRoot: Frame;
+  private readonly poolMode: Frame;
+  private readonly poolSummary: Frame;
+  private readonly poolStages: readonly Frame[];
   private poolOpen = false;
   private readonly drag = stageDrag();
   private lastPhase: Phase | undefined;
@@ -96,7 +96,7 @@ export class StagePanel {
   ) {
     const journal = controls === "journal";
     this.clicks = new ButtonClicks("ui.stage.click", (button, clicker) => this.click(button, playerSlot(clicker)), button => this.hover(button));
-    const dialogButton = (parent: framehandle, x: number, y: number, width: number, height: number, text: string, target: StageButton) =>
+    const dialogButton = (parent: Frame, x: number, y: number, width: number, height: number, text: string, target: StageButton) =>
       this.clicks.add(stageButton(parent, x, y, width, height, text), target, undefined, "native");
     this.backdrop = createWindowBackdrop("MeleeStageBackdrop", MENU_STYLE.panelTexture, 800);
     const root = createFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
@@ -270,7 +270,7 @@ export class StagePanel {
     if (width > 0 && height > 0) {
       const pointerAtX = pointerX(toReal(inputPointerX()), width, height);
       const pointerAtY = pointerY(toReal(inputPointerY()), height);
-      const dropped = updateStageDrag(this.drag, mouseDown(MOUSE_BUTTON_TYPE_LEFT), pointerAtX, pointerAtY, game.stageChoice);
+      const dropped = updateStageDrag(this.drag, mouseDown(MouseButton.left), pointerAtX, pointerAtY, game.stageChoice);
       if (dropped !== undefined) sendSync("stage-drop", formatInt(dropped));
       if (this.drag.gesture?.kind === "carry") {
         x = pointerAtX;

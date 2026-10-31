@@ -36,24 +36,24 @@ import { PoisonStackPresentation } from "./poisonStackPresentation";
 import { SpellPassPresentation } from "./spellPassPresentation";
 import { SoundBank, SoundKind } from "./soundBank";
 import { bindPrototype } from "../../platform/rebind";
-import { createBeam, createEffect, destroyBeam, destroyEffect, moveBeam, setBeamColor, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
-import { playSound, releaseWhenDone, setSoundPosition, soundFromLabel, stopSound } from "wisp/game/sound";
+import { Beam, createBeam, createEffect, destroyBeam, destroyEffect, Effect, moveBeam, setBeamColor, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { playSound, releaseWhenDone, setSoundPosition, Sound, soundFromLabel, stopSound } from "wisp/game/sound";
 
 interface SpecialSlot {
   readonly bear: SummonPresentation;
-  readonly aura: effect;
-  readonly felFlames: effect;
-  readonly cannonFlames: effect;
-  readonly manaHand: effect;
-  readonly wingTrail: effect;
-  readonly drainFlash: effect;
-  readonly silence: effect;
-  readonly curse: effect;
-  readonly frog: effect;
-  readonly siphon: lightning;
+  readonly aura: Effect;
+  readonly felFlames: Effect;
+  readonly cannonFlames: Effect;
+  readonly manaHand: Effect;
+  readonly wingTrail: Effect;
+  readonly drainFlash: Effect;
+  readonly silence: Effect;
+  readonly curse: Effect;
+  readonly frog: Effect;
+  readonly siphon: Beam;
   siphonShown: boolean;
-  readonly laser: lightning;
-  readonly chain: lightning;
+  readonly laser: Beam;
+  readonly chain: Beam;
   laserShown: boolean;
   lastX: number;
   lastZ: number;
@@ -62,7 +62,7 @@ interface SpecialSlot {
   previousSpecial: SpecialAction;
   previousSpecialFrame: number;
 
-  readonly immolationLoop: sound;
+  readonly immolationLoop: Sound;
 }
 
 
@@ -160,7 +160,7 @@ export class SpecialEffects {
     });
   }
 
-  private park(model: effect, slot: number, effect: number): void {
+  private park(model: Effect, slot: number, effect: number): void {
     parkOnce(model, this.origin, (this.parked ??= []), SLOT_EFFECTS * slot + effect);
   }
 
@@ -172,7 +172,7 @@ export class SpecialEffects {
     (this.parked ??= [])[SLOT_EFFECTS * slot + effect] = false;
   }
 
-  slotEffects(slot: number, into: effect[]): void {
+  slotEffects(slot: number, into: Effect[]): void {
     const effects = this.slots[slot];
     if (effects === undefined) return;
     into.push(effects.aura, effects.felFlames, effects.cannonFlames, effects.manaHand, effects.wingTrail, effects.drainFlash, effects.silence, effects.curse, effects.frog);
@@ -191,7 +191,7 @@ export class SpecialEffects {
   }
 
 
-  private show(model: effect, slot: number, effect: number, fighter: Readonly<Fighter>, x: number, z: number, size: number): void {
+  private show(model: Effect, slot: number, effect: number, fighter: Readonly<Fighter>, x: number, z: number, size: number): void {
     this.placed(slot, effect);
     const scale = fighterModelScale(fighter);
     placeEffect(model, this.origin.x + fighter.motion.x + x * scale, this.front, this.origin.z + fighter.motion.z + z * scale);
@@ -206,7 +206,7 @@ export class SpecialEffects {
     else this.park(slot.curse, index, CURSE);
   }
 
-  private showStun(fighter: Readonly<Fighter>, index: number, manaHand: effect): void {
+  private showStun(fighter: Readonly<Fighter>, index: number, manaHand: Effect): void {
     if (fighter.status.condition === HeroStatusKind.stun) this.show(manaHand, index, MANA_HAND, fighter, 0.0, 175.0, f32(0.6));
     else this.park(manaHand, index, MANA_HAND);
   }
@@ -265,7 +265,7 @@ export class SpecialEffects {
     slot.previousSpecialFrame = frame;
   }
 
-  private applyStatic(model: effect, slot: number, effect: number, pose: Readonly<StaticSpecialPose>): void {
+  private applyStatic(model: Effect, slot: number, effect: number, pose: Readonly<StaticSpecialPose>): void {
     if (!pose.visible) {
       this.park(model, slot, effect);
       return;

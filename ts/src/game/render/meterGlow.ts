@@ -5,6 +5,7 @@ import type { Fighter } from "../sim/fighter";
 import type { MatchCamera } from "../sim/matchCamera";
 import type { WorldOrigin } from "./effects";
 import { PosedWhiteModel } from "./posedWhiteModel";
+import type { Effect } from "wisp/game/effects";
 
 export class MeterGlow {
   private readonly model: PosedWhiteModel;
@@ -24,7 +25,7 @@ export class MeterGlow {
     this.model.tint(meterGlowAlpha(frame), color.red, color.green, color.blue);
   }
 
-  drawnEffects(into: effect[]): void {
+  drawnEffects(into: Effect[]): void {
     this.model.drawnEffects(into);
   }
 

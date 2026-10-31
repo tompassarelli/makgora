@@ -31,11 +31,11 @@ import { resultFighterPlacement } from "../presentation/arenaCamera";
 import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { defeatClip, resultBodies, resultPoseAt, type ResultBody, type ResultClips } from "../presentation/resultPose";
-import { createEffect, destroyEffect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw, setEffectZ } from "wisp/game/effects";
-import { setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { createEffect, destroyEffect, Effect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw, setEffectZ } from "wisp/game/effects";
+import { Frame, FramePoint, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { player } from "wisp/game/players";
 import { preloadAsset } from "wisp/game/files";
-import { clearMusic, createSound, endTheme, playMusic, playSound, playTheme, resetVolumeGroups, setSoundCutoff, setSoundDistances, setSoundDuration, setSoundPosition, setSoundVolume, setVolumeGroup, soundFileDuration, stopMusic, stopSound } from "wisp/game/sound";
+import { clearMusic, createSound, endTheme, playMusic, playSound, playTheme, resetVolumeGroups, setSoundCutoff, setSoundDistances, setSoundDuration, setSoundPosition, setSoundVolume, setVolumeGroup, Sound, soundFileDuration, stopMusic, stopSound, VolumeGroup } from "wisp/game/sound";
 import { formatInt, toReal } from "wisp/game/text";
 
 
@@ -44,7 +44,7 @@ export const LEVEL_UP_FRAME = 12;
 
 const FACING_CAMERA = f32(-1.5707963705062866);
 
-const createItemSounds = (): sound[] => [MatchCue.lastStock, MatchCue.itemSpawn, MatchCue.confirm].map(cue => {
+const createItemSounds = (): Sound[] => [MatchCue.lastStock, MatchCue.itemSpawn, MatchCue.confirm].map(cue => {
     const path = cueSound(cue);
     const sound = createSound(path, false, true, true, 10, 10, "DefaultEAXON");
     setSoundDuration(sound, soundFileDuration(path));
@@ -54,7 +54,7 @@ const createItemSounds = (): sound[] => [MatchCue.lastStock, MatchCue.itemSpawn,
     return sound;
   });
 
-const createOrbSounds = (): sound[] => [MatchCue.itemSpawn, MatchCue.meterReady, MatchCue.confirm].map(cue => {
+const createOrbSounds = (): Sound[] => [MatchCue.itemSpawn, MatchCue.meterReady, MatchCue.confirm].map(cue => {
     const path = cueSound(cue);
     const sound = createSound(path, false, true, true, 10, 10, "DefaultEAXON");
     setSoundDuration(sound, soundFileDuration(path));
@@ -68,7 +68,7 @@ interface VictoryPose {
   readonly character: Character;
   readonly costume: number;
   readonly role: DuoRole;
-  model: effect | undefined;
+  model: Effect | undefined;
   modelPath: string | undefined;
   readonly clips: ResultClips;
 }
@@ -92,12 +92,12 @@ export class MatchPresentation {
   // Hover differs by client; create its handle at shared startup on every client.
   private readonly hoverSound = createSound(cueSound(MatchCue.hover), false, false, false, 10, 10, "DefaultEAXON");
   private music: string | undefined;
-  private readonly voices: (sound | undefined)[] = [];
+  private readonly voices: (Sound | undefined)[] = [];
   private readonly sounds = new SoundBank();
-  private readonly countdown: framehandle;
+  private readonly countdown: Frame;
   private readonly poses: (VictoryPose | undefined)[] = [];
   private readonly partners: (number | undefined)[] = [];
-  private readonly resultSounds: sound[] = [];
+  private readonly resultSounds: Sound[] = [];
   private resultEffectsMuted = false;
   private resultBurst = false;
   pending: ResultsView | undefined;
@@ -115,14 +115,14 @@ export class MatchPresentation {
     this.sounds.prepare(SoundKind.interfaceFile, interfaceSoundPaths(RENDERED_FIGHTERS));
     const parent = gameUi();
     this.countdown = createText("MatchCountdown", parent, 0);
-    setFrameAbsPoint(this.countdown, FRAMEPOINT_CENTER, f32(0.4), f32(0.34));
-    setFrameTextAlignment(this.countdown, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    setFrameAbsPoint(this.countdown, FramePoint.center, f32(0.4), f32(0.34));
+    setFrameTextAlignment(this.countdown, TextAlignment.middle, TextAlignment.center);
     setFrameLevel(this.countdown, 10);
     setFrameEnabled(this.countdown, false);
     setFrameVisible(this.countdown, false);
   }
 
-  private playFile(path: string): sound | undefined {
+  private playFile(path: string): Sound | undefined {
     return this.sounds.play(SoundKind.interfaceFile, path, 127);
   }
 
@@ -357,8 +357,8 @@ export class MatchPresentation {
     this.resultSounds.length = 0;
     if (this.resultBurst) {
       // A model's event sound outlives DestroyEffect, so the level-up burst's sound is cut through its volume groups.
-      setVolumeGroup(SOUND_VOLUMEGROUP_SPELLS, 0.0);
-      setVolumeGroup(SOUND_VOLUMEGROUP_COMBAT, 0.0);
+      setVolumeGroup(VolumeGroup.spells, 0.0);
+      setVolumeGroup(VolumeGroup.combat, 0.0);
       this.resultEffectsMuted = true;
     }
     this.pending = undefined;
@@ -371,7 +371,7 @@ export class MatchPresentation {
   }
 
 
-  private loadingFrames: { readonly cover: framehandle; readonly art: framehandle; readonly name: framehandle } | undefined;
+  private loadingFrames: { readonly cover: Frame; readonly art: Frame; readonly name: Frame } | undefined;
 
 
   showLoading(name: string, texture: string): void {
@@ -385,14 +385,14 @@ export class MatchPresentation {
     fitToWindow(frames.cover);
     setFrameLevel(frames.cover, 8);
     setFrameTexture(frames.art, texture, 0, true);
-    setFrameAbsPoint(frames.art, FRAMEPOINT_CENTER, f32(0.4), f32(0.35));
+    setFrameAbsPoint(frames.art, FramePoint.center, f32(0.4), f32(0.35));
 
     setFrameSize(frames.art, f32(0.18), f32(0.18));
     setFrameLevel(frames.art, 9);
-    setFrameAbsPoint(frames.name, FRAMEPOINT_TOP, f32(0.4), f32(0.24));
+    setFrameAbsPoint(frames.name, FramePoint.top, f32(0.4), f32(0.24));
     setFrameSize(frames.name, f32(0.4), f32(0.06));
     setFrameFont(frames.name, MENU_FONT, f32(0.02), 0);
-    setFrameTextAlignment(frames.name, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER);
+    setFrameTextAlignment(frames.name, TextAlignment.top, TextAlignment.center);
     setFrameLevel(frames.name, 9);
     setFrameText(frames.name, `${name}\n|cffbbbbbbGetting the arena ready…|r`);
     for (const frame of [frames.cover, frames.art, frames.name]) {

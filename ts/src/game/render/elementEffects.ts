@@ -9,27 +9,27 @@ import { ELEMENTS, HIT_CUES, type HitCueSeen, advanceHitCueSeen, elementLook, hi
 import { fighterModelScale } from "../presentation/fighterScale";
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
-import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
-import { playSound, setSoundPosition, setSoundVolume, soundFromLabel, stopSound } from "wisp/game/sound";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { playSound, setSoundPosition, setSoundVolume, Sound, soundFromLabel, stopSound } from "wisp/game/sound";
 
 
 const SHOWN = ELEMENTS.filter((element) => elementLook(element).victim !== undefined);
 
 export class ElementEffects {
 
-  private readonly models: readonly effect[];
+  private readonly models: readonly Effect[];
   private parked: ParkedFlags | undefined;
 
   private readonly hitSerials: number[] = [0, 0, 0, 0];
 
   private readonly front: number;
 
-  readonly hitCues: readonly effect[];
+  readonly hitCues: readonly Effect[];
   private readonly hitCueSeen: HitCueSeen[] = PARTICIPANT_SLOTS.flatMap(() => HIT_CUES.map(() => hitCueSeen()));
 
   private readonly hitCueShown: number[] = PARTICIPANT_SLOTS.flatMap(() => HIT_CUES.map(() => -1));
 
-  private readonly hitSounds: readonly (sound | undefined)[] = HIT_CUES.map((cue) => cue.look.sound === undefined ? undefined : soundFromLabel(cue.look.sound, false, true, true, 10, 10));
+  private readonly hitSounds: readonly (Sound | undefined)[] = HIT_CUES.map((cue) => cue.look.sound === undefined ? undefined : soundFromLabel(cue.look.sound, false, true, true, 10, 10));
 
   constructor(private readonly origin: WorldOrigin) {
     this.front = origin.y - 10.0;
