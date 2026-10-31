@@ -418,8 +418,8 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Rain of Fire", startup: FEL, active: cue("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", "overhead", f32(0.45)) },
   },
   [Character.lichKing]: {
-    neutral: { spell: "Val'kyr Shadowguard", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\Cripple\\CrippleTarget.mdx", "ahead", f32(0.8)) },
-    side: { spell: "Death Grip", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.8)) },
+    neutral: { spell: "Death Grip", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.8)) },
+    side: { spell: "Howling Gale", startup: RUNE, active: WIND_WHIRL },
     up: { spell: "Frost Wyrm", startup: FROST_WYRM_MOUNT, active: FROST_WYRM_MOUNT },
     down: { spell: "Harvest Soul", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdx", "hand", f32(0.7)) },
   },

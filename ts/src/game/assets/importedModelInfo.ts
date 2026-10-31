@@ -19,7 +19,6 @@ export const LICH_KING_STOCK_SCALE = { unit: "LichKing2", scale: 1.0 } as const;
 
 export const HOWLING_BLAST_MODEL = "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx";
 
-export const VALKYR_MODEL = "Units\\Undead\\Banshee\\Banshee.mdx";
 
 
 

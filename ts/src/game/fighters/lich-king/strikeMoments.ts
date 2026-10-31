@@ -19,7 +19,7 @@ export const lichKingStrikeMoments = {
   19: { clip: 19, seconds: f32(0.000), end: f32(0.750) },
   20: { clip: 14, seconds: f32(0.100), end: f32(0.417) },
   21: { clip: 15, seconds: f32(0.133), end: f32(0.566) },
-  100: { clip: 64, seconds: f32(0.667), end: f32(0.867) },
-  101: { clip: 62, seconds: f32(0.367), end: f32(0.833) },
+  100: { clip: 62, seconds: f32(0.367), end: f32(0.833) },
+  101: { clip: 64, seconds: f32(0.583), end: f32(0.867) },
   102: { clip: 65, seconds: f32(0.150), end: f32(0.933) },
 };

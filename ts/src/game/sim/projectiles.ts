@@ -14,6 +14,7 @@ import { type HitEffect, HitElement, copyHitEffect, emptyHitEffect } from "./hit
 import type { SpecialProjectile } from "./specials/schema";
 import { agesWithMove } from "./specials/heroProjectiles";
 import { repelSpell } from "./specials/spellImmunity";
+import { blowGust } from "./specials/gust";
 import { reflectsProjectiles } from "./specials/reflector";
 import { bounceAfterHit, clearBounce, steerBounce } from "./projectileBounce";
 import { capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule, segmentBoxesOverlap } from "./geometry/contactGeometry";
@@ -366,6 +367,10 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
     return undefined;
   }
   if (spec === undefined || spec.life - projectile.life <= (spec.activeFrom ?? 0) - 1) return undefined;
+  if (spec.gust !== undefined) {
+    blowGust(world, ownerSlot, projectile, spec, spec.gust, oldX, oldZ);
+    return undefined;
+  }
   const radius = heroProjectileRadius(projectile, spec);
   heroFlight.x1 = oldX;
   heroFlight.z1 = oldZ;

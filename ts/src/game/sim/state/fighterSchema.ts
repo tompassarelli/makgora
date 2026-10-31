@@ -188,7 +188,7 @@ export const FIGHTER_DIFF_ORDER: readonly string[] = [
   "ledgeSerial", "ledgeIntangible", "ledgeRegrab", "ledgeGrabs", "grappleState", "grappleFrame", "grappleSurface", "grappleAnchorX", "grappleAnchorZ", "grappleLength", "grappleSpent", "grappleAim", "platformDownHeld", "platformDownAge", "platformDropConsumed", "stickRecent", "stickOlder", "cannonHeld",
   "cannonFiring", "cannonCooldown", "cannonPassing", "waterIn", "waterFrames", "waterEntries", "waterHydraFrame", "waterHydraX",
   "waterHydraStrikeFrame", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "projectileBounces[${i}]", "projectileHomeward[${i}]",
-  "projectileLastStruck[${i}]", "grabReel", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy", "pullBy", "pullFrames", "pullHold",
+  "projectileLastStruck[${i}]", "projectileGustStruck[${i}]", "grabReel", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy", "pullBy", "pullFrames", "pullHold",
   "duoRole", "duoLink", "duoRing[${i}]", "duoHead", "duoOrder", "duoOrderFrame", "duoReviveSpent", "duoSwapCooldown", "duoTossCooldown",
   "victimDuoChain", "victimDuoFree", "victimNetImmune", "victimGrabImmuneDuo", "victimHandoffs", "victimHandoffWindow", "victimShieldRun", "victimShieldFree",
 ];
@@ -224,7 +224,7 @@ export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
   duo: ["role", "link", "ring[]", "head", "order", "orderFrame", "reviveSpent", "swapCooldown", "tossCooldown"],
   victim: ["duoChain", "duoFree", "netImmune", "grabImmuneDuo", "handoffs", "handoffWindow", "shieldRun", "shieldFree"],
   pack: ["length", "life", "age", "x", "z", "direction", "durability", "serial", "spec", "struck[]", "specialStruck", "mode", "modeFrame", "apart", "bitten", "hits", "percent", "hitstun", "velocityX", "velocityZ", "jumps", "surface"],
-  projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "poolHits", "poolWait", "spec", "surface", "x", "z", "velocityX", "velocityZ", "damageMultiplier", "bounces", "homeward", "lastStruck"],
+  projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "poolHits", "poolWait", "spec", "surface", "x", "z", "velocityX", "velocityZ", "damageMultiplier", "bounces", "homeward", "lastStruck", "gustStruck"],
 };
 
 // Rows run in canonical emit order, the byte-stable stateHash order; influence operands (WeakMap) and PACK_SPARES stay outside the snapshot.
@@ -652,6 +652,7 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "projectiles[].bounces", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectileBounces[${i}]", writer: "int", when: ["nonzero"] }, diff: "projectileBounces[${i}]", respawn: { blast: "0", helper: "clearSpecialOnStock", respawn: "0" } },
   { path: "projectiles[].homeward", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "projectileHomeward[${i}]", writer: "flagBool" }, diff: "projectileHomeward[${i}]", respawn: { blast: "false", helper: "clearSpecialOnStock", respawn: "false" } },
   { path: "projectiles[].lastStruck", type: "optionalInt", init: "undefined", copy: "plain", same: "plain", canon: { name: "projectileLastStruck[${i}]", writer: "optionalInt", when: ["defined"] }, diff: "projectileLastStruck[${i}]", respawn: { blast: "undefined", helper: "clearSpecialOnStock", respawn: "undefined" } },
+  { path: "projectiles[].gustStruck", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectileGustStruck[${i}]", writer: "int", when: ["nonzero"] }, diff: "projectileGustStruck[${i}]", respawn: { blast: "0", helper: "clearSpecialOnStock", respawn: "0" } },
   { path: "grab.reel", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "grabReel", writer: "int", when: ["nonzero"] }, diff: "grabReel", respawn: { blast: "0", helper: "clearGrabLinks", respawn: "0" } },
   { path: "status.aura", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "aura", writer: "flagBool" }, diff: "aura", respawn: { blast: "false", respawn: "false" } },
   { path: "status.auraFrames", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "auraFrames", writer: "int", when: ["nonzero"] }, diff: "auraFrames", respawn: { blast: "0", respawn: "0" } },

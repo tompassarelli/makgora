@@ -40,6 +40,7 @@ function copyFighterProjectiles(target: Fighter, source: Readonly<Fighter>): voi
     to.bounces = from.bounces;
     to.homeward = from.homeward;
     to.lastStruck = from.lastStruck;
+    to.gustStruck = from.gustStruck;
   }
   const rest = sources[PROJECTILE_CAPACITY - 1];
   if (live < PROJECTILE_CAPACITY && rest !== undefined && targets[PROJECTILE_CAPACITY - 1]?.visualFamily !== rest.visualFamily) {
@@ -610,7 +611,7 @@ function sameFighterProjectiles(target: Readonly<Fighter>, source: Readonly<Figh
     const b = sources[index];
     if (a === undefined || b === undefined) return false;
     if (a === b) continue;
-    if (a.life !== b.life || a.serial !== b.serial || a.kind !== b.kind || a.direction !== b.direction || a.visualFamily !== b.visualFamily || a.newlyReflected !== b.newlyReflected || a.poolHits !== b.poolHits || a.poolWait !== b.poolWait || a.spec !== b.spec || a.surface !== b.surface || a.bounces !== b.bounces || a.homeward !== b.homeward || a.lastStruck !== b.lastStruck) return false;
+    if (a.life !== b.life || a.serial !== b.serial || a.kind !== b.kind || a.direction !== b.direction || a.visualFamily !== b.visualFamily || a.newlyReflected !== b.newlyReflected || a.poolHits !== b.poolHits || a.poolWait !== b.poolWait || a.spec !== b.spec || a.surface !== b.surface || a.bounces !== b.bounces || a.homeward !== b.homeward || a.lastStruck !== b.lastStruck || a.gustStruck !== b.gustStruck) return false;
     if (!sameReal(a.x, b.x) || !sameReal(a.z, b.z) || !sameReal(a.velocityX, b.velocityX) || !sameReal(a.velocityZ, b.velocityZ) || !sameReal(a.damageMultiplier, b.damageMultiplier)) return false;
   }
   return live >= PROJECTILE_CAPACITY || targets[PROJECTILE_CAPACITY - 1]?.visualFamily === sources[PROJECTILE_CAPACITY - 1]?.visualFamily;
@@ -1626,6 +1627,10 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
     const projectile = at(fighter.projectiles, i);
     if (projectile.lastStruck !== undefined) sink.int(prefix, `projectileLastStruck[${i}]`, projectile.lastStruck ?? -1);
+  }
+  for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
+    const projectile = at(fighter.projectiles, i);
+    if (projectile.gustStruck !== 0) sink.int(prefix, `projectileGustStruck[${i}]`, projectile.gustStruck);
   }
   if (grab.reel !== 0) sink.int(prefix, "grabReel", grab.reel);
   if (status.aura) sink.bool(prefix, "aura", true);

@@ -12,9 +12,9 @@ import { Character, HeroStatusKind, SpecialAction } from "../../sim/codes";
 import { canBeGrabbed } from "../../sim/conditions";
 import { createFighter, type Fighter } from "../../sim/fighter";
 import { fighterAt } from "../../sim/roster";
-import { DEATH_GRIP, DEATH_GRIP_HOLD, DEATH_GRIP_PULL_FRAMES, DEATH_GRIP_SPAWN_FRAME, DEATH_GRIP_SPEED, DEATH_GRIP_STUN_FRAMES, VALKYR } from "./specials";
+import { DEATH_GRIP, DEATH_GRIP_HOLD, DEATH_GRIP_PULL_FRAMES, DEATH_GRIP_SPAWN_FRAME, DEATH_GRIP_SPEED, DEATH_GRIP_STUN_FRAMES } from "./specials";
 
-type Press = "neutral" | "side" | "shield" | "none";
+type Press = "neutral" | "shield" | "none";
 
 interface Duel {
   readonly state: ReplayState;
@@ -32,7 +32,6 @@ interface Setup {
 
 const AIR_HEIGHT = 900.0;
 const LOW_AIR_HEIGHT = 300.0;
-const VALKYR_SPAWN_FRAME = 26;
 const AIR_LANDING_LAG = 20;
 
 function duel(setup: Setup): Duel {
@@ -66,10 +65,8 @@ function hover(f: Fighter, z: number): void {
 }
 
 function row(d: Readonly<Duel>, press: Press): Parameters<typeof inputRow>[0] {
-  const toward = d.facing > 0 ? Action.moveRight : Action.moveLeft;
   switch (press) {
     case "neutral": return { held: maskOf(Action.special), pressed: maskOf(Action.special) };
-    case "side": return { held: maskOf(toward, Action.special), pressed: maskOf(Action.special), axisX: d.facing > 0 ? 127 : -127, specialX: d.facing > 0 ? 1 : -1 };
     case "shield": return { held: maskOf(Action.rightTrigger), pressed: maskOf(Action.rightTrigger) };
     default: return {};
   }
@@ -102,7 +99,7 @@ interface Grip {
 function grip(setup: Setup, other: Press = "none", frames = 90): Grip {
   const d = duel(setup);
   step(d, "none");
-  step(d, "side", other);
+  step(d, "neutral", other);
   let gripped = false;
   let pullFrames = 0;
   let stunFrames = 0;
@@ -128,35 +125,12 @@ function grip(setup: Setup, other: Press = "none", frames = 90): Grip {
   return { gripped, pullFrames, arrivedX, arrivedZ, kingX, kingZ, stunFrames, d };
 }
 
-test("Val'kyr Shadowguard is his neutral special: she leaves on frame 26 at 5 a frame his way and carries the foe she reaches, in both facings [k3 measure docs/design/roster.md]", () => {
-  for (const facing of [1, -1]) {
-    const d = duel({ facing, foeAhead: 200.0 });
-    step(d, "none");
-    step(d, "neutral");
-    assertEquals(d.king.special.action, SpecialAction.heroNeutral);
-    let spawnedOn: number | undefined;
-    let carried = false;
-    for (let frame = 0; frame < 80; frame++) {
-      step(d, "none");
-      const valkyr = d.king.projectiles.find((p) => p.life > 0 && p.spec === VALKYR);
-      if (spawnedOn === undefined && valkyr !== undefined) {
-        spawnedOn = d.king.special.frame;
-        assertEquals(valkyr.velocityX, f32(facing * 5.0));
-      }
-      carried ||= d.foe.status.condition === HeroStatusKind.carried;
-    }
-    assertEquals(spawnedOn, VALKYR_SPAWN_FRAME);
-    assertTrue(carried);
-    assertTrue(d.foe.status.condition !== HeroStatusKind.gripped);
-  }
-});
-
-test("Death Grip is his side special: the coil leaves on frame 16 and grips a foe 300 ahead but never one 420 ahead, in both facings [k3 measure docs/design/roster.md]", () => {
+test("Death Grip is his neutral special: the coil leaves on frame 16 and grips a foe 300 ahead but never one 420 ahead, in both facings [k3 measure docs/design/roster.md]", () => {
   for (const facing of [1, -1]) {
     const d = duel({ facing, foeAhead: 900.0 });
     step(d, "none");
-    step(d, "side");
-    assertEquals(d.king.special.action, SpecialAction.heroSide);
+    step(d, "neutral");
+    assertEquals(d.king.special.action, SpecialAction.heroNeutral);
     while (!d.king.projectiles.some((p) => p.life > 0 && p.spec === DEATH_GRIP)) step(d, "none");
     assertEquals(d.king.special.frame, DEATH_GRIP_SPAWN_FRAME);
     assertEquals(d.king.projectiles.find((p) => p.life > 0 && p.spec === DEATH_GRIP)?.velocityX, f32(facing * DEATH_GRIP_SPEED));
@@ -194,8 +168,8 @@ test("A raised shield stops Death Grip: the foe is neither gripped nor moved [k3
 test("Death Grip in the air pulls an airborne foe to his height and his side, and his landing takes the air landing lag [k3 measure docs/design/roster.md]", () => {
   for (const facing of [1, -1]) {
     const d = duel({ facing, foeAhead: 250.0, height: AIR_HEIGHT });
-    step(d, "side");
-    assertEquals(d.king.special.action, SpecialAction.heroSide);
+    step(d, "neutral");
+    assertEquals(d.king.special.action, SpecialAction.heroNeutral);
     let arrived = false;
     let landingLag = 0;
     for (let frame = 0; frame < 120; frame++) {
@@ -210,7 +184,7 @@ test("Death Grip in the air pulls an airborne foe to his height and his side, an
     }
     assertTrue(arrived);
     const low = duel({ facing, foeAhead: 900.0, height: LOW_AIR_HEIGHT });
-    step(low, "side");
+    step(low, "neutral");
     for (let frame = 0; frame < 60; frame++) {
       step(low, "none");
       if (low.king.motion.grounded) landingLag = Math.max(landingLag, low.king.landing.lag);
@@ -226,7 +200,7 @@ test("From the frame it arrives the foe is stunned for exactly 18 frames, cannot
     assertTrue(g.d.foe.status.condition === HeroStatusKind.none);
     const d = duel({ facing, foeAhead: 300.0 });
     step(d, "none");
-    step(d, "side");
+    step(d, "neutral");
     while (!stunned(d.foe)) step(d, "none");
     let grabbable = false;
     while (stunned(d.foe)) {
@@ -240,7 +214,7 @@ test("From the frame it arrives the foe is stunned for exactly 18 frames, cannot
 
 test("A rollback across Death Grip's coil, pull and stun replays to the live checksum [k1 scenario]", () => {
   const end = 70;
-  const script = (tick: number): Press => tick === 2 ? "side" : "none";
+  const script = (tick: number): Press => tick === 2 ? "neutral" : "none";
   for (const facing of [1, -1]) {
     for (const save of [10, 20, 26, 30, 36, 44]) {
       const run = duel({ facing, foeAhead: 300.0 });

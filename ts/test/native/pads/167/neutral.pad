@@ -1,13 +1,22 @@
-# #167 Lich King Val'kyr Shadowguard, his neutral special since 1 Nov: she flies out and seizes b. Captured as
-# she spawns (frame 26). Lich King a against Lich King b. Syntax and checks: smashcraft:docs/native-bot-session.md.
+# #167 Lich King Death Grip, his neutral special since Tom moved it there on 1 Nov: the coil catches b, pulls it
+# to just in front of him and stuns it 18 frames from arrival; b's buffered jab comes out on the first free frame.
+# Captured in flight, mid-pull and in the stun. Lich King a against Lich King b. Syntax and checks:
+# smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero lich king
 # Input starts after frame 500: on a loaded host the helpers first see a quick match up to ~400 frames in.
 540 b stick -1 0
 560 b stick 0 0
 600 a tap X 2
-627 a capture
-628 a capture
+615 a capture
+622 a capture
+636 a capture
+633 b tap A 2
+637 b tap A 2
+641 b tap A 2
+645 b tap A 2
 1000 a press VIEW
 1070 a release VIEW
+# Expected: the coil reaches b on frame 615; the stun ends and b's jab starts on frame 649.
 #! expect a 600 special 13 form 0
-#! expect b 629 damage 5.000
+#! expect b 615 damage 4.000
+#! expect b 649 applied attack 1 style 0

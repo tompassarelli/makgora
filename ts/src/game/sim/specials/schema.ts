@@ -11,6 +11,7 @@ import type { SpecialBeam } from "./specialBeam";
 import type { SpecialSteer, SpecialSteeredShot } from "./shotSteering";
 import type { ToggleAura } from "./auraSchema";
 import type { CompanionBody, CompanionOrder } from "./companionSchema";
+import type { ProjectileGust } from "./gustSchema";
 export type { SpecialSelfHit, SpecialSteer, SpecialSteeredShot } from "./shotSteering";
 export type { FrameWindow } from "./castWindows";
 export { CompanionMode, CompanionOrder } from "./companionSchema";
@@ -204,6 +205,7 @@ export interface SpecialProjectile {
   readonly pierces?: true | undefined;
   /** Leaves `reach` out along its move's eight-way aim from `offsetZ` above its owner's feet and flies `speed` that way, straight ahead with no aim. It is part of the move's body: it skips the hero projectile cap and ends when the move is interrupted. */
   readonly breath?: { readonly speed: number; readonly reach: number } | undefined;
+  readonly gust?: ProjectileGust | undefined;
 }
 
 interface ArmorWindow extends FrameWindow { readonly shell?: boolean | undefined; readonly chillsStriker?: boolean | undefined; readonly perStack?: number | undefined }

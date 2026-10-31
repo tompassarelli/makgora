@@ -43,6 +43,6 @@ export const LICH_KING_CLIPS: HeroClipTable = {
   victimPummel: clip("Grabbed"), victimThrowForward: clip("Damage Tumble"), victimThrowBack: clip("Damage Tumble"),
   victimThrowUp: clip("Damage Tumble"), victimThrowDown: clip("Damage Ground"),
 
-  neutralSpecial: clip("Special Side"), sideSpecial: clip("Special Neutral"), upSpecial: clip("Special Up"), downSpecial: clip("Special Down"),
-  neutralSpecialAir: clip("Special Side"), sideSpecialAir: clip("Special Neutral"), upSpecialAir: clip("Special Up"), downSpecialAir: clip("Special Down"),
+  neutralSpecial: clip("Special Neutral"), sideSpecial: clip("Special Side"), upSpecial: clip("Special Up"), downSpecial: clip("Special Down"),
+  neutralSpecialAir: clip("Special Neutral"), sideSpecialAir: clip("Special Side"), upSpecialAir: clip("Special Up"), downSpecialAir: clip("Special Down"),
 };

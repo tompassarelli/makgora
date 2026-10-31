@@ -1,23 +1,27 @@
-# #167 Lich King Death Grip, his side special since 1 Nov: the coil catches b, pulls it to just in front of him
-# and stuns it 18 frames from arrival; b's buffered jab comes out on the first free frame. Captured in flight,
-# mid-pull and in the stun. Lich King a against Lich King b. Syntax and checks: smashcraft:docs/native-bot-session.md.
+# #167 Lich King Howling Gale, his side special since 1 Nov: after 14 frames a gust rises one body behind him
+# and blows forward over him; b, standing 240 in front of him (past his 1.2H lee), takes 5 on frame 630 and is
+# blown away. Then a jumps and casts it in the air: the gust reaches him on frame 875 and carries him forward at
+# 9 a frame. Captured as it rises, as it passes over him, as it strikes b, and as it carries him. Lich King a
+# against Lich King b. Syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero lich king
 # Input starts after frame 500: on a loaded host the helpers first see a quick match up to ~400 frames in.
-540 b stick -1 0
-560 b stick 0 0
+580 b stick -1 0
+589 b stick 0 0
 600 a stick 1 0
 600 a tap X 2
 601 a stick 0 0
-615 a capture
+614 a capture
 622 a capture
-636 a capture
-633 b tap A 2
-637 b tap A 2
-641 b tap A 2
-645 b tap A 2
+630 a capture
+850 a tap B 8
+860 a stick 1 0
+860 a tap X 2
+861 a stick 0 0
+874 a capture
+878 a capture
+884 a capture
 1000 a press VIEW
 1070 a release VIEW
-# Expected: the coil reaches b on frame 615; the stun ends and b's jab starts on frame 649.
 #! expect a 600 special 14 form 0
-#! expect b 615 damage 4.000
-#! expect b 649 applied attack 1 style 0
+#! expect b 630 damage 5.000
+#! expect a 860 special 14 form 1

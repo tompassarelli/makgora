@@ -183,6 +183,7 @@ export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProj
     projectile.newlyReflected = false;
     projectile.poolHits = 0;
     projectile.poolWait = 0;
+    projectile.gustStruck = 0;
     clearBounce(projectile);
     projectile.surface = surface;
     projectile.life = spec.life;

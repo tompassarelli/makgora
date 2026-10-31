@@ -6,13 +6,13 @@ export const LICH_KING_GAMEPLAN: FighterGameplan = {
   spacing: [
     { move: AttackStyle.forwardTilt, near: 105.0, far: 190.0 },
     { move: AttackStyle.downTilt, near: 80.0, far: 150.0 },
-    { move: GameplanSpecial.side, near: 200.0, far: 330.0 },
-    { move: GameplanSpecial.neutral, near: 120.0, far: 260.0 },
+    { move: GameplanSpecial.neutral, near: 200.0, far: 330.0 },
+    { move: GameplanSpecial.side, near: 180.0, far: 420.0 },
     { move: GameplanSpecial.down, near: 420.0, far: 1400.0 },
   ],
   approach: [
 
-    { via: "shoot", moves: [GameplanSpecial.side, AttackStyle.forwardTilt], weight: 2 },
+    { via: "shoot", moves: [GameplanSpecial.neutral, AttackStyle.forwardTilt], weight: 2 },
 
     { via: "shoot", moves: [GameplanSpecial.down, AttackStyle.upTilt, AttackStyle.grab] },
     { via: "run", moves: [AttackStyle.dashAttack, AttackStyle.grab] },
@@ -22,7 +22,7 @@ export const LICH_KING_GAMEPLAN: FighterGameplan = {
     { starter: AttackStyle.downTilt, followUps: [AttackStyle.forwardTilt, AttackStyle.grab] },
     { starter: AttackStyle.upTilt, followUps: [AttackStyle.upAir, AttackStyle.upTilt] },
     { starter: GameplanThrow.up, followUps: [AttackStyle.upAir] },
-    { starter: GameplanSpecial.side, followUps: [AttackStyle.forwardTilt, AttackStyle.upTilt, AttackStyle.downTilt] },
+    { starter: GameplanSpecial.neutral, followUps: [AttackStyle.forwardTilt, AttackStyle.upTilt, AttackStyle.downTilt] },
 
     { starter: GameplanThrow.down, followUps: [AttackStyle.forwardTilt, AttackStyle.dashAttack] },
   ],
@@ -31,7 +31,6 @@ export const LICH_KING_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.upSmash, fromPercent: 90.0 },
     { move: AttackStyle.backAir, fromPercent: 100.0 },
 
-    { move: GameplanSpecial.neutral, fromPercent: 80.0 },
     { move: GameplanThrow.back, fromPercent: 120.0 },
   ],
   recovery: { aim: "ledge", upSpecial: "last" },

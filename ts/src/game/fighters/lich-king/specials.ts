@@ -6,8 +6,8 @@ import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
 import type { AppliedStatus } from "../../sim/appliedStatus";
 import { type AuthoredSpecial, type CompanionBody, type FighterSpecials, FollowUpInput, type SpecialCharge, type SpecialCompanion, type SpecialPlacement, type SpecialProjectile, frames } from "../../sim/specials/schema";
+import { ANGLES } from "../../sim/heroes/authoring";
 import { capsule, hit } from "./moves";
-import { VALKYR_MODEL } from "../../assets/importedModelInfo";
 
 const h = (fraction: number): number => f32(HERO_REFERENCE_HEIGHT * fraction);
 
@@ -41,26 +41,6 @@ const deathGrip = (landingLag: number | undefined): AuthoredSpecial => ({
   projectiles: [DEATH_GRIP],
 });
 
-const CARRIED: AppliedStatus = { kind: HeroStatusKind.carried, frames: 100, group: HeroStatusGroup.sleep, immunityFrames: 240 };
-
-
-
-
-
-const valkyrProjectile = (speed: number): SpecialProjectile => ({
-  model: VALKYR_MODEL,
-  spawnFrame: 26, offsetX: 40.0, offsetZ: f32(CHEST + 10.0), velocityX: speed, velocityZ: 0.0,
-  life: 60, radius: h(f32(0.2)), effect: { damage: 5.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false, element: HitElement.dark },
-  reflectable: true, limit: 1, status: CARRIED,
-});
-export const VALKYR = valkyrProjectile(5.0);
-const shadowguard = (projectile: SpecialProjectile, landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 52,
-  armor: { ...frames(10, 26), maxDamage: 8.0 },
-  landingLag,
-  projectiles: [projectile],
-});
-
 export const WYRM_SUMMON_FRAMES = 9;
 export const WYRM_RIDE = frames(WYRM_SUMMON_FRAMES + 1, WYRM_SUMMON_FRAMES + 40);
 const WYRM_RIDE_FRAMES = WYRM_RIDE.last - WYRM_RIDE.first + 1;
@@ -81,19 +61,50 @@ const wyrmBreath = (spawnFrame: number): SpecialProjectile => ({
 });
 export const WYRM_BREATHS = WYRM_BREATH_FRAMES.map((frame) => wyrmBreath(frame));
 
-const FROST_WYRM: AuthoredSpecial = {
+export const GALE_WYRM_RISE = f32(WYRM_RISE * f32(1.25));
+export const GALE_WYRM_DRIFT = f32(WYRM_DRIFT * f32(1.4));
+
+const frostWyrm = (rise: number, drift: number): AuthoredSpecial => ({
   endFrame: WYRM_RIDE.last + WYRM_DISMOUNT_FRAMES,
   facesStick: true,
   turnsAround: true,
   aimFrames: WYRM_RIDE.last,
   motion: [
     { ...frames(1, WYRM_SUMMON_FRAMES), velocityX: 0.0, velocityZ: 0.0 },
-    { ...WYRM_RIDE, velocityX: 0.0, velocityZ: WYRM_RISE, driftSpeed: WYRM_DRIFT, liftSpeed: WYRM_LIFT },
+    { ...WYRM_RIDE, velocityX: 0.0, velocityZ: rise, driftSpeed: drift, liftSpeed: WYRM_LIFT },
   ],
   projectiles: WYRM_BREATHS,
   oncePerAirtime: true,
   helpless: true,
+});
+const FROST_WYRM: AuthoredSpecial = { ...frostWyrm(WYRM_RISE, WYRM_DRIFT), spendsEmpowered: true, variants: [frostWyrm(GALE_WYRM_RISE, GALE_WYRM_DRIFT)] };
+
+export const GALE_SPAWN_FRAME = 14;
+export const GALE_BEHIND = h(1.0);
+export const GALE_SPEED = 16.0;
+export const GALE_LIFE = 36;
+export const GALE_LEE = h(f32(1.2));
+export const GALE_OWNER_PUSH = 9.0;
+export const GALE_BOOST_FRAMES = 60;
+export const GALE_COOLDOWN = 120;
+export const GALE_MODEL = "Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx";
+
+const GALE_GROUNDED = { damage: 5.0, growth: 40.0, base: 30.0, launchX: ANGLES[20].x, launchZ: ANGLES[20].z, electric: false, element: HitElement.ice };
+export const HOWLING_GALE: SpecialProjectile = {
+  model: GALE_MODEL, spawnFrame: GALE_SPAWN_FRAME, offsetX: -GALE_BEHIND, offsetZ: CHEST, velocityX: GALE_SPEED, velocityZ: 0.0,
+  life: GALE_LIFE, radius: h(f32(0.45)),
+  effect: { damage: 7.0, growth: 60.0, base: 45.0, launchX: ANGLES[25].x, launchZ: ANGLES[25].z, electric: false, element: HitElement.ice },
+  reflectable: false, limit: 1,
+  gust: { lee: GALE_LEE, leeHeight: h(1.0), groundedEffect: GALE_GROUNDED, ownerPush: GALE_OWNER_PUSH },
 };
+const howlingGale = (landingLag: number | undefined): AuthoredSpecial => ({
+  endFrame: 32,
+  cooldownFrames: GALE_COOLDOWN,
+  oncePerAirtime: true,
+  landingLag,
+  projectiles: [HOWLING_GALE],
+  empowers: { frame: GALE_SPAWN_FRAME, shots: 1, frames: GALE_BOOST_FRAMES },
+});
 
 
 
@@ -136,16 +147,16 @@ const harvestSoul = (landingLag: number | undefined): AuthoredSpecial => ({
 
 export const LICH_KING_SPECIALS: FighterSpecials = {
   neutral: {
-    name: "Val'kyr Shadowguard",
-    description: "A Val'kyr seizes the first foe she reaches and carries them toward the edge; mash to break free.",
-    ground: shadowguard(VALKYR, undefined),
-    air: shadowguard(VALKYR, AIR_LANDING_LAG),
-  },
-  side: {
     name: "Death Grip",
     description: "A death coil yanks the first foe it reaches to just in front of him, briefly stunned; shields stop it.",
     ground: deathGrip(undefined),
     air: deathGrip(AIR_LANDING_LAG),
+  },
+  side: {
+    name: "Howling Gale",
+    description: "After a short delay a frost gale rises one body behind him and blows forward over him. He breaks the wind, so a foe standing close is spared; farther out it launches standing foes and hurls airborne ones harder. In the air it carries him forward, and Frost Wyrm flies faster and farther while it blows and just after.",
+    ground: howlingGale(undefined),
+    air: howlingGale(AIR_LANDING_LAG),
   },
   up: {
     name: "Frost Wyrm",

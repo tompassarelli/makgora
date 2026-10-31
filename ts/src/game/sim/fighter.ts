@@ -316,6 +316,7 @@ export interface Projectile {
   bounces: number;
   homeward: boolean;
   lastStruck: number | undefined;
+  gustStruck: number;
 }
 
 
@@ -649,6 +650,7 @@ function emptyProjectile(): Projectile {
     bounces: 0,
     homeward: false,
     lastStruck: undefined,
+    gustStruck: 0,
   };
 }
 

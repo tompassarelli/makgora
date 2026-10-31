@@ -154,7 +154,7 @@ no source chains it. Reapplying refreshes the duration. Status, frames, group
 and per-group immunity are rollback state, written to the canonical record
 only while live; a new stock clears them.
 
-Carried (the Lich King's Val'kyr Shadowguard, #167) discards every input
+Carried (built for the Lich King's Val'kyr Shadowguard, #167, which left his kit on 1 Nov; no move applies it now) discards every input
 and replaces motion: each frame the fighter moves its rule's speed toward its
 back and rises, with no gravity or drift, and the hit that applies it turns
 the victim to face back along the hit. It mashes out as Sleep does (never

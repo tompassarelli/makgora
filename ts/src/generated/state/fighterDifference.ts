@@ -367,6 +367,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).bounces !== at(actual.projectiles, i).bounces) return `projectileBounces[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).homeward !== at(actual.projectiles, i).homeward) return `projectileHomeward[${i}]`;
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).lastStruck !== at(actual.projectiles, i).lastStruck) return `projectileLastStruck[${i}]`;
+  for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(expected.projectiles, i).gustStruck !== at(actual.projectiles, i).gustStruck) return `projectileGustStruck[${i}]`;
   if (expected.grab.reel !== actual.grab.reel) return "grabReel";
   if (expected.status.aura !== actual.status.aura) return "aura";
   if (expected.status.auraFrames !== actual.status.auraFrames) return "auraFrames";

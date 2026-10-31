@@ -1392,7 +1392,7 @@ Tom asked on 2026-10-31, after a playtest, for three changes, all in:
 heavy Frostmourne swordsman who commands the dead, from Warcraft III and the
 Icecrown Citadel encounter. Distinct from the Lich (Kel'Thuzad), a light frost
 caster: the Lich King wins with blade reach and kill power, controls space
-with the Val'kyr and Death Grip, and raises a Ghoul from the souls he harvests. He is slow on foot and in the air, so fast
+with Death Grip and Howling Gale, and raises a Ghoul from the souls he harvests. He is slow on foot and in the air, so fast
 pressure inside the blade and juggles are his weakness.
 
 Source: smashcraft:ts/src/game/fighters/lich-king/moves.ts, lichKingSpecials.ts,
@@ -1427,18 +1427,13 @@ Soul until 1 Nov, when that name went to his down special.
 ### B specials
 
 Howling Blast, his neutral special until 1 Nov, left the kit when Tom moved
-the Val'kyr to neutral and made the side special Death Grip.
+the Val'kyr to neutral and made the side special Death Grip. Later on 1 Nov
+Tom moved Death Grip to neutral, gave the side special to Howling Gale, and
+the Val'kyr Shadowguard left the kit.
 
-- **Val'kyr Shadowguard** (neutral, 20 mana; side until Tom moved her on
-  1 Nov, unchanged): a Val'kyr flies out on frame 26 at 5 units a frame for
-  60 frames and seizes the first body she reaches (a shield stops her; a
-  reflector turns her back). The victim is carried 3 units a frame the way she flew, rising,
-  for 100 frames, with no control. Mashing frees them, never before frame 20;
-  any damaging hit, his own included, drops the carry; then 240 frames immune.
-  (Tom delegated, 7 Oct): she carries toward the edge he faces rather than the
-  nearest one, so the player aims the drop and the victim can read it.
-- **Death Grip** (side, 150-frame cooldown; Tom's design, 1 Nov, after the
-  World of Warcraft death knight's pull): a death coil (the stock Death Coil
+- **Death Grip** (neutral, 150-frame cooldown; Tom's design, 1 Nov, after the
+  World of Warcraft death knight's pull; side until Tom moved it to neutral
+  later that day, unchanged): a death coil (the stock Death Coil
   missile) leaves his hand on frame 16 at 24 units a frame for 12 frames,
   reaching about 2.6H; end lag through frame 40. The first body it reaches
   takes 4 damage with no knockback and is yanked over 10 frames to 70 units
@@ -1451,6 +1446,28 @@ the Val'kyr to neutral and made the side special Death Grip.
   pull for 90 frames after. In the air it pulls to his height and he lands
   with 20 frames of landing lag. Sounds: the stock DeathCoil cast and
   Ensnare on the catch.
+- **Howling Gale** (side, 120-frame cooldown, once per airtime; Tom's design,
+  1 Nov; numbers delegated): after a 14-frame delay a gust (the stock small
+  tornado, TornadoElementalSmall) rises one body length (1H, 132 units)
+  behind him at chest height (0.5H) and blows forward over him at 16 units a
+  frame for 36 frames, so it ends about 3.4H in front of him; its swept
+  radius is 0.45H. End lag runs through frame 32. He is a windbreak: the
+  gust passes over him, so nothing within 1.2H of him and lower than 1H above
+  his feet is touched, on either side, and he has no hitbox directly in
+  front of him. Past that lee it strikes every foe it reaches once each,
+  never ending on a hit: a foe standing on the ground takes 5 damage at 20
+  degrees (base 30, growth 40), a wind's shove; an airborne foe takes 7 at
+  25 degrees (base 45, growth 60), so more percent, more hitstun and a
+  longer launch. A shield takes the hit as a shield hit; nothing reflects
+  it. On the ground the gale does nothing to him. In the air, when it
+  reaches him it raises his speed the way it blows to at least 9 units a
+  frame (his air drift is far slower), so a gale cast behind his back carries
+  him sideways back to the stage; he keeps his jump and up special. The air
+  form lands with 20 frames of landing lag. Frost Wyrm boost: from the frame
+  the gust rises (14) for 60 frames, so while it blows and about a second
+  after, his next up special is the boosted Frost Wyrm below. Sounds: the
+  stock BreathOfFrost cast and CycloneBirth on each hit; the cast cue is a
+  frost-tinted small tornado at his feet. Clip: the cast clip the Val'kyr used.
 - **Frost Wyrm** (up; Tom's design, 1 Nov 2026, numbers delegated): the
   stock Classic Frost Wyrm (Units\Undead\FrostWyrm) rises under him through
   a 9-frame summon while he hangs in place, and he rides it seated on its back
@@ -1469,6 +1486,15 @@ the Val'kyr to neutral and made the side special Death Grip.
   Sounds: FrostWyrmAttack1 on the summon, FrostBoltHit on a breath hit.
   It replaces Ascension of the Damned (an ice column rising 2.7H in 23 frames
   inside an 11.25% vortex).
+  **Gale-boosted ride** (Tom's design, 1 Nov; numbers delegated): called
+  while Howling Gale's boost window is open (the 60 frames from the gust
+  rising, so during the gale or just after it), the ride keeps every frame
+  above but climbs 1.25 times as fast (3.0H) and steers 1.4 times as far
+  across (1.82H); the window is spent by that one ride. "Length" is read as
+  distance flown, not a longer ride, so the seated clip and the wyrm cue keep
+  their timing. The boosted route lies outside his 320-440 rise band on
+  purpose: it costs the side special first (120-frame cooldown, once per
+  airtime), and the plain ride stays inside the band.
 - **Harvest Soul** (down; Tom's design, 1 Nov, replacing Defile; numbers
   delegated): hold the button and from frame 15 a soul tether (the stock Drain
   Life lightning) joins his hand to the nearest foe at any range, through
@@ -1521,12 +1547,12 @@ selection line is "What" (the campaign unit has no Ready line).
 **Gameplan** (lichKingGameplan.ts, #105): he holds the sweep's tip spacing,
 pulls a zoning foe into his blade with Death Grip and follows with a tilt,
 channels Harvest Soul from long range and raises the Ghoul at a full meter,
-starts tech chases from Frozen Ground and Soul Reaper, and kills with the smashes, his back air and a
-Val'kyr carry near the ledge.
+starts tech chases from Frozen Ground and Soul Reaper, keeps a foe in the
+gale's band with Howling Gale, and kills with the smashes and his back air.
 
 ### Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A heavy swordsman holding Frostmourne's tip; kills with smashes, back air and a Val'kyr carry.
+Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A heavy swordsman holding Frostmourne's tip; kills with smashes and back air.
 
 ```balance-profile
 fighter: lich-king
@@ -2058,7 +2084,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Shadow Hunter | Glaive drill, ward placement and crossfire | Banked Voodoo damage |
 | Pit Lord | Wide cleaver swings and armoured charge move | Third-contact cleave bonus |
 | Beastmaster | Commanded bear, Quilbeast and hawk positions | Timed Pack Hunt bonus |
-| Lich King | Frostmourne reach, Val'kyr carry, Death Grip and the Harvest Soul channel | Souls banked from ordinary hits and soul forms (a channelled, visible soul meter returned 1 Nov) |
+| Lich King | Frostmourne reach, Death Grip, the Howling Gale windbreak and the Harvest Soul channel | Souls banked from ordinary hits and soul forms (a channelled, visible soul meter returned 1 Nov) |
 | Thrall | Mounted hammer reach, lightning and wolves | Counted Windfury |
 | Jaina | Staff strikes, Blizzard placement and Water Elemental | Faster hidden meter regeneration |
 | Sylvanas | Bow-and-dagger actions, Silence and chosen escape | Banked Black Quiver damage |
