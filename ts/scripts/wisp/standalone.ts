@@ -286,7 +286,9 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   if (chosen !== undefined) query.set("chosen", chosen);
   if (options.presentation !== undefined) query.set("presentation", options.presentation);
   if (digests !== undefined) query.set("digests", digests);
-  const nativeModule = query.size === 0 ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
+  const compiled = !import.meta.path.endsWith(".ts");
+  if (compiled) process.env.SMASHCRAFT_NATIVE_QUERY = query.toString();
+  const nativeModule = query.size === 0 || compiled ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
   return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}), ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) }) }, {
     ...run,
     reforged: storage === undefined ? {} : { storage },
