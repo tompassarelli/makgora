@@ -461,7 +461,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Akama (WIP) | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Firelord (WIP) | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Firelord (WIP) | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Firelord (WIP) | light | up throw | 1/1 in short hop, back air, out dash, dash attack | 1/1 KD in up smash, out down smash | 2/1 | 1/1 |
+| Firelord (WIP) | light | up throw | 1/1 in short hop, back air, out dash, dash attack | 1/1 KD in up smash, out down smash | 2/1 in up smash, out forward smash | 1/1 |
 | Firelord (WIP) | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Firelord (WIP) | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Firelord (WIP) | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
