@@ -36,7 +36,7 @@ class CapacityFailure extends Schema.TaggedError<CapacityFailure, { readonly bra
 
 
 
-export type CapacityClass = "moderate" | "heavy" | "critical";
+export type CapacityClass = "moderate" | "heavy" | "critical" | "tom";
 
 export const admitted = (capacityClass: CapacityClass, owner: string, timeoutSeconds: number, command: readonly string[]): string[] => admitsThroughHelper()
   ? [process.execPath, capacityHelper, "run", "--class", capacityClass, "--owner", owner, "--timeout-seconds", String(timeoutSeconds), "--", ...command]

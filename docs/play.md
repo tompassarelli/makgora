@@ -146,7 +146,7 @@ installed build appends one line to `~/.local/state/agents/handoffs/tom-build.lo
 
 `land_to_installed_s` counts from the commit's committer time; the other
 fields name the stage a slow landing spent its time in (smashcraft:tools/tom-build/README.md). Failed builds
-are in `journalctl --user -u smashcraft-tom-build`.
+are in `journalctl --user -u smashcraft-tom-build`. A landing that moves the pinned Wisp's `window/` source also adds a `<utc> <sha> window-library <seconds> <hash> <library path>` line once the native window library is built, so `wisp play --window native` starts without a cargo build.
 
 ## Lane builds before landing
 

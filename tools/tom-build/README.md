@@ -54,3 +54,21 @@ why, and `~/.local/state/agents/handoffs/tom-build-refused.log` gets one line
 Each install replaces the previous build in Maps/00-Smashcraft and removes any
 `Smashcraft X.Y-LANE.w3x` lane map (`bun scripts/laneBuild.ts --install`,
 smashcraft:docs/play.md).
+
+## Window library
+
+Right after a build is installed and its line is logged, the watcher checks whether
+`~/.cache/wisp/window/<hash>/release/libwisp_window.so` exists for the window source of the
+Wisp its own `ts/` has pinned (Wisp keys the cache by a hash of `window/`, so the check is true
+exactly when that hash is new). If it is missing, the watcher starts
+`bun scripts/prepareWindowLibrary.ts --sha <sha>` detached, under the capacity class `tom`, and goes on
+polling: the map install never waits for it and the next landing's map build is not held back.
+The script copies the package's `window/` to `~/.local/share/smashcraft-build-inputs/window-source`
+(so a later `bun install` that moves the pin cannot change the source mid-build), builds it with the
+resolver Wisp's player uses, and appends one line to `tom-build.log`:
+`<utc> <sha> window-library <seconds> <hash> <library path>`. A library that already exists logs nothing.
+The unit has `KillMode=process`, so a restart onto the next tip leaves a running window build alone;
+a second build of the same hash waits on `window-library.lock` and finds the library built.
+Tom's `bun wisp play --standalone --window native` then opens it without a cargo build.
+The script reads the resolver from the pinned package's `host/window/library.ts` by path, because the
+package exports no window entry.

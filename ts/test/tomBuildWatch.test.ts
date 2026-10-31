@@ -39,6 +39,7 @@ const landing = (fetchStores: boolean, failure: PlayProblem = unstored) => {
     }),
     install: ({ version }, _held) => Effect.succeed({ version, path: "Maps/00-Smashcraft/map.w3x" }),
     notes: () => Effect.succeed("checklist.md"),
+    windowLibrary: () => Effect.void,
     budget: () => Effect.void,
   };
   return { steps, calls };

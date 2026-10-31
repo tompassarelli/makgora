@@ -9,6 +9,7 @@ import { runProcess } from "./hostProcess";
 import { FETCH_HINT } from "./wisp/buildInputs";
 import { type LandingDecision, TOM_EDITION, buildLabel, costPrediction } from "./wisp/greenBuilds";
 import { writePlaytestChecklist } from "./wisp/playtestChecklist";
+import { startWindowLibrary } from "./wisp/windowLibrary";
 import { type BuildStage, currentPlaytest } from "./wisp/currentPlaytest";
 import { installLatest, library, pendingTidy, tidyLibrary } from "./wisp/mapLibrary";
 import { PLAYTEST_PREFIX, projectRoot, tsDirectory } from "./wisp/project";
@@ -93,6 +94,7 @@ export interface WatchSteps<R> {
   readonly tidy: Effect.Effect<string | undefined, PlayProblem, R>;
   readonly install: (built: Built, held: string | undefined) => Effect.Effect<Installed, PlayProblem, R>;
   readonly notes: (version: string, sha: string, previous: string | undefined) => Effect.Effect<string, PlayProblem, R>;
+  readonly windowLibrary: (sha: string) => Effect.Effect<void, never, R>;
   readonly budget: (sha: string, timing: Timing) => Effect.Effect<void, never, R>;
 }
 
@@ -173,6 +175,7 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   const timing: Timing = { landed, onMain, started, finished, stages: [...built.stages, { name: "boot", millis: booted - booting }, { name: "maps-copy", millis: finished - copying }], load };
   const line = buildLine(sha, installed, timing);
   yield* append(files.log, line);
+  yield* steps.windowLibrary(sha);
   yield* steps.budget(sha, timing);
   yield* steps.notes(installed.version, sha, previous).pipe(
     Effect.tap((path) => Effect.sync(() => console.log(`Playtest checklist ${path}`))),
@@ -274,6 +277,7 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
   install: installBuild(documentsFolder(PLAYTEST_PREFIX)),
   tidy: tidyFolder(documentsFolder(PLAYTEST_PREFIX), clientHold(documentsFolder(PLAYTEST_PREFIX))),
   notes: writePlaytestChecklist,
+  windowLibrary: startWindowLibrary,
   budget: (sha, timing) => (busy(timing)
     ? Effect.sync(() => console.log(`Landing ${sha.slice(0, 7)} counts against neither budget: CPU pressure peaked at ${timing.load.pressure}% during its build, above ${BUSY_PRESSURE}%`))
     : reportBudget(sha, timing)).pipe(
