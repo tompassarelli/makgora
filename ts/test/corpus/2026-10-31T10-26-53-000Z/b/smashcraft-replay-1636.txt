@@ -1,0 +1,16 @@
+function PreloadFiles takes nothing returns nothing
+
+	call PreloadStart()
+	call Preload( "wisp-repro 1" )
+	call Preload( "build typescript-native-driver" )
+	call Preload( "frame 1100" )
+	call Preload( "checksum 797:30954" )
+	call Preload( "replay 1636" )
+	call Preload( "version 4b52914f1fa1" )
+	call Preload( "parts 7" )
+	call Preload( "end 3" )
+	call PreloadEnd( 0.0 )
+
+endfunction
+
+

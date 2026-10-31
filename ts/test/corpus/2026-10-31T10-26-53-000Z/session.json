@@ -1,0 +1,11 @@
+{
+  "argv": ["bun", "wisp"],
+  "cwd": "ts",
+  "started": "2026-10-31T10:26:53.000Z",
+  "ended": "2026-10-31T10:26:53.000Z",
+  "clients": ["a", "b"],
+  "git": { "commit": "5e3f2bc6513a82dd1b828cee1561e81cb7f7dbdf", "dirty": false },
+  "desyncs": [],
+  "pad": "test/native/pads/cpu-expert.pad",
+  "presentation": "native"
+}
