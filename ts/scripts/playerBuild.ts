@@ -1,5 +1,9 @@
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
+import { Effect } from "effect";
+import { ChildProcess } from "effect/process";
+import { runProcess } from "./hostProcess";
 
 const EXE = process.platform === "win32" ? ".exe" : "";
 const WISP_WINDOW = join(import.meta.dir, "../node_modules/wisp/host/window");
@@ -21,25 +25,24 @@ function option(args: readonly string[], name: string): string {
   const at = args.indexOf(`--${name}`);
   const value = args[at + 1];
   if (at < 0 || value === undefined) throw new Error(`playerBuild needs --${name}`);
-  return resolve(value);
+  return value;
 }
 
-const args = process.argv.slice(2);
-const out = option(args, "out"), library = option(args, "library"), tools = option(args, "tools");
-const commit = args[args.indexOf("--commit") + 1];
-if (commit === undefined || !/^[0-9a-f]{40}$/.test(commit)) throw new Error("playerBuild needs --commit with a full commit hash");
+const build = (args: readonly string[]) => Effect.gen(function*() {
+  const out = resolve(option(args, "out")), library = resolve(option(args, "library")), tools = resolve(option(args, "tools")), commit = option(args, "commit");
+  if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error("playerBuild needs --commit with a full commit hash");
+  if (!existsSync(library)) throw new Error(`no window library at ${library}`);
+  const version = readFileSync(join(import.meta.dir, "../../map-version"), "utf8").trim();
+  rmSync(out, { recursive: true, force: true });
+  mkdirSync(out, { recursive: true });
+  yield* runProcess(ChildProcess.make("bun", ["build", "--compile", "--define", `PLAYER_COMMIT=${JSON.stringify(commit)}`, "--define", `PLAYER_VERSION=${JSON.stringify(version)}`, ...ENTRYPOINTS, "--outfile", join(out, `smashcraft-play${EXE}`)], { stdout: "pipe", stderr: "pipe" }));
+  copyFileSync(library, join(out, basename(library)));
+  for (const tool of readdirSync(tools)) {
+    copyFileSync(join(tools, tool), join(out, tool));
+    chmodSync(join(out, tool), 0o755);
+  }
+  writeFileSync(join(out, "README.txt"), README(version));
+  console.log(`player package: ${out}`);
+});
 
-const version = readFileSync(join(import.meta.dir, "../../map-version"), "utf8").trim();
-
-rmSync(out, { recursive: true, force: true });
-mkdirSync(out, { recursive: true });
-const compiled = Bun.spawnSync(["bun", "build", "--compile", "--define", `PLAYER_COMMIT=${JSON.stringify(commit)}`, "--define", `PLAYER_VERSION=${JSON.stringify(version)}`, ...ENTRYPOINTS, "--outfile", join(out, `smashcraft-play${EXE}`)], { stdout: "inherit", stderr: "inherit" });
-if (compiled.exitCode !== 0) throw new Error(`bun build --compile exited ${compiled.exitCode}`);
-if (!existsSync(library)) throw new Error(`no window library at ${library}`);
-copyFileSync(library, join(out, basename(library)));
-for (const tool of readdirSync(tools)) {
-  copyFileSync(join(tools, tool), join(out, tool));
-  chmodSync(join(out, tool), 0o755);
-}
-writeFileSync(join(out, "README.txt"), README(version));
-console.log(`player package: ${out}`);
+BunRuntime.runMain(build(process.argv.slice(2)).pipe(Effect.provide(BunServices.layer)));
