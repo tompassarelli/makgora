@@ -6,7 +6,7 @@ import { Key } from "../src/host/loop/keyEvents";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { shell } from "../src/host/loop/state";
 import { pauseMatchPresentation } from "../src/host/loop/view";
-import { passStartControls } from "../scripts/wisp/startControls";
+import { declineTutorial, passStartControls } from "../scripts/wisp/startControls";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 import { MAIN_MENU_BOX, TUTORIAL_BOX } from "../src/game/ui/selectionLayout";
@@ -132,6 +132,7 @@ test("the title screen opens from fighter selection by the Main menu button, Esc
   };
   clients.start();
   passStartControls(clients);
+  declineTutorial(clients);
   clients.frames(10);
   expect(titles()).toEqual([false, false]);
   expect(clients.click(0, ...centre(MAIN_MENU_BOX))).toBe(true);

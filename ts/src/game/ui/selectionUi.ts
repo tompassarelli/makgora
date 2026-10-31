@@ -62,7 +62,7 @@ import { CreditsMenu } from "./creditsMenu";
 import { MainMenuButton } from "./mainMenuButton";
 import { anyOpen, overAny } from "./menuHover";
 import { CommunityMenu } from "./communityMenu";
-import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
+import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffer, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offerTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
@@ -293,7 +293,7 @@ export class SelectionPanel {
     this.delay = createDelayControls(root, ruleClick, DELAY_TEXT_SIZE);
     presentDelayControls(this.delay, false);
     this.tutorial = createTutorialMenu(gameUi(), root, suffix, (frame, target, box) => this.clicks.add(frame, target,
-      target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? "Not now" : target.direction < 0 ? "−" : "+", "native", box));
+      target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? NOT_NOW_LABEL : target.direction < 0 ? "−" : "+", "native", box));
     this.credits = new CreditsMenu(gameUi(), root, suffix, version, participantId);
     this.community = new CommunityMenu(gameUi(), root, suffix, participantId);
     this.mainMenu = new MainMenuButton(root, suffix, participantId);
@@ -318,6 +318,7 @@ export class SelectionPanel {
       createSyncTrigger(`ui.selection.${suffix}.cpuDrop`, "cpu-fighter-drop", owner, (_, data) => this.acceptCpuDrop(data)),
       createSyncTrigger(`ui.selection.${suffix}.recall`, "fighter-recall", owner, (_, data) => this.acceptRecall(data)),
       createSyncTrigger(`ui.selection.${suffix}.hand`, "select-hand", PARTICIPANT_SLOTS, (sender, data) => this.acceptHand(sender, data)),
+      createSyncTrigger(`ui.selection.${suffix}.tutorialOffer`, TUTORIAL_OFFER, owner, () => this.acceptTutorialOffer()),
     ];
     setFrameVisible(root, false);
     setFrameVisible(this.backdrop, false);
@@ -338,6 +339,7 @@ export class SelectionPanel {
     bindSyncHandler(`ui.selection.${suffix}.cpuDrop`, (_, data) => this.acceptCpuDrop(data));
     bindSyncHandler(`ui.selection.${suffix}.recall`, (_, data) => this.acceptRecall(data));
     bindSyncHandler(`ui.selection.${suffix}.hand`, (sender, data) => this.acceptHand(sender, data));
+    bindSyncHandler(`ui.selection.${suffix}.tutorialOffer`, () => this.acceptTutorialOffer());
   }
 
   destroy(): void {
@@ -564,6 +566,10 @@ export class SelectionPanel {
     if (this.choosing() !== undefined && chip !== undefined) this.actions.recallChoice(this.participantId, chip);
   }
 
+  private acceptTutorialOffer(): void {
+    this.tutorialOpen = acceptsTutorialOffer(this.tutorialOpen, this.choosing());
+  }
+
   private acceptHand(sender: number, data: string): void {
     if (this.ownsLocalClient()) this.handChannel.receive(sender, data, this.now);
   }
@@ -697,7 +703,7 @@ export class SelectionPanel {
     if (game.phase === Phase.match) this.markSeen();
     if (visible && !this.tutorialOffered) {
       this.tutorialOffered = true;
-      if (offersTutorial(game, this.isSeen())) this.tutorialOpen = true;
+      offerTutorial(game, this.isSeen());
     }
     setFrameVisible(this.tutorial.root, visible && this.tutorialOpen && !cpuOpen && !this.movesOpen);
     this.credits.show(visible);
