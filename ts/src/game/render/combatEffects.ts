@@ -1,5 +1,3 @@
-
-
 import { DEMON_HUNTER_MODEL_FILE } from "../presentation/demonHunterAssetInfo";
 import { RIFLEMAN_MODEL_FILE } from "../presentation/fighterAssetInfo";
 import {
@@ -48,6 +46,7 @@ import { bodyCostume, bodyVariants, costumeClipModel } from "../roster/costumes"
 import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectPitch, setEffectRoll, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { setCameraField, setFilterBlendMode, setFilterDuration, setFilterEndColor, setFilterEndUV, setFilterStartColor, setFilterStartUV, setFilterTexMapFlags, setFilterTexture, showFilter } from "wisp/game/view";
 import { player } from "wisp/game/players";
+import { preloadAsset } from "wisp/game/files";
 
 const KO_VARIANTS = bodyVariants(SELECTABLE_CHARACTERS);
 const KO_FIGHTERS = KO_VARIANTS.length;
@@ -141,7 +140,7 @@ export class CombatEffects {
     const parked: ParkedFlags = [];
     this.parked = parked;
     const names = impactSoundNames(SELECTABLE_CHARACTERS);
-    for (const path of tierSoundPaths()) Preload(path);
+    for (const path of tierSoundPaths()) preloadAsset(path);
     this.sounds.prepare(SoundKind.combatFile, names.files);
     this.sounds.prepare(SoundKind.combatLabel, names.labels);
     for (let i = 0; i < IMPACT_COUNT; i++) {

@@ -7,6 +7,7 @@ import { facingYaw } from "../../game/render/effects";
 import { DAMAGE_BLEND_PROBE_MODELS } from "../../platform/damageBlendProbeModels";
 import { createEffect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { setCameraField, setCameraPosition } from "wisp/game/view";
+import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
 
 interface Case {
   readonly model: effect;
@@ -15,11 +16,11 @@ interface Case {
 }
 
 function report(frame: number, phase: string): void {
-  PreloadGenClear();
-  PreloadGenStart();
-  Preload(`DAMAGE_BLEND_PROBE frame=${frame} phase=${phase} blendSeconds=0.05`);
-  Preload("left-to-right: ready-frozen, ready-running, tilt-frozen, tilt-running; upper row faces right, lower row faces left");
-  PreloadGenEnd("smashcraft-damage-blend-probe.txt");
+  clearFileLines();
+  startFile();
+  addFileLine(`DAMAGE_BLEND_PROBE frame=${frame} phase=${phase} blendSeconds=0.05`);
+  addFileLine("left-to-right: ready-frozen, ready-running, tilt-frozen, tilt-running; upper row faces right, lower row faces left");
+  endFile("smashcraft-damage-blend-probe.txt");
 }
 
 export function start(this: void): void {

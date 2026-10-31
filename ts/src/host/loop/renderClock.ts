@@ -7,6 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { renderClockFile } from "../../game/core/gameFiles";
 import { displayText } from "wisp/game/frames";
 import { localPlayer, playerSlot } from "wisp/game/players";
+import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
 const PROBE_GAME_SECONDS = 4.0;
@@ -132,12 +133,12 @@ export function probeRenderClock(): void {
     const lines = [`render-clock run=${I2S(run)} clock=${step > 0 ? "running" : "unavailable"}`
       + ` clock-step-us=${R2SW(step * 1000000.0, 1, 2)} burst-gap-threshold-ms=${ms(gap)}`];
     for (const candidate of [zeroSamples, fastSamples]) for (const line of summarize(candidate, gap)) lines.push(line);
-    PreloadGenClear();
-    PreloadGenStart();
+    clearFileLines();
+    startFile();
     for (const line of lines) {
-      Preload(line);
+      addFileLine(line);
       displayText(localPlayer(), 0.0, 0.0, line);
     }
-    PreloadGenEnd(renderClockFile(playerSlot(localPlayer()), run));
+    endFile(renderClockFile(playerSlot(localPlayer()), run));
   });
 }

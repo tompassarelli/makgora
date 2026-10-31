@@ -7,6 +7,7 @@ import { DRAW_EVENT, burstAlpha, drawnAlpha } from "./betweenFrames";
 import { activeRollback, shellState } from "./state";
 import { displayText } from "wisp/game/frames";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
+import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
 const TICK = "shell.tick";
@@ -126,14 +127,14 @@ function finish(probe: CallbackClock): void {
   probe.bursts.push(probe.burstRecord);
   DestroyTimer(probe.gameClock);
   const slot = playerSlot(localPlayer());
-  PreloadGenClear();
-  PreloadGenStart();
-  Preload(`callback-clock v=3 run=${probe.run} slot=${slot} key=${probe.key} callbacks=${probe.callbacks}`);
-  for (const record of probe.records) Preload(record);
-  for (const record of probe.rollbacks) Preload(record);
-  for (const record of probe.events) Preload(record);
-  for (const record of probe.bursts) Preload(record);
-  PreloadGenEnd(callbackClockFile(slot, probe.run));
+  clearFileLines();
+  startFile();
+  addFileLine(`callback-clock v=3 run=${probe.run} slot=${slot} key=${probe.key} callbacks=${probe.callbacks}`);
+  for (const record of probe.records) addFileLine(record);
+  for (const record of probe.rollbacks) addFileLine(record);
+  for (const record of probe.events) addFileLine(record);
+  for (const record of probe.bursts) addFileLine(record);
+  endFile(callbackClockFile(slot, probe.run));
   displayText(localPlayer(), 0.0, 0.0, `callback-clock run=${probe.run} callbacks=${probe.callbacks} written`);
 }
 

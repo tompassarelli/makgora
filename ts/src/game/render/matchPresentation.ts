@@ -34,6 +34,7 @@ import { defeatClip, resultBodies, resultPoseAt, type ResultBody, type ResultCli
 import { createEffect, destroyEffect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw, setEffectZ } from "wisp/game/effects";
 import { setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { player } from "wisp/game/players";
+import { preloadAsset } from "wisp/game/files";
 
 
 export const RESULTS_DELAY_FRAMES = 90;
@@ -108,7 +109,7 @@ export class MatchPresentation {
   constructor(private readonly origin: Readonly<WorldOrigin>, private readonly banner: ResultsDisplay) {
     SetSoundDuration(this.hoverSound, GetSoundFileDuration(cueSound(MatchCue.hover)));
     SetSoundVolume(this.hoverSound, 70);
-    for (const path of presentationSoundPaths(SELECTABLE_CHARACTERS, STAGE_CATALOG.map(stage => stage.id))) Preload(path);
+    for (const path of presentationSoundPaths(SELECTABLE_CHARACTERS, STAGE_CATALOG.map(stage => stage.id))) preloadAsset(path);
     this.sounds.prepare(SoundKind.interfaceFile, interfaceSoundPaths(SELECTABLE_CHARACTERS));
     const parent = gameUi();
     this.countdown = createText("MatchCountdown", parent, 0);
