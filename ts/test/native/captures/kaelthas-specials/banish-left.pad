@@ -1,10 +1,10 @@
-# smashcraft#796: Kael'thas walks up and casts Banish left: one hand out, the other down, a green swirling beam from his hand after the 18-frame delay.
-#! chat -dev quick pair kael'thas sunstrider / mountain king
-250 a stick -1 0
-268 a stick 0 0
-272 a stick 0 -1
-274 a tap X 2
-276 a stick 0 0
+# smashcraft#796: Kael'thas walks up and casts Banish left: one hand out, the other down, a green swirling beam from his hand after the 20-frame delay.
+#! chat -dev quick pair mountain king / kael'thas sunstrider
+250 b stick -1 0
+268 b stick 0 0
+272 b stick 0 -1
+274 b tap X 2
+276 b stick 0 0
 278 a capture
 284 a capture
 290 a capture

@@ -1,17 +1,17 @@
 # smashcraft#796: Kael'thas holds Flame Strike left, the orb leaves his hand and gathers speed, he steers it up, then releases and the pillar erupts where the orb is.
-#! chat -dev quick pair kael'thas sunstrider / mountain king
-250 a stick -1 0
-252 a press X
-254 a stick 0 0
+#! chat -dev quick pair mountain king / kael'thas sunstrider
+250 b stick -1 0
+252 b press X
+254 b stick 0 0
 258 a capture
 262 a capture
-266 a stick 0 1
+266 b stick 0 1
 270 a capture
 276 a capture
 282 a capture
-288 a stick 0 0
+288 b stick 0 0
 290 a capture
-296 a release X
+296 b release X
 300 a capture
 304 a capture
 308 a capture

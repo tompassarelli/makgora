@@ -1,22 +1,29 @@
-# smashcraft#796: Kael'thas casts Pyroblast left, steers it up and back around, and it strikes him, launching him along its flight with no damage.
-#! chat -dev quick pair kael'thas sunstrider / mountain king
-250 a stick -1 0
-252 a tap X 2
-254 a stick 0 0
+# smashcraft#796: Kael'thas full-hops and casts Pyroblast left, steers it down under him and back up into him, and it strikes him, launching him up and back along its flight with no damage (PK Thunder 2's self-hit; a grounded Kael is launched into the floor).
+#! chat -dev quick pair mountain king / kael'thas sunstrider
+248 b stick -1 0
+249 b stick 0 0
+250 b press Y
+254 b tap X 2
+260 b release Y
 262 a capture
-268 a capture
-272 a stick 1 0
-278 a capture
-286 a capture
-294 a capture
-296 a stick 0.25 -0.9
-302 a capture
-310 a capture
-318 a capture
-324 a capture
-328 a capture
-334 a capture
-342 a capture
+275 a capture
+279 b stick 0 -1
+285 a capture
+295 a capture
+301 b stick 1 1
+305 a capture
+315 a capture
+322 a capture
+326 b stick 0 1
+329 b stick 0 0
+329 a capture
+333 a capture
+340 a capture
 350 a capture
-380 a press VIEW
-450 a release VIEW
+360 a capture
+372 a capture
+385 a capture
+400 a capture
+415 a capture
+445 a press VIEW
+515 a release VIEW
