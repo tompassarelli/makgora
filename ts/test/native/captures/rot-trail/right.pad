@@ -1,18 +1,18 @@
-# Stitches' Rot trail facing right: Rot goes on, he runs right and leaves a rot patch every 12 frames, then the foe runs right through the trail and is burned and slowed on it.
-#! chat -dev setup quick pair medivh / butcher
-250 b stick 0 -1
-256 b tap X 2
-270 b stick 1 0
+# Stitches' Rot trail facing right: Rot goes on, he runs right toward the foe and leaves a rot patch every 12 frames, then the foe runs left through the trail and is burned and slowed on it.
+#! cue 270-446 patches: effect=DeathAndDecayTarget
+#! chat -dev setup quick pair butcher / medivh;lives 3 3
+250 a stick 0 -1
+256 a tap X 2
+270 a stick 1 0
 284 a capture
-300 a capture
-316 a capture
-332 a capture
-340 a stick 1 0
-348 a capture
+296 a stick 0 0
+304 a capture
+318 b stick -1 0
+326 a capture
+338 a capture
+350 a capture
 356 b stick 0 0
-364 a capture
+362 a capture
 380 a capture
-396 a capture
-412 a capture
-428 a capture
-444 a stick 0 0
+400 a capture
+420 a capture
