@@ -6,13 +6,14 @@ export const STAGE_SKIES: readonly StageSky[] = [
   { stage: 0, theme: "Sky", zenith: [42, 72, 116], horizon: [125, 157, 178], nadir: [20, 28, 43], cloud: 8 },
   { stage: 2, theme: "Icecrown", zenith: [10, 18, 32], horizon: [34, 62, 80], nadir: [14, 22, 34], cloud: 14, aurora: [18, 92, 78] },
   { stage: 11, theme: "Gryphon", zenith: [50, 77, 112], horizon: [150, 173, 182], nadir: [31, 42, 58], cloud: 14 },
-  { stage: 3, theme: "Durotar", zenith: [73, 55, 63], horizon: [175, 128, 86], nadir: [38, 30, 32], cloud: 10 },
+  { stage: 10, theme: "Nordrassil", zenith: [10, 18, 24], horizon: [24, 38, 36], nadir: [10, 14, 14], cloud: 2 },
+  { stage: 3, theme: "Durotar", zenith: [14, 12, 20], horizon: [38, 26, 24], nadir: [14, 11, 12], cloud: 2 },
   { stage: 4, theme: "Naxxramas", zenith: [24, 16, 32], horizon: [40, 58, 42], nadir: [30, 62, 30], cloud: 0, ribs: 24 },
   { stage: 14, theme: "Hellfire", zenith: [27, 24, 42], horizon: [32, 42, 34], nadir: [23, 30, 26], cloud: 6 },
   { stage: 12, theme: "Blackrock", zenith: [20, 18, 22], horizon: [46, 22, 10], nadir: [128, 76, 46], cloud: 7 },
   { stage: 6, theme: "Stratholme", zenith: [28, 24, 32], horizon: [36, 30, 30], nadir: [18, 16, 20], cloud: 6 },
   { stage: 7, theme: "Sargeras", zenith: [28, 48, 62], horizon: [28, 48, 52], nadir: [16, 30, 34], cloud: 12 },
-  { stage: 13, theme: "AhnQiraj", zenith: [76, 72, 84], horizon: [179, 159, 115], nadir: [41, 35, 37], cloud: 7 },
+  { stage: 13, theme: "AhnQiraj", zenith: [16, 14, 24], horizon: [34, 27, 26], nadir: [14, 12, 14], cloud: 2 },
 ];
 const hash = (value: Uint8Array | string) => new Bun.CryptoHasher("sha256").update(value).digest("hex");
 

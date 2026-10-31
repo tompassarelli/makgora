@@ -585,9 +585,9 @@ it a distant landmark rather than a foreground wall. The Frozen Throne's
 | --- | --- |
 | Sky Deck | Melee Final Destination's quiet space: no props, muted blue horizon and dark lower atmosphere; the neutral deck is the sole horizontal landmark. |
 | Frozen Throne | Battlefield's distant island silhouette: a half-size throne massif on the right, glacier counterweight low on the left, small crystals below the fighting line, restrained steel-blue sky. Snow remains behind the arena. |
-| Nordrassil | Dream Land's identifiable tree plus Fountain's cool well accents: smaller World Tree on the left, two asymmetrically placed low wells, one right crag. **The Felwood aurora sky is preserved exactly.** |
+| Nordrassil | Dream Land's identifiable tree plus Fountain's cool well accents: smaller World Tree on the left, two asymmetrically placed low wells, one right crag. Since 31 Oct 2026 the stock Felwood sky is replaced by an original dark teal gradient, and the scenery is tinted dark so fighters read first. |
 | Gryphon Aerie | Battlefield's airy skyline: a small distant right aviary, two different low crags form a descending left ridge, a desaturated blue cloud field leaves space around the carried platform. |
-| Durotar Skies | Northern Cave and Rivals Fire Capital's low skyline: uneven mesa chain with one small watchtower; warm dusty horizon and dusky upper sky. |
+| Durotar Skies | Northern Cave and Rivals Fire Capital's low skyline: uneven mesa chain with one small watchtower; since 31 Oct 2026 a dark rust-black dusk, the spires tinted dark and desaturated so fighters are the lit shapes. |
 | Naxxramas | Brinstar's dark enclosed cavern over a glowing basin: a closed Scourge hall of tall arches and spiked pillars under a dark violet vault, over green plague slime. |
 | Hellfire Citadel | Northern Cave's separated rock planes and Rivals' recessed scenery: one distant gate, descending rock field, restrained green haze beneath violet upper sky. |
 | Blackrock | Brinstar's charcoal upper cavern and warm lower basin: original smoke-grey/rust sky replaces red winter clouds; right basalt landmark counterweighted by a lower left crag. Fire accents are 1.25–1.5 scale below the deck, and the small cart gives industrial scale. |
@@ -599,8 +599,8 @@ behind the world with unshaded, unfogged materials and no depth writes.
 Only one sky draws at a time. Regenerate all stage art with
 `bun tools/stage/package.ts`, pin the stage-assets family with
 `bun wisp inputs add stage-assets DIR` from smashcraft:ts/, and use a full map
-build when content-addressed sky paths change. Nordrassil remains a stock
-sky so its existing animated aurora is unaffected.
+build when content-addressed sky paths change. Nordrassil draws its own dark
+teal sky since 31 Oct 2026; the stock Felwood sky no longer draws.
 
 Warcraft draws no effect whose position lies outside the map's world bounds,
 and keeps units inside its playable bounds. The base map's playable area is

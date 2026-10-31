@@ -10,9 +10,9 @@
     {
       "stage": 10,
       "file": "StageCardNordrassil.blp",
-      "inputs": "948aeb8cf92ca0bd2c3bd03244f2b476a85dbb288ec3d15a57d5070689676b34",
-      "sha256": "2d2f4f692db13e0dc569a3a383a38f5b040fb3459feecb5d83de66622797e4ed",
-      "bytes": 98739
+      "inputs": "97c8378f4f6ed5e2cb4a7bda069c528e6f78293d10c6f0cfb0b24bf5862a9f1a",
+      "sha256": "fd8f505d1ce043af76ad7183164ccc1e4d2e3971d41a62bbf23f6c34cb3370fe",
+      "bytes": 44104
     },
     {
       "stage": 11,
@@ -24,9 +24,9 @@
     {
       "stage": 3,
       "file": "StageCardDurotar.blp",
-      "inputs": "33ff61f14a438e786ac493bab1b3dc0fbc0483b97e4a0ef5654162927d013e9d",
-      "sha256": "be904e0bd504ecf04f7b875a83f6d82babac83d4077cf4eb2437c8c812bd3942",
-      "bytes": 84899
+      "inputs": "7a485c6261edd7cf6690ff2d61458f900cf526aa89626ad5524703555f1e124c",
+      "sha256": "bf5a54cb7cdfddbcc314fb0a56b278b505a21ad65d3df208f9dcd93c2a697cc9",
+      "bytes": 39677
     },
     {
       "stage": 4,
@@ -52,9 +52,9 @@
     {
       "stage": 13,
       "file": "StageCardAhnQiraj.blp",
-      "inputs": "122f6b46304167e9a8280ee9c2e9d5550a314d04e984dc5f6766a7f8d4b1d1a6",
-      "sha256": "8eb59d3960ec4ee26d4961f2ac7a131435c5528cd4787efbee8ddd4fa6619d4f",
-      "bytes": 86245
+      "inputs": "d5fe252231a0e23e9ff3480e2a1b067f7d535f9e42ccad55a6679c0e660ceb04",
+      "sha256": "799cde3fd30e6e99b86b163d5c30661e2feb94cd400a9acc4f22a2f4c7e569a5",
+      "bytes": 39243
     },
     {
       "stage": 6,

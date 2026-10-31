@@ -18,6 +18,12 @@
   repository root, `bun tools/stage/contrast.ts --separation MASK SCENE BACKDROP...`
   prints each fighter's L\* band against the backdrop behind it and fails
   below `SEPARATION_LIMIT` (smashcraft:docs/design/visual-quality.md).
+  `bun tools/stage/headlessSeparation.ts [--out DIR] STAGE...`
+  runs the same measure headless in one call: per stage it plays both pair
+  orders (`Shadow Hunter / Chen Stormstout` and the reverse, so each fighter
+  faces each way and Player 1's red and Player 2's blue each stand on both
+  sides), renders near and far for both clients, and prints every fighter's
+  band gap; it exits 1 below the limit. Run it on gex45 under `machine-capacity run --class gpu`, not on the laptop.
 
 - Stage search: from the repository root, through the capacity helper,
   `bun tools/stage/search.ts STAGE [SPEC.json] [--out DIR]` captures the

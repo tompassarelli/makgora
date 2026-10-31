@@ -56,7 +56,7 @@ export const STAGE_DECK_PALETTES: readonly { readonly stage: number; readonly th
 
   { stage: FROZEN_THRONE_STAGE, theme: "Icecrown", palette: { top: [200, 226, 240], lip: [220, 240, 252], body: [140, 160, 196], underside: [150, 176, 210] }, materials: {"top":{"texture":"TerrainArt\\Icecrown\\Ice_RuneBricks.blp"},"lip":{"texture":"TerrainArt\\Icecrown\\Ice_Ice.blp"},"body":{"texture":"TerrainArt\\Icecrown\\Ice_BlackSquares.blp"},"underside":{"texture":"Textures\\Ice_Natural01.blp"},"platform":{"top":{"texture":"TerrainArt\\Icecrown\\Ice_TiledBricks.blp"},"lip":{"texture":"TerrainArt\\Icecrown\\Ice_Ice.blp"},"body":{"texture":"TerrainArt\\Icecrown\\Ice_BlackBricks.blp"},"underside":{"texture":"TerrainArt\\Icecrown\\Ice_BlackBricks.blp"},"tint":[180,208,224]}} },
 
-  { stage: WIND_TEST_STAGE, theme: "Nordrassil", palette: { top: [184, 236, 148], lip: [110, 170, 160], body: [124, 108, 98], underside: [84, 72, 64] }, materials: {
+  { stage: WIND_TEST_STAGE, theme: "Nordrassil", palette: { top: [184, 236, 148], lip: [110, 170, 160], body: [48, 44, 42], underside: [40, 36, 34] }, materials: {
     top: { texture: "TerrainArt\\Ashenvale\\Ashen_GrassLumpy.blp", crop: [0, 0, 0.125, 0.25] },
     lip: { texture: "TerrainArt\\Ashenvale\\Ashen_Vines.blp" },
     body: { texture: "TerrainArt\\Ashenvale\\Ashen_Rock.blp", crop: [0, 0, 0.125, 0.25] },
@@ -91,7 +91,7 @@ export const STAGE_DECK_PALETTES: readonly { readonly stage: number; readonly th
     },
   } },
 
-  { stage: DRIFTING_DECK_STAGE, theme: "Durotar", palette: { top: [214, 180, 130], lip: [140, 62, 40], body: [70, 46, 34], underside: [96, 66, 46] }, materials: {"top":{"texture":"TerrainArt\\Barrens\\Barrens_Dirt.blp"},"lip":{"texture":"Textures\\Watchtower.blp","crop":[0.09375,0.3125,0.3125,0.41015625]},"body":{"texture":"TerrainArt\\Barrens\\Barrens_Rock.blp"},"underside":{"texture":"Textures\\BarrensNatural02.blp"},"platform":{"top":{"texture":"Textures\\Watchtower.blp","crop":[0.09375,0.3125,0.3125,0.41015625]},"lip":{"texture":"Textures\\Watchtower.blp","crop":[0.09375,0.3125,0.3125,0.41015625]},"body":{"texture":"TerrainArt\\Barrens\\Barrens_DirtRough.blp"},"underside":{"texture":"TerrainArt\\Barrens\\Barrens_DirtRough.blp"},"tint":[218,166,100]}} },
+  { stage: DRIFTING_DECK_STAGE, theme: "Durotar", palette: { top: [214, 180, 130], lip: [110, 60, 46], body: [40, 28, 26], underside: [44, 30, 26] }, materials: {"top":{"texture":"TerrainArt\\Barrens\\Barrens_Dirt.blp"},"lip":{"texture":"Textures\\Watchtower.blp","crop":[0.09375,0.3125,0.3125,0.41015625]},"body":{"texture":"TerrainArt\\Barrens\\Barrens_Rock.blp"},"underside":{"texture":"Textures\\BarrensNatural02.blp"},"platform":{"top":{"texture":"Textures\\Watchtower.blp","crop":[0.09375,0.3125,0.3125,0.41015625]},"lip":{"texture":"Textures\\Watchtower.blp","crop":[0.09375,0.3125,0.3125,0.41015625]},"body":{"texture":"TerrainArt\\Barrens\\Barrens_DirtRough.blp"},"underside":{"texture":"TerrainArt\\Barrens\\Barrens_DirtRough.blp"},"tint":[218,166,100]}} },
   { stage: PATTERNED_DECKS_STAGE, theme: "Scourge", palette: { top: [232, 238, 244], lip: [100, 170, 110], body: [180, 184, 204], underside: [76, 84, 100] }, materials: {
     top: { texture: "TerrainArt\\Icecrown\\Ice_BlackSquares.blp" },
     lip: { texture: "TerrainArt\\Icecrown\\Ice_RuneBricks.blp" },
@@ -171,7 +171,7 @@ export const STAGE_DECK_PALETTES: readonly { readonly stage: number; readonly th
       tint: [224, 184, 126],
     },
   } },
-  { stage: TIMED_TEST_STAGE, theme: "Qiraji", palette: { top: [224, 204, 160], lip: [170, 130, 50], body: [110, 84, 56], underside: [138, 108, 74] }, materials: {
+  { stage: TIMED_TEST_STAGE, theme: "Qiraji", palette: { top: [224, 204, 160], lip: [170, 130, 50], body: [60, 48, 40], underside: [60, 48, 40] }, materials: {
     top: { texture: "TerrainArt\\Ruins\\Ruins_Sand.blp" },
     lip: { texture: "TerrainArt\\Ruins\\Ruins_SmallBricks.blp" },
     body: { texture: "TerrainArt\\Ruins\\Ruins_LargeBricks.blp" },

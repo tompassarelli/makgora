@@ -694,6 +694,46 @@ check gates them. Evidence:
 ~/.local/state/smashcraft/evidence/strath-contrast/ (native-before-all,
 native-after3-6, side-by-side-after3/).
 
+### Durotar Skies, Ahn'Qiraj and Nordrassil: fighters first (31 Oct 2026)
+
+Tom asked on 31 Oct 2026 for fighters to stand out from the busy saturated
+rock behind them on these three stages, with Player 1's red sinking into
+Durotar's red rock. The levers, in the order tried: the sky became a dark
+original gradient (Durotar rust-black, Ahn'Qiraj mauve-black, Nordrassil teal-black,
+replacing the stock Felwood sky, whose aurora drew as the flat fog colour on
+Tom's build); every scenery piece takes one desaturated cool-dark tint
+(Durotar 44,38,44, Ahn'Qiraj 46,40,46, Nordrassil 34,46,42), so the spires
+keep their silhouettes but lose their red or green saturation and their
+fighter-height detail; the fog and the floor under the deck drop to the same
+dark; the deck's body and underside tints darken (the busy cracked rock and
+brick faces under the fighters), while the lit top and lip stay. The fighters
+keep the stock light, so they are the only lit shapes.
+
+`bun tools/stage/headlessSeparation.ts 3 10 13` (gex45, headless
+Classic, `Shadow Hunter / Chen Stormstout` and the reverse so every fighter
+stands on each side with Player 1 red and Player 2 blue, near and far, both
+clients, 1280×720 and 1280×540) prints each fighter's gap, fighter P25 minus
+backdrop P75 in L\*; the limit is 0 and is not loosened. Worst gap per stage,
+before then after:
+
+| Stage | Before | After |
+| --- | --- | --- |
+| Durotar Skies | -46.9 | 3.7 |
+| Nordrassil | -36.8 | 3.4 |
+| Ahn'Qiraj | -41.7 | 4.0 |
+
+Every one of the 32 fighter regions per stage passes. The metric credits
+lightness only: the backdrop is now darker than the darkest fighter's lower
+quartile (Shadow Hunter, L\* 14), which also removes the red-on-red overlap,
+because the rock's chroma falls to a few units. The price is a low-key
+backdrop: layers separate by tint steps of a few L\* instead of by colour.
+The renderer's rim light (wisp-109-light2) would give each fighter a lit edge
+against any backdrop, so the backdrop could rise a few L\* again; haze
+(wisp-weather) would build the depth steps back without changing the play
+plane. The native-window captures at match zoom are in
+~/.local/state/smashcraft/shots/contrast-durotar-*.png, contrast-aq-*.png and
+contrast-nordrassil-*.png.
+
 ### Nordrassil atmosphere (#294)
 
 NO-3 softens the far World Tree's roots with teal-green height fog: style 3,
