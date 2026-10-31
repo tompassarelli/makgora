@@ -84,8 +84,8 @@ function addCpuOpponent(game: Parameters<typeof cycleSlotMode>[0]): void {
 const QUICK_MATCH = "-dev quick cpu wren expert hero illidan";
 const SELECT_SETTLE_STEPS = 30;
 
-export async function createStandaloneSession(options: { readonly script?: string; readonly presentation?: MapBuild["presentation"]; readonly fourFighters?: boolean; readonly start?: StandaloneStart; readonly chosen?: string; readonly savedFiles?: string } = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string }> {
-  const { script, presentation, fourFighters = false, start = "match", chosen, savedFiles } = options;
+export async function createStandaloneSession(options: { readonly script?: string; readonly presentation?: MapBuild["presentation"]; readonly fourFighters?: boolean; readonly stage?: number; readonly start?: StandaloneStart; readonly chosen?: string; readonly savedFiles?: string } = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string }> {
+  const { script, presentation, fourFighters = false, stage = 0, start = "match", chosen, savedFiles } = options;
   const scripted = script?.startsWith(SELECTION_SCRIPT) === true;
   const selection = scripted || start === "select";
   const driven = script !== undefined && !scripted;
@@ -133,7 +133,7 @@ export async function createStandaloneSession(options: { readonly script?: strin
       for (const command of FOUR_FIGHTERS) applyDeveloperCommand(state, 0, command);
 
       state.game.stockCount = FOUR_FIGHTER_STOCKS;
-      startQuickMatch(state, 0, undefined, Character.demonHunter, FOUR_FIGHTER_STOCKS);
+      startQuickMatch(state, stage, undefined, Character.demonHunter, FOUR_FIGHTER_STOCKS);
     });
     else if (selection) client.run(() => { if (asksForCpu(script)) addCpuOpponent(shell().game as unknown as Parameters<typeof cycleSlotMode>[0]); });
     else if (script === undefined) client.run(() => {

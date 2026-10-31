@@ -79,7 +79,7 @@ class ReplayHistoryPlayback implements RollbackPlayback {
   }
 
   confirmedState(epoch: number, frame: number, row: Readonly<MatchFrameInput>): Readonly<ReplayState> | undefined {
-    return epoch === this.current ? this.history.stateAfter(epoch, frame, row) : undefined;
+    return epoch === this.current ? this.history.stateAfter(epoch, frame, row, this.state) : undefined;
   }
 
   rebase(schedule: Parameters<RollbackPlayback["rebase"]>[0], epoch: number, frame: number): boolean {

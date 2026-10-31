@@ -16,6 +16,7 @@ import { SELECTABLE_CHARACTERS, fighterSlug } from "../../../src/game/roster/kit
 import { census, comparePairRuns, profile } from "../perfCensus";
 import { budget } from "../perfBudget";
 import { rates } from "../sessionRates";
+import { stepTiming } from "../stepTiming";
 
 const main = buildProject("main");
 const integrity = buildProject("integrity");
@@ -41,4 +42,4 @@ const runProfile = profile(SMASHCRAFT_PERF);
 const compare = comparePairRuns(measure);
 
 export const perf: typeof measure = (args) =>
-  args[0] === "census" ? spikeCensus(args.slice(1)) : args[0] === "compare" ? compare(args.slice(1)) : args[0] === "budget" ? budget(args.slice(1)) : args[0] === "rates" ? rates(args.slice(1)) : args[0] === "profile" ? runProfile(args.slice(1)) : measure(args);
+  args[0] === "census" ? spikeCensus(args.slice(1)) : args[0] === "compare" ? compare(args.slice(1)) : args[0] === "budget" ? budget(args.slice(1)) : args[0] === "rates" ? rates(args.slice(1)) : args[0] === "step" ? stepTiming(args.slice(1)) : args[0] === "profile" ? runProfile(args.slice(1)) : measure(args);

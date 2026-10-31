@@ -164,6 +164,7 @@ function othersRepeat(state: Readonly<ReplayState>, scope: number, repeated: Rep
 export class ReplayHistory {
   private readonly snapshots = repeat(REPLAY_HISTORY_CAPACITY, createReplaySnapshot);
   private spare = createReplaySnapshot();
+  private readonly liveCopies = [createReplaySnapshot(), createReplaySnapshot()];
   private borrowed: ReplayState | undefined;
   private readonly inputs = repeat(REPLAY_HISTORY_CAPACITY, createMatchFrameInput);
   private readonly speculative = repeat(REPLAY_HISTORY_CAPACITY, () => false);
@@ -505,17 +506,30 @@ export class ReplayHistory {
    * The state after `frame` when history ran it on a row equal to `row` from
    * a corrected state before it: every earlier row authoritative or already
    * matched here, no repair pending. Running `row` from the state before
-   * `frame` would reach it. It stays immutable until the next successful
-   * stateAfter call, even when the history ring reuses its slot.
+   * `frame` would reach it. When `frame` is the last recorded frame, it is
+   * a copy of `live`, the state that frame reached. It stays immutable until
+   * the next successful stateAfter call, even when the history ring reuses its slot.
    */
-  stateAfter(epoch: number, frame: number, row: Readonly<MatchFrameInput>): Readonly<ReplayState> | undefined {
-    if (!this.contains(epoch, frame) || !this.contains(epoch, frame + 1)) return undefined;
+  stateAfter(epoch: number, frame: number, row: Readonly<MatchFrameInput>, live?: Readonly<ReplayState>): Readonly<ReplayState> | undefined {
+    if (!this.contains(epoch, frame)) return undefined;
+    const reached = frame + 1 === this.nextFrame ? this.reachedLive(frame, live) : this.contains(epoch, frame + 1);
+    if (!reached) return undefined;
     if (Math.max(this.authoritativeThrough, this.matchedThrough) < frame - 1) return undefined;
     if (this.repairNext !== undefined && this.repairNext <= frame + 1) return undefined;
     if (!sameMatchFrameInput(this.inputAt(frame), row)) return undefined;
     this.matchedThrough = Math.max(this.matchedThrough, frame);
-    this.borrowed = this.snapshotAt(frame + 1);
+    this.borrowed = live !== undefined && frame + 1 === this.nextFrame ? this.copyLive(live) : this.snapshotAt(frame + 1);
     return this.borrowed;
+  }
+
+  private reachedLive(frame: number, live: Readonly<ReplayState> | undefined): boolean {
+    return live !== undefined && this.liveFollows && this.repairNext === undefined && live.runtime.simulationFrame === frame;
+  }
+
+  private copyLive(live: Readonly<ReplayState>): ReplayState {
+    const target = at(this.liveCopies, 0) === this.borrowed ? at(this.liveCopies, 1) : at(this.liveCopies, 0);
+    copyReplayState(target, live);
+    return target;
   }
 
   /**
