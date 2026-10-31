@@ -7,8 +7,6 @@ import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { type CueBirth } from "./projectileArt";
 import { type Cue } from "./specialCues";
 import { REACH_CUE_NORMALS } from "./reachCueInfo";
-import { VASHJ_TRAIL_NORMALS } from "../fighters/lady-vashj/look";
-import { VASHJ_TRAIL_MODEL } from "../sim/ultimates";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegion, immolationRegion, wingDiveRegion } from "../sim/specials";
 
 
@@ -20,8 +18,6 @@ const NATURE_FLARE: Cue = { ...FIRE_FLARE, model: "Abilities\\Spells\\NightElf\\
 const IMPALE_SPIKES: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", scale: f32(1.0), sequence: "birth", seconds: f32(0.4) };
 const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", scale: f32(0.15), sequence: "birth", seconds: f32(0.2) };
 const NOVA_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx", scale: f32(0.38), sequence: "birth", seconds: f32(0.1), timeScale: 1.0, birth: { eachFrame: false } };
-export const VASHJ_TRAIL_SCALE = f32(0.6);
-const VASHJ_TRAIL: Cue = { ...NEUTRAL_FLARE, model: VASHJ_TRAIL_MODEL, scale: VASHJ_TRAIL_SCALE, seconds: f32(0.2), timeScale: 0.0 };
 
 export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.rifleman]: NEUTRAL_FLARE,
@@ -41,7 +37,6 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.thrall]: NEUTRAL_FLARE,
   [Character.jaina]: FROST_FLARE,
   [Character.sylvanas]: NEUTRAL_FLARE,
-  [Character.ladyVashj]: VASHJ_TRAIL,
   [Character.cairne]: NEUTRAL_FLARE,
   [Character.peon]: NEUTRAL_FLARE,
   [Character.tinker]: NEUTRAL_FLARE,
@@ -64,7 +59,6 @@ export const SIGNATURE_CUE_NORMALS: { readonly [character: number]: readonly Att
   [Character.medivh]: [AttackStyle.dashAttack],
   [Character.lich]: [AttackStyle.jab, AttackStyle.jab2, AttackStyle.upSmash, AttackStyle.upTilt, AttackStyle.neutralAir, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir, AttackStyle.dashAttack],
   [Character.anubarak]: [AttackStyle.dashAttack],
-  [Character.ladyVashj]: VASHJ_TRAIL_NORMALS,
 };
 
 

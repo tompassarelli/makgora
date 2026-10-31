@@ -9,10 +9,6 @@ import { fighterAt } from "../src/game/sim/roster";
 import { authoredTuning } from "../src/game/sim/tuning";
 import { type ShowcaseRow, showcaseMoves, showcaseRows } from "../src/game/session/showcaseTimeline";
 import { showcaseFixtures } from "../src/platform/captureFixtures";
-import { DISJOINT_CUES, disjointNormals } from "../src/game/presentation/disjointCues";
-import { createFighter } from "../src/game/sim/fighter";
-import { VASHJ_TRAIL_MODEL } from "../src/game/sim/ultimates";
-import { PROJECTILE_DRAW_CUES } from "../src/game/presentation/projectileArt";
 
 const vashj = Character.ladyVashj;
 const upSmash = (row: ShowcaseRow): boolean => row.move.kind === "normal" && row.move.code === AttackStyle.upSmash;
@@ -86,16 +82,6 @@ test("the dummy staged for each of Lady Vashj's seven read moves stands in its r
   }
 });
 
-test("Lady Vashj's weapon trail is drawn on exactly jab, up tilt, down smash, neutral air, back air and forward smash, and the gaze draws it across its cone [k2 property]", () => {
-  const drawn = disjointNormals(createFighter(vashj, 0.0, 1));
-  expect([...drawn].sort((a, b) => a - b)).toEqual([AttackStyle.jab, AttackStyle.upTilt, AttackStyle.downSmash, AttackStyle.neutralAir, AttackStyle.backAir, AttackStyle.forwardSmash].sort((a, b) => a - b));
-  expect(DISJOINT_CUES[vashj]?.model).toBe(VASHJ_TRAIL_MODEL);
-  const gaze = authoredTuning(vashj).ultimate;
-  const streaks = (gaze?.projectiles ?? []).filter(shot => shot.model === VASHJ_TRAIL_MODEL);
-  expect(streaks.length).toBeGreaterThan(1);
-  for (const shot of streaks) expect(shot.spawnFrame).toBeGreaterThanOrEqual(gaze?.gaze?.window.first ?? 0);
-});
-
 test("Lady Vashj's back air stages the dummy behind her, on the side its hit launches toward, clear of her body and the dummy's [k2 property]", () => {
   const body = hurtCapsule(vashj);
   const regions = authoredTuning(vashj).moves?.normals[AttackStyle.backAir]?.regions ?? [];
@@ -103,18 +89,4 @@ test("Lady Vashj's back air stages the dummy behind her, on the side its hit lau
   const rows = showcaseRows(vashj).filter(row => row.move.kind === "normal" && row.move.code === AttackStyle.backAir);
   expect(rows.length).toBe(2);
   for (const { move, facing } of rows) expect(`${facing} behind ${(move.gap ?? 0) <= -body.radius * 3}`).toBe(`${facing} behind true`);
-});
-
-
-test("Lady Vashj's trail is the shockwave crescent at least 0.6 large and her gaze beams of it drift both ways at the cue's size [k2 property]", () => {
-  const cue = DISJOINT_CUES[vashj];
-  expect(cue?.scale).toBeGreaterThanOrEqual(Math.fround(0.6));
-  expect(cue?.model).toBe("Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx");
-  expect(PROJECTILE_DRAW_CUES[VASHJ_TRAIL_MODEL]?.scale).toBe(cue?.scale);
-  const beams = (authoredTuning(vashj).ultimate?.projectiles ?? []).filter(shot => shot.model === VASHJ_TRAIL_MODEL && shot.spawnFrame === 21);
-  const drifts = beams.map(shot => shot.velocityZ).sort((a, b) => a - b);
-  expect(drifts.length).toBeGreaterThanOrEqual(5);
-  expect(drifts[0]).toBeLessThan(0);
-  expect(drifts[drifts.length - 1]).toBeGreaterThan(0);
-  for (const shot of beams) expect(shot.velocityX).toBeGreaterThan(Math.abs(shot.velocityZ));
 });
