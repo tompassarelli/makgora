@@ -124,7 +124,7 @@ jobs:
           [ ! -f .git/shallow ] || rm -rf .git
           git init -q .
           git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$GITHUB_REPOSITORY"
-          mirror="/srv/farm-mirror/${GITHUB_REPOSITORY#*/}.git/objects"
+          mirror="/srv/farm-mirror/smashcraft.git/objects"
           if [ -d "$mirror" ]; then echo "$mirror" > .git/objects/info/alternates; fi
           git -c gc.auto=0 fetch -q --no-tags origin "$SHA"
           git checkout -q --force --detach "$SHA"
@@ -236,7 +236,7 @@ jobs:
           [ ! -f .git/shallow ] || rm -rf .git
           git init -q .
           git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$GITHUB_REPOSITORY"
-          mirror="/srv/farm-mirror/${GITHUB_REPOSITORY#*/}.git/objects"
+          mirror="/srv/farm-mirror/smashcraft.git/objects"
           if [ -d "$mirror" ]; then echo "$mirror" > .git/objects/info/alternates; fi
           git -c gc.auto=0 fetch -q --no-tags origin "$SHA"
           git checkout -q --force --detach "$SHA"

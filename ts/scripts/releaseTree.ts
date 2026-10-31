@@ -27,7 +27,7 @@ export function releaseTreeDrift(snapshot: ReleaseSnapshot) {
     const candidates = epics.filter(epic => {
       const key = /^E\d+\b/.exec(epic.title)?.[0]?.toLowerCase() ?? "";
       const labeled = [...labels].some(label => label === key || label === `epic:${key}` || label === `epic: ${key}` || label === epic.title.toLowerCase());
-      const linked = new RegExp(`(?:https://github\\.com/tompassarelli/smashcraft/issues/|(?<![\\w/#-])(?:tompassarelli/)?smashcraft#|(?<![\\w/#-])#)${epic.number}(?!\\d)`).test(issue.body ?? "");
+      const linked = new RegExp(`(?:https://github\\.com/tompassarelli/(?:smashcraft|makgora)/issues/|(?<![\\w/#-])(?:tompassarelli/)?(?:smashcraft|makgora)#|(?<![\\w/#-])#)${epic.number}(?!\\d)`).test(issue.body ?? "");
       return labeled || linked;
     }).map(epic => epic.number);
     return { issue: issue.number, candidates };
