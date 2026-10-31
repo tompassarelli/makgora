@@ -3,13 +3,12 @@ import { dirname, join } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Cause, Effect, Exit, Layer } from "effect";
 import type { Teardown } from "effect/Runtime";
-import mapVersion from "../../map-version" with { type: "text" };
 import { PLAYER_USAGE, PRODUCT, playerArguments, playerMap } from "./playerArguments";
 
 declare const PLAYER_COMMIT: string | undefined;
+declare const PLAYER_VERSION: string | undefined;
 
-const playerVersion = () => `${PRODUCT} ${mapVersion.trim()}${typeof PLAYER_COMMIT === "string" ? ` (${PLAYER_COMMIT})` : ""}`;
-
+const playerVersion = () => `${PRODUCT} ${typeof PLAYER_VERSION === "string" ? PLAYER_VERSION : "dev"}${typeof PLAYER_COMMIT === "string" ? ` (${PLAYER_COMMIT})` : ""}`;
 
 const argv = process.argv.slice(2);
 if (argv.includes("--version")) {
