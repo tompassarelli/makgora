@@ -24711,7 +24711,7 @@
    "authored.moves.normals.3.regions.5.hit.effect.launchZ": 0.4226182699203491,
    "authored.moves.normals.4.startupFrames": 15,
    "authored.moves.normals.4.activeFrames": 3,
-   "authored.moves.normals.4.totalFrames": 47,
+   "authored.moves.normals.4.totalFrames": 44,
    "authored.moves.normals.4.landingLag": 0,
    "authored.moves.normals.4.regions.0.firstFrame": 15,
    "authored.moves.normals.4.regions.0.lastFrame": 15,
@@ -24768,7 +24768,7 @@
    "authored.moves.normals.5.regions.0.hit.effect.launchZ": 0,
    "authored.moves.normals.6.startupFrames": 8,
    "authored.moves.normals.6.activeFrames": 3,
-   "authored.moves.normals.6.totalFrames": 29,
+   "authored.moves.normals.6.totalFrames": 26,
    "authored.moves.normals.6.landingLag": 0,
    "authored.moves.normals.6.regions.0.firstFrame": 8,
    "authored.moves.normals.6.regions.0.lastFrame": 8,
@@ -24850,7 +24850,7 @@
    "authored.moves.normals.8.regions.2.hit.effect.launchZ": 0.9659258127212524,
    "authored.moves.normals.9.startupFrames": 8,
    "authored.moves.normals.9.activeFrames": 3,
-   "authored.moves.normals.9.totalFrames": 29,
+   "authored.moves.normals.9.totalFrames": 26,
    "authored.moves.normals.9.landingLag": 0,
    "authored.moves.normals.9.regions.0.firstFrame": 8,
    "authored.moves.normals.9.regions.0.lastFrame": 8,
@@ -24875,7 +24875,7 @@
    "authored.moves.normals.9.regions.2.hit.effect.launchZ": 0.6427876353263855,
    "authored.moves.normals.10.startupFrames": 8,
    "authored.moves.normals.10.activeFrames": 3,
-   "authored.moves.normals.10.totalFrames": 29,
+   "authored.moves.normals.10.totalFrames": 26,
    "authored.moves.normals.10.landingLag": 0,
    "authored.moves.normals.10.regions.0.firstFrame": 8,
    "authored.moves.normals.10.regions.0.lastFrame": 8,
@@ -25073,7 +25073,7 @@
    "authored.moves.normals.16.regions.3.hit.groundedEffect.launchZ": 0.8191520571708679,
    "authored.moves.normals.19.startupFrames": 5,
    "authored.moves.normals.19.activeFrames": 8,
-   "authored.moves.normals.19.totalFrames": 35,
+   "authored.moves.normals.19.totalFrames": 32,
    "authored.moves.normals.19.landingLag": 0,
    "authored.moves.normals.19.regions.0.firstFrame": 5,
    "authored.moves.normals.19.regions.0.lastFrame": 5,
@@ -25337,7 +25337,7 @@
    "normal.3.hit.5.launchZ": 0.4226182699203491,
    "normal.4.startupFrames": 15,
    "normal.4.activeFrames": 3,
-   "normal.4.endingFrames": 29,
+   "normal.4.endingFrames": 26,
    "normal.4.landingLag": 0,
    "normal.4.hit.0.damage": 16.038000106811523,
    "normal.4.hit.0.growth": 113.41000366210938,
@@ -25375,7 +25375,7 @@
    "normal.5.landingLag": 0,
    "normal.6.startupFrames": 8,
    "normal.6.activeFrames": 3,
-   "normal.6.endingFrames": 18,
+   "normal.6.endingFrames": 15,
    "normal.6.landingLag": 0,
    "normal.6.hit.0.damage": 8.748000144958496,
    "normal.6.hit.0.growth": 87.63500213623047,
@@ -25437,7 +25437,7 @@
    "normal.8.hit.2.launchZ": 0.9659258127212524,
    "normal.9.startupFrames": 8,
    "normal.9.activeFrames": 3,
-   "normal.9.endingFrames": 18,
+   "normal.9.endingFrames": 15,
    "normal.9.landingLag": 0,
    "normal.9.hit.0.damage": 8.748000144958496,
    "normal.9.hit.0.growth": 87.63500213623047,
@@ -25456,7 +25456,7 @@
    "normal.9.hit.2.launchZ": 0.6427876353263855,
    "normal.10.startupFrames": 8,
    "normal.10.activeFrames": 3,
-   "normal.10.endingFrames": 18,
+   "normal.10.endingFrames": 15,
    "normal.10.landingLag": 0,
    "normal.10.hit.0.damage": 8.748000144958496,
    "normal.10.hit.0.growth": 87.63500213623047,
@@ -25617,7 +25617,7 @@
    "normal.18.hit.0.launchZ": 0.7071067690849304,
    "normal.19.startupFrames": 5,
    "normal.19.activeFrames": 8,
-   "normal.19.endingFrames": 22,
+   "normal.19.endingFrames": 19,
    "normal.19.landingLag": 0,
    "normal.19.hit.0.damage": 9.720000267028809,
    "normal.19.hit.0.growth": 92.79000091552734,
@@ -25765,39 +25765,39 @@
     "killPercent": 75
    },
    "normal.4.hit.0": {
-    "advantage": -22,
+    "advantage": -19,
     "killPercent": 41
    },
    "normal.4.hit.1": {
-    "advantage": -21,
+    "advantage": -18,
     "killPercent": 41
    },
    "normal.4.hit.2": {
-    "advantage": -20,
+    "advantage": -17,
     "killPercent": 41
    },
    "normal.4.hit.3": {
-    "advantage": -25,
+    "advantage": -22,
     "killPercent": 89
    },
    "normal.4.hit.4": {
-    "advantage": -24,
+    "advantage": -21,
     "killPercent": 89
    },
    "normal.4.hit.5": {
-    "advantage": -23,
+    "advantage": -20,
     "killPercent": 89
    },
    "normal.6.hit.0": {
-    "advantage": -15,
+    "advantage": -12,
     "killPercent": 139
    },
    "normal.6.hit.1": {
-    "advantage": -14,
+    "advantage": -11,
     "killPercent": 139
    },
    "normal.6.hit.2": {
-    "advantage": -13,
+    "advantage": -10,
     "killPercent": 139
    },
    "normal.7.hit.0": {
@@ -25822,27 +25822,27 @@
     "advantage": -13
    },
    "normal.9.hit.0": {
-    "advantage": -15,
+    "advantage": -12,
     "killPercent": 139
    },
    "normal.9.hit.1": {
-    "advantage": -14,
+    "advantage": -11,
     "killPercent": 139
    },
    "normal.9.hit.2": {
-    "advantage": -13,
+    "advantage": -10,
     "killPercent": 139
    },
    "normal.10.hit.0": {
-    "advantage": -15,
+    "advantage": -12,
     "killPercent": 139
    },
    "normal.10.hit.1": {
-    "advantage": -14,
+    "advantage": -11,
     "killPercent": 139
    },
    "normal.10.hit.2": {
-    "advantage": -13,
+    "advantage": -10,
     "killPercent": 139
    },
    "normal.11.hit.0": {
@@ -25950,35 +25950,35 @@
     "killPercent": 112
    },
    "normal.19.hit.0": {
-    "advantage": -23,
-    "killPercent": 122
-   },
-   "normal.19.hit.1": {
-    "advantage": -22,
-    "killPercent": 122
-   },
-   "normal.19.hit.2": {
-    "advantage": -21,
-    "killPercent": 122
-   },
-   "normal.19.hit.3": {
     "advantage": -20,
     "killPercent": 122
    },
-   "normal.19.hit.4": {
+   "normal.19.hit.1": {
     "advantage": -19,
     "killPercent": 122
    },
-   "normal.19.hit.5": {
+   "normal.19.hit.2": {
     "advantage": -18,
     "killPercent": 122
    },
-   "normal.19.hit.6": {
+   "normal.19.hit.3": {
     "advantage": -17,
     "killPercent": 122
    },
-   "normal.19.hit.7": {
+   "normal.19.hit.4": {
     "advantage": -16,
+    "killPercent": 122
+   },
+   "normal.19.hit.5": {
+    "advantage": -15,
+    "killPercent": 122
+   },
+   "normal.19.hit.6": {
+    "advantage": -14,
+    "killPercent": 122
+   },
+   "normal.19.hit.7": {
+    "advantage": -13,
     "killPercent": 122
    },
    "normal.20.hit.0": {
@@ -31832,7 +31832,7 @@
    "authored.specials.neutral.ground.hurt.0.firstFrame": 6,
    "authored.specials.neutral.ground.hurt.0.lastFrame": 29,
    "authored.specials.neutral.ground.projectiles.0.effect.damage": 13,
-   "authored.specials.neutral.ground.projectiles.0.effect.growth": 70,
+   "authored.specials.neutral.ground.projectiles.0.effect.growth": 80,
    "authored.specials.neutral.ground.projectiles.0.effect.base": 25,
    "authored.specials.neutral.ground.projectiles.0.effect.launchX": 0.7660444378852844,
    "authored.specials.neutral.ground.projectiles.0.effect.launchZ": 0.6427876353263855,
@@ -31848,8 +31848,8 @@
    "authored.specials.side.ground.projectiles.0.effect.base": 20,
    "authored.specials.side.ground.projectiles.0.effect.launchX": 0.1736481785774231,
    "authored.specials.side.ground.projectiles.0.effect.launchZ": 0.9848077297210693,
-   "authored.specials.side.ground.projectiles.0.burstInto.effect.damage": 11,
-   "authored.specials.side.ground.projectiles.0.burstInto.effect.growth": 80,
+   "authored.specials.side.ground.projectiles.0.burstInto.effect.damage": 15,
+   "authored.specials.side.ground.projectiles.0.burstInto.effect.growth": 90,
    "authored.specials.side.ground.projectiles.0.burstInto.effect.base": 30,
    "authored.specials.side.ground.projectiles.0.burstInto.effect.launchX": 0.1736481785774231,
    "authored.specials.side.ground.projectiles.0.burstInto.effect.launchZ": 0.9848077297210693,
@@ -31858,8 +31858,8 @@
    "authored.specials.side.ground.projectiles.0.burstInto.expiresInto.effect.base": 0,
    "authored.specials.side.ground.projectiles.0.burstInto.expiresInto.effect.launchX": 0.1736481785774231,
    "authored.specials.side.ground.projectiles.0.burstInto.expiresInto.effect.launchZ": 0.9848077297210693,
-   "authored.specials.side.ground.heldOrb.erupts.effect.damage": 11,
-   "authored.specials.side.ground.heldOrb.erupts.effect.growth": 80,
+   "authored.specials.side.ground.heldOrb.erupts.effect.damage": 15,
+   "authored.specials.side.ground.heldOrb.erupts.effect.growth": 90,
    "authored.specials.side.ground.heldOrb.erupts.effect.base": 30,
    "authored.specials.side.ground.heldOrb.erupts.effect.launchX": 0.1736481785774231,
    "authored.specials.side.ground.heldOrb.erupts.effect.launchZ": 0.9848077297210693,
@@ -31870,7 +31870,7 @@
    "authored.specials.side.ground.heldOrb.erupts.expiresInto.effect.launchZ": 0.9848077297210693,
    "authored.specials.side.air.endFrame": 44,
    "authored.specials.side.air.cooldownFrames": 72,
-   "authored.specials.side.air.landingLag": 30,
+   "authored.specials.side.air.landingLag": 23,
    "authored.specials.side.air.hurt.0.firstFrame": 4,
    "authored.specials.side.air.hurt.0.lastFrame": 34,
    "authored.specials.side.air.projectiles.0.effect.damage": 0,
@@ -31878,8 +31878,8 @@
    "authored.specials.side.air.projectiles.0.effect.base": 20,
    "authored.specials.side.air.projectiles.0.effect.launchX": 0.1736481785774231,
    "authored.specials.side.air.projectiles.0.effect.launchZ": 0.9848077297210693,
-   "authored.specials.side.air.projectiles.0.burstInto.effect.damage": 11,
-   "authored.specials.side.air.projectiles.0.burstInto.effect.growth": 80,
+   "authored.specials.side.air.projectiles.0.burstInto.effect.damage": 15,
+   "authored.specials.side.air.projectiles.0.burstInto.effect.growth": 90,
    "authored.specials.side.air.projectiles.0.burstInto.effect.base": 30,
    "authored.specials.side.air.projectiles.0.burstInto.effect.launchX": 0.1736481785774231,
    "authored.specials.side.air.projectiles.0.burstInto.effect.launchZ": 0.9848077297210693,
@@ -31888,8 +31888,8 @@
    "authored.specials.side.air.projectiles.0.burstInto.expiresInto.effect.base": 0,
    "authored.specials.side.air.projectiles.0.burstInto.expiresInto.effect.launchX": 0.1736481785774231,
    "authored.specials.side.air.projectiles.0.burstInto.expiresInto.effect.launchZ": 0.9848077297210693,
-   "authored.specials.side.air.heldOrb.erupts.effect.damage": 11,
-   "authored.specials.side.air.heldOrb.erupts.effect.growth": 80,
+   "authored.specials.side.air.heldOrb.erupts.effect.damage": 15,
+   "authored.specials.side.air.heldOrb.erupts.effect.growth": 90,
    "authored.specials.side.air.heldOrb.erupts.effect.base": 30,
    "authored.specials.side.air.heldOrb.erupts.effect.launchX": 0.1736481785774231,
    "authored.specials.side.air.heldOrb.erupts.effect.launchZ": 0.9848077297210693,
@@ -32333,21 +32333,21 @@
    },
    "special.neutral.ground.projectiles.0": {
     "advantage": -39,
-    "killPercent": 111
+    "killPercent": 93
    },
    "special.side.ground.projectiles.0": {
     "advantage": -27
    },
    "special.side.ground.projectiles.0.burstInto": {
-    "advantage": -38,
-    "killPercent": 234
+    "advantage": -36,
+    "killPercent": 150
    },
    "special.side.ground.projectiles.0.burstInto.expiresInto": {
     "advantage": -42
    },
    "special.side.ground.heldOrb.erupts": {
-    "advantage": -38,
-    "killPercent": 234
+    "advantage": -36,
+    "killPercent": 150
    },
    "special.side.ground.heldOrb.erupts.expiresInto": {
     "advantage": -42
@@ -32356,15 +32356,15 @@
     "advantage": -27
    },
    "special.side.air.projectiles.0.burstInto": {
-    "advantage": -38,
-    "killPercent": 234
+    "advantage": -36,
+    "killPercent": 150
    },
    "special.side.air.projectiles.0.burstInto.expiresInto": {
     "advantage": -42
    },
    "special.side.air.heldOrb.erupts": {
-    "advantage": -38,
-    "killPercent": 234
+    "advantage": -36,
+    "killPercent": 150
    },
    "special.side.air.heldOrb.erupts.expiresInto": {
     "advantage": -42

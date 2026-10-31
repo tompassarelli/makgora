@@ -6,7 +6,7 @@ import { frames, FollowUpInput, type AuthoredSpecial, type FighterSpecials, type
 import type { AppliedStatus } from "../../sim/appliedStatus";
 import { kaelCastBody, kaelHit } from "./moves";
 
-const AIR_LANDING_LAG = 30;
+const AIR_LANDING_LAG = 23;
 
 export const PYROBLAST_STARTUP_FRAMES = 21;
 export const PYROBLAST_STEER_FRAMES = 80;
@@ -17,7 +17,7 @@ export const PYROBLAST_SPEED = 7.5;
 export const PYROBLAST: SpecialProjectile = {
   model: "Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdx",
   spawnFrame: PYROBLAST_STARTUP_FRAMES, offsetX: 52.0, offsetZ: 60.0, velocityX: PYROBLAST_SPEED, velocityZ: 0.0,
-  life: PYROBLAST_STEER_FRAMES + PYROBLAST_COAST_FRAMES, radius: 22.0, effect: { ...kaelHit(13.0, 40, 70.0, 25.0), strong: true },
+  life: PYROBLAST_STEER_FRAMES + PYROBLAST_COAST_FRAMES, radius: 22.0, effect: { ...kaelHit(13.0, 40, 80.0, 25.0), strong: true },
   reflectable: true, limit: 1, steered: true,
 };
 export const PYROBLAST_STEER: SpecialSteeredShot = {
@@ -54,7 +54,7 @@ export const FLAME_STRIKE_BURST: SpecialProjectile = {
   model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx", modelRadius: 155.0, modelOffsetZ: -50.0,
   modelAnimation: { sequence: "birth", warningSeconds: FLAME_STRIKE_COLUMN_SECONDS.from, activeSeconds: FLAME_STRIKE_COLUMN_SECONDS.from, rate: FLAME_STRIKE_COLUMN_RATE },
   spawnFrame: 0, offsetX: 0.0, offsetZ: 50.0, velocityX: 0.0, velocityZ: 0.0,
-  life: FLAME_STRIKE_BURST_FRAMES, radius: 45.0, effect: kaelHit(11.0, 80, 80.0, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
+  life: FLAME_STRIKE_BURST_FRAMES, radius: 45.0, effect: kaelHit(15.0, 80, 90.0, 30.0), expiresInto: FLAME_STRIKE_BURN, reflectable: false, limit: 1,
 };
 export const FLAME_STRIKE_RELEASE_FRAME = 16;
 export const FLAME_STRIKE_ORB_FRAMES = 50;

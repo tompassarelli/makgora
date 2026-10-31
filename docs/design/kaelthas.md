@@ -87,7 +87,7 @@ dash in early and beat him before the fire arrives.
 | Input | What it does and the decision | Counterplay | Prior art |
 |---|---|---|---|
 | Neutral: **Pyroblast** | About 21 frames of windup gathering fire in his hands, then one slow heavy fireball he steers with the stick for up to 80 frames (it was 60), turning about 6 degrees a frame (PK Thunder's sharp turns), while he stands rooted on the ground or sinks slowly in the air. Steered back into him after 16 frames of flight, it launches him along its heading for 36 frames at 11 units a frame, intangible for the first 18, with no damage, and leaves him helpless if he ends in the air (PK Thunder 2's self-hit). Special or shield lets it go: it flies straight about 14 frames and fizzles. 13%, launches at 40 degrees and kills a Warden off the side from centre stage at about 170%; 13 shield damage. One at a time, reflectable. Connecting leaves 21 frames of recovery; a miss (timed out, let go, reflected) leaves 46. | Outrun it, rush and hit Kael while he steers (that puts it out), or shield it and punish the long recovery; reflect it back at him. | [Ness's PK Thunder][pkthunder] (a steered projectile with a rooted caster) |
-| Side: **Flame Strike** | Hold to fly a fire orb: it leaves his hand on frame 16 after a held cast pose (the rune left on frame 8; this orb left on frame 6 until the 2026-10-30 playtest, so point-blank it erupts no sooner than frame 16) at 5 a frame, gains 0.375 a frame up to 12 (the rune slid 8), and the stick climbs or sinks it up to 5 a frame. Release, touching a fighter or shield, the floor, or 50 frames in the air erupts the pillar at the orb. The pillar stands 0.6 s (36 frames: a 6-frame burst, a 30-frame burn) and its column plays out inside that window. The burst deals 11% and launches; the burn is flinchless chip, 2% every 8 frames. The cast ends on frame 34 and leaves 23 frames of landing lag in the air. One pillar, a recast replaces it, no cooldown. Castable in the air and offstage: his edgeguard. | Dodge or shield the orb, roll past the pillar, or punish the cast from outside its line; a shield survives the burst but invites the grab. | [Ness's PK Flash][pkflash] (a placed delayed burst); [Robin's Arcfire][arcfire] (a lingering pillar that zones) |
+| Side: **Flame Strike** | Hold to fly a fire orb: it leaves his hand on frame 16 after a held cast pose (the rune left on frame 8; this orb left on frame 6 until the 2026-10-30 playtest, so point-blank it erupts no sooner than frame 16) at 5 a frame, gains 0.375 a frame up to 12 (the rune slid 8), and the stick climbs or sinks it up to 5 a frame. Release, touching a fighter or shield, the floor, or 50 frames in the air erupts the pillar at the orb. The pillar stands 0.6 s (36 frames: a 6-frame burst, a 30-frame burn) and its column plays out inside that window. The burst deals 15% and launches; the burn is flinchless chip, 2% every 8 frames. The cast ends on frame 34 and leaves 23 frames of landing lag in the air. One pillar, a recast replaces it, no cooldown. Castable in the air and offstage: his edgeguard. | Dodge or shield the orb, roll past the pillar, or punish the cast from outside its line; a shield survives the burst but invites the grab. | [Ness's PK Flash][pkflash] (a placed delayed burst); [Robin's Arcfire][arcfire] (a lingering pillar that zones) |
 | Down: **Banish** | He sticks out one hand and, after a 20-frame delay, a green swirling beam shoots straight ahead from it, three of his body lengths long and live for 6 frames; the beam is stock Banish swirls (`BanishTarget`) spread along the live region from his hand, and he casts with one hand out and the other arm down; it is a hit region along the beam, not a projectile, and deals no damage. A whiff leaves 30 frames of recovery, and 22 frames of landing lag in the air. A fighter it touches turns ethereal for 60 frames (the duration sweep kept 60: over 12,240 matches a duration Kael won 49.0% at 45 frames, 49.7% at 60 and 50.2% at 90, a spread inside the field's noise, so the middle value stays). They lose normals, grabs and shield, but still move, jump, air dodge and cast their specials. Only spells reach them, at +30%. | Space outside it or shield it; banished, keep away and fight with your specials; his spheres cannot touch you. | [Mewtwo's Disable][disable] (a status that removes options) |
 | Up: **Phoenix** | He becomes the phoenix and steers with momentum, not snapping. The flames burn down as the visible timer; when they are gone he falls helpless. Hit mid-flight, he becomes an egg that falls fast and helpless and hatches on landing. The phoenix body has a weak contact hitbox. | Hit the flight to make the egg, then cover where it lands; the burning-down flames show how far he can still go. | [Fox's Fire Fox][firefox] (a committed fire recovery), [Peach's Parasol][parasol] (steerable float) |
 | Grab: **Siphon Mana** | A long, slow tether grab, punishable on whiff, with an ordinary pummel; no heal, no meter drain. His answer to a shield held against Flame Strike. | Read it and jump or spot dodge; punish the whiff. | [Samus's grapple][grapple] (long tether grab with whiff lag) |
@@ -159,9 +159,11 @@ the normals and body box and checked by `bun wisp ledger --check` and
   replaced by a steerable fire orb like Zelda's Din's Fire, with a startup 25%
   shorter (frame 6 for 8) and an orb faster than the rune. The playtest
   of the same day found frame 6 as fast as Fox's shine at close range, so the
-  orb now leaves on frame 16, the cast ends on frame 44 (it was 34) and the air
-  landing lag is 30 (it was 23), keeping the cast's proportions; the orb's
-  flight, steering and pillar are unchanged. The numbers
+  orb now leaves on frame 16 with the cast still ending on frame 34 and the air
+  landing lag 23 (a first version ended it on frame 44 for 30 and, with no
+  balance run behind it, left Kael at 38% of 12,240 expert matches in run
+  41177297393 on f3fb969e2d); the orb's flight, steering and pillar are
+  unchanged. The numbers
   SmashWiki gives for the Melee originals are durations, not speeds: PK Thunder
   runs frames 20 to 138; PK Thunder 2's self-hit lasts frames 1 to 36 (a clean
   hit 1 to 10), grants intangibility in the first half, sends Ness opposite
@@ -195,6 +197,14 @@ the normals and body box and checked by `bun wisp ledger --check` and
     The farm field on the landed change (balance run 41042046794) read
     50.5% over 12,240 matches; Chen still beats him and Warden still loses
     90% to him.
+  - Retune after the held cast (2026-10-31). The held cast and its longer
+    recovery left Kael at 38% (run 41177297393). Restoring the recovery alone
+    read 39% (run 41178938037); the burst at 13% with growth 90 and Pyroblast's
+    growth 74 read 44.9% (run 41180881248); the burst at 14% read 46.9% (run
+    41182313085, 5,745 wins of 12,240); then Flame Strike's 72-frame cooldown
+    on main took that tuning to 44.1% (run 41186069426), and the burst at 15%
+    with Pyroblast's growth 80 read 49.95% (run 41188018557, 6,114 wins of
+    12,240), the release frame staying 16.
 
 - **The World of Warcraft and Heroes of the Storm spells** (a charged fire
   blast, a possession and the raid-boss lifting ring) are cut; Tom kept the
