@@ -81,7 +81,7 @@
   default) and draws the stage, sky and fighters; it steps Smashcraft's default
   session, so it refuses `--presentation`, `--four-fighters`, `--host` and
   `--join`; with `--map MAP.w3x --player-assets-only` its worker thread reads
-  the map's imports and the Warcraft install as Chrome does; `--start select|results` opens it at character select or in a one-stock match that ends quickly, for the victory screen. The command finds the window
+  the map's imports and the Warcraft install as Chrome does; `--start select|results` opens it at character select or in a one-stock match that ends quickly, for the victory screen. A live window keeps Smashcraft's first-run files (whether the Tutorial prompt was answered) in `~/.local/state/smashcraft/native-files`, and a headless `--start select` run keeps the prompt off so captures stay the same; the window has no pointer, so at the prompt the attack key starts the tutorial, the special key or Esc is Not now, and left and right pick the lesson. The command finds the window
   library itself: `WISP_WINDOW_LIBRARY`, else the build of the vendored package's `window/` source in
   `~/.cache/wisp/window`, which the first run builds with cargo (in the package's nix dev shell on
   Linux, which links the Wayland, X11 and Vulkan libraries into the library, so no dev shell or

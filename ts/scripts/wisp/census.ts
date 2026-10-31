@@ -1,4 +1,4 @@
-import { passStartControls } from "./startControls";
+import { declineTutorial, passStartControls } from "./startControls";
 
 
 
@@ -130,6 +130,7 @@ function startTraining(clients: Lockstep, measure: PerfMeasure, fighter: Charact
   clients.start();
   clients.frames(30);
   passStartControls(clients);
+  declineTutorial(clients);
   clients.press(0, KEY.right);
   clients.frames(5);
   for (const client of clients.clients) {

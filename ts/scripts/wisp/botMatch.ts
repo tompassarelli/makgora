@@ -1,4 +1,4 @@
-import { passStartControls } from "./startControls";
+import { declineTutorial, passStartControls } from "./startControls";
 
 
 
@@ -198,6 +198,7 @@ export function playBotMatch(clients: Lockstep, match: BotMatch, frames: number,
   clients.start();
   for (let index = 0; index < 30; index++) frame();
   passStartControls(clients, count => { for (let index = 0; index < count; index++) frame(); });
+  declineTutorial(clients, count => { for (let index = 0; index < count; index++) frame(); });
 
   for (const client of clients.clients) clients.press(client.slot, keyboard ? KEY_RIGHT : Key.n);
   for (let index = 0; index < 5; index++) frame();

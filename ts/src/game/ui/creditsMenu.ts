@@ -1,8 +1,7 @@
 import { SELECT_LEVELS } from "./selectLevels";
 import { f32 } from "wisp/src/sim/f32";
 import { CREDITS_TITLE, creditsBody } from "./credits";
-import { PANEL_TEXTURE } from "./hudLayout";
-import { ButtonClicks, createBackdrop, placeTopLeft } from "./frames";
+import { ButtonClicks, createBackdrop, placeTopLeft, styleMenuPanel } from "./frames";
 import { InfoPanelState } from "./infoPanelState";
 import { panelButton, panelText } from "./infoPanel";
 import { CREDITS_BOX } from "./selectionLayout";
@@ -20,7 +19,7 @@ export class CreditsMenu {
   constructor(owner: framehandle, rules: framehandle, suffix: string, version: string, private readonly participantId: number) {
     this.clicks = new ButtonClicks(`ui.credits.${suffix}.click`, (target, clicker) => this.click(target, clicker));
     this.root = createBackdrop(`MeleeCreditsMenu${suffix}`, owner, 0);
-    BlzFrameSetTexture(this.root, PANEL_TEXTURE, 0, true);
+    styleMenuPanel(this.root, `MeleeCreditsPanel${suffix}`);
     placeTopLeft(this.root, f32(0.1), f32(0.53));
     BlzFrameSetSize(this.root, f32(0.6), f32(0.46));
     BlzFrameSetLevel(this.root, SELECT_LEVELS.credits);

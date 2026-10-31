@@ -6,6 +6,7 @@ import { Effect } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { RenderFailure } from "wisp/scripts/wisp/headlessRender";
 import { installHeadless } from "wisp/scripts/wisp/headless";
+import { customMapData } from "wisp/scripts/wisp/headlessInput";
 import { describeDigestDifference, digestDifference, frameDigest } from "../../src/game/replay/frameDigest";
 import { Action } from "../../src/game/input/actions";
 import { DEFAULT_PRESET, keyFor, presetBindings } from "../../src/game/input/keyBindings";
@@ -75,11 +76,15 @@ const selectionClicks = (script: string): readonly { readonly step: number; read
 
 export type StandaloneStart = "match" | "select" | "results";
 
+const offersPrompt = (start: StandaloneStart, savedFiles: string | undefined): boolean => start !== "select" || savedFiles !== undefined;
+
+const clientOptions = (savedFiles: string | undefined) => savedFiles === undefined ? { keepCalls: 0 } : { keepCalls: 0, files: () => customMapData(savedFiles) };
+
 const QUICK_MATCH = "-dev quick cpu wren expert hero illidan";
 const SELECT_SETTLE_STEPS = 30;
 
-export async function createStandaloneSession(options: { readonly script?: string; readonly presentation?: MapBuild["presentation"]; readonly fourFighters?: boolean; readonly start?: StandaloneStart; readonly chosen?: string } = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string }> {
-  const { script, presentation, fourFighters = false, start = "match", chosen } = options;
+export async function createStandaloneSession(options: { readonly script?: string; readonly presentation?: MapBuild["presentation"]; readonly fourFighters?: boolean; readonly start?: StandaloneStart; readonly chosen?: string; readonly savedFiles?: string } = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string }> {
+  const { script, presentation, fourFighters = false, start = "match", chosen, savedFiles } = options;
   const scripted = script?.startsWith(SELECTION_SCRIPT) === true;
   const selection = scripted || start === "select";
   const driven = script !== undefined && !scripted;
@@ -95,7 +100,7 @@ export async function createStandaloneSession(options: { readonly script?: strin
     const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/developerCommands.ts"));
     const { views }: { views(state: State): { readonly settings: readonly { endPreview(): void; isOpen(): boolean; close(): void }[] } } = await import(join(platform, "../host/loop/ui.ts"));
     const { tutorialOffers }: { tutorialOffers: { enabled: boolean } } = await import(join(platform, "../game/ui/tutorialMenu.ts"));
-    if (start === "select") tutorialOffers.enabled = false;
+    tutorialOffers.enabled = offersPrompt(start, savedFiles);
     const { drawnFrame }: { drawnFrame(state: State): { readonly frame: number } } = await import(join(platform, "../host/loop/drawnFrame.ts"));
     const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import(join(import.meta.dir, "botMatch.ts"));
     const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import(join(platform, "../host/loop/menus.ts"));
@@ -108,7 +113,7 @@ export async function createStandaloneSession(options: { readonly script?: strin
       start() { main.startBuild(driverBuild); driverApi?.installSmashcraftNativeDriver(); driverApi?.startSmashcraftNativeDriver(); },
     };
     const driverCommand = driverApi?.nativeDriverCommand;
-    const clients = runtime.clients(driver ?? { install: () => main.install(build), start: () => main.startBuild(build) }, !driven ? [0] : [0, 1], { keepCalls: 0 });
+    const clients = runtime.clients(driver ?? { install: () => main.install(build), start: () => main.startBuild(build) }, !driven ? [0] : [0, 1], clientOptions(savedFiles));
     clients.start();
     clients.frames(30);
     const client = clients.client(0);
@@ -264,6 +269,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const query = new URLSearchParams();
   if (playerAssets !== undefined) query.set("map", playerAssets.map);
   if (options.start !== undefined) query.set("start", options.start);
+  if (!options.headless) query.set("save", "1");
   if (chosen !== undefined) query.set("chosen", chosen);
   const nativeModule = query.size === 0 ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
   return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}), ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) }) }, {
