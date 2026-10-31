@@ -20,7 +20,7 @@ function widenByHits(active: Span, move: Readonly<AuthoredSpecial>): void {
   for (const projectile of move.projectiles ?? []) widen(active, projectile.spawnFrame, projectile.spawnFrame);
   for (const segment of move.motion ?? []) {
     if (segment.velocityX !== 0 || segment.velocityZ !== 0 || (segment.aimedSpeed ?? 0) !== 0
-      || (segment.driftSpeed ?? 0) !== 0 || segment.relocate !== undefined) widen(active, segment.first, segment.last);
+      || (segment.driftSpeed ?? 0) !== 0 || segment.relocate !== undefined || segment.resurface !== undefined) widen(active, segment.first, segment.last);
   }
 }
 

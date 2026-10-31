@@ -113,7 +113,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | 12 | Naga Sea Witch | Ground control and arcing projectiles | Slow air movement and exposed recovery |
 | 13 | Beastmaster | Three-animal pack coordination | Shared resources and punishable pet commands |
 | 14 | Dark Ranger | Marked targets and a single skeletal helper | Requires setup and must approach to cash in marks |
-| 15 | Firelord | Fire zones and one short-lived summon | Zones have startup and can be escaped vertically |
+| 15 | Firelord | Fire zones that scar the ground, and a dive through the floor to the newest scar | Zones have startup and can be escaped vertically; the dive is open to a hit for 6 frames before it and 16 after, and waits 120 frames |
 
 Akama, the Broken Ashtongue elder of The Frozen Throne, is planned for a later kit; until then he plays as a stand-in.
 
@@ -1303,7 +1303,7 @@ Standing grab 7/2/23, reach 0.50H. Pummel: dagger hilt, never lifesteal.
 
 Selectable now as a stand-in on the shared placeholder moveset ([standins.md](standins.md)); this kit is the plan for his real one.
 
-**Identity:** a caster who leaves brief fire zones and builds pressure with a single lava spawn. Flame trails are visually clear and mechanically bounded. The floating model still follows normal jumps and gravity.
+**Identity:** a caster who leaves brief fire zones that scar the ground and dives through the floor back to the newest scar. Flame trails are visually clear and mechanically bounded. The floating model still follows normal jumps and gravity.
 
 ### Normals
 
@@ -1328,11 +1328,11 @@ Selectable now as a stand-in on the shared placeholder moveset ([standins.md](st
 | Input | Proposed move and behavior | Timing and cost |
 | --- | --- | --- |
 | Neutral B | **Incinerating Ember:** straight projectile at 0.10H/frame, life 35, radius 0.16H; 5 damage, POKE at 35 degrees. Consecutive body hits add one heat mark, max 3, expiring 180 frames after the latest hit. The third hit consumes marks and adds 3 damage plus LAUNCH at 65 degrees instead of normal POKE; no secondary area explosion. One active, reflectable. | Spawn f21, end f45; 3 mana |
-| Side B | **Lava Spawn:** ground-only summon 0.6H ahead, 10 durability, 240-frame life. Remains stationary and fires in placement-facing direction at ages 60 and 150: speed 0.08H/frame, life 25, radius 0.15H, 5 damage, POKE at 40 degrees, reflectable. One spawn, no splitting; recast recalls it. | Summon f30, end f57; 22 mana initial, 0 recall |
+| Side B | **Submerge:** ground-only; in the air the press is the neutral special. He sinks into the floor and resurfaces on the floor at the newest live Lava Raze crater, one that has a floor under it. No hitbox; it moves him and nothing else. Intangible for 12 frames while he is underground, and he keeps his facing. With no live crater he resurfaces 0.9H ahead of where he sank when a floor lies level there, and otherwise stays where he sank (our default, not Tom's). The crater is not used up, so a second dive after the cooldown goes to it again. | Open f0–5, intangible f6–17 (he is at the crater from f12), end f34; a 120-frame cooldown from the press; no mana |
 | Up B | **Flame Jet:** 2.0H upward movement, up to 0.45H lateral, attached one-hit flame attack for 8 damage, LAUNCH at 80 degrees. Free version 1.4H with no hitbox. | Hit f11–16, movement through f31, then helpless; 15 mana |
-| Down B | **Lava Raze:** three Shadowraze-style lava eruptions at 1x, 2x and 3x a 0.7H step ahead of his front, picked by the stick's motion over the 10 frames up to and including the press: plain down erupts one step ahead, down and forward two, and a quarter-circle forward (down, then down and forward, then forward, in order) three, and the quarter-circle picks Lava Raze even though the press itself reads forward. A plain forward press is the side special, and the stick after the press picks nothing. A glowing crack opens on the ground at the aimed spot. The eruption is a 0.35H-radius molten column, so the three spots tile with no gap; it sits on the ground below the spot, does not appear past a ledge, and from the air lands on the floor below the aimed point. 12 damage at every distance, LAUNCH at 60 degrees outward from the column's centre: a foe left of it flies left, right of it flies right, exactly on it flies away from Firelord, so a far raze behind a foe pulls them in and a near raze in front of a foe pushes them off. One hit per cast, shieldable. | Crack f14, eruption hits f23–26, end f30 (air landing lag 20); 20 mana |
+| Down B | **Lava Raze:** three Shadowraze-style lava eruptions at 1x, 2x and 3x a 0.7H step ahead of his front, picked by the stick's motion over the 10 frames up to and including the press: plain down erupts one step ahead, down and forward two, and a quarter-circle forward (down, then down and forward, then forward, in order) three, and the quarter-circle picks Lava Raze even though the press itself reads forward. A plain forward press is the side special, and the stick after the press picks nothing. A glowing crack opens on the ground at the aimed spot. The eruption is a 0.35H-radius molten column, so the three spots tile with no gap; it sits on the ground below the spot, does not appear past a ledge, and from the air lands on the floor below the aimed point. 12 damage at every distance, LAUNCH at 60 degrees outward from the column's centre: a foe left of it flies left, right of it flies right, exactly on it flies away from Firelord, so a far raze behind a foe pulls them in and a near raze in front of a foe pushes them off. One hit per cast, shieldable. After the glow a scorch of embers stays on the floor where the column stood for 180 frames, the crater Submerge dives to; it has no hitbox and does not block anything, and it is drawn so a foe can read where Firelord will come up. | Crack f14, eruption hits f23–26, end f30 (air landing lag 20); 20 mana |
 
-Lava Spawn has no body collision or auto-aim and uses the same owner-stun/grab attack suppression as the other pets. Existing projectiles remain independent after firing. Heat marks are per source and target; reflected Embers belong to the reflector and cannot consume someone else’s marks.
+Existing projectiles remain independent after firing. Heat marks are per source and target; reflected Embers belong to the reflector and cannot consume someone else’s marks.
 
 ### Grab and throws
 
@@ -1349,6 +1349,13 @@ Standing grab 9/2/26, reach 0.60H. Pummel: ember squeeze, no extra heat mark.
 
 Down B was Molten Patch, a ground zone 0.7H ahead; Tom replaced it on 2026-10-30 with Lava Raze, after Nevermore's Shadowraze in Dota, and picked the three distances by stick. The numbers are the proposed ones, unchanged. Mana is a trait tag only, so the 20 is not charged yet.
 
+Tom asked on 2026-10-31 to replace the side special Lava Spawn with Submerge: he sinks into the ground and quickly resurfaces at his last Lava Raze location; each raze leaves a crater for 180 frames (3 s) and Submerge targets the newest live one; he named two uses, extending a combo after a raze and escaping. The rule for a dive with no crater is ours, and so are the rest of the numbers:
+
+- **Crater.** The raze's chain is crack, eruption, glow, then a crater of 180 frames, counted from the frame the glow ends. It sits on the floor the raze landed on, so a raze cast from the air has a crater on the floor below and one that did not open (past a ledge, or over the void) leaves none. The newest crater wins by age. A crater is skipped, and the next newest taken, when no floor lies under it at the dive, as when its platform has gone.
+- **Fallback.** With no valid crater he comes up 0.9H ahead of where he went down if a floor lies within a short step of his height there, and stays where he is if not; a defensive dive at a ledge never carries him off it.
+- **Underground.** Intangible for 12 frames (the window opens a frame early, as every special window does), against 14 for a spot dodge and 16 for a roll, so the dive is no longer a dodge than the dodge. He is open to a hit for the 6 frames he sinks and the 16 after the last intangible frame.
+- **Not an endless escape.** The move ends on frame 34 (33 frames after the press frame) and cannot start again for 120 frames from the press: 86 frames after he can act again, and 12 of every 120 frames intangible, a tenth. The crater, not Submerge, is what he needs, and a new one costs a raze (30 frames) that can be hit at the crack.
+
 Tom asked on 2026-10-31, after a playtest, for three changes, all in:
 
 - **Motion input.** The stick history is a general reader on every fighter whose kit asks for it (`sim/stickHistory.ts`): 14 frames of the stick as one of nine zones, saved with rollback and canonical state, and a kit lists the motions that pick its move or its aim (`selectedByMotion`, `aimByMotion`). Lava Raze reads 10 frames. A stick sweep from down to forward takes 3 to 7 frames on a pad, so 10 leaves slack for a slow thumb; any longer and a crouch followed a moment later by a forward press would read as a quarter-circle. Both ends are tested: the down step on the oldest buffered frame still counts, one frame older does not, and a plain forward press or a quarter-circle that finished earlier casts the side special.
@@ -1356,7 +1363,7 @@ Tom asked on 2026-10-31, after a playtest, for three changes, all in:
 - **No true infinite.** Every hit adds 12 percent, no DI escapes the chain at 80 percent, and a foe who mashes buttons escapes it from 60 percent, so a chain that starts at 50 percent ends within three more hits. All of it is tested.
 - **Launch.** 60 degrees outward, because the old 85 sent foes almost straight up (the sideways part was 9 percent of the speed), which kept them in the column and gave nothing to read; at 60 the sideways part is half the speed and the foe still stays airborne long enough to chain. A steeper 70 or 85 chains at more percents but pushes less; a flatter 50 chains nowhere at an end frame of 30. The balance baseline was re-frozen for the change: the raze's kill percent in the feel table moved from 182 to 99 and its frame advantage rose by 18 on the three recorded hits, both from the lower launch angle and the shorter end lag.
 
-**Required counterplay test:** lava fire plus Lava Raze leaves an aerial route and cannot cause indefinite shieldstun. Heat marks create a readable incentive to avoid the third hit without giving normals hidden explosions.
+**Required counterplay test:** lava fire plus Lava Raze leaves an aerial route and cannot cause indefinite shieldstun. A visible crater tells the foe where Submerge ends, and the 16 frames after it are the punish. Heat marks create a readable incentive to avoid the third hit without giving normals hidden explosions.
 
 ## Lich King
 

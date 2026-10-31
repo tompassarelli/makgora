@@ -286,6 +286,10 @@ function writeSpecialMotion(move: Readonly<AuthoredSpecial>, name: string, resul
     if (segment.relocate !== undefined) int(`motion[${index}].relocate`, segment.relocate);
     if (segment.relocateProjectile !== undefined) result.push(specialProjectileCanonical(segment.relocateProjectile, `${name}.motion[${index}].relocateProjectile`));
     if (segment.relocateReach !== undefined) real(`motion[${index}].relocateReach`, segment.relocateReach);
+    if (segment.resurface !== undefined) {
+      result.push(specialProjectileCanonical(segment.resurface.at, `${name}.motion[${index}].resurface.at`));
+      real(`motion[${index}].resurface.fallbackReach`, segment.resurface.fallbackReach);
+    }
     if (segment.seek !== undefined) {
       real(`motion[${index}].seek.speed`, segment.seek.speed);
       real(`motion[${index}].seek.turnCos`, segment.seek.turnCos);

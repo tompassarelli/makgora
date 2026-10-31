@@ -14,6 +14,7 @@ import { clearMotionValue, setWorldMotionValue } from "../motion";
 import { squareRoot } from "../warcraftMath";
 import { isHeroSpecialAction, runningHeroSpecial, inWindow, projectileAnchor } from "./runningMove";
 import { strike } from "./heroContact";
+import { resurfaceHeroSpecial } from "./resurface";
 import { enterFollowUp } from "./heroForms";
 
 type SpecialRide = NonNullable<SpecialMotion["ride"]>;
@@ -451,6 +452,10 @@ export function relocateHeroSpecial(world: Roster, slot: number, stage: number, 
   const move = runningHeroSpecial(f);
   if (move?.motion === undefined) return;
   for (const segment of move.motion) {
+    if (segment.resurface !== undefined && f.special.frame === segment.first) {
+      resurfaceHeroSpecial(f, segment.resurface, stage, matchFrame);
+      return;
+    }
     if ((segment.relocate === undefined && segment.relocateProjectile === undefined) || f.special.frame !== segment.first) continue;
     if (segment.relocate === Relocation.behindLocked) {
       const target = lockedTarget(world, f, segment.relocateReach ?? 0.0);

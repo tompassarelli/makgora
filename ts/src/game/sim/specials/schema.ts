@@ -49,6 +49,9 @@ export interface SpecialMotion extends FrameWindow {
 
   readonly relocateReach?: number | undefined;
 
+  /** On its first frame stands its user on the floor under the newest live projectile of `at`; with none that has a floor under it, `fallbackReach` ahead if a floor lies level there, else he stays where he is. */
+  readonly resurface?: { readonly at: SpecialProjectile; readonly fallbackReach: number } | undefined;
+
   readonly throughEdge?: boolean | undefined;
 
   /** On its first frame, after the move has connected, turns to face the first fighter it struck. */
@@ -491,7 +494,7 @@ export function stopsSidewaysOnStart(move: Readonly<AuthoredSpecial>, grounded: 
 export function movementSpecial(move: Readonly<AuthoredSpecial>): boolean {
   for (const segment of move.motion ?? []) {
     if (segment.velocityX !== 0.0 || segment.velocityZ !== 0.0 || segment.aimedSpeed !== undefined || segment.driftSpeed !== undefined
-      || segment.liftSpeed !== undefined || segment.seek !== undefined || segment.steer !== undefined || segment.relocate !== undefined) return true;
+      || segment.liftSpeed !== undefined || segment.seek !== undefined || segment.steer !== undefined || segment.relocate !== undefined || segment.resurface !== undefined) return true;
   }
   return false;
 }
