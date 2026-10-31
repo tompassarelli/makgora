@@ -1,7 +1,9 @@
 import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
-import { CHARGED_AIM_FRAMES, FollowUpInput, frames, type AuthoredSpecial, type FighterSpecials, type SpecialCharge, type SpecialFollowUp, type SpecialProjectile, type ToggleAura } from "../../sim/specials/schema";
+import { CHARGED_AIM_FRAMES, FollowUpInput, frames, type AuthoredSpecial, type FighterSpecials, type SpecialCharge, type SpecialFollowUp, type SpecialProjectile } from "../../sim/specials/schema";
+import { groundHit } from "../../sim/heroes/groundNormals";
+import type { AuraTrail, ToggleAura } from "../../sim/specials/auraSchema";
 import { butcherReachBody, capsule, hit } from "./moves";
 
 const AIR_LANDING_LAG = 22;
@@ -59,7 +61,23 @@ const hookSwing: AuthoredSpecial = {
   ledgeTether: SWING_TETHER,
 };
 
-export const ROT: ToggleAura = { frame: 5, radius: 90.0, every: 10, damage: 1.0, slowScale: f32(0.85), slowFrames: 12, selfEvery: 20, selfDamage: 1.0 };
+export const ROT_RADIUS = 90.0;
+export const ROT_PATCH_FRAMES = 150;
+export const ROT_PATCH_LIMIT = 12;
+export const ROT_PATCH_EVERY = 12;
+const ROT_PATCH_MODEL = "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx";
+
+export const ROT_PATCH: SpecialProjectile = {
+  model: ROT_PATCH_MODEL, modelRadius: 150.0, spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
+  life: ROT_PATCH_FRAMES, activeFrom: ROT_PATCH_FRAMES + 1, radius: f32(f32(0.4) * ROT_RADIUS), effect: groundHit(0.0, 85, 0.0, 0.0, HitElement.poison), reflectable: false, limit: ROT_PATCH_LIMIT,
+};
+
+export const ROT_TRAIL: AuraTrail<SpecialProjectile> = { patch: ROT_PATCH, every: ROT_PATCH_EVERY, minTravel: 24.0, limit: ROT_PATCH_LIMIT };
+
+export const ROT: ToggleAura<SpecialProjectile> = {
+  frame: 5, radius: ROT_RADIUS, every: 10, damage: 1.0, slowScale: f32(0.85), slowFrames: 12, selfEvery: 20, selfDamage: 1.0,
+  trail: ROT_TRAIL,
+};
 const rot: AuthoredSpecial = { endFrame: 10, toggleAura: ROT };
 
 export const BUTCHER_SPECIALS: FighterSpecials = {
@@ -69,6 +87,6 @@ export const BUTCHER_SPECIALS: FighterSpecials = {
     ground: butchersCharge(false), air: butchersCharge(true) },
   up: { name: "Hook Swing", description: "He flings the hook up and ahead: if it bites the ledge it reels him there; otherwise he hops a short way and falls helpless.",
     ground: hookSwing },
-  down: { name: "Rot", description: "Toggle: a stinking cloud around him burns and slows anyone close, and bleeds him while it lasts. Keep out of it.",
+  down: { name: "Rot", description: "Toggle: a stinking cloud around him burns and slows anyone close, and bleeds him while it lasts. Moving on the ground with it on, he leaves rot on the floor that goes on burning and slowing foes who cross it for two and a half seconds after he has passed. Keep out of it.",
     ground: rot },
 };

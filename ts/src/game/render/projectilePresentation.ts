@@ -9,7 +9,7 @@ import { heroDefinition } from "../roster/kits";
 import { HERO_PROJECTILE_CAP } from "../sim/specials/heroProjectiles";
 import { f32 } from "wisp/src/sim/f32";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, parkCue } from "./effects";
-import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, fighterProjectileModels, projectileModelOf, restartsStationaryField, RIBBON_PARK_SEQUENCES, ultimateProjectiles } from "../presentation/projectileArt";
+import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, fighterProjectileModels, heroPoolSize, projectileModelOf, restartsStationaryField, RIBBON_PARK_SEQUENCES, ultimateProjectiles } from "../presentation/projectileArt";
 import { projectedProjectile } from "../presentation/projectilePose";
 import { opponentReflectedModels } from "../presentation/reflectedProjectileArt";
 import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
@@ -120,11 +120,11 @@ export class ProjectilePresentation {
     const paths = fighterProjectileModels(character);
     const ultimateOnly = paths.filter((path, index) => index > 0 && !hero && ultimateProjectiles(character).some((spec) => spec.model === path));
     paths.forEach((path, index) => {
-      const size = hero ? HERO_PROJECTILE_CAP + 1 : index === 0 ? PROJECTILE_CAPACITY - 4 * ultimateOnly.length : 4;
+      const specials = heroDefinition(character)?.specials;
+      const size = hero && specials !== undefined ? heroPoolSize(specials, path, HERO_PROJECTILE_CAP + 1) : hero ? HERO_PROJECTILE_CAP + 1 : index === 0 ? PROJECTILE_CAPACITY - 4 * ultimateOnly.length : 4;
       const effects: number[] = [];
       const boundaries: number[][] = [];
       const raised: number[][] = [];
-      const specials = heroDefinition(character)?.specials;
 
       const defilePool = character === Character.lichKing && specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined);
       const groundPool = (specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined && spec.pool.growth > 0.0)) || PROJECTILE_DRAW_OFFSETS[path]?.disc !== undefined;

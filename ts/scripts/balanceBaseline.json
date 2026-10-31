@@ -39276,6 +39276,11 @@
    "authored.specials.up.ground.regions.0.hit.effect.launchZ": 0.9848077297210693,
    "authored.specials.down.ground.endFrame": 10,
    "authored.specials.down.ground.toggleAura.damage": 1,
+   "authored.specials.down.ground.toggleAura.trail.patch.effect.damage": 0,
+   "authored.specials.down.ground.toggleAura.trail.patch.effect.growth": 0,
+   "authored.specials.down.ground.toggleAura.trail.patch.effect.base": 0,
+   "authored.specials.down.ground.toggleAura.trail.patch.effect.launchX": 0.08715574443340302,
+   "authored.specials.down.ground.toggleAura.trail.patch.effect.launchZ": 0.9961947202682495,
    "normal.0.startupFrames": 4,
    "normal.0.activeFrames": 2,
    "normal.0.endingFrames": 16,
@@ -39750,6 +39755,9 @@
    },
    "special.up.ground.regions.0": {
     "advantage": -20
+   },
+   "special.down.ground.toggleAura.trail.patch": {
+    "advantage": -9
    },
    "throw.3": {
     "advantage": 0,

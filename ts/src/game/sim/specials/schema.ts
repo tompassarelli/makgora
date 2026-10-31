@@ -9,6 +9,7 @@ import type { ProjectileBounce, ProjectileVelocity, SpecialGaze } from "./volley
 import type { CastWindows, FrameWindow, SpecialChannel } from "./castWindows";
 import type { SpecialBeam } from "./specialBeam";
 import type { SpecialSteer, SpecialSteeredShot } from "./shotSteering";
+import type { ToggleAura } from "./auraSchema";
 export type { SpecialSelfHit, SpecialSteer, SpecialSteeredShot } from "./shotSteering";
 export type { FrameWindow } from "./castWindows";
 
@@ -279,9 +280,6 @@ export type CompanionMode = (typeof CompanionMode)[keyof typeof CompanionMode];
 
 export interface LedgeTether extends FrameWindow { readonly reach: StrikeCapsule }
 
-/** While on, foes within `radius` take `damage` every `every` frames and run at `slowScale` for `slowFrames`; its user takes `selfDamage` every `selfEvery`. */
-export interface ToggleAura { readonly frame: number; readonly radius: number; readonly every: number; readonly damage: number; readonly slowScale: number; readonly slowFrames: number; readonly selfEvery: number; readonly selfDamage: number }
-
 export interface SelfHeal { readonly frame: number; readonly heal: number }
 
 export interface SpecialGuard extends FrameWindow {
@@ -401,7 +399,7 @@ export interface AuthoredSpecial extends CastWindows {
   /** Over these frames a ledge inside `reach` catches the hook, and its user is reeled to hang there. */
   readonly ledgeTether?: LedgeTether | undefined;
   /** On `frame` it switches its user's aura on or off. */
-  readonly toggleAura?: ToggleAura | undefined;
+  readonly toggleAura?: ToggleAura<SpecialProjectile> | undefined;
 }
 
 export interface SpecialFollowUp {

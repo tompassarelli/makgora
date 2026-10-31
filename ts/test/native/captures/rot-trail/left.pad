@@ -1,0 +1,18 @@
+# Stitches' Rot trail facing left: Rot goes on, he runs left and leaves a rot patch every 12 frames, then the foe runs left through the trail and is burned and slowed on it.
+#! chat -dev setup quick pair butcher / medivh
+250 a stick 0 -1
+256 a tap X 2
+270 a stick -1 0
+284 a capture
+300 a capture
+316 a capture
+332 a capture
+340 b stick -1 0
+348 a capture
+356 a stick 0 0
+364 b capture
+380 b capture
+396 b capture
+412 b capture
+428 a capture
+444 b stick 0 0

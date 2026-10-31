@@ -72,6 +72,7 @@ function strikeProjectiles(strike: Readonly<TargetedStrike> | undefined, into: S
 function formProjectiles(special: AuthoredSpecial | undefined, into: SpecialProjectile[]): void {
   if (special === undefined) return;
   for (const projectile of special.projectiles ?? []) chainProjectiles(projectile, into);
+  chainProjectiles(special.toggleAura?.trail?.patch, into);
   for (const placement of specialPlacements(special)) for (const shot of [placement.shot, placement.finalShot, placement.mark]) if (shot !== undefined) into.push(shot);
   strikeProjectiles(special.targetedStrike, into);
   if (special.burst !== undefined) {
@@ -206,3 +207,12 @@ export const RIBBON_PARK_SEQUENCES: { readonly [model: string]: string | null } 
   "Units\\Undead\\Locust\\Locust.mdx": "Death",
   "Units\\Undead\\Scarab\\Scarab.mdl": "Death",
 };
+
+export function heroPoolSize(specials: Readonly<FighterSpecials>, model: string, least: number): number {
+  let size = least;
+  for (const slot of SPECIAL_SLOTS) {
+    const trail = specials[slot].ground.toggleAura?.trail;
+    if (trail?.patch.model === model) size = Math.max(size, trail.limit);
+  }
+  return size;
+}
