@@ -10,7 +10,6 @@ interface SackCue {
   readonly model: string;
   readonly anchor: "behind" | "ahead";
   readonly scale: number;
-  readonly drawn: true;
   readonly sound?: string | undefined;
   readonly anchorFrames?: readonly { readonly x: number; readonly z: number }[] | undefined;
   readonly lingerFrames?: number | undefined;
@@ -49,8 +48,8 @@ export const goldSackStored = (fighter: Readonly<Fighter>): boolean =>
 
 const goldSackCues = (stage: number): SackCues => ({
   spell: "Gold Sack",
-  startup: { model: GOLD_SACK_GLINT, anchor: "ahead", scale: stage >= GOLD_SACK_CHARGE.stages ? FULL_GLINT_SCALE : GLINT_SCALE, drawn: true, sound: GOLD_CLINK, anchorFrames: SACK_MOUTH, lingerFrames: GLINT_LINGER_FRAMES },
-  active: { model: GOLD_SACK_COIN_SPILL, anchor: "ahead", scale: COIN_SPILL_SCALE, drawn: true, anchorFrames: STRUCK, lingerFrames: COIN_SPILL_LINGER_FRAMES },
+  startup: { model: GOLD_SACK_GLINT, anchor: "ahead", scale: stage >= GOLD_SACK_CHARGE.stages ? FULL_GLINT_SCALE : GLINT_SCALE, sound: GOLD_CLINK, anchorFrames: SACK_MOUTH, lingerFrames: GLINT_LINGER_FRAMES },
+  active: { model: GOLD_SACK_COIN_SPILL, anchor: "ahead", scale: COIN_SPILL_SCALE, anchorFrames: STRUCK, lingerFrames: COIN_SPILL_LINGER_FRAMES },
 });
 const GOLD_SACK_CUES: readonly SackCues[] = Array.from({ length: GOLD_SACK_CHARGE.stages }, (_, handful) => goldSackCues(handful + 1));
 export const GOLD_SACK_SLOT_CUES: SackCues = at(GOLD_SACK_CUES, 0);

@@ -17,8 +17,8 @@ import { fighterAt } from "../../sim/roster";
 import { clearSpecialOnStock } from "../../sim/transitions";
 import { FOLLOW_UP_FORM, chargeStage } from "../../sim/specials/schema";
 import { GOLD_SACK_CHARGE, GOLD_SACK_DAMAGE, GOLD_SACK_FIRST_ACTIVE } from "./specials";
-import { GOLD_SACK_COIN_SPILL } from "../../presentation/peonCues";
-import { specialCueState } from "../../presentation/specialCues";
+import { GOLD_SACK_COIN_SPILL, GOLD_SACK_SLOT_CUES } from "../../presentation/peonCues";
+import { fighterOwnCues, specialCueState } from "../../presentation/specialCues";
 
 const FULL = GOLD_SACK_CHARGE.full;
 const HOLD = GOLD_SACK_CHARGE.hold;
@@ -311,4 +311,10 @@ test("Gold Sack: a bonk that connects reaches the coin spill's active phase on t
   };
   assertGreaterThan(coinFrames(IN_REACH), 0);
   assertEquals(coinFrames(900.0), 0, "a bonk that misses shows no coins");
+});
+
+test("Gold Sack: the effects class loads a model for the glint and the coin spill cues, so the cues it shows are drawn [k1 scenario]", () => {
+  const loaded = fighterOwnCues(Character.peon);
+  assertTrue(loaded.includes(GOLD_SACK_SLOT_CUES.startup));
+  assertTrue(loaded.includes(GOLD_SACK_SLOT_CUES.active));
 });
