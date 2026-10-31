@@ -42,5 +42,5 @@ export const FIGHTER_VIEW_BOUNDS: Readonly<Record<Character, ViewBounds>> = {
   [Character.firelord]: { left: -80, right: 80, bottom: 0, top: 174 },
   [Character.alchemist]: { left: -93, right: 122, bottom: -6, top: 215 },
   [Character.onyxia]: { left: -38, right: 33, bottom: -5, top: 142 },
-  [Character.onyxiaDragon]: { left: -148, right: 94, bottom: -108, top: 116 },
+  [Character.onyxiaDragon]: { left: -364, right: 217, bottom: 0, top: 663 },
 };

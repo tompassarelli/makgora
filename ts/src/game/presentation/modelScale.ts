@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { Character } from "../sim/codes";
-import { LICH_KING_STOCK_SCALE, PRESTOR_STOCK_SCALE, TYRANDE_STOCK_SCALE } from "../assets/importedModelInfo";
+import { LICH_KING_STOCK_SCALE, ONYXIA_DRAGON_STOCK_SCALE, PRESTOR_STOCK_SCALE, TYRANDE_STOCK_SCALE } from "../assets/importedModelInfo";
 
 
 
@@ -48,7 +48,7 @@ export const STOCK_MODEL_SCALES: Readonly<Record<Character, { readonly unit: str
   [Character.firelord]: { unit: "Nfir", scale: 1.0 },
   [Character.alchemist]: { unit: "Nalc", scale: 1.0 },
   [Character.onyxia]: PRESTOR_STOCK_SCALE,
-  [Character.onyxiaDragon]: { unit: "nbdr", scale: 1.0 },
+  [Character.onyxiaDragon]: ONYXIA_DRAGON_STOCK_SCALE,
   [Character.murloc]: { unit: "nmrl", scale: 1.0 },
   [Character.grom]: { unit: "Ogrh", scale: 1.0 },
 };

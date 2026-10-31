@@ -118,8 +118,10 @@ recorded in smashcraft:docs/design/roster-next.md#hive-model-terms.
 - The dragon: [Onyxia by Symphoneum](https://www.hiveworkshop.com/threads/onyxia.348925/),
   its "Lore Accurate" `Onyxia.mdx` and `Onyxia_portrait.mdx`, built from
   Warcraft III Reforged assets and usable with credit to Symphoneum. It is a
-  Reforged HD model (PBR textures in DDS), so its look in Classic graphics
-  must be checked in the native game before it ships.
+  Reforged HD model (PBR textures in DDS); Smashcraft ships a Classic MDX 800
+  conversion of it (smashcraft:tools/animations/hd-to-classic.ts), which draws
+  the diffuse texture only. It has flying animations only, so the dragon hovers
+  with its claws on the floor.
 - Prestor: [Katrana Prestor by Footman16](https://www.hiveworkshop.com/threads/katrana-prestor.362851/),
   Classic SD, 843 polygons, an edit of AndrewOverload519's Female Human Mage
   and kangyun's Sally Whitemane staff with both permissions posted. Tom chose

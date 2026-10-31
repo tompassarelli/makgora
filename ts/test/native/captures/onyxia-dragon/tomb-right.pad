@@ -1,0 +1,44 @@
+# Onyxia's dragon form on Tomb facing right: Reveal on frame 62 turns Lady Katrana Prestor into the dragon on 106, then she stands, walks, casts Wing Buffet, jumps and lands, and Human Guise from frame 372 turns her back, so the dragon's claws are judged against the deck at match zoom.
+#! cue 200-222 wing buffet: effect=Tornado_Target
+#! chat -dev quick stage 7 pair onyxia / murloc
+56 a capture
+60 a stick 0 -1
+62 a tap X 2
+66 a stick 0 0
+80 a capture
+100 a capture
+108 a capture
+116 a capture
+130 a capture
+136 a stick 0.6 0
+146 a capture
+156 a capture
+166 a capture
+176 a capture
+180 a stick 0 0
+182 a stick 1 0
+190 a tap X 2
+194 a stick 0 0
+204 a capture
+210 a capture
+216 a capture
+222 a capture
+230 a capture
+240 a tap B 1
+246 a capture
+254 a capture
+262 a capture
+270 a capture
+278 a capture
+286 a capture
+294 a capture
+302 a capture
+310 a capture
+330 a capture
+370 a stick 0 -1
+372 a tap X 2
+376 a stick 0 0
+380 a capture
+392 a capture
+402 a capture
+420 a capture

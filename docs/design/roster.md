@@ -341,6 +341,14 @@ The map's description carries the same credits.
   Its page asks only for credit. Its two command icons are crops of Hearthstone
   art and are not imported; the select portrait is rendered from the model.
 
+- [Onyxia by Symphoneum](https://www.hiveworkshop.com/threads/onyxia.348925/)
+  (Hive Workshop, Reforged HD model, open source, credit asked): its "Lore Accurate"
+  `Onyxia.mdx`, converted to a Classic MDX 800 model by
+  smashcraft:tools/animations/hd-to-classic.ts (diffuse textures as BLP, normal,
+  ORM and emissive maps dropped, each vertex held to its heaviest three bones)
+  and imported as `war3mapImported\OnyxiaDragon.mdx` with five
+  `OnyxiaDragon*.blp` textures for Onyxia's dragon form.
+
 Source terms read on 29 October 2026 from the Wayback Machine's 20 October
 2025 copy of the page: johnwar names Ujimasa Hojo's Archer, Dark Ranger,
 Sylvanas Windrunner and derivatives and kangyun's Tyrande Whisperwind (Heavy

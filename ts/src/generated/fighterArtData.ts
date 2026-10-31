@@ -42,7 +42,7 @@ export const FIGHTER_ART: ReadonlyMap<number, FighterArt> = new Map<number, Figh
   [33, { name: "Firelord", slug: "firelord", source: "hero-models/heroflamelord.mdx", stock: "war3.w3mod:units/creeps/heroflamelord/heroflamelord.mdx", model: "Units\\Creeps\\HeroFlameLord\\HeroFlameLord.mdl" }],
   [34, { name: "GoblinAlchemist", slug: "goblin-alchemist", source: "hero-models/herogoblinalchemist.mdx", stock: "war3.w3mod:units/creeps/herogoblinalchemist/herogoblinalchemist.mdx", model: "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist.mdl" }],
   [35, { name: "Onyxia", slug: "onyxia", source: "imported-models/KatranaPrestorHero.mdx", model: "war3mapImported\\KatranaPrestorHero.mdx" }],
-  [36, { name: "OnyxiaDragon", slug: "onyxia-dragon", source: "hero-models/blackdragon.mdx", stock: "war3.w3mod:units/creeps/blackdragon/blackdragon.mdx", model: "Units\\Creeps\\BlackDragon\\BlackDragon.mdl" }],
+  [36, { name: "OnyxiaDragon", slug: "onyxia-dragon", source: "imported-models/OnyxiaDragon.mdx", model: "war3mapImported\\OnyxiaDragon.mdx" }],
 ]);
 
 export function fighterArt(character: number): FighterArt {

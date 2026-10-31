@@ -4,25 +4,28 @@ import { f32 } from "wisp/src/sim/f32";
 import type { FighterOriginalClip } from "./fighterOriginalClip";
 
 export const clips: readonly FighterOriginalClip[] = [
-  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-73d996efe983b61006a554e2881b09c1e92d01430eff0d88351a6b0f94c501d7.mdx", startSeconds: f32(0.667), endSeconds: 1.5, looping: true, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-73d996efe983b61006a554e2881b09c1e92d01430eff0d88351a6b0f94c501d7.mdx", startSeconds: f32(2.333), endSeconds: f32(3.833), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-73d996efe983b61006a554e2881b09c1e92d01430eff0d88351a6b0f94c501d7.mdx", startSeconds: f32(4.333), endSeconds: f32(7.667), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-73d996efe983b61006a554e2881b09c1e92d01430eff0d88351a6b0f94c501d7.mdx", startSeconds: f32(8.333), endSeconds: 9.0, looping: true, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-73d996efe983b61006a554e2881b09c1e92d01430eff0d88351a6b0f94c501d7.mdx", startSeconds: 10.0, endSeconds: f32(10.9), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-73d996efe983b61006a554e2881b09c1e92d01430eff0d88351a6b0f94c501d7.mdx", startSeconds: 18.0, endSeconds: 19.0, looping: false, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-73d996efe983b61006a554e2881b09c1e92d01430eff0d88351a6b0f94c501d7.mdx", startSeconds: f32(23.333), endSeconds: f32(24.833), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-ddf58e267f9dfc268517617fcb006a750a6f74722f10a80ffc6bb49f47ebbe20.mdx", startSeconds: f32(1.433), endSeconds: f32(3.233), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-ddf58e267f9dfc268517617fcb006a750a6f74722f10a80ffc6bb49f47ebbe20.mdx", startSeconds: f32(3.333), endSeconds: f32(4.733), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-ddf58e267f9dfc268517617fcb006a750a6f74722f10a80ffc6bb49f47ebbe20.mdx", startSeconds: f32(4.833), endSeconds: f32(5.833), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-ddf58e267f9dfc268517617fcb006a750a6f74722f10a80ffc6bb49f47ebbe20.mdx", startSeconds: f32(5.933), endSeconds: f32(6.933), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-ddf58e267f9dfc268517617fcb006a750a6f74722f10a80ffc6bb49f47ebbe20.mdx", startSeconds: f32(7.033), endSeconds: f32(8.533), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-ddf58e267f9dfc268517617fcb006a750a6f74722f10a80ffc6bb49f47ebbe20.mdx", startSeconds: f32(8.633), endSeconds: f32(10.033), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaDragonTimelineBody-ddf58e267f9dfc268517617fcb006a750a6f74722f10a80ffc6bb49f47ebbe20.mdx", startSeconds: f32(10.133), endSeconds: f32(11.133), looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
-  ["stand - 1", 0],
-  ["attack 1", 1],
-  ["stand - 3", 2],
-  ["walk", 3],
-  ["walk - 2", 4],
-  ["death", 5],
-  ["spell devour", 6],
-  ["stand", 0],
-  ["attack", 1],
+  ["attack 1", 0],
+  ["stand 2", 1],
+  ["walk 2", 2],
+  ["death 1", 3],
+  ["spell 1", 4],
+  ["stand 1", 5],
+  ["walk 1", 6],
+  ["attack", 0],
+  ["stand", 1],
+  ["walk", 2],
+  ["death", 3],
+  ["spell", 4],
 ]);
 
 export const light: string | undefined = undefined;

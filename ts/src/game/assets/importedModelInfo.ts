@@ -1,3 +1,4 @@
+import { f32 } from "wisp/src/sim/f32";
 import { THRALL_MODEL_FILE } from "../fighters/thrall/clips";
 
 
@@ -36,6 +37,10 @@ export const PRESTOR_MODEL = "war3mapImported\\KatranaPrestorHero.mdx";
 
 export const PRESTOR_STOCK_SCALE = { unit: "KatranaPrestorHero", scale: 1.0 } as const;
 
+export const ONYXIA_DRAGON_MODEL = "war3mapImported\\OnyxiaDragon.mdx";
+
+export const ONYXIA_DRAGON_STOCK_SCALE = { unit: "OnyxiaDragon", scale: f32(0.4) } as const;
+
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string; readonly reanimated?: true }[] = [
   { entry: GROM_BLOODLUST_MODEL, file: "GromBloodlustQuiet.mdx" },
   { entry: SCOURGE_WALL_MODEL, file: "UndeadWalls.mdx" },
@@ -52,4 +57,6 @@ export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly f
   { entry: TYRANDE_MODEL, file: "TyrandeDismountedV2.mdx", reanimated: true },
   { entry: PRESTOR_MODEL, file: "KatranaPrestorHero.mdx" },
   { entry: "KatranaPrestor.blp", file: "KatranaPrestor.blp" },
+  { entry: ONYXIA_DRAGON_MODEL, file: "OnyxiaDragon.mdx" },
+  ...["Attach", "Body", "Fin", "Head", "Limbs"].map((part) => ({ entry: `OnyxiaDragon${part}.blp`, file: `OnyxiaDragon${part}.blp` })),
 ];

@@ -100,6 +100,10 @@ Onyxia model (Lady Katrana Prestor): [Katrana Prestor by Footman16](https://www.
 Sally Whitemane staff, both used with their authors' permission and credited
 here as the page asks.
 
+Onyxia model (the dragon): [Onyxia by Symphoneum](https://www.hiveworkshop.com/threads/onyxia.348925/)
+(Hive Workshop), built from Warcraft III Reforged models and used with credit to
+Symphoneum, converted to a Classic model for Smashcraft.
+
 Tyrande model: [Tyrande Whisperwind (Re-Classic) by johnwar](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/)
 (Hive Workshop), built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas
 models and kangyun's Tyrande, used with kangyun's permission, reanimated for
