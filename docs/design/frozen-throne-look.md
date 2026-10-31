@@ -24,10 +24,10 @@ Layer order, back to front:
 6. Causeway: the first stair restored, five still stock ice floes stepped from the deck's back edge (y 1360 to 1520, z 0 to -220), each lower and deeper than the one nearer the camera (depth scale 5 to 13, width 2.5, tint [64, 82, 104], below fighter brightness, #875), so the ice visibly climbs from the deck to the throne's dais (Tom's playtest, 2026-10-31, after the throne take removed the stair). The spire and chair (the floes, back slab, pillars, obelisk and arms at y 2020 to 2150) are lifted 150 so the stair ends under the chair's arms and does not cover the throne the way the first stair did. A floe's `matrixScale` is depth, width, thickness once yawed 270, so the stair is wide at the bottom and narrow at the top.
 7. Dais pillars: two `IceTorch` towers at x of 400 each side, clear of the throne.
 8. Crystal clusters: eight `Icecrown_Crystal3` standing behind the throne (y 2450 to 2550), tinted cyan: the backlight the throne's silhouette is read against.
-9. Gothic towers: `IceCrownObelisk` and `IceCrownPillar` pairs at x of 2500 to 2900, dark, pushed clear of the deck ends (#875).
+9. Gothic towers: `IceCrownObelisk` and `IceCrownPillar` pairs at x of 2800 to 3100, dark, and the two near glaciers at x of 3100 to 3200, pushed clear of the deck ends (#875, take 2).
 10. Floor: the existing ground under the deck, tinted deep navy so it is not a flat grey field (#875). The native window takes the sky from the distance fog, so the fog is a deep blue (0.15625, 0.28125, 0.453125) that keeps the sky quiet behind the fighters.
 
-The two side ledges are the same stock ice floe tinted steel-blue (`stockPlatforms.ts`), not the untinted white the first takes drew.
+The two side ledges are the same stock ice floe tinted steel-blue (`stockPlatforms.ts`), not the untinted white the first takes drew. Each raised platform now stands on a slim dark `IceCrownPillar` stem under its middle (side ledges at x -340 and 340, the high platform at 0, y 60), so none reads as a floating disc (#875, take 2). The arch is dimmed to a deep steel blue, the pale spire and stair are a step darker, and the floor is a lighter navy so the deck underside separates from it at far zoom.
 
 ## Element map
 

@@ -1272,3 +1272,16 @@ Native Classic captures on gex45 at match tick 700, taken with the fog at 0.15, 
 | far (Chen first) | 35.6 → 34.3 | 43.4 → 28.6 | -7.8 → +5.7 | -40.6 → -21.6 |
 
 Every view now draws both fighters brighter than the ring around them. The separation check (`--separation`, limit 0, not loosened) still fails: the backdrop behind each fighter keeps a 75th percentile of L\* 29 to 41 against fighters' lower quartile of 19 to 28, because the dark halves of Rokhan and Chen sit below the stair and spire. The next lever is the pale spire and stair.
+
+### Take 2 (#875)
+
+Same captures on the shipped fog values, taken before the readable-throne rework (1576b52d4e) landed; before at f39e36f6d5 and after the second take (arch dimmed, pale spire and stair a step darker, ledge stems, towers to |x| 2800 to 3100, near glaciers to |x| 3100 to 3200, lighter navy floor):
+
+| View (pair order) | Ring L\* before → after | Fighter minus ring before → after | Worst separation gap before → after |
+| --- | --- | --- | --- |
+| near (Shadow Hunter first) | 22.5 → 23.0 | +11.1 → +10.7 | -15.8 → -13.8 |
+| near (Chen first) | 24.7 → 25.3 | +8.4 → +7.9 | -19.1 → -16.1 |
+| far (Shadow Hunter first) | 27.9 → 26.4 | +6.7 → +8.2 | -18.4 → -15.6 |
+| far (Chen first) | 28.6 → 27.0 | +5.6 → +7.1 | -21.5 → -17.2 |
+
+The near ring rises about half a unit because the lighter floor sits in the lower ring; the far ring falls from the dimmer arch and spire. The separation check still fails (limit 0, not loosened).
