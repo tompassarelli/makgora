@@ -120,8 +120,16 @@ recorded in smashcraft:docs/design/roster-next.md#hive-model-terms.
   Warcraft III Reforged assets and usable with credit to Symphoneum. It is a
   Reforged HD model (PBR textures in DDS), so its look in Classic graphics
   must be checked in the native game before it ships.
-- Prestor: the page Tom chose is a World of Warcraft port and is not used.
-  Which model replaces it is Tom's decision (gate 145, 31 October 2026).
+- Prestor: [Katrana Prestor by Footman16](https://www.hiveworkshop.com/threads/katrana-prestor.362851/),
+  Classic SD, 843 polygons, an edit of AndrewOverload519's Female Human Mage
+  and kangyun's Sally Whitemane staff with both permissions posted. Tom chose
+  it after hearing that its texture is based on her World of Warcraft texture
+  plus freehand work, and judged it not a World of Warcraft port (decision
+  relayed 2026-10-31, gate 145). Its icons are Hearthstone crops and are not
+  imported; the select portrait is rendered from the model. The model keeps its
+  team-colour cape and glow layers, so each player's Prestor shows the slot colour.
+- The page Tom first picked (Hive 375457, a World of Warcraft port) and DSDK's
+  model are not used.
 
 ## Status (31 October 2026)
 

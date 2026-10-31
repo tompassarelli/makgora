@@ -59,6 +59,7 @@ import { type ShellState, type StatusFrames, activeRollback, localSlot } from ".
 import { presentedMatch } from "./presentedMatch";
 import { EMPTY_PAUSE_VIEW, pauseScreenUp, pauseView } from "./pauseView";
 import { type UiObjects, pauseEffects, views } from "./ui";
+import { followFormChange } from "./formChange";
 import { drawStageScenery, presentDrifters } from "./stageScenery";
 import { probeCamera } from "./responseProbe";
 import { clockSeconds } from "./trace";
@@ -423,7 +424,10 @@ export function renderPersistentPresentation(s: ShellState): void {
   ui.classic?.present(game);
   ui.combat.present(runtime.impacts, runtime.simulationFrame, s.runtime.impacts, playing, s.camera);
   const roared = roaring(world, playing);
-  for (const slot of PARTICIPANT_SLOTS) presentSlot(s, ui, slot, game, world, runtime, playing, drawn, matchFrame, roared, agencyMarks[slot]);
+  for (const slot of PARTICIPANT_SLOTS) {
+    followFormChange(s, ui, slot, world);
+    presentSlot(s, ui, slot, game, world, runtime, playing, drawn, matchFrame, roared, agencyMarks[slot]);
+  }
   presentShieldEnergyCapture(s, game, world, runtime, playing);
   concealFighters(s);
 }

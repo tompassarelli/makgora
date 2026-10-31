@@ -444,6 +444,7 @@ export interface CatalogHero {
   readonly jab: { readonly name: string; readonly description: string };
   readonly partner?: PartnerBody | undefined;
   readonly damageScale?: ((role: number, partnerLive: boolean) => number) | undefined;
+  readonly homeForm?: Character | undefined;
 }
 
 export interface CheckMotion { readonly physics: FighterPhysics; readonly ground: GroundMovementRules }

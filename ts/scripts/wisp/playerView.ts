@@ -36,7 +36,7 @@ import { allCueModels, MISSING_CUE_MODEL } from "../../src/game/presentation/spe
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
 import { Character } from "../../src/game/sim/codes";
 import type { AuthoredSpecial } from "../../src/game/sim/specials/schema";
-import { HERO_ROSTER } from "../../src/game/roster/kits";
+import { ALL_HEROES } from "../../src/game/roster/kits";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { stageBounds } from "../../src/game/sim/stageBounds";
 import { STAGE_LAVA_MODEL } from "../../src/generated/stages/terrainAssetInfo";
@@ -71,7 +71,7 @@ function recordPlacement(special: AuthoredSpecial | undefined, fallback: string)
   }
   for (const followUp of special?.followUps ?? []) recordPlacement(followUp.special, fallback);
 }
-for (const hero of HERO_ROSTER) {
+for (const hero of ALL_HEROES) {
   if (hero.specials === undefined) continue;
   for (const slot of SPECIAL_SLOTS) {
     const kit = hero.specials[slot];
@@ -124,7 +124,7 @@ export const SMASHCRAFT_SCENE: SceneExpectations & { readonly settledFrame: numb
     { name: "pooled fighter", models: fighterModels },
     { name: "body flash", models: Object.values(WHITE_FIGHTER_MODELS) },
 
-    { name: "hero body", models: HERO_ROSTER.map(({ character }) => heroLook(character)!.model) },
+    { name: "hero body", models: ALL_HEROES.map(({ character }) => heroLook(character)!.model) },
 
     {
       name: "hit spark", lifetime: seconds(3), models: [
@@ -134,7 +134,7 @@ export const SMASHCRAFT_SCENE: SceneExpectations & { readonly settledFrame: numb
       ],
     },
 
-    { name: "KO body", lifetime: seconds(3), models: [DEMON_HUNTER_MODEL_FILE, ...HERO_ROSTER.map(({ character }) => heroLook(character)!.model)] },
+    { name: "KO body", lifetime: seconds(3), models: [DEMON_HUNTER_MODEL_FILE, ...ALL_HEROES.map(({ character }) => heroLook(character)!.model)] },
 
     { name: "shield bubble", lifetime: seconds(75), models: [SHIELD_P1_MODEL, SHIELD_P2_MODEL, SHIELD_P3_MODEL, SHIELD_P4_MODEL] },
 

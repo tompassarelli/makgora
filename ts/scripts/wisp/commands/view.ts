@@ -30,7 +30,7 @@ import { STRIKE_FILE_GLOB, measureStrikeMoments, staleStrikeFighters, strikeMome
 import { HERO_STRIKE_MOMENTS } from "../../../src/game/presentation/heroStrikeMomentInfo";
 import { checkoutInputs } from "../buildInputs";
 import { BODY_HEIGHT, type ReachCueRow, measureReachCue, measuredStyles, reachCueSource, showsReachCue } from "../reachCues";
-import { HERO_ROSTER, SELECTABLE_CHARACTERS, isSelectableCharacter, fighterName, fighterSlug, shipsInMap } from "../../../src/game/roster/kits";
+import { ALL_HEROES, SELECTABLE_CHARACTERS, isSelectableCharacter, fighterName, fighterSlug, shipsInMap } from "../../../src/game/roster/kits";
 import { DRAWN_STRIDES } from "../../../src/game/presentation/drawnStrideInfo";
 import { DRAWN_MOTION } from "../drawnMotionInfo";
 import { MOTION_STATES, drawnStrideSource, measureDrawnMotion, measureDrawnStride, type DrawnStride, type DrawnMotionRow } from "../drawnMotion";
@@ -190,7 +190,7 @@ const strikes = (args: readonly string[]) => Effect.scoped(Effect.gen(function*(
     (directory) => Effect.sync(() => rmSync(directory, { recursive: true, force: true })),
   );
   const files = new Map<string, string>();
-  for (const [index, model] of [...new Set(HERO_ROSTER.map(({ character }) => heroLook(character)!.model))].entries()) {
+  for (const [index, model] of [...new Set(ALL_HEROES.map(({ character }) => heroLook(character)!.model))].entries()) {
     if (assets !== undefined) {
       files.set(model, join(assets, heroModelSource(model)));
       continue;
@@ -209,7 +209,7 @@ const strikes = (args: readonly string[]) => Effect.scoped(Effect.gen(function*(
   const differing = yield* differingStrikeFiles(sources);
   if (check) {
     if (differing.length === 0) return yield* Console.log(`${moments.length} strike moments in ${sources.size} files match the committed models: ${STRIKE_GAME}`);
-    const stale = staleStrikeFighters(moments, HERO_STRIKE_MOMENTS, HERO_ROSTER.map(({ character }) => character)).map(fighterSlug);
+    const stale = staleStrikeFighters(moments, HERO_STRIKE_MOMENTS, ALL_HEROES.map(({ character }) => character)).map(fighterSlug);
     return yield* new MapBuildFailure({ operation: "check strike moments", path: STRIKE_GAME, cause: `the committed strike tables ${differing.join(", ")} differ from what ${stale.length > 0 ? stale.join(", ") : "the roster"} measure from their committed models; run bun wisp view strikes --assets "$(bun wisp inputs path assets)" and commit the tables` });
   }
   yield* Effect.tryPromise({
@@ -250,7 +250,7 @@ const reach = (args: readonly string[]) => Effect.gen(function*() {
           }
           continue;
         }
-        const hero = HERO_ROSTER.find((candidate) => candidate.character === fighter);
+        const hero = ALL_HEROES.find((candidate) => candidate.character === fighter);
         let model: DrawnModel;
         let id: string;
         if (hero === undefined) {
@@ -283,7 +283,7 @@ const reachCues = (args: readonly string[]) => Effect.gen(function*() {
     try: async () => {
       const measured: ReachCueRow[] = [];
       for (const character of SELECTABLE_CHARACTERS) {
-        const hero = HERO_ROSTER.find((candidate) => candidate.character === character);
+        const hero = ALL_HEROES.find((candidate) => candidate.character === character);
         const model = hero === undefined ? await loadDrawnModel(assets, character)
           : new DrawnModel(await Bun.file(join(assets, heroModelSource(heroLook(hero.character)!.model))).arrayBuffer(), characterModelScale(character));
         for (const style of measuredStyles(character)) measured.push(measureReachCue(model, character, style));
@@ -312,10 +312,10 @@ const motion = (args: readonly string[]) => Effect.gen(function*() {
       });
       const rows: DrawnMotionRow[] = selected === undefined ? [] : DRAWN_MOTION.filter(row => row.character !== selected);
       const models: { character: Character; drawn: DrawnModel; model: string }[] = [];
-      const characters = [ Character.rifleman, Character.demonHunter, ...HERO_ROSTER.map((hero) => hero.character)];
+      const characters = [ Character.rifleman, Character.demonHunter, ...ALL_HEROES.map((hero) => hero.character)];
       for (const character of characters) {
         if (selected !== undefined && character !== selected) continue;
-        const hero = HERO_ROSTER.find((candidate) => candidate.character === character);
+        const hero = ALL_HEROES.find((candidate) => candidate.character === character);
         const relative = hero === undefined ? FIGHTER_MODELS[character] ?? "" : heroModelSource(heroLook(hero.character)!.model);
         const bytes = await Bun.file(join(assets, relative)).arrayBuffer();
         const hash = new Bun.CryptoHasher("sha256").update(new Uint8Array(bytes)).digest("hex");

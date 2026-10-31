@@ -10,7 +10,7 @@ import { AttackStyle, Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type HitRegion, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { attackStartupFrames } from "../sim/moves";
-import { HERO_ROSTER } from "../roster/kits";
+import { ALL_HEROES } from "../roster/kits";
 import { type Cue, fighterOwnCues, timed } from "./specialCues";
 import { DISJOINT_CUES } from "./disjointCues";
 import { FEL_CRESCENT_MODEL } from "../../generated/assets/felCrescentAssetInfo";
@@ -128,7 +128,7 @@ export function fighterAttackCues(character: Character): readonly Cue[] {
 export function allAttackCueModels(): readonly string[] {
   const models: string[] = [];
   for (const { model } of Object.values(DISJOINT_CUES)) if (!models.includes(model)) models.push(model);
-  for (const character of [ Character.rifleman, Character.demonHunter, ...HERO_ROSTER.map((hero) => hero.character)]) {
+  for (const character of [ Character.rifleman, Character.demonHunter, ...ALL_HEROES.map((hero) => hero.character)]) {
     for (const { model } of fighterAttackCues(character)) if (!models.includes(model)) models.push(model);
   }
   return models;

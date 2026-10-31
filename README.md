@@ -95,6 +95,11 @@ Naxxramas wall model:
 (Hive Workshop), an original model tagged open source, used with credit to
 Kuzakani and Hive Workshop.
 
+Onyxia model (Lady Katrana Prestor): [Katrana Prestor by Footman16](https://www.hiveworkshop.com/threads/katrana-prestor.362851/)
+(Hive Workshop), an edit of AndrewOverload519's Female Human Mage with kangyun's
+Sally Whitemane staff, both used with their authors' permission and credited
+here as the page asks.
+
 Tyrande model: [Tyrande Whisperwind (Re-Classic) by johnwar](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/)
 (Hive Workshop), built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas
 models and kangyun's Tyrande, used with kangyun's permission, reanimated for

@@ -13,7 +13,7 @@ import { ACTIVE_CUE_FRAMES, type CueWindows, heroCueWindows } from "./cueWindows
 import { idiv } from "wisp/src/sim/intMath";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { commandGrabHolding } from "../sim/specials/commandGrabLock";
-import { HERO_ROSTER } from "../roster/kits";
+import { ALL_HEROES } from "../roster/kits";
 import { BANISH_DELAY_FRAMES, PHOENIX_BURN_FRAMES, PHOENIX_STARTUP_FRAMES, PYROBLAST_STARTUP_FRAMES } from "../fighters/kaelthas/specials";
 import { GOLD_SACK_SLOT_CUES, peonCueState, peonExtraCues } from "./peonCues";
 import {
@@ -649,7 +649,7 @@ export function fighterBranchCues(character: Character): readonly MoveCues[] {
 
 export function allCueModels(): readonly string[] {
   const models: string[] = [];
-  const characters: readonly Character[] = [ Character.rifleman, Character.demonHunter, ...HERO_ROSTER.map(({ character }) => character)];
+  const characters: readonly Character[] = [ Character.rifleman, Character.demonHunter, ...ALL_HEROES.map(({ character }) => character)];
   for (const character of characters) for (const cue of fighterCueList(character)) if (cue.drawn !== true && !models.includes(cue.model)) models.push(cue.model);
   return models;
 }

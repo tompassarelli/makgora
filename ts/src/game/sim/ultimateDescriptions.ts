@@ -30,4 +30,6 @@ export const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | und
   [Character.archimonde]: "Fel circles mark the foe and the ground on both sides of them; three infernals crash down one after another. Leave the circles.",
   [Character.butcher]: "He raises the cleaver, then lunges: a caught foe is pinned and carved for a long moment while he heals. Shield or dodge the lunge.",
   [Character.tyrande]: "Moonlight marks four lanes ahead of her and stars fall on them three times while she channels. Leave the lanes, shield, or hit her to end it.",
+  [Character.onyxia]: "Embers mark a line of ground ahead of her, a hold of flame sweeps along it, then pillars of fire erupt and launch. Leave the line, shield, or hit her to end it.",
+  [Character.onyxiaDragon]: "Embers mark a line of ground ahead of her, a hold of flame sweeps along it, then pillars of fire erupt and launch. Leave the line, shield, or hit her to end it.",
 };

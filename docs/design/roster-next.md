@@ -119,6 +119,19 @@ check; the Onyxia page matches the Wayback Machine's 25 June 2025 copy.
     (awaiting update: the reviewer asked for proof of permission from Sxar,
     and a reply notes a WoW hair texture, `Hair01_00.blp`).
 
+#### Prestor's model, decided (31 October 2026)
+
+Tom chose Footman16's Katrana Prestor for Onyxia's human form after hearing that
+its texture is "based on her texture from WoW as well as some freehand" (decision
+relayed 31 October 2026, closing gate 145). He judged it not a World of Warcraft
+port. Imported as the `imported-models` entries `KatranaPrestorHero.mdx` and
+`KatranaPrestor.blp` (Version 800, 843 triangles, 16 geosets, team-colour and
+team-glow layers, sequences Stand - 1, Stand - 2, Attack -1, Spell, Death,
+Dissipate, Walk; zip sha256 `0cc3fd77ab0f924028e3d75026d1570bfc0e228913f4a4aade19aebf72d23b27`).
+Credits: Footman16, AndrewOverload519 (Female Human Mage) and kangyun (staff).
+The page's own terms line is "So if you decide to use this resource please give
+credits." The icons and the portrait model are not imported.
+
 ### H1 intake (29 October 2026)
 
 Both models were downloaded through a plain headful Chrome on gex45's private

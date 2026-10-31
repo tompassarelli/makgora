@@ -1,0 +1,21 @@
+# Onyxia's team colour: Lady Katrana Prestor on slot a and slot b side by side keep each player's colour on the cape and glow, then both reveal and the dragons stand where they were.
+#! cue 150-166 howl: effect=HowlCaster
+#! chat -dev quick pair onyxia / onyxia
+20 a stick -0.3 0
+20 b stick 0.3 0
+60 a stick 0 0
+60 b stick 0 0
+100 a capture
+100 b capture
+120 a stick 0 -1
+120 b stick 0 -1
+122 a tap X 2
+122 b tap X 2
+134 a capture
+134 b capture
+158 a capture
+158 b capture
+200 a stick 0 0
+200 b stick 0 0
+210 a capture
+210 b capture

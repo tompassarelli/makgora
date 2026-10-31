@@ -1,6 +1,6 @@
 import type { Character } from "../src/game/sim/codes";
 import { IMPORTED_MODEL_FILES } from "../src/game/assets/importedModelInfo";
-import { HERO_ROSTER } from "../src/game/roster/kits";
+import { ALL_HEROES } from "../src/game/roster/kits";
 import { heroLook } from "../src/game/roster/looks";
 
 
@@ -24,7 +24,7 @@ export function heroModelSource(model: string): string {
 export const fighters: ReadonlyMap<Character, { readonly name: string; readonly source: string; readonly stock?: string }> = new Map([
   [1, { name: "Rifleman", source: "animation-assets/RiflemanFighter.mdx" }],
   [2, { name: "Illidan", source: "illidan-animation/DemonHunterFighter.mdx" }],
-  ...HERO_ROSTER.toSorted((a, b) => a.character - b.character).map((hero) => [hero.character, {
+  ...ALL_HEROES.toSorted((a, b) => a.character - b.character).map((hero) => [hero.character, {
     name: hero.name.replaceAll(/[^A-Za-z]/g, ""),
     source: heroModelSource(heroLook(hero.character)!.model),
     ...(importedModelFile(heroLook(hero.character)!.model) === undefined ? { stock: stockModelPath(heroLook(hero.character)!.model) } : {}),

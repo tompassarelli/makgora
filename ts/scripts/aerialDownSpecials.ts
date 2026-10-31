@@ -58,6 +58,8 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.akama]: "stand-in Burst in the air, a blast on both sides while falling",
   [Character.firelord]: "stand-in Burst in the air, a blast on both sides while falling",
   [Character.alchemist]: "stand-in Burst in the air, a blast on both sides while falling",
+  [Character.onyxia]: "aerial Reveal holds her in place for the 44 frames of the form change",
+  [Character.onyxiaDragon]: "aerial Human Guise holds her in place for the 26 frames of the form change",
 };
 
 export interface AerialDownRow {

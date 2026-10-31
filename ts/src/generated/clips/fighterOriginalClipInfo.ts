@@ -34,6 +34,8 @@ import * as tyrande from "./tyrande";
 import * as firelord from "./firelord";
 import * as akama from "./akama";
 import * as goblinAlchemist from "./goblin-alchemist";
+import * as onyxia from "./onyxia";
+import * as onyxiaDragon from "./onyxia-dragon";
 
 /** The light model's animation while its fighter is shown, and while hidden. */
 export const ORIGINAL_LIGHT_ACTIVE_ANIMATION = "Stand";
@@ -80,6 +82,8 @@ const FIGHTERS: Readonly<Record<number, FighterClips>> = {
   33: firelord,
   32: akama,
   34: goblinAlchemist,
+  35: onyxia,
+  36: onyxiaDragon,
 };
 
 /** Clips 0 to count - 1 exist for this character. */

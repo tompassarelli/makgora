@@ -1,4 +1,4 @@
 
 
 
-export const HIDDEN_FIGHTERS: readonly string[] = [];
+export const HIDDEN_FIGHTERS: readonly string[] = ["goblin-alchemist"];

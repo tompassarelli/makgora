@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Portrait } from 'wisp/scripts/wisp/screenBounds';
 import { PARTICIPANT_SLOTS } from '../src/game/input/participants';
-import { RENDERED_FIGHTERS, fighterRenderName } from '../src/game/roster/kits';
+import { PORTRAIT_FIGHTERS, fighterRenderName } from '../src/game/roster/kits';
 import { portraitCostumes, portraitOutfit } from '../src/game/roster/looks';
 import { fighters } from './heroModelSource';
 import { originalClip } from '../src/generated/clips/fighterOriginalClipInfo';
@@ -45,6 +45,8 @@ export const PORTRAIT_PARTS: Readonly<Record<string, PortraitParts>> = {
   Akama: part('Bone_joint11', [], []),
   Firelord: part('Bone_Head', [], []),
   GoblinAlchemist: part('Bone_Head01', [], []),
+  Onyxia: part('Bone_Head', [], []),
+  OnyxiaDragon: part('Bone_Head', [], []),
 };
 
 /** The fighter's declared parts kept to the nodes its drawn Classic body has, and the declared nodes it lacks. */
@@ -62,7 +64,7 @@ export const RECEIPTS = 'receipts';
 
 const TIMELINE_BODY = /^war3mapImported\\(.+)TimelineBody-[0-9a-f]+\.mdx$/i;
 
-const currentBodies = (): ReadonlyMap<string, string> => new Map(RENDERED_FIGHTERS.flatMap((character) => {
+const currentBodies = (): ReadonlyMap<string, string> => new Map(PORTRAIT_FIGHTERS.flatMap((character) => {
   const model = originalClip(character, 0)?.modelPath, name = model === undefined ? undefined : TIMELINE_BODY.exec(model)?.[1];
   return model === undefined || name === undefined ? [] : [[name, model] as const];
 }));
@@ -96,7 +98,7 @@ export function sourceModelHash(assets: string, character: number): string {
 
 /** Each stored portrait receipt, costume outfits included, that is missing or whose source-model hash differs from its fighter's current model. */
 export function stalePortraits(assets: string, renders: string): readonly string[] {
-  return RENDERED_FIGHTERS.flatMap((character) => {
+  return PORTRAIT_FIGHTERS.flatMap((character) => {
     const current = sourceModelHash(assets, character);
     return portraitCostumes(character).flatMap((costume) => {
       const name = fighterRenderName(character) + portraitOutfit(character, costume);

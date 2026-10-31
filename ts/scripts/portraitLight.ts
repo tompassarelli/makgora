@@ -4,7 +4,7 @@
 import { join } from 'node:path';
 import { Effect, Schema } from 'effect';
 import { assetsView, readManifest } from './wisp/buildInputs';
-import { RENDERED_FIGHTERS, fighterRenderName } from '../src/game/roster/kits';
+import { PORTRAIT_FIGHTERS, fighterRenderName } from '../src/game/roster/kits';
 import { CARD_PREVIEW, CARD_TEXTURE_PX, TILE_TEXTURE_PX, cardPortrait } from '../src/game/ui/portraitFrames';
 
 /** Calibrated on Peon, Blademaster and Thrall, the portraits Tom accepts as well lit (#363). */
@@ -145,7 +145,7 @@ export const bustPixels = pixels;
 
 const portrait = (renders: string, kind: string, name: string) => join(renders, `Fighter${kind}${name}P1.tga`);
 
-export const lookLights = (renders: string, names = RENDERED_FIGHTERS.map(fighterRenderName)): Effect.Effect<Map<string, Light>, PixelsFailure> =>
+export const lookLights = (renders: string, names = PORTRAIT_FIGHTERS.map(fighterRenderName)): Effect.Effect<Map<string, Light>, PixelsFailure> =>
   Effect.forEach(names, (name) => Effect.map(pixels(portrait(renders, 'Bust', name)), (bytes) => [name, lightOf(bytes)] as const)).pipe(Effect.map((entries) => new Map(entries)));
 
 if (import.meta.main) {
@@ -154,7 +154,7 @@ if (import.meta.main) {
     const problems = judgePreview();
     {
       const lights = yield* lookLights(renders);
-      const colours = yield* Effect.forEach(RENDERED_FIGHTERS, (character) => Effect.gen(function* () {
+      const colours = yield* Effect.forEach(PORTRAIT_FIGHTERS, (character) => Effect.gen(function* () {
         const name = fighterRenderName(character);
         const tile = join(renders, `FighterTile${name}.tga`);
         return [name, colourOf(yield* pixels(tile), yield* pixels(portrait(renders, 'Bust', name)))] as const;

@@ -21,6 +21,8 @@ import { malfurionStrikeMoments } from "../fighters/malfurion/strikeMoments";
 import { medivhStrikeMoments } from "../fighters/medivh/strikeMoments";
 import { mountainKingStrikeMoments } from "../fighters/mountain-king/strikeMoments";
 import { murlocStrikeMoments } from "../fighters/murloc/strikeMoments";
+import { onyxiaStrikeMoments } from "../fighters/onyxia/strikeMoments";
+import { onyxiaDragonStrikeMoments } from "../fighters/onyxia-dragon/strikeMoments";
 import { peonStrikeMoments } from "../fighters/peon/strikeMoments";
 import { pitLordStrikeMoments } from "../fighters/pit-lord/strikeMoments";
 import { shadowHunterStrikeMoments } from "../fighters/shadow-hunter/strikeMoments";
@@ -57,6 +59,8 @@ export const HERO_STRIKE_MOMENTS: { readonly [character: number]: { readonly [st
   [Character.medivh]: medivhStrikeMoments,
   [Character.mountainKing]: mountainKingStrikeMoments,
   [Character.murloc]: murlocStrikeMoments,
+  [Character.onyxia]: onyxiaStrikeMoments,
+  [Character.onyxiaDragon]: onyxiaDragonStrikeMoments,
   [Character.peon]: peonStrikeMoments,
   [Character.pitLord]: pitLordStrikeMoments,
   [Character.shadowHunter]: shadowHunterStrikeMoments,

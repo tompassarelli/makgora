@@ -120,5 +120,7 @@ export interface HeroDefinition {
   readonly partner?: PartnerBody | undefined;
 
   readonly damageScale?: ((role: number, partnerLive: boolean) => number) | undefined;
+
+  readonly homeForm?: Character | undefined;
 }
 

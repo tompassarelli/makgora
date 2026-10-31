@@ -5,7 +5,7 @@
 
 
 import { AttackPhase, AttackStyle, Character } from "../../src/game/sim/codes";
-import { HERO_ROSTER } from "../../src/game/roster/kits";
+import { ALL_HEROES } from "../../src/game/roster/kits";
 import { type DrawnModel } from "./drawnModel";
 import { type PoseFrame, sampleAttack } from "./hurtboxView";
 
@@ -81,7 +81,7 @@ export const REACH_CHECKED: readonly { readonly character: Character; readonly s
   { character: Character.rifleman, styles: [AttackStyle.jab, AttackStyle.jab2, AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown, AttackStyle.upTilt, AttackStyle.downTilt, AttackStyle.dashAttack, AttackStyle.neutralAir, AttackStyle.upAir, AttackStyle.downAir] },
   { character: Character.demonHunter, styles: [AttackStyle.jab, AttackStyle.jab2, AttackStyle.jab3, AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown, AttackStyle.downTilt, AttackStyle.downSmash] },
 
-  ...HERO_ROSTER.map((hero) => ({ character: hero.character, styles: hero.character === Character.lichKing
+  ...ALL_HEROES.map((hero) => ({ character: hero.character, styles: hero.character === Character.lichKing
     ? [...HERO_GROUND, ...AERIAL_STYLES, AttackStyle.forwardSmash, AttackStyle.upSmash, AttackStyle.downSmash, AttackStyle.grab, AttackStyle.getupAttack, AttackStyle.ledgeAttack]
     : HERO_GROUND.filter((style) => hero.moves.normals[style] !== undefined) })),
 ];

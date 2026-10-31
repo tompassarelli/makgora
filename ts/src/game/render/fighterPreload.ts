@@ -1,6 +1,6 @@
 import { originalClip, originalClipCount, originalLightPath } from "../../generated/clips/fighterOriginalClipInfo";
 import { costumeClipModel, costumesFor } from "../roster/costumes";
-import { SELECTABLE_CHARACTERS } from "../roster/kits";
+import { RENDERED_FIGHTERS } from "../roster/kits";
 import { heroLook } from "../roster/looks";
 import { fighterModel } from "./combatEffects";
 import { WHITE_FIGHTER_MODELS } from "../../generated/assets/whiteFighterModels";
@@ -36,7 +36,7 @@ export function fighterModels(character: number): string[] {
 /** The distinct models of every selectable fighter. */
 export function preloadFighterModels(): string[] {
   const models: string[] = [];
-  for (const character of SELECTABLE_CHARACTERS) for (const model of fighterModels(character)) addNew(models, model);
+  for (const character of RENDERED_FIGHTERS) for (const model of fighterModels(character)) addNew(models, model);
   return models;
 }
 
@@ -54,6 +54,6 @@ export function fighterTextures(character: number): string[] {
 /** The distinct match images of every selectable fighter. */
 export function preloadFighterTextures(): string[] {
   const textures: string[] = [];
-  for (const character of SELECTABLE_CHARACTERS) for (const texture of fighterTextures(character)) addNew(textures, texture);
+  for (const character of RENDERED_FIGHTERS) for (const texture of fighterTextures(character)) addNew(textures, texture);
   return textures;
 }

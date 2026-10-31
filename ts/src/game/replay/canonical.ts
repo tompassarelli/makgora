@@ -24,7 +24,7 @@ import { CPU_OPPONENT_CHOICES, CPU_OPPONENT_IDS, CPU_TIERS } from "../match/cpuP
 import { botStrategyValues } from "../match/botStrategy";
 import type { ReplayState } from "./snapshot";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
-import { HERO_ROSTER } from "../roster/kits";
+import { ALL_HEROES } from "../roster/kits";
 import { ILLIDAN_MOVES, RIFLEMAN_MOVES } from "../sim/originalMoves";
 
 const REPLAY_CHECKSUM_MODULUS = 1_000_003;
@@ -598,7 +598,7 @@ export function foldStateChecksum(fold: StateChecksumFold, characters: number): 
 
 export function prepareKitDigests(): void {
   for (const moves of [RIFLEMAN_MOVES, ILLIDAN_MOVES]) kitDigestField("moves", moves, MOVES_DIGESTS, fighterMovesCanonical);
-  for (const hero of HERO_ROSTER) {
+  for (const hero of ALL_HEROES) {
     kitDigestField("moves", hero.moves, MOVES_DIGESTS, fighterMovesCanonical);
     kitDigestField("specials", hero.specials, SPECIALS_DIGESTS, fighterSpecialsCanonical);
     const specials = hero.specials;

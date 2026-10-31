@@ -12,7 +12,7 @@ import { captureScene, renderScenes, type RenderScene } from 'wisp/scripts/wisp/
 import { createStandaloneSession, NEUTRAL_INPUT } from './wisp/standalone';
 import { headlessRender } from './wisp/headlessRender';
 import { assetsView, readManifest } from './wisp/buildInputs';
-import { PORTRAIT_KINDS, type PortraitKind, RENDERED_FIGHTERS, fighterKey, fighterName, fighterRenderName } from '../src/game/roster/kits';
+import { PORTRAIT_KINDS, type PortraitKind, PORTRAIT_FIGHTERS, fighterKey, fighterName, fighterRenderName } from '../src/game/roster/kits';
 import { fighterPortrait, heroLook, portraitCostumes, portraitOutfit } from '../src/game/roster/looks';
 import { costumeBody } from '../src/generated/costumes/costumeBodies';
 import { PARTNER_COSTUME } from '../src/game/presentation/model/costume';
@@ -107,7 +107,7 @@ const FOV = 8;
 
 /** A costume's own render is keyed by its fighter's character plus its index times this, so one number names a body in the maps below. */
 const COSTUME_STRIDE = 1000;
-const renderIds = RENDERED_FIGHTERS.flatMap((character) => portraitCostumes(character).map((costume) => character + costume * COSTUME_STRIDE));
+const renderIds = PORTRAIT_FIGHTERS.flatMap((character) => portraitCostumes(character).map((costume) => character + costume * COSTUME_STRIDE));
 const characterOf = (id: number) => id % COSTUME_STRIDE;
 const costumeOf = (id: number) => Math.floor(id / COSTUME_STRIDE);
 const renderName = (id: number) => fighterRenderName(characterOf(id)) + portraitOutfit(characterOf(id), costumeOf(id));
@@ -512,7 +512,7 @@ await Effect.runPromise(Effect.gen(function*() {
   for (const family of readdirSync(stored)) if (family !== 'fighter-renders') symlinkSync(join(stored, family), join(assets, family));
   for (const file of readdirSync(join(stored, 'fighter-renders'))) symlinkSync(join(stored, 'fighter-renders', file), join(assets, 'fighter-renders', file));
   const portraitFile = (id: number, kind: PortraitKind, slot?: number) => fighterPortrait(characterOf(id), kind, slot, costumeOf(id)).replace(/^.*war3mapImported\\/, '').replace(/\.blp$/, '.tga');
-  const standIn = at(RENDERED_FIGHTERS, 0);
+  const standIn = at(PORTRAIT_FIGHTERS, 0);
   for (const character of renderIds) for (const kind of PORTRAIT_KINDS) for (const slot of [...(kind === 'Tile' ? [undefined] : []), ...PARTICIPANT_SLOTS]) {
     const file = portraitFile(character, kind, slot);
     if (!existsSync(join(assets, 'fighter-renders', file))) symlinkSync(join(stored, 'fighter-renders', portraitFile(standIn, kind, slot)), join(assets, 'fighter-renders', file));

@@ -6,7 +6,7 @@ import { SHADOW_HUNTER_GROUND } from "../fighters/shadow-hunter/moves";
 import { WARDEN_GROUND } from "../fighters/warden/moves";
 import { BEASTMASTER_MOVES } from "../fighters/beastmaster/moves";
 import type { HeroLook } from "../presentation/model/look";
-import { type PortraitKind, RENDERED_FIGHTERS, fighterRenderName, lookCharacter } from "./kits";
+import { type PortraitKind, PORTRAIT_FIGHTERS, fighterRenderName, lookCharacter, portraitOwner } from "./kits";
 import { anubarakLook } from "../fighters/anubarak/look";
 import { beastmasterLook } from "../fighters/beastmaster/look";
 import { blademasterLook } from "../fighters/blademaster/look";
@@ -28,6 +28,7 @@ import { tyrandeLook } from "../fighters/tyrande/look";
 import { akamaLook } from "../fighters/akama/look";
 import { firelordLook } from "../fighters/firelord/look";
 import { alchemistLook } from "../fighters/alchemist/look";
+import { dragonLook, prestorLook } from "../fighters/onyxia/look";
 import { mountainKingLook } from "../fighters/mountain-king/look";
 import { murlocLook } from "../fighters/murloc/look";
 import { peonLook } from "../fighters/peon/look";
@@ -60,6 +61,8 @@ const LOOKS: { readonly [character: number]: HeroLook | undefined } = {
   [Character.akama]: akamaLook,
   [Character.firelord]: firelordLook,
   [Character.alchemist]: alchemistLook,
+  [Character.onyxia]: prestorLook,
+  [Character.onyxiaDragon]: dragonLook,
   [Character.mountainKing]: mountainKingLook(MOUNTAIN_KING_GROUND),
   [Character.murloc]: murlocLook,
   [Character.peon]: peonLook,
@@ -86,9 +89,9 @@ export function portraitOutfit(character: number, costume: number): string {
 }
 
 export function fighterPortrait(character: number, kind: PortraitKind, slot?: number, costume = 0): string {
-  const outfit = portraitOutfit(character, costume);
-  for (const rendered of RENDERED_FIGHTERS) {
-    if (rendered === character) return `war3mapImported\\Fighter${kind}${fighterRenderName(character)}${outfit}${slot === undefined ? "" : `P${slot + 1}`}.blp`;
+  const owner = portraitOwner(character), outfit = portraitOutfit(owner, costume);
+  for (const rendered of PORTRAIT_FIGHTERS) {
+    if (rendered === owner) return `war3mapImported\\Fighter${kind}${fighterRenderName(owner)}${outfit}${slot === undefined ? "" : `P${slot + 1}`}.blp`;
   }
   return fighterIcon(character);
 }

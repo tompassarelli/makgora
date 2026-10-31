@@ -33,6 +33,10 @@ export const TYRANDE_ICON = "ReplaceableTextures\\CommandButtons\\BTNPriestessOf
 
 export const TYRANDE_STOCK_SCALE = { unit: "TyrandeDismountedV2", scale: 1.0 } as const;
 
+export const PRESTOR_MODEL = "war3mapImported\\KatranaPrestorHero.mdx";
+
+export const PRESTOR_STOCK_SCALE = { unit: "KatranaPrestorHero", scale: 1.0 } as const;
+
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string; readonly reanimated?: true }[] = [
   { entry: GROM_BLOODLUST_MODEL, file: "GromBloodlustQuiet.mdx" },
   { entry: SCOURGE_WALL_MODEL, file: "UndeadWalls.mdx" },
@@ -47,4 +51,6 @@ export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly f
   { entry: "ReplaceableTextures\\CommandButtonsDisabled\\DISBTNLichKing.blp", file: "DISBTNLichKing.blp" },
   { entry: "ReplaceableTextures\\SSCscorescreen-hero-lichking.blp", file: "SSCscorescreen-hero-lichking.blp" },
   { entry: TYRANDE_MODEL, file: "TyrandeDismountedV2.mdx", reanimated: true },
+  { entry: PRESTOR_MODEL, file: "KatranaPrestorHero.mdx" },
+  { entry: "KatranaPrestor.blp", file: "KatranaPrestor.blp" },
 ];

@@ -6,7 +6,7 @@ import { heroLook } from "../src/game/roster/looks";
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
 import { AttackStyle, Character, SpecialAction } from "../src/game/sim/codes";
 import { WARDEN_MOVES } from "../src/game/fighters/warden/moves";
-import { HERO_ROSTER, fighterSlug } from "../src/game/roster/kits";
+import { ALL_HEROES, fighterSlug } from "../src/game/roster/kits";
 import { PARTNER_COSTUME } from "../src/game/presentation/model/costume";
 
 export const output = "src/generated/fighterArtData.ts";
@@ -55,7 +55,7 @@ function flashClips(character: number): number[] {
   return [...indices].sort((a, b) => a - b);
 }
 
-const lookModel = (character: number) => HERO_ROSTER.some((hero) => hero.character === character) ? heroLook(character)!.model : undefined;
+const lookModel = (character: number) => ALL_HEROES.some((hero) => hero.character === character) ? heroLook(character)!.model : undefined;
 
 function wardenBlade(style: AttackStyle): string {
   const move = WARDEN_MOVES.normals[style];

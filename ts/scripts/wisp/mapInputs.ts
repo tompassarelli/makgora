@@ -30,7 +30,7 @@ import { DEMON_HUNTER_MODEL_FILE } from "../../src/game/presentation/demonHunter
 import { SUMMON_BEAR, summonClip, summonClipCount } from "../../src/game/presentation/summonClipInfo";
 import { Character } from "../../src/game/sim/codes";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
-import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS, shipsInMap } from "../../src/game/roster/kits";
+import { ALL_HEROES, PORTRAIT_KINDS, PORTRAIT_FIGHTERS, shipsInMap } from "../../src/game/roster/kits";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
 import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";
@@ -131,7 +131,7 @@ export const ORIGINAL_CLIP_MODELS =[...new Set(Object.values(Character).filter(s
   return [...clips, ...costumes, ...light === undefined ? [] : [light]];
 }))];
 
-const IMPORTED_HERO_MODELS = HERO_ROSTER.map(({ character }) => heroLook(character)!.model).filter((model) => importedModelFile(model) !== undefined);
+const IMPORTED_HERO_MODELS = ALL_HEROES.map(({ character }) => heroLook(character)!.model).filter((model) => importedModelFile(model) !== undefined);
 
 
 export const SCRIPT_MODELS: readonly string[] = [
@@ -237,7 +237,7 @@ const PORTRAIT_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cach
 
 
 
-export const MAP_PORTRAITS: readonly string[] = RENDERED_FIGHTERS.flatMap((character) => portraitCostumes(character).flatMap((costume) => PORTRAIT_KINDS.flatMap((kind) =>
+export const MAP_PORTRAITS: readonly string[] = PORTRAIT_FIGHTERS.flatMap((character) => portraitCostumes(character).flatMap((costume) => PORTRAIT_KINDS.flatMap((kind) =>
   [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot) => fighterPortrait(character, kind, slot, costume)))));
 
 const portraitImports = (assets: string) => Effect.forEach(

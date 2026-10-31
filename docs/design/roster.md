@@ -114,6 +114,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | 9 | Pit Lord | Extreme heavy with long cleaves | Very large target and slow recovery |
 | 10 | Goblin Tinker | Gadgets, mechanical reach, and rockets | Long setup and exposed body |
 | 11 | Goblin Alchemist | Ogre brawler with potion preparation | Slow body and buffs that require commitment |
+| 11b | Onyxia | Lady Katrana Prestor builds damage with shadow strings, then reveals the black dragon to finish the stock ([onyxia.md](onyxia.md)); she is selectable in the Alchemist's place and the Alchemist is hidden, not deleted | A kill-poor human form, then a huge dragon who cannot change back for five seconds |
 | 12 | Naga Sea Witch | Ground control and arcing projectiles | Slow air movement and exposed recovery |
 | 13 | Beastmaster | Three-animal pack coordination | Shared resources and punishable pet commands |
 | 14 | Dark Ranger | Marked targets and a single skeletal helper | Requires setup and must approach to cash in marks |
@@ -325,6 +326,16 @@ The map's description carries the same credits.
   for Tyrande, with every Smashcraft clip authored on it by
   smashcraft:tools/animations/tyrande-clips.ts. It is a 5,181-polygon model
   that draws only Warcraft III's own Classic textures, with no texture of its own.
+
+- [Katrana Prestor by Footman16](https://www.hiveworkshop.com/threads/katrana-prestor.362851/)
+  (Hive Workshop, approved and recommended, Classic SD models): `KatranaPrestorHero.mdx`
+  and its texture `KatranaPrestor.blp`, imported as
+  `war3mapImported\KatranaPrestorHero.mdx` for Onyxia's human form. It is an
+  843-polygon edit of AndrewOverload519's Female Human Mage and kangyun's Sally
+  Whitemane staff, both permissions posted on the page (read 31 October 2026,
+  smashcraft:docs/design/roster-next.md#onyxias-two-models-read-31-october-2026).
+  Its page asks only for credit. Its two command icons are crops of Hearthstone
+  art and are not imported; the select portrait is rendered from the model.
 
 Source terms read on 29 October 2026 from the Wayback Machine's 20 October
 2025 copy of the page: johnwar names Ujimasa Hojo's Archer, Dark Ranger,

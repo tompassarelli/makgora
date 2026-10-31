@@ -1,4 +1,5 @@
 import { respawnFighterFields } from "../../generated/state/fighterState";
+import { restoreHomeForm } from "./forms";
 import { restCannon, restFreezeTrap, restWater } from "./fighterRest";
 import { setWorldMotionValue } from "./motion";
 import { type Roster, fighterAt } from "./roster";
@@ -8,6 +9,7 @@ export function respawnFighter(world: Roster, slot: number, startX: number): voi
   const f = fighterAt(world, slot);
   clearGrabLinks(world, slot);
   clearSpecialOnStock(f);
+  restoreHomeForm(f);
   restCannon(f);
   restWater(f);
   restFreezeTrap(f);

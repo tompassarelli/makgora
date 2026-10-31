@@ -431,6 +431,17 @@ const TYRANDE: AuthoredSpecial = {
   ],
 };
 
+const DEEP_BREATH_HOLD: HitEffect = { ...hit(5.0, 80, 0.0, 0.0, HitElement.fire), setKnockback: 30.0 };
+const DEEP_BREATH_LANES = [90.0, 180.0, 270.0, 360.0, 450.0, 540.0] as const;
+const DEEP_BREATH: AuthoredSpecial = {
+  name: "Deep Breath", endFrame: 104, airStall: frames(1, 30),
+  projectiles: DEEP_BREATH_LANES.flatMap((x, lane): SpecialProjectile[] => [
+    { ...mark("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx", 18 + 4 * lane, 16, x), ...ON_FLOOR, cancelOnInterrupt: true },
+    { ...mark("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx", 34 + 4 * lane, 14, x), ...ON_FLOOR, radius: 60.0, activeFrom: 4, effect: DEEP_BREATH_HOLD, cancelOnInterrupt: true },
+    { ...mark("Doodads\\Cinematic\\FirePillarMedium\\FirePillarMedium.mdx", 66 + 3 * lane, 14, x), ...ON_FLOOR, radius: 64.0, activeFrom: 4, effect: hit(12.0, 70, 104.0, 40.0, HitElement.fire), cancelOnInterrupt: true },
+  ]),
+};
+
 /** Every fighter's ultimate, by character. */
 export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial | undefined } = {
   [Character.rifleman]: RIFLEMAN,
@@ -462,6 +473,8 @@ export const FIGHTER_ULTIMATES: { readonly [character: number]: AuthoredSpecial 
   [Character.archimonde]: ARCHIMONDE,
   [Character.butcher]: BUTCHER,
   [Character.tyrande]: TYRANDE,
+  [Character.onyxia]: DEEP_BREATH,
+  [Character.onyxiaDragon]: DEEP_BREATH,
 };
 
 /** The ultimate's official name and one-line description, for the move list and Moves page. */

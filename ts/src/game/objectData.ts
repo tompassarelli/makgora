@@ -4,7 +4,7 @@ import { RIFLEMAN_MODEL_FILE } from "./presentation/fighterAssetInfo";
 import { DEMON_HUNTER_MODEL_FILE } from "./presentation/demonHunterAssetInfo";
 import { characterModelScale } from "./presentation/modelScale";
 import { Character } from "./sim/codes";
-import { HERO_ROSTER, heroDefinition } from "./roster/kits";
+import { ALL_HEROES, heroDefinition } from "./roster/kits";
 import { heroLook } from "./roster/looks";
 
 export interface FighterObject {
@@ -71,13 +71,15 @@ export const FIGHTER_OBJECTS: Readonly<Record<Character, FighterObject>> = {
   [Character.akama]: heroObject(Character.akama),
   [Character.firelord]: heroObject(Character.firelord),
   [Character.alchemist]: heroObject(Character.alchemist),
+  [Character.onyxia]: heroObject(Character.onyxia),
+  [Character.onyxiaDragon]: heroObject(Character.onyxiaDragon),
   [Character.murloc]: heroObject(Character.murloc),
   [Character.ladyVashj]: heroObject(Character.ladyVashj),
   [Character.grom]: heroObject(Character.grom),
   [Character.malfurion]: heroObject(Character.malfurion),
 };
 
-export const FIGHTER_OBJECT_ORDER: readonly Character[] = [Character.demonHunter, ...HERO_ROSTER.map((hero) => hero.character)];
+export const FIGHTER_OBJECT_ORDER: readonly Character[] = [Character.demonHunter, ...ALL_HEROES.map((hero) => hero.character)];
 
 
 export const FILE_IO_OBJECT = {

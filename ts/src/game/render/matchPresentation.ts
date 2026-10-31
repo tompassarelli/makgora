@@ -21,7 +21,7 @@ import { mainDeckZAt } from "../sim/stage";
 import { confirmedItemCues, createItemCueObservation, observeItemCues } from "../presentation/itemLook";
 import { confirmedOrbCues, createOrbCueObservation, observeOrbCues } from "../presentation/orbLook";
 import { orbPoint, orbWarned } from "../sim/orbs";
-import { SELECTABLE_CHARACTERS } from "../roster/kits";
+import { RENDERED_FIGHTERS } from "../roster/kits";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { createBackdrop, createText, fitToWindow, gameUi, sizeText, styleMenuPanel } from "../ui/frames";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "../ui/hudLayout";
@@ -111,8 +111,8 @@ export class MatchPresentation {
   constructor(private readonly origin: Readonly<WorldOrigin>, private readonly banner: ResultsDisplay) {
     setSoundDuration(this.hoverSound, soundFileDuration(cueSound(MatchCue.hover)));
     setSoundVolume(this.hoverSound, 70);
-    for (const path of presentationSoundPaths(SELECTABLE_CHARACTERS, STAGE_CATALOG.map(stage => stage.id))) preloadAsset(path);
-    this.sounds.prepare(SoundKind.interfaceFile, interfaceSoundPaths(SELECTABLE_CHARACTERS));
+    for (const path of presentationSoundPaths(RENDERED_FIGHTERS, STAGE_CATALOG.map(stage => stage.id))) preloadAsset(path);
+    this.sounds.prepare(SoundKind.interfaceFile, interfaceSoundPaths(RENDERED_FIGHTERS));
     const parent = gameUi();
     this.countdown = createText("MatchCountdown", parent, 0);
     setFrameAbsPoint(this.countdown, FRAMEPOINT_CENTER, f32(0.4), f32(0.34));

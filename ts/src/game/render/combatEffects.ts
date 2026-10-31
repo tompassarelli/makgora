@@ -35,7 +35,7 @@ import { SoundBank, SoundKind } from "./soundBank";
 import { tierSoundPaths } from "../presentation/moveTiers";
 import type { ImpactEvents } from "../presentation/impactEvents";
 import { Character } from "../sim/codes";
-import { SELECTABLE_CHARACTERS } from "../roster/kits";
+import { RENDERED_FIGHTERS } from "../roster/kits";
 import { type ParkedFlags, type WorldOrigin, hideEffect, parkOnce, placeEffect } from "./effects";
 import { characterModelScale } from "../presentation/modelScale";
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
@@ -49,7 +49,7 @@ import { player } from "wisp/game/players";
 import { preloadAsset } from "wisp/game/files";
 import { stopSound } from "wisp/game/sound";
 
-const KO_VARIANTS = bodyVariants(SELECTABLE_CHARACTERS);
+const KO_VARIANTS = bodyVariants(RENDERED_FIGHTERS);
 const KO_FIGHTERS = KO_VARIANTS.length;
 const KO_BODY_COUNT = IMPACTS_PER_KIND * 2 * KO_FIGHTERS;
 const STAR_KO_FIRST = IMPACT_STAR_KO * IMPACTS_PER_KIND;
@@ -140,7 +140,7 @@ export class CombatEffects {
     this.z = origin.z;
     const parked: ParkedFlags = [];
     this.parked = parked;
-    const names = impactSoundNames(SELECTABLE_CHARACTERS);
+    const names = impactSoundNames(RENDERED_FIGHTERS);
     for (const path of tierSoundPaths()) preloadAsset(path);
     this.sounds.prepare(SoundKind.combatFile, names.files);
     this.sounds.prepare(SoundKind.combatLabel, names.labels);

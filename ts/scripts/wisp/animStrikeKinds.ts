@@ -24,6 +24,8 @@ export const SPELL_STRIKES: Readonly<Record<string, readonly string[]>> = {
   akama: ["neutral-special", "up-special", "down-special"],
   firelord: ["neutral-special", "up-special", "down-special"],
   "goblin-alchemist": ["neutral-special", "up-special", "down-special"],
+  onyxia: ["neutral-special", "side-special", "up-special", "down-special", "ultimate"],
+  "onyxia-dragon": ["neutral-special", "side-special", "up-special", "down-special", "ultimate"],
   "chen-stormstout": ["neutral-special", "ultimate"],
   "pit-lord": ["neutral-special", "up-special"],
   uther: ["neutral-special", "down-special", "ultimate"],

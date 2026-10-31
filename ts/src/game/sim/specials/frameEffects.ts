@@ -1,3 +1,4 @@
+import { becomeForm } from "../forms";
 import { cleansePoisonAndSlow } from "../heroStatus";
 import { toggleManaShield } from "../manaShield";
 import { toggleAuraOnFrame } from "../toggleAura";
@@ -37,6 +38,7 @@ export function applyFrameEffectsBeforePlacements(f: Fighter, move: Readonly<Aut
 }
 
 export function applyFrameEffectsAfterPlacements(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number): void {
+  if (move.becomes?.frame === frame) becomeForm(f, move.becomes.character);
   if (move.burst?.frame === frame) burstProjectiles(f, move.burst.from, move.burst.into);
   if (move.ritual?.frame === frame) {
     f.status.armorFrames = 0;

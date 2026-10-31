@@ -8,7 +8,7 @@ import { ANKH_BURST_MODEL } from "../../generated/assets/ankhAssetInfo";
 
 import { Character, ProjectileKind } from "../sim/codes";
 import type { Projectile } from "../sim/fighter";
-import { HERO_ROSTER, heroDefinition } from "../roster/kits";
+import { ALL_HEROES, heroDefinition } from "../roster/kits";
 import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import type { AuthoredSpecial, FighterSpecials, SpecialProjectile, TargetedStrike } from "../sim/specials/schema";
 import { specialPlacements } from "../sim/specials/placements";
@@ -124,7 +124,7 @@ export function ultimateProjectiles(character: Character): readonly SpecialProje
 
 export function allProjectileModels(): readonly string[] {
   const models: string[] = Object.values(ORIGINAL_PROJECTILE_MODELS);
-  for (const character of [Character.rifleman, Character.demonHunter, ...HERO_ROSTER.map((hero) => hero.character)]) {
+  for (const character of [Character.rifleman, Character.demonHunter, ...ALL_HEROES.map((hero) => hero.character)]) {
     for (const model of fighterProjectileModels(character)) if (!models.includes(model)) models.push(model);
   }
   return models;

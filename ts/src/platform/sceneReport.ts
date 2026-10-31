@@ -3,7 +3,7 @@
 
 import { installSceneReport, startSceneReport } from "wisp/src/platform/scene";
 import { FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH } from "../game/presentation/arenaCamera";
-import { HERO_ROSTER } from "../game/roster/kits";
+import { ALL_HEROES } from "../game/roster/kits";
 import { shellState } from "../host/loop/state";
 import { presentedFrame } from "../host/loop/presentedMatch";
 import { heroLook } from "../game/roster/looks";
@@ -25,6 +25,6 @@ export function startMatchSceneReport(): void {
       return Math.abs(z - ground) < 1.0 || z < ground - HIDDEN_EFFECT_DEPTH + 1.0;
     },
 
-    unitModel: (unitType) => HERO_ROSTER.map(({ character }) => heroLook(character)).find((look) => look?.objectId === unitType)?.model,
+    unitModel: (unitType) => ALL_HEROES.map(({ character }) => heroLook(character)).find((look) => look?.objectId === unitType)?.model,
   });
 }

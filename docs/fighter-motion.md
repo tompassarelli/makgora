@@ -624,5 +624,45 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Alchemist (WIP) | ledge-get-up | 4: Walk 1 | 112.9 | 31.1 | up; 58.6/52.2 |
 | Alchemist (WIP) | ledge-roll | 4: Walk 1 | 114.2 | 31.2 | forward; 107.3/108.7 |
 | Alchemist (WIP) | ledge-attack | 3: attack one -1 NEW | 140.2 | 38.2 | both; 73.2/135.7 |
+| Onyxia | walk | 6: Walk | 64.1 | 35.5 | forward; 57.9/63.6 |
+| Onyxia | dash | 6: Walk | 60.9 | 34.9 | forward; 58.2/60.6 |
+| Onyxia | run | 6: Walk | 57.1 | 27.1 | forward; 50.8/57.0 |
+| Onyxia | turn | 6: Walk | 25.1 | 9.5 | back; 16.4/19.6 |
+| Onyxia | brake | 6: Walk | 25.2 | 9.1 | in place; 18.8/15.5 |
+| Onyxia | jump-squat | 0: Stand - 1 | 0.0 | 0.0 | down; 0.0/0.0 |
+| Onyxia | roll-forward | 6: Walk | 64.6 | 35.7 | forward; 58.2/64.2 |
+| Onyxia | roll-back | 6: Walk | 64.6 | 35.7 | back; 64.2/58.2 |
+| Onyxia | spot-dodge | 0: Stand - 1 | 11.8 | 6.3 | in place; 4.0/11.7 |
+| Onyxia | air-dodge | 0: Stand - 1 | 12.2 | 6.2 | in place; 4.1/12.2 |
+| Onyxia | tech | 0: Stand - 1 | 12.3 | 6.3 | in place; 4.0/12.3 |
+| Onyxia | tech-forward | 0: Stand - 1 | 12.4 | 6.4 | forward; 4.1/12.3 |
+| Onyxia | tech-back | 0: Stand - 1 | 12.4 | 6.4 | back; 12.3/4.1 |
+| Onyxia | get-up | 0: Stand - 1 | 12.0 | 6.3 | up; 6.2/4.1 |
+| Onyxia | get-up-forward | 0: Stand - 1 | 12.2 | 6.2 | forward; 4.1/12.2 |
+| Onyxia | get-up-back | 0: Stand - 1 | 12.2 | 6.2 | back; 12.2/4.1 |
+| Onyxia | get-up-attack | 2: Attack -1 | 159.5 | 68.8 | both; 102.6/91.4 |
+| Onyxia | ledge-get-up | 6: Walk | 64.0 | 35.5 | up; 42.1/30.9 |
+| Onyxia | ledge-roll | 6: Walk | 62.3 | 35.3 | forward; 58.2/61.8 |
+| Onyxia | ledge-attack | 2: Attack -1 | 159.5 | 69.0 | both; 100.5/90.9 |
+| Onyxia | walk | 3: Walk | 183.0 | 15.0 | forward; 118.4/27.6 |
+| Onyxia | dash | 3: Walk | 180.3 | 14.8 | forward; 116.9/28.9 |
+| Onyxia | run | 3: Walk | 185.5 | 17.3 | forward; 126.0/23.2 |
+| Onyxia | turn | 3: Walk | 48.2 | 6.6 | back; 28.0/8.5 |
+| Onyxia | brake | 3: Walk | 34.2 | 5.1 | in place; 20.3/7.1 |
+| Onyxia | jump-squat | 0: Stand - 1 | 0.0 | 0.0 | down; 0.0/0.0 |
+| Onyxia | roll-forward | 3: Walk | 183.0 | 15.1 | forward; 118.4/28.7 |
+| Onyxia | roll-back | 3: Walk | 183.0 | 15.1 | back; 28.7/118.4 |
+| Onyxia | spot-dodge | 2: Stand - 3 | 184.4 | 32.4 | in place; 59.2/34.4 |
+| Onyxia | air-dodge | 2: Stand - 3 | 183.2 | 32.8 | in place; 64.5/34.7 |
+| Onyxia | tech | 0: Stand - 1 | 173.1 | 22.9 | in place; 63.6/32.5 |
+| Onyxia | tech-forward | 0: Stand - 1 | 173.0 | 23.0 | forward; 63.4/32.6 |
+| Onyxia | tech-back | 0: Stand - 1 | 173.0 | 23.0 | back; 32.6/63.4 |
+| Onyxia | get-up | 2: Stand - 3 | 182.2 | 32.2 | up; 180.9/46.7 |
+| Onyxia | get-up-forward | 0: Stand - 1 | 173.2 | 22.9 | forward; 63.6/32.5 |
+| Onyxia | get-up-back | 0: Stand - 1 | 173.2 | 22.9 | back; 32.5/63.6 |
+| Onyxia | get-up-attack | 1: Attack 1 | 186.2 | 51.6 | both; 89.8/55.8 |
+| Onyxia | ledge-get-up | 3: Walk | 183.0 | 15.0 | up; 144.7/33.2 |
+| Onyxia | ledge-roll | 3: Walk | 182.8 | 15.1 | forward; 118.8/28.9 |
+| Onyxia | ledge-attack | 1: Attack 1 | 186.9 | 51.5 | both; 87.7/55.8 |
 
 Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floaters Firelord and Lady Vashj. Warden, Tyrande and Jaina are grounded and their models carry a single stock Walk, so Tyrande runs on an authored `Movement run` (tools/animations/run-clips.ts, #834) whose stride is measured over the grounded vertices that move, leaving the hem and pelvis out. Warden walks on that clip (`--walk`), which her stride lock holds at 3.38x with no slide, and runs and dashes on her stock Walk, which needs 6.17x at run speed and 5.36x at dash speed, so her cap is 6.25x (groundLocomotionRateCap) instead of 5x and her feet stay on the ground at both (Tom asked for this split on 2026-10-31). Jaina (about 1.15x) is marginal and stays on her walk.

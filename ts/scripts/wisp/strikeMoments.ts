@@ -9,7 +9,7 @@ import { attackPose, clipFor, ownAttackClip } from "../../src/game/presentation/
 import { SPECIAL_KEY } from "../../src/game/presentation/heroStrikeMomentKeys";
 import { SPECIAL_SLOTS } from "../../src/game/presentation/projectileArt";
 import { AttackStyle, Character } from "../../src/game/sim/codes";
-import { HERO_ROSTER } from "../../src/game/roster/kits";
+import { ALL_HEROES } from "../../src/game/roster/kits";
 import { DrawnModel } from "./drawnModel";
 import { heroLook } from "../../src/game/roster/looks";
 
@@ -60,7 +60,7 @@ function measure(drawn: DrawnModel, character: number, style: number, clip: numb
 
 export async function measureStrikeMoments(modelBytes: (model: string) => Promise<ArrayBuffer>, only?: ReadonlySet<number>): Promise<StrikeMoment[]> {
   const moments: StrikeMoment[] = [];
-  for (const hero of HERO_ROSTER) {
+  for (const hero of ALL_HEROES) {
     if (only !== undefined && !only.has(hero.character)) continue;
     const bytes = await modelBytes(heroLook(hero.character)!.model);
     const sequences = parseMDX(bytes).Sequences;

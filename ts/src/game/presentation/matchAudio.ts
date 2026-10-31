@@ -104,6 +104,8 @@ const RACES: Readonly<Record<Character, Race>> = {
   32: Race.nightElf,
   33: Race.orc,
   34: Race.orc,
+  35: Race.human,
+  36: Race.human,
 };
 
 export const characterRace = (character: Character): Race => RACES[character];
@@ -160,6 +162,8 @@ const VOICES: Readonly<Record<Exclude<Character, DialogueVoiced>, readonly [stri
   32: ["Units\\Other\\DranaiAkama\\", "Akama"],
   33: ["Units\\Creeps\\HeroFlameLord\\", "HeroFireLord"],
   34: ["Units\\Creeps\\HeroGoblinAlchemist\\", "HeroAlchemist"],
+  35: ["Units\\Human\\Sorceress\\", "Sorceress", "What", "YesAttack"],
+  36: ["Units\\Human\\Sorceress\\", "Sorceress", "What", "YesAttack"],
 };
 
 const MURLOC_MOVE_TAKES = 3;
@@ -220,6 +224,8 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.akama]: "stand - var4",
   [Character.firelord]: "stand ready",
   [Character.alchemist]: "stand 3",
+  [Character.onyxia]: "spell",
+  [Character.onyxiaDragon]: "stand 3",
 };
 
 export const victoryAnimation = (character: Character): string => VICTORY_ANIMATIONS[character];
