@@ -48,7 +48,7 @@ on:
 run-name: Balance ${{ inputs.ref }} ${{ inputs.lane }} ${{ inputs.opponent }} ${{ inputs.tier }} ${{ inputs.per-pair }} a pair ${{ inputs.tag }}
 
 concurrency:
-  group: balance ${{ inputs.lane || 'main' }} ${{ inputs.opponent }} ${{ inputs.tier }} ${{ inputs.per-pair }} ${{ inputs.matchups && inputs.tag }} ${{ inputs.ledge-rule }}
+  group: balance ${{ inputs.ref == 'main' && github.sha || inputs.ref }} ${{ inputs.lane || 'main' }} ${{ inputs.opponent }} ${{ inputs.tier }} ${{ inputs.per-pair }} ${{ inputs.matchups && inputs.tag }} ${{ inputs.ledge-rule }}
   cancel-in-progress: true
 
 permissions:
