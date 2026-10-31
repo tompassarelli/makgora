@@ -1,12 +1,14 @@
 import { min } from "../core/numbers";
 import { addFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
+import { f32 } from "wisp/src/sim/f32";
 import { DownState, SpecialAction } from "./codes";
 import { isAerialAttack } from "./moves";
 import { finishLanding } from "./down";
 import { type Fighter, PLATFORM_DROP_INPUT_WINDOW } from "./fighter";
-import { setWorldMotionValue, totalVelocityZ } from "./motion";
+import { setWorldMotionValue, slopedLandingZ, totalVelocityZ } from "./motion";
 import type { Controls } from "./roster";
-import { surfaceCount, surfaceLeft, surfacePass, surfaceRight, surfaceZ } from "./stage";
+import { type GroundLine, surfaceCount, surfaceLeft, surfaceLine, surfaceMoves, surfacePass, surfaceRight, surfaceShiftX, surfaceShiftZ, surfaceZ } from "./stage";
+import { heroMotionPassesPlatforms } from "./specials/heroMotion";
 import { stickX, stickZ } from "./stick";
 import { bodyTop } from "./surfaces";
 import { clearDash } from "./groundMovement";
@@ -96,4 +98,60 @@ export function belowStandingPlatform(attacker: Readonly<Fighter>, target: Reado
   const { motion } = attacker;
   if (stage === undefined || !motion.grounded || motion.surface === undefined || !surfacePass(stage, motion.surface)) return false;
   return addFloat32(target.motion.z, melee(bodyTop(target.character))) < motion.z;
+}
+
+const landingRise: { value: number | undefined } = { value: undefined };
+
+function landingRiseOf(f: Fighter): number {
+  if (landingRise.value === undefined) landingRise.value = totalVelocityZ(f);
+  return landingRise.value;
+}
+
+function slopedLandingCandidate(f: Fighter, line: GroundLine, standing: boolean, oldX: number, oldZ: number, bestZ: number | undefined): number | undefined {
+  const { motion } = f;
+  const lineZ = slopedLandingZ(line, standing, oldX, oldZ, motion.x, motion.z);
+  if (lineZ === undefined || (bestZ !== undefined && lineZ <= bestZ)) return undefined;
+  return landingRiseOf(f) > 0 ? undefined : lineZ;
+}
+
+function crossesPlatformInBounds(f: Fighter, stage: number, matchFrame: number, i: number, fromX: number, fromZ: number, platformZ: number): boolean {
+  const { motion } = f;
+  const fraction = fromZ === motion.z ? 1.0 : f32(f32(fromZ - platformZ) / f32(fromZ - motion.z));
+  const crossingX = f32(fromX + f32(f32(motion.x - fromX) * fraction));
+  const left = surfaceLeft(stage, i, matchFrame);
+  const right = surfaceRight(stage, i, matchFrame);
+  return crossingX >= left && crossingX <= right && motion.x >= left && motion.x <= right;
+}
+
+function platformLandingCandidate(f: Fighter, stage: number, matchFrame: number, i: number, carried: number | undefined, oldX: number, oldZ: number, bestZ: number | undefined): number | undefined {
+  const { motion } = f;
+  const platformZ = surfaceZ(stage, i, matchFrame);
+  const follows = i !== carried && surfaceMoves(stage, i);
+  const fromZ = follows ? f32(oldZ + surfaceShiftZ(stage, i, matchFrame)) : oldZ;
+  if (!(fromZ >= platformZ && motion.z <= platformZ)) return undefined;
+  const rise = landingRiseOf(f);
+  if ((follows ? f32(rise - surfaceShiftZ(stage, i, matchFrame)) : rise) > 0) return undefined;
+  const fromX = follows ? f32(oldX + surfaceShiftX(stage, i, matchFrame)) : oldX;
+  const inBounds = crossesPlatformInBounds(f, stage, matchFrame, i, fromX, fromZ, platformZ);
+  return inBounds && (bestZ === undefined || platformZ > bestZ) ? platformZ : undefined;
+}
+
+export function landingDeck(f: Fighter, stage: number, matchFrame: number, oldX: number, oldZ: number, carried: number | undefined): number | undefined {
+  landingRise.value = undefined;
+  let landing: number | undefined;
+  let landingZ = 0.0;
+  const passesPlatforms = heroMotionPassesPlatforms(f);
+  for (let i = 0; i < surfaceCount(stage); i++) {
+    if (passesPlatforms && i !== 0) continue;
+    const bestZ = landing === undefined ? undefined : landingZ;
+    const line = surfaceLine(stage, i);
+    const candidateZ =
+      line !== undefined
+        ? slopedLandingCandidate(f, line, i === carried, oldX, oldZ, bestZ)
+        : platformLandingCandidate(f, stage, matchFrame, i, carried, oldX, oldZ, bestZ);
+    if (candidateZ === undefined) continue;
+    landing = i;
+    landingZ = candidateZ;
+  }
+  return landing;
 }

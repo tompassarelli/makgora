@@ -40,7 +40,7 @@ import {
 } from "./fighter";
 import { advanceGroundMovement, clearDash, readLandingExit, restingTraction, wantsCrouch } from "./groundMovement";
 import { heroEgg, jumpCancelHeroSpecial } from "./specials/engine";
-import { heroFloats, heroMotionHolds, heroMotionPassesPlatforms, heroSpecialJumps } from "./specials/heroMotion";
+import { heroFloats, heroMotionHolds, heroSpecialJumps } from "./specials/heroMotion";
 import { tickEmpowered } from "./specials/empowered";
 import { carryHeroStatus, heroStatusFall } from "./heroStatus";
 import { closeParasol, endParasolAerial, parasolFall, reopenParasol } from "./parasol";
@@ -58,9 +58,7 @@ import {
   moveMeleeVerticalVelocity,
   moveMeleeX,
   moveMeleeZ,
-  slopedLandingZ,
   totalVelocityX,
-  totalVelocityZ,
 } from "./motion";
 import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
@@ -327,53 +325,6 @@ function moveHorizontally(f: Fighter, stage: number, matchFrame: number, dashEnt
   moveMeleeX(f, shield.recoilX);
 }
 
-
-
-
-
-
-
-
-
-function landingDeck(f: Fighter, stage: number, matchFrame: number, oldX: number, oldZ: number, carried: number | undefined): number | undefined {
-  const { motion } = f;
-
-  let rise: number | undefined;
-  let landing: number | undefined;
-  let landingZ = 0.0;
-  const passesPlatforms = heroMotionPassesPlatforms(f);
-  for (let i = 0; i < stageSurfaces.surfaceCount(stage); i++) {
-    if (passesPlatforms && i !== 0) continue;
-    const line = stageSurfaces.surfaceLine(stage, i);
-    if (line !== undefined) {
-      const lineZ = slopedLandingZ(line, i === carried, oldX, oldZ, motion.x, motion.z);
-      if (lineZ === undefined || (landing !== undefined && lineZ <= landingZ)) continue;
-      if (rise === undefined) rise = totalVelocityZ(f);
-      if (rise > 0) continue;
-      landing = i;
-      landingZ = lineZ;
-      continue;
-    }
-    const platformZ = stageSurfaces.surfaceZ(stage, i, matchFrame);
-    const follows = i !== carried && stageSurfaces.surfaceMoves(stage, i);
-    const fromZ = follows ? f32(oldZ + stageSurfaces.surfaceShiftZ(stage, i, matchFrame)) : oldZ;
-    if (!(fromZ >= platformZ && motion.z <= platformZ)) continue;
-    if (rise === undefined) rise = totalVelocityZ(f);
-    if ((follows ? f32(rise - stageSurfaces.surfaceShiftZ(stage, i, matchFrame)) : rise) > 0) continue;
-    const fromX = follows ? f32(oldX + stageSurfaces.surfaceShiftX(stage, i, matchFrame)) : oldX;
-    const fraction = fromZ === motion.z ? 1.0 : f32(f32(fromZ - platformZ) / f32(fromZ - motion.z));
-    const crossingX = f32(fromX + f32(f32(motion.x - fromX) * fraction));
-    const left = stageSurfaces.surfaceLeft(stage, i, matchFrame);
-    const right = stageSurfaces.surfaceRight(stage, i, matchFrame);
-    if (crossingX >= left && crossingX <= right && motion.x >= left && motion.x <= right) {
-      if (landing === undefined || platformZ > landingZ) {
-        landing = i;
-        landingZ = platformZ;
-      }
-    }
-  }
-  return landing;
-}
 export function advanceShieldFrameTimers(f: Fighter, input: Readonly<Controls>, carrying: boolean): boolean {
   const { shield, dodge, status } = f;
   const forcedShield = shield.raised && shield.stun > 0;
@@ -423,7 +374,7 @@ export function resolveSurfaceMotion(f: Fighter, world: Roster, slot: number, st
   rideWall(f, wallSide, frameDeltaX, frameDeltaZ, oldX, oldZ);
 
   const ascending = edge === EdgePass.none && !teleportsThisFrame(f) && platforms.mountPlatform(f, stage, matchFrame, input);
-  const landing = edge === EdgePass.land ? 0 : edge !== EdgePass.none || ascending ? undefined : landingDeck(f, stage, matchFrame, oldX, oldZ, carried);
+  const landing = edge === EdgePass.land ? 0 : edge !== EdgePass.none || ascending ? undefined : platforms.landingDeck(f, stage, matchFrame, oldX, oldZ, carried);
   const contact = platforms.passesThroughPlatform(f, stage, input, landing);
   if (landing !== undefined && !contact) {
     finishLanding(f, stage, matchFrame, input, landing, false);
