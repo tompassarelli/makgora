@@ -101,6 +101,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Alchemist (WIP) | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, side special, short hop, back air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 20% → up air against 5/5 DI |
 | Alchemist (WIP) | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, side special, grab, back throw, dash, dash attack, side special; missed tech forward smash; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, side special, grab, back throw, dash, dash attack, side special covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Alchemist (WIP) | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, down special; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Onyxia | light | yes | yes | yes | yes | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, up throw, forward smash; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
+| Onyxia | medium | yes | yes | yes | yes | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Onyxia | heavy | yes | yes | yes | **no** | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 
 ## True combos from each throw
 
@@ -480,4 +483,16 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Alchemist (WIP) | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Alchemist (WIP) | heavy | up throw | 1/1 in forward tilt, out side special | 1/1 | 1/1 KD in up smash, out forward smash | 1/1 in up smash, out down smash |
 | Alchemist (WIP) | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Onyxia | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Onyxia | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Onyxia | light | up throw | 1/1 in up smash, out forward smash | 1/1 KD in up smash, out forward smash | 2/1 in up smash, out forward smash | 1/1 in up smash, out forward smash |
+| Onyxia | light | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
+| Onyxia | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Onyxia | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Onyxia | medium | up throw | 1/1 in up smash, out forward smash | 1/1 KD in up smash, out forward smash | 1/1 in forward smash, out short hop, down air | 2/1 in up smash, out short hop, down air |
+| Onyxia | medium | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
+| Onyxia | heavy | forward throw | 0/0 | 1/0 | 0/0 KD | 0/0 KD |
+| Onyxia | heavy | back throw | 1/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Onyxia | heavy | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 |
+| Onyxia | heavy | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
 
