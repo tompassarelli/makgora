@@ -11,6 +11,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
 `bun tools/animations/recovery-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` from
   the repository root appends fighter recovery and transition clips before
   storing their families and refreshing the clip pool (smashcraft:docs/fighter-animation-work.md).
+  `--replace-pose POSE` re-keys that action's root motion in place on each shipped model that
+  carries it (smashcraft:tools/animations/recovery-actions.ts holds the poses), checking every other sequence draws unchanged;
+  the turn is a pure yaw, upright on every frame, because a lean read as tipping over backward
+  under Blademaster's back banner (Tom's playtest, 2026-11-01).
   `bun tools/animations/drill-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` appends
   Blademaster, Warden and Shadow Hunter down-air drills, preserving earlier
   clips and writing both-facing silhouette sheets for the native review.

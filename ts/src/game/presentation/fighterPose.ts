@@ -154,6 +154,13 @@ const clipRate = (seconds: number, frames: number): number => f32(seconds / f32(
 
 
 
+function advanceMotion(pose: FighterPose, fighter: Readonly<Fighter>, controls: Readonly<Controls>, world: Readonly<Roster>): void {
+  const flipped = pose.motion.previousFacing !== 0 && fighter.facing !== pose.motion.previousFacing;
+  advanceIllidanMotion(pose.motion, fighter, controls, world);
+  if (flipped && pose.motion.motion === IllidanLocomotion.turn && pose.animation === motionKey(IllidanLocomotion.turn)) pose.animation = "";
+}
+
+
 export function advanceFighterPose(
   pose: FighterPose, fighter: Readonly<Fighter>, world: Readonly<Roster>, controls: Readonly<Controls>,
   wasOut: boolean, jumped: boolean, attacked: boolean, hit: boolean,
@@ -165,7 +172,7 @@ export function advanceFighterPose(
   const charging = fighter.attack.smashCharging || (fighter.attack.smashChargeAllowed && controls.attackHeld && isSmashAttack(fighter.attack.style));
   if (attacked && phase !== AttackPhase.none && !charging) selectAttackClip(pose, fighter);
   if (phase !== AttackPhase.none) followFlurryClock(pose, fighter);
-  advanceIllidanMotion(pose.motion, fighter, controls, world);
+  advanceMotion(pose, fighter, controls, world);
   if (hit) {
     pose.motion.escapeRemaining = 0;
     pose.motion.respawnRemaining = 0;

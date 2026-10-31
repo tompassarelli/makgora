@@ -117,8 +117,15 @@ export function advanceIllidanMotion(history: IllidanMotion, fighter: Readonly<F
     && (ground.pivotGraceFrames > 0 || f32(motion.vx * fighter.facing) < 0)) {
     history.motion = IllidanLocomotion.idle;
     history.transitionRemaining = 0;
-  } else if (controls.direction !== 0 && history.previousFacing !== 0
-    && (fighter.facing !== history.previousFacing || (ground.action !== GroundAction.dash && f32(motion.vx * controls.direction) < 0))) {
+  } else if (controls.direction !== 0 && history.previousFacing !== 0 && fighter.facing !== history.previousFacing) {
+    history.motion = IllidanLocomotion.turn;
+    history.transitionRemaining = TRANSITION_FRAMES;
+  } else if (ground.action === GroundAction.turnRun && controls.direction !== 0 && controls.direction !== fighter.facing) {
+    if (history.motion !== IllidanLocomotion.stop) {
+      history.motion = IllidanLocomotion.stop;
+      history.transitionRemaining = TRANSITION_FRAMES;
+    } else if (history.transitionRemaining > 0) history.transitionRemaining--;
+  } else if (controls.direction !== 0 && history.previousFacing !== 0 && ground.action !== GroundAction.dash && f32(motion.vx * controls.direction) < 0) {
     history.motion = IllidanLocomotion.turn;
     history.transitionRemaining = TRANSITION_FRAMES;
   } else if (controls.direction === 0 && history.previouslyMoving

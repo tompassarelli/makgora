@@ -1,23 +1,98 @@
-
-
 import { chmodSync, cpSync, lstatSync, mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, model as mdx } from "war3-model";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { Character } from "../../ts/src/game/sim/codes";
-import { DOWN_DAMAGE_FRAMES } from "../../ts/src/game/sim/down";
-import { authoredPhysics } from "../../ts/src/game/sim/tuning";
 import { seconds } from "./asset-info";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
 import { fighters } from "../../ts/scripts/heroModelSource";
+import { type Action, actions, phaseAt, quaternion } from "./recovery-actions";
 
 const args = process.argv.slice(2);
+const valued = new Set(["--fighter", "--replace-pose"]);
 const only = args.flatMap((arg, i) => args[i - 1] === "--fighter" ? [arg.toLowerCase()] : []);
-const [assets, output] = args.filter((arg, i) => !arg.startsWith("--") && args[i - 1] !== "--fighter").map(p => resolve(p));
+const replacing = args.flatMap((arg, i) => args[i - 1] === "--replace-pose" ? [arg] : []);
+const [assets, output] = args.filter((arg, i) => !arg.startsWith("--") && !valued.has(args[i - 1] ?? "")).map(p => resolve(p));
 const metadataOnly = args.includes("--metadata-only");
-ensure(assets && output, "usage: bun tools/animations/recovery-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--fighter NAME]... [--metadata-only]");
+ensure(assets && output, "usage: bun tools/animations/recovery-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--fighter NAME]... [--metadata-only | --replace-pose POSE...]");
+
 const project = resolve(import.meta.dir, "../..");
 ensure(relative(project, output).startsWith(".."), "Derived models must stay outside the checkout");
+
+function keyMotion(model: mdx.Model, helper: mdx.Helper, action: Action, index: number, start: number, label: string): void {
+  const translation: mdx.AnimKeyframe[] = [];
+  for (let frame = 0; frame <= action.frames; frame++) {
+    const p = phaseAt(action.phases, frame / action.frames), Frame = Math.round(start + frame * 1000 / 60);
+    helper.Rotation?.Keys.push({ Frame, Vector: quaternion(p.roll + p.lean, p.yaw) });
+    helper.Scaling?.Keys.push({ Frame, Vector: new Float32Array([1, 1, 1 - p.tuck]) });
+    const key = { Frame, Vector: new Float32Array([0, 0, p.height]) };
+    translation.push(key); helper.Translation?.Keys.push(key);
+  }
+  for (const track of [helper.Rotation, helper.Translation, helper.Scaling]) track?.Keys.sort((a, b) => a.Frame - b.Frame);
+  if (action.airborne) return;
+  const drawn = new DrawnModel(generateMDX(model), 1);
+  for (let frame = 0; frame <= action.frames; frame++) {
+    const triangle = drawn.triangles(index, frame / 60, 1);
+    let lowest = Infinity;
+    for (let i = 1; i < triangle.length; i += 2) lowest = Math.min(lowest, triangle[i] ?? Infinity);
+    ensure(Number.isFinite(lowest), `${label}: invisible body`);
+    const p = phaseAt(action.phases, frame / action.frames);
+    translation[frame]!.Vector[2] -= lowest - p.height;
+  }
+}
+
+function moves(drawn: DrawnModel, index: number, frames: number): number {
+  const first = drawn.triangles(index, 0, 1);
+  let motion = 0;
+  for (let frame = 1; frame <= frames; frame++) {
+    const after = drawn.triangles(index, frame / 60, 1);
+    ensure(first.length === after.length, `sequence ${index}: body disappears`);
+    for (let i = 0; i < first.length; i += 2) motion = Math.max(motion,
+      Math.hypot((after[i] ?? 0) - (first[i] ?? 0), (after[i + 1] ?? 0) - (first[i + 1] ?? 0)));
+  }
+  return motion;
+}
+
+if (replacing.length > 0) {
+  ensure(!metadataOnly, "--replace-pose re-keys shipped models; it takes no --metadata-only");
+  for (const [character, fighter] of fighters.entries()) {
+    if (only.length > 0 && !only.includes(fighter.name.toLowerCase())) continue;
+    const shipped = parseSource(await Bun.file(join(assets, fighter.source)).arrayBuffer());
+    if (!shipped.Helpers.some(n => n.Name === "Recovery Motion")) continue;
+    const model = structuredClone(shipped);
+    const moved = model.Helpers.find(n => n.Name === "Recovery Motion");
+    ensure(moved, `${fighter.name}: no Recovery Motion helper`);
+    const replaced = new Set<number>();
+    for (const pose of replacing) {
+      const action = actions(character).find(a => a.pose === pose);
+      ensure(action, `${fighter.name}: no recovery action ${pose}`);
+      const index = model.Sequences.findIndex(s => s.Name === `Recovery ${pose}`);
+      const sequence = model.Sequences[index];
+      ensure(sequence, `${fighter.name}: no Recovery ${pose} sequence`);
+      const [start = 0, end = 0] = sequence.Interval;
+      ensure(end === start + Math.round(action.frames * 1000 / 60), `${fighter.name}/${pose}: action length changed`);
+      for (const track of [moved.Rotation, moved.Translation, moved.Scaling]) if (track) track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end);
+      keyMotion(model, moved, action, index, start, `${fighter.name}/${pose}`);
+      replaced.add(index);
+    }
+    const before = new DrawnModel(generateMDX(shipped), 1);
+    const encoded = encodeVerified(parseSource(generateMDX(model)));
+    const after = new DrawnModel(encoded, 1);
+    for (const [index, sequence] of shipped.Sequences.entries()) {
+      if (replaced.has(index)) continue;
+      for (const progress of [0, 0.5, 1]) {
+        const time = (sequence.Interval[1] - sequence.Interval[0]) * progress / 1000;
+        const a = before.triangles(index, time, 1), b = after.triangles(index, time, 1);
+        ensure(a.length === b.length && a.every((v, i) => Math.abs(v - (b[i] ?? Infinity)) < 0.001), `${fighter.name}/${sequence.Name}: an unrelated posed body changed`);
+      }
+    }
+    for (const index of replaced) ensure(moves(after, index, Math.round((shipped.Sequences[index]!.Interval[1] - shipped.Sequences[index]!.Interval[0]) * 60 / 1000)) >= 5, `${fighter.name}/${shipped.Sequences[index]!.Name}: held stance instead of an action`);
+    mkdirSync(join(output, fighter.source, ".."), { recursive: true });
+    await Bun.write(join(output, fighter.source), encoded);
+    console.log(`RECOVERY_CLIPS_REPLACED ${fighter.name}: ${replacing.join(", ")} re-keyed in place, every other sequence unchanged`);
+  }
+  process.exit(0);
+}
 mkdirSync(output, { recursive: true });
 for (const family of metadataOnly ? [] : ["animation-assets", "hero-models"]) {
   ensure(lstatSync(join(output, family), { throwIfNoEntry: false })?.isSymbolicLink() !== true,
@@ -26,57 +101,6 @@ for (const family of metadataOnly ? [] : ["animation-assets", "hero-models"]) {
   chmodSync(join(output, family), 0o755);
 }
 
-interface Phase { readonly at: number; readonly roll?: number; readonly yaw?: number; readonly lean?: number; readonly tuck?: number; readonly height?: number }
-interface Action { readonly pose: string; readonly frames: number; readonly phases: readonly Phase[]; readonly airborne?: boolean; readonly attack?: boolean }
-const roll = (sign: number, down = false): readonly Phase[] => [
-  { at: 0, roll: down ? sign * 90 : 0, tuck: down ? 0.25 : 0 },
-  { at: 0.14, roll: sign * 30, tuck: 0.28 },
-  { at: 0.35, roll: sign * 135, tuck: 0.3 },
-  { at: 0.65, roll: sign * 265, tuck: 0.3 },
-  { at: 0.86, roll: sign * 350, tuck: 0.18 },
-  { at: 1, roll: sign * 360, tuck: 0 },
-];
-const LYING_KNOCKDOWN = new Set<Character>([Character.archimonde]);
-const lying = (character: Character): Action[] => !LYING_KNOCKDOWN.has(character) ? [] : [
-  { pose: "knockdown", frames: 30, phases: [{ at: 0 }, { at: 0.35, roll: 55, tuck: 0.08 }, { at: 0.8, roll: 90 }, { at: 1, roll: 90 }] },
-  { pose: "downDamage", frames: DOWN_DAMAGE_FRAMES, phases: [{ at: 0, roll: 90 }, { at: 0.3, roll: 90, height: 10 }, { at: 1, roll: 90 }] },
-];
-function actions(character: Character): Action[] {
-  const transitions: Action[] = [
-    { pose: "turn", frames: 8, phases: [{ at: 0, yaw: 180 }, { at: 0.4, yaw: 110, lean: -15 }, { at: 1, yaw: 0 }] },
-    { pose: "stop", frames: 8, phases: [{ at: 0, lean: -20 }, { at: 0.4, lean: -25, tuck: 0.12 }, { at: 1 }] },
-    { pose: "jumpSquat", frames: authoredPhysics(character).jumpSquatFrames, phases: [{ at: 0 }, { at: 0.6, tuck: 0.28, lean: 15 }, { at: 1, tuck: 0.3, lean: 12 }] },
-    { pose: "airDodge", frames: 49, airborne: true, phases: [{ at: 0 }, { at: 0.08, tuck: 0.25, lean: -32 }, { at: 0.55, tuck: 0.25, lean: -32 }, { at: 1, lean: -10 }] },
-    { pose: "tech", frames: 26, phases: [{ at: 0, roll: 85, tuck: 0.2 }, { at: 0.3, roll: 50, tuck: 0.35 }, { at: 0.65, roll: -10, tuck: 0.16 }, { at: 1 }] },
-    { pose: "techForward", frames: 40, phases: roll(-1, true) },
-    { pose: "techBackward", frames: 40, phases: roll(1, true) },
-    { pose: "getUpRollForward", frames: 35, phases: roll(-1, true) },
-    { pose: "getUpRollBackward", frames: 35, phases: roll(1, true) },
-  ];
-  if (character < 3) return transitions;
-  return [...lying(character), ...transitions,
-    { pose: "rollForward", frames: 31, phases: roll(-1) },
-    { pose: "rollBackward", frames: 31, phases: roll(1) },
-    { pose: "spotDodge", frames: 22, phases: [{ at: 0 }, { at: 0.1, lean: -35, tuck: 0.22 }, { at: 0.7, lean: -35, tuck: 0.22 }, { at: 1 }] },
-    { pose: "getUp", frames: 30, phases: [{ at: 0, roll: 90 }, { at: 0.3, roll: 70, tuck: 0.2 }, { at: 0.75, roll: 15, tuck: 0.1 }, { at: 1 }] },
-    { pose: "getUpAttack", frames: 49, attack: true, phases: [{ at: 0, roll: 90 }, { at: 0.2, roll: 65 }, { at: 16 / 49, roll: 15, yaw: 0 }, { at: 19 / 49, roll: 15, yaw: 180 }, { at: 0.65, roll: 8, yaw: 180 }, { at: 1, yaw: 360 }] },
-    { pose: "ledgeClimb", frames: 25, phases: [{ at: 0, lean: 65, height: -60 }, { at: 0.45, lean: 30, height: -15 }, { at: 1 }] },
-    { pose: "ledgeRoll", frames: 36, phases: roll(-1, true) },
-    { pose: "ledgeAttack", frames: 40, attack: true, phases: [{ at: 0, lean: 65, height: -60 }, { at: 0.3, lean: 20, height: -10 }, { at: 0.5, lean: 15 }, { at: 1 }] },
-  ];
-}
-function phaseAt(phases: readonly Phase[], t: number): Required<Omit<Phase, "at">> {
-  const a = phases.findLast(p => p.at <= t) ?? phases[0];
-  const b = phases.find(p => p.at >= t) ?? phases.at(-1);
-  ensure(a && b, "Empty motion phases");
-  const blend = a.at === b.at ? 0 : (t - a.at) / (b.at - a.at);
-  const v = (key: keyof Omit<Phase, "at">) => (a[key] ?? 0) * (1 - blend) + (b[key] ?? 0) * blend;
-  return { roll: v("roll"), yaw: v("yaw"), lean: v("lean"), tuck: v("tuck"), height: v("height") };
-}
-function quaternion(y: number, z: number): Float32Array<ArrayBuffer> {
-  const a = y * Math.PI / 360, b = z * Math.PI / 360;
-  return new Float32Array([-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)]);
-}
 const infoPath = join(project, "ts/src/game/presentation/recoveryClipInfo.ts");
 const generated = new Map<number, string[]>(only.length === 0 ? [] : [...(await Bun.file(infoPath).text()).matchAll(/^  (\d+): \{\n[\s\S]*?\n  \},$/gm)].map(block => [Number(block[1]), block[0].split("\n")] as const));
 const records: unknown[] = [];
@@ -137,26 +161,7 @@ for (const [character, fighter] of fighters.entries()) {
         track.Keys.push({ ...key, Frame: Math.round(start + (key.Frame - channelDonor.Interval[0]) * (end - start) / (channelDonor.Interval[1] - channelDonor.Interval[0])) });
       }
     });
-    const translation: mdx.AnimKeyframe[] = [];
-    for (let frame = 0; frame <= action.frames; frame++) {
-      const p = phaseAt(action.phases, frame / action.frames), Frame = Math.round(start + frame * 1000 / 60);
-      helper.Rotation?.Keys.push({ Frame, Vector: quaternion(p.roll + p.lean, p.yaw) });
-      helper.Scaling?.Keys.push({ Frame, Vector: new Float32Array([1, 1, 1 - p.tuck]) });
-      const key = { Frame, Vector: new Float32Array([0, 0, p.height]) };
-      translation.push(key); helper.Translation?.Keys.push(key);
-    }
-    if (!action.airborne) {
-      const drawn = new DrawnModel(generateMDX(model), 1);
-      for (let frame = 0; frame <= action.frames; frame++) {
-        const triangle = drawn.triangles(index, frame / 60, 1);
-        let lowest = Infinity;
-        for (let i = 1; i < triangle.length; i += 2) lowest = Math.min(lowest, triangle[i] ?? Infinity);
-        ensure(Number.isFinite(lowest), `${fighter.name}/${action.pose}: invisible body`);
-
-        const p = phaseAt(action.phases, frame / action.frames);
-        translation[frame]!.Vector[2] -= lowest - p.height;
-      }
-    }
+    keyMotion(model, helper, action, index, start, `${fighter.name}/${action.pose}`);
     bindings.push(`    ${action.pose}: { index: ${index}, seconds: ${seconds((end - start) / 1000)} },`);
   }
 
@@ -172,14 +177,7 @@ for (const [character, fighter] of fighters.entries()) {
   }
   for (const [offset, action] of actions(character).entries()) {
     const index = source.Sequences.length + offset;
-    const first = finalPreview.triangles(index, 0, 1);
-    let motion = 0;
-    for (let frame = 1; frame <= action.frames; frame++) {
-      const after = finalPreview.triangles(index, frame / 60, 1);
-      ensure(first.length === after.length, `${fighter.name}/${action.pose}: body disappears`);
-      for (let i = 0; i < first.length; i += 2) motion = Math.max(motion,
-        Math.hypot((after[i] ?? 0) - (first[i] ?? 0), (after[i + 1] ?? 0) - (first[i + 1] ?? 0)));
-    }
+    const motion = moves(finalPreview, index, action.frames);
     ensure(motion >= 5, `${fighter.name}/${action.pose}: held stance instead of an action (${motion})`);
   }
   chmodSync(join(output, fighter.source), 0o644);
