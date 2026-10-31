@@ -24691,7 +24691,7 @@
    "authored.moves.normals.3.regions.5.hit.effect.launchZ": 0.4226182699203491,
    "authored.moves.normals.4.startupFrames": 15,
    "authored.moves.normals.4.activeFrames": 3,
-   "authored.moves.normals.4.totalFrames": 44,
+   "authored.moves.normals.4.totalFrames": 47,
    "authored.moves.normals.4.landingLag": 0,
    "authored.moves.normals.4.regions.0.firstFrame": 15,
    "authored.moves.normals.4.regions.0.lastFrame": 17,
@@ -24720,7 +24720,7 @@
    "authored.moves.normals.5.regions.0.hit.effect.launchZ": 0,
    "authored.moves.normals.6.startupFrames": 8,
    "authored.moves.normals.6.activeFrames": 3,
-   "authored.moves.normals.6.totalFrames": 26,
+   "authored.moves.normals.6.totalFrames": 29,
    "authored.moves.normals.6.landingLag": 0,
    "authored.moves.normals.6.regions.0.firstFrame": 8,
    "authored.moves.normals.6.regions.0.lastFrame": 10,
@@ -24788,7 +24788,7 @@
    "authored.moves.normals.8.regions.2.hit.effect.launchZ": 0.9659258127212524,
    "authored.moves.normals.9.startupFrames": 8,
    "authored.moves.normals.9.activeFrames": 3,
-   "authored.moves.normals.9.totalFrames": 26,
+   "authored.moves.normals.9.totalFrames": 29,
    "authored.moves.normals.9.landingLag": 0,
    "authored.moves.normals.9.regions.0.firstFrame": 8,
    "authored.moves.normals.9.regions.0.lastFrame": 8,
@@ -24813,7 +24813,7 @@
    "authored.moves.normals.9.regions.2.hit.effect.launchZ": 0.6427876353263855,
    "authored.moves.normals.10.startupFrames": 8,
    "authored.moves.normals.10.activeFrames": 3,
-   "authored.moves.normals.10.totalFrames": 26,
+   "authored.moves.normals.10.totalFrames": 29,
    "authored.moves.normals.10.landingLag": 0,
    "authored.moves.normals.10.regions.0.firstFrame": 8,
    "authored.moves.normals.10.regions.0.lastFrame": 8,
@@ -25011,7 +25011,7 @@
    "authored.moves.normals.16.regions.3.hit.groundedEffect.launchZ": 0.8191520571708679,
    "authored.moves.normals.19.startupFrames": 5,
    "authored.moves.normals.19.activeFrames": 8,
-   "authored.moves.normals.19.totalFrames": 32,
+   "authored.moves.normals.19.totalFrames": 35,
    "authored.moves.normals.19.landingLag": 0,
    "authored.moves.normals.19.regions.0.firstFrame": 5,
    "authored.moves.normals.19.regions.0.lastFrame": 12,
@@ -25226,7 +25226,7 @@
    "normal.3.hit.5.launchZ": 0.4226182699203491,
    "normal.4.startupFrames": 15,
    "normal.4.activeFrames": 3,
-   "normal.4.endingFrames": 26,
+   "normal.4.endingFrames": 29,
    "normal.4.landingLag": 0,
    "normal.4.hit.0.damage": 16.038000106811523,
    "normal.4.hit.0.growth": 113.41000366210938,
@@ -25244,7 +25244,7 @@
    "normal.5.landingLag": 0,
    "normal.6.startupFrames": 8,
    "normal.6.activeFrames": 3,
-   "normal.6.endingFrames": 15,
+   "normal.6.endingFrames": 18,
    "normal.6.landingLag": 0,
    "normal.6.hit.0.damage": 8.748000144958496,
    "normal.6.hit.0.growth": 87.63500213623047,
@@ -25296,7 +25296,7 @@
    "normal.8.hit.2.launchZ": 0.9659258127212524,
    "normal.9.startupFrames": 8,
    "normal.9.activeFrames": 3,
-   "normal.9.endingFrames": 15,
+   "normal.9.endingFrames": 18,
    "normal.9.landingLag": 0,
    "normal.9.hit.0.damage": 8.748000144958496,
    "normal.9.hit.0.growth": 87.63500213623047,
@@ -25315,7 +25315,7 @@
    "normal.9.hit.2.launchZ": 0.6427876353263855,
    "normal.10.startupFrames": 8,
    "normal.10.activeFrames": 3,
-   "normal.10.endingFrames": 15,
+   "normal.10.endingFrames": 18,
    "normal.10.landingLag": 0,
    "normal.10.hit.0.damage": 8.748000144958496,
    "normal.10.hit.0.growth": 87.63500213623047,
@@ -25476,7 +25476,7 @@
    "normal.18.hit.0.launchZ": 0.7071067690849304,
    "normal.19.startupFrames": 5,
    "normal.19.activeFrames": 8,
-   "normal.19.endingFrames": 19,
+   "normal.19.endingFrames": 22,
    "normal.19.landingLag": 0,
    "normal.19.hit.0.damage": 9.720000267028809,
    "normal.19.hit.0.growth": 92.79000091552734,
@@ -25589,15 +25589,15 @@
     "killPercent": 75
    },
    "normal.4.hit.0": {
-    "advantage": -19,
+    "advantage": -22,
     "killPercent": 41
    },
    "normal.4.hit.1": {
-    "advantage": -22,
+    "advantage": -25,
     "killPercent": 89
    },
    "normal.6.hit.0": {
-    "advantage": -12,
+    "advantage": -15,
     "killPercent": 139
    },
    "normal.7.hit.0": {
@@ -25622,27 +25622,27 @@
     "advantage": -13
    },
    "normal.9.hit.0": {
-    "advantage": -12,
+    "advantage": -15,
     "killPercent": 139
    },
    "normal.9.hit.1": {
-    "advantage": -11,
+    "advantage": -14,
     "killPercent": 139
    },
    "normal.9.hit.2": {
-    "advantage": -10,
+    "advantage": -13,
     "killPercent": 139
    },
    "normal.10.hit.0": {
-    "advantage": -12,
+    "advantage": -15,
     "killPercent": 139
    },
    "normal.10.hit.1": {
-    "advantage": -11,
+    "advantage": -14,
     "killPercent": 139
    },
    "normal.10.hit.2": {
-    "advantage": -10,
+    "advantage": -13,
     "killPercent": 139
    },
    "normal.11.hit.0": {
@@ -25750,7 +25750,7 @@
     "killPercent": 112
    },
    "normal.19.hit.0": {
-    "advantage": -20,
+    "advantage": -23,
     "killPercent": 122
    },
    "normal.20.hit.0": {
@@ -29112,7 +29112,7 @@
    "authored.moves.normals.17.regions.2.hit.effect.launchZ": 0.7071067690849304,
    "authored.moves.normals.19.startupFrames": 7,
    "authored.moves.normals.19.activeFrames": 8,
-   "authored.moves.normals.19.totalFrames": 38,
+   "authored.moves.normals.19.totalFrames": 34,
    "authored.moves.normals.19.landingLag": 0,
    "authored.moves.normals.19.regions.0.firstFrame": 7,
    "authored.moves.normals.19.regions.0.lastFrame": 9,
@@ -29892,7 +29892,7 @@
    "normal.18.hit.0.launchZ": 0.7071067690849304,
    "normal.19.startupFrames": 7,
    "normal.19.activeFrames": 8,
-   "normal.19.endingFrames": 23,
+   "normal.19.endingFrames": 19,
    "normal.19.landingLag": 0,
    "normal.19.hit.0.damage": 11.263999938964844,
    "normal.19.hit.0.growth": 88.6500015258789,
@@ -30202,19 +30202,19 @@
     "killPercent": 112
    },
    "normal.19.hit.0": {
-    "advantage": -24,
+    "advantage": -20,
     "killPercent": 152
    },
    "normal.19.hit.1": {
-    "advantage": -24,
+    "advantage": -20,
     "killPercent": 152
    },
    "normal.19.hit.2": {
-    "advantage": -22,
+    "advantage": -18,
     "killPercent": 161
    },
    "normal.19.hit.3": {
-    "advantage": -22,
+    "advantage": -18,
     "killPercent": 161
    },
    "normal.20.hit.0": {
