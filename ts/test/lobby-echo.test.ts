@@ -3,7 +3,7 @@ import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { Key } from "../src/host/loop/keyEvents";
-import { passStartControls } from "../scripts/wisp/startControls";
+import { declineTutorial, passStartControls } from "../scripts/wisp/startControls";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
@@ -18,6 +18,7 @@ test("two online clients in the lobby show each player's measured echo in ms und
   clients.start();
   clients.frames(30);
   passStartControls(clients, count => clients.frames(count));
+  declineTutorial(clients);
   for (const slot of HUMANS) clients.press(slot, Key.n);
   const echoes = () => clients.clients.map(client => HUMANS.map(slot => client.frames.shownText().find(text => echoLine(slot).test(text))));
   for (let frame = 0; frame < ECHO_FRAMES && echoes().flat().includes(undefined); frame++) clients.frames(1);

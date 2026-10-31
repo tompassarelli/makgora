@@ -1,10 +1,11 @@
 import { f32 } from "wisp/src/sim/f32";
 import { PICKER_DONE } from "../../src/game/ui/settingsUi";
-import { NOT_NOW_BOX } from "../../src/game/ui/tutorialMenu";
+import { NOT_NOW_BOX, NOT_NOW_LABEL } from "../../src/game/ui/tutorialMenu";
 
 interface StartClient {
   readonly slot: number;
   readonly natives: Readonly<Record<string, unknown>>;
+  readonly frames?: { shownText(): readonly string[] };
   run?(body: () => void): void;
 }
 
@@ -40,8 +41,12 @@ export function passStartControls(clients: StartClients, step: (count: number) =
 const NOT_NOW_X = f32(NOT_NOW_BOX.x + f32(NOT_NOW_BOX.width / 2));
 const NOT_NOW_Y = f32(NOT_NOW_BOX.y - f32(NOT_NOW_BOX.height / 2));
 
-export function declineTutorial(clients: StartClients, step: (count: number) => void = count => clients.frames(count)): void {
+export const tutorialPrompted = (client: StartClient): boolean => client.frames?.shownText().includes(NOT_NOW_LABEL) === true;
+
+export function declineTutorial(clients: StartClients, step: (count: number) => void = count => clients.frames(count), limit = 240): void {
+  for (let frame = 0; frame < limit && !clients.clients.every(client => tutorialPrompted(client)); frame++) step(1);
   for (const client of clients.clients) {
+    if (!tutorialPrompted(client)) throw new Error(`client ${client.slot} never opened its Tutorial prompt`);
     if (!clients.click(client.slot, NOT_NOW_X, NOT_NOW_Y)) throw new Error(`client ${client.slot} has no Not now button under the pointer`);
   }
   step(2);
