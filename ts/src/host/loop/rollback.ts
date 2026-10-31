@@ -24,7 +24,7 @@ import { MatchLifecycle } from "../../game/netcode/journal/lifecycle";
 import { JournalInputSource } from "../../game/netcode/journal/source";
 import { captureReplaySnapshot, restoreReplaySnapshot } from "../../game/replay/snapshot";
 import { pacedStop, resetPauseBarrier, settlePace, stopFrame } from "../../game/session/pauseBarrier";
-import { confirmedBudget, keyboardCatchesUp, repairBudget, speculativeBudget } from "../../game/session/playback";
+import { confirmedBudget, keyboardCatchesUp, ownFrames, repairBudget, speculativeBudget } from "../../game/session/playback";
 import { wholeRepairCost } from "../../game/replay/history";
 import { queueLocalRows } from "../../game/session/localInput";
 import { applyFrame, presentPredictedHits } from "./frame";
@@ -337,7 +337,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   const pending = rollback.playback.pendingRepair(epoch);
   const behind = pending === undefined ? 0 : lastConfirmed + 2 - pending;
   const whole = wholeRepairCost(speculative.world);
-  const repair = repairBudget(speculativeBudget(journal !== undefined), pending === undefined ? 0 : schedule.nextSpeculative - pending, whole);
+  const repair = repairBudget(speculativeBudget(journal !== undefined), pending === undefined ? 0 : schedule.nextSpeculative - pending, whole, ownFrames(lastConfirmed - schedule.nextConfirmed + 1, journal !== undefined));
   const repaired = rollback.playback.repair(epoch, speculative, Math.max(repair.frames, behind), Math.max(repair.cost, behind * whole));
   endFrameSection(RECONCILE_SECTION);
   if (repaired === "rejected") {

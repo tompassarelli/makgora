@@ -90,7 +90,7 @@ export const CATCH_UP_FRAMES = 6;
 
 
 
-// A callback's own frames cost about two units per fighter, so its repair keeps the rest: two whole four-fighter frames at about 2.5 ms each in Lua32 (#168).
+// Each frame a callback runs costs about a unit per fighter, and 16 units are four whole four-fighter frames at about 2.5 ms each in Lua32 (#168): a repair that finishes within two keeps them, a longer one keeps what the callback's own frames leave.
 
 
 
@@ -105,8 +105,9 @@ const REPAIR_HEADROOM = 16;
 
 
 
-export function repairBudget(speculative: number, depth: number, whole: number): { readonly frames: number; readonly cost: number } {
-  const cost = REPAIR_HEADROOM - 2 * whole;
+export function repairBudget(speculative: number, depth: number, whole: number, own: number): { readonly frames: number; readonly cost: number } {
+  const finishing = REPAIR_HEADROOM - 2 * whole;
+  const cost = depth * whole <= finishing ? finishing : REPAIR_HEADROOM - Math.max(2, own) * whole;
   const steps = floorDiv(cost, REPAIR_SCOPED_COST);
   if (depth <= REPLAY_HISTORY_CAPACITY / 2) return { frames: steps, cost };
   return { frames: Math.max(steps, speculative + 1), cost: Math.max(cost, (speculative + 1) * whole) };
@@ -131,6 +132,8 @@ export const confirmedBudget = (confirmable: number, journal: boolean): number =
 
 
 export const speculativeBudget = (journal: boolean): number => (journal ? CATCH_UP_FRAMES : 1);
+
+export const ownFrames = (confirmed: number, journal: boolean): number => (journal ? 2 : confirmed + speculativeBudget(false));
 
 const KEYBOARD_CATCH_UP_MARGIN = 4;
 
