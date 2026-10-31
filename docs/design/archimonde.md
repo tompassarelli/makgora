@@ -220,3 +220,19 @@ short hop and walk (one facing each). Failing, by cause:
 Next: stage the dummy clear of his body for the ground and aerial normals,
 shorten or shrink the contact flash on the smashes, Bash and down air, and
 give the run row travel, then recapture the failing rows.
+
+## Showcase staging for wide bodies (2026-10-31)
+
+The 46 failing rows of the check above mostly stood the dummy inside his body:
+the showcase placed a normal's dummy at 0.75 of the move's furthest reach, which
+for a hurt capsule of radius 34.8 leaves the visible bodies overlapping. A
+normal's gap for a fighter wider than 30 now grows by 4/3 (jab 107 to 142,
+forward smash 160 to 213, back air -100 to -134). A headless test strikes the
+dummy staged for his jab, forward smash, forward tilt, down smash, neutral air
+and back air in both facings, clear of his body (`showcaseDummyReach.test.ts`;
+reverting the scale makes the jab rows fail). Landed at f470015537.
+
+Still open for the native-check box: recapture the failing rows at that commit,
+shorten or shrink the contact flash on up smash, Bash and down air, give the
+run row travel, move Rain of Fire's and down smash's effects onto the dummy, and
+read the 58 sheets with three cold viewers.
