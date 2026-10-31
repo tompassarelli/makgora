@@ -42,14 +42,15 @@ export const admitted = (capacityClass: CapacityClass, owner: string, timeoutSec
   ? [process.execPath, capacityHelper, "run", "--class", capacityClass, "--owner", owner, "--timeout-seconds", String(timeoutSeconds), "--", ...command]
   : [...command];
 
+// Bun.spawn's default env is the environment the process started with, not process.env as changed since.
+export const rerun = (command: readonly string[]) => Effect.tryPromise({
+  try: () => Bun.spawn([...command], { stdin: "inherit", stdout: "inherit", stderr: "inherit", env: { ...process.env } }).exited,
+  catch: (cause) => new CapacityFailure({ problem: String(cause) }),
+});
+
 export const admit = (capacityClass: "moderate" | "heavy", owner: string, timeoutSeconds: number) => Effect.gen(function*() {
   if (!admitsThroughHelper()) return undefined;
-  return yield* Effect.tryPromise({
-    try: () => Bun.spawn(admitted(capacityClass, owner, timeoutSeconds, [process.execPath, ...process.argv.slice(1)]), {
-      stdin: "inherit", stdout: "inherit", stderr: "inherit",
-    }).exited,
-    catch: (cause) => new CapacityFailure({ problem: String(cause) }),
-  });
+  return yield* rerun(admitted(capacityClass, owner, timeoutSeconds, [process.execPath, ...process.argv.slice(1)]));
 });
 
 
