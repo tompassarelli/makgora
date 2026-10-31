@@ -13,6 +13,7 @@ import { attackStartupFrames } from "../sim/moves";
 import { ALL_HEROES } from "../roster/kits";
 import { type Cue, fighterOwnCues, timed } from "./specialCues";
 import { DISJOINT_CUES } from "./disjointCues";
+import { orbitRingModels } from "./orbitRings";
 import { FEL_CRESCENT_MODEL } from "../../generated/assets/felCrescentAssetInfo";
 
 const cue = (model: string, scale: number): Cue => ({ model, anchor: "body", scale });
@@ -128,6 +129,7 @@ export function fighterAttackCues(character: Character): readonly Cue[] {
 export function allAttackCueModels(): readonly string[] {
   const models: string[] = [];
   for (const { model } of Object.values(DISJOINT_CUES)) if (!models.includes(model)) models.push(model);
+  for (const model of orbitRingModels()) if (!models.includes(model)) models.push(model);
   for (const character of [ Character.rifleman, Character.demonHunter, ...ALL_HEROES.map((hero) => hero.character)]) {
     for (const { model } of fighterAttackCues(character)) if (!models.includes(model)) models.push(model);
   }

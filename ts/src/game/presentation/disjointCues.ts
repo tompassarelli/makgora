@@ -59,14 +59,13 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
 export const SIGNATURE_CUE_NORMALS: { readonly [character: number]: readonly AttackStyle[] } = {
   [Character.malfurion]: [AttackStyle.dashAttack],
   [Character.medivh]: [AttackStyle.dashAttack],
-  [Character.lich]: [AttackStyle.jab, AttackStyle.jab2, AttackStyle.upSmash, AttackStyle.upTilt, AttackStyle.neutralAir, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir, AttackStyle.dashAttack],
+  [Character.lich]: [AttackStyle.jab, AttackStyle.jab2, AttackStyle.upSmash, AttackStyle.upTilt, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir, AttackStyle.dashAttack],
   [Character.anubarak]: [AttackStyle.dashAttack],
 };
 
 
 export const FLARE_REGIONS: { readonly [character: number]: { readonly [style: number]: (index: number) => boolean } } = {
   [Character.lich]: {
-    [AttackStyle.neutralAir]: index => { const slot = imod(index, 12); return slot === 0 || slot === 2 || slot === 4 || slot === 8; },
     [AttackStyle.forwardAir]: index => imod(index, 3) === 1,
   },
 };
@@ -107,7 +106,7 @@ export interface HitAreaPose { visible: boolean; x: number; z: number; scale: nu
 const BODY_MIDDLE = 66.0;
 
 export const AREA_CUE_SCALES: { readonly [character: number]: { readonly [style: number]: number } } = {
-  [Character.lich]: { [AttackStyle.jab]: 2.0, [AttackStyle.jab2]: 2.0, [AttackStyle.neutralAir]: f32(0.6) },
+  [Character.lich]: { [AttackStyle.jab]: 2.0, [AttackStyle.jab2]: 2.0 },
 };
 
 export function normalAreaPose(fighter: Readonly<Fighter>, style: AttackStyle, index: number, region: HitRegion, out: HitAreaPose): HitAreaPose {
