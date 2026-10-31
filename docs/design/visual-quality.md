@@ -820,8 +820,11 @@ and of the whole backdrop above the deck (12.5% to 57.5%):
 
 The gap is the first fighter's; the second fighter's gap stays -42.8 L* before and
 after in all four views, a floor of its band (L* 9.0 to 51.7), not of the backdrop.
-The native window drew the amber take at sky-strip luma 110 in the same framing
-(Wisp window capture of main before this change), against 123 in Classic.
+The native window's captures at its default match zoom (Shadow Hunter first, then
+Chen first; the standalone window, one frame each) read sky-strip luma 110.3 and 110.1
+before and 28.1 and 27.9 after, backdrop above the deck 103.2 and 103.3 before and
+31.9 and 31.4 after, against 33.0 in Classic after, so Classic's sky strip sits
+about 5 luma above the window's.
 Captures: ~/.local/state/smashcraft/shots/aq-classic/ (classic-before-*,
 classic-after-*; pass1-* is the intermediate take).
 
