@@ -20,6 +20,7 @@ import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, START_BUTTON, startButtonConta
 import { destroyEvents } from "wisp/game/events";
 import { createFrame, createFrameByType, destroyFrame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { localPlayer, playerSlot } from "wisp/game/players";
+import { sendSync } from "wisp/game/sync";
 
 
 
@@ -268,7 +269,7 @@ export class StagePanel {
       const pointerAtX = pointerX(I2R(BlzGetMouseScreenPosX()), width, height);
       const pointerAtY = pointerY(I2R(BlzGetMouseScreenPosY()), height);
       const dropped = updateStageDrag(this.drag, BlzIsMouseButtonPressed(MOUSE_BUTTON_TYPE_LEFT), pointerAtX, pointerAtY, game.stageChoice);
-      if (dropped !== undefined) BlzSendSyncData("stage-drop", I2S(dropped));
+      if (dropped !== undefined) sendSync("stage-drop", I2S(dropped));
       if (this.drag.gesture?.kind === "carry") {
         x = pointerAtX;
         y = pointerAtY;

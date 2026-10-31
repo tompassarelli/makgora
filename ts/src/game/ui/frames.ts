@@ -8,6 +8,7 @@ import { MENU_STYLE, NATIVE_TEXT_BASE } from "./hudLayout";
 import { createEvents, destroyEvents, onEvents } from "wisp/game/events";
 import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, frameEnabled, frameVisible, namedFrame, originFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTexture } from "wisp/game/frames";
 import { eventPlayer, localPlayer, player as playerOf, playerSlot } from "wisp/game/players";
+import { addSyncEvent, syncData } from "wisp/game/sync";
 
 
 export type MenuControls = "journal" | "keyboard";
@@ -185,7 +186,7 @@ export class ButtonClicks<T> {
 
 export function createSyncTrigger(name: string, prefix: string, senders: readonly number[], handle: (sender: number, data: string) => void): trigger {
   const trigger = createEvents();
-  for (const sender of senders) BlzTriggerRegisterPlayerSyncEvent(trigger, playerOf(sender), prefix, false);
+  for (const sender of senders) addSyncEvent(trigger, playerOf(sender), prefix);
   onEvents(trigger, trampoline(name));
   bindSyncHandler(name, handle);
   return trigger;
@@ -193,5 +194,5 @@ export function createSyncTrigger(name: string, prefix: string, senders: readonl
 
 
 export function bindSyncHandler(name: string, handle: (sender: number, data: string) => void): void {
-  on(name, () => handle(playerSlot(eventPlayer()), BlzGetTriggerSyncData()));
+  on(name, () => handle(playerSlot(eventPlayer()), syncData()));
 }

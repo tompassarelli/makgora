@@ -18,6 +18,7 @@ import { LEDGER_MARK, handleLedger, receiveLedgerReport, takeLedgerReport } from
 import { createEvents, onEvents } from "wisp/game/events";
 import { setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 import { eventPlayer, localPlayer, player, playerSlot } from "wisp/game/players";
+import { addSyncEvent, sendSync, syncData } from "wisp/game/sync";
 
 export const DELAY_PREFIX = "SC_DY";
 export const DELAY_RECEIVED = "shell.delayProposal";
@@ -116,7 +117,7 @@ export function hostDelayFrom(net: NetDelay, game: Readonly<MatchState>, sender:
 export const nextManualDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>, direction: -1 | 1): number => stepManualDelay(net.policy, net.manual, autoMatchDelay(net, game), direction);
 
 export function sendHostDelay(manual: number): void {
-  BlzSendSyncData(DELAY_PREFIX, `${HOST_MARK}${I2S(manual)}`);
+  sendSync(DELAY_PREFIX, `${HOST_MARK}${I2S(manual)}`);
 }
 
 export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>, local: number): LobbyNet {
@@ -324,7 +325,7 @@ function proposeDelay(net: NetDelay, players: number, active: boolean, inMatch: 
   const { rate } = net;
   const rateChanged = rate.slow !== net.sentSlow || (rate.slow && rate.fps !== net.sentFps);
   if (!inMatch || proposal !== net.proposed || rateChanged) {
-    if (BlzSendSyncData(DELAY_PREFIX, delayMessage(inMatch ? -1 : net.ticks, proposal, echoMs(net.estimate), rate.fps, rate.slow))) {
+    if (sendSync(DELAY_PREFIX, delayMessage(inMatch ? -1 : net.ticks, proposal, echoMs(net.estimate), rate.fps, rate.slow))) {
       net.proposed = proposal;
       net.sentFps = rate.fps;
       net.sentSlow = rate.slow;
@@ -365,12 +366,12 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
 export function sendHandleLedger(game: Readonly<MatchState>): void {
   if (!isOnline(game)) return;
   const report = takeLedgerReport(handleLedger());
-  if (report !== undefined) BlzSendSyncData(DELAY_PREFIX, report);
+  if (report !== undefined) sendSync(DELAY_PREFIX, report);
 }
 
 export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>): void {
   const slot = playerSlot(eventPlayer());
-  const data = BlzGetTriggerSyncData();
+  const data = syncData();
   if (data.substring(0, 1) === LEDGER_MARK) {
     receiveLedgerReport(handleLedger(), playerSlot(localPlayer()), slot, data);
     return;
@@ -390,6 +391,6 @@ export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>):
 
 export function registerDelayProposals(handler: string): void {
   const trigger = createEvents();
-  for (const slot of PARTICIPANT_SLOTS) BlzTriggerRegisterPlayerSyncEvent(trigger, player(slot), DELAY_PREFIX, false);
+  for (const slot of PARTICIPANT_SLOTS) addSyncEvent(trigger, player(slot), DELAY_PREFIX);
   onEvents(trigger, trampoline(handler));
 }

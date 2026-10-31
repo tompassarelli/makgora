@@ -74,6 +74,7 @@ import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus,
 import { destroyEvents } from "wisp/game/events";
 import { createFrameByType, destroyFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { localPlayer, player as playerOf } from "wisp/game/players";
+import { sendSync } from "wisp/game/sync";
 
 
 type SelectionButton = { kind: "tile"; tile: number } | CardButton | CpuButton | { kind: "start" } | { kind: "settings" } | RuleButton
@@ -608,7 +609,7 @@ export class SelectionPanel {
     const { game, handChannel, localHand, now } = this;
     const choosing = this.choosing() !== undefined;
     const data = handChannel.send(choosing && !this.localPanel ? localHand : HIDDEN_HAND, now);
-    if (data !== undefined) BlzSendSyncData("select-hand", data);
+    if (data !== undefined) sendSync("select-hand", data);
     const drawn = game === undefined ? [] : handChannel.drawn(game, localHand, now);
     for (const slot of PARTICIPANT_SLOTS) {
       const frames = this.hands[slot];
@@ -625,8 +626,8 @@ export class SelectionPanel {
   private sendPlacement({ slot, tile }: Placement): void {
     const game = this.choosing();
     if (game === undefined) return;
-    if (slot === this.participantId && humanFighterActive(game, slot)) BlzSendSyncData("fighter-drop", I2S(tile));
-    else if (canChooseComputer(game, this.participantId, slot)) BlzSendSyncData("cpu-fighter-drop", `${I2S(slot)}${I2S(tile)}`);
+    if (slot === this.participantId && humanFighterActive(game, slot)) sendSync("fighter-drop", I2S(tile));
+    else if (canChooseComputer(game, this.participantId, slot)) sendSync("cpu-fighter-drop", `${I2S(slot)}${I2S(tile)}`);
   }
 
 
@@ -644,7 +645,7 @@ export class SelectionPanel {
 
   recallHeld(): void {
     const { held } = this.drag;
-    if (this.ownsLocalClient() && this.choosing() !== undefined && held !== undefined) BlzSendSyncData("fighter-recall", I2S(held));
+    if (this.ownsLocalClient() && this.choosing() !== undefined && held !== undefined) sendSync("fighter-recall", I2S(held));
   }
 
   private isSeen(): boolean {

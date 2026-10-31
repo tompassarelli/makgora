@@ -15,6 +15,7 @@ import { readChunk, writeLine } from "wisp/src/platform/fileio";
 import { startPlaytest } from "./menus";
 import { type ShellState, localSlot, playtestProgress } from "./state";
 import { eventPlayer, playerSlot } from "wisp/game/players";
+import { sendSync, syncData } from "wisp/game/sync";
 
 export const PLAYTEST = "shell.playtest";
 export const PLAYTEST_PREFIX = "SC_PLAY";
@@ -37,17 +38,17 @@ export function servicePlaytestRequest(s: ShellState): void {
   if (!state.starting) {
     if (readChunk(PLAYTEST_GO_FILE) === undefined) return;
     state.starting = true;
-    BlzSendSyncData(PLAYTEST_PREFIX, PLAYTEST_HOLD);
+    sendSync(PLAYTEST_PREFIX, PLAYTEST_HOLD);
     return;
   }
   state.sent = true;
-  BlzSendSyncData(PLAYTEST_PREFIX, state.request);
+  sendSync(PLAYTEST_PREFIX, state.request);
 }
 
 
 export function playtestRequested(s: ShellState): void {
   if (playerSlot(eventPlayer()) !== firstHumanSlot(s.game)) return;
-  const line = BlzGetTriggerSyncData();
+  const line = syncData();
   if (line === PLAYTEST_HOLD) {
     playtestProgress().starting = true;
     return;

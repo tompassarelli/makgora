@@ -10,6 +10,7 @@ import { LOBBY_COUNTER_FILE, PLAYER_FILE_CHUNK } from "../../game/core/gameFiles
 import { departPlayerFiles, enqueuePlayerFile, lobbyCounter, receiveLobbyCounter, receivePlayerFileChunk, type PlayerFileQueue } from "./playerFileQueue";
 import { createEvents, onEvents } from "wisp/game/events";
 import { eventPlayer, localPlayer, player, playerSlot, playerSlotState } from "wisp/game/players";
+import { addSyncEvent, sendSync, syncData, syncPrefix } from "wisp/game/sync";
 
 export const PLAYER_FILE_RECEIVED = "shell.playerFileReceived";
 const MORE_PREFIX = "SC_FL";
@@ -38,17 +39,17 @@ function sendFile(owner: number): void {
   const text = localBindingsText();
   let offset = 0;
   while (text.length - offset > CHUNK) {
-    BlzSendSyncData(MORE_PREFIX, text.substring(offset, offset + CHUNK));
+    sendSync(MORE_PREFIX, text.substring(offset, offset + CHUNK));
     offset += CHUNK;
   }
-  BlzSendSyncData(LAST_PREFIX, `${globalThis.__smashcraftLobbyCounter ?? 0}${COUNTER_END}${text.substring(offset)}`);
+  sendSync(LAST_PREFIX, `${globalThis.__smashcraftLobbyCounter ?? 0}${COUNTER_END}${text.substring(offset)}`);
 }
 
 
 export function playerFileReceived(): void {
   const owner = playerSlot(eventPlayer());
-  const data = BlzGetTriggerSyncData();
-  if (BlzGetTriggerSyncPrefix() !== LAST_PREFIX) {
+  const data = syncData();
+  if (syncPrefix() !== LAST_PREFIX) {
     receivePlayerFileChunk(files(), owner, data, false, sendFile);
     return;
   }
@@ -76,8 +77,8 @@ export function startPlayerFiles(): void {
   delete files().lobbyCounters;
   const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    BlzTriggerRegisterPlayerSyncEvent(trigger, player(slot), MORE_PREFIX, false);
-    BlzTriggerRegisterPlayerSyncEvent(trigger, player(slot), LAST_PREFIX, false);
+    addSyncEvent(trigger, player(slot), MORE_PREFIX);
+    addSyncEvent(trigger, player(slot), LAST_PREFIX);
   }
   onEvents(trigger, trampoline(PLAYER_FILE_RECEIVED));
 }

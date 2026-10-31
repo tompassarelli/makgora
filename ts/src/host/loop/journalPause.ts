@@ -19,6 +19,7 @@ import { traceInput } from "./trace";
 import { LASTING, pauseMatchPresentation, setStatus } from "./view";
 import { startControl } from "./viewHud";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
+import { sendSync, syncData } from "wisp/game/sync";
 
 
 export const CHAT_CLOSED_PREFIX = "SC_JH";
@@ -90,7 +91,7 @@ export function serviceControlAck(s: ShellState, rollback: Rollback, journal: Jo
   const frame = source.acceptControlAck(wire, request.stage);
   if (frame === undefined) return;
   const ack = encodeControlAck({ epoch: rollback.epoch, slot: localSlot(), sequence, stage: request.stage, frame });
-  if (!BlzSendSyncData(CONTROL_ACK_PREFIX, ack)) failJournal(s, rollback, journal, "pause acknowledgment could not be synchronized");
+  if (!sendSync(CONTROL_ACK_PREFIX, ack)) failJournal(s, rollback, journal, "pause acknowledgment could not be synchronized");
   else if (keyboard) return;
   else if (journal.ingress === "editbox") consumeEditbox(s, rollback, journal);
   else if (journal.mailbox !== undefined) releaseMessage(journal.mailbox);
@@ -101,7 +102,7 @@ export function receiveControlAckEvent(s: ShellState): void {
   const epoch = journalEpoch(s);
   if (epoch === undefined) return;
   const { rollback, journal } = epoch;
-  const receipt = receiveControlAck(journal.barrier, s.game.humanMask, rollback.epoch, playerSlot(eventPlayer()), BlzGetTriggerSyncData());
+  const receipt = receiveControlAck(journal.barrier, s.game.humanMask, rollback.epoch, playerSlot(eventPlayer()), syncData());
   if (typeof receipt === "object") failJournal(s, rollback, journal, receipt.failure);
   else if (receipt === "complete") {
     const request = journal.barrier.request;
@@ -157,7 +158,7 @@ export function chatClosedEvent(s: ShellState): void {
   const slot = playerSlot(eventPlayer());
   if (epoch === undefined || !isParticipantSlot(slot)) return;
   const { rollback, journal } = epoch;
-  if (BlzGetTriggerSyncData() === `${rollback.epoch}|${journal.chatSerial[slot]}`) journal.chatRequested[slot] = false;
+  if (syncData() === `${rollback.epoch}|${journal.chatSerial[slot]}`) journal.chatRequested[slot] = false;
 }
 
 
@@ -166,7 +167,7 @@ export function serviceChat(s: ShellState, rollback: Rollback, journal: Journal)
   if (editbox === undefined || s.game.phase !== Phase.match || journal.failed) return;
   const idle = journal.barrier.request === undefined;
   if (chatBusy(journal) && !s.session.paused && idle) requestPause(s, rollback, journal, true);
-  if (editbox.serviceChat(s.session.paused && idle) && !BlzSendSyncData(CHAT_CLOSED_PREFIX, `${rollback.epoch}|${editbox.chatSerial() ?? 0}`)) {
+  if (editbox.serviceChat(s.session.paused && idle) && !sendSync(CHAT_CLOSED_PREFIX, `${rollback.epoch}|${editbox.chatSerial() ?? 0}`)) {
     failJournal(s, rollback, journal, "chat close could not be synchronized");
   }
 }
@@ -176,7 +177,7 @@ export function servicePauseRequest(s: ShellState, rollback: Rollback, journal: 
   if (journal.editbox === undefined || s.game.phase !== Phase.match || journal.failed) return;
   const wire = peekEditbox(s, rollback, journal);
   if (wire === undefined || !wire.startsWith("JP1")) return;
-  if (!BlzSendSyncData(PAUSE_REQUEST_PREFIX, wire)) failJournal(s, rollback, journal, "pause request could not be synchronized");
+  if (!sendSync(PAUSE_REQUEST_PREFIX, wire)) failJournal(s, rollback, journal, "pause request could not be synchronized");
   else consumeEditbox(s, rollback, journal);
 }
 
@@ -191,7 +192,7 @@ export function pauseRequestEvent(s: ShellState): void {
   const { rollback, journal } = epoch;
   if (s.game.phase !== Phase.match || journal.failed || journal.source === undefined) return;
   if (!humanActive(s.game, playerSlot(eventPlayer()))) return;
-  const wire = BlzGetTriggerSyncData();
+  const wire = syncData();
   const epochPrefix = `JP1${padDecimal(rollback.epoch, 10)}`;
   if (journal.barrier.request !== undefined) {
 

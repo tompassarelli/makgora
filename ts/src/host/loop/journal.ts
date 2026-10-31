@@ -30,6 +30,7 @@ import { probeClockMs, probeFileRead, probeInput, probeIntegrity, probePoll, pro
 import { type Journal, type Rollback, type ShellState, localSlot, playsOnKeyboard, playtestProgress } from "./state";
 import { recordSend, traceInput } from "./trace";
 import { LASTING, setStatus } from "./view";
+import { sendSync } from "wisp/game/sync";
 
 
 export const INPUT_PREFIX = "SC_GP";
@@ -124,7 +125,7 @@ export function flushTransport(s: ShellState, rollback: Rollback, journal: Journ
   const message = journal.outgoing.ready(rollback.batch);
   if (message === undefined) return;
   const started = probeClockMs(s.probe);
-  const sent = BlzSendSyncData(INPUT_PREFIX, message.wire);
+  const sent = sendSync(INPUT_PREFIX, message.wire);
   probeSendFinished(s.probe, started);
   if (!sent) {
     rollback.sendFailed = true;
@@ -149,7 +150,7 @@ export function flushTransport(s: ShellState, rollback: Rollback, journal: Journ
 
 
 function startKeyboard(s: ShellState, rollback: Rollback, journal: Journal): void {
-  if (!BlzSendSyncData(INPUT_PREFIX, `K4${rollback.epoch}`)) {
+  if (!sendSync(INPUT_PREFIX, `K4${rollback.epoch}`)) {
     failJournal(s, rollback, journal, "keyboard readiness could not be synchronized");
     return;
   }
@@ -171,7 +172,7 @@ function serviceReadiness(s: ShellState, rollback: Rollback, journal: Journal): 
     if (journal.readyWait >= HELPER_READY_CALLBACKS) startKeyboard(s, rollback, journal);
     return;
   }
-  if (!BlzSendSyncData(INPUT_PREFIX, `J4${rollback.epoch}`)) {
+  if (!sendSync(INPUT_PREFIX, `J4${rollback.epoch}`)) {
     failJournal(s, rollback, journal, "controller readiness could not be synchronized");
     return;
   }
@@ -239,7 +240,7 @@ export function serviceJournalInput(s: ShellState, rollback: Rollback, journal: 
     return;
   }
   if (!editbox && s.build.responseProbe) {
-    if (!journal.startSent) journal.startSent = BlzSendSyncData(INPUT_PREFIX, `J4${rollback.epoch}`);
+    if (!journal.startSent) journal.startSent = sendSync(INPUT_PREFIX, `J4${rollback.epoch}`);
     if (journal.readyMask !== s.game.humanMask) return;
   }
   const slot = localSlot();
@@ -379,7 +380,7 @@ export function serviceJournalEnd(s: ShellState, rollback: Rollback, journal: Jo
   }
   if (journal.quiescent) return;
   if (playsOnKeyboard(journal, localSlot()) || (journal.endReceived && readChunk(quiescentFile(identity)) === "Q")) {
-    if (!BlzSendSyncData(INPUT_PREFIX, `E4${rollback.epoch}`)) {
+    if (!sendSync(INPUT_PREFIX, `E4${rollback.epoch}`)) {
       failJournal(s, rollback, journal, "controller stop could not be synchronized");
       return;
     }

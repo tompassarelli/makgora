@@ -6,6 +6,7 @@ import { KEYBOARD_PAUSE_PREFIX, Key } from "./keyEvents";
 import { startDown } from "./keys";
 import { type ShellState, localSlot } from "./state";
 import { eventPlayer, playerSlot } from "wisp/game/players";
+import { sendSync } from "wisp/game/sync";
 
 
 export function onPauseKeyDown(s: ShellState): void {
@@ -13,7 +14,7 @@ export function onPauseKeyDown(s: ShellState): void {
   if (GetHandleId(BlzGetTriggerPlayerKey()) === Key.escape && s.game.phase !== Phase.match) return;
   const chatting = s.chatOpen?.() ?? warcraftChatOpen(s.chatFrame);
   if (!isParticipantSlot(slot) || slot !== localSlot() || !humanActive(s.game, slot) || chatting) return;
-  BlzSendSyncData(KEYBOARD_PAUSE_PREFIX, "");
+  sendSync(KEYBOARD_PAUSE_PREFIX, "");
 }
 
 export function onKeyboardPause(s: ShellState): void {

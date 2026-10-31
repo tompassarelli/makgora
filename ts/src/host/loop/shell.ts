@@ -72,6 +72,7 @@ import { createEvents, onEvents } from "wisp/game/events";
 import { displayText, hideOriginFrames, loadFrameFile } from "wisp/game/frames";
 import { enableFog, enableFogMask, setCameraSmoothing, setTimeOfDay, setTimeOfDayScale } from "wisp/game/view";
 import { addLeaveEvent, eventPlayer, localPlayer, player, playerSlot, setPlayerColor } from "wisp/game/players";
+import { addSyncEvent } from "wisp/game/sync";
 
 const TICK = "shell.tick";
 const PLAYER_LEFT = "shell.playerLeft";
@@ -289,7 +290,7 @@ function developerChord(s: ShellState, key: number, handler: string): void {
 function syncTrigger(s: ShellState, prefix: string, handler: string, humansOnly: boolean): void {
   const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    if (!humansOnly || humanActive(s.game, slot)) BlzTriggerRegisterPlayerSyncEvent(trigger, player(slot), prefix, false);
+    if (!humansOnly || humanActive(s.game, slot)) addSyncEvent(trigger, player(slot), prefix);
   }
   onEvents(trigger, trampoline(handler));
 }

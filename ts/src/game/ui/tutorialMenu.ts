@@ -14,6 +14,7 @@ import { type ClickBox, createBackdrop, createText, placeTopLeft, styleMenuPanel
 import { TUTORIAL_BOX } from "./selectionLayout";
 import type { SelectionActions } from "./selectionActions";
 import { createFrame, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible } from "wisp/game/frames";
+import { sendSync } from "wisp/game/sync";
 
 export type TutorialButton = { kind: "tutorialOpen" } | { kind: "tutorialStep"; direction: -1 | 1 } | { kind: "tutorialStart" } | { kind: "tutorialClose" };
 
@@ -113,7 +114,7 @@ export const TUTORIAL_OFFER = "tutorial-offer";
 
 // Keys answer an open prompt on every client, and only this client knows its seen file, so the prompt opens through a sync event.
 export function offerTutorial(game: Readonly<MatchState>, seen: boolean): void {
-  if (offersTutorial(game, seen)) BlzSendSyncData(TUTORIAL_OFFER, "1");
+  if (offersTutorial(game, seen)) sendSync(TUTORIAL_OFFER, "1");
 }
 
 export const acceptsTutorialOffer = (open: boolean, choosing: Readonly<MatchState> | undefined): boolean => open || choosing !== undefined;

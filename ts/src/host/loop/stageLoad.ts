@@ -10,6 +10,7 @@ import type { ShellState } from "./state";
 import { views } from "./ui";
 import { drawStage } from "./view";
 import { eventPlayer, playerSlot } from "wisp/game/players";
+import { sendSync, syncData } from "wisp/game/sync";
 
 export const STAGE_READY = "shell.stageReady";
 
@@ -45,12 +46,12 @@ export function serviceStageLoad(s: ShellState): void {
   const load = s.stageLoad;
   if (load === undefined) return;
   const step = tickStageLoad(load);
-  if (step === StageLoadStep.report) BlzSendSyncData(STAGE_READY_PREFIX, `${load.stage}`);
+  if (step === StageLoadStep.report) sendSync(STAGE_READY_PREFIX, `${load.stage}`);
   else if (step === StageLoadStep.start) finishStageLoad(s);
 }
 
 
 export function stageReadyEvent(s: ShellState): void {
   const load = s.stageLoad;
-  if (load !== undefined && stageReported(load, playerSlot(eventPlayer()), BlzGetTriggerSyncData())) finishStageLoad(s);
+  if (load !== undefined && stageReported(load, playerSlot(eventPlayer()), syncData())) finishStageLoad(s);
 }

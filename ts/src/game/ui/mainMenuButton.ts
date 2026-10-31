@@ -3,6 +3,7 @@ import { panelButton } from "./infoPanel";
 import { MAIN_MENU_BOX } from "./selectionLayout";
 import { setFrameText } from "wisp/game/frames";
 import { localPlayer, player as playerOf } from "wisp/game/players";
+import { sendSync } from "wisp/game/sync";
 
 export const MAIN_MENU_PREFIX = "SC_MM";
 const LABEL = "Main menu";
@@ -24,7 +25,7 @@ export class MainMenuButton {
 
   // Engine: every client must open the title screen together, so the click is sent as sync data instead of set locally.
   private click(clicker: player): void {
-    if (clicker === playerOf(this.participantId) && localPlayer() === clicker) BlzSendSyncData(MAIN_MENU_PREFIX, "");
+    if (clicker === playerOf(this.participantId) && localPlayer() === clicker) sendSync(MAIN_MENU_PREFIX, "");
   }
 
   focus(focused: boolean): void {

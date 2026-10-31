@@ -46,6 +46,7 @@ import { pollPad, recordPadRow } from "./analogPad";
 import { beginRealFrames, pauseRealFrames, realFramesDue, realSeconds } from "./realFrames";
 import { beginNetEpoch, matchDelay, noteDepth, notePop, notePopBefore, noteReceived, noteSent, requestFor } from "./netDelay";
 import { eventPlayer, playerSlot } from "wisp/game/players";
+import { sendSync, syncData } from "wisp/game/sync";
 
 
 const STALL_NOTICE_CALLBACKS = 20;
@@ -153,7 +154,7 @@ function sendBatch(s: ShellState, rollback: Rollback, keyboard: KeyboardRollback
     return false;
   }
   const started = probeClockMs(s.probe);
-  const sent = BlzSendSyncData(INPUT_PREFIX, wire);
+  const sent = sendSync(INPUT_PREFIX, wire);
   probeSendFinished(s.probe, started);
   if (!sent) return false;
   for (let row = 0; row < count; row++) {
@@ -436,7 +437,7 @@ export function receiveInput(s: ShellState): void {
   s.trace.rawSyncEvents++;
   if (rollback === undefined) return;
   const sender = playerSlot(eventPlayer());
-  const wire = BlzGetTriggerSyncData();
+  const wire = syncData();
   if (rollback.journal !== undefined && receiveLifecycle(s, rollback, rollback.journal, sender, wire)) return;
   if (!rollback.active || !humanActive(s.game, sender)) return;
   const packets = TRANSPORT.decode(wire);
