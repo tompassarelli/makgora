@@ -26,11 +26,11 @@ if (typeof chosen === "string") {
   process.exit(2);
 }
 
-// a compiled player embeds Wisp's worker as simWorker.js, which Wisp names with its .ts source
+// a compiled player embeds Wisp's worker as simWorker.js, which Wisp names with its .ts source, and a Worker gets the environment the process started with unless given the current one
 const SourceWorker = globalThis.Worker;
 globalThis.Worker = class extends SourceWorker {
   constructor(url: string | URL, options?: WorkerOptions) {
-    super(typeof url === "string" ? url.replace(/\.ts$/, ".js") : url, options);
+    super(typeof url === "string" ? url.replace(/\.ts$/, ".js") : url, { env: process.env as Record<string, string>, ...options });
   }
 };
 
