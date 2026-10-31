@@ -12,7 +12,7 @@ const ISLE_PEAK = "Doodads\\Ruins\\Rocks\\Ruins_Spires\\Ruins_Spires0.mdx";
 export const STRATHOLME_SCENERY: StageScenery = {
   farZ: 13000.0,
   sky: STAGE_SKY_MODELS[6] ?? "",
-  skyLook: { zenith: [0.11, 0.094, 0.125], cover: 0.6, sunAzimuth: 90, sunElevation: 4, sun: [0.6, 0.15, 0.08], stars: 0.5, glow: 0.6 },
+  skyLook: { zenith: [f32(0.11), f32(0.094), 0.125], cover: f32(0.6), sunAzimuth: 90, sunElevation: 4, sun: [f32(0.6), f32(0.15), f32(0.08)], stars: 0.5, glow: f32(0.6) },
   fog: { start: 3300.0, end: 7000.0, red: 0.25, green: 0.265625, blue: 0.3125 },
   floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [36, 24, 20] },
   pieces: [
@@ -71,7 +71,7 @@ export const STRATHOLME_SCENERY: StageScenery = {
 export const TOMB_OF_SARGERAS_SCENERY: StageScenery = {
   farZ: 13000.0,
   sky: STAGE_SKY_MODELS[7] ?? "",
-  skyLook: { zenith: [0.11, 0.19, 0.24], cover: 0.75, sunAzimuth: 120, sunElevation: 40, sun: [0.5, 0.72, 0.68], stars: 0, glow: 0.1 },
+  skyLook: { zenith: [f32(0.11), f32(0.19), f32(0.24)], cover: 0.75, sunAzimuth: 120, sunElevation: 40, sun: [0.5, f32(0.72), f32(0.68)], stars: 0, glow: f32(0.1) },
   tint: [96, 144, 152],
   fog: { start: 5000.0, end: 11000.0, red: 0.25, green: 0.4375, blue: 0.46875 },
 

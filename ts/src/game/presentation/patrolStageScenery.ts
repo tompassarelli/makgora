@@ -27,7 +27,7 @@ const PLAGUE_CLOUD = "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.
 export const DUROTAR_SCENERY: StageScenery = {
   farZ: 13000.0,
   sky: STAGE_SKY_MODELS[3] ?? "",
-  skyLook: { zenith: [0.055, 0.047, 0.078], cover: 0.5, sunAzimuth: 90, sunElevation: 7, sun: [0.7, 0.32, 0.14], stars: 0, glow: 0.3 },
+  skyLook: { zenith: [f32(0.055), f32(0.047), f32(0.078)], cover: 0.5, sunAzimuth: 90, sunElevation: 7, sun: [f32(0.7), f32(0.32), f32(0.14)], stars: 0, glow: f32(0.3) },
   fog: { start: 5000.0, end: 11000.0, red: 0.09375, green: 0.0625, blue: 0.0625 },
   tint: [44, 38, 44],
   floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [22, 18, 20] },
