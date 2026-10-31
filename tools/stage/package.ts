@@ -9,7 +9,7 @@ import { stagePointLightMdl, stagePointLightModelFile } from "../../ts/scripts/s
 import { packageLiquids } from "./liquids";
 import { packageSkies } from "./skies";
 import { packageCrags } from "./crags";
-import { platformDeckFaces, texturedDeckMdl } from "../../ts/scripts/stageMaterials";
+import { platformDeckMdl, texturedDeckMdl } from "../../ts/scripts/stageMaterials";
 import { modelFacts } from "../../ts/node_modules/wisp/host/models/models";
 import { MODEL_FACTS } from "../../ts/scripts/wisp/modelFacts";
 import { roundedFacts, writeModelFacts } from "../../ts/scripts/wisp/modelFactsTable";
@@ -77,7 +77,7 @@ for (const { stage, theme, palette, materials } of STAGE_DECK_PALETTES) {
     const mainFaces = mainDeckFaces(mainDeckOutlineStage(stage));
     const authored = mainFaces.flatMap(face => face.corners.flatMap(corner => corner.map(Math.fround)));
     const { bytes: texture, name: textureName } = paletteTexture(palette);
-    const slab = materials === undefined ? slabMdl(textureName) : texturedDeckMdl(platformDeckFaces(), materials.platform, palette);
+    const slab = materials === undefined ? slabMdl(textureName) : platformDeckMdl(materials.platform, palette);
     const slabBytes = new Uint8Array(generateMDX(parseMDL(slab)));
     const slabName = `StageDeck-${hash(slabBytes)}.mdx`;
     const mainMdl = materials === undefined ? mainDeckMdl(mainFaces, textureName) : texturedDeckMdl(mainFaces, materials, palette);
@@ -93,7 +93,7 @@ for (const { stage, theme, palette, materials } of STAGE_DECK_PALETTES) {
     imports.push(slabName, mainName, textureName);
     let alternate = "";
     if (materials?.alternatePlatform !== undefined) {
-        const mdl = texturedDeckMdl(platformDeckFaces(), materials.alternatePlatform, palette);
+        const mdl = platformDeckMdl(materials.alternatePlatform, palette);
         const bytes = new Uint8Array(generateMDX(parseMDL(mdl)));
         const name = `StageDeck-${hash(bytes)}.mdx`;
         await Bun.write(join(output, name), bytes);

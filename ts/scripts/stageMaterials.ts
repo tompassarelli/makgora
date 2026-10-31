@@ -5,13 +5,13 @@ const parts = ["top", "lip", "body", "underside"] as const;
 const vec = (values: readonly number[]) => `{ ${values.join(", ")} }`;
 
 
-function tileFace(face: DeckFace, tileSize = 128): { corners: number[][]; uv: number[][] }[] {
+function tileFace(face: DeckFace, tileSize = 128, origin = 0): { corners: number[][]; uv: number[][] }[] {
   const axes = Math.abs(face.normal[2]) > 0.5 ? [0, 1] : Math.abs(face.normal[1]) > 0.5 ? [0, 2] : [1, 2];
   const a = axes[0] ?? 0, b = axes[1] ?? 2;
-  const lowA = Math.floor(Math.min(...face.corners.map(p => p[a] ?? 0)) / tileSize);
-  const highA = Math.ceil(Math.max(...face.corners.map(p => p[a] ?? 0)) / tileSize);
-  const lowB = Math.floor(Math.min(...face.corners.map(p => p[b] ?? 0)) / tileSize);
-  const highB = Math.ceil(Math.max(...face.corners.map(p => p[b] ?? 0)) / tileSize);
+  const lowA = Math.floor((Math.min(...face.corners.map(p => p[a] ?? 0)) - origin) / tileSize);
+  const highA = Math.ceil((Math.max(...face.corners.map(p => p[a] ?? 0)) - origin) / tileSize);
+  const lowB = Math.floor((Math.min(...face.corners.map(p => p[b] ?? 0)) - origin) / tileSize);
+  const highB = Math.ceil((Math.max(...face.corners.map(p => p[b] ?? 0)) - origin) / tileSize);
   const clip = (polygon: number[][], axis: number, limit: number, above: boolean): number[][] => {
     const result: number[][] = [];
     for (let i = 0; i < polygon.length; i++) {
@@ -30,16 +30,17 @@ function tileFace(face: DeckFace, tileSize = 128): { corners: number[][]; uv: nu
   };
   const cells: { corners: number[][]; uv: number[][] }[] = [];
   for (let x = lowA; x < highA; x++) for (let y = lowB; y < highB; y++) {
+    const startA = origin + x * tileSize, startB = origin + y * tileSize;
     let corners = face.corners.map(p => [...p]);
-    for (const [axis, limit, above] of [[a,x*tileSize,true],[a,(x+1)*tileSize,false],[b,y*tileSize,true],[b,(y+1)*tileSize,false]] as const) corners = clip(corners,axis,limit,above);
+    for (const [axis, limit, above] of [[a,startA,true],[a,startA+tileSize,false],[b,startB,true],[b,startB+tileSize,false]] as const) corners = clip(corners,axis,limit,above);
     if (corners.length < 3) continue;
-    cells.push({ corners, uv: corners.map(p => [((p[a] ?? 0)-x*tileSize)/tileSize,((p[b] ?? 0)-y*tileSize)/tileSize]) });
+    cells.push({ corners, uv: corners.map(p => [((p[a] ?? 0)-startA)/tileSize,((p[b] ?? 0)-startB)/tileSize]) });
   }
   return cells;
 }
 
 
-export function texturedDeckMdl(faces: readonly DeckFace[], materials: PlatformMaterialSet, palette: DeckPalette): string {
+export function texturedDeckMdl(faces: readonly DeckFace[], materials: PlatformMaterialSet, palette: DeckPalette, centredTiles = false): string {
   const tomb = materials.body.texture === "Textures\\RuinsNatural.blp";
   const textures = parts.map(part => tomb ? { ...materials[part], ...(part === "top" || part === "lip" ? { tileSize: 512 } : {}), ...(part === "body" || part === "underside" ? { tileSize: 4096 } : {}) } : materials[part]);
   if (tomb) faces = faces.flatMap(face => {
@@ -60,7 +61,7 @@ export function texturedDeckMdl(faces: readonly DeckFace[], materials: PlatformM
     if (source === undefined) throw new Error(`missing ${part} texture`);
     const [u0,v0,u1,v1] = source.crop ?? (source.texture.startsWith("TerrainArt\\") ? [0,0,0.25,0.25] : [0,0,1,1]);
     const vertices: number[][] = [], normals: number[][] = [], uv: number[][] = [], triangles: number[] = [];
-    for (const face of faces.filter(f=>f.material===material)) for (const cell of tomb && part !== "top" && part !== "lip" ? [{ corners: face.corners.map(p => [...p]), uv: face.corners.map(p => [(p[0] + 600) / 1200, (p[2] + 300) / 300]) }] : tileFace(face, source.tileSize)) {
+    for (const face of faces.filter(f=>f.material===material)) for (const cell of tomb && part !== "top" && part !== "lip" ? [{ corners: face.corners.map(p => [...p]), uv: face.corners.map(p => [(p[0] + 600) / 1200, (p[2] + 300) / 300]) }] : tileFace(face, source.tileSize, centredTiles ? -(source.tileSize ?? 128) / 2 : 0)) {
       const offset=vertices.length;
       vertices.push(...cell.corners); normals.push(...cell.corners.map(()=>[...face.normal]));
       const bottom = Math.min(...face.corners.map(p => p[2] ?? 0));
@@ -89,6 +90,11 @@ ${geosets.join("\n")}
 Bone "Deck" { ObjectId 0, GeosetId Multiple, GeosetAnimId None, }
 PivotPoints 1 { { 0, 0, 0 }, }
 `;
+}
+
+
+export function platformDeckMdl(materials: PlatformMaterialSet, palette: DeckPalette): string {
+  return texturedDeckMdl(platformDeckFaces(), materials, palette, true);
 }
 
 
