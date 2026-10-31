@@ -169,8 +169,8 @@ export const BLACKROCK_SCENERY: StageScenery = {
     { model: BASALT, x: 3200.0, y: 4050.0, z: -1550.0, scale: 6.0, yaw: 150.0, matrixScale: [2.25, 1.0, 2.0], color: [30, 28, 30] },
     { model: STAGE_CRAG_KNOLL_MODEL, x: 2100.0, y: 4000.0, z: -1500.0, scale: 1.0, yaw: 30.0, matrixScale: [14.0, 14.0, 14.0], color: [58, 40, 36] },
     { model: STAGE_CRAG_KNOLL_MODEL, x: -2500.0, y: 4000.0, z: -1500.0, scale: 1.0, yaw: 200.0, matrixScale: [13.0, 13.0, 12.0], color: [58, 40, 36] },
-    { model: PILLAR, x: 2100.0, y: 4000.0, z: 200.0, scale: 2.0, yaw: 0.0 },
-    { model: PILLAR, x: -2500.0, y: 4000.0, z: -60.0, scale: 2.0, yaw: 0.0 },
+    { model: PILLAR, x: 2100.0, y: 4000.0, z: 60.0, scale: 3.25, yaw: 0.0 },
+    { model: PILLAR, x: -2500.0, y: 4000.0, z: -140.0, scale: 3.0, yaw: 0.0 },
   ],
 };
 
