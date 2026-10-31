@@ -2,6 +2,7 @@
 import {parseMDL,generateMDX,parseMDX} from 'war3-model';
 import {join} from 'node:path';
 import {typescriptAssetInfo} from './asset-info';
+import {nodeFlags, restoreBillboards} from './billboards';
 
 const out=process.argv[2] ?? join(import.meta.dir,'../../build/illidan-animation');
 const metadataOnly=process.argv[3]==='--metadata-only';
@@ -19,7 +20,9 @@ const bindings: Binding[] = clips.map((clip)=>{
  return {...clip,index,seconds};
 });
 ensure(model.Geosets.length===18,'Expected 17 preserved geosets plus source-derived wings');
-const bytes=metadataOnly ? await Bun.file(join(out,'DemonHunterFighter.mdx')).arrayBuffer() : generateMDX(model);const decoded=parseMDX(bytes);
+const stock=join(import.meta.dir,'../../build/illidan-assets/demonhunter.mdx');
+const bytes=metadataOnly ? await Bun.file(join(out,'DemonHunterFighter.mdx')).arrayBuffer() : restoreBillboards(new Uint8Array(generateMDX(model)),await Bun.file(stock).bytes()).bytes.buffer;const decoded=parseMDX(bytes);
+ensure(nodeFlags(new Uint8Array(bytes)).some(node=>node.name==='heroglowtall'&&(node.flags&64)!==0),'Lost the stock billboard flags: Warcraft turns heroglowtall and the glaive glows toward the camera');
 ensure(decoded.Sequences.length===model.Sequences.length,'MDX lost sequences');
 ensure(decoded.Textures.length===model.Textures.length,'MDX lost textures');
 const source=await Bun.file(join(out,'source-textures.json')).json();
