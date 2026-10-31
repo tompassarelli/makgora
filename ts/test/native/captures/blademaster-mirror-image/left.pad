@@ -1,0 +1,11 @@
+# Blademaster's Mirror Image facing left: side-B on match frame 60 leaves the image where he stood on frame 71 (special frame 12) and steps him back; the image is his own model at alpha 120 in his team colour and stands until frame 280.
+#! cue 71-280 image: effect=HeroBladeMaster
+#! chat -dev setup quick pair mountain king / blademaster
+20 b stick -1 0
+32 b stick 0 0
+60 b stick -1 0
+60 b tap X 2
+62 b stick 0 0
+75 a capture
+90 a capture
+120 a capture
