@@ -2,10 +2,10 @@
 import { STAGE_DECK_MODEL, STAGE_DECK_MODELS, STAGE_MAIN_DECK_MODEL } from "../../generated/stages/stageAssetInfo";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { surfaceCount } from "../sim/stage";
-import { hasCannon, hasTide } from "../sim/stageHazards";
+import { hasCannon, hasTide, hasWind } from "../sim/stageHazards";
 import { hasLava } from "../sim/lava";
 import { STAGE_LAVA_MODEL } from "../../generated/stages/terrainAssetInfo";
-import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL } from "./stageHazards";
+import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, WIND_STREAK_MODEL } from "./stageHazards";
 import { placedPieces, stageScenery } from "./stageScenery";
 import { platformParts } from "./stockPlatforms";
 import { CARRIED_TEST_STAGE, SKY_STAGE, TOMB_OF_SARGERAS_STAGE, surfacePass } from "../sim/stage";
@@ -49,6 +49,7 @@ export function stageModels(stage: number): string[] {
   if (hasCannon(stage)) models.push(CANNON_MODEL);
   if (hasLava(stage)) models.push(STAGE_LAVA_MODEL);
   if (hasTide(stage)) models.push(HYDRA_CREST_MODEL, HYDRA_RING_MODEL);
+  if (hasWind(stage)) models.push(WIND_STREAK_MODEL);
   for (const piece of placedPieces(stage)) models.push(piece.model);
   for (const piece of stageScenery(stage).drifters ?? []) models.push(piece.model);
   if (stageEdgeLight(stage, 0, 0) !== undefined) models.push(STAGE_EDGE_LIGHT_MODEL);

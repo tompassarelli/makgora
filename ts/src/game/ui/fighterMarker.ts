@@ -3,7 +3,7 @@ import { type NumberJolt, colourCode, damageOutlineText, damageText, numberJolt,
 import { unitsForPixels } from "./portraitFrames";
 import { slotColor } from "./slotColors";
 import { createBackdrop, createText, consoleUi } from "./frames";
-import { MENU_FONT } from "./hudLayout";
+import { MENU_FONT, markerArrowTexture } from "./hudLayout";
 import { attachOutline, createOutline, createTemplateOutline, setOutlineText } from "./textOutline";
 
 export const MARKER_WIDTH = unitsForPixels(220);
@@ -123,7 +123,7 @@ export class FighterMarker {
     if (!shown) return;
     if (this.shownColor !== color) {
       this.shownColor = color;
-      BlzFrameSetTexture(this.arrow, `war3mapImported\\MarkerArrow${I2S(color)}.tga`, 0, true);
+      BlzFrameSetTexture(this.arrow, markerArrowTexture(color), 0, true);
       BlzFrameSetText(this.name, markerNameText(partner, human, this.playerName, slotColor(color).rgb));
     }
     this.showDamage(damage);

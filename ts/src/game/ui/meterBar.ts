@@ -8,6 +8,7 @@ const LINE_WIDTH = f32(0.0006);
 const ULTIMATE_FILL = "ReplaceableTextures\\TeamColor\\TeamColor04.blp";
 const ULTIMATE_PULSE = "ReplaceableTextures\\TeamColor\\TeamColor05.blp";
 const DRAIN = "ReplaceableTextures\\TeamColor\\TeamColor03.blp";
+export const METER_TEXTURES = [ULTIMATE_FILL, ULTIMATE_PULSE, DRAIN] as const;
 const DRAIN_ALPHA = 210;
 const FRAME_LEVELS = [22, 23, 24, 25] as const;
 

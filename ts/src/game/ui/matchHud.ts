@@ -14,7 +14,7 @@ import {
 import { attachOutline, createOutline, createTemplateOutline, destroyOutline, setOutlineText, showOutline } from "./textOutline";
 import { unitsForPixels } from "./portraitFrames";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
-import { MENU_FONT } from "./hudLayout";
+import { MENU_FONT, hudPlateTexture } from "./hudLayout";
 import { clockHundredths, clockMain, clockSeconds, hundredthsLabel } from "./clockReadout";
 
 
@@ -227,7 +227,7 @@ export class FighterHud {
       this.shownCostume = costume;
       this.shownColor = color;
       this.shownMirrored = this.panel.mirrored;
-      BlzFrameSetTexture(this.plate, `war3mapImported\\HudPlate${this.panel.mirrored ? "Mirror" : ""}${I2S(color)}.tga`, 0, true);
+      BlzFrameSetTexture(this.plate, hudPlateTexture(color, this.panel.mirrored), 0, true);
       BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Bust", color, costume), 0, true);
       for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", color, costume), 0, true);
     }

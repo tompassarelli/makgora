@@ -16,7 +16,11 @@ import { Character } from "../../src/game/sim/codes";
 import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { DIZZY_MODEL } from "../../src/host/loop/fighterBody";
-import { preloadFighterModels } from "../../src/game/render/fighterPreload";
+import { preloadFighterModels, preloadFighterTextures } from "../../src/game/render/fighterPreload";
+import { preloadMatchModels } from "../../src/game/render/matchPreload";
+import { preloadHudTextures } from "../../src/game/ui/hudPreload";
+import { SELECTABLE_CHARACTERS } from "../../src/game/roster/kits";
+import { cueModels } from "./cueModels";
 import { preloadModels, preloadSkies } from "../../src/game/presentation/stagePreload";
 import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "./headless";
 import { deliverKey } from "./deliverKey";
@@ -178,9 +182,15 @@ export async function createStandaloneSession(options: { readonly script?: strin
   }
 }
 
+/** Every model and interface image a match can show on any selectable stage with any selectable fighter, so the native window reads them in, and remasters them, while the player is in the menus. */
+export const standalonePreload = () => ({
+  preloadModels: [...new Set([DIZZY_MODEL, ...preloadFighterModels(), ...preloadModels(), ...preloadSkies(), ...preloadMatchModels(), ...cueModels(SELECTABLE_CHARACTERS)])],
+  preloadTextures: [...new Set([...preloadHudTextures(), ...preloadFighterTextures()])],
+});
+
 export const smashcraftStandalone = (render: StandaloneGame["render"]): StandaloneGame => ({
   title: "Smashcraft",
-  render: { ...render, preloadModels: [...new Set([DIZZY_MODEL, ...preloadFighterModels(), ...preloadModels(), ...preloadSkies()])] },
+  render: { ...render, ...standalonePreload() },
   create: createStandaloneSession,
   net: { mapHash: smashcraftMapHash, create: createNetStandalone },
 });
