@@ -57,7 +57,7 @@ jobs:
           if [ "${{ matrix.name }}" = windows ]; then
             cp ts/node_modules/wisp/native/windows/map-pack.exe "$RUNNER_TEMP/tools/map-pack.exe"
           else
-            git clone --depth 1 --branch v9.31 https://github.com/ladislav-zezula/StormLib "$RUNNER_TEMP/stormlib"
+            git clone --depth 1 --branch v9.30 https://github.com/ladislav-zezula/StormLib "$RUNNER_TEMP/stormlib"
             cmake -S "$RUNNER_TEMP/stormlib" -B "$RUNNER_TEMP/storm-build" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
             cmake --build "$RUNNER_TEMP/storm-build" --parallel
             gcc -O2 -I"$RUNNER_TEMP/stormlib/src" ts/node_modules/wisp/native/map-pack.c "$(find "$RUNNER_TEMP/storm-build" -name libstorm.a | head -1)" -lz -lbz2 -lstdc++ -o "$RUNNER_TEMP/tools/map-pack"
