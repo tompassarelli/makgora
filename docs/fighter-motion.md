@@ -64,7 +64,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Muradin Bronzebeard | ledge-get-up | 41: Recovery ledgeClimb | 112.3 | 64.2 | up; 110.7/0.0 |
 | Muradin Bronzebeard | ledge-roll | 42: Recovery ledgeRoll | 109.9 | 43.3 | forward; 71.0/83.6 |
 | Muradin Bronzebeard | ledge-attack | 43: Recovery ledgeAttack | 185.5 | 83.0 | both; 110.7/106.4 |
-| Maiev Shadowsong | walk | 2: Walk | 89.0 | 21.5 | forward; 88.6/85.1 |
+| Maiev Shadowsong | walk | 78: Movement run | 90.1 | 11.4 | forward; 84.2/88.5 |
 | Maiev Shadowsong | dash | 78: Movement run | 86.5 | 10.3 | forward; 81.5/85.0 |
 | Maiev Shadowsong | run | 78: Movement run | 79.9 | 13.9 | forward; 75.7/74.4 |
 | Maiev Shadowsong | turn | 12: Recovery turn | 128.1 | 27.2 | back; 128.1/90.5 |
@@ -625,4 +625,4 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Alchemist (WIP) | ledge-roll | 4: Walk 1 | 114.2 | 31.2 | forward; 107.3/108.7 |
 | Alchemist (WIP) | ledge-attack | 3: attack one -1 NEW | 140.2 | 38.2 | both; 73.2/135.7 |
 
-Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floaters Firelord and Lady Vashj. Warden, Tyrande and Jaina are grounded and their models carry a single stock Walk, so Warden and Tyrande run on an authored `Movement run` (tools/animations/run-clips.ts, #834) whose stride is measured over the grounded vertices that move, leaving the hem and pelvis out. Jaina (about 1.15x) is marginal and stays on her walk.
+Walking/running cadence uses grounded vertices' horizontal excursion twice per cycle. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floaters Firelord and Lady Vashj. Warden, Tyrande and Jaina are grounded and their models carry a single stock Walk, so Warden and Tyrande run on an authored `Movement run` (tools/animations/run-clips.ts, #834) whose stride is measured over the grounded vertices that move, leaving the hem and pelvis out. Warden walks on it too (`--walk`): her stock Walk would need 6.3x at walk speed, past the cap, while the authored clip plays at 3.4x with the feet within 15% of the body. Jaina (about 1.15x) is marginal and stays on her walk.

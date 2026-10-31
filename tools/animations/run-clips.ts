@@ -22,7 +22,7 @@ const [inputArg, outputArg, ...options] = process.argv.slice(2);
 const input = resolve(inputArg ?? ""), output = resolve(outputArg ?? "");
 const project = resolve(import.meta.dir, "../..");
 const character = Number(options[options.indexOf("--character") + 1]) as Character;
-ensure(inputArg && outputArg && relative(project, output).startsWith("..") && options.includes("--character"), "usage: bun tools/animations/run-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID");
+ensure(inputArg && outputArg && relative(project, output).startsWith("..") && options.includes("--character"), "usage: bun tools/animations/run-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID [--walk]");
 const fighter = fighters.get(character), rig = FIGHTER_RIGS.get(character);
 ensure(fighter && rig, `no fighter or canonical rig for character ${character}`);
 
@@ -176,7 +176,7 @@ await Bun.write(join(output, `${fighter.name}-run.png`), sheet(`${fighter.name} 
 
 const tables: Record<number, Partial<Record<string, HeroClip>>> = { ...(MOVEMENT_CLIPS as Readonly<Record<number, HeroClipTable>>) };
 const bound = { index, seconds: Math.fround(duration) };
-tables[character] = { ...tables[character], run: bound, dash: bound };
+tables[character] = { ...tables[character], ...(options.includes("--walk") ? { walk: bound } : {}), run: bound, dash: bound };
 const entries = Object.entries(tables).sort(([a], [b]) => Number(a) - Number(b)).flatMap(([key, table]) => Object.keys(table).length === 0 ? [] : [`  ${key}: {`,
   ...Object.entries(table).map(([pose, clip]) => `    ${pose}: { index: ${clip!.index}, seconds: ${seconds(Math.fround(clip!.seconds))} },`), "  },"]);
 await Bun.write(join(project, "ts/src/game/presentation/movementClipInfo.ts"), [

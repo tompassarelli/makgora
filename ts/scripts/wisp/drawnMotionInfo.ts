@@ -81,7 +81,7 @@ export const DRAWN_MOTION: readonly DrawnMotionRow[] = [
   {"character":4,"state":"ledge-get-up","model":"units\\human\\HeroMountainKing\\HeroMountainKing.mdl","clips":[41],"names":["Recovery ledgeClimb"],"motion":112.3,"body":64.2,"direction":"up","toward":110.7,"against":0},
   {"character":4,"state":"ledge-roll","model":"units\\human\\HeroMountainKing\\HeroMountainKing.mdl","clips":[42],"names":["Recovery ledgeRoll"],"motion":109.9,"body":43.3,"direction":"forward","toward":71,"against":83.6},
   {"character":4,"state":"ledge-attack","model":"units\\human\\HeroMountainKing\\HeroMountainKing.mdl","clips":[43],"names":["Recovery ledgeAttack"],"motion":185.5,"body":83,"direction":"both","toward":110.7,"against":106.4},
-  {"character":5,"state":"walk","model":"Units\\NightElf\\HeroWarden\\HeroWarden.mdx","clips":[2],"names":["Walk"],"motion":89,"body":21.5,"direction":"forward","toward":88.6,"against":85.1},
+  {"character":5,"state":"walk","model":"Units\\NightElf\\HeroWarden\\HeroWarden.mdx","clips":[78],"names":["Movement run"],"motion":90.1,"body":11.4,"direction":"forward","toward":84.2,"against":88.5},
   {"character":5,"state":"dash","model":"Units\\NightElf\\HeroWarden\\HeroWarden.mdx","clips":[78],"names":["Movement run"],"motion":86.5,"body":10.3,"direction":"forward","toward":81.5,"against":85},
   {"character":5,"state":"run","model":"Units\\NightElf\\HeroWarden\\HeroWarden.mdx","clips":[78],"names":["Movement run"],"motion":79.9,"body":13.9,"direction":"forward","toward":75.7,"against":74.4},
   {"character":5,"state":"turn","model":"Units\\NightElf\\HeroWarden\\HeroWarden.mdx","clips":[12],"names":["Recovery turn"],"motion":128.1,"body":27.2,"direction":"back","toward":128.1,"against":90.5},

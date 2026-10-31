@@ -16,6 +16,7 @@ export const MOVEMENT_CLIPS = {
   5: {
     crouch: { index: 72, seconds: f32(0.4) },
     ledgeHang: { index: 76, seconds: 1.0 },
+    walk: { index: 78, seconds: f32(0.8833333) },
     run: { index: 78, seconds: f32(0.8833333) },
     dash: { index: 78, seconds: f32(0.8833333) },
   },
