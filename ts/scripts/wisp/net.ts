@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import type { NetGame } from "wisp/scripts/wisp/net/peer";
 import type { StandaloneInput, StandaloneNetSession } from "wisp/scripts/wisp/standalone";
+import type { KeyTransition } from "wisp/src/headless/keyInput";
 import type { LockstepLink } from "wisp/src/headless/lockstep";
 import { pendingRow, windowHalted } from "wisp/src/netcode/shadowSchedule";
 import { PARTICIPANT_CAPACITY } from "../../src/game/input/participants";
@@ -97,6 +98,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
     const chat = (options.script ?? "").split("\n").map((line) => line.trim()).filter((line) => line.startsWith("#! chat ")).map((line) => line.substring(8));
     let latest: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
     let held = new Set<number>();
+    let typed: KeyTransition[] = [];
     let lastPhase = -1;
     let controlsClosed = false;
     const net = netcodeStats();
@@ -105,7 +107,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
     let measuredRtt: number | undefined;
     return {
       client,
-      input: (input) => { latest = input; },
+      input: (input) => { latest = input; if (input.keys !== undefined) typed.push(...input.keys); },
       start: () => lockstep.start(),
       measured: (rttMs) => {
         measuredRtt = rttMs;
@@ -135,7 +137,12 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
             if (lastPhase === Phase.match) presses.press(key, tick);
           }
           held = next;
+          for (const { key, meta, down } of typed) {
+            lockstep.key(slot, key, meta, down);
+            if (down && lastPhase === Phase.match) presses.press(key, tick);
+          }
         }
+        typed = [];
         tick++;
         lockstep.frames(1);
         presses.poll(tick);
