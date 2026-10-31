@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "./fighter";
 import type { Controls } from "./roster";
 import type { ShieldGeometry } from "./tuning";
-import { stickX, stickZ } from "./stick";
+import { stickX, stickZ, TILT_STICK_DOWN, TILT_STICK_UP, TILT_STICK_X } from "./stick";
 
 
 
@@ -14,14 +14,19 @@ const DOWN_REACH = f32(3.6297448);
 const FORWARD_REACH = 2.75;
 const BACK_REACH = f32(3.3000001);
 
+function capTilt(stick: number, low: number, high: number): number {
+  return stick < low ? low : stick > high ? high : stick;
+}
+
 export function advanceShieldTilt(fighter: Fighter, input: Readonly<Controls>): void {
   const active = fighter.shield.raised && input.diStickValid;
-  fighter.shield.tiltX = active ? stickX(input) : 0.0;
-  fighter.shield.tiltZ = active ? stickZ(input) : 0.0;
+  fighter.shield.tiltX = active ? capTilt(stickX(input), -TILT_STICK_X, TILT_STICK_X) : 0.0;
+  fighter.shield.tiltZ = active ? capTilt(stickZ(input), -TILT_STICK_DOWN, TILT_STICK_UP) : 0.0;
 }
 
 export function shieldReach(geometry: Readonly<ShieldGeometry>): number {
-  const tilt = f32(f32(Math.max(UP_REACH, DOWN_REACH, FORWARD_REACH, BACK_REACH) * geometry.radius) / RETAIL_RADIUS);
+  const farthest = Math.max(f32(UP_REACH * TILT_STICK_UP), f32(DOWN_REACH * TILT_STICK_DOWN), f32(FORWARD_REACH * TILT_STICK_X), f32(BACK_REACH * TILT_STICK_X));
+  const tilt = f32(f32(farthest * geometry.radius) / RETAIL_RADIUS);
   return f32(f32(Math.max(Math.abs(geometry.centerX), Math.abs(geometry.centerZ)) + tilt) + geometry.radius);
 }
 

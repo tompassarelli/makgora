@@ -107,8 +107,7 @@ The tilt modifier (both held) shortens the stick as a box controller's modifier 
 jumps: the input adapter scales each axis so a full press sends x = ±0.6875,
 up 0.65 and down −0.675, one Melee stick unit (0.0125) inside roll and spot
 dodge (0.7, `SHIELD_DODGE_STICK_THRESHOLD`), tap jump (0.6625) and crouch and
-platform drop (0.6875). The same values apply with or without shield; there is
-no separate shield cap. Diagonals and analog sticks scale by the same per-axis
+platform drop (0.6875). The same values apply with or without shield. Diagonals and analog sticks scale by the same per-axis
 limits, and DI, shield tilt, air drift and specials read the shortened values;
 a bot that sets the modifier on digital directions reads them too. Side walks
 in the walk-middle zone at one full walk speed, never dashing (0.8), up stays
@@ -119,6 +118,16 @@ held stays until −0.625. Up + modifier in a dash or run is above the relaxed
 Wall jumps need x ≥ 0.8, so the modifier never wall-jumps. The values are
 `TILT_STICK_X`, `TILT_STICK_UP` and `TILT_STICK_DOWN` in
 smashcraft:ts/src/game/sim/stick.ts.
+
+Shield tilt is capped at those values on every input (departs from Melee, where a
+full stick pushes the bubble farthest): a raised shield tilts per axis to at most
+x = ±0.6875, up 0.65 and down −0.675, so a full stick press, a diagonal or a
+pad's analog stick puts the bubble exactly where the tilt modifier's press does,
+and a press below the cap tilts as before. Shield reach (`shieldReach`) is the
+farthest capped tilt. Tom asked on 1 Nov 2026 (playtest) that the bubble's
+separation from the body at full forward be capped at what the largest shield
+tilt gives, since it sat unusually far from the body; the cap is
+`advanceShieldTilt` in smashcraft:ts/src/game/sim/shieldTilt.ts.
 
 
 ### States and their options
