@@ -41,6 +41,7 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
     copyFileSync(join(tools, tool), join(out, tool));
     chmodSync(join(out, tool), 0o755);
   }
+  copyFileSync(join(import.meta.dir, "../node_modules/wisp/src/natives/warcraft.d.ts"), join(out, "warcraft.d.ts"));
   writeFileSync(join(out, "README.txt"), README(version));
   console.log(`player package: ${out}`);
 });
