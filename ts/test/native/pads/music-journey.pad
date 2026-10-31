@@ -1,0 +1,10 @@
+#! select cpu
+# wisp#188: title, character select, stage select, match, results, rematch, results and back to character select; run with --start select --chosen demonHunter.
+60 back
+140 start
+220 start
+300 start
+1200 left
+1240 attack
+1960 right
+2000 attack

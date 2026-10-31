@@ -12,7 +12,7 @@ import { describeDigestDifference, digestDifference, frameDigest } from "../../s
 import { Action } from "../../src/game/input/actions";
 import { DEFAULT_PRESET, keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
-import { Phase, selectCharacter } from "../../src/game/lobby/lobbyState";
+import { Phase, cycleSlotMode, selectCharacter, selectCpuCharacter, setCpuOpponent, setCpuTier, setStocks } from "../../src/game/lobby/lobbyState";
 import { fighterAt, isActive } from "../../src/game/sim/roster";
 import { Character } from "../../src/game/sim/codes";
 import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
@@ -38,6 +38,7 @@ const ACTIONS: Readonly<Record<string, Action>> = {
   cUp: Action.cUp, cDown: Action.cDown,
 };
 const BINDINGS = presetBindings(DEFAULT_PRESET);
+const ESCAPE_KEY = 0x1b;
 export const NEUTRAL_INPUT: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
 
 export function heldKeys(input: StandaloneInput): Set<number> {
@@ -49,7 +50,7 @@ export function heldKeys(input: StandaloneInput): Set<number> {
   const held = new Set<number>();
   for (const button of buttons) {
     const action = ACTIONS[button];
-    const key = button === "start" ? 89 : button === "view" ? 75 : action === undefined ? undefined : keyFor(BINDINGS, action, 0);
+    const key = button === "start" ? 89 : button === "view" ? 75 : button === "back" ? ESCAPE_KEY : action === undefined ? undefined : keyFor(BINDINGS, action, 0);
     if (key !== undefined) held.add(key);
   }
   return held;
@@ -64,13 +65,15 @@ const FOUR_FIGHTERS = ["-dev slots 1 14", "-dev fighter 2 Blademaster", "-dev fi
 const FOUR_FIGHTER_STOCKS = 99;
 
 
-/** A script whose first line is this stays on character select instead of starting a match, so a scene check can draw the selection screen. Its other lines are `STEP BUTTON`, which holds that button (attack, special, jump, left and so on) for 3 steps from STEP, and `STEP click X Y`, which clicks at X, Y of Warcraft's 0.8 by 0.6 screen once at STEP; a click on Done closes the controls panel that opens first. */
+/** A script whose first line is this stays on character select instead of starting a match, so a scene check can draw the selection screen. Its other lines are `STEP BUTTON`, which holds that button (attack, special, jump, left and so on) for 3 steps from STEP, and `STEP click X Y`, which clicks at X, Y of Warcraft's 0.8 by 0.6 screen once at STEP; `start` and `back` (Esc) work as buttons too, and a `cpu` word on the first line (`#! select cpu`) fills slot 2 with a one-stock Wren Expert so a match ends by itself; a click on Done closes the controls panel that opens first. */
 const SELECTION_SCRIPT = "#! select";
+const CPU_OPPONENT = "cpu";
+const MENU_BUTTONS = new Set(["start", "back"]);
 
 const selectionLines = (script: string) => script.split("\n").map(line => line.trim().split(/\s+/)).filter(([step]) => /^\d+$/.test(step ?? ""));
 
 const selectionPresses = (script: string): readonly { readonly step: number; readonly button: string }[] =>
-  selectionLines(script).flatMap(([step, button]) => button !== undefined && ACTIONS[button] !== undefined ? [{ step: Number(step), button }] : []);
+  selectionLines(script).flatMap(([step, button]) => button !== undefined && (ACTIONS[button] !== undefined || MENU_BUTTONS.has(button)) ? [{ step: Number(step), button }] : []);
 
 const selectionClicks = (script: string): readonly { readonly step: number; readonly x: number; readonly y: number }[] =>
   selectionLines(script).flatMap(([step, verb, x, y]) => verb === "click" ? [{ step: Number(step), x: Number(x), y: Number(y) }] : []);
@@ -80,6 +83,19 @@ export type StandaloneStart = "match" | "select" | "results";
 const offersPrompt = (start: StandaloneStart, savedFiles: string | undefined): boolean => start !== "select" || savedFiles !== undefined;
 
 const clientOptions = (savedFiles: string | undefined) => savedFiles === undefined ? { keepCalls: 0 } : { keepCalls: 0, files: () => customMapData(savedFiles) };
+
+const OPPONENT_SLOT = 1;
+
+const asksForCpu = (script: string | undefined): boolean => script?.startsWith(SELECTION_SCRIPT) === true && script.split("\n", 1)[0]?.split(/\s+/).includes(CPU_OPPONENT) === true;
+
+function addCpuOpponent(game: Parameters<typeof cycleSlotMode>[0]): void {
+  cycleSlotMode(game, 0, OPPONENT_SLOT);
+  cycleSlotMode(game, 0, OPPONENT_SLOT);
+  setCpuOpponent(game, 0, OPPONENT_SLOT, "wren");
+  setCpuTier(game, 0, OPPONENT_SLOT, "expert");
+  selectCpuCharacter(game, 0, OPPONENT_SLOT, Character.demonHunter);
+  setStocks(game, 0, 1);
+}
 
 const QUICK_MATCH = "-dev quick cpu wren expert hero illidan";
 const SELECT_SETTLE_STEPS = 30;
@@ -131,7 +147,7 @@ export async function createStandaloneSession(options: { readonly script?: strin
       state.game.stockCount = FOUR_FIGHTER_STOCKS;
       startQuickMatch(state, 0, undefined, Character.demonHunter, FOUR_FIGHTER_STOCKS);
     });
-    else if (selection) client.run(() => undefined);
+    else if (selection) client.run(() => { if (asksForCpu(script)) addCpuOpponent(shell().game as unknown as Parameters<typeof cycleSlotMode>[0]); });
     else if (script === undefined) client.run(() => {
       applyDeveloperCommand(shell(), 0, QUICK_MATCH);
       if (start === "results") for (const slot of PARTICIPANT_SLOTS) if (isActive(shell().world, slot)) fighterAt(shell().world, slot).status.stocks = 1;
