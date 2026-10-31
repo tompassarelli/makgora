@@ -70,6 +70,7 @@ import { advanceHandleLedger, handleLedger, installHandleLedger } from "./handle
 import { knownFrame } from "wisp/src/netcode/shadowSchedule";
 import { createEvents, onEvents } from "wisp/game/events";
 import { displayText, hideOriginFrames, loadFrameFile } from "wisp/game/frames";
+import { addChatEvent, addKeyEvent, chatText, enableSelections, enableUserControl, osKey } from "wisp/game/input";
 import { enableFog, enableFogMask, setCameraSmoothing, setTimeOfDay, setTimeOfDayScale } from "wisp/game/view";
 import { addLeaveEvent, eventPlayer, localPlayer, player, playerSlot, setPlayerColor } from "wisp/game/players";
 import { addSyncEvent } from "wisp/game/sync";
@@ -237,7 +238,7 @@ function controlsCommand(s: ShellState): void {
   const settings = s.participants[slot].bindings;
   if (!settings.ready) return;
   const announce = (message: string): void => displayText(player(slot), 0, 0, message);
-  if (GetEventPlayerChatString() === SAVE_CONTROLS) {
+  if (chatText() === SAVE_CONTROLS) {
     saveBindingSettings(settings);
     announce(settings.message);
   } else {
@@ -283,7 +284,7 @@ function playerLeft(s: ShellState): void {
 function developerChord(s: ShellState, key: number, handler: string): void {
   const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    if (humanActive(s.game, slot)) BlzTriggerRegisterPlayerKeyEvent(trigger, player(slot), ConvertOsKeyType(key), 2, true);
+    if (humanActive(s.game, slot)) addKeyEvent(trigger, player(slot), osKey(key), 2, true);
   }
   onEvents(trigger, trampoline(handler));
 }
@@ -330,23 +331,23 @@ function createTriggers(s: ShellState): void {
   }
   if (s.build.devConsole) {
     const chat = createEvents();
-    for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, player(slot), "-dev ", false);
+    for (const slot of PARTICIPANT_SLOTS) addChatEvent(chat, player(slot), "-dev ", false);
     onEvents(chat, trampoline(DEV_COMMAND));
   }
   const received = createEvents();
   registerChatEvents(received, PARTICIPANT_SLOTS);
   onEvents(received, trampoline(CHAT_RECEIVED));
   const history = createEvents();
-  registerChatHistoryKey(history, PARTICIPANT_SLOTS, ConvertOsKeyType(Key.f8));
+  registerChatHistoryKey(history, PARTICIPANT_SLOTS, osKey(Key.f8));
   onEvents(history, trampoline(CHAT_HISTORY));
   const controls = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    TriggerRegisterPlayerChatEvent(controls, player(slot), SAVE_CONTROLS, true);
-    TriggerRegisterPlayerChatEvent(controls, player(slot), LOAD_CONTROLS, true);
+    addChatEvent(controls, player(slot), SAVE_CONTROLS, true);
+    addChatEvent(controls, player(slot), LOAD_CONTROLS, true);
   }
   onEvents(controls, trampoline(CONTROLS_COMMAND));
   const clip = createEvents();
-  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(clip, player(slot), SAVE_MOMENT_COMMAND, true);
+  for (const slot of PARTICIPANT_SLOTS) addChatEvent(clip, player(slot), SAVE_MOMENT_COMMAND, true);
   onEvents(clip, trampoline(SAVE_MOMENT));
   syncTrigger(s, PLAYTEST_PREFIX, PLAYTEST, true);
   syncTrigger(s, STAGE_READY_PREFIX, STAGE_READY, true);
@@ -374,8 +375,8 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
   hideOriginFrames(true);
 
   if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(localPlayer(), 0.0, 0.0, "Smashcraft's menus could not load. Restart the game.");
-  BlzEnableSelections(false, false);
-  EnableUserControl(true);
+  enableSelections(false, false);
+  enableUserControl(true);
   enableFog(false);
   enableFogMask(false);
 

@@ -13,6 +13,7 @@ import { activeRollback, shellState } from "../host/loop/state";
 import { FRAME_SECTIONS } from "../host/loop/frameSections";
 import { createEvents, onEvents } from "wisp/game/events";
 import { displayTimedText } from "wisp/game/frames";
+import { addChatEvent, chatText } from "wisp/game/input";
 import { eventPlayer, player } from "wisp/game/players";
 
 
@@ -34,7 +35,7 @@ const CAPTURE_COMMAND = "-dev capture ";
 const CAPTURE_HANDLER = "frameMeter.capture";
 
 function captureCommand(): void {
-  const text = GetEventPlayerChatString().substring(CAPTURE_COMMAND.length);
+  const text = chatText().substring(CAPTURE_COMMAND.length);
   if (text === "clear" || text.includes(" ")) return;
   const state = shellState();
   if (state === undefined || state.game.phase !== Phase.match) throw new Error("start a match before capturing frame cost");
@@ -62,6 +63,6 @@ export function startMatchFrameMeter(): void {
   });
   on(CAPTURE_HANDLER, captureCommand);
   const chat = createEvents();
-  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, player(slot), CAPTURE_COMMAND, false);
+  for (const slot of PARTICIPANT_SLOTS) addChatEvent(chat, player(slot), CAPTURE_COMMAND, false);
   onEvents(chat, trampoline(CAPTURE_HANDLER));
 }

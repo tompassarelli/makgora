@@ -8,6 +8,7 @@ import { warcraftChatOpen } from "../../platform/editboxJournal";
 import { localParticipantSlot } from "./diagnostics";
 import { type ShellState, localSlot } from "./state";
 import { views } from "./ui";
+import { windowFocused } from "wisp/game/input";
 import { eventPlayer, playerSlot } from "wisp/game/players";
 
 export function localHints(s: Readonly<ShellState>): boolean {
@@ -17,7 +18,7 @@ export function localHints(s: Readonly<ShellState>): boolean {
 
 // Capture maps play pads inside the map, so -dev hints chooses the look there instead of reading the connected controller.
 export function localDevice(s: Readonly<ShellState>): HintDevice {
-  return s.dev.hintsLook ?? (BlzIsLocalClientActive() && osKeyDown(PAD_PRESENT_KEY) ? "pad" : "keyboard");
+  return s.dev.hintsLook ?? (windowFocused() && osKeyDown(PAD_PRESENT_KEY) ? "pad" : "keyboard");
 }
 
 export function localHintsKey(s: Readonly<ShellState>): boolean {

@@ -1,14 +1,15 @@
+import { keyDown, osKey } from "wisp/game/input";
 const types: oskeytype[] = [];
 
 export function osKeyType(key: number): oskeytype {
   const known = types[key];
   if (known !== undefined) return known;
-  const type = ConvertOsKeyType(key);
+  const type = osKey(key);
   types[key] = type;
   return type;
 }
 
-export const osKeyDown = (key: number): boolean => BlzIsKeyPressed(osKeyType(key));
+export const osKeyDown = (key: number): boolean => keyDown(osKeyType(key));
 
 const MATCH_POLLS = 240;
 

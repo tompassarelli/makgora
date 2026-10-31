@@ -7,6 +7,7 @@ import { readChunk, writeLine } from "wisp/src/platform/fileio";
 import { nativeChatFile } from "../game/core/gameFiles";
 import { createEvents, onEvents } from "wisp/game/events";
 import { addFrameEvent, createFrameByType, frameChild, frameChildCount, frameName, frameText, frameTextLimit, frameVisible, originFrame, setFrameAbsPoint, setFrameAlpha, setFrameFocus, setFrameSize, setFrameText, setFrameTextLimit, setFrameVisible } from "wisp/game/frames";
+import { windowFocused } from "wisp/game/input";
 
 
 export const EDITBOX_ENTER = "journal.editboxEnter";
@@ -134,7 +135,7 @@ export class EditboxIngress {
 
 
   takePauseControls(): string {
-    if (this.session?.chat !== "receiving" || !BlzIsLocalClientActive()) return "";
+    if (this.session?.chat !== "receiving" || !windowFocused()) return "";
     const text = frameText(this.box);
     let journal = "";
     let controls = "";
@@ -166,7 +167,7 @@ export class EditboxIngress {
 
   peek(): string | undefined {
     const { session } = this;
-    if (session === undefined || !session.receiving() || !BlzIsLocalClientActive()) return undefined;
+    if (session === undefined || !session.receiving() || !windowFocused()) return undefined;
     const text = frameText(this.box);
     const rest = session.drain(text);
     if (rest !== text) setFrameText(this.box, rest);

@@ -19,6 +19,7 @@ import { STAGE_CHIP_TEXTURE, StageCard } from "./stageCard";
 import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, START_BUTTON, startButtonContains } from "./selectionLayout";
 import { destroyEvents } from "wisp/game/events";
 import { createFrame, createFrameByType, destroyFrame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, setPointer } from "wisp/game/input";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { sendSync } from "wisp/game/sync";
 import { formatInt, parseInt, toReal, truncate } from "wisp/game/text";
@@ -181,10 +182,10 @@ export class StagePanel {
     const width = toReal(screenWidth());
     const height = toReal(screenHeight());
     if (width <= 0 || height <= 0) return;
-    if (startButtonContains(pointerX(toReal(BlzGetMouseScreenPosX()), width, height), pointerY(toReal(BlzGetMouseScreenPosY()), height))) return;
+    if (startButtonContains(pointerX(toReal(inputPointerX()), width, height), pointerY(toReal(inputPointerY()), height))) return;
     const x = START_BUTTON.x + START_BUTTON.width / 2;
     const y = START_BUTTON.y - START_BUTTON.height / 2;
-    BlzSetMousePos(truncate(pixelX(x, width, height)), truncate(pixelY(y, height)));
+    setPointer(truncate(pixelX(x, width, height)), truncate(pixelY(y, height)));
   }
 
   private highlightStage(choice: number | undefined): void {
@@ -267,9 +268,9 @@ export class StagePanel {
     const width = toReal(screenWidth());
     const height = toReal(screenHeight());
     if (width > 0 && height > 0) {
-      const pointerAtX = pointerX(toReal(BlzGetMouseScreenPosX()), width, height);
-      const pointerAtY = pointerY(toReal(BlzGetMouseScreenPosY()), height);
-      const dropped = updateStageDrag(this.drag, BlzIsMouseButtonPressed(MOUSE_BUTTON_TYPE_LEFT), pointerAtX, pointerAtY, game.stageChoice);
+      const pointerAtX = pointerX(toReal(inputPointerX()), width, height);
+      const pointerAtY = pointerY(toReal(inputPointerY()), height);
+      const dropped = updateStageDrag(this.drag, mouseDown(MOUSE_BUTTON_TYPE_LEFT), pointerAtX, pointerAtY, game.stageChoice);
       if (dropped !== undefined) sendSync("stage-drop", formatInt(dropped));
       if (this.drag.gesture?.kind === "carry") {
         x = pointerAtX;

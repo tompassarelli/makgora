@@ -31,6 +31,7 @@ import { clearMatchEffects, views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { LASTING, pauseMatchPresentation, setStatus } from "./view";
 import { noteKeyDownEvent, noteKeyUpEvent, osKeyDown } from "../../platform/osKeys";
+import { eventKey } from "wisp/game/input";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 
 
@@ -120,7 +121,7 @@ function pausedMatchKeyDown(s: ShellState, slot: ParticipantSlot, key: number): 
 
 function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = false): void {
   if (!humanActive(s.game, slot)) return;
-  const key = GetHandleId(BlzGetTriggerPlayerKey());
+  const key = eventKey();
   if (!startKey && !keyEventAllowed(s.keyEvents, key, s.participants[slot].bindings.bindings)) return;
   if (journalOwnsKey(s, slot, key)) return;
   if (s.participants[slot].bindings.naming) {
@@ -195,7 +196,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
 
 function participantKeyUp(s: ShellState, slot: ParticipantSlot, startKey = false): void {
   if (!humanActive(s.game, slot)) return;
-  const key = GetHandleId(BlzGetTriggerPlayerKey());
+  const key = eventKey();
   if (!startKey && !keyEventAllowed(s.keyEvents, key, s.participants[slot].bindings.bindings)) return;
 
   if (s.pauseMenu?.title && menuAction(s.participants[slot].bindings.bindings, key) === Action.attack) s.titleAwaitRelease = false;
@@ -229,7 +230,7 @@ function triggerSlot(): ParticipantSlot | undefined {
 
 export function onKeyDown(s: ShellState): void {
   const slot = triggerSlot();
-  const key = GetHandleId(BlzGetTriggerPlayerKey());
+  const key = eventKey();
   if (eventPlayer() === localPlayer()) noteKeyDownEvent(s.localKeys, key, activeRollback(s) !== undefined && s.game.phase === Phase.match && !s.session.paused);
   if (slot !== undefined && key === Key.f10) views(s).selections[slot].wakeStockCursor();
   if (key === NATIVE_PREFLIGHT_KEY.code) {
@@ -241,7 +242,7 @@ export function onKeyDown(s: ShellState): void {
 
 export function onKeyUp(s: ShellState): void {
   const slot = triggerSlot();
-  const key = GetHandleId(BlzGetTriggerPlayerKey());
+  const key = eventKey();
   if (eventPlayer() === localPlayer()) noteKeyUpEvent(s.localKeys, key);
   if (slot !== undefined) participantKeyUp(s, slot);
 }

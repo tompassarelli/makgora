@@ -6,6 +6,7 @@ import { KEY_DOWN, KEY_UP } from "./keyEvents";
 import { DRAW_EVENT, burstAlpha, drawnAlpha } from "./betweenFrames";
 import { activeRollback, shellState } from "./state";
 import { displayText } from "wisp/game/frames";
+import { eventKey } from "wisp/game/input";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
 declare const os: { readonly clock?: (this: void) => number } | undefined;
@@ -96,7 +97,7 @@ function noteRollbacks(probe: CallbackClock, now: number): void {
 }
 
 function noteKeyEvent(probe: CallbackClock, down: boolean, now: number): void {
-  if (GetHandleId(BlzGetTriggerPlayerKey()) !== probe.key || probe.events.length >= MAX_EVENTS) return;
+  if (eventKey() !== probe.key || probe.events.length >= MAX_EVENTS) return;
   const player = eventPlayer();
   if (player === localPlayer()) probe.events.push(`${down ? "d" : "u"} ${microseconds(now)} ${osKeyDown(probe.key) ? 1 : 0} ${probe.callbacks}`);
   else probe.events.push(`${down ? "D" : "U"} ${microseconds(now)} ${playerSlot(player)} ${probe.callbacks}`);

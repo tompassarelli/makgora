@@ -5,6 +5,7 @@ import { localParticipantSlot } from "./diagnostics";
 import type { ShellState } from "./state";
 import { createEvents, onEvents } from "wisp/game/events";
 import { createQuest, displayTimedText, setQuestCompleted, setQuestDescription, setQuestDiscovered, setQuestIcon, setQuestRequired, setQuestTitle } from "wisp/game/frames";
+import { addChatEvent } from "wisp/game/input";
 import { eventPlayer, player, playerSlot } from "wisp/game/players";
 
 export const HELP_EVENT = "shell.help";
@@ -29,8 +30,8 @@ function addQuest(title: string, description: string, icon: string, required: bo
 export function startHelp(s: ShellState): void {
   const chat = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    TriggerRegisterPlayerChatEvent(chat, player(slot), HELP_COMMAND, true);
-    TriggerRegisterPlayerChatEvent(chat, player(slot), COMMANDS_COMMAND, true);
+    addChatEvent(chat, player(slot), HELP_COMMAND, true);
+    addChatEvent(chat, player(slot), COMMANDS_COMMAND, true);
   }
   onEvents(chat, trampoline(HELP_EVENT));
   if (globalThis.__smashcraftHelpQuests === undefined) {

@@ -73,6 +73,7 @@ import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfi
 import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus, createCpuSettings, showCpuSettings } from "./selectionCpuSettings";
 import { destroyEvents } from "wisp/game/events";
 import { createFrameByType, destroyFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, showCursor } from "wisp/game/input";
 import { localPlayer, player as playerOf } from "wisp/game/players";
 import { sendSync } from "wisp/game/sync";
 import { formatInt, toReal } from "wisp/game/text";
@@ -588,7 +589,7 @@ export class SelectionPanel {
     setFrameVisible(this.bullseye, bullseye);
     if (bullseye) placeTopLeft(this.bullseye, bullseyeLeft(x, bullseyeSize(this.roster.grid)), bullseyeTop(y, bullseyeSize(this.roster.grid)));
     // Warcraft shows its cursor again on its own (a frame click), so the hidden state is asserted every update; the shown state is sent once.
-    if (!stock || this.cursorEnabled !== true) BlzEnableCursor(stock);
+    if (!stock || this.cursorEnabled !== true) showCursor(stock);
     this.cursorEnabled = stock;
   }
 
@@ -602,7 +603,7 @@ export class SelectionPanel {
     if (!this.ownsLocalClient() || (phase !== Phase.characterMenu && phase !== Phase.stageMenu)) return;
     this.gameMenuWake = GAME_MENU_WAKE_UPDATES;
     this.warcraftMenuOpen = true;
-    BlzEnableCursor(true);
+    showCursor(true);
     this.cursorEnabled = true;
   }
 
@@ -684,8 +685,8 @@ export class SelectionPanel {
     const width = toReal(screenWidth());
     const height = toReal(screenHeight());
     const pointed = width > 0 && height > 0;
-    const x = pointed ? pointerX(toReal(BlzGetMouseScreenPosX()), width, height) : 0.0;
-    const y = pointed ? pointerY(toReal(BlzGetMouseScreenPosY()), height) : 0.0;
+    const x = pointed ? pointerX(toReal(inputPointerX()), width, height) : 0.0;
+    const y = pointed ? pointerY(toReal(inputPointerY()), height) : 0.0;
     if (this.showDialog(game, visible, cpuOpen, pointed, x, y)) return;
     this.showTiles(game);
     if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;
@@ -770,7 +771,7 @@ export class SelectionPanel {
       if ((slot === participantId && humanFighterActive(game, slot)) || canChooseComputer(game, participantId, slot)) selectable |= 1 << slot;
     }
     this.roster.selectable = selectable;
-    const placement = updateSelectionDrag(drag, this.roster, BlzIsMouseButtonPressed(MOUSE_BUTTON_TYPE_LEFT), x, y);
+    const placement = updateSelectionDrag(drag, this.roster, mouseDown(MOUSE_BUTTON_TYPE_LEFT), x, y);
     if (placement !== undefined) this.sendPlacement(placement);
   }
 

@@ -9,6 +9,7 @@ import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type ShellState, localSlot } from "./state";
 import { osKeyDown } from "../../platform/osKeys";
 import { createEvents, onEvents } from "wisp/game/events";
+import { addPointerMoveEvent, eventPointerX, eventPointerY, windowFocused } from "wisp/game/input";
 import { eventPlayer, localPlayer, player } from "wisp/game/players";
 
 export const PAD_MOUSE = "shell.padMouse";
@@ -30,7 +31,7 @@ export function createPadTriggers(s: ShellState): void {
   if (s.pad === undefined || (s.build.analogPadDiagnostic !== true && s.build.analogPad !== "cursor")) return;
   const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
-    if (humanActive(s.game, slot)) TriggerRegisterPlayerEvent(trigger, player(slot), EVENT_PLAYER_MOUSE_MOVE);
+    if (humanActive(s.game, slot)) addPointerMoveEvent(trigger, player(slot));
   }
   onEvents(trigger, trampoline(PAD_MOUSE));
 }
@@ -44,7 +45,7 @@ export function padMouse(s: ShellState): void {
   }
 
   if (eventPlayer() !== localPlayer() || !pressed(PAD_ACTIVE_KEY)) return;
-  const point = { x: f32(BlzGetTriggerPlayerMouseX()), y: f32(BlzGetTriggerPlayerMouseY()) };
+  const point = { x: f32(eventPointerX()), y: f32(eventPointerY()) };
   if (pressed(0x21)) {
     pad.calibration.first = point;
     pad.calibration.last = undefined;
@@ -62,7 +63,7 @@ export function padMouse(s: ShellState): void {
 export function pollPad(s: Readonly<ShellState>): number | undefined {
   const pad = s.pad;
   if (pad === undefined) return undefined;
-  if (!BlzIsLocalClientActive() || !pressed(PAD_PRESENT_KEY)) {
+  if (!windowFocused() || !pressed(PAD_PRESENT_KEY)) {
     pad.packet = undefined;
     return undefined;
   }

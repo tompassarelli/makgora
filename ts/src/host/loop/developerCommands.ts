@@ -41,13 +41,14 @@ import { views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { pauseMatchPresentation, renderFighter, renderPersistentPresentation } from "./view";
 import { clearTextMessages, displayText } from "wisp/game/frames";
+import { chatText } from "wisp/game/input";
 import { setTerrainFogHeight, setTerrainFogOverSky } from "wisp/game/view";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
 import { formatInt, parseInt, parseReal, truncate } from "wisp/game/text";
 
 
 export function onDevCommand(s: ShellState): void {
-  applyDeveloperCommand(s, playerSlot(eventPlayer()), GetEventPlayerChatString());
+  applyDeveloperCommand(s, playerSlot(eventPlayer()), chatText());
 }
 
 

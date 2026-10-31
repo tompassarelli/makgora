@@ -4,6 +4,7 @@
 import { CARRIER_KEYS, COMMIT_KEY, type KeyboardMailbox, decodeChunk } from "../game/netcode/journal/keyboard";
 import { writeLine } from "wisp/src/platform/fileio";
 import { osKeyDown } from "./osKeys";
+import { windowFocused } from "wisp/game/input";
 
 const isDown = osKeyDown;
 
@@ -14,7 +15,7 @@ function acknowledge(mailbox: KeyboardMailbox): void {
 
 
 export function pollMailbox(mailbox: KeyboardMailbox): boolean {
-  if (!BlzIsLocalClientActive()) return false;
+  if (!windowFocused()) return false;
   const commit = isDown(COMMIT_KEY);
   if (!mailbox.pending(commit)) return false;
   const chunk = decodeChunk(CARRIER_KEYS.map((key) => isDown(key)));

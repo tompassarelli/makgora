@@ -13,6 +13,7 @@ import { edgeStampFile, responsePageFile } from "../../game/core/gameFiles";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/input/participants";
 import type { MatchCamera } from "../../game/sim/matchCamera";
 import { createFrameByType, originFrame, setFrameAbsPoint, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
+import { windowFocused } from "wisp/game/input";
 import { cameraField, cameraTargetX } from "wisp/game/view";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { formatReal } from "wisp/game/text";
@@ -298,7 +299,7 @@ function stampEdge(probe: ResponseProbe, stage: "poll" | "present"): void {
   if (!probe.recording || !probe.edgeStamps || probe.exporting || row === undefined || probe.row === undefined) return;
   const slot = playerSlot(localPlayer());
   writeLines(edgeStampFile(slot, probe.run, probe.row, stage), [
-    `EDGE v=1 build=${probe.build} local=${slot} run=${probe.run} row=${probe.row} stage=${stage} held=${row.held ?? -1} pressed=${row.pressed ?? -1} released=${row.released ?? -1} active=${BlzIsLocalClientActive() ? 1 : 0} native_ms=${formatReal(nowMs(probe))}`,
+    `EDGE v=1 build=${probe.build} local=${slot} run=${probe.run} row=${probe.row} stage=${stage} held=${row.held ?? -1} pressed=${row.pressed ?? -1} released=${row.released ?? -1} active=${windowFocused() ? 1 : 0} native_ms=${formatReal(nowMs(probe))}`,
   ]);
 }
 

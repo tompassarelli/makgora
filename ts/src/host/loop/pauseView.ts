@@ -8,6 +8,7 @@ import type { PauseView } from "../../game/ui/pauseScreen";
 import { osKeyDown } from "../../platform/osKeys";
 import { localHints, localHintsKey } from "./hints";
 import type { ShellState } from "./state";
+import { windowFocused } from "wisp/game/input";
 
 const PAD_CAMERA = "Camera: stick moves · C-stick zooms";
 
@@ -19,7 +20,7 @@ function keyboardCamera(bindings: Readonly<KeyBindings>): string {
 export const pauseScreenUp = (s: Readonly<ShellState>): boolean => s.session.paused || s.dev.pauseLook !== undefined;
 
 export function pauseView(s: Readonly<ShellState>, bindings: Readonly<KeyBindings>): PauseView {
-  const pad = s.dev.pauseLook === undefined ? BlzIsLocalClientActive() && osKeyDown(PAD_PRESENT_KEY) : s.dev.pauseLook === "pad";
+  const pad = s.dev.pauseLook === undefined ? windowFocused() && osKeyDown(PAD_PRESENT_KEY) : s.dev.pauseLook === "pad";
   return {
     player: s.pausedBy === undefined ? undefined : s.pausedBy + 1,
     clock: timedMatch(s.game) ? clockMain(clockSeconds(s.game.remainingFrames)) : undefined,

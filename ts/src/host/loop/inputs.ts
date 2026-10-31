@@ -13,6 +13,7 @@ import { type ShellState, keepShellMomentEnd, localSlot } from "./state";
 import { settingsOpen } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { beginKeyPoll, osKeyDown, polledKeyDown } from "../../platform/osKeys";
+import { windowFocused } from "wisp/game/input";
 import { player as playerOf, playerControl, playerSlotState } from "wisp/game/players";
 
 
@@ -71,7 +72,7 @@ export function controlsAvailable(s: Readonly<ShellState>, slot: ParticipantSlot
 export function pollLocalKeys(s: Readonly<ShellState>): number {
   beginKeyPoll(s.localKeys);
   const slot = localSlot();
-  if (!isParticipantSlot(slot) || !BlzIsLocalClientActive() || !humanFighterActive(s.game, slot) || (s.chatOpen?.() ?? warcraftChatOpen(s.chatFrame))) return 0;
+  if (!isParticipantSlot(slot) || !windowFocused() || !humanFighterActive(s.game, slot) || (s.chatOpen?.() ?? warcraftChatOpen(s.chatFrame))) return 0;
   const { bindings } = s.participants[slot].bindings;
   const menuHeld = s.pauseKeysHeld;
   if (menuHeld !== undefined) {
