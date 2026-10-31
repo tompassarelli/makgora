@@ -171,17 +171,17 @@ export const STAGE_DECK_PALETTES: readonly { readonly stage: number; readonly th
       tint: [224, 184, 126],
     },
   } },
-  { stage: TIMED_TEST_STAGE, theme: "Qiraji", palette: { top: [224, 204, 160], lip: [170, 130, 50], body: [60, 48, 40], underside: [60, 48, 40] }, materials: {
-    top: { texture: "TerrainArt\\Ruins\\Ruins_Sand.blp" },
-    lip: { texture: "TerrainArt\\Ruins\\Ruins_SmallBricks.blp" },
-    body: { texture: "TerrainArt\\Ruins\\Ruins_LargeBricks.blp" },
-    underside: { texture: "Textures\\Ruins_Rock.blp", crop: [0, 0, 0.40625, 0.1875] },
+  { stage: TIMED_TEST_STAGE, theme: "Qiraji", palette: { top: [255, 244, 222], lip: [236, 226, 250], body: [204, 194, 232], underside: [180, 172, 210] }, materials: {
+    top: { texture: "Textures\\RuinsDoodads1.blp", crop: [0.203125, 0, 0.28125, 0.46875] },
+    lip: { texture: "TerrainArt\\Dalaran\\Dalaran_BrickTiles.blp" },
+    body: { texture: "TerrainArt\\Dalaran\\Dalaran_BrickTiles.blp" },
+    underside: { texture: "TerrainArt\\Dalaran\\Dalaran_SquareTiles.blp" },
     platform: {
-      top: { texture: "TerrainArt\\Ruins\\Ruins_RoundTiles.blp" },
-      lip: { texture: "Textures\\RuinsDoodads1.blp", crop: [0.0625, 0.078125, 0.15625, 0.34375] },
-      body: { texture: "TerrainArt\\Ruins\\Ruins_LargeBricks.blp" },
-      underside: { texture: "Textures\\Ruins_Rock.blp", crop: [0, 0, 0.40625, 0.1875] },
-      tint: [190, 162, 106],
+      top: { texture: "Textures\\RuinsDoodads1.blp", crop: [0.203125, 0, 0.28125, 0.46875] },
+      lip: { texture: "TerrainArt\\Dalaran\\Dalaran_BrickTiles.blp" },
+      body: { texture: "TerrainArt\\Dalaran\\Dalaran_SquareTiles.blp" },
+      underside: { texture: "TerrainArt\\Dalaran\\Dalaran_SquareTiles.blp" },
+      tint: [255, 244, 222],
     },
   } },
 ];

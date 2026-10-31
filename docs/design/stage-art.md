@@ -438,9 +438,10 @@ lit value and stay darker than the lit backdrop above the deck.
   rust, lava orange. Near: black boulders and stalagmites rising from the
   lava. Mid ridge: lighter stalagmites in front of the magma rocks. Far: the
   basalt spire field and its landmark crag; the lava keeps the floor.
-- **Ahn'Qiraj: the gates of the Qiraji temple in Silithus.** Palette: ochre
-  sand, sandstone, mauve sky. Near: dark sandstone boulders. Valley: broken
-  Qiraji pillars and a fallen archway. Mid ridge: pale sandstone and rubble.
+- **Ahn'Qiraj: the gates of the Qiraji temple in Silithus.** Palette: tan
+  sand, cool purple-grey carved stone, amber haze sky (since 31 Oct 2026, to
+  match the Silithus look references). Near: sand-tinted sandstone boulders.
+  Valley: broken city columns and fallen archways. Mid ridge: pale sandstone and rubble.
   Far: the ruined spires, the gate and the obelisks.
 - **Stratholme: the burning city.** Palette: brown-black brick, slate, warm
   fire. Near: dark rubble heaps. Valley: broken columns and a fire burning
@@ -483,7 +484,8 @@ Nordrassil, Blackrock and Hellfire keep their depth-pass look. Rules 17 and
   fill the floor under the deck's centre.
 - **Naxxramas.** Palette: ash, bruise-violet rock, plague green; the near
   and mid ridges are blighted Underground rock tinted violet-grey, not moss.
-- **Ahn'Qiraj.** Palette: sand, sandstone, gold; no green rock anywhere.
+- **Ahn'Qiraj.** Palette: tan sand, cool purple-grey carved stone, amber
+  haze; no green rock anywhere.
   Skyline: the sandstone gate left of centre, two insect-built Qiraji
   ziggurats beside it, the gold obelisks right of centre, sandstone mesas
   only at the edges with open desert between them, and pale far mesas and
@@ -608,7 +610,7 @@ it a distant landmark rather than a foreground wall. The Frozen Throne's
 | Naxxramas | Brinstar's dark enclosed cavern over a glowing basin: a closed Scourge hall of tall arches and spiked pillars under a dark violet vault, over green plague slime. |
 | Hellfire Citadel | Northern Cave's separated rock planes and Rivals' recessed scenery: one distant gate, descending rock field, restrained green haze beneath violet upper sky. |
 | Blackrock | Brinstar's charcoal upper cavern and warm lower basin: original smoke-grey/rust sky replaces red winter clouds; right basalt landmark counterweighted by a lower left crag. Fire accents are 1.25–1.5 scale below the deck, and the small cart gives industrial scale. |
-| Ahn'Qiraj | Battlefield's asymmetric architectural skyline: distant left obelisk at scale 4.5, lower right broken arch at scale 4, recessed fallen wall and low stones. Sand horizon and desaturated mauve zenith separate the gold deck edge from sky. Since 31 Oct 2026 the sky, fog, floor and every piece tint sit one value step brighter than the first dark pass (Tom found it a touch too dark): the sky dome and far pieces gain most, the horizon and the pieces behind the fighters gain least, because the fighter band gap (every row above 0 L*, worst +0.9) bounds what sits behind them. |
+| Ahn'Qiraj | Battlefield's asymmetric architectural skyline: a distant broken archway left of centre, two broken city columns right of centre, ziggurats and mesas fading into haze, low stones. Since 31 Oct 2026 the stage follows Tom's Silithus look references (World of Warcraft screenshots, look targets only): the sky is an original amber gradient (zenith 216,148,98, horizon 238,194,142) that the fog (224,176,128, 3,400 to 9,000) carries into the distance, the ground is tan sand, the deck top is the pale RuinsDoodads1 sandstone, and the deck face, lip, underside and the structure pieces (Dalaran brick and square tiles, Lordaeron ruined archways and columns) are tinted cool lavender-grey. The fighter band gaps for this look are in [visual quality](visual-quality.md#ahnqiraj-reference-palette-31-oct-2026). |
 
 Original skies use one seamless inward sphere of 1,024 triangles and one
 256×128 texture each, no particles, lights or animated tracks. Sky draws

@@ -551,7 +551,7 @@ Per stage (backdrop facts from [Per-stage recommendations](#per-stage-recommenda
 | Nordrassil (10) | stock FelwoodSky aurora | Bloom (G2) on the aurora and wisp emissives; teal-green height fog below the deck | — |
 | Gryphon Aerie (11) | pale clouds *(guess)* | GA-4: desaturated blue height fog darkening the cloud field below the deck. Style 3, start/end 5,500/11,500, density 0.25, height -1,800 to -500 relative to the deck origin, cap 0.5, drawn over sky. RGB (0.25, 0.375, 0.5); Classic keeps that tint in distance fog beyond the fight. Existing sky and daylight preserve the airy skyline and Alliance deck accents (GA-1, GA-3) | — |
 | Blackrock (12) | lowest #178 ΔE00 (21.2) | Forge-fire effects carrying warm omni lights, one shadow-casting; bloom on lava; the G2 ASSAO for fighter contact shadows. Check it first | — |
-| Ahn'Qiraj (13) | bright sandstone; light at 0.5 | Dusk-ochre height fog below the deck | — |
+| Ahn'Qiraj (13) | amber haze sky, sand ground, lavender-grey stone (31 Oct 2026) | Warm distance fog 3,400 to 9,000 | — |
 | Hellfire (14) | dark haze *(guess)* | Fel-green omni lights from imported effects; bloom on fel fire. Outland_Sky is a stock Classic sky | — |
 
 Naxxramas is indoors (Tom, 18 Oct): its sky is a ribbed vault, dark violet above a green-lit horizon (40, 58, 42), and its white key and violet fill shine at 2.0 so fighters stand off it (#296). NX-1's cold plague-green omni light
@@ -753,6 +753,41 @@ against any backdrop, so the backdrop could rise a few L\* again; haze
 plane. The native-window captures at match zoom are in
 ~/.local/state/smashcraft/shots/contrast-durotar-*.png, contrast-aq-*.png and
 contrast-nordrassil-*.png.
+
+### Ahn'Qiraj reference palette (31 Oct 2026)
+
+Look-lead's direction, on Tom's Silithus look references (warm orange haze sky,
+tan sand ground, cool purple-grey carved stone; World of Warcraft screenshots
+used as look targets only): the sky is an original gradient (zenith 216,148,98,
+horizon 238,194,142, nadir 206,168,124), the fog is 224,176,128 from 3,400 to
+9,000, the floor under the deck is tan (tint 255,226,176), the deck top is
+RuinsDoodads1 sandstone (tint 255,244,222), and the deck lip, body and
+underside are Dalaran brick and square tiles tinted lavender-grey (236,226,250,
+204,194,232 and 180,172,210). The broken archways and columns are the stock
+Lordaeron ruined structures, tinted 196,184,226 (far) and 172,160,204 (near),
+instead of the brown Ruins arch and obelisk models, whose brown textures a
+tint cannot turn grey.
+
+`bun tools/stage/headlessSeparation.ts 13` (gex45, headless Classic, Shadow
+Hunter and Chen Stormstout in both pair orders, near and far, both clients)
+measures the worst fighter band gap -21.2 L* (limit 0, not loosened), against
+-35.8 L* for the first warm take and +0.9 for the dark pass this replaces.
+The rule is two-sided, so Chen Stormstout, the darker fighter (lower quartile
+L* 15), clears it wherever the backdrop behind him is evenly light: 6 of 16
+rows pass, and the 10 that fail are Shadow Hunter's wide band (L* 20 to 83) and
+the rows where dark stone or dark ziggurat pieces share the box around a
+fighter (gaps -5.0 to -21.2). They are accepted by look-lead for this stage on
+Tom's references; every other stage keeps the limit at 0.
+
+| Pair, view | Client | Fighter | Gap (L*) |
+| --- | --- | --- | --- |
+| Shadow Hunter / Chen, near | 0, 1 | Shadow Hunter, Chen | -20.5, -12.4 and -20.7, -14.5 |
+| Shadow Hunter / Chen, far | 0, 1 | Shadow Hunter, Chen | -11.9, +7.0 and -5.0, +36.3 |
+| Chen / Shadow Hunter, near | 0, 1 | Chen, Shadow Hunter | +33.1, -21.2 and +33.1, -20.0 |
+| Chen / Shadow Hunter, far | 0, 1 | Chen, Shadow Hunter | +37.2, -21.1 and +34.7, -11.2 |
+
+Ideas: a hue-aware separation term (chroma against the backdrop's chroma) would
+credit the warm fighters on this stage, whose lightness bands overlap the haze.
 
 ### Nordrassil atmosphere (#294)
 

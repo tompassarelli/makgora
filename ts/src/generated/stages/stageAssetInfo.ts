@@ -11,7 +11,7 @@ export const STAGE_DECK_MODELS: Readonly<Record<number, { readonly slab: string;
   12: { slab: "war3mapImported\\StageDeck-14ac350c5ca9c3f1cdc914b44159f54889eaf7d0ac1be33eda7a1f6d2ef5a578.mdx", main: "war3mapImported\\StageMainDeck-1201cf5d5d0ff337e73be2bea46739833646cd706b8dc4229ecf330f5bdae0af.mdx" },
   6: { slab: "war3mapImported\\StageDeck-24aa1d52dd6b5b3b8bb4ccf0d65307dd2e8291efe49a25f2310cf45ed6d673d9.mdx", main: "war3mapImported\\StageMainDeck-d454080f7b53b15a05b9c1c15187719c53f7cf852e1018fd7d7e74b41d1d879d.mdx" },
   7: { slab: "war3mapImported\\StageDeck-dc3c140e46007d9a7f504e9335b3009019a2dc3a4866f33d4cac8749645e5a59.mdx", main: "war3mapImported\\StageMainDeck-1f04d2e2e634a666ac22b2321f081318a2175503eaa51c33edc0e12c5e68b0c9.mdx" },
-  13: { slab: "war3mapImported\\StageDeck-728f0b5c1c97b661f582c8e9d82327cc6dc89d8940857fc56696864c3d09dfa9.mdx", main: "war3mapImported\\StageMainDeck-4981014953bb4b6535459c1bb37cbf906e4b8dbbb3cb7d41563ed69a59619aaf.mdx" },
+  13: { slab: "war3mapImported\\StageDeck-687f0a8b1342fda949b4fffa39407301c99340536eb687505ff0573fc0749000.mdx", main: "war3mapImported\\StageMainDeck-621c76afb1f32bafdb5c3df328000dfbae702f99aaac3da8c9a4d2cf60df1ba6.mdx" },
 };
 /** The neutral palette's slab. */
 export const STAGE_DECK_MODEL = "war3mapImported\\StageDeck-7e2aae2330a24a8ac729f2e74e7461292e493daebf98cda5c5d99fc07e302052.mdx";
