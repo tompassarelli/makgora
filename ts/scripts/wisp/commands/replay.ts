@@ -43,7 +43,7 @@ const compileReplayLua = Effect.gen(function*() {
   const sources = ["src", "test/replay"].flatMap((dir) => [...new Bun.Glob(`${dir}/**/*.ts`).scanSync(ts)]).sort().map((path) => join(ts, path));
   const framework = [...new Bun.Glob("src/**/*.{ts,lua}").scanSync(join(ts, "node_modules/wisp"))].map((file) => join(ts, "node_modules/wisp", file));
   const config = join(ts, "tsconfig.lua-replay.json");
-  const hash = yield* Effect.tryPromise(() => inputsHash([...sources, ...framework.sort(), join(ts, "node_modules/wisp/plugins/warcraft-numbers.ts"), config]));
+  const hash = yield* Effect.tryPromise(() => inputsHash([...sources, ...framework.sort(), join(ts, "node_modules/wisp/plugins/warcraft-numbers.ts"), join(ts, "node_modules/wisp/plugins/game-api.ts"), config]));
   const stamp = Bun.file(`${replayLua}.inputs`);
   if (yield* Effect.tryPromise(async () => await Bun.file(replayLua).exists() && await stamp.exists() && await stamp.text() === hash)) return;
   yield* runProcess(ChildProcess.make(process.execPath, ["--bun", join(ts, "node_modules/typescript-to-lua/dist/tstl.js"), "-p", config], { cwd: ts }));

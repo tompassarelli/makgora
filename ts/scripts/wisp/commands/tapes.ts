@@ -88,7 +88,7 @@ const compileTypeScriptLua = Effect.gen(function*() {
   const framework = [...new Bun.Glob("src/**/*.{ts,lua}").scanSync(join(ts, "node_modules/wisp"))]
     .map((file) => join(ts, "node_modules/wisp", file));
   const hash = yield* attempt("hash the Lua inputs", () => inputsHash([...sources, ...framework,
-    join(ts, "node_modules/wisp/plugins/warcraft-numbers.ts"), config], "tstl"));
+    join(ts, "node_modules/wisp/plugins/warcraft-numbers.ts"), join(ts, "node_modules/wisp/plugins/game-api.ts"), config], "tstl"));
   return yield* cachedBuild(tapesLua, hash,
     runProcess(ChildProcess.make(process.execPath, ["--bun", join(ts, "node_modules/typescript-to-lua/dist/tstl.js"), "-p", config], { cwd: ts })).pipe(
       Effect.mapError((failure) => new TapesFailure({ problem: `compile TypeScript Lua: ${failure.message}` }))));

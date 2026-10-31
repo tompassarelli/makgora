@@ -22,6 +22,7 @@ const natives = "node_modules/wisp/src/natives/warcraft.d.ts";
 const stackTraces = {
   luaPlugins: [
     { name: "./node_modules/wisp/plugins/warcraft-numbers.ts" },
+    { name: "./node_modules/wisp/plugins/game-api.ts" },
     { name: "./node_modules/wisp/plugins/stack-traces.ts" },
     { name: "./plugins/source-version.ts" },
   ],
