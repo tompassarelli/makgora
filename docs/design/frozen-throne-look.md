@@ -18,18 +18,18 @@ Layer order, back to front:
 
 1. Sky: dark teal gradient with a dim green aurora band, original 256x128 texture (`ts/scripts/stageSky.ts`, `aurora`).
 2. Snow: the existing drifting-snow model.
-3. Spire massif: the stock Frozen Throne model, stretched tall and centred at y 7600.
+3. Throne spire: ten stock ice floes stacked and narrowing from dark at the foot to pale at the top (y 2100, z -420 to 262), crowned by an `IceCrownObelisk` seat between two `IceTorch` pylons at z 300; the foot hides behind the deck and the colour climbs from near-black teal to pale ice so the lit seat is the first thing the eye reaches.
 4. Great arch: one huge `IC_IceArch` at y 4800 framing the spire.
 5. Far ice spires: Glacier2 and Glacier5 stretched tall, left and right.
 6. Stair: five stacked stock ice floes narrowing upward, a plain stepped snow ramp, centred at y 1400 to 1520.
-7. Throne pillars: two `IceTorch` towers flanking the stair head with an `IceCrownObelisk` between them as the seat.
+7. Stair pillars: two `IceTorch` towers flanking the stair head.
 8. Crystal clusters: eight `Icecrown_Crystal3` either side of the stair, tinted cyan.
 9. Gothic towers: `IceCrownObelisk` and `IceCrownPillar` pairs at x of 1550 to 2000, dark.
 10. Floor: the existing dark ground under the deck.
 
 ## Element map
 
-- Throne on an ice spire: stock Classic `Doodads\Cinematic\FrozenThrone\FrozenThrone` (Warcraft build); the native window uses the same stock model.
+- Throne on an ice spire: original tiered spire from stock `North_IceFloe3` slabs with an obelisk seat and two pylons; the stock `FrozenThrone` model is a closed rock dome with its throne inside, so it is not used (take 2, 2026-10-31).
 - Snowy stair: original stepped ramp built from stock ice floes (generic shape).
 - Chained pillars: stock `IceTorch` towers; chains between them are not built (no stock chain model, and models cannot roll).
 - Bone or ice arches: stock `IC_IceArch`.
