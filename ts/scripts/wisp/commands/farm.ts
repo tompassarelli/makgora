@@ -30,13 +30,27 @@ type Job = keyof typeof WORKFLOWS;
 
 const isAncestor = (sha: string, tip: string) => run(["git", "merge-base", "--is-ancestor", sha, tip]).pipe(Effect.as(true), Effect.orElseSucceed(() => false));
 
+const COMMIT_ID = /^[0-9a-f]{7,40}$/i;
+
+const commitOf = (name: string, cwd?: string) => run(["git", "rev-parse", "--verify", `${name}^{commit}`], false, cwd);
+
+export const resolveGiven = (given: string | undefined, cwd?: string) => Effect.gen(function*() {
+  if (given === undefined) return yield* commitOf("HEAD", cwd);
+  const asId = COMMIT_ID.test(given) ? yield* commitOf(given, cwd).pipe(Effect.option) : undefined;
+  if (asId !== undefined && asId._tag === "Some") return asId.value;
+  yield* run(["git", "fetch", "--quiet", "origin", `+refs/heads/${given}:refs/remotes/origin/${given}`], false, cwd).pipe(Effect.ignore);
+  const remote = yield* commitOf(`origin/${given}`, cwd).pipe(Effect.option);
+  return remote._tag === "Some" ? remote.value : yield* commitOf(given, cwd);
+});
+
 const admission = (workflow: FarmWorkflow, given: string | undefined, named: string | undefined, repo: string) => Effect.gen(function*() {
   const lane = named === undefined ? undefined : named.includes("/") ? named : `claude/${named}`;
   const laneTip = lane === undefined ? undefined : (yield* run(["git", "ls-remote", "origin", `refs/heads/${lane}`])).split(/\s/)[0] || undefined;
   const missing: Admission = { kind: "refuse", why: `${lane} isn't on origin: push the lane first` };
   if (lane !== undefined && laneTip === undefined) return { sha: "", verdict: missing };
   if (lane !== undefined) yield* run(["git", "fetch", "--quiet", "origin", `refs/heads/${lane}`]);
-  const sha = yield* run(["git", "rev-parse", "--verify", `${given ?? laneTip ?? "HEAD"}^{commit}`]);
+  const sha = yield* resolveGiven(given ?? laneTip);
+  console.error(`resolved ${given ?? laneTip ?? "HEAD"} to ${sha}`);
   yield* run(["git", "fetch", "--quiet", "origin", "main"]);
   const main = yield* run(["git", "rev-parse", "FETCH_HEAD"]);
   const onMain = yield* isAncestor(sha, main);
@@ -156,13 +170,13 @@ export const farm: Command = (args) => Effect.gen(function*() {
   if (admitted.verdict.kind === "refuse") return yield* new FarmFailure({ problem: `not dispatched: ${admitted.verdict.why}` });
   const unmatched = job === "pads" ? yield* unmatchedPads(admitted.sha, parsed.values.only ?? []) : [];
   if (unmatched.length > 0) return yield* new UsageFailure({ problem: `not dispatched: no pad script at ${admitted.sha.slice(0, 12)} matches --only ${unmatched.join(", ")} (name a file or folder under ${PADS})` });
-  if (job === "test") return yield* farmTest({ ref: parsed.values.ref, wait: parsed.values.wait === true });
+  if (job === "test") return yield* farmTest({ ref: admitted.sha, wait: parsed.values.wait === true });
   const verdict = admitted.verdict;
   const runs = perfRuns.length > 0 ? perfRuns : ["playable-bot-four"];
   const workflow = WORKFLOWS[job satisfies Job];
 
   yield* Effect.scoped(Effect.gen(function*() {
-    const { ref, scratch } = verdict.kind === "dispatch" ? { ref: admitted.sha, scratch: undefined } : yield* resolveRef(parsed.values.ref, repo);
+    const { ref, scratch } = verdict.kind === "dispatch" ? { ref: admitted.sha, scratch: undefined } : yield* resolveRef(admitted.sha, repo);
     const lane = verdict.kind === "dispatch" ? verdict.lane : `farm/${ref.slice(0, 12)}`;
     const inputsFor = (tag: string) => job === "balance"
       ? { ref, lane, opponent: parsed.values.opponent ?? "wren", tier: parsed.values.tier ?? "expert", "per-pair": parsed.values["per-pair"] ?? "400", seeds: parsed.values.seeds ?? "100", matchups: parsed.values.matchups ?? "", probe: parsed.values.probe ?? "40", tag }
