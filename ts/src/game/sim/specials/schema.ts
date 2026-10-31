@@ -10,8 +10,11 @@ import type { CastWindows, FrameWindow, SpecialChannel } from "./castWindows";
 import type { SpecialBeam } from "./specialBeam";
 import type { SpecialSteer, SpecialSteeredShot } from "./shotSteering";
 import type { ToggleAura } from "./auraSchema";
+import type { CompanionOrder, SpecialCompanion } from "./companionSchema";
 export type { SpecialSelfHit, SpecialSteer, SpecialSteeredShot } from "./shotSteering";
 export type { FrameWindow } from "./castWindows";
+export { CompanionMode, CompanionOrder } from "./companionSchema";
+export type { CompanionBody, SpecialCompanion } from "./companionSchema";
 
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;
 export type SpecialSlot = (typeof SpecialSlot)[keyof typeof SpecialSlot];
@@ -247,45 +250,6 @@ export interface SpecialPlacement {
   readonly taunt?: { readonly radius: number; readonly pull: number } | undefined;
   readonly windWalk?: { readonly frames: number; readonly hop: number } | undefined;
 }
-
-export interface SpecialCompanion {
-  readonly behavior?: "sentry" | "flying" | undefined;
-  readonly followHeight?: number | undefined;
-  readonly lungeDrop?: number | undefined;
-  readonly volleyFrames?: readonly number[] | undefined;
-  readonly waveFrame?: number | undefined;
-  readonly engage?: number | undefined;
-  readonly followSpeed: number;
-  readonly followBehind: number;
-  readonly returnSpeed: number;
-  readonly lungeStartup: number;
-  readonly lungeActive: number;
-  readonly lungeRecovery: number;
-  readonly lungeTravel: number;
-  readonly bite: StrikeCapsule;
-  readonly biteEffect: HitEffect;
-  readonly biteStatus?: AppliedStatus | undefined;
-  readonly stunFrames: number;
-  readonly leash: number;
-  readonly leashFrames: number;
-  readonly body?: CompanionBody | undefined;
-}
-
-export interface CompanionBody {
-  readonly weight: number;
-  readonly gravity: number;
-  readonly fallSpeed: number;
-  readonly hopSpeed: number;
-  readonly hopReach: number;
-  readonly airJumps: number;
-  readonly airDrift: number;
-}
-
-export const CompanionOrder = { lunge: 1, return: 2 } as const;
-export type CompanionOrder = (typeof CompanionOrder)[keyof typeof CompanionOrder];
-
-export const CompanionMode = { follow: 0, lunge: 1, stunned: 2, returning: 3, vanished: 4 } as const;
-export type CompanionMode = (typeof CompanionMode)[keyof typeof CompanionMode];
 
 export interface LedgeTether extends FrameWindow { readonly reach: StrikeCapsule }
 
