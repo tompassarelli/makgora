@@ -1,15 +1,12 @@
 import { DEFAULT_FIGHTER } from "../../game/roster/kits";
 import { announcePlaying } from "./nativePlaying";
-import { leadsDuo } from "../../game/sim/duoStatus";
 import { partnerOwner } from "../../game/sim/duoOwner";
-import { presentDrawnBody } from "./fighterDrawView";
 import { shieldEnergyReady, shieldEnergyReceipt } from "../../game/session/shieldEnergyCapture";
 import { writeLines } from "wisp/src/platform/fileio";
 import { computerActive } from "../../game/lobby/lobbyState";
 
 import { itemBodyTint } from "../../game/presentation/itemLook";
 import { MATCH_HELP_BOX, MATCH_NOTICE_BOX } from "../../game/ui/hudLayout";
-import type { NoticePlace } from "../../game/ui/noticeLayout";
 import { CryDecision, createCryGate, cryStandIn, gateCry } from "../../game/presentation/hurtVoice";
 import { deckModel, slabScale } from "../../game/presentation/stagePreload";
 import { type PlatformPart, platformParts } from "../../game/presentation/stockPlatforms";
@@ -21,7 +18,8 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/
 import { SHOWCASE_PAD_X } from "../../game/session/showcase";
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
 import type { FrameControls } from "../../game/match/controls";
-import { DEFAULT_RESULT_PICK, Phase, costumeFor, costumeTintFor, fighterColor, humanActive, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
+import { type MatchState, Phase, costumeFor, costumeTintFor, fighterColor, humanActive, stageClock } from "../../game/lobby/lobbyState";
+import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, type ScreenPoint, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 
@@ -41,33 +39,31 @@ import type { FighterPose } from "../../game/presentation/fighterPose";
 import { FRAME_SECONDS } from "../../game/presentation/frameClock";
 import { chatBox } from "../../game/ui/nativeChat";
 import { hideWarcraftChat } from "../../game/ui/warcraftChat";
-import { CANNON_MODEL, CANNON_MODEL_BASE, cannonWarned, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, PLATFORM_CUE_FRAMES, WIND_STREAK_COUNT, WIND_STREAK_MODEL, framesUntilPlatformMoves, hydraWarningX, hydraStrikeZ, lavaLook, windStreak } from "../../game/presentation/stageHazards";
+import { CANNON_MODEL, CANNON_MODEL_BASE, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, WIND_STREAK_COUNT, WIND_STREAK_MODEL, lavaLook, windStreak } from "../../game/presentation/stageHazards";
 import { escapeMeterView, readEscapeMeter } from "../../game/presentation/escapeMeter";
-import { keepNoticeClearOfMarkers, presentFighterMarkers } from "./fighterMarkers";
+import { presentFighterMarkers } from "./fighterMarkers";
 import { drawnScale, lavaPiece } from "../../game/presentation/stageScenery";
 import { hasLava, lavaSide } from "../../game/sim/lava";
 import type { Fighter } from "../../game/sim/fighter";
-import { journalIngress } from "../../game/session/build";
 import { type StartControl, matchHelp, matchStartNotice, resultNotice, waitingMessage } from "../../game/session/messages";
 import { isIntangible } from "../../game/sim/conditions";
 import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
-import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from "../../game/sim/stage";
-import { CANNON_Z, SEA_SURFACE_Z, cannonOn, cannonRock, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
-import { localParticipantSlot, presentedCueTrace, traceParticipant } from "./diagnostics";
+import { surfaceCount, surfaceLeft, surfaceRight, surfaceZ } from "../../game/sim/stage";
+import { CANNON_Z, cannonOn, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
+import { localParticipantSlot, traceParticipant } from "./diagnostics";
 import { colorFighterBody, paintFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
 import { concealFighter, concealFighters } from "./fighterCloak";
 import { localDevice, localHints } from "./hints";
-import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
-import { warcraftMenuOpen } from "./warcraftMenu";
+import { type ShellState, type StatusFrames, activeRollback, localSlot } from "./state";
 import { presentedMatch } from "./presentedMatch";
 import { EMPTY_PAUSE_VIEW, pauseScreenUp, pauseView } from "./pauseView";
-import { type UiObjects, layoutHuds, menuControlHit, pauseEffects, views } from "./ui";
-import { loreClears } from "../../game/classic/loreClears";
+import { type UiObjects, pauseEffects, views } from "./ui";
 import { drawStageScenery, presentDrifters } from "./stageScenery";
-import { probeCamera, probeWaiting } from "./responseProbe";
+import { probeCamera } from "./responseProbe";
 import { clockSeconds } from "./trace";
 import { frameCaptureStage } from "../../platform/captureStage";
-import { ultimateReady } from "../../game/presentation/meterCues";
+import { markLoreClear, presentMatchPanels, presentMessages, updateSlotHud } from "./viewHud";
+import { presentHydra, presentSlot, presentStageMotion } from "./viewPresentation";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -99,8 +95,6 @@ export function announce(s: ShellState, text: string): void {
   setStatus(s, text, 2.0);
 }
 
-export const startControl = (s: Readonly<ShellState>): StartControl =>
-  (journalIngress(s.build) === "editbox" && !playsOnKeyboard(s.rollback?.journal, localSlot()) ? "Start" : "Y");
 
 function frameText(name: string, x: number, y: number, width: number, height: number, size: number): framehandle {
   const frame = BlzCreateFrameByType("TEXT", name, BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), "", 0);
@@ -410,88 +404,22 @@ export function renderPersistentPresentation(s: ShellState): void {
   const matchFrame = stageClock(game);
 
   const drawn = s.drawnStage;
-  const beforePlatform = framesUntilPlatformMoves(drawn, matchFrame);
-  for (let index = 0; index < s.stageDeckParts.length; index++) {
-    const light = stageEdgeLight(drawn, index, matchFrame);
-    if (light === undefined) break;
-    BlzSetSpecialEffectPosition(at(s.stageDeckParts, index), s.origin.x + light.x, s.origin.y + light.y, s.origin.z + light.z);
-  }
-  for (let index = 1; index < s.stageDecks.length; index++) {
-    if (!surfaceMoves(drawn, index)) continue;
-    const x = s.origin.x + (surfaceLeft(drawn, index, matchFrame) + surfaceRight(drawn, index, matchFrame)) / 2;
-    BlzSetSpecialEffectPosition(at(s.stageDecks, index), x, s.origin.y, s.origin.z + surfaceZ(drawn, index, matchFrame));
-    const warns = beforePlatform !== undefined && beforePlatform <= PLATFORM_CUE_FRAMES;
-    BlzSetSpecialEffectColor(at(s.stageDecks, index), 255, warns ? 170 : 255, warns ? 40 : 255);
-  }
-  if (s.stageCannon !== undefined && cannonOn(drawn, matchFrame)) {
-    BlzSetSpecialEffectPosition(s.stageCannon, s.origin.x + cannonX(matchFrame), s.origin.y, s.origin.z + CANNON_Z - CANNON_MODEL_BASE);
-    BlzSetSpecialEffectPitch(s.stageCannon, cannonRock(matchFrame));
-    const warned = cannonWarned(world);
-    BlzSetSpecialEffectColor(s.stageCannon, 255, warned ? 70 : 255, warned ? 40 : 255);
-  }
+  presentStageMotion(s, drawn, matchFrame, world);
   presentLava(s, drawn, matchFrame);
   presentWind(s, drawn, matchFrame);
   presentDrifters(s);
-  for (const slot of PARTICIPANT_SLOTS) {
-    const ring = s.stageHydra?.[slot * 2];
-    const crest = s.stageHydra?.[slot * 2 + 1];
-    if (ring === undefined || crest === undefined) continue;
-    const water = playing && isActive(world, slot) ? fighterAt(world, slot).water : undefined;
-    const strikeZ = water === undefined ? undefined : hydraStrikeZ(drawn, water, game.matchFrame);
-    const x = water === undefined ? undefined : strikeZ === undefined ? hydraWarningX(drawn, water) : water.hydraX;
-    if (x === undefined) {
-      hideEffect(ring, s.origin);
-      hideEffect(crest, s.origin);
-      continue;
-    }
-    BlzSetSpecialEffectScale(ring, strikeZ === undefined ? 0.75 : 1.0);
-    BlzSetSpecialEffectColor(ring, 48, 72, 64);
-    BlzSetSpecialEffectPosition(ring, s.origin.x + x, s.origin.y, s.origin.z + SEA_SURFACE_Z + 8.0);
-    BlzSetSpecialEffectScale(crest, strikeZ === undefined ? 0.75 : 1.0);
-    BlzSetSpecialEffectYaw(crest, Math.PI / 2.0);
-    BlzSetSpecialEffectPosition(crest, s.origin.x + x, s.origin.y + 40.0, s.origin.z + (strikeZ ?? SEA_SURFACE_Z - 60.0));
-    BlzSetSpecialEffectTimeScale(crest, 0.0);
-  }
+  presentHydra(s, drawn, world, game, playing);
   const ui = views(s);
   if (playing) markAgency(ui, world, stage, matchFrame, s.controls, (activeRollback(s)?.repairedFrames ?? 0) > 0);
   ui.classic?.present(game);
   ui.combat.present(runtime.impacts, runtime.simulationFrame, s.runtime.impacts, playing, s.camera);
   const roared = roaring(world, playing);
-  for (const slot of PARTICIPANT_SLOTS) {
-    const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
-    const renderers = ui.fighters[slot];
-    if (s.game.phase === Phase.result) {
-      const body = s.participants[slot].body;
-      if (body !== undefined) ShowUnit(body.unit, false);
-    }
-    const live = playing ? fighter : undefined;
-    const posed = ui.match.posing === slot ? undefined : live;
-    if (renderers !== undefined) presentDrawnBody(renderers, fighter, game.phase !== Phase.result && ui.match.posing !== slot, posed, runtime.poses[slot], stage, runtime.simulationFrame, matchFrame, game.camera, game.ultimatesOff);
-    renderers?.goldSack?.present(posed, stage);
-    renderers?.shurikenGlow?.present(posed, stage);
-    renderers?.spheres?.present(posed, runtime.simulationFrame, s.session.paused);
-    renderers?.flight?.present(posed, stage, s.session.paused);
-    if (renderers !== undefined) {
-      renderers.agency.present(live, live === undefined ? "act" : agencyMarks[slot]);
-      renderers.terror.present(live, roared, s.session.paused);
-      renderers.seaSplash.present(live, drawn, s.session.paused);
-    }
-    ui.special.presentStatic(runtime.specials, live, slot);
-    ui.special.presentSummons(runtime.summons, live, slot);
-    if (live !== undefined) ui.frost.present(live, slot);
-    else ui.frost.hideSlot(slot);
-    ui.stance.present(live, slot);
-    if (live !== undefined) ui.elements.present(live, slot);
-    else ui.elements.hideSlot(slot);
-    if (live !== undefined) ui.placed.present(live, slot);
-    else ui.placed.hideSlot(slot);
-    renderers?.shield.present(fighter, playing);
-    renderers?.projectiles.present(fighter, playing, s.session.paused);
-    renderers?.hookChain?.present(fighter, s.world, playing);
-    renderers?.cues?.present(fighter, playing, s.session.paused);
-    renderers?.meter?.present(runtime.simulationFrame, fighter, playing, presentedCueTrace(s, slot, runtime.simulationFrame));
-    renderers?.hitAreas?.present(live);
-  }
+  for (const slot of PARTICIPANT_SLOTS) presentSlot(s, ui, slot, game, world, runtime, playing, drawn, matchFrame, roared, agencyMarks[slot]);
+  presentShieldEnergyCapture(s, game, world, runtime, playing);
+  concealFighters(s);
+}
+
+function presentShieldEnergyCapture(s: ShellState, game: MatchState, world: Readonly<Roster>, runtime: PacingAndPresentation, playing: boolean): void {
   const capture = s.dev.shieldEnergyCapture;
   if (capture?.pending && playing) {
     const partner = PARTICIPANT_SLOTS.find(slot => computerActive(game, slot) && isActive(world, slot));
@@ -504,7 +432,6 @@ export function renderPersistentPresentation(s: ShellState): void {
       writeLines(`smashcraft-dev-shield-energy-p${localSlot()}.txt`, capture.lines);
     }
   }
-  concealFighters(s);
 }
 
 
@@ -593,10 +520,6 @@ const ESCAPING = [false, false, false, false];
 const BUBBLE_POINT: ScreenPoint = { column: 0.0, row: 0.0 };
 const METER_POINT: ScreenPoint = { column: 0.0, row: 0.0 };
 
-const shownMessages: { frames: object | undefined; helpVisible: boolean | undefined; noticeVisible: boolean | undefined; help: string | undefined; notice: string | undefined; noticePlace: NoticePlace } = {
-  frames: undefined, helpVisible: undefined, noticeVisible: undefined, help: undefined, notice: undefined, noticePlace: { left: MATCH_NOTICE_BOX.left, top: MATCH_NOTICE_BOX.top },
-};
-
 export function renderUi(s: ShellState): void {
   announcePlaying(s);
   if (resumePresentationHeld(s)) return;
@@ -613,66 +536,10 @@ export function renderUi(s: ShellState): void {
   ui.pauseScreen.update(screenShown, screenShown ? pauseView(s, localKeys) : EMPTY_PAUSE_VIEW);
   const localFighter = local !== undefined && s.participants[local].body !== undefined && isActive(s.world, local) ? fighterAt(s.world, local) : undefined;
   const showMatch = !paused && !pauseHudHidden(s) && !selecting && !(local !== undefined && ui.settings[local].isOpen());
-  for (const slot of PARTICIPANT_SLOTS) {
-    if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
-      const fighter = fighterAt(s.world, slot);
-      ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined, costumeTintFor(game, slot, fighter.character), costumeFor(game, slot), leadsDuo(s.world, slot));
-      ui.meterBars[slot].hud.update(showMatch, fighter.meter.ultimate, ultimateReady(fighter, game.ultimatesOff), fighter.visuals.manaDrained);
-    } else {
-      ui.huds[slot].update(false, DEFAULT_FIGHTER, slot, 0.0, 0);
-      ui.meterBars[slot].hud.update(false, 0, false, 0);
-    }
-    ui.selections[slot].menuBindings(s.participants[slot].bindings.bindings);
-    ui.selections[slot].update(game, s.startingChoicesReady === false, menu.title || ui.settings[slot].isOpen(), selecting || game.phase === Phase.result || paused || menu.title || ui.settings[slot].isOpen(), warcraftMenuOpen(s), s.sessionWins.counts, clockSeconds(s.trace), menuControlHit(ui, slot));
-    ui.settings[slot].update();
-  }
-  ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), game.remainingFrames);
-  ui.match.presentCountdown(game, showMatch);
-  ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer, localKeys);
-  const hints = localHints(s);
-  if (ui.hints.laidFor !== hints) layoutHuds(s, hints);
-  ui.hints.update(showMatch && hints && game.phase === Phase.match && local !== undefined, s.participants[local ?? 0].bindings, localDevice(s));
-  ui.classic?.updateCard(game);
-  const cleared = game.lore && game.phase === Phase.result && game.run.active && game.run.cleared ? game.run.current : undefined;
-  if (cleared !== undefined && localSlot() === game.run.player) loreClears().mark(cleared.id);
-  const { help, notice } = s.frames;
-  if (shownMessages.frames !== s.frames) {
-    shownMessages.frames = s.frames;
-    shownMessages.helpVisible = undefined;
-    shownMessages.noticeVisible = undefined;
-    shownMessages.help = undefined;
-    shownMessages.notice = undefined;
-    shownMessages.noticePlace.left = MATCH_NOTICE_BOX.left;
-    shownMessages.noticePlace.top = MATCH_NOTICE_BOX.top;
-  }
-  const teaching = game.phase === Phase.match && game.training && s.trainingHints === true && !paused;
-  const helpVisible = showMatch && teaching;
-  if (shownMessages.helpVisible !== helpVisible) {
-    shownMessages.helpVisible = helpVisible;
-    BlzFrameSetVisible(help, helpVisible);
-  }
-  const waiting = game.phase === Phase.match ? activeRollback(s)?.waitingFor ?? 0 : 0;
-  const starting = matchStartNotice(game);
-  const noticeVisible = showMatch && (waiting !== 0 || starting !== "" || (game.phase === Phase.result && !ui.match.resultsShown()));
-  if (shownMessages.noticeVisible !== noticeVisible) {
-    shownMessages.noticeVisible = noticeVisible;
-    BlzFrameSetVisible(notice, noticeVisible);
-  }
-  keepNoticeClearOfMarkers(notice, noticeVisible, shownMessages.noticePlace);
-  if (!selecting) {
-    if (game.phase === Phase.result) ui.results.update(resultNotice(game, s.status.text).replace("\n", "  ·  "), matchHelp(game, s.session.paused, startControl(s), localFighter, false), resultChoicesOpen(game) && local !== undefined ? s.resultFocus?.[local] ?? DEFAULT_RESULT_PICK : undefined);
-    const helpText = matchHelp(game, s.session.paused, startControl(s), localFighter, game.phase === Phase.match);
-    if (shownMessages.help !== helpText) {
-      shownMessages.help = helpText;
-      BlzFrameSetText(help, helpText);
-    }
-    probeWaiting(s.probe, waiting, localSlot());
-    const noticeText = game.phase === Phase.result ? resultNotice(game, s.status.text) : waiting !== 0 ? waitingMessage(waiting) : starting;
-    if (shownMessages.notice !== noticeText) {
-      shownMessages.notice = noticeText;
-      BlzFrameSetText(notice, noticeText);
-    }
-  }
+  for (const slot of PARTICIPANT_SLOTS) updateSlotHud(s, ui, slot, game, selecting, paused, menu.title, showMatch);
+  presentMatchPanels(s, game, ui, showMatch, local, localKeys);
+  markLoreClear(game);
+  presentMessages(s, game, ui, showMatch, paused, selecting, local, localFighter);
   ui.stage.update(game);
   hideWarcraftChat();
   ui.chat.update(FRAME_SECONDS, chatBox(game.phase));

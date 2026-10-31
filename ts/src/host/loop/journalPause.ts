@@ -16,7 +16,8 @@ import { consumeEditbox, failJournal, journalEpoch, journalIdentity, mailboxMess
 import { type Journal, type Rollback, type ShellState, localSlot, playsOnKeyboard } from "./state";
 import { syncKeyEvents } from "./keyEvents";
 import { traceInput } from "./trace";
-import { LASTING, pauseMatchPresentation, setStatus, startControl } from "./view";
+import { LASTING, pauseMatchPresentation, setStatus } from "./view";
+import { startControl } from "./viewHud";
 
 
 export const CHAT_CLOSED_PREFIX = "SC_JH";
