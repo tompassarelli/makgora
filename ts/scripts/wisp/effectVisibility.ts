@@ -5,7 +5,7 @@ import { BunRuntime } from "@effect/platform-bun";
 import { dirname, join, relative } from "node:path";
 import { type model as mdx } from "wisp/vendor/war3-model.mjs";
 import { parseModelMDX } from "wisp/scripts/wisp/models";
-import { selectSequence } from "wisp/src/headless/animation";
+import { selectSequence } from "wisp/src/game/native/animation";
 import { Character } from "../../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS, fighterSlug, heroDefinition } from "../../src/game/roster/kits";
 import { HERO_CUES, fighterMoveCues, fighterBranchCues, fighterCueList, type Cue } from "../../src/game/presentation/specialCues";
