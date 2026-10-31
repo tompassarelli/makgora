@@ -16,9 +16,19 @@ import { FLAME_STRIKE_BURST } from "../fighters/kaelthas/specials";
 import { PILLAR_COLUMN_STRETCH, FINGER_COLUMN_WIDTH } from "../fighters/archimonde/specials";
 import { ELUNE_SHIMMER } from "../fighters/tyrande/specials";
 import { HOOK_MODEL } from "../fighters/butcher/specials";
-import type { CueBirth } from "./specialCues";
 import { SPECIAL_SLOTS, type SpecialSlot } from "./slotCues";
 import type { Fuse } from "./discLook";
+
+export interface CueBirth {
+  readonly eachFrame: boolean;
+  readonly strike?: number | undefined;
+  readonly strikes?: number | undefined;
+  readonly strikeRadius?: number | undefined;
+  readonly trail?: number | undefined;
+  readonly taper?: boolean | undefined;
+  readonly voices?: number | undefined;
+  readonly lingerFrames?: number | undefined;
+}
 
 
 export const ORIGINAL_PROJECTILE_MODELS = {

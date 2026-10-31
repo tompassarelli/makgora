@@ -32,7 +32,7 @@ import {
   RIFLEMAN_SECOND_SHOT_FORM,
   RIFLEMAN_SECOND_SHOT_LAST,
 } from "../sim/specials";
-import { SPECIAL_SLOTS, type SpecialSlot } from "./projectileArt";
+import { type CueBirth, SPECIAL_SLOTS, type SpecialSlot } from "./projectileArt";
 import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
 import { FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
@@ -66,17 +66,6 @@ export const CUE_ANCHORS: { readonly [anchor in CueAnchor]: { readonly x: number
 
   breath: { x: 124.0, z: 62.0 },
 };
-
-export interface CueBirth {
-  readonly eachFrame: boolean;
-  readonly strike?: number | undefined;
-  readonly strikes?: number | undefined;
-  readonly strikeRadius?: number | undefined;
-  readonly trail?: number | undefined;
-  readonly taper?: boolean | undefined;
-  readonly voices?: number | undefined;
-  readonly lingerFrames?: number | undefined;
-}
 
 export interface Cue {
   readonly model: string;
@@ -142,15 +131,29 @@ const BIRTH_CUES = new Set([
   "GoldCredit", "NagaDeath", "AIfbSpecialArt", "PolyMorphDoneGround", "UCancelDeath", "ToonBoom", "BloodlustSpecial",
 ]);
 
+const CUE_SECONDS: { readonly [name: string]: number | undefined } = {
+  MarkOfChaosTarget: 0.75,
+  InvisibilityTarget: 0.75,
+  FlameStrike1: f32(1.3),
+  DarkRitualCaster: 1.0,
+  DeathAndDecayTarget: 0.5,
+  DeathCoilSpecialArt: f32(0.3),
+  ThunderClapCaster: f32(0.3),
+  WarStompCaster: f32(0.3),
+  StarfallTarget: f32(0.8),
+};
+
+const CUE_PITCH: { readonly [name: string]: number | undefined } = {
+  ThunderClapCaster: f32(1.570796327),
+  WarStompCaster: f32(1.570796327),
+  Consecration: f32(1.570796327),
+};
+
 const cue = (model: string, anchor: CueAnchor, scale: number): Cue => {
   const name = (model.split("\\").pop() ?? model).replace(".mdx", "").replace(".mdl", "");
   const sequence = BIRTH_CUES.has(name) ? "birth" : "stand";
-
-  const seconds = name === "MarkOfChaosTarget" || name === "InvisibilityTarget" ? 0.75 : name === "FlameStrike1" ? f32(1.3)
-    : name === "DarkRitualCaster" ? 1.0 : name === "DeathAndDecayTarget" ? 0.5
-    : name === "DeathCoilSpecialArt" || name === "ThunderClapCaster" || name === "WarStompCaster" ? f32(0.3)
-    : name === "StarfallTarget" ? f32(0.8) : f32(0.2);
-  const pitch = name === "ThunderClapCaster" || name === "WarStompCaster" || name === "Consecration" ? f32(1.570796327) : 0.0;
+  const seconds = CUE_SECONDS[name] ?? f32(0.2);
+  const pitch = CUE_PITCH[name] ?? 0.0;
   return { model, anchor, scale, sequence, seconds, pitch };
 };
 const drawn = (model: string, anchor: CueAnchor): Cue => ({ model, anchor, scale: 1.0, drawn: true });
@@ -546,10 +549,26 @@ export interface CueState {
 
 const NONE: CueState = { cues: undefined, phase: "none" };
 
+interface CueSource {
+  cues: MoveCues | undefined;
+  windows: CueWindows | undefined;
+}
+
+const CUE_SOURCE: CueSource = { cues: undefined, windows: undefined };
+const NO_CUE_SOURCE: CueSource = { cues: undefined, windows: undefined };
+
 
 export function specialCueState(fighter: Readonly<Fighter>): CueState {
   const { action, frame } = fighter.special;
   if (action === SpecialAction.none || fighter.status.out) return NONE;
+  const character = characterCueState(fighter, action, frame);
+  if (character !== undefined) return character;
+  const { cues, windows } = action >= SpecialAction.heroNeutral && action <= SpecialAction.heroDown ? heroCueSource(fighter, action) : originalCueSource(fighter, action);
+  if (cues === undefined || windows === undefined) return NONE;
+  return cuePhase(cues, windows, frame);
+}
+
+function characterCueState(fighter: Readonly<Fighter>, action: number, frame: number): CueState | undefined {
   const peon = fighter.character === Character.peon ? peonCueState(fighter, PEON_REST_CUES) : undefined;
   if (peon !== undefined) return peon;
   if (fighter.character === Character.dreadlord && action === SpecialAction.heroSide && fighter.special.grabFrame > 0) {
@@ -559,27 +578,36 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
     if (frame > PHOENIX_STARTUP_FRAMES && frame <= PHOENIX_STARTUP_FRAMES + PHOENIX_BURN_FRAMES) return { cues: KAEL_PHOENIX_FORM, phase: "active" };
     return frame <= PHOENIX_STARTUP_FRAMES ? { cues: KAEL_PHOENIX_CHARGE, phase: "startup" } : NONE;
   }
-  if (fighter.character === Character.sylvanas && action === SpecialAction.heroUltimate) {
-    const seek = runningHeroSpecial(fighter)?.motion?.find((segment) => segment.seek !== undefined);
-    if (seek === undefined) return NONE;
-    if (frame >= seek.first && frame <= seek.last) return { cues: BANSHEE_FORM, phase: "active" };
-    return fighter.special.form === 0 && frame < seek.first ? { cues: BANSHEE_FORM, phase: "startup" } : NONE;
-  }
-  let cues: MoveCues | undefined;
-  let windows: CueWindows | undefined;
-  if (action >= SpecialAction.heroNeutral && action <= SpecialAction.heroDown) {
-    const move = runningHeroSpecial(fighter);
-    const slot = SPECIAL_SLOTS[action - SpecialAction.heroNeutral] ?? "neutral";
-    const branchCue = heroBranchCue(HERO_BRANCH_CUES[fighter.character]?.[slot], fighter.special.form, fighter.special.variant);
-    if (branchCue === "none") return NONE;
-    cues = branchCue === undefined || branchCue === "slot" ? HERO_CUES[fighter.character]?.[slot] : branchCue;
-    windows = move === undefined ? undefined : heroCueWindows(move, cues?.active === THUNDER_CLAP_CUE ? 1 : ACTIVE_CUE_FRAMES);
-  } else {
-    const branch = ORIGINAL_BRANCH_CUES[action]?.[fighter.special.form];
-    cues = branch === undefined ? ORIGINAL_CUES[action] : branch.cues;
-    windows = branch === undefined ? originalCueWindows(action, fighter.motion.grounded) : branchWindows(branch);
-  }
-  if (cues === undefined || windows === undefined) return NONE;
+  if (fighter.character === Character.sylvanas && action === SpecialAction.heroUltimate) return sylvanasCueState(fighter, frame);
+  return undefined;
+}
+
+function sylvanasCueState(fighter: Readonly<Fighter>, frame: number): CueState {
+  const seek = runningHeroSpecial(fighter)?.motion?.find((segment) => segment.seek !== undefined);
+  if (seek === undefined) return NONE;
+  if (frame >= seek.first && frame <= seek.last) return { cues: BANSHEE_FORM, phase: "active" };
+  return fighter.special.form === 0 && frame < seek.first ? { cues: BANSHEE_FORM, phase: "startup" } : NONE;
+}
+
+function heroCueSource(fighter: Readonly<Fighter>, action: number): CueSource {
+  const move = runningHeroSpecial(fighter);
+  const slot = SPECIAL_SLOTS[action - SpecialAction.heroNeutral] ?? "neutral";
+  const branchCue = heroBranchCue(HERO_BRANCH_CUES[fighter.character]?.[slot], fighter.special.form, fighter.special.variant);
+  if (branchCue === "none") return NO_CUE_SOURCE;
+  const cues = branchCue === undefined || branchCue === "slot" ? HERO_CUES[fighter.character]?.[slot] : branchCue;
+  CUE_SOURCE.cues = cues;
+  CUE_SOURCE.windows = move === undefined ? undefined : heroCueWindows(move, cues?.active === THUNDER_CLAP_CUE ? 1 : ACTIVE_CUE_FRAMES);
+  return CUE_SOURCE;
+}
+
+function originalCueSource(fighter: Readonly<Fighter>, action: number): CueSource {
+  const branch = ORIGINAL_BRANCH_CUES[action]?.[fighter.special.form];
+  CUE_SOURCE.cues = branch === undefined ? ORIGINAL_CUES[action] : branch.cues;
+  CUE_SOURCE.windows = branch === undefined ? originalCueWindows(action, fighter.motion.grounded) : branchWindows(branch);
+  return CUE_SOURCE;
+}
+
+function cuePhase(cues: MoveCues, windows: CueWindows, frame: number): CueState {
   if (frame >= windows.active.first && frame <= windows.active.last) return { cues, phase: "active" };
   if (frame >= windows.startup.first && frame <= windows.startup.last) return { cues, phase: "startup" };
   return { cues, phase: "none" };
