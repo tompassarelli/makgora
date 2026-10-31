@@ -186,7 +186,13 @@ jobs:
         run: |
           [ "${{ steps.bun.outputs.cache-hit }}" = true ] || curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.13"
           echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies, retrying a package download the network cut
+        run: |
+          for attempt in 1 2 3; do
+            bun install --frozen-lockfile && exit 0
+            [ "$attempt" = 3 ] || sleep $((attempt * 10))
+          done
+          exit 1
         working-directory: ts
       - id: scope
         env:
