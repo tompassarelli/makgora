@@ -41,6 +41,7 @@ import { views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { pauseMatchPresentation, renderFighter, renderPersistentPresentation } from "./view";
 import { clearTextMessages, displayText } from "wisp/game/frames";
+import { setTerrainFogHeight, setTerrainFogOverSky } from "wisp/game/view";
 
 
 export function onDevCommand(s: ShellState): void {
@@ -368,8 +369,8 @@ function fogReceipt(s: ShellState, message: string): string | undefined {
   const v = message.slice(10).split(" ").map((word) => S2R(word));
   if (v.length < 11) return undefined;
   s.stageFogOverride = true;
-  SetTerrainFogExV(R2I(v[0] ?? 0), v[1] ?? 0, v[2] ?? 0, v[3] ?? 0, v[4] ?? 0, v[5] ?? 0, v[6] ?? 0, v[7] ?? 0, v[8] ?? 0, v[9] ?? 0, v[10] ?? 0);
-  BlzSetTerrainFogDrawOverSky((v[11] ?? 0) > 0.5);
+  setTerrainFogHeight(R2I(v[0] ?? 0), v[1] ?? 0, v[2] ?? 0, v[3] ?? 0, v[4] ?? 0, v[5] ?? 0, v[6] ?? 0, v[7] ?? 0, v[8] ?? 0, v[9] ?? 0, v[10] ?? 0);
+  setTerrainFogOverSky((v[11] ?? 0) > 0.5);
   return `dev: fogv ${message.slice(10)}`;
 }
 

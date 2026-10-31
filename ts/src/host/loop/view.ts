@@ -67,6 +67,7 @@ import { markLoreClear, presentMatchPanels, presentMessages, updateSlotHud } fro
 import { presentHydra, presentSlot, presentStageMotion } from "./viewPresentation";
 import { createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectYaw } from "wisp/game/effects";
 import { clearTextMessages, createFrameByType, originFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameFont, setFrameSize, setFrameTextAlignment } from "wisp/game/frames";
+import { panCameraTo, setCameraBounds, setCameraField, setCameraPosition } from "wisp/game/view";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -450,17 +451,17 @@ function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect:
     const bounds = stageBounds(s.game.stageChoice).camera;
     const left = centerX + bounds.left;
     const right = centerX + bounds.right;
-    SetCameraBounds(left, centerY, right, centerY, left, centerY, right, centerY);
-  } else SetCameraBounds(targetX, centerY, targetX, centerY, targetX, centerY, targetX, centerY);
-  SetCameraField(CAMERA_FIELD_ROTATION, ARENA_CAMERA.rotation, 0.0);
-  SetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, angle, 0.0);
-  SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, framing.distance, duration);
-  SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + framing.z, duration);
-  SetCameraField(CAMERA_FIELD_ROLL, 0.0, 0.0);
-  SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(framing, aspect), duration);
-  SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(s.game.stageChoice, framing), 0.0);
-  if (duration > 0.0) PanCameraToTimed(targetX, centerY, duration);
-  else SetCameraPosition(targetX, centerY);
+    setCameraBounds(left, centerY, right, centerY, left, centerY, right, centerY);
+  } else setCameraBounds(targetX, centerY, targetX, centerY, targetX, centerY, targetX, centerY);
+  setCameraField(CAMERA_FIELD_ROTATION, ARENA_CAMERA.rotation, 0.0);
+  setCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, angle, 0.0);
+  setCameraField(CAMERA_FIELD_TARGET_DISTANCE, framing.distance, duration);
+  setCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + framing.z, duration);
+  setCameraField(CAMERA_FIELD_ROLL, 0.0, 0.0);
+  setCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(framing, aspect), duration);
+  setCameraField(CAMERA_FIELD_FARZ, arenaFarZ(s.game.stageChoice, framing), 0.0);
+  if (duration > 0.0) panCameraTo(targetX, centerY, duration);
+  else setCameraPosition(targetX, centerY);
 }
 
 
@@ -494,12 +495,12 @@ export function lockArenaCamera(s: ShellState): void {
   shakeRoarCamera(world, game.phase, s.session.paused, FLOOR_HEIGHT + framing.z);
   if (s.build.analogPadDiagnostic === true) {
 
-    SetCameraBounds(centerX, centerY, centerX, centerY, centerX, centerY, centerX, centerY);
-    SetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, 270.0, 0.0);
-    SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, 3200.0, 0.0);
-    SetCameraField(CAMERA_FIELD_ZOFFSET, 0.0, 0.0);
-    SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, 70.0, 0.0);
-    SetCameraPosition(centerX, centerY);
+    setCameraBounds(centerX, centerY, centerX, centerY, centerX, centerY, centerX, centerY);
+    setCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, 270.0, 0.0);
+    setCameraField(CAMERA_FIELD_TARGET_DISTANCE, 3200.0, 0.0);
+    setCameraField(CAMERA_FIELD_ZOFFSET, 0.0, 0.0);
+    setCameraField(CAMERA_FIELD_FIELD_OF_VIEW, 70.0, 0.0);
+    setCameraPosition(centerX, centerY);
   }
   views(s).items.present(game, world);
   views(s).auras.present(game.phase === Phase.match, world);

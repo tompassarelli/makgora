@@ -6,33 +6,34 @@ import type { ShellState, StageDrifter } from "./state";
 import { clockSeconds } from "./trace";
 import { arenaFogOffset, arenaFogEnd, cameraZOverride } from "../../game/presentation/arenaCamera";
 import { createEffect, destroyEffect, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { resetTerrainFog, setDayNightModels, setShadowLightCount, setSkyModel, setTerrainFog, setTerrainFogHeight, setTerrainFogMaxDensity, setTerrainFogOverSky, showSky, showTerrain } from "wisp/game/view";
 
 function updateStageFog(s: ShellState): void {
   if (s.stageFogHidden === true || s.stageFogOverride === true) return;
   const scenery = stageScenery(s.game.stageChoice);
 
   const fog = scenery.fog;
-  if (fog === undefined) { ResetTerrainFog(); return; }
+  if (fog === undefined) { resetTerrainFog(); return; }
   const offset = arenaFogOffset(s.game.stageChoice);
   const end = arenaFogEnd(s.game.stageChoice);
-  SetTerrainFogEx(0, fog.start + offset, end, 0.0, fog.red, fog.green, fog.blue);
+  setTerrainFog(0, fog.start + offset, end, 0.0, fog.red, fog.green, fog.blue);
   const height = scenery.heightFog;
   if (height === undefined) return;
-  SetTerrainFogExV(3, height.start + offset, Math.max(height.end + offset, end), height.density,
+  setTerrainFogHeight(3, height.start + offset, Math.max(height.end + offset, end), height.density,
     s.origin.z + height.heightStart, s.origin.z + height.heightEnd,
     fog.start + offset, end, fog.red, fog.green, fog.blue);
 }
 
 function drawStageFog(s: ShellState): void {
   s.stageFogOverride = undefined;
-  BlzSetTerrainFogMaxLinearDensity(1.0);
-  BlzSetTerrainFogDrawOverSky(false);
+  setTerrainFogMaxDensity(1.0);
+  setTerrainFogOverSky(false);
   updateStageFog(s);
   const height = stageScenery(s.game.stageChoice).heightFog;
   if (height === undefined) return;
-  BlzSetTerrainFogMaxLinearDensity(height.maxDensity);
+  setTerrainFogMaxDensity(height.maxDensity);
   // The native window drops fog drawn over its painted sky and takes the sky's horizon from the fog, so there Gryphon's fog stays a plain fog.
-  BlzSetTerrainFogDrawOverSky(height.drawOverSky && typeof WispSetSkyLook !== "function");
+  setTerrainFogOverSky(height.drawOverSky && typeof WispSetSkyLook !== "function");
 }
 
 
@@ -80,15 +81,15 @@ export function drawStageScenery(s: ShellState): void {
   }
   const scenery = stageScenery(s.game.stageChoice);
 
-  BlzShowTerrain(false);
-  SetSkyModel(scenery.sky);
+  showTerrain(false);
+  setSkyModel(scenery.sky);
   drawStageSkyLook(scenery.skyLook);
-  SetDayNightModels(STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT);
+  setDayNightModels(STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT);
   s.stageFogHidden = false;
   drawStageFog(s);
 
   const shadows = shadowCastingLights(s.game.stageChoice);
-  if (shadows > 0 || s.shadowLightsRaised) BlzSetMinShadowCastingPointLightCount(shadows);
+  if (shadows > 0 || s.shadowLightsRaised) setShadowLightCount(shadows);
   s.shadowLightsRaised = shadows > 0;
   s.stageScenery = placedPieces(s.game.stageChoice).map(piece => addPiece(s, piece, ANIM_TYPE_STAND));
   s.stageDrifters = driftingPieces(s.game.stageChoice).map(piece => addDrifter(s, piece));
@@ -102,7 +103,7 @@ export function preloadStageAssets(origin: Readonly<{ x: number; y: number; z: n
     hideEffect(effect, origin);
     destroyEffect(effect);
   }
-  for (const sky of preloadSkies()) SetSkyModel(sky);
+  for (const sky of preloadSkies()) setSkyModel(sky);
 }
 
 
@@ -111,7 +112,7 @@ export function preloadStageAssets(origin: Readonly<{ x: number; y: number; z: n
 
 
 export function showBackdrop(s: ShellState, visible: boolean): void {
-  BlzShowSkyBox(visible);
+  showSky(visible);
   const alpha = visible ? 255 : 0;
   const pieces = placedPieces(s.game.stageChoice);
   for (const [index, effect] of (s.stageScenery ?? []).entries()) {
@@ -143,9 +144,9 @@ export function showStageFog(s: ShellState, visible: boolean): void {
   s.stageFogHidden = !visible;
   if (visible) drawStageFog(s);
   else {
-    BlzSetTerrainFogMaxLinearDensity(1.0);
-    BlzSetTerrainFogDrawOverSky(false);
-    SetTerrainFogEx(0, 100000.0, 200000.0, 0.0, 0.0, 0.0, 0.0);
+    setTerrainFogMaxDensity(1.0);
+    setTerrainFogOverSky(false);
+    setTerrainFog(0, 100000.0, 200000.0, 0.0, 0.0, 0.0, 0.0);
   }
 }
 
@@ -160,11 +161,11 @@ export function showStageLighting(s: ShellState, authored: boolean): void {
 
 export function leverCommand(s: ShellState, name: string, a: string, b: string): void {
   if (name === "fog") showStageFog(s, a === "on");
-  else if (name === "density") BlzSetTerrainFogMaxLinearDensity(S2R(a));
-  else if (name === "oversky") BlzSetTerrainFogDrawOverSky(a === "on");
-  else if (name === "sky") BlzShowSkyBox(a === "on");
+  else if (name === "density") setTerrainFogMaxDensity(S2R(a));
+  else if (name === "oversky") setTerrainFogOverSky(a === "on");
+  else if (name === "sky") showSky(a === "on");
   else if (name === "camz") cameraZOverride.z = a === "off" ? undefined : S2R(a);
-  else if (name === "shadows") BlzSetMinShadowCastingPointLightCount(S2I(a));
+  else if (name === "shadows") setShadowLightCount(S2I(a));
   else if (name === "light") {
     const lights = pointLightPieces(s.game.stageChoice);
     const effects = s.stageScenery ?? [];

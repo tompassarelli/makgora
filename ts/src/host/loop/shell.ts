@@ -70,6 +70,7 @@ import { advanceHandleLedger, handleLedger, installHandleLedger } from "./handle
 import { knownFrame } from "wisp/src/netcode/shadowSchedule";
 import { createEvents, onEvents } from "wisp/game/events";
 import { displayText, hideOriginFrames, loadFrameFile } from "wisp/game/frames";
+import { enableFog, enableFogMask, setCameraSmoothing, setTimeOfDay, setTimeOfDayScale } from "wisp/game/view";
 
 const TICK = "shell.tick";
 const PLAYER_LEFT = "shell.playerLeft";
@@ -371,8 +372,8 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
   if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(GetLocalPlayer(), 0.0, 0.0, "Smashcraft's menus could not load. Restart the game.");
   BlzEnableSelections(false, false);
   EnableUserControl(true);
-  FogEnable(false);
-  FogMaskEnable(false);
+  enableFog(false);
+  enableFogMask(false);
 
 
   for (const slot of PARTICIPANT_SLOTS) SetPlayerColor(Player(slot), ConvertPlayerColor(slot));
@@ -386,9 +387,9 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
   createUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
   s.ui?.results.bindActions((choice, clicker) => pickResult(s, GetPlayerId(clicker), choice));
   view.drawStage(s);
-  CameraSetSmoothingFactor(0.0);
-  SetTimeOfDay(12.0);
-  SetTimeOfDayScale(0.0);
+  setCameraSmoothing(0.0);
+  setTimeOfDay(12.0);
+  setTimeOfDayScale(0.0);
   startPlayerFiles();
   makePreview(s);
   view.lockArenaCamera(s);

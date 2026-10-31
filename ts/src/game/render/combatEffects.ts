@@ -46,6 +46,7 @@ import type { Fighter } from "../sim/fighter";
 import { heroLook } from "../roster/looks";
 import { bodyCostume, bodyVariants, costumeClipModel } from "../roster/costumes";
 import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectPitch, setEffectRoll, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { setCameraField, setFilterBlendMode, setFilterDuration, setFilterEndColor, setFilterEndUV, setFilterStartColor, setFilterStartUV, setFilterTexMapFlags, setFilterTexture, showFilter } from "wisp/game/view";
 
 
 const KO_VARIANTS = bodyVariants(SELECTABLE_CHARACTERS);
@@ -203,30 +204,30 @@ export class CombatEffects {
     }
     if (!this.koFlashShown) {
       if (this.cineFilter) {
-        SetCineFilterTexture("ReplaceableTextures\\CameraMasks\\White_Mask.blp");
-        SetCineFilterBlendMode(BLEND_MODE_BLEND);
-        SetCineFilterTexMapFlags(TEXMAP_FLAG_NONE);
-        SetCineFilterStartUV(0.0, 0.0, 1.0, 1.0);
-        SetCineFilterEndUV(0.0, 0.0, 1.0, 1.0);
-        SetCineFilterDuration(0.0);
-        DisplayCineFilter(true);
+        setFilterTexture("ReplaceableTextures\\CameraMasks\\White_Mask.blp");
+        setFilterBlendMode(BLEND_MODE_BLEND);
+        setFilterTexMapFlags(TEXMAP_FLAG_NONE);
+        setFilterStartUV(0.0, 0.0, 1.0, 1.0);
+        setFilterEndUV(0.0, 0.0, 1.0, 1.0);
+        setFilterDuration(0.0);
+        showFilter(true);
       }
-      SetCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_DISTANCE, KO_BLUR_DISTANCE, 0.0);
+      setCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_DISTANCE, KO_BLUR_DISTANCE, 0.0);
       this.koFlashShown = true;
     }
     if (this.cineFilter) {
-      SetCineFilterStartColor(levels.colour, levels.colour, levels.colour, levels.alpha);
-      SetCineFilterEndColor(levels.colour, levels.colour, levels.colour, levels.alpha);
+      setFilterStartColor(levels.colour, levels.colour, levels.colour, levels.alpha);
+      setFilterEndColor(levels.colour, levels.colour, levels.colour, levels.alpha);
     }
-    SetCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_SCALE, levels.blur, 0.0);
+    setCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_SCALE, levels.blur, 0.0);
   }
 
   private hideKoFlash(): void {
     if (!this.koFlashShown) return;
     this.koFlashShown = false;
-    DisplayCineFilter(false);
-    SetCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_DISTANCE, 0.0, 0.0);
-    SetCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_SCALE, 0.0, 0.0);
+    showFilter(false);
+    setCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_DISTANCE, 0.0, 0.0);
+    setCameraField(CAMERA_FIELD_DEPTH_OF_FIELD_SCALE, 0.0, 0.0);
   }
 
 

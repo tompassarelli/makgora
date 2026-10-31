@@ -13,6 +13,7 @@ import { edgeStampFile, responsePageFile } from "../../game/core/gameFiles";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/input/participants";
 import type { MatchCamera } from "../../game/sim/matchCamera";
 import { createFrameByType, originFrame, setFrameAbsPoint, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
+import { cameraField, cameraTargetX } from "wisp/game/view";
 
 const ROW_LIMIT = 7200;
 const PAGE_ROWS = 150;
@@ -368,10 +369,10 @@ export function probeCamera(probe: ResponseProbe | undefined, simulated: Readonl
   values[5] = projected.z;
   values[6] = projected.distance;
   values[7] = projected.tangent;
-  values[8] = GetCameraTargetPositionX() - originX;
-  values[9] = GetCameraField(CAMERA_FIELD_ZOFFSET) - floor;
-  values[10] = GetCameraField(CAMERA_FIELD_TARGET_DISTANCE);
-  values[11] = GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW);
+  values[8] = cameraTargetX() - originX;
+  values[9] = cameraField(CAMERA_FIELD_ZOFFSET) - floor;
+  values[10] = cameraField(CAMERA_FIELD_TARGET_DISTANCE);
+  values[11] = cameraField(CAMERA_FIELD_FIELD_OF_VIEW);
 }
 
 export function probePresent(probe: ResponseProbe | undefined, confirmedShield: boolean, predictedShield: boolean, poseSerial: number): void {

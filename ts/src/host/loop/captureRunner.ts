@@ -10,6 +10,7 @@ import { bareFighter } from "./fighterCloak";
 import { holdAgeSeekedEffects } from "./heldAnimations";
 import { type ShellState, shellState } from "./state";
 import { clearTextMessages, screenHeight, screenWidth } from "wisp/game/frames";
+import { cameraEyeX, cameraEyeY, cameraEyeZ, cameraField, cameraTargetX, cameraTargetY, cameraTargetZ } from "wisp/game/view";
 
 const WARMUP_TICKS = 300;
 
@@ -92,7 +93,7 @@ function beginHold(s: ShellState, r: Runner, fixture: CaptureFixture, target: nu
     r.stampTick = r.ticks;
   }
   holdAgeSeekedEffects(s);
-  r.view = [screenWidth(), screenHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
+  r.view = [screenWidth(), screenHeight(), cameraField(CAMERA_FIELD_FIELD_OF_VIEW), cameraEyeX(), cameraEyeY(), cameraEyeZ(), cameraTargetX(), cameraTargetY(), cameraTargetZ()];
 }
 
 function hidesNext(s: ShellState, r: Runner, silhouette: Silhouette | undefined): boolean {
