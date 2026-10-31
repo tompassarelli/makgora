@@ -1,6 +1,7 @@
 
 
 import { frameCostClockFile } from "../../game/core/gameFiles";
+import { displayText } from "wisp/game/frames";
 declare const os: { readonly clock?: () => number } | undefined;
 
 const WORK_ITERATIONS = 100000;
@@ -33,7 +34,7 @@ export function probeFrameCostClock(): void {
     + ` os.delta=${osBefore === undefined || osAfter === undefined ? "n/a" : seconds(osAfter - osBefore)}`
     + ` timer.before=${seconds(timerBefore)} timer.after=${seconds(timerAfter)}`
     + ` timer.delta=${seconds(timerAfter - timerBefore)} work=${I2S(work)}`;
-  DisplayTextToPlayer(GetLocalPlayer(), 0.0, 0.0, message);
+  displayText(GetLocalPlayer(), 0.0, 0.0, message);
   PreloadGenClear();
   PreloadGenStart();
   Preload(message);

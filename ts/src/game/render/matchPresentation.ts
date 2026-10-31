@@ -32,6 +32,7 @@ import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalC
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { defeatClip, resultBodies, resultPoseAt, type ResultBody, type ResultClips } from "../presentation/resultPose";
 import { createEffect, destroyEffect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw, setEffectZ } from "wisp/game/effects";
+import { setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 
 export const RESULTS_DELAY_FRAMES = 90;
@@ -110,11 +111,11 @@ export class MatchPresentation {
     this.sounds.prepare(SoundKind.interfaceFile, interfaceSoundPaths(SELECTABLE_CHARACTERS));
     const parent = gameUi();
     this.countdown = createText("MatchCountdown", parent, 0);
-    BlzFrameSetAbsPoint(this.countdown, FRAMEPOINT_CENTER, f32(0.4), f32(0.34));
-    BlzFrameSetTextAlignment(this.countdown, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
-    BlzFrameSetLevel(this.countdown, 10);
-    BlzFrameSetEnable(this.countdown, false);
-    BlzFrameSetVisible(this.countdown, false);
+    setFrameAbsPoint(this.countdown, FRAMEPOINT_CENTER, f32(0.4), f32(0.34));
+    setFrameTextAlignment(this.countdown, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    setFrameLevel(this.countdown, 10);
+    setFrameEnabled(this.countdown, false);
+    setFrameVisible(this.countdown, false);
   }
 
   private playFile(path: string): sound | undefined {
@@ -136,12 +137,12 @@ export class MatchPresentation {
         age = game.matchFrame - game.startHold - 1;
       }
     }
-    BlzFrameSetVisible(this.countdown, shown && text !== "");
+    setFrameVisible(this.countdown, shown && text !== "");
     if (!shown || text === "") return;
     const pop = f32(f32(1.25) - f32(Math.min(age, 12) / 48.0));
     sizeText(this.countdown, f32(f32(0.075) * pop), f32(0.4), f32(0.14));
-    BlzFrameSetAlpha(this.countdown, Math.min(255, floorDiv((MATCH_TICKS_PER_SECOND - age) * 255, 24)));
-    BlzFrameSetText(this.countdown, `${MENU_STYLE.gold}${text}|r`);
+    setFrameAlpha(this.countdown, Math.min(255, floorDiv((MATCH_TICKS_PER_SECOND - age) * 255, 24)));
+    setFrameText(this.countdown, `${MENU_STYLE.gold}${text}|r`);
   }
 
   cue(cue: MatchCue): void {
@@ -376,30 +377,30 @@ export class MatchPresentation {
       art: createBackdrop("StageLoadingArt", parent, 0),
       name: createText("StageLoadingName", parent, 0),
     });
-    BlzFrameSetTexture(frames.cover, PANEL_TEXTURE, 0, true);
+    setFrameTexture(frames.cover, PANEL_TEXTURE, 0, true);
     fitToWindow(frames.cover);
-    BlzFrameSetLevel(frames.cover, 8);
-    BlzFrameSetTexture(frames.art, texture, 0, true);
-    BlzFrameSetAbsPoint(frames.art, FRAMEPOINT_CENTER, f32(0.4), f32(0.35));
+    setFrameLevel(frames.cover, 8);
+    setFrameTexture(frames.art, texture, 0, true);
+    setFrameAbsPoint(frames.art, FRAMEPOINT_CENTER, f32(0.4), f32(0.35));
 
-    BlzFrameSetSize(frames.art, f32(0.18), f32(0.18));
-    BlzFrameSetLevel(frames.art, 9);
-    BlzFrameSetAbsPoint(frames.name, FRAMEPOINT_TOP, f32(0.4), f32(0.24));
-    BlzFrameSetSize(frames.name, f32(0.4), f32(0.06));
-    BlzFrameSetFont(frames.name, MENU_FONT, f32(0.02), 0);
-    BlzFrameSetTextAlignment(frames.name, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER);
-    BlzFrameSetLevel(frames.name, 9);
-    BlzFrameSetText(frames.name, `${name}\n|cffbbbbbbGetting the arena ready…|r`);
+    setFrameSize(frames.art, f32(0.18), f32(0.18));
+    setFrameLevel(frames.art, 9);
+    setFrameAbsPoint(frames.name, FRAMEPOINT_TOP, f32(0.4), f32(0.24));
+    setFrameSize(frames.name, f32(0.4), f32(0.06));
+    setFrameFont(frames.name, MENU_FONT, f32(0.02), 0);
+    setFrameTextAlignment(frames.name, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER);
+    setFrameLevel(frames.name, 9);
+    setFrameText(frames.name, `${name}\n|cffbbbbbbGetting the arena ready…|r`);
     for (const frame of [frames.cover, frames.art, frames.name]) {
-      BlzFrameSetEnable(frame, false);
-      BlzFrameSetVisible(frame, true);
+      setFrameEnabled(frame, false);
+      setFrameVisible(frame, true);
     }
   }
 
   hideLoading(): void {
     const frames = this.loadingFrames;
     if (frames === undefined) return;
-    for (const frame of [frames.cover, frames.art, frames.name]) BlzFrameSetVisible(frame, false);
+    for (const frame of [frames.cover, frames.art, frames.name]) setFrameVisible(frame, false);
   }
 
 

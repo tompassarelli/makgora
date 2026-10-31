@@ -8,6 +8,7 @@ import { trampoline } from "wisp/src/platform/dispatch";
 import { readChunk, readChunks, writeChunks } from "wisp/src/platform/fileio";
 import { LOBBY_COUNTER_FILE, PLAYER_FILE_CHUNK } from "../../game/core/gameFiles";
 import { departPlayerFiles, enqueuePlayerFile, lobbyCounter, receiveLobbyCounter, receivePlayerFileChunk, type PlayerFileQueue } from "./playerFileQueue";
+import { createEvents, onEvents } from "wisp/game/events";
 
 export const PLAYER_FILE_RECEIVED = "shell.playerFileReceived";
 const MORE_PREFIX = "SC_FL";
@@ -72,12 +73,12 @@ function takeLobbyCounter(): void {
 export function startPlayerFiles(): void {
   takeLobbyCounter();
   delete files().lobbyCounters;
-  const trigger = CreateTrigger();
+  const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
     BlzTriggerRegisterPlayerSyncEvent(trigger, Player(slot), MORE_PREFIX, false);
     BlzTriggerRegisterPlayerSyncEvent(trigger, Player(slot), LAST_PREFIX, false);
   }
-  TriggerAddAction(trigger, trampoline(PLAYER_FILE_RECEIVED));
+  onEvents(trigger, trampoline(PLAYER_FILE_RECEIVED));
 }
 
 function chunks(text: string): string[] {

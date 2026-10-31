@@ -40,6 +40,7 @@ import { isHost, sendHostDelay } from "./netDelay";
 import { views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { pauseMatchPresentation, renderFighter, renderPersistentPresentation } from "./view";
+import { clearTextMessages, displayText } from "wisp/game/frames";
 
 
 export function onDevCommand(s: ShellState): void {
@@ -228,7 +229,7 @@ function quickMatchReceipt(s: ShellState, actor: number, message: string, reques
   if (promo !== undefined) {
     if (!prepareQuickPromo(s.game, promo.pair)) return undefined;
     s.promoHudHidden = true;
-    ClearTextMessages();
+    clearTextMessages();
     startQuickMatch(s, promo.stage, "normal", undefined, QUICK_CPU_STOCKS);
     return "dev: quick promo";
   }
@@ -382,7 +383,7 @@ function desyncReceipt(actor: number): string {
 
 function writeDeveloperReceipt(s: ShellState, receipt: string): void {
   s.devReceipts++;
-  if (s.build.receiptsOnScreen && !s.promoHudHidden) DisplayTextToPlayer(GetLocalPlayer(), 0.0, 0.0, receipt);
+  if (s.build.receiptsOnScreen && !s.promoHudHidden) displayText(GetLocalPlayer(), 0.0, 0.0, receipt);
   const file = devReceiptFile(journalIdentity(s, s.rollback?.epoch ?? 0), s.devReceipts, s.devStep, s.devSteps, s.dev, s.game, s.sessionWins.counts);
   writeLines(file.name, file.lines);
 }

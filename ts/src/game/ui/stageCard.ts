@@ -7,6 +7,7 @@ import { RANDOM_STAGE, stageInfo } from "../menu/stageCatalog";
 import { STAGE_SILHOUETTES, SILHOUETTE_PIECES } from "../../generated/stages/stageSilhouettes";
 import { createBackdrop, createText, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
+import { setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 export const STAGE_CARD_COAL = "ReplaceableTextures\\TeamColor\\TeamColor20.blp";
 export const STAGE_CARD_SNOW = "ReplaceableTextures\\TeamColor\\TeamColor21.blp";
@@ -24,55 +25,55 @@ export class StageCard {
   constructor(parent: framehandle, id: string, left: number, top: number, width: number, height: number, private readonly banner: boolean) {
     const panel = createBackdrop(`${id}Panel`, parent, 0);
     this.panel = panel;
-    BlzFrameSetTexture(panel, STAGE_CARD_COAL, 0, true);
+    setFrameTexture(panel, STAGE_CARD_COAL, 0, true);
     placeTopLeft(panel, left, top);
-    BlzFrameSetSize(panel, width, height);
-    BlzFrameSetEnable(panel, false);
+    setFrameSize(panel, width, height);
+    setFrameEnabled(panel, false);
     this.picture = createBackdrop(`${id}Picture`, parent, 0);
     placeTopLeft(this.picture, left, top);
-    BlzFrameSetSize(this.picture, banner ? width : height, height);
-    BlzFrameSetEnable(this.picture, false);
+    setFrameSize(this.picture, banner ? width : height, height);
+    setFrameEnabled(this.picture, false);
     const side = width - height;
     this.boxWidth = f32(side * f32(0.84));
     this.boxLeft = f32(left + height + side * f32(0.08));
     this.boxTop = f32(top - height * f32(0.14));
     for (let index = 0; index < SILHOUETTE_PIECES; index++) {
       const piece = createBackdrop(`${id}Piece${I2S(index)}`, parent, index);
-      BlzFrameSetTexture(piece, STAGE_CARD_SNOW, 0, true);
-      BlzFrameSetAlpha(piece, 230);
-      BlzFrameSetEnable(piece, false);
+      setFrameTexture(piece, STAGE_CARD_SNOW, 0, true);
+      setFrameAlpha(piece, 230);
+      setFrameEnabled(piece, false);
       this.pieces.push(piece);
     }
     if (banner) {
       const strip = createBackdrop(`${id}Banner`, parent, 0);
-      BlzFrameSetTexture(strip, STAGE_CARD_COAL, 0, true);
-      BlzFrameSetAlpha(strip, 210);
+      setFrameTexture(strip, STAGE_CARD_COAL, 0, true);
+      setFrameAlpha(strip, 210);
       placeTopLeft(strip, left, f32(top - height * f32(0.78)));
-      BlzFrameSetSize(strip, width, f32(height * f32(0.22)));
-      BlzFrameSetEnable(strip, false);
+      setFrameSize(strip, width, f32(height * f32(0.22)));
+      setFrameEnabled(strip, false);
       const name = createText(`${id}Name`, parent, 0);
       placeTopLeft(name, f32(left + height * f32(0.06)), f32(top - height * f32(0.78)));
-      BlzFrameSetSize(name, f32(width - height * f32(0.08)), f32(height * f32(0.22)));
-      BlzFrameSetFont(name, MENU_FONT, f32(height * f32(0.13)), 0);
-      BlzFrameSetTextAlignment(name, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
-      BlzFrameSetEnable(name, false);
+      setFrameSize(name, f32(width - height * f32(0.08)), f32(height * f32(0.22)));
+      setFrameFont(name, MENU_FONT, f32(height * f32(0.13)), 0);
+      setFrameTextAlignment(name, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
+      setFrameEnabled(name, false);
       this.name = name;
     }
   }
 
   show(choice: number): void {
     const stage = stageInfo(choice);
-    BlzFrameSetTexture(this.picture, stage.texture, 0, true);
-    BlzFrameSetVisible(this.panel, choice !== RANDOM_STAGE);
-    if (this.name !== undefined) BlzFrameSetText(this.name, stage.name);
+    setFrameTexture(this.picture, stage.texture, 0, true);
+    setFrameVisible(this.panel, choice !== RANDOM_STAGE);
+    if (this.name !== undefined) setFrameText(this.name, stage.name);
     const pieces = this.banner ? [] : STAGE_SILHOUETTES[choice] ?? [];
     for (let index = 0; index < SILHOUETTE_PIECES; index++) {
       const frame = at(this.pieces, index);
       const piece = pieces[index];
-      BlzFrameSetVisible(frame, piece !== undefined);
+      setFrameVisible(frame, piece !== undefined);
       if (piece === undefined) continue;
       placeTopLeft(frame, f32(this.boxLeft + piece[0] * this.boxWidth), f32(this.boxTop - piece[1] * this.boxWidth));
-      BlzFrameSetSize(frame, f32(piece[2] * this.boxWidth), f32(piece[3] * this.boxWidth));
+      setFrameSize(frame, f32(piece[2] * this.boxWidth), f32(piece[3] * this.boxWidth));
     }
   }
 }

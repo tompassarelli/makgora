@@ -5,6 +5,7 @@ import { slotColor } from "./slotColors";
 import { createBackdrop, createText, consoleUi } from "./frames";
 import { MENU_FONT, markerArrowTexture } from "./hudLayout";
 import { attachOutline, createOutline, createTemplateOutline, setOutlineText } from "./textOutline";
+import { createFrame, createFrameByType, destroyFrame, setFrameAbsPoint, setFrameEnabled, setFrameFont, setFrameLevel, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 export const MARKER_WIDTH = unitsForPixels(220);
 export const MARKER_HEIGHT = unitsForPixels(170);
@@ -78,32 +79,32 @@ export class FighterMarker {
   constructor(private readonly slot: number) {
     const suffix = I2S(slot);
     const context = markerContext(slot);
-    this.root = BlzCreateFrameByType("FRAME", `FighterMarker${suffix}`, consoleUi(), "", context);
-    BlzFrameSetSize(this.root, MARKER_WIDTH, MARKER_HEIGHT);
-    BlzFrameSetLevel(this.root, LEVEL);
+    this.root = createFrameByType("FRAME", `FighterMarker${suffix}`, consoleUi(), "", context);
+    setFrameSize(this.root, MARKER_WIDTH, MARKER_HEIGHT);
+    setFrameLevel(this.root, LEVEL);
     this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", this.root, context + 1, LEVEL, NUMBER_SCALE);
     this.percentOutline = createOutline(`FighterMarkerPercent${suffix}`, this.root, context + 2, MENU_FONT, PERCENT_FONT, LEVEL);
     this.damage = this.number(markerNumberContext(slot));
     this.percent = this.text(`FighterMarkerPercent${suffix}`, context + 4, PERCENT_FONT, PERCENT_WIDTH_PX, PERCENT_HEIGHT_PX);
     this.name = this.text(`FighterMarkerName${suffix}`, context + 5, NAME_FONT, 220, NAME_HEIGHT_PX);
     this.arrow = createBackdrop(`FighterMarkerArrow${suffix}`, this.root, context + 6);
-    BlzFrameSetSize(this.arrow, unitsForPixels(ARROW_WIDTH_PX), unitsForPixels(ARROW_HEIGHT_PX));
-    BlzFrameSetEnable(this.arrow, false);
-    BlzFrameSetLevel(this.arrow, LEVEL);
-    BlzFrameSetPoint(this.arrow, FRAMEPOINT_BOTTOM, this.root, FRAMEPOINT_BOTTOM, 0.0, 0.0);
-    BlzFrameSetPoint(this.name, FRAMEPOINT_BOTTOM, this.root, FRAMEPOINT_BOTTOM, 0.0, unitsForPixels(ARROW_HEIGHT_PX));
-    BlzFrameSetTextAlignment(this.name, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_CENTER);
-    BlzFrameSetTextAlignment(this.damage, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
-    BlzFrameSetTextAlignment(this.percent, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
-    BlzFrameSetPoint(this.percent, FRAMEPOINT_BOTTOMLEFT, this.damage, FRAMEPOINT_BOTTOMRIGHT, 0.0, unitsForPixels(10));
+    setFrameSize(this.arrow, unitsForPixels(ARROW_WIDTH_PX), unitsForPixels(ARROW_HEIGHT_PX));
+    setFrameEnabled(this.arrow, false);
+    setFrameLevel(this.arrow, LEVEL);
+    setFramePoint(this.arrow, FRAMEPOINT_BOTTOM, this.root, FRAMEPOINT_BOTTOM, 0.0, 0.0);
+    setFramePoint(this.name, FRAMEPOINT_BOTTOM, this.root, FRAMEPOINT_BOTTOM, 0.0, unitsForPixels(ARROW_HEIGHT_PX));
+    setFrameTextAlignment(this.name, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_CENTER);
+    setFrameTextAlignment(this.damage, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
+    setFrameTextAlignment(this.percent, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
+    setFramePoint(this.percent, FRAMEPOINT_BOTTOMLEFT, this.damage, FRAMEPOINT_BOTTOMRIGHT, 0.0, unitsForPixels(10));
     this.placeNumber();
     attachOutline(this.damageOutline, this.damage, OUTLINE_PX / NUMBER_SCALE, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_RIGHT);
     attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
-    BlzFrameSetVisible(this.root, false);
+    setFrameVisible(this.root, false);
   }
 
   destroy(): void {
-    BlzDestroyFrame(this.root);
+    destroyFrame(this.root);
   }
 
 
@@ -117,21 +118,21 @@ export class FighterMarker {
     }
     if (shown !== this.shown) {
       this.shown = shown;
-      BlzFrameSetVisible(this.root, shown);
+      setFrameVisible(this.root, shown);
     }
     const jolted = stepJolt(this.jolt, shown, damage);
     if (!shown) return;
     if (this.shownColor !== color) {
       this.shownColor = color;
-      BlzFrameSetTexture(this.arrow, markerArrowTexture(color), 0, true);
-      BlzFrameSetText(this.name, markerNameText(partner, human, this.playerName, slotColor(color).rgb));
+      setFrameTexture(this.arrow, markerArrowTexture(color), 0, true);
+      setFrameText(this.name, markerNameText(partner, human, this.playerName, slotColor(color).rgb));
     }
     this.showDamage(damage);
     const moved = x !== this.shownX || y !== this.shownY;
     if (moved) {
       this.shownX = x;
       this.shownY = y;
-      BlzFrameSetAbsPoint(this.root, FRAMEPOINT_BOTTOM, x, y);
+      setFrameAbsPoint(this.root, FRAMEPOINT_BOTTOM, x, y);
     }
     if (moved || jolted) this.placeNumber();
   }
@@ -143,13 +144,13 @@ export class FighterMarker {
     const shownDamage = damageText(damage);
     if (this.shownDamage !== shownDamage) {
       this.shownDamage = shownDamage;
-      BlzFrameSetText(this.damage, shownDamage);
+      setFrameText(this.damage, shownDamage);
       setOutlineText(this.damageOutline, damageOutlineText(damage));
     }
     const shownPercent = percentText(damage);
     if (this.shownPercent !== shownPercent) {
       this.shownPercent = shownPercent;
-      BlzFrameSetText(this.percent, shownPercent);
+      setFrameText(this.percent, shownPercent);
       setOutlineText(this.percentOutline, percentOutlineText(damage));
     }
   }
@@ -157,24 +158,24 @@ export class FighterMarker {
   private placeNumber(): void {
     const right = this.shownX + unitsForPixels(NUMBER_RIGHT_PX + this.jolt.dx);
     const bottom = this.shownY + unitsForPixels(markerNumberRisePx(this.shownPartner === true) - this.jolt.dy);
-    BlzFrameSetAbsPoint(this.damage, FRAMEPOINT_BOTTOMRIGHT, right, bottom);
+    setFrameAbsPoint(this.damage, FRAMEPOINT_BOTTOMRIGHT, right, bottom);
   }
 
   private text(name: string, context: number, size: number, width: number, height: number): framehandle {
     const frame = createText(name, this.root, context);
-    BlzFrameSetFont(frame, MENU_FONT, size, 1);
-    BlzFrameSetSize(frame, unitsForPixels(width), unitsForPixels(height));
-    BlzFrameSetEnable(frame, false);
-    BlzFrameSetLevel(frame, LEVEL);
+    setFrameFont(frame, MENU_FONT, size, 1);
+    setFrameSize(frame, unitsForPixels(width), unitsForPixels(height));
+    setFrameEnabled(frame, false);
+    setFrameLevel(frame, LEVEL);
     return frame;
   }
 
   private number(context: number): framehandle {
-    const frame = BlzCreateFrame("SmashcraftDamage", this.root, 0, context);
-    BlzFrameSetScale(frame, NUMBER_SCALE);
-    BlzFrameSetSize(frame, unitsForPixels(NUMBER_WIDTH_PX) / NUMBER_SCALE, unitsForPixels(NUMBER_HEIGHT_PX) / NUMBER_SCALE);
-    BlzFrameSetEnable(frame, false);
-    BlzFrameSetLevel(frame, LEVEL);
+    const frame = createFrame("SmashcraftDamage", this.root, 0, context);
+    setFrameScale(frame, NUMBER_SCALE);
+    setFrameSize(frame, unitsForPixels(NUMBER_WIDTH_PX) / NUMBER_SCALE, unitsForPixels(NUMBER_HEIGHT_PX) / NUMBER_SCALE);
+    setFrameEnabled(frame, false);
+    setFrameLevel(frame, LEVEL);
     return frame;
   }
 }

@@ -22,6 +22,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { specialAreaRegion } from "../presentation/disjointCues";
 import { CueLinger, type CuePlace } from "../presentation/cueLinger";
 import { clearEffectSubAnimations, createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectPitch, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { displayTimedText } from "wisp/game/frames";
 
 interface CueModel {
   readonly cue: Cue;
@@ -239,7 +240,7 @@ export class SpecialCueEffects {
       const identity = `${cueName}: ${cue.model}`;
       if (this.reported[identity] !== true) {
         this.reported[identity] = true;
-        DisplayTimedTextToPlayer(GetLocalPlayer(), 0.0, 0.0, 30.0, `Missing effect: ${fighterName(this.character)} / ${identity}`);
+        displayTimedText(GetLocalPlayer(), 0.0, 0.0, 30.0, `Missing effect: ${fighterName(this.character)} / ${identity}`);
       }
     } else parkOnce(this.missing, this.origin, this.missingParked, 0);
     const held = fighter !== undefined && cue !== undefined && !failed && POPCORN_CUE_MODELS[cue.model] !== true ? cue : undefined;

@@ -1,6 +1,7 @@
 
 import { runFrameCostBenchmark } from "../../game/replay/frameCostBenchmark";
 import { frameCostFile } from "../../game/core/gameFiles";
+import { debugMessage } from "wisp/game/frames";
 
 declare const os: { readonly clock: (this: void) => number };
 
@@ -20,6 +21,6 @@ export function start(source: string): void {
       Preload(`state=${result.finalState.slice(offset, offset + 200)}`);
     }
     PreloadGenEnd(frameCostFile(source, GetPlayerId(GetLocalPlayer()), "typescript"));
-    BJDebugMsg(`Benchmark: ${I2S(result.frames)} frames, ${R2SW(result.totalSeconds, 12, 6)} seconds`);
+    debugMessage(`Benchmark: ${I2S(result.frames)} frames, ${R2SW(result.totalSeconds, 12, 6)} seconds`);
   });
 }

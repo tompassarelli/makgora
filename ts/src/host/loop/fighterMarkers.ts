@@ -14,6 +14,7 @@ import { pauseHudHidden } from "./pauseCamera";
 import { presentedMatch } from "./presentedMatch";
 import type { ShellState } from "./state";
 import { views } from "./ui";
+import { setFrameAbsPoint } from "wisp/game/frames";
 
 const METER_LIFT = unitsForPixels(40);
 const POINT: ScreenPoint = { column: 0.0, row: 0.0 };
@@ -44,5 +45,5 @@ export function presentFighterMarkers(s: ShellState, framing: Readonly<MatchCame
 
 
 export function keepNoticeClearOfMarkers(notice: framehandle, visible: boolean, place: NoticePlace): void {
-  if (visible && clearNoticePlace(place, X, Y, SHOWN)) BlzFrameSetAbsPoint(notice, FRAMEPOINT_TOPLEFT, place.left, place.top);
+  if (visible && clearNoticePlace(place, X, Y, SHOWN)) setFrameAbsPoint(notice, FRAMEPOINT_TOPLEFT, place.left, place.top);
 }

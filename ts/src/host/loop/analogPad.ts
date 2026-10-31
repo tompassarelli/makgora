@@ -8,6 +8,7 @@ import { humanActive, humanFighterActive } from "../../game/lobby/lobbyState";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type ShellState, localSlot } from "./state";
 import { osKeyDown } from "../../platform/osKeys";
+import { createEvents, onEvents } from "wisp/game/events";
 
 export const PAD_MOUSE = "shell.padMouse";
 
@@ -26,11 +27,11 @@ const pressed = osKeyDown;
 
 export function createPadTriggers(s: ShellState): void {
   if (s.pad === undefined || (s.build.analogPadDiagnostic !== true && s.build.analogPad !== "cursor")) return;
-  const trigger = CreateTrigger();
+  const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
     if (humanActive(s.game, slot)) TriggerRegisterPlayerEvent(trigger, Player(slot), EVENT_PLAYER_MOUSE_MOVE);
   }
-  TriggerAddAction(trigger, trampoline(PAD_MOUSE));
+  onEvents(trigger, trampoline(PAD_MOUSE));
 }
 
 export function padMouse(s: ShellState): void {

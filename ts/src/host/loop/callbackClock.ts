@@ -5,6 +5,7 @@ import { RATES_RECORD_CHARS } from "./sessionRates";
 import { KEY_DOWN, KEY_UP } from "./keyEvents";
 import { DRAW_EVENT, burstAlpha, drawnAlpha } from "./betweenFrames";
 import { activeRollback, shellState } from "./state";
+import { displayText } from "wisp/game/frames";
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
 const TICK = "shell.tick";
@@ -132,7 +133,7 @@ function finish(probe: CallbackClock): void {
   for (const record of probe.events) Preload(record);
   for (const record of probe.bursts) Preload(record);
   PreloadGenEnd(callbackClockFile(slot, probe.run));
-  DisplayTextToPlayer(GetLocalPlayer(), 0.0, 0.0, `callback-clock run=${probe.run} callbacks=${probe.callbacks} written`);
+  displayText(GetLocalPlayer(), 0.0, 0.0, `callback-clock run=${probe.run} callbacks=${probe.callbacks} written`);
 }
 
 export function probeCallbackClock(key: number, callbacks: number): boolean {

@@ -3,6 +3,7 @@ import { imod } from "wisp/src/sim/intMath";
 import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
 import { MENU_STYLE } from "./hudLayout";
 import type { ChordLabels } from "../input/pauseChord";
+import { createFrameByType, screenHeight, screenWidth, setFrameAlpha, setFrameEnabled, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 const PLATE = "war3mapImported\\SelectionAction.tga";
 const FRAME = "war3mapImported\\SelectionTileFrame.tga";
@@ -82,8 +83,8 @@ export class PauseScreen {
   constructor(select: (choice: number, clicker: player) => void) {
     this.clicks = new ButtonClicks("ui.pauseScreen.click", select);
     this.root = createBackdrop(NAME, consoleUi(), 1810);
-    BlzFrameSetLevel(this.root, 20);
-    BlzFrameSetSize(this.root, f32(0.001), f32(0.001));
+    setFrameLevel(this.root, 20);
+    setFrameSize(this.root, f32(0.001), f32(0.001));
     placeTopLeft(this.root, f32(0.0), f32(0.6));
     for (const corner of [0, 1, 2, 3]) this.bracket(corner);
     this.ornament(0);
@@ -108,10 +109,10 @@ export class PauseScreen {
       this.capText.push(this.label(`Cap${I2S(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TEXT_JUSTIFY_CENTER));
       if (index < 3) this.joins.push(this.label(`Join${I2S(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TEXT_JUSTIFY_CENTER));
     }
-    this.button = BlzCreateFrameByType("BUTTON", `${NAME}Button`, this.root, "", 1811);
+    this.button = createFrameByType("BUTTON", `${NAME}Button`, this.root, "", 1811);
     this.parts.push({ frame: this.button, place: edges => resetPlateBox(edges) });
     this.clicks.add(this.button, 0);
-    BlzFrameSetVisible(this.root, false);
+    setFrameVisible(this.root, false);
   }
 
   bindActions(select: (choice: number, clicker: player) => void): void {
@@ -125,26 +126,26 @@ export class PauseScreen {
   }
 
   update(paused: boolean, view: PauseView): void {
-    if (paused !== this.shown) BlzFrameSetVisible(this.root, paused);
+    if (paused !== this.shown) setFrameVisible(this.root, paused);
     this.shown = paused;
     if (!paused) return;
-    const key = BlzGetLocalClientWidth() * 65536 + BlzGetLocalClientHeight();
+    const key = screenWidth() * 65536 + screenHeight();
     const chord = view.chord;
     const caps = view.pad ? ["L", "R", "A", "START/BACK"] : [chord.left, chord.right, chord.attack, view.pauseKey];
     const signature = `${caps.join("|")}`;
     if (key !== this.size || signature !== this.labels) {
       this.size = key;
       this.labels = signature;
-      this.edges = windowEdges(BlzGetLocalClientWidth(), BlzGetLocalClientHeight());
+      this.edges = windowEdges(screenWidth(), screenHeight());
       for (const part of this.parts) this.set(part.frame, part.place(this.edges));
       this.layoutCaps(caps, view.pad);
     }
-    BlzFrameSetText(this.nameText, `${MENU_STYLE.gold}${view.player === undefined ? "PAUSE" : `PLAYER ${I2S(view.player)} PAUSE`}|r`);
-    BlzFrameSetText(this.clockText, view.clock === undefined ? "" : `${MENU_STYLE.text}${view.clock}|r`);
+    setFrameText(this.nameText, `${MENU_STYLE.gold}${view.player === undefined ? "PAUSE" : `PLAYER ${I2S(view.player)} PAUSE`}|r`);
+    setFrameText(this.clockText, view.clock === undefined ? "" : `${MENU_STYLE.text}${view.clock}|r`);
     const hints = view.hints === undefined ? "" : `\nNew-player hints: ${view.hints ? "on" : "off"}${view.hintsKey === true ? " (H)" : ""}`;
-    BlzFrameSetText(this.menuText, `${MENU_STYLE.text}F10: leave the game  ·  G: hide HUD${hints}|r`);
-    BlzFrameSetText(this.cameraText, `${MENU_STYLE.text}${view.camera}|r`);
-    BlzFrameSetText(this.resetText, `${MENU_STYLE.gold}RESET MATCH|r`);
+    setFrameText(this.menuText, `${MENU_STYLE.text}F10: leave the game  ·  G: hide HUD${hints}|r`);
+    setFrameText(this.cameraText, `${MENU_STYLE.text}${view.camera}|r`);
+    setFrameText(this.resetText, `${MENU_STYLE.gold}RESET MATCH|r`);
   }
 
   private layoutCaps(labels: readonly string[], pad: boolean): void {
@@ -161,13 +162,13 @@ export class PauseScreen {
       if (cap !== undefined) this.set(cap, [x, top, width, CAP_HEIGHT]);
       if (text !== undefined) {
         this.set(text, [x, f32(top - f32(0.0075)), width, f32(0.02)]);
-        BlzFrameSetText(text, `${MENU_STYLE.gold}${labels[index] ?? ""}|r`);
+        setFrameText(text, `${MENU_STYLE.gold}${labels[index] ?? ""}|r`);
       }
       x = f32(x + width);
       const plus = this.joins[index];
       if (plus !== undefined) {
         this.set(plus, [x, f32(top - f32(0.0075)), join, f32(0.02)]);
-        BlzFrameSetText(plus, `${MENU_STYLE.text}+|r`);
+        setFrameText(plus, `${MENU_STYLE.text}+|r`);
         x = f32(x + join);
       }
     }
@@ -176,7 +177,7 @@ export class PauseScreen {
   private set(frame: framehandle, [left, top, width, height]: readonly [number, number, number, number]): void {
     const scale = this.scales.get(frame) ?? 1.0;
     placeTopLeft(frame, left, top);
-    BlzFrameSetSize(frame, f32(width / scale), f32(height / scale));
+    setFrameSize(frame, f32(width / scale), f32(height / scale));
   }
 
   private next(name: string): { name: string; context: number } {
@@ -186,9 +187,9 @@ export class PauseScreen {
   private fixed(name: string, texture: string, place: Place, alpha = 255): framehandle {
     const { name: full, context } = this.next(name);
     const frame = createBackdrop(full, this.root, context);
-    BlzFrameSetTexture(frame, texture, 0, true);
-    BlzFrameSetAlpha(frame, alpha);
-    BlzFrameSetEnable(frame, false);
+    setFrameTexture(frame, texture, 0, true);
+    setFrameAlpha(frame, alpha);
+    setFrameEnabled(frame, false);
     this.parts.push({ frame, place });
     return frame;
   }
@@ -205,8 +206,8 @@ export class PauseScreen {
     const { name: full, context } = this.next(name);
     const frame = createText(full, parent, context);
     this.scales.set(frame, sizeText(frame, size, f32(0.2), f32(0.02)));
-    BlzFrameSetTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, justify);
-    BlzFrameSetEnable(frame, false);
+    setFrameTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, justify);
+    setFrameEnabled(frame, false);
     this.parts.push({ frame, place });
     return frame;
   }

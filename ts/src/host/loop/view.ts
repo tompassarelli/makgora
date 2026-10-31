@@ -65,6 +65,7 @@ import { frameCaptureStage } from "../../platform/captureStage";
 import { markLoreClear, presentMatchPanels, presentMessages, updateSlotHud } from "./viewHud";
 import { presentHydra, presentSlot, presentStageMotion } from "./viewPresentation";
 import { createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectYaw } from "wisp/game/effects";
+import { clearTextMessages, createFrameByType, originFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameFont, setFrameSize, setFrameTextAlignment } from "wisp/game/frames";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -97,19 +98,19 @@ export function announce(s: ShellState, text: string): void {
 }
 
 
-function frameText(name: string, x: number, y: number, width: number, height: number, size: number): framehandle {
-  const frame = BlzCreateFrameByType("TEXT", name, BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), "", 0);
-  BlzFrameSetAbsPoint(frame, FRAMEPOINT_TOPLEFT, x, y);
-  BlzFrameSetSize(frame, width, height);
-  BlzFrameSetFont(frame, "Fonts\\FRIZQT__.TTF", size, 0);
-  BlzFrameSetTextAlignment(frame, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+function createStatusText(name: string, x: number, y: number, width: number, height: number, size: number): framehandle {
+  const frame = createFrameByType("TEXT", name, originFrame(ORIGIN_FRAME_GAME_UI, 0), "", 0);
+  setFrameAbsPoint(frame, FRAMEPOINT_TOPLEFT, x, y);
+  setFrameSize(frame, width, height);
+  setFrameFont(frame, "Fonts\\FRIZQT__.TTF", size, 0);
+  setFrameTextAlignment(frame, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
   return frame;
 }
 
 export function createStatusFrames(): StatusFrames {
   return {
-    help: frameText("MeleeHelp", MATCH_HELP_BOX.left, MATCH_HELP_BOX.top, MATCH_HELP_BOX.width, MATCH_HELP_BOX.height, f32(0.01)),
-    notice: frameText("MeleeNotice", MATCH_NOTICE_BOX.left, MATCH_NOTICE_BOX.top, MATCH_NOTICE_BOX.width, MATCH_NOTICE_BOX.height, f32(0.019)),
+    help: createStatusText("MeleeHelp", MATCH_HELP_BOX.left, MATCH_HELP_BOX.top, MATCH_HELP_BOX.width, MATCH_HELP_BOX.height, f32(0.01)),
+    notice: createStatusText("MeleeNotice", MATCH_NOTICE_BOX.left, MATCH_NOTICE_BOX.top, MATCH_NOTICE_BOX.width, MATCH_NOTICE_BOX.height, f32(0.019)),
   };
 }
 
@@ -307,8 +308,8 @@ export function pauseMatchPresentation(s: ShellState, paused: boolean, immediate
   s.pauseChord = undefined;
   if (!paused) s.pausedBy = undefined;
   if (paused && s.game.phase === Phase.match) {
-    const height = BlzGetLocalClientHeight();
-    beginPauseCamera(s, height > 0 ? I2R(BlzGetLocalClientWidth()) / I2R(height) : 16.0 / 9.0);
+    const height = screenHeight();
+    beginPauseCamera(s, height > 0 ? I2R(screenWidth()) / I2R(height) : 16.0 / 9.0);
   } else if (s.pauseCamera !== undefined) {
     const saved = s.pauseCamera;
     copyMatchCamera(s.camera, saved.saved);
@@ -465,11 +466,11 @@ export function lockArenaCamera(s: ShellState): void {
   const { world, game } = presentedMatch(s);
 
   if (game.phase !== Phase.result && !game.camera.initialized) advanceMatchCamera(s.previewCamera, world, game.stageChoice);
-  const height = BlzGetLocalClientHeight();
-  const aspect = height > 0 ? I2R(BlzGetLocalClientWidth()) / I2R(height) : 16.0 / 9.0;
+  const height = screenHeight();
+  const aspect = height > 0 ? I2R(screenWidth()) / I2R(height) : 16.0 / 9.0;
   const angle = aimArenaCamera(s, aspect);
   if (game.phase !== Phase.result && s.viewExtreme !== undefined) extremeCamera(s.camera, game.stageChoice, aspect, s.viewExtreme);
-  if (s.viewExtreme !== undefined) ClearTextMessages();
+  if (s.viewExtreme !== undefined) clearTextMessages();
   if (game.phase !== Phase.result && s.showcaseFocus !== undefined) s.camera.x = SHOWCASE_PAD_X[s.showcaseFocus];
   if (game.phase !== Phase.result && s.showcaseFocus === undefined && (!s.session.paused || s.pauseCamera === undefined)) fitFighterFrames(s.camera, world, game.stageChoice, aspect);
   applyHeldCamera(s);

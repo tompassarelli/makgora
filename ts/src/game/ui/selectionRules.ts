@@ -4,9 +4,10 @@ import type { MatchState } from "../lobby/lobbyState";
 import { MENU_STYLE } from "./hudLayout";
 import { ItemKind, itemBit } from "../sim/codes";
 import { type TutorialMenuFrames, showTutorialLesson } from "./tutorialMenu";
-import { placeTopLeft, setFrameText } from "./frames";
+import { placeTopLeft, setMenuText } from "./frames";
 import { label } from "./selectionFrames";
 import type { SelectionActions } from "./selectionActions";
+import { createFrame, namedFrame, setFrameEnabled, setFrameFont, setFrameSize, setFrameVisible } from "wisp/game/frames";
 
 export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
   | { kind: "items" } | { kind: "ultimates" } | { kind: "itemKind"; item: ItemKind } | { kind: "training" } | { kind: "partner"; setting: TrainingSetting; direction: -1 | 1 } | { kind: "hitAreas" } | { kind: "speed" }
@@ -40,12 +41,12 @@ export interface RuleFrames extends MatchRuleFrames {
 }
 
 function ruleButton(root: framehandle, add: AddRule, box: RuleBox, target: RuleButton, text: string): framehandle {
-  const frame = BlzCreateFrame("ScriptDialogButton", root, 0, 0);
+  const frame = createFrame("ScriptDialogButton", root, 0, 0);
   placeTopLeft(frame, box.x, box.y);
-  BlzFrameSetSize(frame, box.width, box.height);
-  setFrameText(frame, text);
-  BlzFrameSetFont(frame, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
-  BlzFrameSetFont(BlzGetFrameByName("ScriptDialogButtonText", 0), MENU_STYLE.font, MENU_STYLE.headerSize, 0);
+  setFrameSize(frame, box.width, box.height);
+  setMenuText(frame, text);
+  setFrameFont(frame, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
+  setFrameFont(namedFrame("ScriptDialogButtonText", 0), MENU_STYLE.font, MENU_STYLE.headerSize, 0);
   return add(frame, target);
 }
 
@@ -114,7 +115,7 @@ export interface DelayFrames {
 export function createDelayControls(root: framehandle, add: AddRule, textSize: number): DelayFrames {
   const { less, more, auto } = DELAY_CONTROLS;
   const line = ruleButton(root, add, auto, { kind: "inputDelay", step: 0 }, "");
-  BlzFrameSetFont(BlzGetFrameByName("ScriptDialogButtonText", 0), MENU_STYLE.font, textSize, 0);
+  setFrameFont(namedFrame("ScriptDialogButtonText", 0), MENU_STYLE.font, textSize, 0);
   return {
     steps: [ruleButton(root, add, less, { kind: "inputDelay", step: -1 }, "−"), ruleButton(root, add, more, { kind: "inputDelay", step: 1 }, "+")],
     line,
@@ -124,9 +125,9 @@ export function createDelayControls(root: framehandle, add: AddRule, textSize: n
 export function presentDelayControls(frames: DelayFrames, hostControl: boolean): void {
   const box = hostControl ? DELAY_CONTROLS.auto : RULE_BUTTONS.inputDelay;
   placeTopLeft(frames.line, box.x, box.y);
-  BlzFrameSetSize(frames.line, box.width, box.height);
-  BlzFrameSetEnable(frames.line, hostControl);
-  for (const frame of frames.steps) BlzFrameSetVisible(frame, hostControl);
+  setFrameSize(frames.line, box.width, box.height);
+  setFrameEnabled(frames.line, hostControl);
+  for (const frame of frames.steps) setFrameVisible(frame, hostControl);
 }
 
 export function rulesKey(game: Readonly<MatchState>, clears: { count(): number }, fighter: number): string {

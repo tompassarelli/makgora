@@ -11,6 +11,8 @@ import { Phase } from "../game/lobby/lobbyState";
 import { parseDecimal } from "../game/netcode/journal/decimal";
 import { activeRollback, shellState } from "../host/loop/state";
 import { FRAME_SECTIONS } from "../host/loop/frameSections";
+import { createEvents, onEvents } from "wisp/game/events";
+import { displayTimedText } from "wisp/game/frames";
 
 
 const PERF_COMMAND = "-dev perf";
@@ -38,7 +40,7 @@ function captureCommand(): void {
   const frames = parseDecimal(text);
   if (frames === undefined || `${frames}` !== text) throw new Error("capture needs a whole frame count");
   const run = startFrameCostCapture(frames);
-  DisplayTimedTextToPlayer(GetTriggerPlayer(), 0, 0, 5, `dev: capture run=${run} frames=${frames} match-frame=${state.game.matchFrame}`);
+  displayTimedText(GetTriggerPlayer(), 0, 0, 5, `dev: capture run=${run} frames=${frames} match-frame=${state.game.matchFrame}`);
 }
 
 
@@ -58,7 +60,7 @@ export function startMatchFrameMeter(): void {
     stamps: CAPTURE_STAMPS,
   });
   on(CAPTURE_HANDLER, captureCommand);
-  const chat = CreateTrigger();
+  const chat = createEvents();
   for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, Player(slot), CAPTURE_COMMAND, false);
-  TriggerAddAction(chat, trampoline(CAPTURE_HANDLER));
+  onEvents(chat, trampoline(CAPTURE_HANDLER));
 }

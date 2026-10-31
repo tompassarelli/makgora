@@ -9,6 +9,7 @@ import type { KeyBindings } from "../input/keyBindings";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
 import { TRAINING_READOUT_BOX, TRAINING_READOUT_PANEL, TRAINING_READOUT_PANEL_ALPHA } from "./hudLayout";
+import { destroyFrame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 
 
@@ -24,23 +25,23 @@ export class TrainingReadout {
 
   constructor() {
     this.panel = createBackdrop("TrainingReadoutPanel", gameUi(), 892);
-    BlzFrameSetTexture(this.panel, PANEL_TEXTURE, 0, true);
-    BlzFrameSetAlpha(this.panel, TRAINING_READOUT_PANEL_ALPHA);
+    setFrameTexture(this.panel, PANEL_TEXTURE, 0, true);
+    setFrameAlpha(this.panel, TRAINING_READOUT_PANEL_ALPHA);
     placeTopLeft(this.panel, TRAINING_READOUT_PANEL.left, TRAINING_READOUT_PANEL.top);
-    BlzFrameSetSize(this.panel, TRAINING_READOUT_PANEL.width, TRAINING_READOUT_PANEL.height);
-    BlzFrameSetEnable(this.panel, false);
-    BlzFrameSetVisible(this.panel, false);
+    setFrameSize(this.panel, TRAINING_READOUT_PANEL.width, TRAINING_READOUT_PANEL.height);
+    setFrameEnabled(this.panel, false);
+    setFrameVisible(this.panel, false);
     this.label = createText("TrainingReadout", this.panel, 891);
     placeTopLeft(this.label, TRAINING_READOUT_BOX.left, TRAINING_READOUT_BOX.top);
-    BlzFrameSetSize(this.label, TRAINING_READOUT_BOX.width, TRAINING_READOUT_BOX.height);
-    BlzFrameSetFont(this.label, MENU_FONT, f32(0.011), 1);
-    BlzFrameSetTextAlignment(this.label, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
-    BlzFrameSetEnable(this.label, false);
+    setFrameSize(this.label, TRAINING_READOUT_BOX.width, TRAINING_READOUT_BOX.height);
+    setFrameFont(this.label, MENU_FONT, f32(0.011), 1);
+    setFrameTextAlignment(this.label, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+    setFrameEnabled(this.label, false);
   }
 
   destroy(): void {
-    BlzDestroyFrame(this.label);
-    BlzDestroyFrame(this.panel);
+    destroyFrame(this.label);
+    destroyFrame(this.panel);
   }
 
   update(visible: boolean, state: Readonly<TrainingState>, bindings: Readonly<KeyBindings>): void {
@@ -59,7 +60,7 @@ export class TrainingReadout {
 
       const text = tutorialOn(state) ? tutorialText(state, bindings) : trainingReadout(state);
       this.empty = text === "";
-      BlzFrameSetText(this.label, text);
+      setFrameText(this.label, text);
     }
     this.showPanel(!this.empty);
   }
@@ -67,6 +68,6 @@ export class TrainingReadout {
   private showPanel(shown: boolean): void {
     if (shown === this.panelShown) return;
     this.panelShown = shown;
-    BlzFrameSetVisible(this.panel, shown);
+    setFrameVisible(this.panel, shown);
   }
 }

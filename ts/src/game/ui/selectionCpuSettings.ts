@@ -4,9 +4,10 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";
 import { CPU_OPPONENT_COPY } from "./cpuOpponentCopy";
 import { createOpponentSettings } from "./opponentSettingsFrames";
-import { type ClickBox, gameUi, setFrameText } from "./frames";
+import { type ClickBox, gameUi, setMenuText } from "./frames";
 import { CPU_SETTINGS_BOXES } from "./cpuSettingsLayout";
 import { titleCase } from "./selectionFrames";
+import { setFrameEnabled, setFrameLevel, setFrameVisible } from "wisp/game/frames";
 
 export interface CpuDefaults {
   readonly opponent: MatchState["cpuOpponents"][number];
@@ -28,7 +29,7 @@ export interface CpuSettingsFrames {
 export function createCpuSettings(participantId: number, add: (frame: framehandle, target: CpuButton, text: string, box: ClickBox) => framehandle): CpuSettingsFrames {
   const cpu = createOpponentSettings(gameUi(), participantId);
   if (cpu === undefined) throw new Error("the Opponent settings frames did not load");
-  BlzFrameSetLevel(cpu.root, SELECT_LEVELS.cpuSettings);
+  setFrameLevel(cpu.root, SELECT_LEVELS.cpuSettings);
   const steps: framehandle[] = [];
   const cpuButton = (frame: framehandle, button: CpuButton, box: ClickBox) => {
     if (button.kind === "cpuStep") steps.push(frame);
@@ -41,24 +42,24 @@ export function createCpuSettings(participantId: number, add: (frame: framehandl
   cpuButton(cpu.difficultyNext, { kind: "cpuStep", row: 1, direction: 1 }, CPU_SETTINGS_BOXES.difficultyNext);
   const values = [cpu.opponentValue, cpu.difficultyValue];
   const done = cpuButton(cpu.done, { kind: "cpuClose" }, CPU_SETTINGS_BOXES.done);
-  BlzFrameSetVisible(cpu.root, false);
+  setFrameVisible(cpu.root, false);
   return { root: cpu.root, title: cpu.title, values, preview: cpu.preview, prompt: cpu.prompt, done, steps };
 }
 
 export function showCpuSettings(frames: CpuSettingsFrames, game: Readonly<MatchState>, participantId: number, slot: number, focus: 0 | 1 | 2, prompt: string, defaults: CpuDefaults): void {
   const opponent = game.cpuOpponents[slot] ?? defaults.opponent;
   const tier = game.cpuTiers[slot] ?? defaults.tier;
-  setFrameText(frames.title, `CPU ${slot + 1} — Opponent settings`);
+  setMenuText(frames.title, `CPU ${slot + 1} — Opponent settings`);
   for (let row = 0; row < frames.values.length; row++) {
     const frame = frames.values[row];
-    if (frame !== undefined) setFrameText(frame, `${focus === row ? "> " : ""}${titleCase(row === 0 ? opponent : tier)}${focus === row ? " <" : ""}`);
+    if (frame !== undefined) setMenuText(frame, `${focus === row ? "> " : ""}${titleCase(row === 0 ? opponent : tier)}${focus === row ? " <" : ""}`);
   }
   const copy = opponent === "random" ? "A different opponent each match." : `${CPU_OPPONENT_COPY[opponent].description}\n${CPU_OPPONENT_COPY[opponent].tags}\n\n${CPU_OPPONENT_COPY[opponent].previews[tier]}`;
   const permission = canChooseComputer(game, participantId, slot) ? "" : "\n\nOnly the slot owner or first player can change this opponent.";
-  for (const button of frames.steps) BlzFrameSetEnable(button, permission === "");
-  setFrameText(frames.preview, copy + permission);
-  setFrameText(frames.done, focus === 2 ? "> Done <" : "Done");
-  setFrameText(frames.prompt, prompt);
+  for (const button of frames.steps) setFrameEnabled(button, permission === "");
+  setMenuText(frames.preview, copy + permission);
+  setMenuText(frames.done, focus === 2 ? "> Done <" : "Done");
+  setMenuText(frames.prompt, prompt);
 }
 
 export function cpuMenuFocus(focus: 0 | 1 | 2, action: Action, close: () => void, step: (row: 0 | 1, direction: -1 | 1) => void): 0 | 1 | 2 {

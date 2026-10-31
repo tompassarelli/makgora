@@ -2,8 +2,9 @@ import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { ResultRow } from "../presentation/matchCues";
-import { ButtonClicks, createBackdrop, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText, styleMenuPanel } from "./frames";
+import { ButtonClicks, createBackdrop, createText, gameUi, highlightText, placeTopLeft, setMenuText, sizeText, styleMenuPanel } from "./frames";
 import { MENU_STYLE } from "./hudLayout";
+import { createFrame, setFrameEnabled, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible } from "wisp/game/frames";
 
 export const RESULT_CHOICE_NAMES = ["Rematch", "New stage", "Character select"] as const;
 
@@ -31,15 +32,15 @@ export class ResultsBanner {
     const parent = gameUi();
     this.root = createBackdrop("MatchResultsPanel", parent, 0);
     placeTopLeft(this.root, BANNER.left, BANNER.top);
-    BlzFrameSetSize(this.root, BANNER.width, BANNER.height);
-    BlzFrameSetEnable(this.root, false);
+    setFrameSize(this.root, BANNER.width, BANNER.height);
+    setFrameEnabled(this.root, false);
     styleMenuPanel(this.root, "MatchResultsPanel");
     const text = (name: string, x: number, y: number, width: number, height: number, size: number, owner = this.root) => {
       const frame = createText(name, owner, 0);
       placeTopLeft(frame, x, y);
       sizeText(frame, size, width, height);
-      BlzFrameSetTextAlignment(frame, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER);
-      BlzFrameSetEnable(frame, false);
+      setFrameTextAlignment(frame, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER);
+      setFrameEnabled(frame, false);
       return frame;
     };
     this.heading = text("MatchResultsTitle", INNER_LEFT, f32(0.578), INNER_WIDTH, f32(0.022), MENU_STYLE.headerSize);
@@ -47,13 +48,13 @@ export class ResultsBanner {
       this.columns.push(text(`MatchResultsLine${I2S(index)}`, INNER_LEFT, f32(0.553), INNER_WIDTH, f32(0.045), MENU_STYLE.bodySize));
     }
     for (let choice = 0; choice < RESULT_CHOICE_NAMES.length; choice++) {
-      const button = BlzCreateFrame("ScriptDialogButton", this.root, 0, 0);
+      const button = createFrame("ScriptDialogButton", this.root, 0, 0);
       placeTopLeft(button, choiceLeft(choice), CHOICE_TOP);
-      BlzFrameSetSize(button, BUTTON_WIDTH, CHOICE_HEIGHT);
+      setFrameSize(button, BUTTON_WIDTH, CHOICE_HEIGHT);
       this.buttons.push(this.clicks.add(button, choice, at(RESULT_CHOICE_NAMES, choice), "native", { x: choiceLeft(choice), y: CHOICE_TOP, width: BUTTON_WIDTH, height: CHOICE_HEIGHT }));
     }
     this.help = text("MatchResultsHelp", INNER_LEFT, f32(0.47), INNER_WIDTH, f32(0.018), MENU_STYLE.bodySize);
-    BlzFrameSetVisible(this.root, false);
+    setFrameVisible(this.root, false);
   }
 
   over(x: number, y: number): boolean {
@@ -69,26 +70,26 @@ export class ResultsBanner {
     for (let index = 0; index < this.columns.length; index++) {
       const column = at(this.columns, index);
       const row = rows[index];
-      BlzFrameSetVisible(column, row !== undefined);
+      setFrameVisible(column, row !== undefined);
       if (row === undefined) continue;
       placeTopLeft(column, f32(INNER_LEFT + index * width), f32(0.553));
       sizeText(column, MENU_STYLE.bodySize, width, f32(0.045));
-      BlzFrameSetText(column, `${row.winner ? MENU_STYLE.gold : MENU_STYLE.text}${row.text}|r`);
+      setFrameText(column, `${row.winner ? MENU_STYLE.gold : MENU_STYLE.text}${row.text}|r`);
     }
-    BlzFrameSetVisible(this.root, true);
+    setFrameVisible(this.root, true);
   }
 
   hide(): void {
-    BlzFrameSetVisible(this.root, false);
+    setFrameVisible(this.root, false);
   }
 
   update(heading: string, help: string, focus: number | undefined): void {
-    BlzFrameSetText(this.heading, `${MENU_STYLE.gold}${heading}|r`);
-    BlzFrameSetText(this.help, `${MENU_STYLE.text}${help}|r`);
+    setFrameText(this.heading, `${MENU_STYLE.gold}${heading}|r`);
+    setFrameText(this.help, `${MENU_STYLE.text}${help}|r`);
     for (let choice = 0; choice < this.buttons.length; choice++) {
       const button = at(this.buttons, choice);
-      BlzFrameSetVisible(button, focus !== undefined);
-      setFrameText(button, focus === choice ? `> ${at(RESULT_CHOICE_NAMES, choice)} <` : at(RESULT_CHOICE_NAMES, choice));
+      setFrameVisible(button, focus !== undefined);
+      setMenuText(button, focus === choice ? `> ${at(RESULT_CHOICE_NAMES, choice)} <` : at(RESULT_CHOICE_NAMES, choice));
       highlightText(button, focus === choice);
     }
   }

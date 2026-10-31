@@ -6,6 +6,7 @@ import { SELECT_LEVELS } from "./selectLevels";
 import { art } from "./selectionFrames";
 import { consoleUi, gameUi, placeTopLeft } from "./frames";
 import type { DrawnHand } from "./selectionHands";
+import { destroyFrame, setFrameLevel, setFrameVisible } from "wisp/game/frames";
 
 interface HandLayer {
   readonly states: Readonly<Record<HandState, framehandle>>;
@@ -42,14 +43,14 @@ function createLayer(parent: framehandle, grid: RosterGrid, tag: string, suffix:
   const size = handSize(grid);
   const state = (hand: HandState) => {
     const frame = art(parent, `MeleeHand${TEXTURE_NAMES[hand]}${tag}${suffix}_${I2S(slot)}`, `war3mapImported\\SelectionHand${TEXTURE_NAMES[hand]}.tga`, 0.0, 0.0, size, size);
-    BlzFrameSetLevel(frame, SELECT_LEVELS.hand);
-    BlzFrameSetVisible(frame, false);
+    setFrameLevel(frame, SELECT_LEVELS.hand);
+    setFrameVisible(frame, false);
     return frame;
   };
   const { width, height } = handBadgeBox(0.0, 0.0, size);
   const badge = art(parent, `MeleeHandBadge${tag}${suffix}_${I2S(slot)}`, `war3mapImported\\SelectionHandLabelP${I2S(slot + 1)}.tga`, 0.0, 0.0, width, height);
-  BlzFrameSetLevel(badge, SELECT_LEVELS.handBadge);
-  BlzFrameSetVisible(badge, false);
+  setFrameLevel(badge, SELECT_LEVELS.handBadge);
+  setFrameVisible(badge, false);
   return { states: { point: state("point"), fan: state("fan"), pinch: state("pinch") }, badge };
 }
 
@@ -58,8 +59,8 @@ export function createHandFrames(grid: RosterGrid, suffix: string, slot: number)
 }
 
 function presentLayer(layer: HandLayer, hand: DrawnHand | undefined, left: number, top: number, size: number): void {
-  for (const state of HAND_STATES) BlzFrameSetVisible(layer.states[state], hand?.pose.state === state);
-  BlzFrameSetVisible(layer.badge, hand !== undefined);
+  for (const state of HAND_STATES) setFrameVisible(layer.states[state], hand?.pose.state === state);
+  setFrameVisible(layer.badge, hand !== undefined);
   if (hand === undefined) return;
   placeTopLeft(layer.states[hand.pose.state], left, top);
   const badge = handBadgeBox(left, top, size);
@@ -76,8 +77,8 @@ export function presentHand(frames: HandFrames, hand: DrawnHand | undefined, gri
 }
 
 function destroyLayer(layer: HandLayer): void {
-  for (const state of HAND_STATES) BlzDestroyFrame(layer.states[state]);
-  BlzDestroyFrame(layer.badge);
+  for (const state of HAND_STATES) destroyFrame(layer.states[state]);
+  destroyFrame(layer.badge);
 }
 
 export function destroyHandFrames(frames: HandFrames): void {

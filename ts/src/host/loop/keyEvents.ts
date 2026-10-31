@@ -9,6 +9,7 @@ import { type KeyBindings, menuAction } from "../../game/input/keyBindings";
 import { type ShellState, activeRollback } from "./state";
 
 import { pausedKeyUsed } from "./pauseCamera";
+import { createEvents, onEvents } from "wisp/game/events";
 
 export const KEY_DOWN = "shell.keyDown";
 export const KEY_UP = "shell.keyUp";
@@ -74,15 +75,15 @@ export function registerKey(s: Readonly<ShellState>, trigger: trigger, key: numb
 
 function registerKeys(s: ShellState): void {
   const { keyEvents } = s;
-  ensureKeyTriggerPair(keyEvents, () => CreateTrigger(), (down, up) => {
+  ensureKeyTriggerPair(keyEvents, () => createEvents(), (down, up) => {
     for (let key = 1; key <= 255; key++) {
       if (key === Key.enter || key === Key.backspace) continue;
       registerKey(s, down, key, true);
       registerKey(s, up, key, false);
     }
   }, (down, up) => {
-    TriggerAddAction(down, trampoline(KEY_DOWN));
-    TriggerAddAction(up, trampoline(KEY_UP));
+    onEvents(down, trampoline(KEY_DOWN));
+    onEvents(up, trampoline(KEY_UP));
   });
 }
 

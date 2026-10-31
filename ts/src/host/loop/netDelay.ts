@@ -15,6 +15,8 @@ import { at } from "wisp/src/runtime/lookup";
 import { type MachineRate, machineRate, noteMachineSecond } from "wisp/src/netcode/rate";
 import { type Roster, isActive } from "../../game/sim/roster";
 import { LEDGER_MARK, handleLedger, receiveLedgerReport, takeLedgerReport } from "./handleLedger";
+import { createEvents, onEvents } from "wisp/game/events";
+import { setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 
 export const DELAY_PREFIX = "SC_DY";
 export const DELAY_RECEIVED = "shell.delayProposal";
@@ -340,8 +342,8 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   if (net.indicator === undefined) {
     net.indicator = createText("SmashcraftNetIndicator", gameUi(), 0);
     placeTopLeft(net.indicator, f32(0.01), NET_INDICATOR_TOP);
-    BlzFrameSetSize(net.indicator, f32(0.5), f32(0.016));
-    BlzFrameSetVisible(net.indicator, false);
+    setFrameSize(net.indicator, f32(0.5), f32(0.016));
+    setFrameVisible(net.indicator, false);
   }
   const online = isOnline(game);
   const freezing = net.second.held >= HELD_ERROR_CALLBACKS;
@@ -355,8 +357,8 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   const text = slow !== "" ? slow : !inMatch || !online ? "" : freezing ? FREEZING_TEXT : network;
   if (text === net.shownText) return;
   net.shownText = text;
-  BlzFrameSetText(net.indicator, text);
-  BlzFrameSetVisible(net.indicator, text !== "");
+  setFrameText(net.indicator, text);
+  setFrameVisible(net.indicator, text !== "");
 }
 
 export function sendHandleLedger(game: Readonly<MatchState>): void {
@@ -386,7 +388,7 @@ export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>):
 }
 
 export function registerDelayProposals(handler: string): void {
-  const trigger = CreateTrigger();
+  const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) BlzTriggerRegisterPlayerSyncEvent(trigger, Player(slot), DELAY_PREFIX, false);
-  TriggerAddAction(trigger, trampoline(handler));
+  onEvents(trigger, trampoline(handler));
 }

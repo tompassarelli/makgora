@@ -5,6 +5,7 @@ import { ButtonClicks, createBackdrop, placeTopLeft, styleMenuPanel } from "./fr
 import { InfoPanelState } from "./infoPanelState";
 import { panelButton, panelText } from "./infoPanel";
 import { COMMUNITY_BOX } from "./selectionLayout";
+import { destroyFrame, setFrameLevel, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 
 const CLOSE_BOX = { x: f32(0.32), y: f32(0.305), width: f32(0.16), height: f32(0.03) } as const;
 
@@ -21,12 +22,12 @@ export class CommunityMenu {
     this.root = createBackdrop(`MeleeCommunityMenu${suffix}`, owner, 0);
     styleMenuPanel(this.root, `MeleeCommunityPanel${suffix}`);
     placeTopLeft(this.root, f32(0.2), f32(0.47));
-    BlzFrameSetSize(this.root, f32(0.4), f32(0.2));
-    BlzFrameSetLevel(this.root, SELECT_LEVELS.community);
-    BlzFrameSetText(panelText(this.root, `MeleeCommunityTitle${suffix}`, f32(0.21), f32(0.46), f32(0.38), f32(0.03), f32(0.018), TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER), COMMUNITY_TITLE);
-    BlzFrameSetText(panelText(this.root, `MeleeCommunityBody${suffix}`, f32(0.215), f32(0.428), f32(0.37), f32(0.1), f32(0.0135), TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER), communityBody());
+    setFrameSize(this.root, f32(0.4), f32(0.2));
+    setFrameLevel(this.root, SELECT_LEVELS.community);
+    setFrameText(panelText(this.root, `MeleeCommunityTitle${suffix}`, f32(0.21), f32(0.46), f32(0.38), f32(0.03), f32(0.018), TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER), COMMUNITY_TITLE);
+    setFrameText(panelText(this.root, `MeleeCommunityBody${suffix}`, f32(0.215), f32(0.428), f32(0.37), f32(0.1), f32(0.0135), TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER), communityBody());
     this.clicks.add(panelButton(this.root, CLOSE_BOX.x, CLOSE_BOX.y, CLOSE_BOX.width, CLOSE_BOX.height, "Close"), { kind: "communityClose" }, "Close", "native", CLOSE_BOX);
-    BlzFrameSetVisible(this.root, false);
+    setFrameVisible(this.root, false);
     this.clicks.add(panelButton(rules, COMMUNITY_BOX.x, COMMUNITY_BOX.y, COMMUNITY_BOX.width, COMMUNITY_BOX.height, COMMUNITY_TITLE), { kind: "communityOpen" }, COMMUNITY_TITLE, "native", COMMUNITY_BOX);
   }
 
@@ -55,11 +56,11 @@ export class CommunityMenu {
   }
 
   show(visible: boolean): void {
-    BlzFrameSetVisible(this.root, visible && this.state.isOpen);
+    setFrameVisible(this.root, visible && this.state.isOpen);
   }
 
   destroy(): void {
     this.clicks.destroy();
-    BlzDestroyFrame(this.root);
+    destroyFrame(this.root);
   }
 }

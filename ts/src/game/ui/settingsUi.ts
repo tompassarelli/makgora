@@ -23,10 +23,12 @@ import {
   slotLabel,
   toggleNewPlayerHints,
 } from "./bindingSettings";
-import { ButtonClicks, createBackdrop, createText, gameUi, placeTopLeft, setFrameText, styleMenuPanel } from "./frames";
+import { ButtonClicks, createBackdrop, createText, gameUi, placeTopLeft, setMenuText, styleMenuPanel } from "./frames";
 import { MENU_FONT, MENU_STYLE } from "./hudLayout";
 import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
 import { START_HINT } from "./helpText";
+import { createEvents, destroyEvents, onEvents } from "wisp/game/events";
+import { addFrameEvent, createFrameByType, destroyFrame, eventFrameEvent, eventFrameText, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTextLimit, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 export interface SettingsActions {
   closeSettings(participantId: number): void;
@@ -59,12 +61,12 @@ const CLEAR_SIZE = f32(0.012);
 type SlotButton = { readonly frames: readonly framehandle[]; readonly label: framehandle };
 
 function createNameBox(root: framehandle, participantId: number): framehandle {
-  const box = BlzCreateFrameByType("EDITBOX", `MeleeSettingsNameBox${I2S(participantId)}`, root, "EscMenuEditBoxTemplate", participantId);
+  const box = createFrameByType("EDITBOX", `MeleeSettingsNameBox${I2S(participantId)}`, root, "EscMenuEditBoxTemplate", participantId);
   placeTopLeft(box, NAME_BOX.x, NAME_BOX.y);
-  BlzFrameSetSize(box, NAME_BOX.width, NAME_BOX.height);
-  BlzFrameSetTextSizeLimit(box, SLOT_NAME_LIMIT);
-  BlzFrameSetLevel(box, 33);
-  BlzFrameSetVisible(box, false);
+  setFrameSize(box, NAME_BOX.width, NAME_BOX.height);
+  setFrameTextLimit(box, SLOT_NAME_LIMIT);
+  setFrameLevel(box, 33);
+  setFrameVisible(box, false);
   return box;
 }
 
@@ -113,17 +115,17 @@ export class SettingsPanel {
     this.local = GetLocalPlayer() === Player(participantId);
     this.clicks = new ButtonClicks(`ui.settings.${suffix}.click`, (button, clicker) => this.click(button, clicker));
     const root = createBackdrop(`MeleeSettingsRoot${suffix}`, gameUi(), participantId);
-    BlzFrameSetLevel(styleMenuPanel(root, `MeleeSettingsRoot${suffix}`), 30);
+    setFrameLevel(styleMenuPanel(root, `MeleeSettingsRoot${suffix}`), 30);
     placeTopLeft(root, f32(0.09), f32(0.595));
-    BlzFrameSetSize(root, f32(0.66), f32(0.53));
-    BlzFrameSetLevel(root, 30);
+    setFrameSize(root, f32(0.66), f32(0.53));
+    setFrameLevel(root, 30);
     this.root = root;
     const text = (name: string, parent: framehandle, size: number, width: number, height: number): framehandle => {
       const frame = createText(`${name}${suffix}`, parent, participantId);
-      BlzFrameSetSize(frame, width, height);
-      BlzFrameSetFont(frame, MENU_FONT, size, 0);
-      BlzFrameSetEnable(frame, false);
-      BlzFrameSetLevel(frame, parent === root ? 31 : 32);
+      setFrameSize(frame, width, height);
+      setFrameFont(frame, MENU_FONT, size, 0);
+      setFrameEnabled(frame, false);
+      setFrameLevel(frame, parent === root ? 31 : 32);
       return frame;
     };
     const line = (name: string, x: number, y: number, width: number, height: number, size = f32(0.011)): framehandle => {
@@ -133,23 +135,23 @@ export class SettingsPanel {
     };
     const button = (name: string, x: number, y: number, width: number, height: number, caption: string, target: SettingsButton, size = f32(0.011), level = 31): { readonly art: framehandle; readonly label: framehandle; readonly hotspot: framehandle } => {
       const art = createBackdrop(`${name}Art${suffix}`, root, participantId);
-      BlzFrameSetTexture(art, BUTTON_TEXTURE, 0, true);
+      setFrameTexture(art, BUTTON_TEXTURE, 0, true);
       placeTopLeft(art, x, y);
-      BlzFrameSetSize(art, width, height);
-      BlzFrameSetEnable(art, false);
-      BlzFrameSetLevel(art, level);
+      setFrameSize(art, width, height);
+      setFrameEnabled(art, false);
+      setFrameLevel(art, level);
       const label = text(name, art, size, width, height);
-      BlzFrameSetPoint(label, FRAMEPOINT_CENTER, art, FRAMEPOINT_CENTER, 0.0, 0.0);
-      BlzFrameSetTextAlignment(label, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
-      setFrameText(label, caption);
-      const hotspot = BlzCreateFrameByType("BUTTON", `${name}Hit${suffix}`, root, "", participantId);
+      setFramePoint(label, FRAMEPOINT_CENTER, art, FRAMEPOINT_CENTER, 0.0, 0.0);
+      setFrameTextAlignment(label, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+      setMenuText(label, caption);
+      const hotspot = createFrameByType("BUTTON", `${name}Hit${suffix}`, root, "", participantId);
       placeTopLeft(hotspot, x, y);
-      BlzFrameSetSize(hotspot, width, height);
-      BlzFrameSetLevel(hotspot, level + 2);
+      setFrameSize(hotspot, width, height);
+      setFrameLevel(hotspot, level + 2);
       this.clicks.add(hotspot, target, undefined, "native", { x, y, width, height });
       return { art, label, hotspot };
     };
-    BlzFrameSetText(line("MeleeSettingsTitle", f32(0.12), f32(0.578), f32(0.3), f32(0.026), f32(0.016)), `${MENU_STYLE.gold}CONTROLS|r`);
+    setFrameText(line("MeleeSettingsTitle", f32(0.12), f32(0.578), f32(0.3), f32(0.026), f32(0.016)), `${MENU_STYLE.gold}CONTROLS|r`);
     this.presets = BINDING_PRESETS.map((preset, index): readonly [BindingPreset, framehandle] => {
       const { x, y, width, height } = presetButton(index);
       return [preset, button(`MeleeSettingsPreset${I2S(index)}`, x, y, width, height, PRESET_NAMES[preset], { kind: "preset", preset }).label];
@@ -167,12 +169,12 @@ export class SettingsPanel {
       const { art } = button(`MeleeSettingsKey${I2S(key)}`, x, y, width, KEY_CAP_HEIGHT, "", { kind: "key", key });
       const clear = this.clearCross(root, key, f32(f32(x + width) - CLEAR_SIZE), y);
       const name = text(`MeleeSettingsKeyName${I2S(key)}`, art, f32(0.011), width, f32(0.016));
-      BlzFrameSetPoint(name, FRAMEPOINT_TOP, art, FRAMEPOINT_TOP, 0.0, f32(-0.007));
-      BlzFrameSetTextAlignment(name, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
-      BlzFrameSetText(name, keyLabel(key));
+      setFramePoint(name, FRAMEPOINT_TOP, art, FRAMEPOINT_TOP, 0.0, f32(-0.007));
+      setFrameTextAlignment(name, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+      setFrameText(name, keyLabel(key));
       const action = text(`MeleeSettingsKeyAction${I2S(key)}`, art, f32(0.0075), width, f32(0.013));
-      BlzFrameSetPoint(action, FRAMEPOINT_BOTTOM, art, FRAMEPOINT_BOTTOM, 0.0, f32(0.007));
-      BlzFrameSetTextAlignment(action, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+      setFramePoint(action, FRAMEPOINT_BOTTOM, art, FRAMEPOINT_BOTTOM, 0.0, f32(0.007));
+      setFrameTextAlignment(action, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
       return { key, frame: art, action, clear };
     });
     this.status = line("MeleeSettingsStatus", f32(0.12), f32(0.218), f32(0.6), f32(0.018));
@@ -182,7 +184,7 @@ export class SettingsPanel {
     this.customOnly = [remove.art, remove.label, remove.hotspot, rename.art, rename.label, rename.hotspot, reset.art, reset.label, reset.hotspot];
     const bind = button("MeleeSettingsBind", f32(0.56), f32(0.155), f32(0.17), f32(0.032), "", { kind: "bindUnbound" });
     this.bindButton = { frames: [bind.art, bind.hotspot], label: bind.label };
-    BlzFrameSetVisible(root, false);
+    setFrameVisible(root, false);
   }
 
   over(x: number, y: number): boolean {
@@ -191,26 +193,26 @@ export class SettingsPanel {
 
   private clearCross(root: framehandle, key: number, x: number, y: number): readonly framehandle[] {
     const cross = createText(`MeleeSettingsKeyClear${I2S(key)}${I2S(this.participantId)}`, root, this.participantId);
-    BlzFrameSetSize(cross, CLEAR_SIZE, CLEAR_SIZE);
-    BlzFrameSetFont(cross, MENU_FONT, f32(0.009), 0);
-    BlzFrameSetEnable(cross, false);
+    setFrameSize(cross, CLEAR_SIZE, CLEAR_SIZE);
+    setFrameFont(cross, MENU_FONT, f32(0.009), 0);
+    setFrameEnabled(cross, false);
     placeTopLeft(cross, x, y);
-    BlzFrameSetLevel(cross, 34);
-    BlzFrameSetTextAlignment(cross, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
-    BlzFrameSetText(cross, "|cffff6060x|r");
-    const hit = BlzCreateFrameByType("BUTTON", `MeleeSettingsKeyClearHit${I2S(key)}`, root, "", this.participantId);
+    setFrameLevel(cross, 34);
+    setFrameTextAlignment(cross, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    setFrameText(cross, "|cffff6060x|r");
+    const hit = createFrameByType("BUTTON", `MeleeSettingsKeyClearHit${I2S(key)}`, root, "", this.participantId);
     placeTopLeft(hit, x, y);
-    BlzFrameSetSize(hit, CLEAR_SIZE, CLEAR_SIZE);
-    BlzFrameSetLevel(hit, 35);
+    setFrameSize(hit, CLEAR_SIZE, CLEAR_SIZE);
+    setFrameLevel(hit, 35);
     this.clicks.add(hit, { kind: "clear", key }, undefined, "native", { x, y, width: CLEAR_SIZE, height: CLEAR_SIZE });
     return [cross, hit];
   }
 
   private nameTrigger(): trigger {
-    const trigger = CreateTrigger();
-    BlzTriggerRegisterFrameEvent(trigger, this.nameBox, FRAMEEVENT_EDITBOX_TEXT_CHANGED);
-    BlzTriggerRegisterFrameEvent(trigger, this.nameBox, FRAMEEVENT_EDITBOX_ENTER);
-    TriggerAddAction(trigger, trampoline(this.nameEvent()));
+    const trigger = createEvents();
+    addFrameEvent(trigger, this.nameBox, FRAMEEVENT_EDITBOX_TEXT_CHANGED);
+    addFrameEvent(trigger, this.nameBox, FRAMEEVENT_EDITBOX_ENTER);
+    onEvents(trigger, trampoline(this.nameEvent()));
     this.bindNameEvents();
     return trigger;
   }
@@ -222,8 +224,8 @@ export class SettingsPanel {
   private bindNameEvents(): void {
     on(this.nameEvent(), () => {
       if (GetTriggerPlayer() !== Player(this.participantId)) return;
-      nameSlot(this.settings, BlzGetTriggerFrameText());
-      if (BlzGetTriggerFrameEvent() === FRAMEEVENT_EDITBOX_ENTER) endNaming(this.settings);
+      nameSlot(this.settings, eventFrameText());
+      if (eventFrameEvent() === FRAMEEVENT_EDITBOX_ENTER) endNaming(this.settings);
     });
   }
 
@@ -236,8 +238,8 @@ export class SettingsPanel {
 
   destroy(): void {
     this.clicks.destroy();
-    DestroyTrigger(this.nameEvents);
-    BlzDestroyFrame(this.root);
+    destroyEvents(this.nameEvents);
+    destroyFrame(this.root);
   }
 
   private click(button: SettingsButton, clicker: player): void {
@@ -273,13 +275,13 @@ export class SettingsPanel {
     if (this.open || this.settings.ready) return;
     const preview = previewStartingBindings(this.settings);
     if (preview === undefined) return;
-    BlzFrameSetVisible(this.root, true);
+    setFrameVisible(this.root, true);
     this.renderHeader(preview);
     this.renderKeys(preview);
   }
 
   endPreview(): void {
-    if (!this.open) BlzFrameSetVisible(this.root, false);
+    if (!this.open) setFrameVisible(this.root, false);
   }
 
   show(): void {
@@ -296,7 +298,7 @@ export class SettingsPanel {
     endNaming(this.settings);
     this.settings.picking = false;
     this.showNameBox(false);
-    BlzFrameSetVisible(this.root, false);
+    setFrameVisible(this.root, false);
     this.actions.closeSettings(this.participantId);
   }
 
@@ -308,7 +310,7 @@ export class SettingsPanel {
     const signature = `${settings.hints ? "h" : "-"}${settings.layout}${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.fromProfile ? "p" : "-"}${settings.picking ? "s" : "-"}${settings.naming ? "n" : "-"}${I2S(settings.slot)}${settings.customs.map(custom => custom.name).join("|")}${capture === undefined ? "-" : I2S(capture.action * 2 + capture.slot)}`;
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
-    BlzFrameSetVisible(this.root, true);
+    setFrameVisible(this.root, true);
     this.renderHeader(settings);
     this.renderKeys(settings);
   }
@@ -317,44 +319,44 @@ export class SettingsPanel {
     const { capture } = settings;
     const stock = presetOf(settings.bindings);
     this.renderLayouts(settings);
-    setFrameText(this.hintsButton, `New-player hints: ${settings.hints ? `${MENU_STYLE.gold}On|r` : "Off"}`);
+    setMenuText(this.hintsButton, `New-player hints: ${settings.hints ? `${MENU_STYLE.gold}On|r` : "Off"}`);
     const unbound = unboundActions(settings.bindings);
     const unboundText = unbound.map(action => ACTION_KEY_LABELS[action]).join(", ");
-    BlzFrameSetText(this.hint, unbound.length > 0 ? `${MENU_STYLE.gold}Unbound: ${unboundText}.|r Save to keep these keys.` : settings.fromProfile ? `${MENU_STYLE.gold}Your saved profile is selected.|r` : stock === undefined ? "Your own keys. Save to keep them." : `${MENU_STYLE.gold}${PRESET_HINTS[stock]}|r`);
-    BlzFrameSetText(this.help, capture === undefined ? `Click a lit key, then press its new key; its x clears it. Edits go to Custom. ${START_HINT}` : "Press the new key for the flashing action. Delete clears it, Escape cancels.");
+    setFrameText(this.hint, unbound.length > 0 ? `${MENU_STYLE.gold}Unbound: ${unboundText}.|r Save to keep these keys.` : settings.fromProfile ? `${MENU_STYLE.gold}Your saved profile is selected.|r` : stock === undefined ? "Your own keys. Save to keep them." : `${MENU_STYLE.gold}${PRESET_HINTS[stock]}|r`);
+    setFrameText(this.help, capture === undefined ? `Click a lit key, then press its new key; its x clears it. Edits go to Custom. ${START_HINT}` : "Press the new key for the flashing action. Delete clears it, Escape cancels.");
     const first = unbound[0];
-    for (const frame of this.bindButton.frames) BlzFrameSetVisible(frame, first !== undefined);
-    if (first !== undefined) setFrameText(this.bindButton.label, `Bind ${ACTION_KEY_LABELS[first]}`);
-    BlzFrameSetText(this.status, settings.message);
+    for (const frame of this.bindButton.frames) setFrameVisible(frame, first !== undefined);
+    if (first !== undefined) setMenuText(this.bindButton.label, `Bind ${ACTION_KEY_LABELS[first]}`);
+    setFrameText(this.status, settings.message);
   }
 
   private renderLayouts(settings: Readonly<BindingSettings>): void {
     const selected = settings.fromProfile ? undefined : settings.layout;
     for (const [preset, frame] of this.presets) {
       const name = preset === "custom" ? slotLabel(settings) : PRESET_NAMES[preset];
-      setFrameText(frame, preset === selected ? `${MENU_STYLE.gold}${name}|r` : name);
+      setMenuText(frame, preset === selected ? `${MENU_STYLE.gold}${name}|r` : name);
     }
-    setFrameText(this.profileButton, settings.fromProfile || settings.picking ? `${MENU_STYLE.gold}Load profile|r` : "Load profile");
+    setMenuText(this.profileButton, settings.fromProfile || settings.picking ? `${MENU_STYLE.gold}Load profile|r` : "Load profile");
     this.slotButtons.forEach(({ frames, label }, slot) => {
-      for (const frame of frames) BlzFrameSetVisible(frame, settings.picking);
+      for (const frame of frames) setFrameVisible(frame, settings.picking);
       const name = slotLabel(settings, slot);
-      setFrameText(label, settings.layout === "custom" && slot === settings.slot ? `${MENU_STYLE.gold}${name}|r` : name);
+      setMenuText(label, settings.layout === "custom" && slot === settings.slot ? `${MENU_STYLE.gold}${name}|r` : name);
     });
-    for (const frame of this.customOnly) BlzFrameSetVisible(frame, settings.layout === "custom");
-    setFrameText(this.nameButton, settings.naming ? `${MENU_STYLE.gold}Done naming|r` : "Rename");
+    for (const frame of this.customOnly) setFrameVisible(frame, settings.layout === "custom");
+    setMenuText(this.nameButton, settings.naming ? `${MENU_STYLE.gold}Done naming|r` : "Rename");
     this.showNameBox(settings.naming);
   }
 
   private showNameBox(naming: boolean): void {
     if (!this.local) return;
     if (naming && !this.nameShown) {
-      BlzFrameSetText(this.nameBox, this.settings.customs[this.settings.slot]?.name ?? "");
-      BlzFrameSetVisible(this.nameBox, true);
-      BlzFrameSetFocus(this.nameBox, true);
+      setFrameText(this.nameBox, this.settings.customs[this.settings.slot]?.name ?? "");
+      setFrameVisible(this.nameBox, true);
+      setFrameFocus(this.nameBox, true);
       this.nameShown = true;
     } else if (!naming && this.nameShown) {
-      BlzFrameSetFocus(this.nameBox, false);
-      BlzFrameSetVisible(this.nameBox, false);
+      setFrameFocus(this.nameBox, false);
+      setFrameVisible(this.nameBox, false);
       this.nameShown = false;
     }
   }
@@ -365,9 +367,9 @@ export class SettingsPanel {
       const bound = actionFor(settings.bindings, key);
       const index = settings.bindings.keys.indexOf(key);
       const capturing = capture !== undefined && index === capture.action * 2 + capture.slot;
-      BlzFrameSetAlpha(frame, bound === undefined ? DIM_KEY : LIT_KEY);
-      for (const part of clear) BlzFrameSetVisible(part, bound !== undefined);
-      BlzFrameSetText(action, bound === undefined ? "" : capturing ? "|cff66ff66press...|r" : `${MENU_STYLE.gold}${ACTION_KEY_LABELS[bound]}|r`);
+      setFrameAlpha(frame, bound === undefined ? DIM_KEY : LIT_KEY);
+      for (const part of clear) setFrameVisible(part, bound !== undefined);
+      setFrameText(action, bound === undefined ? "" : capturing ? "|cff66ff66press...|r" : `${MENU_STYLE.gold}${ACTION_KEY_LABELS[bound]}|r`);
     }
   }
 }

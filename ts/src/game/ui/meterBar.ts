@@ -3,6 +3,7 @@ import { type MeterFeedback, advanceMeterFeedback, meterDisplay, meterDrainLit, 
 import type { PlateRect } from "./plateLayout";
 import { createBackdrop } from "./frames";
 import { PANEL_TEXTURE } from "./hudLayout";
+import { destroyFrame, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameLevel, setFramePoint, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 const LINE_WIDTH = f32(0.0006);
 const ULTIMATE_FILL = "ReplaceableTextures\\TeamColor\\TeamColor04.blp";
@@ -34,18 +35,18 @@ export class MeterBar {
     this.ultimateFill = createBackdrop(`MeterUltimateFill${suffix}`, parent, context + 1);
     this.ultimatePulse = createBackdrop(`MeterUltimatePulse${suffix}`, parent, context + 2);
     this.drain = createBackdrop(`MeterDrain${suffix}`, parent, context + 3);
-    BlzFrameSetTexture(this.ultimateBack, PANEL_TEXTURE, 0, true);
-    BlzFrameSetTexture(this.ultimateFill, ULTIMATE_FILL, 0, true);
-    BlzFrameSetTexture(this.ultimatePulse, ULTIMATE_PULSE, 0, true);
-    BlzFrameSetTexture(this.drain, DRAIN, 0, true);
-    BlzFrameSetAlpha(this.drain, DRAIN_ALPHA);
-    BlzFrameSetPoint(this.ultimateFill, FRAMEPOINT_LEFT, this.ultimateBack, FRAMEPOINT_LEFT, 0.0, 0.0);
-    BlzFrameSetPoint(this.ultimatePulse, FRAMEPOINT_CENTER, this.ultimateBack, FRAMEPOINT_CENTER, 0.0, 0.0);
-    BlzFrameSetPoint(this.drain, FRAMEPOINT_CENTER, this.ultimateBack, FRAMEPOINT_CENTER, 0.0, 0.0);
+    setFrameTexture(this.ultimateBack, PANEL_TEXTURE, 0, true);
+    setFrameTexture(this.ultimateFill, ULTIMATE_FILL, 0, true);
+    setFrameTexture(this.ultimatePulse, ULTIMATE_PULSE, 0, true);
+    setFrameTexture(this.drain, DRAIN, 0, true);
+    setFrameAlpha(this.drain, DRAIN_ALPHA);
+    setFramePoint(this.ultimateFill, FRAMEPOINT_LEFT, this.ultimateBack, FRAMEPOINT_LEFT, 0.0, 0.0);
+    setFramePoint(this.ultimatePulse, FRAMEPOINT_CENTER, this.ultimateBack, FRAMEPOINT_CENTER, 0.0, 0.0);
+    setFramePoint(this.drain, FRAMEPOINT_CENTER, this.ultimateBack, FRAMEPOINT_CENTER, 0.0, 0.0);
     this.frames().forEach((frame, index) => {
-      BlzFrameSetEnable(frame, false);
-      BlzFrameSetVisible(frame, false);
-      BlzFrameSetLevel(frame, FRAME_LEVELS[index] ?? 22);
+      setFrameEnabled(frame, false);
+      setFrameVisible(frame, false);
+      setFrameLevel(frame, FRAME_LEVELS[index] ?? 22);
     });
   }
 
@@ -58,14 +59,14 @@ export class MeterBar {
       this.barWidth = ultimateBar.width;
       this.barHeight = ultimateBar.height;
       this.shownUltimate = -1.0;
-      BlzFrameSetSize(this.ultimateBack, ultimateBar.width, ultimateBar.height);
-      BlzFrameSetSize(this.ultimatePulse, ultimateBar.width, ultimateBar.height);
-      BlzFrameSetSize(this.drain, ultimateBar.width, ultimateBar.height);
+      setFrameSize(this.ultimateBack, ultimateBar.width, ultimateBar.height);
+      setFrameSize(this.ultimatePulse, ultimateBar.width, ultimateBar.height);
+      setFrameSize(this.drain, ultimateBar.width, ultimateBar.height);
     }
     if (ultimateBar.left !== this.barX || ultimateBar.centerY !== this.barY) {
       this.barX = ultimateBar.left;
       this.barY = ultimateBar.centerY;
-      BlzFrameSetAbsPoint(this.ultimateBack, FRAMEPOINT_CENTER, ultimateBar.left + ultimateBar.width / 2.0, ultimateBar.centerY);
+      setFrameAbsPoint(this.ultimateBack, FRAMEPOINT_CENTER, ultimateBar.left + ultimateBar.width / 2.0, ultimateBar.centerY);
     }
   }
 
@@ -74,27 +75,27 @@ export class MeterBar {
     this.tick++;
     if (shown !== this.visible) {
       this.visible = shown;
-      for (const frame of [this.ultimateBack, this.ultimateFill]) BlzFrameSetVisible(frame, shown);
+      for (const frame of [this.ultimateBack, this.ultimateFill]) setFrameVisible(frame, shown);
     }
     const drain = shown && meterDrainLit(this.feedback);
     if (drain !== this.drainShown) {
       this.drainShown = drain;
-      BlzFrameSetVisible(this.drain, drain);
+      setFrameVisible(this.drain, drain);
     }
     const display = meterDisplay(ultimate, ultimateReady, this.tick);
     const pulse = shown ? display.ultimateBar.pulse : 0;
     if (pulse !== this.shownPulse) {
       this.shownPulse = pulse;
-      BlzFrameSetVisible(this.ultimatePulse, pulse > 0);
-      if (pulse > 0) BlzFrameSetAlpha(this.ultimatePulse, pulse);
+      setFrameVisible(this.ultimatePulse, pulse > 0);
+      if (pulse > 0) setFrameAlpha(this.ultimatePulse, pulse);
     }
     if (!shown) return;
     if (display.ultimateBar.fill === this.shownUltimate) return;
     this.shownUltimate = display.ultimateBar.fill;
-    BlzFrameSetSize(this.ultimateFill, Math.max(LINE_WIDTH, this.barWidth * display.ultimateBar.fill), this.barHeight);
+    setFrameSize(this.ultimateFill, Math.max(LINE_WIDTH, this.barWidth * display.ultimateBar.fill), this.barHeight);
   }
 
   destroy(): void {
-    for (const frame of this.frames()) BlzDestroyFrame(frame);
+    for (const frame of this.frames()) destroyFrame(frame);
   }
 }

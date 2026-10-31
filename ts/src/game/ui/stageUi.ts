@@ -13,10 +13,12 @@ import { pixelX, pixelY, pointerX, pointerY } from "../menu/pointer";
 import { type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTop, updateStageDrag } from "../menu/stageSelection";
 import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stageInfo } from "../menu/stageCatalog";
 import { orbsSetting, hazardsSetting, rulesSummary } from "../session/messages";
-import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
+import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { STAGE_CHIP_TEXTURE, StageCard } from "./stageCard";
 import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, START_BUTTON, startButtonContains } from "./selectionLayout";
+import { destroyEvents } from "wisp/game/events";
+import { createFrame, createFrameByType, destroyFrame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 
 
@@ -42,19 +44,19 @@ function stageText(parent: framehandle, name: string, x: number, y: number, widt
   const label = createText(name, parent, 0);
   placeTopLeft(label, x, y);
   sizeText(label, fontSize, width, height);
-  setFrameText(label, text);
-  BlzFrameSetEnable(label, false);
-  BlzFrameSetTextAlignment(label, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
+  setMenuText(label, text);
+  setFrameEnabled(label, false);
+  setFrameTextAlignment(label, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
   return label;
 }
 
 function stageButton(parent: framehandle, x: number, y: number, width: number, height: number, text: string): framehandle {
-  const control = BlzCreateFrame("ScriptDialogButton", parent, 0, 0);
+  const control = createFrame("ScriptDialogButton", parent, 0, 0);
   placeTopLeft(control, x, y);
-  BlzFrameSetSize(control, width, height);
-  setFrameText(control, text);
-  BlzFrameSetFont(control, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
-  BlzFrameSetFont(BlzGetFrameByName("ScriptDialogButtonText", 0), MENU_STYLE.font, MENU_STYLE.headerSize, 0);
+  setFrameSize(control, width, height);
+  setMenuText(control, text);
+  setFrameFont(control, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
+  setFrameFont(namedFrame("ScriptDialogButtonText", 0), MENU_STYLE.font, MENU_STYLE.headerSize, 0);
   return control;
 }
 
@@ -93,7 +95,7 @@ export class StagePanel {
     const dialogButton = (parent: framehandle, x: number, y: number, width: number, height: number, text: string, target: StageButton) =>
       this.clicks.add(stageButton(parent, x, y, width, height, text), target, undefined, "native");
     this.backdrop = createWindowBackdrop("MeleeStageBackdrop", MENU_STYLE.panelTexture, 800);
-    const root = BlzCreateFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
+    const root = createFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
     this.root = root;
     stageText(root, "MeleeStageTitle", f32(0.055), f32(0.558), f32(0.2), f32(0.032), MENU_STYLE.titleSize, `${MENU_STYLE.gold}STAGE SELECT|r`);
     this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.265), f32(0.558), f32(0.49), f32(0.032), MENU_STYLE.headerSize, "");
@@ -103,21 +105,21 @@ export class StagePanel {
     stageText(root, "MeleeStageGridTitle", f32(0.49), f32(0.483), f32(0.298), f32(0.022), MENU_STYLE.headerSize, `${MENU_STYLE.gold}CHOOSE A STAGE|r`);
     for (const stage of STAGE_CHOICES) {
       const choice = stage.id;
-      const button = BlzCreateFrameByType("BUTTON", `MeleeStageTileButton${I2S(choice)}`, root, "", 0);
+      const button = createFrameByType("BUTTON", `MeleeStageTileButton${I2S(choice)}`, root, "", 0);
       placeTopLeft(button, stageTileLeft(choice), stageTileTop(choice));
-      BlzFrameSetSize(button, f32(0.094), f32(0.059));
+      setFrameSize(button, f32(0.094), f32(0.059));
       this.clicks.add(button, { kind: "stage", choice });
       new StageCard(root, `MeleeStageTile${I2S(choice)}`, stageTileLeft(choice), stageTileTop(choice), f32(0.094), f32(0.059), true).show(choice);
-      this.tileNames[choice] = BlzGetFrameByName(`MeleeStageTile${I2S(choice)}Name`, 0);
-      setFrameText(this.tileNames[choice], stage.name);
+      this.tileNames[choice] = namedFrame(`MeleeStageTile${I2S(choice)}Name`, 0);
+      setMenuText(this.tileNames[choice], stage.name);
     }
     dialogButton(root, STAGE_POOL_BUTTON.x, STAGE_POOL_BUTTON.y, STAGE_POOL_BUTTON.width, STAGE_POOL_BUTTON.height, "Stage pool", { kind: "poolOpen" });
-    this.poolRoot = BlzCreateFrameByType("FRAME", "MeleeStagePoolRoot", root, "", 0);
-    BlzFrameSetLevel(this.poolRoot, SELECT_LEVELS.stagePool);
+    this.poolRoot = createFrameByType("FRAME", "MeleeStagePoolRoot", root, "", 0);
+    setFrameLevel(this.poolRoot, SELECT_LEVELS.stagePool);
     const poolBackdrop = createBackdrop("MeleeStagePoolBackdrop", this.poolRoot, 0);
-    BlzFrameSetTexture(poolBackdrop, PANEL_TEXTURE, 0, true);
+    setFrameTexture(poolBackdrop, PANEL_TEXTURE, 0, true);
     placeTopLeft(poolBackdrop, f32(0.1), f32(0.49));
-    BlzFrameSetSize(poolBackdrop, f32(0.6), f32(0.35));
+    setFrameSize(poolBackdrop, f32(0.6), f32(0.35));
     stageText(this.poolRoot, "MeleeStagePoolTitle", f32(0.14), f32(0.47), f32(0.4), f32(0.025), f32(0.016), "Stage pool");
     dialogButton(this.poolRoot, f32(0.575), f32(0.47), f32(0.085), f32(0.027), "Done", { kind: "poolClose" });
     this.poolMode = dialogButton(this.poolRoot, f32(0.14), f32(0.425), f32(0.52), f32(0.027), "", { kind: "poolMode" });
@@ -127,11 +129,11 @@ export class StagePanel {
       { kind: "poolStage", choice: stage.id },
     ));
     this.poolSummary = stageText(this.poolRoot, "MeleeStagePoolSummary", f32(0.14), f32(0.2), f32(0.52), f32(0.042), f32(0.009), "");
-    BlzFrameSetVisible(this.poolRoot, false);
+    setFrameVisible(this.poolRoot, false);
     this.chip = createBackdrop("MeleeStageChip", root, 0);
-    BlzFrameSetTexture(this.chip, STAGE_CHIP_TEXTURE, 0, true);
-    BlzFrameSetSize(this.chip, f32(0.04), f32(0.04));
-    BlzFrameSetEnable(this.chip, false);
+    setFrameTexture(this.chip, STAGE_CHIP_TEXTURE, 0, true);
+    setFrameSize(this.chip, f32(0.04), f32(0.04));
+    setFrameEnabled(this.chip, false);
     const help = journal
       ? "Click a stage or move the stick.\nAny player can choose.\nA / Click: choose · Start: start · Click BACK: back"
       : "Click a stage or use movement controls.\nAny player can choose.\nY: start · Click BACK TO FIGHTERS: back";
@@ -144,8 +146,8 @@ export class StagePanel {
       const choice = S2I(data);
       if (I2S(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
     });
-    BlzFrameSetVisible(root, false);
-    BlzFrameSetVisible(this.backdrop, false);
+    setFrameVisible(root, false);
+    setFrameVisible(this.backdrop, false);
   }
 
   bindActions(actions: StageActions): void {
@@ -161,9 +163,9 @@ export class StagePanel {
 
   destroy(): void {
     this.clicks.destroy();
-    DestroyTrigger(this.sync);
-    BlzDestroyFrame(this.root);
-    BlzDestroyFrame(this.backdrop);
+    destroyEvents(this.sync);
+    destroyFrame(this.root);
+    destroyFrame(this.backdrop);
   }
 
   private hover(button: StageButton | undefined): void {
@@ -173,8 +175,8 @@ export class StagePanel {
 
   private focusStart(): void {
     highlightText(this.startButton, true);
-    const width = I2R(BlzGetLocalClientWidth());
-    const height = I2R(BlzGetLocalClientHeight());
+    const width = I2R(screenWidth());
+    const height = I2R(screenHeight());
     if (width <= 0 || height <= 0) return;
     if (startButtonContains(pointerX(I2R(BlzGetMouseScreenPosX()), width, height), pointerY(I2R(BlzGetMouseScreenPosY()), height))) return;
     const x = START_BUTTON.x + START_BUTTON.width / 2;
@@ -206,61 +208,61 @@ export class StagePanel {
   update(game: Readonly<MatchState>): void {
     const enabled = game.phase === Phase.stageMenu && humanActive(game, GetPlayerId(GetLocalPlayer()));
     if (this.lastPhase !== game.phase) {
-      BlzFrameSetVisible(this.root, enabled);
-      BlzFrameSetVisible(this.backdrop, enabled);
+      setFrameVisible(this.root, enabled);
+      setFrameVisible(this.backdrop, enabled);
       if (enabled) this.focusStart();
       this.lastPhase = game.phase;
     }
     if (!enabled) {
       clearStageDrag(this.drag);
       this.poolOpen = false;
-      BlzFrameSetVisible(this.poolRoot, false);
+      setFrameVisible(this.poolRoot, false);
       return;
     }
     if (this.lastChoice !== game.stageChoice) {
       const stage = stageInfo(game.stageChoice);
       this.preview.show(game.stageChoice);
-      setFrameText(this.previewName, stage.name);
-      setFrameText(this.previewDescription, stage.description);
+      setMenuText(this.previewName, stage.name);
+      setMenuText(this.previewDescription, stage.description);
       this.lastChoice = game.stageChoice;
     }
     if (this.lastHazards !== game.hazards) {
-      setFrameText(this.hazardsToggle, hazardsSetting(game.hazards));
+      setMenuText(this.hazardsToggle, hazardsSetting(game.hazards));
       this.lastHazards = game.hazards;
     }
     if (this.lastOrbs !== game.orbs.on) {
-      setFrameText(this.orbsToggle, orbsSetting(game.orbs.on));
+      setMenuText(this.orbsToggle, orbsSetting(game.orbs.on));
       this.lastOrbs = game.orbs.on;
     }
     const rules = rulesSummary(game);
     if (this.lastRules !== rules) {
-      setFrameText(this.ruleLabel, `${MENU_STYLE.gold}${rules}|r`);
+      setMenuText(this.ruleLabel, `${MENU_STYLE.gold}${rules}|r`);
       this.lastRules = rules;
     }
-    BlzFrameSetVisible(this.poolRoot, this.poolOpen);
-    BlzFrameSetVisible(this.chip, !this.poolOpen);
+    setFrameVisible(this.poolRoot, this.poolOpen);
+    setFrameVisible(this.chip, !this.poolOpen);
     if (this.poolOpen) {
       clearStageDrag(this.drag);
       const pool = game.stagePool;
       const count = stagePoolCount(pool);
-      setFrameText(this.poolMode, pool.only ? "Only these" : "All except these");
+      setMenuText(this.poolMode, pool.only ? "Only these" : "All except these");
       for (let index = 0; index < STAGE_CATALOG.length; index++) {
         const stage = STAGE_CATALOG[index];
         const frame = this.poolStages[index];
         if (stage === undefined || frame === undefined) continue;
         const selected = (pool.selectedMask & (1 << stage.id)) !== 0;
-        setFrameText(frame, `${selected ? "Yes" : "No"}: ${stage.name}`);
-        BlzFrameSetEnable(frame, count > 1 || !stageInPool(pool, stage.id));
+        setMenuText(frame, `${selected ? "Yes" : "No"}: ${stage.name}`);
+        setFrameEnabled(frame, count > 1 || !stageInPool(pool, stage.id));
       }
-      setFrameText(this.poolSummary, `${I2S(count)} ${count === 1 ? "stage" : "stages"} in the pool.\nEach plays once before the pool repeats.`);
+      setMenuText(this.poolSummary, `${I2S(count)} ${count === 1 ? "stage" : "stages"} in the pool.\nEach plays once before the pool repeats.`);
       this.clicks.refreshHover();
       return;
     }
     fitToWindow(this.backdrop);
     let x = stageTileLeft(game.stageChoice) + f32(0.047);
     let y = f32(stageTileTop(game.stageChoice) - f32(0.0295));
-    const width = I2R(BlzGetLocalClientWidth());
-    const height = I2R(BlzGetLocalClientHeight());
+    const width = I2R(screenWidth());
+    const height = I2R(screenHeight());
     if (width > 0 && height > 0) {
       const pointerAtX = pointerX(I2R(BlzGetMouseScreenPosX()), width, height);
       const pointerAtY = pointerY(I2R(BlzGetMouseScreenPosY()), height);

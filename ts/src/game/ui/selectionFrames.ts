@@ -8,6 +8,7 @@ import { Character } from "../sim/codes";
 import { createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
 import { SELECT_GRID_ORDER } from "./selectionLayout";
 import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
+import { createFrame, setFrameAlpha, setFrameEnabled, setFrameSize, setFrameTextAlignment, setFrameTexture } from "wisp/game/frames";
 
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
@@ -34,10 +35,10 @@ export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
 
 export function art(parent: framehandle, name: string, texture: string, x: number, y: number, width: number, height: number): framehandle {
   const frame = createBackdrop(name, parent, 0);
-  BlzFrameSetTexture(frame, texture, 0, true);
+  setFrameTexture(frame, texture, 0, true);
   placeTopLeft(frame, x, y);
-  BlzFrameSetSize(frame, width, height);
-  BlzFrameSetEnable(frame, false);
+  setFrameSize(frame, width, height);
+  setFrameEnabled(frame, false);
   return frame;
 }
 
@@ -45,8 +46,8 @@ export function label(parent: framehandle, name: string, x: number, y: number, w
   const frame = createText(name, parent, 0);
   placeTopLeft(frame, x, y);
   sizeText(frame, size, width, height);
-  BlzFrameSetTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
-  BlzFrameSetEnable(frame, false);
+  setFrameTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+  setFrameEnabled(frame, false);
   return frame;
 }
 
@@ -66,8 +67,8 @@ export function placeBottomBar(frames: { readonly status: framehandle; readonly 
   const width = cardSize(f32(0.132));
   if (!winsShown) {
     placeTopLeft(frames.status, left, BOTTOM_BAR_TOP);
-    BlzFrameSetSize(frames.status, width, BAR_HEIGHT);
-    BlzFrameSetTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    setFrameSize(frames.status, width, BAR_HEIGHT);
+    setFrameTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
     return;
   }
   const statusWidth = f32(I2R(StringLength(statusText)) * BAR_CHAR_WIDTH);
@@ -76,18 +77,18 @@ export function placeBottomBar(frames: { readonly status: framehandle; readonly 
   const statusRight = f32(f32(cardRight(slot, f32(0.08)) - f32(group / 2)) + statusWidth);
   const coinLeft = f32(statusRight + BAR_LABEL_GAP);
   placeTopLeft(frames.status, left, BOTTOM_BAR_TOP);
-  BlzFrameSetSize(frames.status, f32(statusRight - left), BAR_HEIGHT);
-  BlzFrameSetTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
+  setFrameSize(frames.status, f32(statusRight - left), BAR_HEIGHT);
+  setFrameTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
   placeTopLeft(frames.wins.coin, coinLeft, f32(BOTTOM_BAR_TOP + f32(f32(BAR_COIN - BAR_HEIGHT) / 2)));
-  BlzFrameSetSize(frames.wins.coin, BAR_COIN, BAR_COIN);
+  setFrameSize(frames.wins.coin, BAR_COIN, BAR_COIN);
   placeTopLeft(frames.wins.count, f32(f32(coinLeft + BAR_COIN) + BAR_GAP), BOTTOM_BAR_TOP);
 }
 
 export function hotspot(parent: framehandle, x: number, y: number, width: number, height: number): framehandle {
-  const frame = BlzCreateFrame("ScriptDialogButton", parent, 0, 0);
+  const frame = createFrame("ScriptDialogButton", parent, 0, 0);
   placeTopLeft(frame, x, y);
-  BlzFrameSetSize(frame, width, height);
-  BlzFrameSetAlpha(frame, 0);
+  setFrameSize(frame, width, height);
+  setFrameAlpha(frame, 0);
   return frame;
 }
 

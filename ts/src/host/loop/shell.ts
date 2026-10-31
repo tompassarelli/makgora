@@ -68,6 +68,8 @@ import { beforeNativeSoakTick, afterNativeSoakTick } from "../../platform/native
 import { afterProbedTick, beforeProbedTick } from "./tickProbe";
 import { advanceHandleLedger, handleLedger, installHandleLedger } from "./handleLedger";
 import { knownFrame } from "wisp/src/netcode/shadowSchedule";
+import { createEvents, onEvents } from "wisp/game/events";
+import { displayText, hideOriginFrames, loadFrameFile } from "wisp/game/frames";
 
 const TICK = "shell.tick";
 const PLAYER_LEFT = "shell.playerLeft";
@@ -229,7 +231,7 @@ function controlsCommand(s: ShellState): void {
   if (!isParticipantSlot(slot) || !humanActive(s.game, slot)) return;
   const settings = s.participants[slot].bindings;
   if (!settings.ready) return;
-  const announce = (message: string): void => DisplayTextToPlayer(Player(slot), 0, 0, message);
+  const announce = (message: string): void => displayText(Player(slot), 0, 0, message);
   if (GetEventPlayerChatString() === SAVE_CONTROLS) {
     saveBindingSettings(settings);
     announce(settings.message);
@@ -274,19 +276,19 @@ function playerLeft(s: ShellState): void {
 
 
 function developerChord(s: ShellState, key: number, handler: string): void {
-  const trigger = CreateTrigger();
+  const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
     if (humanActive(s.game, slot)) BlzTriggerRegisterPlayerKeyEvent(trigger, Player(slot), ConvertOsKeyType(key), 2, true);
   }
-  TriggerAddAction(trigger, trampoline(handler));
+  onEvents(trigger, trampoline(handler));
 }
 
 function syncTrigger(s: ShellState, prefix: string, handler: string, humansOnly: boolean): void {
-  const trigger = CreateTrigger();
+  const trigger = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
     if (!humansOnly || humanActive(s.game, slot)) BlzTriggerRegisterPlayerSyncEvent(trigger, Player(slot), prefix, false);
   }
-  TriggerAddAction(trigger, trampoline(handler));
+  onEvents(trigger, trampoline(handler));
 }
 
 
@@ -297,19 +299,19 @@ function createTriggers(s: ShellState): void {
   developerChord(s, s.build.responseProbe ? Key.h : PROBE_KEYS.f7, PROBE_DUMP);
   developerChord(s, Key.r, RESTART);
   developerChord(s, Key.t, TRACE);
-  const startDown = CreateTrigger();
-  const startUp = CreateTrigger();
+  const startDown = createEvents();
+  const startUp = createEvents();
   registerKey(s, startDown, Key.y, true);
   registerKey(s, startUp, Key.y, false);
-  TriggerAddAction(startDown, trampoline(KEY_START_DOWN));
-  TriggerAddAction(startUp, trampoline(KEY_START_UP));
-  const pauseDown = CreateTrigger();
+  onEvents(startDown, trampoline(KEY_START_DOWN));
+  onEvents(startUp, trampoline(KEY_START_UP));
+  const pauseDown = createEvents();
   registerKey(s, pauseDown, Key.backspace, true);
   registerKey(s, pauseDown, Key.escape, true);
-  TriggerAddAction(pauseDown, trampoline(KEY_PAUSE_DOWN));
-  const hintsDown = CreateTrigger();
+  onEvents(pauseDown, trampoline(KEY_PAUSE_DOWN));
+  const hintsDown = createEvents();
   registerKey(s, hintsDown, Key.h, true);
-  TriggerAddAction(hintsDown, trampoline(KEY_HINTS_DOWN));
+  onEvents(hintsDown, trampoline(KEY_HINTS_DOWN));
   syncTrigger(s, KEYBOARD_PAUSE_PREFIX, KEYBOARD_PAUSE, true);
   syncTrigger(s, MAIN_MENU_PREFIX, MAIN_MENU, true);
   syncKeyEvents(s);
@@ -322,30 +324,30 @@ function createTriggers(s: ShellState): void {
     syncTrigger(s, journalPause.CHAT_CLOSED_PREFIX, CHAT_CLOSED, true);
   }
   if (s.build.devConsole) {
-    const chat = CreateTrigger();
+    const chat = createEvents();
     for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, Player(slot), "-dev ", false);
-    TriggerAddAction(chat, trampoline(DEV_COMMAND));
+    onEvents(chat, trampoline(DEV_COMMAND));
   }
-  const received = CreateTrigger();
+  const received = createEvents();
   registerChatEvents(received, PARTICIPANT_SLOTS);
-  TriggerAddAction(received, trampoline(CHAT_RECEIVED));
-  const history = CreateTrigger();
+  onEvents(received, trampoline(CHAT_RECEIVED));
+  const history = createEvents();
   registerChatHistoryKey(history, PARTICIPANT_SLOTS, ConvertOsKeyType(Key.f8));
-  TriggerAddAction(history, trampoline(CHAT_HISTORY));
-  const controls = CreateTrigger();
+  onEvents(history, trampoline(CHAT_HISTORY));
+  const controls = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
     TriggerRegisterPlayerChatEvent(controls, Player(slot), SAVE_CONTROLS, true);
     TriggerRegisterPlayerChatEvent(controls, Player(slot), LOAD_CONTROLS, true);
   }
-  TriggerAddAction(controls, trampoline(CONTROLS_COMMAND));
-  const clip = CreateTrigger();
+  onEvents(controls, trampoline(CONTROLS_COMMAND));
+  const clip = createEvents();
   for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(clip, Player(slot), SAVE_MOMENT_COMMAND, true);
-  TriggerAddAction(clip, trampoline(SAVE_MOMENT));
+  onEvents(clip, trampoline(SAVE_MOMENT));
   syncTrigger(s, PLAYTEST_PREFIX, PLAYTEST, true);
   syncTrigger(s, STAGE_READY_PREFIX, STAGE_READY, true);
-  const leave = CreateTrigger();
+  const leave = createEvents();
   for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerEvent(leave, Player(slot), EVENT_PLAYER_LEAVE);
-  TriggerAddAction(leave, trampoline(PLAYER_LEFT));
+  onEvents(leave, trampoline(PLAYER_LEFT));
   holdGameSpeed();
   const tick = CreateTimer();
   TimerStart(tick, FRAME_SECONDS, true, trampoline(TICK));
@@ -364,9 +366,9 @@ function worldOrigin(): { x: number; y: number; z: number } {
 
 function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: number; y: number; z: number }): void {
   if (shellState() !== undefined) return;
-  BlzHideOriginFrames(true);
+  hideOriginFrames(true);
 
-  if (!BlzLoadTOCFile("war3mapImported\\SmashcraftHUD.toc")) DisplayTextToPlayer(GetLocalPlayer(), 0.0, 0.0, "Smashcraft's menus could not load. Restart the game.");
+  if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(GetLocalPlayer(), 0.0, 0.0, "Smashcraft's menus could not load. Restart the game.");
   BlzEnableSelections(false, false);
   EnableUserControl(true);
   FogEnable(false);

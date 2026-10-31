@@ -1,6 +1,7 @@
 import { ButtonClicks } from "./frames";
 import { panelButton } from "./infoPanel";
 import { MAIN_MENU_BOX } from "./selectionLayout";
+import { setFrameText } from "wisp/game/frames";
 
 export const MAIN_MENU_PREFIX = "SC_MM";
 const LABEL = "Main menu";
@@ -28,7 +29,7 @@ export class MainMenuButton {
   focus(focused: boolean): void {
     if (focused === this.focused) return;
     this.focused = focused;
-    BlzFrameSetText(this.frame, focused ? `> ${LABEL} <` : LABEL);
+    setFrameText(this.frame, focused ? `> ${LABEL} <` : LABEL);
   }
 
   over(x: number, y: number): boolean {

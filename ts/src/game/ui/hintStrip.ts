@@ -4,6 +4,7 @@ import { type HintDevice, hintRows, hintText } from "./hintLines";
 import { HINT_STRIP_CELL, hintStripLeft } from "./plateLayout";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
+import { destroyFrame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 const STRIP_WIDTH = f32(0.104);
 const STRIP_HEIGHT = f32(0.108);
@@ -20,21 +21,21 @@ export class HintStrip {
 
   constructor() {
     this.panel = createBackdrop("NewPlayerHintPanel", gameUi(), 893);
-    BlzFrameSetTexture(this.panel, PANEL_TEXTURE, 0, true);
-    BlzFrameSetAlpha(this.panel, STRIP_ALPHA);
-    BlzFrameSetSize(this.panel, STRIP_WIDTH, STRIP_HEIGHT);
-    BlzFrameSetEnable(this.panel, false);
-    BlzFrameSetVisible(this.panel, false);
+    setFrameTexture(this.panel, PANEL_TEXTURE, 0, true);
+    setFrameAlpha(this.panel, STRIP_ALPHA);
+    setFrameSize(this.panel, STRIP_WIDTH, STRIP_HEIGHT);
+    setFrameEnabled(this.panel, false);
+    setFrameVisible(this.panel, false);
     this.label = createText("NewPlayerHints", this.panel, 894);
-    BlzFrameSetSize(this.label, f32(STRIP_WIDTH - 2 * STRIP_MARGIN), f32(STRIP_HEIGHT - 2 * STRIP_MARGIN));
-    BlzFrameSetFont(this.label, MENU_FONT, f32(0.0074), 1);
-    BlzFrameSetTextAlignment(this.label, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
-    BlzFrameSetEnable(this.label, false);
+    setFrameSize(this.label, f32(STRIP_WIDTH - 2 * STRIP_MARGIN), f32(STRIP_HEIGHT - 2 * STRIP_MARGIN));
+    setFrameFont(this.label, MENU_FONT, f32(0.0074), 1);
+    setFrameTextAlignment(this.label, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+    setFrameEnabled(this.label, false);
   }
 
   destroy(): void {
-    BlzDestroyFrame(this.label);
-    BlzDestroyFrame(this.panel);
+    destroyFrame(this.label);
+    destroyFrame(this.panel);
   }
 
   isShown(): boolean {
@@ -53,11 +54,11 @@ export class HintStrip {
   update(visible: boolean, settings: Readonly<BindingSettings>, device: HintDevice): void {
     if (visible !== this.shown) {
       this.shown = visible;
-      BlzFrameSetVisible(this.panel, visible);
+      setFrameVisible(this.panel, visible);
     }
     const key = settings.revision * 2 + (device === "pad" ? 1 : 0);
     if (!visible || key === this.shownKey) return;
     this.shownKey = key;
-    BlzFrameSetText(this.label, hintText(hintRows(device, settings.bindings, hintsKeyFree(settings)), MENU_STYLE.gold));
+    setFrameText(this.label, hintText(hintRows(device, settings.bindings, hintsKeyFree(settings)), MENU_STYLE.gold));
   }
 }

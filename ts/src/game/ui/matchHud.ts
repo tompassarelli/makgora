@@ -16,6 +16,7 @@ import { unitsForPixels } from "./portraitFrames";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, hudPlateTexture } from "./hudLayout";
 import { clockHundredths, clockMain, clockSeconds, hundredthsLabel } from "./clockReadout";
+import { createFrame, destroyFrame, setFrameEnabled, setFrameFont, setFrameLevel, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 
 const CLOCK_LEVEL = 21;
@@ -44,29 +45,29 @@ class ClockDigits {
   constructor(context: number, size: number, box: ClockBox, left: number, top: number, horizontal: textaligntype) {
     const scale = f32(size / CLOCK_TEMPLATE_SIZE);
     this.rim = createTemplateOutline("SmashcraftDamageOutline", gameUi(), context, CLOCK_LEVEL, scale);
-    this.label = BlzCreateFrame("SmashcraftDamage", gameUi(), 0, context);
-    BlzFrameSetScale(this.label, scale);
-    BlzFrameSetSize(this.label, f32(box.width / scale), f32(box.height / scale));
+    this.label = createFrame("SmashcraftDamage", gameUi(), 0, context);
+    setFrameScale(this.label, scale);
+    setFrameSize(this.label, f32(box.width / scale), f32(box.height / scale));
     placeTopLeft(this.label, left, top);
-    BlzFrameSetTextAlignment(this.label, TEXT_JUSTIFY_BOTTOM, horizontal);
-    BlzFrameSetLevel(this.label, CLOCK_LEVEL);
-    BlzFrameSetEnable(this.label, false);
+    setFrameTextAlignment(this.label, TEXT_JUSTIFY_BOTTOM, horizontal);
+    setFrameLevel(this.label, CLOCK_LEVEL);
+    setFrameEnabled(this.label, false);
     attachOutline(this.rim, this.label, f32(CLOCK_OUTLINE_PX / scale), TEXT_JUSTIFY_BOTTOM, horizontal);
     this.show(false);
   }
 
   show(visible: boolean): void {
-    BlzFrameSetVisible(this.label, visible);
+    setFrameVisible(this.label, visible);
     showOutline(this.rim, visible);
   }
 
   setText(text: string): void {
-    BlzFrameSetText(this.label, `${CLOCK_FILL}${text}|r`);
+    setFrameText(this.label, `${CLOCK_FILL}${text}|r`);
     setOutlineText(this.rim, `${CLOCK_RIM}${text}|r`);
   }
 
   destroy(): void {
-    BlzDestroyFrame(this.label);
+    destroyFrame(this.label);
     destroyOutline(this.rim);
   }
 }
@@ -145,36 +146,36 @@ export class FighterHud {
     const context = 800 + slot * 20;
     const parent = gameUi();
     this.plate = createBackdrop(`FighterHUDPlate${suffix}`, parent, context);
-    BlzFrameSetSize(this.plate, unitsForPixels(PLATE_WIDTH_PX), unitsForPixels(PLATE_HEIGHT_PX));
-    BlzFrameSetEnable(this.plate, false);
+    setFrameSize(this.plate, unitsForPixels(PLATE_WIDTH_PX), unitsForPixels(PLATE_HEIGHT_PX));
+    setFrameEnabled(this.plate, false);
     this.portrait = createBackdrop(`FighterHUDPortrait${suffix}`, parent, context + 1);
-    BlzFrameSetEnable(this.portrait, false);
+    setFrameEnabled(this.portrait, false);
     this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", parent, context + 2, 21, 1.0);
     this.percentOutline = createOutline(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN, MENU_FONT, f32(0.016), 21);
-    this.damage = BlzCreateFrame("SmashcraftDamage", parent, 0, context + 2);
-    BlzFrameSetEnable(this.damage, false);
+    this.damage = createFrame("SmashcraftDamage", parent, 0, context + 2);
+    setFrameEnabled(this.damage, false);
     this.percent = createText(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN);
-    BlzFrameSetFont(this.percent, MENU_FONT, f32(0.016), 1);
-    BlzFrameSetTextAlignment(this.percent, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
-    BlzFrameSetEnable(this.percent, false);
+    setFrameFont(this.percent, MENU_FONT, f32(0.016), 1);
+    setFrameTextAlignment(this.percent, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
+    setFrameEnabled(this.percent, false);
     this.name = createText(`FighterHUDName${suffix}`, parent, context + 3);
-    BlzFrameSetFont(this.name, MENU_FONT, f32(0.0072), 1);
-    BlzFrameSetEnable(this.name, false);
+    setFrameFont(this.name, MENU_FONT, f32(0.0072), 1);
+    setFrameEnabled(this.name, false);
     const stocks: framehandle[] = [];
     for (let index = 0; index < STOCK_ICONS_SHOWN; index++) {
       const icon = createBackdrop(`FighterHUDStock${suffix}_${I2S(index)}`, parent, context + 5 + index);
-      BlzFrameSetEnable(icon, false);
+      setFrameEnabled(icon, false);
       stocks.push(icon);
     }
     this.stocks = stocks;
     this.stockCount = createText(`FighterHUDStockCount${suffix}`, parent, context + 6 + STOCK_ICONS_SHOWN);
-    BlzFrameSetFont(this.stockCount, MENU_FONT, f32(0.011), 1);
-    BlzFrameSetEnable(this.stockCount, false);
+    setFrameFont(this.stockCount, MENU_FONT, f32(0.011), 1);
+    setFrameEnabled(this.stockCount, false);
     this.doomMark = createBackdrop(`FighterHUDDoom${suffix}`, parent, context + 8 + STOCK_ICONS_SHOWN);
-    BlzFrameSetTexture(this.doomMark, DOOM_MARK_TEXTURE, 0, true);
-    BlzFrameSetEnable(this.doomMark, false);
+    setFrameTexture(this.doomMark, DOOM_MARK_TEXTURE, 0, true);
+    setFrameEnabled(this.doomMark, false);
     this.body = [this.plate, this.portrait, this.damage, this.percent, this.name];
-    for (const frame of [...this.body, ...this.stocks, this.stockCount, this.doomMark]) BlzFrameSetLevel(frame, 21);
+    for (const frame of [...this.body, ...this.stocks, this.stockCount, this.doomMark]) setFrameLevel(frame, 21);
     attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
     attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
     this.layout(slot, count);
@@ -182,12 +183,12 @@ export class FighterHud {
   }
 
   destroy(): void {
-    for (const frame of this.body) BlzDestroyFrame(frame);
+    for (const frame of this.body) destroyFrame(frame);
     destroyOutline(this.damageOutline);
     destroyOutline(this.percentOutline);
-    for (const icon of this.stocks) BlzDestroyFrame(icon);
-    BlzDestroyFrame(this.stockCount);
-    BlzDestroyFrame(this.doomMark);
+    for (const icon of this.stocks) destroyFrame(icon);
+    destroyFrame(this.stockCount);
+    destroyFrame(this.doomMark);
   }
 
 
@@ -200,17 +201,17 @@ export class FighterHud {
     placeTopLeft(this.plate, left, PLATE_TOP);
     placeBox(this.portrait, left, panel.bust);
     placeBox(this.damage, left, panel.damage);
-    BlzFrameSetTextAlignment(this.damage, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
+    setFrameTextAlignment(this.damage, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
     placeBox(this.percent, left, panel.percent);
     placeBox(this.doomMark, left, panel.doom);
     placeBox(this.name, left, panel.name);
-    BlzFrameSetTextAlignment(this.name, TEXT_JUSTIFY_MIDDLE, inner);
+    setFrameTextAlignment(this.name, TEXT_JUSTIFY_MIDDLE, inner);
     this.stocks.forEach((icon, index) => {
       const box = panel.stocks[index];
       if (box !== undefined) placeBox(icon, left, box);
     });
     placeBox(this.stockCount, left, panel.stockCount);
-    BlzFrameSetTextAlignment(this.stockCount, TEXT_JUSTIFY_MIDDLE, inner);
+    setFrameTextAlignment(this.stockCount, TEXT_JUSTIFY_MIDDLE, inner);
     this.placeNumber(0.0, 0.0);
   }
 
@@ -218,7 +219,7 @@ export class FighterHud {
   update(visible: boolean, character: Character, color: number, damage: number, stocks: number, cursed = false, tint?: CostumeTint, costume = 0, duo = false): void {
     if (this.shownVisible !== visible) {
       this.shownVisible = visible;
-      for (const frame of this.body) BlzFrameSetVisible(frame, visible);
+      for (const frame of this.body) setFrameVisible(frame, visible);
       showOutline(this.damageOutline, visible);
       showOutline(this.percentOutline, visible);
     }
@@ -227,9 +228,9 @@ export class FighterHud {
       this.shownCostume = costume;
       this.shownColor = color;
       this.shownMirrored = this.panel.mirrored;
-      BlzFrameSetTexture(this.plate, hudPlateTexture(color, this.panel.mirrored), 0, true);
-      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Bust", color, costume), 0, true);
-      for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", color, costume), 0, true);
+      setFrameTexture(this.plate, hudPlateTexture(color, this.panel.mirrored), 0, true);
+      setFrameTexture(this.portrait, fighterPortrait(character, "Bust", color, costume), 0, true);
+      for (const icon of this.stocks) setFrameTexture(icon, fighterPortrait(character, "Stock", color, costume), 0, true);
     }
     this.showTitle(character, duo);
     if (this.shownTint !== tint) {
@@ -247,7 +248,7 @@ export class FighterHud {
     if (this.shownTitleCharacter === character && this.shownDuoTitle === duoTitle) return;
     this.shownTitleCharacter = character;
     this.shownDuoTitle = duoTitle;
-    BlzFrameSetText(this.name, duoTitle ? DUO_TITLE : fighterName(character).toUpperCase());
+    setFrameText(this.name, duoTitle ? DUO_TITLE : fighterName(character).toUpperCase());
   }
 
   private showDamage(damage: number): void {
@@ -256,13 +257,13 @@ export class FighterHud {
     const shownDamage = damageText(damage);
     if (this.shownDamage !== shownDamage) {
       this.shownDamage = shownDamage;
-      BlzFrameSetText(this.damage, shownDamage);
+      setFrameText(this.damage, shownDamage);
       setOutlineText(this.damageOutline, damageOutlineText(damage));
     }
     const shownPercent = percentText(damage);
     if (this.shownPercent !== shownPercent) {
       this.shownPercent = shownPercent;
-      BlzFrameSetText(this.percent, shownPercent);
+      setFrameText(this.percent, shownPercent);
       setOutlineText(this.percentOutline, percentOutlineText(damage));
     }
   }
@@ -270,7 +271,7 @@ export class FighterHud {
   private showCursed(cursed: boolean): void {
     if (this.shownCursed === cursed) return;
     this.shownCursed = cursed;
-    BlzFrameSetVisible(this.doomMark, cursed);
+    setFrameVisible(this.doomMark, cursed);
   }
 
   private showStocks(shownStocks: number): void {
@@ -280,10 +281,10 @@ export class FighterHud {
     const icons = counted ? 1 : shownStocks;
     for (let index = 0; index < this.stocks.length; index++) {
       const icon = this.stocks[index];
-      if (icon !== undefined) BlzFrameSetVisible(icon, index < icons);
+      if (icon !== undefined) setFrameVisible(icon, index < icons);
     }
-    BlzFrameSetVisible(this.stockCount, counted);
-    BlzFrameSetText(this.stockCount, `x${I2S(shownStocks)}`);
+    setFrameVisible(this.stockCount, counted);
+    setFrameText(this.stockCount, `x${I2S(shownStocks)}`);
   }
 
   private placeNumber(dx: number, dy: number): void {
@@ -293,6 +294,6 @@ export class FighterHud {
 }
 
 function placeBox(frame: framehandle, left: number, box: PlateBox): void {
-  BlzFrameSetSize(frame, unitsForPixels(box.width), unitsForPixels(box.height));
+  setFrameSize(frame, unitsForPixels(box.width), unitsForPixels(box.height));
   placeTopLeft(frame, boxLeft(left, box), boxTop(box));
 }

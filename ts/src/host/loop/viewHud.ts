@@ -18,6 +18,7 @@ import { warcraftMenuOpen } from "./warcraftMenu";
 import { probeWaiting } from "./responseProbe";
 import { clockSeconds } from "./trace";
 import { fighterAt, isActive } from "../../game/sim/roster";
+import { setFrameText, setFrameVisible } from "wisp/game/frames";
 
 export const startControl = (s: Readonly<ShellState>): StartControl =>
   (journalIngress(s.build) === "editbox" && !playsOnKeyboard(s.rollback?.journal, localSlot()) ? "Start" : "Y");
@@ -70,14 +71,14 @@ export function presentMessages(s: ShellState, game: MatchState, ui: UiObjects, 
   const helpVisible = showMatch && teaching;
   if (shownMessages.helpVisible !== helpVisible) {
     shownMessages.helpVisible = helpVisible;
-    BlzFrameSetVisible(help, helpVisible);
+    setFrameVisible(help, helpVisible);
   }
   const waiting = game.phase === Phase.match ? activeRollback(s)?.waitingFor ?? 0 : 0;
   const starting = matchStartNotice(game);
   const noticeVisible = showMatch && (waiting !== 0 || starting !== "" || (game.phase === Phase.result && !ui.match.resultsShown()));
   if (shownMessages.noticeVisible !== noticeVisible) {
     shownMessages.noticeVisible = noticeVisible;
-    BlzFrameSetVisible(notice, noticeVisible);
+    setFrameVisible(notice, noticeVisible);
   }
   keepNoticeClearOfMarkers(notice, noticeVisible, shownMessages.noticePlace);
   if (!selecting) presentMessageText(s, game, ui, waiting, starting, local, localFighter);
@@ -89,12 +90,12 @@ function presentMessageText(s: ShellState, game: MatchState, ui: UiObjects, wait
   const helpText = matchHelp(game, s.session.paused, startControl(s), localFighter, game.phase === Phase.match);
   if (shownMessages.help !== helpText) {
     shownMessages.help = helpText;
-    BlzFrameSetText(help, helpText);
+    setFrameText(help, helpText);
   }
   probeWaiting(s.probe, waiting, localSlot());
   const noticeText = game.phase === Phase.result ? resultNotice(game, s.status.text) : waiting !== 0 ? waitingMessage(waiting) : starting;
   if (shownMessages.notice !== noticeText) {
     shownMessages.notice = noticeText;
-    BlzFrameSetText(notice, noticeText);
+    setFrameText(notice, noticeText);
   }
 }

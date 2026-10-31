@@ -19,6 +19,7 @@ function bubblePosition(column: number, row: number): { readonly column: number;
 
 import type { CostumeTint } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
+import { setFrameAbsPoint, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 const PARTNER_BUBBLE_SCALE = f32(0.75);
 
@@ -37,34 +38,34 @@ export class OffscreenBubble {
     const parent = consoleUi();
     this.portrait = createBackdrop(`OffscreenPortrait${I2S(slot)}`, parent, 920 + slot * 2);
     this.arrow = createText(`OffscreenArrow${I2S(slot)}`, parent, 921 + slot * 2);
-    BlzFrameSetSize(this.portrait, OFFSCREEN_PORTRAIT, OFFSCREEN_PORTRAIT);
-    BlzFrameSetSize(this.arrow, f32(0.027), f32(0.027));
-    BlzFrameSetFont(this.arrow, MENU_FONT, f32(0.021), 0);
+    setFrameSize(this.portrait, OFFSCREEN_PORTRAIT, OFFSCREEN_PORTRAIT);
+    setFrameSize(this.arrow, f32(0.027), f32(0.027));
+    setFrameFont(this.arrow, MENU_FONT, f32(0.021), 0);
     for (const frame of [this.portrait, this.arrow]) {
-      BlzFrameSetEnable(frame, false);
-      BlzFrameSetVisible(frame, false);
-      BlzFrameSetLevel(frame, 10);
+      setFrameEnabled(frame, false);
+      setFrameVisible(frame, false);
+      setFrameLevel(frame, 10);
     }
   }
 
   update(visible: boolean, character: Character, color: number, column: number, row: number, aspect: number, tint?: CostumeTint, costume = 0, partner = false): void {
     if (visible !== this.visible) {
       this.visible = visible;
-      BlzFrameSetVisible(this.portrait, visible);
-      BlzFrameSetVisible(this.arrow, visible);
+      setFrameVisible(this.portrait, visible);
+      setFrameVisible(this.arrow, visible);
     }
     if (!visible) return;
     if (this.partner !== partner) {
       this.partner = partner;
       const scale = partner ? PARTNER_BUBBLE_SCALE : 1.0;
-      BlzFrameSetSize(this.portrait, OFFSCREEN_PORTRAIT * scale, OFFSCREEN_PORTRAIT * scale);
-      BlzFrameSetSize(this.arrow, f32(0.027) * scale, f32(0.027) * scale);
-      BlzFrameSetFont(this.arrow, MENU_FONT, f32(0.021) * scale, 0);
+      setFrameSize(this.portrait, OFFSCREEN_PORTRAIT * scale, OFFSCREEN_PORTRAIT * scale);
+      setFrameSize(this.arrow, f32(0.027) * scale, f32(0.027) * scale);
+      setFrameFont(this.arrow, MENU_FONT, f32(0.021) * scale, 0);
     }
     if (this.character !== character || this.color !== color) {
       this.character = character;
       this.color = color;
-      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Tile", color, costume), 0, true);
+      setFrameTexture(this.portrait, fighterPortrait(character, "Tile", color, costume), 0, true);
     }
     if (this.tint !== tint) {
       this.tint = tint;
@@ -73,11 +74,11 @@ export class OffscreenBubble {
     const position = bubblePosition(column, row);
     const x = f32(0.4) + (position.column - 0.5) * aspect * f32(0.6);
     const y = (1.0 - position.row) * f32(0.6);
-    BlzFrameSetAbsPoint(this.portrait, FRAMEPOINT_CENTER, x, y);
+    setFrameAbsPoint(this.portrait, FRAMEPOINT_CENTER, x, y);
     const reach = partner ? f32(0.032) * PARTNER_BUBBLE_SCALE : f32(0.032);
     const arrowX = Math.abs(column - 0.5) > Math.abs(row - 0.5) ? (column > 0.5 ? reach : -reach) : 0.0;
     const arrowY = arrowX === 0 ? (row > 0.5 ? -reach : reach) : 0.0;
-    BlzFrameSetAbsPoint(this.arrow, FRAMEPOINT_CENTER, x + arrowX, y + arrowY);
-    BlzFrameSetText(this.arrow, position.arrow);
+    setFrameAbsPoint(this.arrow, FRAMEPOINT_CENTER, x + arrowX, y + arrowY);
+    setFrameText(this.arrow, position.arrow);
   }
 }

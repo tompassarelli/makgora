@@ -34,9 +34,10 @@ import { slotColor } from "./slotColors";
 import { costumeIndex, costumesFor } from "../roster/costumes";
 import { MAX_COSTUMES } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
-import { placeTopLeft, setFrameText } from "./frames";
+import { placeTopLeft, setMenuText } from "./frames";
 import { presentLiveFighter } from "./liveCard";
 import { BAR_HEIGHT, BAR_TEXT, BOTTOM_BAR_TOP, TAG_SCALE, TAG_SIZE, art, hotspot, label, modeBox, nameText, placeBottomBar, portraitTexture, tileOfCharacter, titleCase } from "./selectionFrames";
+import { createFrame, createFrameByType, setFrameAlpha, setFrameEnabled, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 export const selectionCardTexture = (color: string): string => `war3mapImported\\SelectionCard${color}.tga`;
 const CHIP_TEXTURES: Slots<string> = ["war3mapImported\\SelectionChipP1.tga", "war3mapImported\\SelectionChipP2.tga", "war3mapImported\\SelectionChipP3.tga", "war3mapImported\\SelectionChipP4.tga"];
@@ -92,10 +93,10 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   const x = cardX(slot);
   const name = `${suffix}_${I2S(slot)}`;
   const card = art(root, `MeleeCard${name}`, selectionCardTexture("Gray"), x, CARD_TOP, CARD_WIDTH, CARD_HEIGHT);
-  const mode = BlzCreateFrameByType("BUTTON", `MeleeModeButton${name}`, root, "", 0);
+  const mode = createFrameByType("BUTTON", `MeleeModeButton${name}`, root, "", 0);
   const modeArea = modeBox(slot);
   placeTopLeft(mode, modeArea.x, modeArea.y);
-  BlzFrameSetSize(mode, modeArea.width, modeArea.height);
+  setFrameSize(mode, modeArea.width, modeArea.height);
   add(mode, { kind: "mode", slot });
   const tag = label(mode, `MeleeTag${name}`, cardRight(slot, f32(0.014)), cardDown(f32(0.008)), cardSize(f32(0.132)), cardSize(f32(0.019)), TAG_SIZE);
   const teamArea = teamSettingsBox(slot);
@@ -103,15 +104,15 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   add(team, { kind: "team", slot });
   const teamLabel = label(root, `MeleeTeam${name}`, teamArea.x, cardDown(f32(0.008)), teamArea.width, cardSize(f32(0.019)), TAG_SIZE);
   const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), cardRight(slot, f32(0.029)), cardDown(f32(0.03)), cardSize(f32(0.102)), cardSize(f32(0.102)));
-  const render = BlzCreateFrameByType("SPRITE", `MeleeRender${name}`, root, "", 0);
+  const render = createFrameByType("SPRITE", `MeleeRender${name}`, root, "", 0);
   placeTopLeft(render, cardRight(slot, f32(0.029)), cardDown(f32(0.03)));
-  BlzFrameSetSize(render, cardSize(f32(0.102)), cardSize(f32(0.102)));
-  BlzFrameSetVisible(render, false);
+  setFrameSize(render, cardSize(f32(0.102)), cardSize(f32(0.102)));
+  setFrameVisible(render, false);
   const dotArea = costumeDotsBox(slot);
   const dotSize = cardSize(COSTUME_DOT);
   const dots = Array.from({ length: MAX_COSTUMES }, (_, index) => {
     const dot = art(root, `MeleeCostumeDot${name}_${I2S(index)}`, selectionChipTexture(slot, true), f32(dotArea.x + f32(index * f32(dotSize + cardSize(COSTUME_DOT_GAP)))), dotArea.y, dotSize, dotSize);
-    BlzFrameSetVisible(dot, false);
+    setFrameVisible(dot, false);
     return dot;
   });
   const portraitArea = costumePortraitBox(slot);
@@ -121,14 +122,14 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   const wins = createSessionWinsFrames(root, name, cardRight(slot, f32(0.054)), BOTTOM_BAR_TOP, BAR_TEXT);
   const status = label(root, `MeleeStatus${name}`, cardRight(slot, f32(0.014)), BOTTOM_BAR_TOP, cardSize(f32(0.132)), BAR_HEIGHT, BAR_TEXT);
   const chip = art(root, `MeleeChip${name}`, selectionChipTexture(slot, true), cardRight(slot, f32(0.06)), cardDown(f32(0.075)), cardSize(f32(0.06)), cardSize(f32(0.06)));
-  BlzFrameSetLevel(chip, SELECT_LEVELS.cardChip);
+  setFrameLevel(chip, SELECT_LEVELS.cardChip);
   const box = cpuSettingsBox(slot);
-  const settings = BlzCreateFrame("ScriptDialogButton", root, 0, 0);
+  const settings = createFrame("ScriptDialogButton", root, 0, 0);
   placeTopLeft(settings, box.x, box.y);
-  BlzFrameSetSize(settings, box.width, box.height);
-  setFrameText(settings, "");
+  setFrameSize(settings, box.width, box.height);
+  setMenuText(settings, "");
   const settingsLabel = label(settings, `MeleeCpuSettingsLabel${name}`, box.x + f32(0.004), box.y - f32(0.002), box.width - f32(0.008), box.height - f32(0.004), f32(0.0075));
-  setFrameText(settingsLabel, "Opponent settings");
+  setMenuText(settingsLabel, "Opponent settings");
   add(settings, { kind: "cpuSettings", slot });
   const summary = label(root, `MeleeCpuSummary${name}`, cardRight(slot, f32(0.004)), cardDown(f32(0.136)), cardSize(f32(0.152)), cardSize(f32(0.031)), BAR_TEXT);
   return { card, tag, mode, team, teamLabel, portrait, render, costume, dots, name: name_, status, wins, chip, summary, settings, settingsLabel };
@@ -136,34 +137,34 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
 
 export function presentCardTeam(frames: CardFrames, game: Readonly<MatchState>, slot: ParticipantSlot, participantId: number, menuFocus: MenuFocus | undefined, active: boolean, human: boolean, teamsShown: boolean, palette: number): void {
   const color = slotColor(palette);
-  BlzFrameSetTexture(frames.card, selectionCardTexture(active ? color.name : "Gray"), 0, true);
-  BlzFrameSetVisible(frames.team, teamsShown);
-  BlzFrameSetVisible(frames.teamLabel, teamsShown);
-  BlzFrameSetEnable(frames.team, teamsShown && (slot === participantId && human || canChooseComputer(game, participantId, slot)));
-  setFrameText(frames.teamLabel, `${menuFocus?.kind === "team" && menuFocus.slot === slot ? "> " : ""}${TEAM_NAMES[game.teamChoices[slot]]}`);
+  setFrameTexture(frames.card, selectionCardTexture(active ? color.name : "Gray"), 0, true);
+  setFrameVisible(frames.team, teamsShown);
+  setFrameVisible(frames.teamLabel, teamsShown);
+  setFrameEnabled(frames.team, teamsShown && (slot === participantId && human || canChooseComputer(game, participantId, slot)));
+  setMenuText(frames.teamLabel, `${menuFocus?.kind === "team" && menuFocus.slot === slot ? "> " : ""}${TEAM_NAMES[game.teamChoices[slot]]}`);
 }
 
 export function presentCardTag(frames: CardFrames, game: Readonly<MatchState>, slot: number, participantId: number, menuFocus: MenuFocus | undefined, active: boolean, human: boolean): void {
-  BlzFrameSetSize(frames.mode, game.teamBattle ? cardSize(f32(0.078)) : modeBox(slot).width, modeBox(slot).height);
+  setFrameSize(frames.mode, game.teamBattle ? cardSize(f32(0.078)) : modeBox(slot).width, modeBox(slot).height);
   placeTopLeft(frames.tag, cardRight(slot, game.teamBattle ? f32(0.006) : f32(0.014)), cardDown(f32(0.008)));
-  BlzFrameSetSize(frames.tag, f32(cardSize(game.teamBattle ? f32(0.068) : f32(0.132)) / TAG_SCALE), f32(cardSize(f32(0.019)) / TAG_SCALE));
+  setFrameSize(frames.tag, f32(cardSize(game.teamBattle ? f32(0.068) : f32(0.132)) / TAG_SCALE), f32(cardSize(f32(0.019)) / TAG_SCALE));
   const focused = menuFocus?.kind === "fighter" && menuFocus.slot === slot;
-  setFrameText(frames.tag, active ? `${focused ? "> " : ""}${human ? "Player" : "CPU"}${focused ? " <" : ""}` : "Empty");
-  BlzFrameSetEnable(frames.mode, canCycleSlotMode(game, participantId, slot));
+  setMenuText(frames.tag, active ? `${focused ? "> " : ""}${human ? "Player" : "CPU"}${focused ? " <" : ""}` : "Empty");
+  setFrameEnabled(frames.mode, canCycleSlotMode(game, participantId, slot));
 }
 
 export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>, slot: number, active: boolean, ready: boolean, human: boolean, choice: number | undefined, palette: number, sessionWins: number, echoes: readonly string[], now: number): void {
   const shown = active && ready;
-  BlzFrameSetVisible(frames.portrait, shown);
-  BlzFrameSetVisible(frames.name, shown);
+  setFrameVisible(frames.portrait, shown);
+  setFrameVisible(frames.name, shown);
   const winsShown = shown && sessionWins > 0;
   presentSessionWinsFrames(frames.wins, sessionWins, shown);
   const statusText = human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : active && !human ? "CPU" : `P${I2S(slot + 1)}${at(echoes, slot)}`;
-  setFrameText(frames.status, statusText);
+  setMenuText(frames.status, statusText);
   placeBottomBar(frames, slot, winsShown, statusText, `x${I2S(sessionWins)}`);
   if (ready) {
-    BlzFrameSetTexture(frames.portrait, portraitTexture(choice, false, palette, choice === undefined || choice < 0 ? 0 : costumeIndex(choice, game.costumeChoices[slot] ?? 0)), 0, true);
-    setFrameText(frames.name, nameText(choice));
+    setFrameTexture(frames.portrait, portraitTexture(choice, false, palette, choice === undefined || choice < 0 ? 0 : costumeIndex(choice, game.costumeChoices[slot] ?? 0)), 0, true);
+    setMenuText(frames.name, nameText(choice));
   }
   presentLiveFighter(frames.render, frames.portrait, shown, choice, game.costumeChoices[slot] ?? 0, now);
 }
@@ -192,13 +193,13 @@ export function presentCardCostume(frames: CardFrames, game: Readonly<MatchState
   const chosen = costumeFor(game, slot);
   const tint = costumes[chosen]?.tint;
   paintCostume(frames.portrait, tint);
-  BlzFrameSetEnable(frames.costume, shown && costumes.length > 1 && (slot === participantId && humanFighterActive(game, slot) || canChooseComputer(game, participantId, slot)));
-  BlzFrameSetVisible(frames.costume, shown && costumes.length > 1);
+  setFrameEnabled(frames.costume, shown && costumes.length > 1 && (slot === participantId && humanFighterActive(game, slot) || canChooseComputer(game, participantId, slot)));
+  setFrameVisible(frames.costume, shown && costumes.length > 1);
   for (let index = 0; index < frames.dots.length; index++) {
     const dot = frames.dots[index];
     if (dot === undefined) continue;
-    BlzFrameSetVisible(dot, shown && costumes.length > 1 && index < costumes.length);
-    BlzFrameSetAlpha(dot, index === chosen ? 255 : 70);
+    setFrameVisible(dot, shown && costumes.length > 1 && index < costumes.length);
+    setFrameAlpha(dot, index === chosen ? 255 : 70);
   }
 }
 
@@ -206,25 +207,25 @@ export function presentCardCpu(frames: CardFrames, game: Readonly<MatchState>, s
   const computer = active && !human;
   const preview = cardPortrait(computer);
   placeTopLeft(frames.portrait, cardX(slot) + (CARD_WIDTH - preview.size) / 2, preview.top);
-  BlzFrameSetSize(frames.portrait, preview.size, preview.size);
-  BlzFrameSetVisible(frames.summary, computer);
-  BlzFrameSetVisible(frames.settings, computer);
+  setFrameSize(frames.portrait, preview.size, preview.size);
+  setFrameVisible(frames.summary, computer);
+  setFrameVisible(frames.settings, computer);
   if (computer) {
-    setFrameText(frames.summary, cpuCardSummary(game, slot, defaults));
-    setFrameText(frames.settingsLabel, menuFocus?.kind === "settings" && menuFocus.slot === slot ? "> Opponent settings <" : "Opponent settings");
+    setMenuText(frames.summary, cpuCardSummary(game, slot, defaults));
+    setMenuText(frames.settingsLabel, menuFocus?.kind === "settings" && menuFocus.slot === slot ? "> Opponent settings <" : "Opponent settings");
   }
 }
 
 export function presentCardChip(frames: CardFrames, drag: Readonly<SelectionDrag>, grid: RosterGrid, slot: number, active: boolean, ready: boolean, human: boolean, choice: number | undefined, x: number, y: number, remote: { readonly x: number; readonly y: number } | undefined): boolean {
-  BlzFrameSetVisible(frames.chip, active);
-  BlzFrameSetTexture(frames.chip, selectionChipTexture(slot, human), 0, true);
+  setFrameVisible(frames.chip, active);
+  setFrameTexture(frames.chip, selectionChipTexture(slot, human), 0, true);
   const local = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);
   const carried = local || remote !== undefined;
   const hand = remote !== undefined && !local ? remote : { x, y };
   const chipChoice = tileOfCharacter(choice ?? DEFAULT_FIGHTER);
   const size = carried ? carriedChipSize(grid) : readyChipSize(grid);
-  BlzFrameSetSize(frames.chip, size, size);
-  BlzFrameSetLevel(frames.chip, carried ? SELECT_LEVELS.carriedChip : SELECT_LEVELS.cardChip);
+  setFrameSize(frames.chip, size, size);
+  setFrameLevel(frames.chip, carried ? SELECT_LEVELS.carriedChip : SELECT_LEVELS.cardChip);
   placeTopLeft(
     frames.chip,
     carried ? carriedChipLeft(hand.x, size) : ready ? chipX(grid, slot, chipChoice) : parkedChipLeft(slot, size),

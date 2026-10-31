@@ -1,20 +1,21 @@
 import { MENU_FONT } from "./hudLayout";
 import { createText, placeTopLeft } from "./frames";
+import { createFrame, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment } from "wisp/game/frames";
 
 export function panelText(parent: framehandle, name: string, x: number, y: number, width: number, height: number, size: number, vertical: textaligntype, horizontal: textaligntype): framehandle {
   const frame = createText(name, parent, 0);
   placeTopLeft(frame, x, y);
-  BlzFrameSetSize(frame, width, height);
-  BlzFrameSetFont(frame, MENU_FONT, size, 0);
-  BlzFrameSetTextAlignment(frame, vertical, horizontal);
-  BlzFrameSetEnable(frame, false);
+  setFrameSize(frame, width, height);
+  setFrameFont(frame, MENU_FONT, size, 0);
+  setFrameTextAlignment(frame, vertical, horizontal);
+  setFrameEnabled(frame, false);
   return frame;
 }
 
 export function panelButton(parent: framehandle, x: number, y: number, width: number, height: number, label: string): framehandle {
-  const frame = BlzCreateFrame("ScriptDialogButton", parent, 0, 0);
+  const frame = createFrame("ScriptDialogButton", parent, 0, 0);
   placeTopLeft(frame, x, y);
-  BlzFrameSetSize(frame, width, height);
-  BlzFrameSetText(frame, label);
+  setFrameSize(frame, width, height);
+  setFrameText(frame, label);
   return frame;
 }

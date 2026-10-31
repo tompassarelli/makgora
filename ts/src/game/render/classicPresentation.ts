@@ -12,6 +12,7 @@ import { createBackdrop, createText, gameUi, placeTopLeft } from "../ui/frames";
 import { MENU_FONT, PANEL_TEXTURE } from "../ui/hudLayout";
 import { type ParkedFlags, type WorldOrigin, parkOnce } from "./effects";
 import { createEffect, destroyEffect, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { destroyFrame, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 
 const ZONE_EFFECTS = 4;
@@ -39,27 +40,27 @@ export class ClassicPresentation {
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
     this.card = createBackdrop("ClassicEndingCard", gameUi(), 893);
-    BlzFrameSetTexture(this.card, PANEL_TEXTURE, 0, true);
+    setFrameTexture(this.card, PANEL_TEXTURE, 0, true);
     placeTopLeft(this.card, f32(0.15), f32(0.47));
-    BlzFrameSetSize(this.card, f32(0.5), f32(0.2));
-    BlzFrameSetEnable(this.card, false);
+    setFrameSize(this.card, f32(0.5), f32(0.2));
+    setFrameEnabled(this.card, false);
     this.portrait = createBackdrop("ClassicEndingPortrait", this.card, 894);
     placeTopLeft(this.portrait, f32(0.165), f32(0.455));
-    BlzFrameSetSize(this.portrait, f32(0.12), f32(0.17));
-    BlzFrameSetEnable(this.portrait, false);
+    setFrameSize(this.portrait, f32(0.12), f32(0.17));
+    setFrameEnabled(this.portrait, false);
     const text = (name: string, context: number, top: number, height: number, size: number): framehandle => {
       const frame = createText(name, this.card, context);
       placeTopLeft(frame, f32(0.3), top);
-      BlzFrameSetSize(frame, f32(0.335), height);
-      BlzFrameSetFont(frame, MENU_FONT, size, 0);
-      BlzFrameSetTextAlignment(frame, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
-      BlzFrameSetEnable(frame, false);
+      setFrameSize(frame, f32(0.335), height);
+      setFrameFont(frame, MENU_FONT, size, 0);
+      setFrameTextAlignment(frame, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+      setFrameEnabled(frame, false);
       return frame;
     };
     this.speaker = text("ClassicEndingSpeaker", 895, f32(0.455), f32(0.022), f32(0.015));
     this.lines = text("ClassicEndingLines", 896, f32(0.43), f32(0.1), f32(0.011));
     this.results = text("ClassicEndingResults", 897, f32(0.32), f32(0.04), f32(0.0095));
-    BlzFrameSetVisible(this.card, false);
+    setFrameVisible(this.card, false);
   }
 
 
@@ -149,20 +150,20 @@ export class ClassicPresentation {
 
   updateCard(game: Readonly<MatchState>): void {
     const shown = game.phase === Phase.result && game.run.active && game.run.cleared && !game.lore;
-    BlzFrameSetVisible(this.card, shown);
+    setFrameVisible(this.card, shown);
     if (!shown) return;
     const ending = classicEnding(game);
     const text = `${ending.speaker}|${ending.lines.join("\n")}|${ending.results}`;
     if (text === this.cardText) return;
     this.cardText = text;
-    BlzFrameSetTexture(this.portrait, fighterPortrait(game.run.fighter, "Card", game.run.player), 0, true);
-    BlzFrameSetText(this.speaker, `|cffffcc00${ending.speaker}|r`);
-    BlzFrameSetText(this.lines, ending.lines.join("\n\n"));
-    BlzFrameSetText(this.results, ending.results);
+    setFrameTexture(this.portrait, fighterPortrait(game.run.fighter, "Card", game.run.player), 0, true);
+    setFrameText(this.speaker, `|cffffcc00${ending.speaker}|r`);
+    setFrameText(this.lines, ending.lines.join("\n\n"));
+    setFrameText(this.results, ending.results);
   }
 
   destroy(): void {
     this.endMatch();
-    BlzDestroyFrame(this.card);
+    destroyFrame(this.card);
   }
 }

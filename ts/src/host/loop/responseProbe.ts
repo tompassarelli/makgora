@@ -12,6 +12,7 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { edgeStampFile, responsePageFile } from "../../game/core/gameFiles";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/input/participants";
 import type { MatchCamera } from "../../game/sim/matchCamera";
+import { createFrameByType, originFrame, setFrameAbsPoint, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 
 const ROW_LIMIT = 7200;
 const PAGE_ROWS = 150;
@@ -121,11 +122,11 @@ const vacantStamp = (): TransportStamp => ({ epoch: undefined, frame: 0, sendMs:
 
 
 export function createResponseProbe(build: string): ResponseProbe {
-  const marker = BlzCreateFrameByType("TEXT", "ResponseServiceMarker", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), "", 966);
-  BlzFrameSetText(marker, "|cffff00ffI|r");
-  BlzFrameSetSize(marker, f32(0.012), f32(0.016));
-  BlzFrameSetAbsPoint(marker, FRAMEPOINT_TOPLEFT, f32(0.04), f32(0.595));
-  BlzFrameSetVisible(marker, false);
+  const marker = createFrameByType("TEXT", "ResponseServiceMarker", originFrame(ORIGIN_FRAME_GAME_UI, 0), "", 966);
+  setFrameText(marker, "|cffff00ffI|r");
+  setFrameSize(marker, f32(0.012), f32(0.016));
+  setFrameAbsPoint(marker, FRAMEPOINT_TOPLEFT, f32(0.04), f32(0.595));
+  setFrameVisible(marker, false);
   const probe: ResponseProbe = {
     build, recording: false, exporting: false, edgeStamps: false, previousHeld: undefined, edgePairs: 0, edgeDropped: 0,
     pendingEdgeRow: undefined, rows: 0, row: undefined, run: 0, page: 0, polls: 0, captures: 0, advances: 0, presentations: 0,
@@ -193,7 +194,7 @@ export function startProbe(probe: ResponseProbe, edgeStamps: boolean, epoch?: nu
   for (const stamp of probe.transport) Object.assign(stamp, vacantStamp());
   probe.run++;
 
-  BlzFrameSetVisible(probe.marker, true);
+  setFrameVisible(probe.marker, true);
 }
 
 
@@ -384,7 +385,7 @@ export function probePresent(probe: ResponseProbe | undefined, confirmedShield: 
   // Separate grid cells survive native rasterization; adjacent positions in one strip alias.
   const column = floorMod(probe.row, 32);
   const line = floorMod(floorDiv(probe.row, 32), 4);
-  BlzFrameSetAbsPoint(probe.marker, FRAMEPOINT_TOPLEFT, f32(0.04) + column * f32(0.0032), f32(0.595) - line * f32(0.01));
+  setFrameAbsPoint(probe.marker, FRAMEPOINT_TOPLEFT, f32(0.04) + column * f32(0.0032), f32(0.595) - line * f32(0.01));
   if (probe.pendingEdgeRow === probe.row) {
     stampEdge(probe, "present");
     probe.pendingEdgeRow = undefined;

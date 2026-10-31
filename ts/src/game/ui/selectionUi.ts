@@ -63,7 +63,7 @@ import { MainMenuButton } from "./mainMenuButton";
 import { anyOpen, overAny } from "./menuHover";
 import { CommunityMenu } from "./communityMenu";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offersTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
-import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
+import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type DelayFrames, type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules, presentDelayControls, rulesKey } from "./selectionRules";
@@ -71,6 +71,8 @@ import { panelButton } from "./infoPanel";
 import type { LobbyNet, SelectionActions } from "./selectionActions";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
 import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus, createCpuSettings, showCpuSettings } from "./selectionCpuSettings";
+import { destroyEvents } from "wisp/game/events";
+import { createFrameByType, destroyFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 
 
 type SelectionButton = { kind: "tile"; tile: number } | CardButton | CpuButton | { kind: "start" } | { kind: "settings" } | RuleButton
@@ -85,47 +87,47 @@ const CPU_DEFAULTS: CpuDefaults = { opponent: CPU_OPPONENT_CHOICE_DEFAULT, tier:
 
 function presentMatchRules(rules: RuleFrames, game: Readonly<MatchState>): void {
   const { stockCount, timeLimitMinutes, endless, automaticRematch, training, items, classic, lore } = game;
-  setFrameText(rules.stockValue, `${MENU_STYLE.gold}${stockSetting(stockCount)}|r`);
-  setFrameText(rules.timeValue, `${MENU_STYLE.gold}${timeSetting(timeLimitMinutes)}|r`);
-  setFrameText(rules.teamToggle, `Team Battle: ${game.teamBattle ? "On" : "Off"}`);
-  setFrameText(rules.friendlyFireToggle, `Friendly Fire: ${game.friendlyFire ? "On" : "Off"}`);
-  setFrameText(rules.endlessToggle, endlessSetting(endless));
-  setFrameText(rules.rematchToggle, automaticRematchSetting(automaticRematch));
-  for (const step of rules.steps) BlzFrameSetEnable(step, !endless);
-  setFrameText(rules.itemsToggle, itemsSetting(items.on));
-  setFrameText(rules.ultimatesToggle, ultimatesSetting(!game.ultimatesOff));
+  setMenuText(rules.stockValue, `${MENU_STYLE.gold}${stockSetting(stockCount)}|r`);
+  setMenuText(rules.timeValue, `${MENU_STYLE.gold}${timeSetting(timeLimitMinutes)}|r`);
+  setMenuText(rules.teamToggle, `Team Battle: ${game.teamBattle ? "On" : "Off"}`);
+  setMenuText(rules.friendlyFireToggle, `Friendly Fire: ${game.friendlyFire ? "On" : "Off"}`);
+  setMenuText(rules.endlessToggle, endlessSetting(endless));
+  setMenuText(rules.rematchToggle, automaticRematchSetting(automaticRematch));
+  for (const step of rules.steps) setFrameEnabled(step, !endless);
+  setMenuText(rules.itemsToggle, itemsSetting(items.on));
+  setMenuText(rules.ultimatesToggle, ultimatesSetting(!game.ultimatesOff));
   for (let index = 0; index < rules.itemToggles.length; index++) {
     const frame = rules.itemToggles[index];
     if (frame === undefined) continue;
     const kind = index === 0 ? ItemKind.speed : ItemKind.heavy;
-    setFrameText(frame, itemKindSetting(kind, (items.enabledMask & itemBit(kind)) !== 0));
-    BlzFrameSetVisible(frame, items.on && !training && !classic && !lore);
+    setMenuText(frame, itemKindSetting(kind, (items.enabledMask & itemBit(kind)) !== 0));
+    setFrameVisible(frame, items.on && !training && !classic && !lore);
   }
 }
 
 function presentModeRules(rules: RuleFrames, game: Readonly<MatchState>, clears: LoreClears, fighter: number, tutorial: TutorialMenuFrames): void {
   const { trainer, classicTier, lore, loreBattle: battle } = game;
-  setFrameText(rules.trainingToggle, `${MENU_STYLE.gold}${selectionModeLabel(game)}|r`);
+  setMenuText(rules.trainingToggle, `${MENU_STYLE.gold}${selectionModeLabel(game)}|r`);
   const chosen = loreBattle(battle);
-  setFrameText(rules.classicTierValue, lore ? loreBattleSetting(battle, chosen !== undefined && clears.has(chosen.id)) : classicTierSetting(classicTier));
-  setFrameText(rules.classicRoute, lore ? loreBattleSummary(battle, clears.count()) : classicRouteSummary(fighter));
+  setMenuText(rules.classicTierValue, lore ? loreBattleSetting(battle, chosen !== undefined && clears.has(chosen.id)) : classicTierSetting(classicTier));
+  setMenuText(rules.classicRoute, lore ? loreBattleSummary(battle, clears.count()) : classicRouteSummary(fighter));
   showTutorialLesson(tutorial, trainer.lesson);
-  setFrameText(rules.hitAreasToggle, hitAreasSetting(trainer.showHitAreas));
-  setFrameText(rules.speedToggle, trainingSpeedSetting(trainer.speed));
+  setMenuText(rules.hitAreasToggle, hitAreasSetting(trainer.showHitAreas));
+  setMenuText(rules.speedToggle, trainingSpeedSetting(trainer.speed));
   const [behaviour, escape, tech, damage] = rules.partnerValues;
-  if (behaviour !== undefined) setFrameText(behaviour, partnerBehaviourSetting(trainer.behaviour));
-  if (escape !== undefined) setFrameText(escape, partnerEscapeSetting(trainer.escape));
-  if (tech !== undefined) setFrameText(tech, partnerTechSetting(trainer.tech));
-  if (damage !== undefined) setFrameText(damage, partnerDamageSetting(trainer.damage));
+  if (behaviour !== undefined) setMenuText(behaviour, partnerBehaviourSetting(trainer.behaviour));
+  if (escape !== undefined) setMenuText(escape, partnerEscapeSetting(trainer.escape));
+  if (tech !== undefined) setMenuText(tech, partnerTechSetting(trainer.tech));
+  if (damage !== undefined) setMenuText(damage, partnerDamageSetting(trainer.damage));
 }
 
 function presentRuleVisibility(rules: RuleFrames, game: Readonly<MatchState>): void {
   const { training, items, classic, lore } = game;
-  for (const frame of rules.matchRuleFrames) BlzFrameSetVisible(frame, !training && !classic && !lore);
-  for (const frame of rules.itemToggles) BlzFrameSetVisible(frame, items.on && !training && !classic && !lore);
-  BlzFrameSetVisible(rules.friendlyFireToggle, game.teamBattle && !training && !classic && !lore);
-  for (const frame of rules.trainingFrames) BlzFrameSetVisible(frame, training);
-  for (const frame of rules.classicFrames) BlzFrameSetVisible(frame, classic || lore);
+  for (const frame of rules.matchRuleFrames) setFrameVisible(frame, !training && !classic && !lore);
+  for (const frame of rules.itemToggles) setFrameVisible(frame, items.on && !training && !classic && !lore);
+  setFrameVisible(rules.friendlyFireToggle, game.teamBattle && !training && !classic && !lore);
+  for (const frame of rules.trainingFrames) setFrameVisible(frame, training);
+  for (const frame of rules.classicFrames) setFrameVisible(frame, classic || lore);
 }
 
 function presentRules(rules: RuleFrames, game: Readonly<MatchState>, clears: LoreClears, fighter: number, tutorial: TutorialMenuFrames): void {
@@ -209,14 +211,14 @@ export class SelectionPanel {
     version: string,
   ) {
     const suffix = I2S(participantId);
-    const height = BlzGetLocalClientHeight();
-    const titleBox = selectionTitleBox(height <= 0 ? f32(4.0 / 3.0) : I2R(BlzGetLocalClientWidth()) / I2R(height));
+    const height = screenHeight();
+    const titleBox = selectionTitleBox(height <= 0 ? f32(4.0 / 3.0) : I2R(screenWidth()) / I2R(height));
     const headerBoxLeft = f32(0.05);
     const headerInset = f32(0.022);
     const headerLeft = f32(headerBoxLeft + headerInset);
     this.clicks = new ButtonClicks(`ui.selection.${suffix}.click`, (button, clicker) => this.click(button, clicker), button => this.highlight(button));
     this.backdrop = createWindowBackdrop(`MeleeSelectBackdrop${suffix}`, MENU_STYLE.panelTexture, 400 + participantId);
-    const root = BlzCreateFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
+    const root = createFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
     this.root = root;
     const grid = this.roster.grid;
     const scale = f32(grid.scale);
@@ -231,23 +233,23 @@ export class SelectionPanel {
       const tilePortraitFrame = art(root, `MeleeTilePortrait${name}`, portraitTexture(characterOfTile(choice), true), x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset, portrait, portrait);
       const text = tileLabel(choice);
       const tileName = label(root, `MeleeTileName${name}`, x + TILE_NAME_INSET * scale, y - f32(0.106) * scale, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.023) * scale, TILE_NAME_SIZE);
-      setFrameText(tileName, text);
+      setMenuText(tileName, text);
       this.tiles.push([tileFrame, tilePortraitFrame, tileName]);
       this.tilePortraits.push(tilePortraitFrame);
-      const button = BlzCreateFrameByType("BUTTON", `MeleeTileButton${name}`, root, "", 0);
+      const button = createFrameByType("BUTTON", `MeleeTileButton${name}`, root, "", 0);
       placeTopLeft(button, x, y);
-      BlzFrameSetSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
+      setFrameSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
       this.tileButtons.push(this.clicks.add(button, { kind: "tile", tile: choice }, undefined, "native"));
     }
     this.cards = PARTICIPANT_SLOTS.map(slot => createCard(root, suffix, slot, (frame, target) => this.clicks.add(frame, target, undefined, "native")));
     this.bullseye = art(gameUi(), `MeleeBullseye${suffix}`, "war3mapImported\\SelectionBullseye.tga", 0.0, 0.0, bullseyeSize(grid), bullseyeSize(grid));
-    BlzFrameSetLevel(this.bullseye, SELECT_LEVELS.hand);
-    BlzFrameSetVisible(this.bullseye, false);
+    setFrameLevel(this.bullseye, SELECT_LEVELS.hand);
+    setFrameVisible(this.bullseye, false);
     this.hands = [0, 1, 2, 3].map(slot => createHandFrames(grid, suffix, slot)) as Slots<HandFrames>;
     this.handChannel = new SelectionHands(participantId);
     const headerButton = (box: typeof START_BUTTON, text: string, target: SelectionButton) => {
       const frame = panelButton(root, box.x, box.y, box.width, box.height, "");
-      setFrameText(frame, text);
+      setMenuText(frame, text);
       return this.clicks.add(frame, target, undefined, "native", box);
     };
     this.confirm = headerButton(START_BUTTON, "", { kind: "start" });
@@ -255,28 +257,28 @@ export class SelectionPanel {
     this.movesLabel = headerButton(MOVES_BOX, "Moves", { kind: "moves" });
     const page = (frame: framehandle, x: number, y: number, width: number, height: number) => {
       placeTopLeft(frame, x, y);
-      BlzFrameSetSize(frame, width, height);
-      BlzFrameSetVisible(frame, false);
+      setFrameSize(frame, width, height);
+      setFrameVisible(frame, false);
       return frame;
     };
     const at = (frame: framehandle, box: TextBox) => page(frame, box.left, box.top, box.width, box.height);
     this.movesTitle = at(createText(`MeleeMovesTitle${suffix}`, gameUi(), 470 + participantId), MOVES_TITLE_BOX);
-    BlzFrameSetFont(this.movesTitle, MENU_FONT, f32(0.016), 0);
-    BlzFrameSetTextAlignment(this.movesTitle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    setFrameFont(this.movesTitle, MENU_FONT, f32(0.016), 0);
+    setFrameTextAlignment(this.movesTitle, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
     this.movesBody = at(createText(`MeleeMovesBody${suffix}`, gameUi(), 474 + participantId), MOVES_BODY_BOX);
-    BlzFrameSetFont(this.movesBody, MENU_FONT, f32(0.012), 0);
-    BlzFrameSetTextAlignment(this.movesBody, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
+    setFrameFont(this.movesBody, MENU_FONT, f32(0.012), 0);
+    setFrameTextAlignment(this.movesBody, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
     const pageButton = (name: string, x: number, width: number, text: string, target: SelectionButton) => {
-      const frame = page(BlzCreateFrameByType("GLUETEXTBUTTON", name, gameUi(), "ScriptDialogButton", 0), x, MOVES_BUTTON_TOP, width, MOVES_BUTTON_HEIGHT);
-      setFrameText(frame, text);
+      const frame = page(createFrameByType("GLUETEXTBUTTON", name, gameUi(), "ScriptDialogButton", 0), x, MOVES_BUTTON_TOP, width, MOVES_BUTTON_HEIGHT);
+      setMenuText(frame, text);
       return this.clicks.add(frame, target, undefined, "native", { x, y: MOVES_BUTTON_TOP, width, height: MOVES_BUTTON_HEIGHT });
     };
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
     sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), RULE_HEIGHT);
     placeTopLeft(this.modeLabel, headerLeft, RULE_ROWS[1]);
-    BlzFrameSetTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
-    BlzFrameSetEnable(this.modeLabel, false);
-    setFrameText(this.modeLabel, `${MENU_STYLE.gold}${MOVES_HEADER}|r`);
+    setFrameTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
+    setFrameEnabled(this.modeLabel, false);
+    setMenuText(this.modeLabel, `${MENU_STYLE.gold}${MOVES_HEADER}|r`);
     this.movesFrames = [
       this.movesTitle, this.movesBody,
       pageButton(`MeleeMovesPrevious${suffix}`, f32(0.2), f32(0.1), "<", { kind: "movesStep", direction: -1 }),
@@ -298,17 +300,17 @@ export class SelectionPanel {
     this.community.onOpen = () => this.credits.close();
     this.rules = createClassicRules(root, suffix, ruleClick, matchRules);
     this.help = createBackdrop(`MeleeRuleHelp${suffix}`, root, 0);
-    BlzFrameSetTexture(this.help, PANEL_TEXTURE, 0, true);
-    BlzFrameSetSize(this.help, RULE_HELP_WIDTH, RULE_HELP_HEIGHT);
-    BlzFrameSetLevel(this.help, SELECT_LEVELS.ruleHelp);
-    BlzFrameSetEnable(this.help, false);
+    setFrameTexture(this.help, PANEL_TEXTURE, 0, true);
+    setFrameSize(this.help, RULE_HELP_WIDTH, RULE_HELP_HEIGHT);
+    setFrameLevel(this.help, SELECT_LEVELS.ruleHelp);
+    setFrameEnabled(this.help, false);
     this.helpText = createText(`MeleeRuleHelpText${suffix}`, this.help, 0);
-    BlzFrameSetPoint(this.helpText, FRAMEPOINT_TOPLEFT, this.help, FRAMEPOINT_TOPLEFT, f32(0.008), f32(-0.006));
-    BlzFrameSetPoint(this.helpText, FRAMEPOINT_BOTTOMRIGHT, this.help, FRAMEPOINT_BOTTOMRIGHT, f32(-0.008), f32(0.006));
-    BlzFrameSetFont(this.helpText, MENU_FONT, f32(0.0095), 0);
-    BlzFrameSetTextAlignment(this.helpText, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
-    BlzFrameSetEnable(this.helpText, false);
-    BlzFrameSetVisible(this.help, false);
+    setFramePoint(this.helpText, FRAMEPOINT_TOPLEFT, this.help, FRAMEPOINT_TOPLEFT, f32(0.008), f32(-0.006));
+    setFramePoint(this.helpText, FRAMEPOINT_BOTTOMRIGHT, this.help, FRAMEPOINT_BOTTOMRIGHT, f32(-0.008), f32(0.006));
+    setFrameFont(this.helpText, MENU_FONT, f32(0.0095), 0);
+    setFrameTextAlignment(this.helpText, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
+    setFrameEnabled(this.helpText, false);
+    setFrameVisible(this.help, false);
     const owner = [participantId];
     this.syncTriggers = [
       createSyncTrigger(`ui.selection.${suffix}.drop`, "fighter-drop", owner, (_, data) => this.acceptDrop(data)),
@@ -316,8 +318,8 @@ export class SelectionPanel {
       createSyncTrigger(`ui.selection.${suffix}.recall`, "fighter-recall", owner, (_, data) => this.acceptRecall(data)),
       createSyncTrigger(`ui.selection.${suffix}.hand`, "select-hand", PARTICIPANT_SLOTS, (sender, data) => this.acceptHand(sender, data)),
     ];
-    BlzFrameSetVisible(root, false);
-    BlzFrameSetVisible(this.backdrop, false);
+    setFrameVisible(root, false);
+    setFrameVisible(this.backdrop, false);
   }
 
   bindActions(actions: SelectionActions): void {
@@ -340,18 +342,18 @@ export class SelectionPanel {
   destroy(): void {
     if (this.ownsLocalClient()) this.showHand(false, undefined, 0.0, 0.0, false);
     this.clicks.destroy();
-    for (const trigger of this.syncTriggers) DestroyTrigger(trigger);
-    for (const frame of this.movesFrames) BlzDestroyFrame(frame);
-    BlzDestroyFrame(this.modeLabel);
-    BlzDestroyFrame(this.tutorial.root);
+    for (const trigger of this.syncTriggers) destroyEvents(trigger);
+    for (const frame of this.movesFrames) destroyFrame(frame);
+    destroyFrame(this.modeLabel);
+    destroyFrame(this.tutorial.root);
     this.credits.destroy();
     this.community.destroy();
     this.mainMenu.destroy();
-    BlzDestroyFrame(this.bullseye);
+    destroyFrame(this.bullseye);
     for (const frames of this.hands) destroyHandFrames(frames);
-    if (this.cpu.root !== undefined) BlzDestroyFrame(this.cpu.root);
-    BlzDestroyFrame(this.root);
-    BlzDestroyFrame(this.backdrop);
+    if (this.cpu.root !== undefined) destroyFrame(this.cpu.root);
+    destroyFrame(this.root);
+    destroyFrame(this.backdrop);
   }
 
   private click(button: SelectionButton, clicker: player): void {
@@ -420,7 +422,7 @@ export class SelectionPanel {
       if (card !== undefined) highlightText(card.settingsLabel, button?.kind === "cpuSettings" && button.slot === slot);
     }
     highlightText(this.confirm, button?.kind === "start");
-    setFrameText(this.settingsLabel, button?.kind === "settings" ? "> Controls (F1) <" : "Controls (F1)");
+    setMenuText(this.settingsLabel, button?.kind === "settings" ? "> Controls (F1) <" : "Controls (F1)");
     highlightText(this.movesLabel, button?.kind === "moves");
     if (updateDrag) this.drag.hover = tile;
     for (let index = 0; index < this.tiles.length; index++) {
@@ -445,7 +447,7 @@ export class SelectionPanel {
 
   private closeCpuSettings(): void {
     this.cpuSlot = undefined;
-    if (this.ownsLocalClient()) BlzFrameSetFocus(this.cpu.done, false);
+    if (this.ownsLocalClient()) setFrameFocus(this.cpu.done, false);
   }
 
   private stepCpu(row: 0 | 1, direction: -1 | 1): void {
@@ -574,7 +576,7 @@ export class SelectionPanel {
     this.localPanel = panel;
     this.localHand = hand === undefined ? HIDDEN_HAND : { state: hand, chip: hand === "pinch" ? carried : undefined, x, y };
     this.presentHands();
-    BlzFrameSetVisible(this.bullseye, bullseye);
+    setFrameVisible(this.bullseye, bullseye);
     if (bullseye) placeTopLeft(this.bullseye, bullseyeLeft(x, bullseyeSize(this.roster.grid)), bullseyeTop(y, bullseyeSize(this.roster.grid)));
     // Warcraft shows its cursor again on its own (a frame click), so the hidden state is asserted every update; the shown state is sent once.
     if (!stock || this.cursorEnabled !== true) BlzEnableCursor(stock);
@@ -652,7 +654,7 @@ export class SelectionPanel {
 
   showDelay(net: LobbyNet): void {
     this.net = net;
-    setFrameText(this.delay.line, net.delayText);
+    setMenuText(this.delay.line, net.delayText);
     presentDelayControls(this.delay, net.hostControl);
   }
 
@@ -670,8 +672,8 @@ export class SelectionPanel {
     const cpuOpen = visible && this.cpuSlot !== undefined;
 
     this.showOverlays(game, loading, visible, cpuOpen);
-    const width = I2R(BlzGetLocalClientWidth());
-    const height = I2R(BlzGetLocalClientHeight());
+    const width = I2R(screenWidth());
+    const height = I2R(screenHeight());
     const pointed = width > 0 && height > 0;
     const x = pointed ? pointerX(I2R(BlzGetMouseScreenPosX()), width, height) : 0.0;
     const y = pointed ? pointerY(I2R(BlzGetMouseScreenPosY()), height) : 0.0;
@@ -682,7 +684,7 @@ export class SelectionPanel {
     const carried = this.showCards(game, sessionWins, x, y);
     const infoOpen = anyOpen(this.tutorialOpen, this.credits.opened(), this.community.opened());
     this.showHand(pointed, infoOpen ? undefined : carried, x, y, infoOpen);
-    setFrameText(this.confirm, this.confirmText(game));
+    setMenuText(this.confirm, this.confirmText(game));
     this.showRules(game);
     this.showHelp(game, x, y);
     this.clicks.refreshHover();
@@ -696,16 +698,16 @@ export class SelectionPanel {
       this.tutorialOffered = true;
       if (offersTutorial(game, this.isSeen())) this.tutorialOpen = true;
     }
-    BlzFrameSetVisible(this.tutorial.root, visible && this.tutorialOpen && !cpuOpen && !this.movesOpen);
+    setFrameVisible(this.tutorial.root, visible && this.tutorialOpen && !cpuOpen && !this.movesOpen);
     this.credits.show(visible);
     this.community.show(visible);
-    BlzFrameSetVisible(this.tutorial.open, tutorialAvailable(game));
-    BlzFrameSetVisible(this.cpu.root, cpuOpen);
-    BlzFrameSetVisible(this.root, visible);
+    setFrameVisible(this.tutorial.open, tutorialAvailable(game));
+    setFrameVisible(this.cpu.root, cpuOpen);
+    setFrameVisible(this.root, visible);
     fitToWindow(this.backdrop);
-    BlzFrameSetVisible(this.backdrop, visible || (loading && game.phase === Phase.characterMenu && humanActive(game, participantId)));
-    for (const frame of this.movesFrames) BlzFrameSetVisible(frame, visible && this.movesOpen);
-    BlzFrameSetVisible(this.modeLabel, visible && this.movesOpen);
+    setFrameVisible(this.backdrop, visible || (loading && game.phase === Phase.characterMenu && humanActive(game, participantId)));
+    for (const frame of this.movesFrames) setFrameVisible(frame, visible && this.movesOpen);
+    setFrameVisible(this.modeLabel, visible && this.movesOpen);
     if (!visible || cpuOpen || this.movesOpen) this.hideHelp();
   }
 
@@ -718,14 +720,14 @@ export class SelectionPanel {
     }
     if (cpuOpen && this.cpuSlot !== undefined) {
       this.showHand(pointed, undefined, x, y, true);
-      BlzFrameSetVisible(this.root, false);
+      setFrameVisible(this.root, false);
       clearSelectionDrag(drag);
       showCpuSettings(this.cpu, game, this.participantId, this.cpuSlot, this.cpuFocus, this.menuPrompt.text, CPU_DEFAULTS);
       return true;
     }
     if (this.movesOpen) {
       this.showHand(pointed, undefined, x, y, true);
-      BlzFrameSetVisible(this.root, false);
+      setFrameVisible(this.root, false);
       clearSelectionDrag(drag);
       this.showMoves();
       return true;
@@ -737,13 +739,13 @@ export class SelectionPanel {
     const palette = cardPalette(game, this.participantId);
     if (palette !== this.shownTilePalette) {
       this.shownTilePalette = palette;
-      this.tilePortraits.forEach((frame, tile) => BlzFrameSetTexture(frame, portraitTexture(characterOfTile(tile), true, palette), 0, true));
+      this.tilePortraits.forEach((frame, tile) => setFrameTexture(frame, portraitTexture(characterOfTile(tile), true, palette), 0, true));
     }
     for (let tile = 0; tile < this.tiles.length; tile++) {
       const selectable = tileOffered(game, tile);
-      for (const frame of this.tiles[tile] ?? []) BlzFrameSetVisible(frame, selectable);
+      for (const frame of this.tiles[tile] ?? []) setFrameVisible(frame, selectable);
       const button = this.tileButtons[tile];
-      if (button !== undefined) BlzFrameSetVisible(button, selectable);
+      if (button !== undefined) setFrameVisible(button, selectable);
     }
   }
 
@@ -792,18 +794,18 @@ export class SelectionPanel {
     const text = name === undefined ? "" : ruleHelp(name, game);
     if (text === this.shownHelp) return;
     this.shownHelp = text;
-    BlzFrameSetVisible(this.help, name !== undefined);
+    setFrameVisible(this.help, name !== undefined);
     if (name === undefined) return;
     const box = RULE_BUTTONS[name];
     placeTopLeft(this.help, Math.min(box.x, f32(f32(0.8) - RULE_HELP_WIDTH - f32(0.01))), f32(box.y - box.height - f32(0.003)));
-    setFrameText(this.helpText, text);
+    setMenuText(this.helpText, text);
   }
 
 
   private hideHelp(): void {
     if (this.shownHelp === "") return;
     this.shownHelp = "";
-    BlzFrameSetVisible(this.help, false);
+    setFrameVisible(this.help, false);
   }
 
   private openMoves(): void {
@@ -818,8 +820,8 @@ export class SelectionPanel {
     this.shownMoves = this.movesCharacter;
 
     const { title, lines } = movesPage(this.movesCharacter, this.game?.ultimatesOff !== true);
-    setFrameText(this.movesTitle, title);
-    setFrameText(this.movesBody, lines.join("\n\n"));
+    setMenuText(this.movesTitle, title);
+    setMenuText(this.movesBody, lines.join("\n\n"));
   }
 
   private showRules(game: Readonly<MatchState>): void {

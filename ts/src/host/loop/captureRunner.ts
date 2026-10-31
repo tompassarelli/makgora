@@ -9,6 +9,7 @@ import { paintDrawnStamp } from "./drawnStamp";
 import { bareFighter } from "./fighterCloak";
 import { holdAgeSeekedEffects } from "./heldAnimations";
 import { type ShellState, shellState } from "./state";
+import { clearTextMessages, screenHeight, screenWidth } from "wisp/game/frames";
 
 const WARMUP_TICKS = 300;
 
@@ -49,8 +50,8 @@ const bares = (silhouette: Silhouette | undefined): silhouette is Silhouette => 
 function recordScreenBoxes(s: ShellState, fixture: CaptureFixture, slot: 0 | 1, frame: number): void {
   if (!isActive(s.world, slot)) return;
   const fighter = fighterAt(s.world, slot);
-  const width = BlzGetLocalClientWidth();
-  const height = BlzGetLocalClientHeight();
+  const width = screenWidth();
+  const height = screenHeight();
   const aspect = height > 0 ? I2R(width) / I2R(height) : 16.0 / 9.0;
   const region = screenBox(s.camera, aspect, width, height, effectBounds(fighter, hurtBounds(fighter, emptyBounds())));
   const body = screenBox(s.camera, aspect, width, height, hurtBounds(fighter, emptyBounds()));
@@ -83,7 +84,7 @@ function openingTick(r: Runner, fixture: CaptureFixture): void {
 function beginHold(s: ShellState, r: Runner, fixture: CaptureFixture, target: number): void {
   const silhouette = fixture.silhouette;
   if (silhouette !== undefined && r.held === 0) {
-    ClearTextMessages();
+    clearTextMessages();
     if (silhouette.conceal === "cues" && !r.hidden) recordScreenBoxes(s, fixture, silhouette.slot, target);
   }
   if (silhouette !== undefined && r.hidden && r.held === (silhouette.conceal === "cues" ? CUE_SETTLE_TICKS : 0)) {
@@ -91,14 +92,14 @@ function beginHold(s: ShellState, r: Runner, fixture: CaptureFixture, target: nu
     r.stampTick = r.ticks;
   }
   holdAgeSeekedEffects(s);
-  r.view = [BlzGetLocalClientWidth(), BlzGetLocalClientHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
+  r.view = [screenWidth(), screenHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
 }
 
 function hidesNext(s: ShellState, r: Runner, silhouette: Silhouette | undefined): boolean {
   if (silhouette === undefined) return false;
   r.hidden = !r.hidden;
   applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} ${silhouette.conceal === "cues" ? "cues" : "fighter"} ${silhouette.slot}`);
-  ClearTextMessages();
+  clearTextMessages();
   if (r.hidden) r.hideTick = r.ticks;
   return r.hidden;
 }

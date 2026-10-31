@@ -3,6 +3,8 @@ import { COMMANDS_DESCRIPTION, COMMANDS_TITLE, COMMANDS_COMMAND, CONTROLS_TITLE,
 import { trampoline } from "wisp/src/platform/dispatch";
 import { localParticipantSlot } from "./diagnostics";
 import type { ShellState } from "./state";
+import { createEvents, onEvents } from "wisp/game/events";
+import { createQuest, displayTimedText, setQuestCompleted, setQuestDescription, setQuestDiscovered, setQuestIcon, setQuestRequired, setQuestTitle } from "wisp/game/frames";
 
 export const HELP_EVENT = "shell.help";
 
@@ -13,23 +15,23 @@ declare global {
 }
 
 function addQuest(title: string, description: string, icon: string, required: boolean): quest {
-  const entry = CreateQuest();
-  QuestSetTitle(entry, title);
-  QuestSetDescription(entry, description);
-  QuestSetIconPath(entry, icon);
-  QuestSetRequired(entry, required);
-  QuestSetDiscovered(entry, true);
-  QuestSetCompleted(entry, false);
+  const entry = createQuest();
+  setQuestTitle(entry, title);
+  setQuestDescription(entry, description);
+  setQuestIcon(entry, icon);
+  setQuestRequired(entry, required);
+  setQuestDiscovered(entry, true);
+  setQuestCompleted(entry, false);
   return entry;
 }
 
 export function startHelp(s: ShellState): void {
-  const chat = CreateTrigger();
+  const chat = createEvents();
   for (const slot of PARTICIPANT_SLOTS) {
     TriggerRegisterPlayerChatEvent(chat, Player(slot), HELP_COMMAND, true);
     TriggerRegisterPlayerChatEvent(chat, Player(slot), COMMANDS_COMMAND, true);
   }
-  TriggerAddAction(chat, trampoline(HELP_EVENT));
+  onEvents(chat, trampoline(HELP_EVENT));
   if (globalThis.__smashcraftHelpQuests === undefined) {
     const controls = addQuest(CONTROLS_TITLE, "", "ReplaceableTextures\\CommandButtons\\BTNSpellBookBLS.blp", true);
     addQuest(HOW_TO_PLAY_TITLE, HOW_TO_PLAY, "ReplaceableTextures\\CommandButtons\\BTNTomeOfRetraining.blp", true);
@@ -46,11 +48,11 @@ export function serviceHelp(s: ShellState): void {
   const settings = s.participants[local].bindings;
   if (quests.revision === settings.revision) return;
   quests.revision = settings.revision;
-  QuestSetDescription(quests.controls, controlsDescription(settings.bindings));
+  setQuestDescription(quests.controls, controlsDescription(settings.bindings));
 }
 
 export function helpCommand(): void {
   const slot = GetPlayerId(GetTriggerPlayer());
   if (!isParticipantSlot(slot)) return;
-  for (const line of PLAYER_COMMANDS) DisplayTimedTextToPlayer(Player(slot), 0.0, 0.0, HELP_SECONDS, line);
+  for (const line of PLAYER_COMMANDS) displayTimedText(Player(slot), 0.0, 0.0, HELP_SECONDS, line);
 }

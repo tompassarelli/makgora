@@ -4,6 +4,7 @@
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { PARTICIPANT_SLOTS } from "../game/input/participants";
 import type { MapBuild } from "../game/session/build";
+import { createEvents, onEvents } from "wisp/game/events";
 
 export const STACK_DEMO_COMMAND = "-dev stack-demo";
 export const STACK_DEMO_HANDLER = "stackDemo.command";
@@ -31,7 +32,7 @@ export function installStackDemo(build: Readonly<MapBuild>): void {
 
 export function startStackDemo(build: Readonly<MapBuild>): void {
   if (!build.devConsole) return;
-  const chat = CreateTrigger();
+  const chat = createEvents();
   for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, Player(slot), STACK_DEMO_COMMAND, false);
-  TriggerAddAction(chat, trampoline(STACK_DEMO_HANDLER));
+  onEvents(chat, trampoline(STACK_DEMO_HANDLER));
 }
