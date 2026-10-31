@@ -9,6 +9,7 @@ import { createEvents, destroyEvents, onEvents } from "wisp/game/events";
 import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, frameEnabled, frameVisible, namedFrame, originFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTexture } from "wisp/game/frames";
 import { eventPlayer, localPlayer, player as playerOf, playerSlot } from "wisp/game/players";
 import { addSyncEvent, syncData } from "wisp/game/sync";
+import { toReal } from "wisp/game/text";
 
 
 export type MenuControls = "journal" | "keyboard";
@@ -73,7 +74,7 @@ export function fitToWindow(frame: framehandle): void {
   const key = pixelWidth * 65536 + pixelHeight;
   if (fittedSize.get(frame) === key) return;
   fittedSize.set(frame, key);
-  const aspect = pixelHeight <= 0 ? f32(4.0 / 3.0) : I2R(pixelWidth) / I2R(pixelHeight);
+  const aspect = pixelHeight <= 0 ? f32(4.0 / 3.0) : toReal(pixelWidth) / toReal(pixelHeight);
   setFrameSize(frame, f32(Math.max(f32(0.8), aspect * f32(0.6)) + f32(0.02)), f32(Math.max(f32(0.6), f32(0.8) / aspect) + f32(0.02)));
   setFrameAbsPoint(frame, FRAMEPOINT_CENTER, f32(0.4), f32(0.3));
 }

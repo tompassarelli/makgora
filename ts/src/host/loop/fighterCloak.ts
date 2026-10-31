@@ -4,6 +4,7 @@ import { hideEffect } from "../../game/render/effects";
 import type { ShellState } from "./state";
 import { effectScale, effectX, effectY, effectZ, setEffectPosition, setEffectScale } from "wisp/game/effects";
 import { bodyHidden, setBodyTeamGlow, showBody } from "wisp/game/bodies";
+import { formatInt } from "wisp/game/text";
 
 export interface HiddenFighter {
   unitShown: boolean;
@@ -101,7 +102,7 @@ export function fighterHideCommand(message: string): { readonly slot: Participan
   const part: CloakPart | undefined = rest.startsWith("fighter ") ? "fighter" : rest.startsWith("cues ") ? "cues" : undefined;
   if (part === undefined) return undefined;
   const word = rest.substring(part.length + 1);
-  for (const slot of PARTICIPANT_SLOTS) if (word === I2S(slot)) return { slot, hidden, part };
+  for (const slot of PARTICIPANT_SLOTS) if (word === formatInt(slot)) return { slot, hidden, part };
   return undefined;
 }
 

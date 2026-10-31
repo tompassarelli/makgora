@@ -4,6 +4,7 @@ import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, size
 import { MENU_STYLE } from "./hudLayout";
 import type { ChordLabels } from "../input/pauseChord";
 import { createFrameByType, screenHeight, screenWidth, setFrameAlpha, setFrameEnabled, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 const PLATE = "war3mapImported\\SelectionAction.tga";
 const FRAME = "war3mapImported\\SelectionTileFrame.tga";
@@ -91,7 +92,7 @@ export class PauseScreen {
     this.ornament(3);
     this.plate("Name", PLATE, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.05))), NAME_WIDTH, NAME_HEIGHT]);
     for (const side of [0, 1]) {
-      this.fixed(`Pip${I2S(side)}`, GOLD, edges => {
+      this.fixed(`Pip${formatInt(side)}`, GOLD, edges => {
         const left = f32(edges.right - MARGIN - NAME_WIDTH);
         return [side === 0 ? f32(left + f32(0.018)) : f32(left + NAME_WIDTH - f32(0.026)), f32(edges.top - f32(MARGIN + f32(0.05)) - f32(0.0165)), f32(0.008), f32(0.008)];
       });
@@ -106,8 +107,8 @@ export class PauseScreen {
     this.resetText = this.label("ResetText", f32(MENU_STYLE.headerSize * 1.25), edges => resetBarBox(edges), TEXT_JUSTIFY_CENTER);
     for (let index = 0; index < 4; index++) {
       this.caps.push(this.cap(index));
-      this.capText.push(this.label(`Cap${I2S(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TEXT_JUSTIFY_CENTER));
-      if (index < 3) this.joins.push(this.label(`Join${I2S(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TEXT_JUSTIFY_CENTER));
+      this.capText.push(this.label(`Cap${formatInt(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TEXT_JUSTIFY_CENTER));
+      if (index < 3) this.joins.push(this.label(`Join${formatInt(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TEXT_JUSTIFY_CENTER));
     }
     this.button = createFrameByType("BUTTON", `${NAME}Button`, this.root, "", 1811);
     this.parts.push({ frame: this.button, place: edges => resetPlateBox(edges) });
@@ -140,7 +141,7 @@ export class PauseScreen {
       for (const part of this.parts) this.set(part.frame, part.place(this.edges));
       this.layoutCaps(caps, view.pad);
     }
-    setFrameText(this.nameText, `${MENU_STYLE.gold}${view.player === undefined ? "PAUSE" : `PLAYER ${I2S(view.player)} PAUSE`}|r`);
+    setFrameText(this.nameText, `${MENU_STYLE.gold}${view.player === undefined ? "PAUSE" : `PLAYER ${formatInt(view.player)} PAUSE`}|r`);
     setFrameText(this.clockText, view.clock === undefined ? "" : `${MENU_STYLE.text}${view.clock}|r`);
     const hints = view.hints === undefined ? "" : `\nNew-player hints: ${view.hints ? "on" : "off"}${view.hintsKey === true ? " (H)" : ""}`;
     setFrameText(this.menuText, `${MENU_STYLE.text}F10: leave the game  ·  G: hide HUD${hints}|r`);
@@ -199,7 +200,7 @@ export class PauseScreen {
   }
 
   private cap(index: number): framehandle {
-    return this.fixed(`CapFace${I2S(index)}`, FRAME, () => [0, 0, 0, 0]);
+    return this.fixed(`CapFace${formatInt(index)}`, FRAME, () => [0, 0, 0, 0]);
   }
 
   private label(name: string, size: number, place: Place, justify: textaligntype, parent = this.root): framehandle {
@@ -217,8 +218,8 @@ export class PauseScreen {
     const low = corner >= 2;
     const originX = (e: Edges): number => right ? f32(e.right - MARGIN) : f32(e.left + MARGIN);
     const originY = (e: Edges): number => low ? f32(e.bottom + MARGIN) : f32(e.top - MARGIN);
-    this.fixed(`EtchAcross${I2S(corner)}`, STEEL, e => [right ? f32(originX(e) - CORNER_REACH) : originX(e), low ? f32(originY(e) + ETCH) : originY(e), CORNER_REACH, ETCH], 210);
-    this.fixed(`EtchDown${I2S(corner)}`, STEEL, e => [right ? f32(originX(e) - ETCH) : originX(e), low ? f32(originY(e) + CORNER_REACH) : originY(e), ETCH, CORNER_REACH], 210);
+    this.fixed(`EtchAcross${formatInt(corner)}`, STEEL, e => [right ? f32(originX(e) - CORNER_REACH) : originX(e), low ? f32(originY(e) + ETCH) : originY(e), CORNER_REACH, ETCH], 210);
+    this.fixed(`EtchDown${formatInt(corner)}`, STEEL, e => [right ? f32(originX(e) - ETCH) : originX(e), low ? f32(originY(e) + CORNER_REACH) : originY(e), ETCH, CORNER_REACH], 210);
   }
 
   private ornament(corner: number): void {
@@ -228,10 +229,10 @@ export class PauseScreen {
     const reach = f32(0.062);
     const originX = (e: Edges): number => right ? f32(e.right - inset) : f32(e.left + inset);
     const originY = (e: Edges): number => low ? f32(e.bottom + inset) : f32(e.top - inset);
-    this.fixed(`GoldAcross${I2S(corner)}`, GOLD, e => [right ? f32(originX(e) - reach) : originX(e), low ? f32(originY(e) + GOLD_THICK) : originY(e), reach, GOLD_THICK]);
-    this.fixed(`GoldDown${I2S(corner)}`, GOLD, e => [right ? f32(originX(e) - GOLD_THICK) : originX(e), low ? f32(originY(e) + reach) : originY(e), GOLD_THICK, reach]);
-    this.fixed(`TealAcross${I2S(corner)}`, TEAL, e => [right ? f32(originX(e) - reach - f32(0.022)) : f32(originX(e) + reach), low ? f32(originY(e) + GOLD_THICK) : originY(e), f32(0.022), GOLD_THICK]);
-    this.fixed(`TealDown${I2S(corner)}`, TEAL, e => [right ? f32(originX(e) - GOLD_THICK) : originX(e), low ? f32(originY(e) + reach + f32(0.022)) : f32(originY(e) - reach), GOLD_THICK, f32(0.022)]);
+    this.fixed(`GoldAcross${formatInt(corner)}`, GOLD, e => [right ? f32(originX(e) - reach) : originX(e), low ? f32(originY(e) + GOLD_THICK) : originY(e), reach, GOLD_THICK]);
+    this.fixed(`GoldDown${formatInt(corner)}`, GOLD, e => [right ? f32(originX(e) - GOLD_THICK) : originX(e), low ? f32(originY(e) + reach) : originY(e), GOLD_THICK, reach]);
+    this.fixed(`TealAcross${formatInt(corner)}`, TEAL, e => [right ? f32(originX(e) - reach - f32(0.022)) : f32(originX(e) + reach), low ? f32(originY(e) + GOLD_THICK) : originY(e), f32(0.022), GOLD_THICK]);
+    this.fixed(`TealDown${formatInt(corner)}`, TEAL, e => [right ? f32(originX(e) - GOLD_THICK) : originX(e), low ? f32(originY(e) + reach + f32(0.022)) : f32(originY(e) - reach), GOLD_THICK, f32(0.022)]);
   }
 
   private emblem(): void {

@@ -8,6 +8,7 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { startQuickMatch } from "../host/loop/menus";
 import { type ShellState } from "../host/loop/state";
 import { liveSoakHandles } from "./soakHandles";
+import { truncate } from "wisp/game/text";
 
 interface Soak {
   callbacks: number;
@@ -71,7 +72,7 @@ export function beforeNativeSoakTick(s: ShellState): void {
 function sample(s: ShellState): void {
   const soak = globalThis.__smashcraftNativeSoak;
   if (soak === undefined) return;
-  const heap = typeof collectgarbage === "function" ? `heapKb=${R2I(collectgarbage("count"))}` : "heapKbAbsent=no-collectgarbage";
+  const heap = typeof collectgarbage === "function" ? `heapKb=${truncate(collectgarbage("count"))}` : "heapKbAbsent=no-collectgarbage";
   writeLines(NATIVE_SOAK_FILE, ["dev: native soak four CPUs", `soak callbacks=${soak.callbacks} frames=${soak.frames} matches=${soak.matches} results=${soak.results} phase=${s.game.phase} stage=${s.game.stageChoice} characters=${s.game.characterChoices.join(",")} cpu=${s.game.computerMask} ${heap} handles=${liveSoakHandles()}`]);
 }
 

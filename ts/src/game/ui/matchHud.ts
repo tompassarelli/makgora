@@ -17,6 +17,7 @@ import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, hudPlateTexture } from "./hudLayout";
 import { clockHundredths, clockMain, clockSeconds, hundredthsLabel } from "./clockReadout";
 import { createFrame, destroyFrame, setFrameEnabled, setFrameFont, setFrameLevel, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 
 const CLOCK_LEVEL = 21;
@@ -142,7 +143,7 @@ export class FighterHud {
 
 
   constructor(private readonly slot: number, count: number) {
-    const suffix = I2S(slot);
+    const suffix = formatInt(slot);
     const context = 800 + slot * 20;
     const parent = gameUi();
     this.plate = createBackdrop(`FighterHUDPlate${suffix}`, parent, context);
@@ -163,7 +164,7 @@ export class FighterHud {
     setFrameEnabled(this.name, false);
     const stocks: framehandle[] = [];
     for (let index = 0; index < STOCK_ICONS_SHOWN; index++) {
-      const icon = createBackdrop(`FighterHUDStock${suffix}_${I2S(index)}`, parent, context + 5 + index);
+      const icon = createBackdrop(`FighterHUDStock${suffix}_${formatInt(index)}`, parent, context + 5 + index);
       setFrameEnabled(icon, false);
       stocks.push(icon);
     }
@@ -284,7 +285,7 @@ export class FighterHud {
       if (icon !== undefined) setFrameVisible(icon, index < icons);
     }
     setFrameVisible(this.stockCount, counted);
-    setFrameText(this.stockCount, `x${I2S(shownStocks)}`);
+    setFrameText(this.stockCount, `x${formatInt(shownStocks)}`);
   }
 
   private placeNumber(dx: number, dy: number): void {

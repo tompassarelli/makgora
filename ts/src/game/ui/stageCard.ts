@@ -8,6 +8,7 @@ import { STAGE_SILHOUETTES, SILHOUETTE_PIECES } from "../../generated/stages/sta
 import { createBackdrop, createText, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
 import { setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 export const STAGE_CARD_COAL = "ReplaceableTextures\\TeamColor\\TeamColor20.blp";
 export const STAGE_CARD_SNOW = "ReplaceableTextures\\TeamColor\\TeamColor21.blp";
@@ -38,7 +39,7 @@ export class StageCard {
     this.boxLeft = f32(left + height + side * f32(0.08));
     this.boxTop = f32(top - height * f32(0.14));
     for (let index = 0; index < SILHOUETTE_PIECES; index++) {
-      const piece = createBackdrop(`${id}Piece${I2S(index)}`, parent, index);
+      const piece = createBackdrop(`${id}Piece${formatInt(index)}`, parent, index);
       setFrameTexture(piece, STAGE_CARD_SNOW, 0, true);
       setFrameAlpha(piece, 230);
       setFrameEnabled(piece, false);

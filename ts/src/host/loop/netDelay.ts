@@ -19,6 +19,7 @@ import { createEvents, onEvents } from "wisp/game/events";
 import { setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 import { eventPlayer, localPlayer, player, playerSlot } from "wisp/game/players";
 import { addSyncEvent, sendSync, syncData } from "wisp/game/sync";
+import { formatInt, parseInt } from "wisp/game/text";
 
 export const DELAY_PREFIX = "SC_DY";
 export const DELAY_RECEIVED = "shell.delayProposal";
@@ -117,7 +118,7 @@ export function hostDelayFrom(net: NetDelay, game: Readonly<MatchState>, sender:
 export const nextManualDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>, direction: -1 | 1): number => stepManualDelay(net.policy, net.manual, autoMatchDelay(net, game), direction);
 
 export function sendHostDelay(manual: number): void {
-  sendSync(DELAY_PREFIX, `${HOST_MARK}${I2S(manual)}`);
+  sendSync(DELAY_PREFIX, `${HOST_MARK}${formatInt(manual)}`);
 }
 
 export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>, local: number): LobbyNet {
@@ -126,10 +127,10 @@ export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>, lo
   const echoes = PARTICIPANT_SLOTS.map((slot) => {
     const echo = at(net.slotEchoMs, slot);
     if (!online || !humanActive(game, slot) || echo < 0) return "";
-    return at(net.slotSlow, slot) ? ` · echo |cffff4040${I2S(echo)} ms|r` : ` · echo ${I2S(echo)} ms`;
+    return at(net.slotSlow, slot) ? ` · echo |cffff4040${formatInt(echo)} ms|r` : ` · echo ${formatInt(echo)} ms`;
   });
-  const shown = `${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${I2S(delay)}`;
-  const delayText = !online ? `Input delay: ${shown} frames|r` : net.manual === AUTO_DELAY ? `Input delay: Auto (${shown}|r)` : `Input delay: ${shown}|r (Auto ${I2S(autoMatchDelay(net, game))})`;
+  const shown = `${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${formatInt(delay)}`;
+  const delayText = !online ? `Input delay: ${shown} frames|r` : net.manual === AUTO_DELAY ? `Input delay: Auto (${shown}|r)` : `Input delay: ${shown}|r (Auto ${formatInt(autoMatchDelay(net, game))})`;
   return { delayText, echoes, hostControl: isHost(game, local) };
 }
 
@@ -153,10 +154,10 @@ export interface DelayMessage {
 
 export function delayMessage(ping: number, delay: number, echo: number, fps = -1, slow = false): string {
   const parts: string[] = [];
-  if (ping >= 0) parts.push(`${PING_MARK}${I2S(ping)}`);
-  parts.push(`${DELAY_MARK}${I2S(delay)}`);
-  if (echo >= 0) parts.push(`${ECHO_MARK}${I2S(echo)}`);
-  if (fps >= 0) parts.push(`${RATE_MARK}${I2S(fps)}`);
+  if (ping >= 0) parts.push(`${PING_MARK}${formatInt(ping)}`);
+  parts.push(`${DELAY_MARK}${formatInt(delay)}`);
+  if (echo >= 0) parts.push(`${ECHO_MARK}${formatInt(echo)}`);
+  if (fps >= 0) parts.push(`${RATE_MARK}${formatInt(fps)}`);
   if (slow) parts.push(`${SLOW_MARK}1`);
   return parts.join(" ");
 }
@@ -170,7 +171,7 @@ export function parseDelayMessage(data: string): DelayMessage {
   let host = NO_HOST_DELAY;
   for (const token of data.split(" ")) {
     const mark = token.substring(0, 1);
-    const value = S2I(token.substring(1));
+    const value = parseInt(token.substring(1));
     if (mark === PING_MARK) ping = value;
     else if (mark === DELAY_MARK) delay = value;
     else if (mark === ECHO_MARK) echo = value;
@@ -354,8 +355,8 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   net.depth = 0;
   const poor = connectionPoor(net.policy, net.estimate, delay);
   const slow = inMatch ? slowMachineLine(net, game) : "";
-  const behind = poor ? ` · ${I2S(net.shownDepth)} frames behind` : "";
-  const network = highDelay(delay) ? `|cffff4040Laggy connection: ${I2S(delay)} frames of input delay|r${behind}` : poor ? `|cffff4040Connection poor|r · input delay ${I2S(delay)}${behind}` : "";
+  const behind = poor ? ` · ${formatInt(net.shownDepth)} frames behind` : "";
+  const network = highDelay(delay) ? `|cffff4040Laggy connection: ${formatInt(delay)} frames of input delay|r${behind}` : poor ? `|cffff4040Connection poor|r · input delay ${formatInt(delay)}${behind}` : "";
   const text = slow !== "" ? slow : !inMatch || !online ? "" : freezing ? FREEZING_TEXT : network;
   if (text === net.shownText) return;
   net.shownText = text;

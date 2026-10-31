@@ -69,6 +69,7 @@ import { createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEf
 import { clearTextMessages, createFrameByType, originFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameFont, setFrameSize, setFrameTextAlignment } from "wisp/game/frames";
 import { panCameraTo, setCameraBounds, setCameraField, setCameraPosition } from "wisp/game/view";
 import { setBodyAnimation, setBodyAnimationIndex, setBodyTimeScale, showBody } from "wisp/game/bodies";
+import { formatReal, toReal } from "wisp/game/text";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -291,7 +292,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
     const reaction = damagePose(fighter);
     if (reaction !== DamagePose.none) {
       const { launch, motion } = fighter;
-      traceParticipant(s, slot, `damage pose ${reaction} hitlag ${launch.hitlag} hitstun ${launch.hitstun} x ${R2S(motion.x)} z ${R2S(motion.z)} launch ${R2S(launch.knockbackX)}:${R2S(launch.knockbackZ)}`);
+      traceParticipant(s, slot, `damage pose ${reaction} hitlag ${launch.hitlag} hitstun ${launch.hitstun} x ${formatReal(motion.x)} z ${formatReal(motion.z)} launch ${formatReal(launch.knockbackX)}:${formatReal(launch.knockbackZ)}`);
     }
   }
   if (!pooled) setBodyTimeScale(body.unit, pose.rate);
@@ -315,7 +316,7 @@ export function pauseMatchPresentation(s: ShellState, paused: boolean, immediate
   if (!paused) s.pausedBy = undefined;
   if (paused && s.game.phase === Phase.match) {
     const height = screenHeight();
-    beginPauseCamera(s, height > 0 ? I2R(screenWidth()) / I2R(height) : 16.0 / 9.0);
+    beginPauseCamera(s, height > 0 ? toReal(screenWidth()) / toReal(height) : 16.0 / 9.0);
   } else if (s.pauseCamera !== undefined) {
     const saved = s.pauseCamera;
     copyMatchCamera(s.camera, saved.saved);
@@ -473,7 +474,7 @@ export function lockArenaCamera(s: ShellState): void {
 
   if (game.phase !== Phase.result && !game.camera.initialized) advanceMatchCamera(s.previewCamera, world, game.stageChoice);
   const height = screenHeight();
-  const aspect = height > 0 ? I2R(screenWidth()) / I2R(height) : 16.0 / 9.0;
+  const aspect = height > 0 ? toReal(screenWidth()) / toReal(height) : 16.0 / 9.0;
   const angle = aimArenaCamera(s, aspect);
   if (game.phase !== Phase.result && s.viewExtreme !== undefined) extremeCamera(s.camera, game.stageChoice, aspect, s.viewExtreme);
   if (s.viewExtreme !== undefined) clearTextMessages();

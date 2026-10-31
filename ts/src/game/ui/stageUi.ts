@@ -21,6 +21,7 @@ import { destroyEvents } from "wisp/game/events";
 import { createFrame, createFrameByType, destroyFrame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { sendSync } from "wisp/game/sync";
+import { formatInt, parseInt, toReal, truncate } from "wisp/game/text";
 
 
 
@@ -107,12 +108,12 @@ export class StagePanel {
     stageText(root, "MeleeStageGridTitle", f32(0.49), f32(0.483), f32(0.298), f32(0.022), MENU_STYLE.headerSize, `${MENU_STYLE.gold}CHOOSE A STAGE|r`);
     for (const stage of STAGE_CHOICES) {
       const choice = stage.id;
-      const button = createFrameByType("BUTTON", `MeleeStageTileButton${I2S(choice)}`, root, "", 0);
+      const button = createFrameByType("BUTTON", `MeleeStageTileButton${formatInt(choice)}`, root, "", 0);
       placeTopLeft(button, stageTileLeft(choice), stageTileTop(choice));
       setFrameSize(button, f32(0.094), f32(0.059));
       this.clicks.add(button, { kind: "stage", choice });
-      new StageCard(root, `MeleeStageTile${I2S(choice)}`, stageTileLeft(choice), stageTileTop(choice), f32(0.094), f32(0.059), true).show(choice);
-      this.tileNames[choice] = namedFrame(`MeleeStageTile${I2S(choice)}Name`, 0);
+      new StageCard(root, `MeleeStageTile${formatInt(choice)}`, stageTileLeft(choice), stageTileTop(choice), f32(0.094), f32(0.059), true).show(choice);
+      this.tileNames[choice] = namedFrame(`MeleeStageTile${formatInt(choice)}Name`, 0);
       setMenuText(this.tileNames[choice], stage.name);
     }
     dialogButton(root, STAGE_POOL_BUTTON.x, STAGE_POOL_BUTTON.y, STAGE_POOL_BUTTON.width, STAGE_POOL_BUTTON.height, "Stage pool", { kind: "poolOpen" });
@@ -145,8 +146,8 @@ export class StagePanel {
     this.hazardsToggle = dialogButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "", { kind: "hazards" });
     this.orbsToggle = dialogButton(root, ORBS_BUTTON.x, ORBS_BUTTON.y, ORBS_BUTTON.width, ORBS_BUTTON.height, "", { kind: "orbs" });
     this.sync = createSyncTrigger("ui.stage.drop", "stage-drop", PARTICIPANT_SLOTS, (sender, data) => {
-      const choice = S2I(data);
-      if (I2S(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
+      const choice = parseInt(data);
+      if (formatInt(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
     });
     setFrameVisible(root, false);
     setFrameVisible(this.backdrop, false);
@@ -158,8 +159,8 @@ export class StagePanel {
     bindPrototype(this.preview, StageCard.prototype);
     this.clicks.bindHandler((button, clicker) => this.click(button, playerSlot(clicker)), button => this.hover(button));
     bindSyncHandler("ui.stage.drop", (sender, data) => {
-      const choice = S2I(data);
-      if (I2S(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
+      const choice = parseInt(data);
+      if (formatInt(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
     });
   }
 
@@ -177,13 +178,13 @@ export class StagePanel {
 
   private focusStart(): void {
     highlightText(this.startButton, true);
-    const width = I2R(screenWidth());
-    const height = I2R(screenHeight());
+    const width = toReal(screenWidth());
+    const height = toReal(screenHeight());
     if (width <= 0 || height <= 0) return;
-    if (startButtonContains(pointerX(I2R(BlzGetMouseScreenPosX()), width, height), pointerY(I2R(BlzGetMouseScreenPosY()), height))) return;
+    if (startButtonContains(pointerX(toReal(BlzGetMouseScreenPosX()), width, height), pointerY(toReal(BlzGetMouseScreenPosY()), height))) return;
     const x = START_BUTTON.x + START_BUTTON.width / 2;
     const y = START_BUTTON.y - START_BUTTON.height / 2;
-    BlzSetMousePos(R2I(pixelX(x, width, height)), R2I(pixelY(y, height)));
+    BlzSetMousePos(truncate(pixelX(x, width, height)), truncate(pixelY(y, height)));
   }
 
   private highlightStage(choice: number | undefined): void {
@@ -256,20 +257,20 @@ export class StagePanel {
         setMenuText(frame, `${selected ? "Yes" : "No"}: ${stage.name}`);
         setFrameEnabled(frame, count > 1 || !stageInPool(pool, stage.id));
       }
-      setMenuText(this.poolSummary, `${I2S(count)} ${count === 1 ? "stage" : "stages"} in the pool.\nEach plays once before the pool repeats.`);
+      setMenuText(this.poolSummary, `${formatInt(count)} ${count === 1 ? "stage" : "stages"} in the pool.\nEach plays once before the pool repeats.`);
       this.clicks.refreshHover();
       return;
     }
     fitToWindow(this.backdrop);
     let x = stageTileLeft(game.stageChoice) + f32(0.047);
     let y = f32(stageTileTop(game.stageChoice) - f32(0.0295));
-    const width = I2R(screenWidth());
-    const height = I2R(screenHeight());
+    const width = toReal(screenWidth());
+    const height = toReal(screenHeight());
     if (width > 0 && height > 0) {
-      const pointerAtX = pointerX(I2R(BlzGetMouseScreenPosX()), width, height);
-      const pointerAtY = pointerY(I2R(BlzGetMouseScreenPosY()), height);
+      const pointerAtX = pointerX(toReal(BlzGetMouseScreenPosX()), width, height);
+      const pointerAtY = pointerY(toReal(BlzGetMouseScreenPosY()), height);
       const dropped = updateStageDrag(this.drag, BlzIsMouseButtonPressed(MOUSE_BUTTON_TYPE_LEFT), pointerAtX, pointerAtY, game.stageChoice);
-      if (dropped !== undefined) sendSync("stage-drop", I2S(dropped));
+      if (dropped !== undefined) sendSync("stage-drop", formatInt(dropped));
       if (this.drag.gesture?.kind === "carry") {
         x = pointerAtX;
         y = pointerAtY;

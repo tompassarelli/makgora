@@ -8,6 +8,7 @@ import { placeTopLeft, setMenuText } from "./frames";
 import { label } from "./selectionFrames";
 import type { SelectionActions } from "./selectionActions";
 import { createFrame, namedFrame, setFrameEnabled, setFrameFont, setFrameSize, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
   | { kind: "items" } | { kind: "ultimates" } | { kind: "itemKind"; item: ItemKind } | { kind: "training" } | { kind: "partner"; setting: TrainingSetting; direction: -1 | 1 } | { kind: "hitAreas" } | { kind: "speed" }
@@ -132,7 +133,7 @@ export function presentDelayControls(frames: DelayFrames, hostControl: boolean):
 
 export function rulesKey(game: Readonly<MatchState>, clears: { count(): number }, fighter: number): string {
   const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, classic, classicTier, lore, loreBattle: battle } = game;
-  return `${lore ? "1" : "0"} ${I2S(battle)} ${I2S(clears.count())} ${classic ? "1" : "0"} ${I2S(classicTier)} ${I2S(fighter)} ${I2S(stockCount)} ${I2S(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${I2S(trainer.behaviour)} ${I2S(trainer.escape)} ${I2S(trainer.tech)} ${I2S(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${I2S(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${I2S(items.enabledMask)} ${I2S(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"}`;
+  return `${lore ? "1" : "0"} ${formatInt(battle)} ${formatInt(clears.count())} ${classic ? "1" : "0"} ${formatInt(classicTier)} ${formatInt(fighter)} ${formatInt(stockCount)} ${formatInt(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${formatInt(trainer.behaviour)} ${formatInt(trainer.escape)} ${formatInt(trainer.tech)} ${formatInt(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${formatInt(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${formatInt(items.enabledMask)} ${formatInt(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"}`;
 }
 
 export function applyRuleButton(actions: SelectionActions, participantId: number, button: RuleButton): void {

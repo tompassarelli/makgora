@@ -7,6 +7,7 @@ import { MENU_FONT, markerArrowTexture } from "./hudLayout";
 import { attachOutline, createOutline, createTemplateOutline, setOutlineText } from "./textOutline";
 import { createFrame, createFrameByType, destroyFrame, setFrameAbsPoint, setFrameEnabled, setFrameFont, setFrameLevel, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { player, playerName as playerNameOf } from "wisp/game/players";
+import { formatInt } from "wisp/game/text";
 
 export const MARKER_WIDTH = unitsForPixels(220);
 export const MARKER_HEIGHT = unitsForPixels(170);
@@ -78,7 +79,7 @@ export class FighterMarker {
   private shownY = -1.0;
 
   constructor(private readonly slot: number) {
-    const suffix = I2S(slot);
+    const suffix = formatInt(slot);
     const context = markerContext(slot);
     this.root = createFrameByType("FRAME", `FighterMarker${suffix}`, consoleUi(), "", context);
     setFrameSize(this.root, MARKER_WIDTH, MARKER_HEIGHT);

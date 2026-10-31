@@ -7,6 +7,7 @@ import { art } from "./selectionFrames";
 import { consoleUi, gameUi, placeTopLeft } from "./frames";
 import type { DrawnHand } from "./selectionHands";
 import { destroyFrame, setFrameLevel, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 interface HandLayer {
   readonly states: Readonly<Record<HandState, framehandle>>;
@@ -42,13 +43,13 @@ export const handCrossesEdge = (left: number, top: number, size: number): boolea
 function createLayer(parent: framehandle, grid: RosterGrid, tag: string, suffix: string, slot: number): HandLayer {
   const size = handSize(grid);
   const state = (hand: HandState) => {
-    const frame = art(parent, `MeleeHand${TEXTURE_NAMES[hand]}${tag}${suffix}_${I2S(slot)}`, `war3mapImported\\SelectionHand${TEXTURE_NAMES[hand]}.tga`, 0.0, 0.0, size, size);
+    const frame = art(parent, `MeleeHand${TEXTURE_NAMES[hand]}${tag}${suffix}_${formatInt(slot)}`, `war3mapImported\\SelectionHand${TEXTURE_NAMES[hand]}.tga`, 0.0, 0.0, size, size);
     setFrameLevel(frame, SELECT_LEVELS.hand);
     setFrameVisible(frame, false);
     return frame;
   };
   const { width, height } = handBadgeBox(0.0, 0.0, size);
-  const badge = art(parent, `MeleeHandBadge${tag}${suffix}_${I2S(slot)}`, `war3mapImported\\SelectionHandLabelP${I2S(slot + 1)}.tga`, 0.0, 0.0, width, height);
+  const badge = art(parent, `MeleeHandBadge${tag}${suffix}_${formatInt(slot)}`, `war3mapImported\\SelectionHandLabelP${formatInt(slot + 1)}.tga`, 0.0, 0.0, width, height);
   setFrameLevel(badge, SELECT_LEVELS.handBadge);
   setFrameVisible(badge, false);
   return { states: { point: state("point"), fan: state("fan"), pinch: state("pinch") }, badge };

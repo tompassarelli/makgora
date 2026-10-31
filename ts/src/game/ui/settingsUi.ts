@@ -30,6 +30,7 @@ import { START_HINT } from "./helpText";
 import { createEvents, destroyEvents, onEvents } from "wisp/game/events";
 import { addFrameEvent, createFrameByType, destroyFrame, eventFrameEvent, eventFrameText, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTextLimit, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { eventPlayer, localPlayer, player as playerOf } from "wisp/game/players";
+import { formatInt } from "wisp/game/text";
 
 export interface SettingsActions {
   closeSettings(participantId: number): void;
@@ -62,7 +63,7 @@ const CLEAR_SIZE = f32(0.012);
 type SlotButton = { readonly frames: readonly framehandle[]; readonly label: framehandle };
 
 function createNameBox(root: framehandle, participantId: number): framehandle {
-  const box = createFrameByType("EDITBOX", `MeleeSettingsNameBox${I2S(participantId)}`, root, "EscMenuEditBoxTemplate", participantId);
+  const box = createFrameByType("EDITBOX", `MeleeSettingsNameBox${formatInt(participantId)}`, root, "EscMenuEditBoxTemplate", participantId);
   placeTopLeft(box, NAME_BOX.x, NAME_BOX.y);
   setFrameSize(box, NAME_BOX.width, NAME_BOX.height);
   setFrameTextLimit(box, SLOT_NAME_LIMIT);
@@ -112,7 +113,7 @@ export class SettingsPanel {
     private actions: SettingsActions,
     readonly participantId: number,
   ) {
-    const suffix = I2S(participantId);
+    const suffix = formatInt(participantId);
     this.local = localPlayer() === playerOf(participantId);
     this.clicks = new ButtonClicks(`ui.settings.${suffix}.click`, (button, clicker) => this.click(button, clicker));
     const root = createBackdrop(`MeleeSettingsRoot${suffix}`, gameUi(), participantId);
@@ -155,7 +156,7 @@ export class SettingsPanel {
     setFrameText(line("MeleeSettingsTitle", f32(0.12), f32(0.578), f32(0.3), f32(0.026), f32(0.016)), `${MENU_STYLE.gold}CONTROLS|r`);
     this.presets = BINDING_PRESETS.map((preset, index): readonly [BindingPreset, framehandle] => {
       const { x, y, width, height } = presetButton(index);
-      return [preset, button(`MeleeSettingsPreset${I2S(index)}`, x, y, width, height, PRESET_NAMES[preset], { kind: "preset", preset }).label];
+      return [preset, button(`MeleeSettingsPreset${formatInt(index)}`, x, y, width, height, PRESET_NAMES[preset], { kind: "preset", preset }).label];
     });
     button("MeleeSettingsCustomize", CUSTOMIZE.x, CUSTOMIZE.y, CUSTOMIZE.width, CUSTOMIZE.height, "Customize", { kind: "customize" });
     this.profileButton = button("MeleeSettingsProfile", LOAD_PROFILE.x, LOAD_PROFILE.y, LOAD_PROFILE.width, LOAD_PROFILE.height, "Load profile", { kind: "profile" }).label;
@@ -163,17 +164,17 @@ export class SettingsPanel {
     this.hintsButton = button("MeleeSettingsHints", HINTS_BUTTON.x, HINTS_BUTTON.y, HINTS_BUTTON.width, HINTS_BUTTON.height, "", { kind: "hints" }).label;
     this.nameBox = createNameBox(root, participantId);
     this.nameEvents = this.nameTrigger();
-    this.slotButtons = profileSlots((slot, x, y, width, height) => button(`MeleeSettingsSlot${I2S(slot)}`, x, y, width, height, "", { kind: "slot", slot }, f32(0.011), 37));
+    this.slotButtons = profileSlots((slot, x, y, width, height) => button(`MeleeSettingsSlot${formatInt(slot)}`, x, y, width, height, "", { kind: "slot", slot }, f32(0.011), 37));
     this.hint = line("MeleeSettingsHint", f32(0.12), f32(0.51), f32(0.6), f32(0.018));
     this.help = line("MeleeSettingsHelp", f32(0.12), f32(0.4815), f32(0.6), f32(0.014), f32(0.0095));
     this.keys = keyboardCaps(f32(0.12), f32(0.465)).map(({ key, x, y, width }): KeyButton => {
-      const { art } = button(`MeleeSettingsKey${I2S(key)}`, x, y, width, KEY_CAP_HEIGHT, "", { kind: "key", key });
+      const { art } = button(`MeleeSettingsKey${formatInt(key)}`, x, y, width, KEY_CAP_HEIGHT, "", { kind: "key", key });
       const clear = this.clearCross(root, key, f32(f32(x + width) - CLEAR_SIZE), y);
-      const name = text(`MeleeSettingsKeyName${I2S(key)}`, art, f32(0.011), width, f32(0.016));
+      const name = text(`MeleeSettingsKeyName${formatInt(key)}`, art, f32(0.011), width, f32(0.016));
       setFramePoint(name, FRAMEPOINT_TOP, art, FRAMEPOINT_TOP, 0.0, f32(-0.007));
       setFrameTextAlignment(name, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
       setFrameText(name, keyLabel(key));
-      const action = text(`MeleeSettingsKeyAction${I2S(key)}`, art, f32(0.0075), width, f32(0.013));
+      const action = text(`MeleeSettingsKeyAction${formatInt(key)}`, art, f32(0.0075), width, f32(0.013));
       setFramePoint(action, FRAMEPOINT_BOTTOM, art, FRAMEPOINT_BOTTOM, 0.0, f32(0.007));
       setFrameTextAlignment(action, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
       return { key, frame: art, action, clear };
@@ -193,7 +194,7 @@ export class SettingsPanel {
   }
 
   private clearCross(root: framehandle, key: number, x: number, y: number): readonly framehandle[] {
-    const cross = createText(`MeleeSettingsKeyClear${I2S(key)}${I2S(this.participantId)}`, root, this.participantId);
+    const cross = createText(`MeleeSettingsKeyClear${formatInt(key)}${formatInt(this.participantId)}`, root, this.participantId);
     setFrameSize(cross, CLEAR_SIZE, CLEAR_SIZE);
     setFrameFont(cross, MENU_FONT, f32(0.009), 0);
     setFrameEnabled(cross, false);
@@ -201,7 +202,7 @@ export class SettingsPanel {
     setFrameLevel(cross, 34);
     setFrameTextAlignment(cross, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
     setFrameText(cross, "|cffff6060x|r");
-    const hit = createFrameByType("BUTTON", `MeleeSettingsKeyClearHit${I2S(key)}`, root, "", this.participantId);
+    const hit = createFrameByType("BUTTON", `MeleeSettingsKeyClearHit${formatInt(key)}`, root, "", this.participantId);
     placeTopLeft(hit, x, y);
     setFrameSize(hit, CLEAR_SIZE, CLEAR_SIZE);
     setFrameLevel(hit, 35);
@@ -219,7 +220,7 @@ export class SettingsPanel {
   }
 
   private nameEvent(): string {
-    return `ui.settings.${I2S(this.participantId)}.name`;
+    return `ui.settings.${formatInt(this.participantId)}.name`;
   }
 
   private bindNameEvents(): void {
@@ -308,7 +309,7 @@ export class SettingsPanel {
     if (!this.local || !this.open) return;
     const { settings } = this;
     const { capture } = settings;
-    const signature = `${settings.hints ? "h" : "-"}${settings.layout}${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.fromProfile ? "p" : "-"}${settings.picking ? "s" : "-"}${settings.naming ? "n" : "-"}${I2S(settings.slot)}${settings.customs.map(custom => custom.name).join("|")}${capture === undefined ? "-" : I2S(capture.action * 2 + capture.slot)}`;
+    const signature = `${settings.hints ? "h" : "-"}${settings.layout}${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.fromProfile ? "p" : "-"}${settings.picking ? "s" : "-"}${settings.naming ? "n" : "-"}${formatInt(settings.slot)}${settings.customs.map(custom => custom.name).join("|")}${capture === undefined ? "-" : formatInt(capture.action * 2 + capture.slot)}`;
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
     setFrameVisible(this.root, true);

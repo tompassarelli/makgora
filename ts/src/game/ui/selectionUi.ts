@@ -75,6 +75,7 @@ import { destroyEvents } from "wisp/game/events";
 import { createFrameByType, destroyFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { localPlayer, player as playerOf } from "wisp/game/players";
 import { sendSync } from "wisp/game/sync";
+import { formatInt, toReal } from "wisp/game/text";
 
 
 type SelectionButton = { kind: "tile"; tile: number } | CardButton | CpuButton | { kind: "start" } | { kind: "settings" } | RuleButton
@@ -212,9 +213,9 @@ export class SelectionPanel {
     private readonly controls: MenuControls,
     version: string,
   ) {
-    const suffix = I2S(participantId);
+    const suffix = formatInt(participantId);
     const height = screenHeight();
-    const titleBox = selectionTitleBox(height <= 0 ? f32(4.0 / 3.0) : I2R(screenWidth()) / I2R(height));
+    const titleBox = selectionTitleBox(height <= 0 ? f32(4.0 / 3.0) : toReal(screenWidth()) / toReal(height));
     const headerBoxLeft = f32(0.05);
     const headerInset = f32(0.022);
     const headerLeft = f32(headerBoxLeft + headerInset);
@@ -228,7 +229,7 @@ export class SelectionPanel {
       const { left, top } = cellRect(grid, choice);
       const x = f32(left);
       const y = f32(top);
-      const name = `${suffix}_${I2S(choice)}`;
+      const name = `${suffix}_${formatInt(choice)}`;
       const tileFrame = art(root, `MeleeTile${name}`, MENU_STYLE.borderTexture, x, y, f32(grid.cellWidth), f32(grid.cellHeight));
       const portrait = tilePortrait(scale);
       const inset = (TILE_PORTRAIT_SLOT * scale - portrait) / 2;
@@ -335,7 +336,7 @@ export class SelectionPanel {
     this.community.bindActions();
     bindPrototype(this.mainMenu, MainMenuButton.prototype);
     this.mainMenu.bindActions();
-    const suffix = I2S(this.participantId);
+    const suffix = formatInt(this.participantId);
     bindSyncHandler(`ui.selection.${suffix}.drop`, (_, data) => this.acceptDrop(data));
     bindSyncHandler(`ui.selection.${suffix}.cpuDrop`, (_, data) => this.acceptCpuDrop(data));
     bindSyncHandler(`ui.selection.${suffix}.recall`, (_, data) => this.acceptRecall(data));
@@ -626,8 +627,8 @@ export class SelectionPanel {
   private sendPlacement({ slot, tile }: Placement): void {
     const game = this.choosing();
     if (game === undefined) return;
-    if (slot === this.participantId && humanFighterActive(game, slot)) sendSync("fighter-drop", I2S(tile));
-    else if (canChooseComputer(game, this.participantId, slot)) sendSync("cpu-fighter-drop", `${I2S(slot)}${I2S(tile)}`);
+    if (slot === this.participantId && humanFighterActive(game, slot)) sendSync("fighter-drop", formatInt(tile));
+    else if (canChooseComputer(game, this.participantId, slot)) sendSync("cpu-fighter-drop", `${formatInt(slot)}${formatInt(tile)}`);
   }
 
 
@@ -645,7 +646,7 @@ export class SelectionPanel {
 
   recallHeld(): void {
     const { held } = this.drag;
-    if (this.ownsLocalClient() && this.choosing() !== undefined && held !== undefined) sendSync("fighter-recall", I2S(held));
+    if (this.ownsLocalClient() && this.choosing() !== undefined && held !== undefined) sendSync("fighter-recall", formatInt(held));
   }
 
   private isSeen(): boolean {
@@ -680,11 +681,11 @@ export class SelectionPanel {
     const cpuOpen = visible && this.cpuSlot !== undefined;
 
     this.showOverlays(game, loading, visible, cpuOpen);
-    const width = I2R(screenWidth());
-    const height = I2R(screenHeight());
+    const width = toReal(screenWidth());
+    const height = toReal(screenHeight());
     const pointed = width > 0 && height > 0;
-    const x = pointed ? pointerX(I2R(BlzGetMouseScreenPosX()), width, height) : 0.0;
-    const y = pointed ? pointerY(I2R(BlzGetMouseScreenPosY()), height) : 0.0;
+    const x = pointed ? pointerX(toReal(BlzGetMouseScreenPosX()), width, height) : 0.0;
+    const y = pointed ? pointerY(toReal(BlzGetMouseScreenPosY()), height) : 0.0;
     if (this.showDialog(game, visible, cpuOpen, pointed, x, y)) return;
     this.showTiles(game);
     if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;

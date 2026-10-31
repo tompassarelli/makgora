@@ -18,6 +18,7 @@ import { views } from "./ui";
 import { type InputTrace, beginInputTrace, closeTraceWindow, finishInputTrace, traceInput, traceParticipantWindow, traceSeconds } from "./trace";
 import { knownFrame } from "wisp/src/netcode/shadowSchedule";
 import { nextCaptureTarget } from "../../game/netcode/inputSchedule";
+import { formatReal } from "wisp/game/text";
 
 const bit = (value: boolean) => (value ? "1" : "0");
 
@@ -50,7 +51,7 @@ function traceConfirmedState(s: ShellState): void {
   const started = traceSeconds(s.trace);
   captureReplaySnapshot(s.diagnostic, s.world, s.game, s.controls, s.runtime);
   const fold = beginStateChecksum(s.diagnostic);
-  traceInput(s.trace, `checksum capture native-seconds ${R2S(traceSeconds(s.trace) - started)}`);
+  traceInput(s.trace, `checksum capture native-seconds ${formatReal(traceSeconds(s.trace) - started)}`);
   s.trace.checksum = { frame: s.runtime.simulationFrame, fold, slice: idiv(fold.text.length + CHECKSUM_FOLD_CALLBACKS - 1, CHECKSUM_FOLD_CALLBACKS) };
 }
 
@@ -92,7 +93,7 @@ export function startInputTrace(s: ShellState): void {
   traceLitMeterCues(s);
   const receiptStarted = traceSeconds(s.trace);
   writeLines(INPUT_START_FILE, [traceStartLine(s.build.id)]);
-  traceInput(s.trace, `trace-start receipt native-seconds ${R2S(traceSeconds(s.trace) - receiptStarted)}`);
+  traceInput(s.trace, `trace-start receipt native-seconds ${formatReal(traceSeconds(s.trace) - receiptStarted)}`);
 }
 
 
@@ -134,7 +135,7 @@ export function traceTick(s: ShellState): void {
       trace.lastAxes = axes;
     }
     if (trace.lastDodge !== fighter.dodge.airFrame || trace.lastLandingLag !== fighter.landing.lag) {
-      traceInput(trace, `motion air ${fighter.dodge.airFrame} landing ${fighter.landing.lag} x ${R2S(fighter.motion.x)} z ${R2S(fighter.motion.z)}`);
+      traceInput(trace, `motion air ${fighter.dodge.airFrame} landing ${fighter.landing.lag} x ${formatReal(fighter.motion.x)} z ${formatReal(fighter.motion.z)}`);
       trace.lastDodge = fighter.dodge.airFrame;
       trace.lastLandingLag = fighter.landing.lag;
     }

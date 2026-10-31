@@ -31,6 +31,7 @@ import type { Fighter } from "../game/sim/fighter";
 import { beginAttack, beginDownState } from "../game/sim/transitions";
 import { selectScriptedAttackClip } from "../game/presentation/fighterPose";
 import { at } from "wisp/src/runtime/lookup";
+import { parseReal } from "wisp/game/text";
 
 interface Pad {
   buttons: number;
@@ -298,7 +299,7 @@ function braceTarget(target: Fighter): void {
 
 function crossTarget(target: Fighter, args: readonly string[]): void {
   const [facing, gap = "0"] = args;
-  target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
+  target.motion.x = (facing === "left" ? -1 : 1) * parseReal(gap);
   target.motion.vx = 0.0;
   for (const entry of target.hits.entries) entry.window = 0;
 }
@@ -310,19 +311,19 @@ function stageScriptedMove(s: ShellState, slot: number, args: readonly string[])
     const direction = facing === "left" ? -1 : 1;
     mover.facing = direction;
     if (kind === "run") {
-      mover.motion.x = -direction * S2R("60");
-      target.motion.x = direction * S2R("260");
+      mover.motion.x = -direction * parseReal("60");
+      target.motion.x = direction * parseReal("260");
     }
     return;
   }
   if (gap !== "-") {
     mover.motion.x = 0.0;
-    target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
-    target.facing = (facing === "left" ? 1 : -1) * (S2R(gap) < 0.0 ? -1 : 1);
+    target.motion.x = (facing === "left" ? -1 : 1) * parseReal(gap);
+    target.facing = (facing === "left" ? 1 : -1) * (parseReal(gap) < 0.0 ? -1 : 1);
   }
   startScriptedMove(s, slot, kind, code, facing);
-  if (lift !== undefined && mover.motion.grounded) hangTarget(target, S2R(lift), mover.attack.style === undefined ? 0 : attackStartupFrames(mover.attack.style, mover.tuning.moves));
-  else if (lift !== undefined) liftTarget(target, f32(mover.motion.z + S2R(lift)));
+  if (lift !== undefined && mover.motion.grounded) hangTarget(target, parseReal(lift), mover.attack.style === undefined ? 0 : attackStartupFrames(mover.attack.style, mover.tuning.moves));
+  else if (lift !== undefined) liftTarget(target, f32(mover.motion.z + parseReal(lift)));
 }
 
 function applyShowcaseEdge(s: ShellState, edge: Edge): boolean {

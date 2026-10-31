@@ -34,6 +34,7 @@ import { RESULTS_DELAY_FRAMES } from "../../game/render/matchPresentation";
 import { LASTING, renderFighter, resumePresentationHeld, setStatus } from "./view";
 import { writeMatchRecord } from "./matchRecords";
 import { beginReplayFrame, endReplaySegment, replayFrameRan } from "./replays";
+import { formatReal } from "wisp/game/text";
 
 function observe(before: FrameObservation, fighter: Readonly<Fighter>): void {
   before.out = fighter.status.out;
@@ -76,10 +77,10 @@ function reportChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<Fr
 
 function traceChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<FrameObservation>, f: Readonly<Fighter>): void {
   if (before.shieldRaised !== f.shield.raised || before.shieldTiltX !== f.shield.tiltX || before.shieldTiltZ !== f.shield.tiltZ) {
-    traceParticipant(s, slot, `shield tilt x ${R2S(f.shield.tiltX)} z ${R2S(f.shield.tiltZ)} raised ${bit(f.shield.raised)} grounded ${bit(f.motion.grounded)} roll ${f.dodge.groundFrame} jump ${f.jump.squat}`);
+    traceParticipant(s, slot, `shield tilt x ${formatReal(f.shield.tiltX)} z ${formatReal(f.shield.tiltZ)} raised ${bit(f.shield.raised)} grounded ${bit(f.motion.grounded)} roll ${f.dodge.groundFrame} jump ${f.jump.squat}`);
   }
   if (f.motion.grounded && before.groundSpeed !== f.motion.vx && (f.shield.raised || f.motion.vx === 0)) {
-    traceParticipant(s, slot, `ground-speed vx ${R2S(f.motion.vx)} shield ${bit(f.shield.raised)}`);
+    traceParticipant(s, slot, `ground-speed vx ${formatReal(f.motion.vx)} shield ${bit(f.shield.raised)}`);
   }
   if (before.ground !== f.ground.action || before.facing !== f.facing) {
     traceParticipant(s, slot, `ground action ${f.ground.action} facing ${f.facing} dash-frame ${f.ground.dashFrame}`);
@@ -88,26 +89,26 @@ function traceChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<Fra
   const holding = f.grab.target !== undefined;
   if (before.holding !== holding) traceParticipant(s, slot, `grab-hold ${holding ? "start" : "end"}`);
   if (before.special !== f.special.action) {
-    traceParticipant(s, slot, `special ${f.special.action} form ${f.special.form} action-frame ${f.special.frame} x ${R2S(f.motion.x)} z ${R2S(f.motion.z)}`);
+    traceParticipant(s, slot, `special ${f.special.action} form ${f.special.form} action-frame ${f.special.frame} x ${formatReal(f.motion.x)} z ${formatReal(f.motion.z)}`);
   }
-  else if (before.form !== f.special.form) traceParticipant(s, slot, `special-form ${f.special.form} action ${f.special.action} action-frame ${f.special.frame} x ${R2S(f.motion.x)} z ${R2S(f.motion.z)}`);
+  else if (before.form !== f.special.form) traceParticipant(s, slot, `special-form ${f.special.form} action ${f.special.action} action-frame ${f.special.frame} x ${formatReal(f.motion.x)} z ${formatReal(f.motion.z)}`);
   const actionable = canAttack(f);
   if (f.down.state !== before.down || actionable !== before.actionable) {
-    traceParticipant(s, slot, `recovery down ${f.down.state} actionable ${bit(actionable)} hitlag ${f.launch.hitlag} hitstun ${f.launch.hitstun} damage ${R2S(f.status.damage)}`);
+    traceParticipant(s, slot, `recovery down ${f.down.state} actionable ${bit(actionable)} hitlag ${f.launch.hitlag} hitstun ${f.launch.hitstun} damage ${formatReal(f.status.damage)}`);
   }
-  if (before.breakState !== f.shield.breakState) traceParticipant(s, slot, `shield-break ${f.shield.breakState} z ${R2S(f.motion.z)} remaining ${R2S(f.shield.breakRemaining)}`);
-  if (before.ledge !== f.ledge.state) traceParticipant(s, slot, `ledge ${f.ledge.state} x ${R2S(f.motion.x)} z ${R2S(f.motion.z)}`);
-  if (before.dodgeMoved && before.dodgeMotion === 0 && !f.motion.grounded) traceParticipant(s, slot, `fall gravity z ${R2S(f.motion.z)}`);
-  if (!before.fastFalling && f.motion.fastFalling) traceParticipant(s, slot, `fall fast z ${R2S(f.motion.z)}`);
-  if (!before.grounded && f.motion.grounded) traceParticipant(s, slot, `land lag ${f.landing.lag} x ${R2S(f.motion.x)}`);
+  if (before.breakState !== f.shield.breakState) traceParticipant(s, slot, `shield-break ${f.shield.breakState} z ${formatReal(f.motion.z)} remaining ${formatReal(f.shield.breakRemaining)}`);
+  if (before.ledge !== f.ledge.state) traceParticipant(s, slot, `ledge ${f.ledge.state} x ${formatReal(f.motion.x)} z ${formatReal(f.motion.z)}`);
+  if (before.dodgeMoved && before.dodgeMotion === 0 && !f.motion.grounded) traceParticipant(s, slot, `fall gravity z ${formatReal(f.motion.z)}`);
+  if (!before.fastFalling && f.motion.fastFalling) traceParticipant(s, slot, `fall fast z ${formatReal(f.motion.z)}`);
+  if (!before.grounded && f.motion.grounded) traceParticipant(s, slot, `land lag ${f.landing.lag} x ${formatReal(f.motion.x)}`);
   if (before.crouching !== f.motion.crouching) traceParticipant(s, slot, `crouch ${bit(f.motion.crouching)}`);
-  if (before.jump !== f.jump.serial) traceParticipant(s, slot, `applied jump ${f.jump.serial} double ${bit(f.jump.isDouble)} z ${R2S(f.motion.z)}`);
+  if (before.jump !== f.jump.serial) traceParticipant(s, slot, `applied jump ${f.jump.serial} double ${bit(f.jump.isDouble)} z ${formatReal(f.motion.z)}`);
   if (!before.dropConsumed && f.platform.dropConsumed) {
     if (f.motion.grounded && f.motion.surface !== undefined) traceParticipant(s, slot, `platform mount deck ${f.motion.surface}`);
     else if (!f.motion.grounded && before.surface !== undefined) traceParticipant(s, slot, `platform drop deck ${before.surface}`);
   }
-  if (before.damage !== f.status.damage) traceParticipant(s, slot, `damage ${R2S(f.status.damage)} hitlag ${f.launch.hitlag} hitstun ${f.launch.hitstun} height ${f.visuals.hitHeight} strength ${f.visuals.hitStrength} clip ${s.runtime.poses[slot].clipIndex ?? -1}`);
-  if (before.damage !== f.status.damage) traceParticipant(s, slot, `launch up ${bit(f.launch.knockbackZ > 0.0)} from-air ${bit(before.surface === undefined)} x ${R2S(f.launch.knockbackX)} z ${R2S(f.launch.knockbackZ)}`);
+  if (before.damage !== f.status.damage) traceParticipant(s, slot, `damage ${formatReal(f.status.damage)} hitlag ${f.launch.hitlag} hitstun ${f.launch.hitstun} height ${f.visuals.hitHeight} strength ${f.visuals.hitStrength} clip ${s.runtime.poses[slot].clipIndex ?? -1}`);
+  if (before.damage !== f.status.damage) traceParticipant(s, slot, `launch up ${bit(f.launch.knockbackZ > 0.0)} from-air ${bit(before.surface === undefined)} x ${formatReal(f.launch.knockbackX)} z ${formatReal(f.launch.knockbackZ)}`);
   const influence = before.di !== f.launch.diSerial ? influenceOperands(f) : undefined;
   if (influence !== undefined) {
 
@@ -120,7 +121,7 @@ function traceChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<Fra
     for (let index = 0; index < f.projectiles.length; index++) {
       const projectile = f.projectiles[index];
       if (projectile === undefined || projectile.life <= 0 || (before.projectileLives[index] ?? 0) > 0) continue;
-      traceParticipant(s, slot, `reflect family ${projectile.visualFamily} kind ${projectile.kind} model ${projectileModelOf(projectile) ?? "none"} direction ${projectile.direction} multiplier ${R2S(projectile.damageMultiplier)} life ${projectile.life}`);
+      traceParticipant(s, slot, `reflect family ${projectile.visualFamily} kind ${projectile.kind} model ${projectileModelOf(projectile) ?? "none"} direction ${projectile.direction} multiplier ${formatReal(projectile.damageMultiplier)} life ${projectile.life}`);
     }
   }
 }

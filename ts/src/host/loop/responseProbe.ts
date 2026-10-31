@@ -15,6 +15,7 @@ import type { MatchCamera } from "../../game/sim/matchCamera";
 import { createFrameByType, originFrame, setFrameAbsPoint, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
 import { cameraField, cameraTargetX } from "wisp/game/view";
 import { localPlayer, playerSlot } from "wisp/game/players";
+import { formatReal } from "wisp/game/text";
 
 const ROW_LIMIT = 7200;
 const PAGE_ROWS = 150;
@@ -297,7 +298,7 @@ function stampEdge(probe: ResponseProbe, stage: "poll" | "present"): void {
   if (!probe.recording || !probe.edgeStamps || probe.exporting || row === undefined || probe.row === undefined) return;
   const slot = playerSlot(localPlayer());
   writeLines(edgeStampFile(slot, probe.run, probe.row, stage), [
-    `EDGE v=1 build=${probe.build} local=${slot} run=${probe.run} row=${probe.row} stage=${stage} held=${row.held ?? -1} pressed=${row.pressed ?? -1} released=${row.released ?? -1} active=${BlzIsLocalClientActive() ? 1 : 0} native_ms=${R2S(nowMs(probe))}`,
+    `EDGE v=1 build=${probe.build} local=${slot} run=${probe.run} row=${probe.row} stage=${stage} held=${row.held ?? -1} pressed=${row.pressed ?? -1} released=${row.released ?? -1} active=${BlzIsLocalClientActive() ? 1 : 0} native_ms=${formatReal(nowMs(probe))}`,
   ]);
 }
 
@@ -419,19 +420,19 @@ export function exportProbePage(probe: ResponseProbe): void {
   for (let index = first; index < Math.min(probe.rows, last); index++) {
     const r = probe.service[index];
     if (r === undefined) continue;
-    lines.push(`A ${index} ${R2S(r.entryMs)} ${R2S(r.pollMs ?? -1)} ${R2S(r.captureMs ?? -1)} ${R2S(r.advanceMs ?? -1)} ${R2S(r.presentMs ?? -1)} ${r.frameBefore} ${r.frameAfter ?? -1} ${r.speculativeBefore} ${r.speculativeAfter ?? -1} ${r.known} ${r.target ?? -1}`);
+    lines.push(`A ${index} ${formatReal(r.entryMs)} ${formatReal(r.pollMs ?? -1)} ${formatReal(r.captureMs ?? -1)} ${formatReal(r.advanceMs ?? -1)} ${formatReal(r.presentMs ?? -1)} ${r.frameBefore} ${r.frameAfter ?? -1} ${r.speculativeBefore} ${r.speculativeAfter ?? -1} ${r.known} ${r.target ?? -1}`);
     lines.push(`B ${index} ${r.held ?? -1} ${r.pressed ?? -1} ${r.released ?? -1} ${r.captureResult ?? -1} ${r.phase} ${r.confirmedShield ?? -1} ${r.predictedShield ?? -1} ${r.poseSerial ?? -1} ${r.correction ?? -1}`);
-    lines.push(`C ${index} ${r.fileReads} ${r.fileBytes} ${R2S(r.fileReadMs)} ${r.sendCalls} ${R2S(r.sendCallMs)}`);
-    if (r.cameraRecorded) lines.push(`Q ${index} ${r.camera.map(value => R2S(value)).join(" ")}`);
+    lines.push(`C ${index} ${r.fileReads} ${r.fileBytes} ${formatReal(r.fileReadMs)} ${r.sendCalls} ${formatReal(r.sendCallMs)}`);
+    if (r.cameraRecorded) lines.push(`Q ${index} ${r.camera.map(value => formatReal(value)).join(" ")}`);
     for (const fighter of PARTICIPANT_SLOTS) {
-      if ((r.positionMask & (1 << fighter)) !== 0) lines.push(`P ${index} ${fighter} ${r.presentedFrame} ${R2S(r.positionX[fighter])} ${R2S(r.positionZ[fighter])}`);
+      if ((r.positionMask & (1 << fighter)) !== 0) lines.push(`P ${index} ${fighter} ${r.presentedFrame} ${formatReal(r.positionX[fighter])} ${formatReal(r.positionZ[fighter])}`);
     }
   }
   for (const index of probe.transportOrder.slice(first, last)) {
     const stamp = probe.transport[index];
     if (stamp === undefined) continue;
     const age = stamp.receiveMs === undefined || stamp.sendMs === undefined ? -1.0 : stamp.receiveMs - stamp.sendMs;
-    lines.push(`D ${stamp.epoch ?? -1} ${stamp.frame} ${R2S(stamp.sendMs ?? -1)} ${R2S(stamp.receiveMs ?? -1)} ${R2S(age)}`);
+    lines.push(`D ${stamp.epoch ?? -1} ${stamp.frame} ${formatReal(stamp.sendMs ?? -1)} ${formatReal(stamp.receiveMs ?? -1)} ${formatReal(age)}`);
   }
   writeLines(responsePageFile(slot, probe.run, probe.page), lines);
   probe.page++;

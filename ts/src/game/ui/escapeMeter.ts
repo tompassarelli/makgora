@@ -6,6 +6,7 @@ import { ESCAPE_METER_BORDER, ESCAPE_METER_HEIGHT, ESCAPE_METER_SEGMENTS, type E
 import { createBackdrop, consoleUi } from "./frames";
 import { PANEL_TEXTURE } from "./hudLayout";
 import { destroyFrame, setFrameAbsPoint, setFrameEnabled, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 const WIDTH = f32(0.07);
 const HEIGHT = f32(ESCAPE_METER_HEIGHT);
@@ -29,12 +30,12 @@ export class EscapeMeter {
 
     const parent = consoleUi();
     const context = 1100 + slot * 20;
-    this.back = createBackdrop(`EscapeMeterBack${I2S(slot)}`, parent, context);
-    this.fill = createBackdrop(`EscapeMeterFill${I2S(slot)}`, parent, context + 1);
+    this.back = createBackdrop(`EscapeMeterBack${formatInt(slot)}`, parent, context);
+    this.fill = createBackdrop(`EscapeMeterFill${formatInt(slot)}`, parent, context + 1);
     const lines: framehandle[] = [];
-    for (let line = 1; line < SEGMENTS; line++) lines.push(createBackdrop(`EscapeMeterLine${I2S(slot)}`, parent, context + 1 + line));
+    for (let line = 1; line < SEGMENTS; line++) lines.push(createBackdrop(`EscapeMeterLine${formatInt(slot)}`, parent, context + 1 + line));
     this.lines = lines;
-    this.mark = createBackdrop(`EscapeMeterMark${I2S(slot)}`, parent, context + 1 + SEGMENTS);
+    this.mark = createBackdrop(`EscapeMeterMark${formatInt(slot)}`, parent, context + 1 + SEGMENTS);
     setFrameTexture(this.back, PANEL_TEXTURE, 0, true);
     setFrameTexture(this.fill, FILL, 0, true);
     for (const line of lines) setFrameTexture(line, PANEL_TEXTURE, 0, true);

@@ -43,6 +43,7 @@ import { pauseMatchPresentation, renderFighter, renderPersistentPresentation } f
 import { clearTextMessages, displayText } from "wisp/game/frames";
 import { setTerrainFogHeight, setTerrainFogOverSky } from "wisp/game/view";
 import { eventPlayer, localPlayer, playerSlot } from "wisp/game/players";
+import { formatInt, parseInt, parseReal, truncate } from "wisp/game/text";
 
 
 export function onDevCommand(s: ShellState): void {
@@ -54,8 +55,8 @@ const CINE_OFF_SUFFIX = " |cine off";
 const HOST_DELAY_COMMAND = "-dev hostdelay ";
 
 function hostDelayCommand(s: ShellState, actor: number, text: string): string {
-  const manual = text === "auto" ? AUTO_DELAY : S2I(text);
-  const valid = manual === AUTO_DELAY || (isFixedDelay(manual) && I2S(manual) === text);
+  const manual = text === "auto" ? AUTO_DELAY : parseInt(text);
+  const valid = manual === AUTO_DELAY || (isFixedDelay(manual) && formatInt(manual) === text);
   if (s.rollback === undefined || s.game.phase !== Phase.characterMenu || !isHost(s.game, actor) || !valid) return `dev: hostdelay takes auto or 0 to ${MAX_INPUT_DELAY} from the host on character select`;
   if (actor === localSlot()) sendHostDelay(manual);
   return `dev: hostdelay ${text}`;
@@ -188,7 +189,7 @@ function matchStartReceipt(s: ShellState, actor: number, message: string, reques
 // Capture maps play pads inside the map and stop counting frames while paused, so this draws the pause screen over the running match, in the keyboard or pad look chosen here instead of read from the connected controller.
 function pauseReceipt(s: ShellState, message: string): string | undefined {
   const [, , look, player] = message.split(" ");
-  const slot = player === undefined ? 0 : S2I(player) - 1;
+  const slot = player === undefined ? 0 : parseInt(player) - 1;
   if ((look !== "keyboard" && look !== "pad") || !isParticipantSlot(slot) || s.game.phase !== Phase.match) return undefined;
   s.dev.pauseLook = look;
   s.pausedBy = slot;
@@ -218,7 +219,7 @@ function shieldEnergyReceipt(s: ShellState, message: string): string | undefined
 }
 
 function meterReceipt(s: ShellState, message: string): string | undefined {
-  const points = S2I(message.substring(METER_COMMAND.length));
+  const points = parseInt(message.substring(METER_COMMAND.length));
   if (s.game.phase !== Phase.match || points < 0 || points > 100) return undefined;
   prepareDevState(s);
   for (const slot of PARTICIPANT_SLOTS) if (isActive(s.world, slot)) setMeterPercent(fighterAt(s.world, slot), points);
@@ -328,7 +329,7 @@ function probeReceipt(s: ShellState, actor: number, message: string, requests: D
     return "dev: render clock probe";
   }
   if (message.startsWith("-dev callback-clock ")) {
-    const callbacks = S2I(message.substring(20));
+    const callbacks = parseInt(message.substring(20));
     return callbacks > 0 && probeCallbackClock(0x43, callbacks) ? `dev: callback clock ${callbacks}` : undefined;
   }
   if (message === DESYNC_COMMAND) return desyncReceipt(actor);
@@ -340,7 +341,7 @@ function probeReceipt(s: ShellState, actor: number, message: string, requests: D
 }
 
 function effectsReceipt(s: ShellState, message: string): string | undefined {
-  const index = S2I(message.slice(13));
+  const index = parseInt(message.slice(13));
   const scenario = HIT_PRESENTATION_CASES[index];
   if (scenario === undefined || s.game.phase !== Phase.match) return undefined;
   const events = { ...createImpactEvents(), ...scenario.cue };
@@ -367,10 +368,10 @@ function leverReceipt(s: ShellState, message: string): string {
 }
 
 function fogReceipt(s: ShellState, message: string): string | undefined {
-  const v = message.slice(10).split(" ").map((word) => S2R(word));
+  const v = message.slice(10).split(" ").map((word) => parseReal(word));
   if (v.length < 11) return undefined;
   s.stageFogOverride = true;
-  setTerrainFogHeight(R2I(v[0] ?? 0), v[1] ?? 0, v[2] ?? 0, v[3] ?? 0, v[4] ?? 0, v[5] ?? 0, v[6] ?? 0, v[7] ?? 0, v[8] ?? 0, v[9] ?? 0, v[10] ?? 0);
+  setTerrainFogHeight(truncate(v[0] ?? 0), v[1] ?? 0, v[2] ?? 0, v[3] ?? 0, v[4] ?? 0, v[5] ?? 0, v[6] ?? 0, v[7] ?? 0, v[8] ?? 0, v[9] ?? 0, v[10] ?? 0);
   setTerrainFogOverSky((v[11] ?? 0) > 0.5);
   return `dev: fogv ${message.slice(10)}`;
 }

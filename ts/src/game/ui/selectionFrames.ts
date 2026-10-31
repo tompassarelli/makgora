@@ -9,6 +9,7 @@ import { createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
 import { SELECT_GRID_ORDER } from "./selectionLayout";
 import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
 import { createFrame, setFrameAlpha, setFrameEnabled, setFrameSize, setFrameTextAlignment, setFrameTexture } from "wisp/game/frames";
+import { formatInt, parseInt, textLength, toReal } from "wisp/game/text";
 
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
@@ -71,8 +72,8 @@ export function placeBottomBar(frames: { readonly status: framehandle; readonly 
     setFrameTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
     return;
   }
-  const statusWidth = f32(I2R(StringLength(statusText)) * BAR_CHAR_WIDTH);
-  const countWidth = f32(I2R(StringLength(countText)) * BAR_CHAR_WIDTH);
+  const statusWidth = f32(toReal(textLength(statusText)) * BAR_CHAR_WIDTH);
+  const countWidth = f32(toReal(textLength(countText)) * BAR_CHAR_WIDTH);
   const group = f32(f32(f32(statusWidth + countWidth) + BAR_COIN) + f32(BAR_GAP + BAR_LABEL_GAP));
   const statusRight = f32(f32(cardRight(slot, f32(0.08)) - f32(group / 2)) + statusWidth);
   const coinLeft = f32(statusRight + BAR_LABEL_GAP);
@@ -106,8 +107,8 @@ export function tileOfCharacter(character: number): RosterTile {
 }
 
 export const decodeTile = (data: string): RosterTile | undefined => {
-  const tile = S2I(data);
-  return I2S(tile) === data && tile >= 0 && tile < ROSTER_TILES ? tile : undefined;
+  const tile = parseInt(data);
+  return formatInt(tile) === data && tile >= 0 && tile < ROSTER_TILES ? tile : undefined;
 };
 export const decodeSlot = (data: string): number | undefined => (data === "0" ? 0 : data === "1" ? 1 : data === "2" ? 2 : data === "3" ? 3 : undefined);
 

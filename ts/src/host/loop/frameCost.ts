@@ -4,12 +4,13 @@ import { frameCostClockFile } from "../../game/core/gameFiles";
 import { displayText } from "wisp/game/frames";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
+import { formatInt, formatRealWidth } from "wisp/game/text";
 declare const os: { readonly clock?: () => number } | undefined;
 
 const WORK_ITERATIONS = 100000;
 
 function seconds(value: number): string {
-  return R2SW(value, 12, 6);
+  return formatRealWidth(value, 12, 6);
 }
 
 function readOsClock(): number | undefined {
@@ -35,7 +36,7 @@ export function probeFrameCostClock(): void {
   const message = `frame-cost-clock os=${hasOs ? "present" : "missing"} os.clock=${hasOsClock ? "present" : "missing"}`
     + ` os.delta=${osBefore === undefined || osAfter === undefined ? "n/a" : seconds(osAfter - osBefore)}`
     + ` timer.before=${seconds(timerBefore)} timer.after=${seconds(timerAfter)}`
-    + ` timer.delta=${seconds(timerAfter - timerBefore)} work=${I2S(work)}`;
+    + ` timer.delta=${seconds(timerAfter - timerBefore)} work=${formatInt(work)}`;
   displayText(localPlayer(), 0.0, 0.0, message);
   clearFileLines();
   startFile();

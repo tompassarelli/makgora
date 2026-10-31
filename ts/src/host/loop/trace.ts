@@ -8,6 +8,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { type ParticipantSlot, type Slots, isParticipantSlot } from "../../game/input/participants";
 import { writeLines } from "wisp/src/platform/fileio";
 import type { StateChecksumFold } from "../../game/replay/canonical";
+import { formatReal } from "wisp/game/text";
 
 const ECHO_CAPACITY = 256;
 const ECHO_BIN_LIMITS = [3, 6, 9, 12, 18] as const;
@@ -144,7 +145,7 @@ export function traceSeconds(trace: Readonly<InputTrace>): number {
 
 export function traceInput(trace: InputTrace, entry: string): void {
   if (!trace.active) return;
-  if (trace.lines.length < trace.capacity) trace.lines.push(`${trace.ticks} ${R2S(traceSeconds(trace))} ${entry}`);
+  if (trace.lines.length < trace.capacity) trace.lines.push(`${trace.ticks} ${formatReal(traceSeconds(trace))} ${entry}`);
   else trace.dropped++;
 }
 
@@ -182,7 +183,7 @@ export function resetEchoRing(trace: InputTrace): void {
 export function finishInputTrace(trace: InputTrace): void {
   trace.active = false;
   trace.finishedAt = clockSeconds(trace);
-  writeLines(INPUT_TRACE_FILE, [...trace.lines, ...traceEndLines(trace.dropped, trace.ticks, R2S(traceSeconds(trace)))]);
+  writeLines(INPUT_TRACE_FILE, [...trace.lines, ...traceEndLines(trace.dropped, trace.ticks, formatReal(traceSeconds(trace)))]);
 }
 
 
@@ -265,10 +266,10 @@ export function closeTraceWindow(trace: InputTrace, schedule: ScheduleSummary, j
   traceInput(trace, `local sent-rows ${w.sentRows} singleton-packets ${w.singletons} batch-pending ${schedule.batchPending}`);
   const wait = w.batchWait;
   const waitDivisor = Math.max(1, wait.samples);
-  traceInput(trace, `local capture-send samples ${wait.samples} callbacks mean-max ${R2S(wait.sumCallbacks / waitDivisor)}:${wait.maxCallbacks} native-ms mean-max ${R2S(wait.sumSeconds * 1000.0 / waitDivisor)}:${R2S(wait.maxSeconds * 1000.0)}`);
+  traceInput(trace, `local capture-send samples ${wait.samples} callbacks mean-max ${formatReal(wait.sumCallbacks / waitDivisor)}:${wait.maxCallbacks} native-ms mean-max ${formatReal(wait.sumSeconds * 1000.0 / waitDivisor)}:${formatReal(wait.maxSeconds * 1000.0)}`);
   const echo = w.echo;
   const echoDivisor = Math.max(1, echo.samples);
-  traceInput(trace, `local echo samples ${echo.samples} pending ${trace.echoPending} overwritten ${echo.overwritten} callbacks min-mean-max ${echo.minCallbacks}:${R2S(echo.sumCallbacks / echoDivisor)}:${echo.maxCallbacks}`);
-  traceInput(trace, `local echo native-ms min-mean-max ${R2S(echo.minSeconds * 1000.0)}:${R2S(echo.sumSeconds * 1000.0 / echoDivisor)}:${R2S(echo.maxSeconds * 1000.0)} callbacks bins 0-3,4-6,7-9,10-12,13-18,19+ ${echo.bins.join(":")}`);
+  traceInput(trace, `local echo samples ${echo.samples} pending ${trace.echoPending} overwritten ${echo.overwritten} callbacks min-mean-max ${echo.minCallbacks}:${formatReal(echo.sumCallbacks / echoDivisor)}:${echo.maxCallbacks}`);
+  traceInput(trace, `local echo native-ms min-mean-max ${formatReal(echo.minSeconds * 1000.0)}:${formatReal(echo.sumSeconds * 1000.0 / echoDivisor)}:${formatReal(echo.maxSeconds * 1000.0)} callbacks bins 0-3,4-6,7-9,10-12,13-18,19+ ${echo.bins.join(":")}`);
   trace.window = traceWindow();
 }

@@ -20,6 +20,7 @@ function bubblePosition(column: number, row: number): { readonly column: number;
 import type { CostumeTint } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
 import { setFrameAbsPoint, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 const PARTNER_BUBBLE_SCALE = f32(0.75);
 
@@ -36,8 +37,8 @@ export class OffscreenBubble {
   constructor(slot: number) {
 
     const parent = consoleUi();
-    this.portrait = createBackdrop(`OffscreenPortrait${I2S(slot)}`, parent, 920 + slot * 2);
-    this.arrow = createText(`OffscreenArrow${I2S(slot)}`, parent, 921 + slot * 2);
+    this.portrait = createBackdrop(`OffscreenPortrait${formatInt(slot)}`, parent, 920 + slot * 2);
+    this.arrow = createText(`OffscreenArrow${formatInt(slot)}`, parent, 921 + slot * 2);
     setFrameSize(this.portrait, OFFSCREEN_PORTRAIT, OFFSCREEN_PORTRAIT);
     setFrameSize(this.arrow, f32(0.027), f32(0.027));
     setFrameFont(this.arrow, MENU_FONT, f32(0.021), 0);

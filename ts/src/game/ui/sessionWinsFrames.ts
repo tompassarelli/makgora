@@ -1,6 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { createBackdrop, createText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { setFrameEnabled, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 export interface SessionWinsFrames {
   readonly coin: framehandle;
@@ -33,7 +34,7 @@ export function presentSessionWinsFrames(frames: SessionWinsFrames, count: numbe
     frames.shown = shown;
   }
   if (shown && frames.shownCount !== count) {
-    setMenuText(frames.count, `x${I2S(count)}`);
+    setMenuText(frames.count, `x${formatInt(count)}`);
     frames.shownCount = count;
   }
 }

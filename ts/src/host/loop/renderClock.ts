@@ -8,6 +8,7 @@ import { renderClockFile } from "../../game/core/gameFiles";
 import { displayText } from "wisp/game/frames";
 import { localPlayer, playerSlot } from "wisp/game/players";
 import { addFileLine, clearFileLines, endFile, startFile } from "wisp/game/files";
+import { formatInt, formatRealWidth } from "wisp/game/text";
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
 const PROBE_GAME_SECONDS = 4.0;
@@ -48,13 +49,13 @@ function percentile(sorted: readonly number[], p: number): number {
 }
 
 function ms(value: number): string {
-  return R2SW(value * 1000.0, 1, 3);
+  return formatRealWidth(value * 1000.0, 1, 3);
 }
 
 function summarize(candidate: Candidate, gap: number): string[] {
   const { clock, game, cost, callbacks } = candidate;
   const n = clock.length;
-  if (n < 2) return [`${candidate.name} callbacks=${I2S(callbacks)} samples=${I2S(n)}`];
+  if (n < 2) return [`${candidate.name} callbacks=${formatInt(callbacks)} samples=${formatInt(n)}`];
   const frameGaps: number[] = [];
   const gameSteps: number[] = [];
   const perFrame: number[] = [];
@@ -83,19 +84,19 @@ function summarize(candidate: Candidate, gap: number): string[] {
   for (const value of cost) totalCost += value;
   cost.sort((a, b) => a - b);
   return [
-    `${candidate.name} callbacks=${I2S(callbacks)} samples=${I2S(n)} capped=${callbacks > n ? "yes" : "no"}`
-      + ` bursts=${I2S(frames)} clock=${ms(wall)}ms game=${ms(gameSpan)}ms`
-      + ` bursts/s=${R2SW(wall > 0 ? (frames - 1) / wall : 0, 1, 1)}`,
+    `${candidate.name} callbacks=${formatInt(callbacks)} samples=${formatInt(n)} capped=${callbacks > n ? "yes" : "no"}`
+      + ` bursts=${formatInt(frames)} clock=${ms(wall)}ms game=${ms(gameSpan)}ms`
+      + ` bursts/s=${formatRealWidth(wall > 0 ? (frames - 1) / wall : 0, 1, 1)}`,
     `${candidate.name} burst-gap-ms p10=${ms(percentile(frameGaps, TENTH))} p50=${ms(percentile(frameGaps, 0.5))}`
       + ` p90=${ms(percentile(frameGaps, NINE_TENTHS))} max=${ms(percentile(frameGaps, 1.0))}`,
     `${candidate.name} game-step-ms p10=${ms(percentile(gameSteps, TENTH))} p50=${ms(percentile(gameSteps, 0.5))}`
       + ` p90=${ms(percentile(gameSteps, NINE_TENTHS))} max=${ms(percentile(gameSteps, 1.0))}`,
-    `${candidate.name} callbacks-per-burst min=${I2S(perFrame[0] ?? 0)} p50=${I2S(percentile(perFrame, 0.5))}`
-      + ` max=${I2S(perFrame[frames - 1] ?? 0)} in-burst-spacing-us=${R2SW(burstPairs > 0 ? burstSpan / burstPairs * 1000000.0 : 0, 1, 2)}`,
-    `${candidate.name} record-cost-us mean=${R2SW(totalCost / n * 1000000.0, 1, 2)}`
-      + ` p50=${R2SW(percentile(cost, 0.5) * 1000000.0, 1, 2)}`
-      + ` p90=${R2SW(percentile(cost, NINE_TENTHS) * 1000000.0, 1, 2)}`
-      + ` max=${R2SW(percentile(cost, 1.0) * 1000000.0, 1, 2)} total-ms=${ms(totalCost)}`,
+    `${candidate.name} callbacks-per-burst min=${formatInt(perFrame[0] ?? 0)} p50=${formatInt(percentile(perFrame, 0.5))}`
+      + ` max=${formatInt(perFrame[frames - 1] ?? 0)} in-burst-spacing-us=${formatRealWidth(burstPairs > 0 ? burstSpan / burstPairs * 1000000.0 : 0, 1, 2)}`,
+    `${candidate.name} record-cost-us mean=${formatRealWidth(totalCost / n * 1000000.0, 1, 2)}`
+      + ` p50=${formatRealWidth(percentile(cost, 0.5) * 1000000.0, 1, 2)}`
+      + ` p90=${formatRealWidth(percentile(cost, NINE_TENTHS) * 1000000.0, 1, 2)}`
+      + ` max=${formatRealWidth(percentile(cost, 1.0) * 1000000.0, 1, 2)} total-ms=${ms(totalCost)}`,
   ];
 }
 
@@ -130,8 +131,8 @@ export function probeRenderClock(): void {
     DestroyTimer(fast);
     DestroyTimer(reference);
     DestroyTimer(stop);
-    const lines = [`render-clock run=${I2S(run)} clock=${step > 0 ? "running" : "unavailable"}`
-      + ` clock-step-us=${R2SW(step * 1000000.0, 1, 2)} burst-gap-threshold-ms=${ms(gap)}`];
+    const lines = [`render-clock run=${formatInt(run)} clock=${step > 0 ? "running" : "unavailable"}`
+      + ` clock-step-us=${formatRealWidth(step * 1000000.0, 1, 2)} burst-gap-threshold-ms=${ms(gap)}`];
     for (const candidate of [zeroSamples, fastSamples]) for (const line of summarize(candidate, gap)) lines.push(line);
     clearFileLines();
     startFile();

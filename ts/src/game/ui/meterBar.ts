@@ -4,6 +4,7 @@ import type { PlateRect } from "./plateLayout";
 import { createBackdrop } from "./frames";
 import { PANEL_TEXTURE } from "./hudLayout";
 import { destroyFrame, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameLevel, setFramePoint, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 const LINE_WIDTH = f32(0.0006);
 const ULTIMATE_FILL = "ReplaceableTextures\\TeamColor\\TeamColor04.blp";
@@ -30,7 +31,7 @@ export class MeterBar {
   private tick = 0;
 
   constructor(name: string, slot: number, parent: framehandle, context: number) {
-    const suffix = `${name}${I2S(slot)}`;
+    const suffix = `${name}${formatInt(slot)}`;
     this.ultimateBack = createBackdrop(`MeterUltimateBack${suffix}`, parent, context);
     this.ultimateFill = createBackdrop(`MeterUltimateFill${suffix}`, parent, context + 1);
     this.ultimatePulse = createBackdrop(`MeterUltimatePulse${suffix}`, parent, context + 2);

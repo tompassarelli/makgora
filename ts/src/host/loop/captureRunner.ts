@@ -11,6 +11,7 @@ import { holdAgeSeekedEffects } from "./heldAnimations";
 import { type ShellState, shellState } from "./state";
 import { clearTextMessages, screenHeight, screenWidth } from "wisp/game/frames";
 import { cameraEyeX, cameraEyeY, cameraEyeZ, cameraField, cameraTargetX, cameraTargetY, cameraTargetZ } from "wisp/game/view";
+import { toReal } from "wisp/game/text";
 
 const WARMUP_TICKS = 300;
 
@@ -53,7 +54,7 @@ function recordScreenBoxes(s: ShellState, fixture: CaptureFixture, slot: 0 | 1, 
   const fighter = fighterAt(s.world, slot);
   const width = screenWidth();
   const height = screenHeight();
-  const aspect = height > 0 ? I2R(width) / I2R(height) : 16.0 / 9.0;
+  const aspect = height > 0 ? toReal(width) / toReal(height) : 16.0 / 9.0;
   const region = screenBox(s.camera, aspect, width, height, effectBounds(fighter, hurtBounds(fighter, emptyBounds())));
   const body = screenBox(s.camera, aspect, width, height, hurtBounds(fighter, emptyBounds()));
   screenLines.push(`SCREEN ${fixture.name} ${frame} ${width} ${height} ${boxText(region)} ${boxText(body)}`);

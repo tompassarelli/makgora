@@ -1,6 +1,7 @@
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { writeLine } from "wisp/src/platform/fileio";
 import { handleLedgerFile } from "../../game/core/gameFiles";
+import { formatInt, parseInt } from "wisp/game/text";
 
 export const LEDGER_MARK = "l";
 export const LEDGER_TICKS = 60;
@@ -98,8 +99,8 @@ export function installHandleLedger(ledger: HandleLedger): void {
 }
 
 export function encodeLedgerReport(record: Readonly<LedgerWindow>): string {
-  const parts = [`${LEDGER_MARK}${I2S(record.window)}:${I2S(record.total)}`];
-  for (const tick of record.ticks.slice(0, SENT_TICKS)) parts.push(`${I2S(tick.offset)}.${I2S(tick.count)}.${I2S(tick.natives[0] ?? -1)}`);
+  const parts = [`${LEDGER_MARK}${formatInt(record.window)}:${formatInt(record.total)}`];
+  for (const tick of record.ticks.slice(0, SENT_TICKS)) parts.push(`${formatInt(tick.offset)}.${formatInt(tick.count)}.${formatInt(tick.natives[0] ?? -1)}`);
   if (record.ticks.length > SENT_TICKS) parts.push(OVERFLOW);
   return parts.join(",");
 }
@@ -112,11 +113,11 @@ export function decodeLedgerReport(data: string): LedgerReport | undefined {
   const ticks: { offset: number; count: number; native: number }[] = [];
   for (const part of parts.slice(1)) {
     if (part === OVERFLOW) continue;
-    const [offset, count, native] = part.split(".").map(value => S2I(value));
+    const [offset, count, native] = part.split(".").map(value => parseInt(value));
     if (offset === undefined || count === undefined || native === undefined) return undefined;
     ticks.push({ offset, count, native });
   }
-  return { window: S2I(head[0] ?? ""), total: S2I(head[1] ?? ""), ticks };
+  return { window: parseInt(head[0] ?? ""), total: parseInt(head[1] ?? ""), ticks };
 }
 
 export function takeLedgerReport(ledger: HandleLedger): string | undefined {
@@ -152,10 +153,10 @@ export function receiveLedgerReport(ledger: HandleLedger, local: number, sender:
   const tick = offset < 0 ? window : window + offset;
   const mine = own.ticks.find(entry => entry.offset === offset);
   const theirs = other.ticks.find(entry => entry.offset === offset);
-  const where = offset < 0 ? `in ticks ${I2S(window)}-${I2S(window + LEDGER_TICKS - 1)}` : `at tick ${I2S(tick)}`;
-  const line = `handle ledger: p${I2S(local)} and p${I2S(sender)} differ ${where}:`
-    + ` p${I2S(local)} made or freed ${I2S(offset < 0 ? own.total : mine?.count ?? 0)} (${(mine?.natives ?? []).map(code => nativeName(code)).join(" ")})`
-    + ` and p${I2S(sender)} ${I2S(offset < 0 ? other.total : theirs?.count ?? 0)} (${theirs === undefined ? "" : nativeName(theirs.native)})`;
+  const where = offset < 0 ? `in ticks ${formatInt(window)}-${formatInt(window + LEDGER_TICKS - 1)}` : `at tick ${formatInt(tick)}`;
+  const line = `handle ledger: p${formatInt(local)} and p${formatInt(sender)} differ ${where}:`
+    + ` p${formatInt(local)} made or freed ${formatInt(offset < 0 ? own.total : mine?.count ?? 0)} (${(mine?.natives ?? []).map(code => nativeName(code)).join(" ")})`
+    + ` and p${formatInt(sender)} ${formatInt(offset < 0 ? other.total : theirs?.count ?? 0)} (${theirs === undefined ? "" : nativeName(theirs.native)})`;
   ledger.lines.push(line);
   writeLine(handleLedgerFile(local, tick), line);
   return line;

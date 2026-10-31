@@ -11,6 +11,7 @@ import { departPlayerFiles, enqueuePlayerFile, lobbyCounter, receiveLobbyCounter
 import { createEvents, onEvents } from "wisp/game/events";
 import { eventPlayer, localPlayer, player, playerSlot, playerSlotState } from "wisp/game/players";
 import { addSyncEvent, sendSync, syncData, syncPrefix } from "wisp/game/sync";
+import { parseInt } from "wisp/game/text";
 
 export const PLAYER_FILE_RECEIVED = "shell.playerFileReceived";
 const MORE_PREFIX = "SC_FL";
@@ -54,7 +55,7 @@ export function playerFileReceived(): void {
     return;
   }
   const end = data.indexOf(COUNTER_END);
-  receiveLobbyCounter(files(), owner, S2I(data.substring(0, end)));
+  receiveLobbyCounter(files(), owner, parseInt(data.substring(0, end)));
   receivePlayerFileChunk(files(), owner, data.substring(end + 1), true, sendFile);
 }
 
@@ -67,7 +68,7 @@ export const receivedLobbyCounter = (owner: number): number => lobbyCounter(file
 
 // Engine: Preloader replays the first counter it read for the whole process, so the latest counter written is kept in memory.
 function takeLobbyCounter(): void {
-  const counter = (globalThis.__smashcraftLobbyCounter ?? S2I(readChunk(LOBBY_COUNTER_FILE) ?? "")) + 1;
+  const counter = (globalThis.__smashcraftLobbyCounter ?? parseInt(readChunk(LOBBY_COUNTER_FILE) ?? "")) + 1;
   globalThis.__smashcraftLobbyCounter = counter;
   writeChunks(LOBBY_COUNTER_FILE, [`${counter}`]);
 }

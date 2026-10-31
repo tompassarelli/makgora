@@ -7,6 +7,7 @@ import { clockSeconds } from "./trace";
 import { arenaFogOffset, arenaFogEnd, cameraZOverride } from "../../game/presentation/arenaCamera";
 import { createEffect, destroyEffect, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { resetTerrainFog, setDayNightModels, setShadowLightCount, setSkyModel, setTerrainFog, setTerrainFogHeight, setTerrainFogMaxDensity, setTerrainFogOverSky, showSky, showTerrain } from "wisp/game/view";
+import { parseInt, parseReal } from "wisp/game/text";
 
 function updateStageFog(s: ShellState): void {
   if (s.stageFogHidden === true || s.stageFogOverride === true) return;
@@ -161,15 +162,15 @@ export function showStageLighting(s: ShellState, authored: boolean): void {
 
 export function leverCommand(s: ShellState, name: string, a: string, b: string): void {
   if (name === "fog") showStageFog(s, a === "on");
-  else if (name === "density") setTerrainFogMaxDensity(S2R(a));
+  else if (name === "density") setTerrainFogMaxDensity(parseReal(a));
   else if (name === "oversky") setTerrainFogOverSky(a === "on");
   else if (name === "sky") showSky(a === "on");
-  else if (name === "camz") cameraZOverride.z = a === "off" ? undefined : S2R(a);
-  else if (name === "shadows") setShadowLightCount(S2I(a));
+  else if (name === "camz") cameraZOverride.z = a === "off" ? undefined : parseReal(a);
+  else if (name === "shadows") setShadowLightCount(parseInt(a));
   else if (name === "light") {
     const lights = pointLightPieces(s.game.stageChoice);
     const effects = s.stageScenery ?? [];
-    const index = S2I(a);
+    const index = parseInt(a);
     const effect = effects[effects.length - lights.length + index];
     const piece = lights[index];
     if (effect === undefined || piece === undefined) return;

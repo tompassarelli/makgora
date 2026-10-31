@@ -38,6 +38,7 @@ import { placeTopLeft, setMenuText } from "./frames";
 import { presentLiveFighter } from "./liveCard";
 import { BAR_HEIGHT, BAR_TEXT, BOTTOM_BAR_TOP, TAG_SCALE, TAG_SIZE, art, hotspot, label, modeBox, nameText, placeBottomBar, portraitTexture, tileOfCharacter, titleCase } from "./selectionFrames";
 import { createFrame, createFrameByType, setFrameAlpha, setFrameEnabled, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 export const selectionCardTexture = (color: string): string => `war3mapImported\\SelectionCard${color}.tga`;
 const CHIP_TEXTURES: Slots<string> = ["war3mapImported\\SelectionChipP1.tga", "war3mapImported\\SelectionChipP2.tga", "war3mapImported\\SelectionChipP3.tga", "war3mapImported\\SelectionChipP4.tga"];
@@ -91,7 +92,7 @@ export interface CardFrames {
 
 export function createCard(root: framehandle, suffix: string, slot: number, add: (frame: framehandle, target: CardButton) => framehandle): CardFrames {
   const x = cardX(slot);
-  const name = `${suffix}_${I2S(slot)}`;
+  const name = `${suffix}_${formatInt(slot)}`;
   const card = art(root, `MeleeCard${name}`, selectionCardTexture("Gray"), x, CARD_TOP, CARD_WIDTH, CARD_HEIGHT);
   const mode = createFrameByType("BUTTON", `MeleeModeButton${name}`, root, "", 0);
   const modeArea = modeBox(slot);
@@ -111,7 +112,7 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   const dotArea = costumeDotsBox(slot);
   const dotSize = cardSize(COSTUME_DOT);
   const dots = Array.from({ length: MAX_COSTUMES }, (_, index) => {
-    const dot = art(root, `MeleeCostumeDot${name}_${I2S(index)}`, selectionChipTexture(slot, true), f32(dotArea.x + f32(index * f32(dotSize + cardSize(COSTUME_DOT_GAP)))), dotArea.y, dotSize, dotSize);
+    const dot = art(root, `MeleeCostumeDot${name}_${formatInt(index)}`, selectionChipTexture(slot, true), f32(dotArea.x + f32(index * f32(dotSize + cardSize(COSTUME_DOT_GAP)))), dotArea.y, dotSize, dotSize);
     setFrameVisible(dot, false);
     return dot;
   });
@@ -159,9 +160,9 @@ export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>
   setFrameVisible(frames.name, shown);
   const winsShown = shown && sessionWins > 0;
   presentSessionWinsFrames(frames.wins, sessionWins, shown);
-  const statusText = human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : active && !human ? "CPU" : `P${I2S(slot + 1)}${at(echoes, slot)}`;
+  const statusText = human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : active && !human ? "CPU" : `P${formatInt(slot + 1)}${at(echoes, slot)}`;
   setMenuText(frames.status, statusText);
-  placeBottomBar(frames, slot, winsShown, statusText, `x${I2S(sessionWins)}`);
+  placeBottomBar(frames, slot, winsShown, statusText, `x${formatInt(sessionWins)}`);
   if (ready) {
     setFrameTexture(frames.portrait, portraitTexture(choice, false, palette, choice === undefined || choice < 0 ? 0 : costumeIndex(choice, game.costumeChoices[slot] ?? 0)), 0, true);
     setMenuText(frames.name, nameText(choice));

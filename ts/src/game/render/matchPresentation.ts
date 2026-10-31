@@ -36,6 +36,7 @@ import { setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFont, setFram
 import { player } from "wisp/game/players";
 import { preloadAsset } from "wisp/game/files";
 import { clearMusic, createSound, endTheme, playMusic, playSound, playTheme, resetVolumeGroups, setSoundCutoff, setSoundDistances, setSoundDuration, setSoundPosition, setSoundVolume, setVolumeGroup, soundFileDuration, stopMusic, stopSound } from "wisp/game/sound";
+import { formatInt, toReal } from "wisp/game/text";
 
 
 export const RESULTS_DELAY_FRAMES = 90;
@@ -129,11 +130,11 @@ export class MatchPresentation {
     let text = "";
     let age = 0;
     if (game.phase === Phase.result && game.rematchCountdown > 0) {
-      text = I2S(floorDiv(game.rematchCountdown + MATCH_TICKS_PER_SECOND - 1, MATCH_TICKS_PER_SECOND));
+      text = formatInt(floorDiv(game.rematchCountdown + MATCH_TICKS_PER_SECOND - 1, MATCH_TICKS_PER_SECOND));
       age = floorMod(-game.rematchCountdown, MATCH_TICKS_PER_SECOND);
     } else if (game.phase === Phase.match && game.startHold > 0 && game.matchFrame > 0) {
       if (game.matchFrame <= game.startHold) {
-        text = I2S(floorDiv(game.startHold - game.matchFrame + MATCH_TICKS_PER_SECOND, MATCH_TICKS_PER_SECOND));
+        text = formatInt(floorDiv(game.startHold - game.matchFrame + MATCH_TICKS_PER_SECOND, MATCH_TICKS_PER_SECOND));
         age = floorMod(game.matchFrame - 1, MATCH_TICKS_PER_SECOND);
       } else if (game.matchFrame <= game.startHold + MATCH_TICKS_PER_SECOND) {
         text = "GO!";
@@ -323,7 +324,7 @@ export class MatchPresentation {
     for (const [index, row] of bodies.entries()) {
       const pose = this.poses[row.slot];
       if (pose === undefined) continue;
-      const { clip, time } = resultPoseAt(pose.clips, row.winner, I2R(this.resultFrames) / 60.0);
+      const { clip, time } = resultPoseAt(pose.clips, row.winner, toReal(this.resultFrames) / 60.0);
       const modelPath = costumeClipModel(pose.character, pose.costume, clip);
       if (pose.model !== undefined && pose.modelPath !== modelPath) {
         destroyEffect(pose.model);

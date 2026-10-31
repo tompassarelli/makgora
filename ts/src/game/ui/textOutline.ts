@@ -2,13 +2,14 @@ import { f32 } from "wisp/src/sim/f32";
 import { unitsForPixels } from "./portraitFrames";
 import { createText } from "./frames";
 import { clearFramePoints, createFrame, destroyFrame, setFrameEnabled, setFrameFont, setFrameLevel, setFramePoint, setFrameScale, setFrameText, setFrameTextAlignment, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 const OFFSETS = [[-1, 1], [1, 1], [-1, -1], [1, -1]] as const;
 
 
 export function createOutline(name: string, owner: framehandle, context: number, font: string, size: number, level: number): readonly framehandle[] {
   return OFFSETS.map((_, index) => {
-    const copy = createText(`${name}Outline${I2S(index)}`, owner, context);
+    const copy = createText(`${name}Outline${formatInt(index)}`, owner, context);
     setFrameFont(copy, font, size, 0);
     setFrameEnabled(copy, false);
     setFrameLevel(copy, level);

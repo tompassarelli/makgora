@@ -5,6 +5,7 @@ import type { ResultRow } from "../presentation/matchCues";
 import { ButtonClicks, createBackdrop, createText, gameUi, highlightText, placeTopLeft, setMenuText, sizeText, styleMenuPanel } from "./frames";
 import { MENU_STYLE } from "./hudLayout";
 import { createFrame, setFrameEnabled, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible } from "wisp/game/frames";
+import { formatInt } from "wisp/game/text";
 
 export const RESULT_CHOICE_NAMES = ["Rematch", "New stage", "Character select"] as const;
 
@@ -45,7 +46,7 @@ export class ResultsBanner {
     };
     this.heading = text("MatchResultsTitle", INNER_LEFT, f32(0.578), INNER_WIDTH, f32(0.022), MENU_STYLE.headerSize);
     for (let index = 0; index < PARTICIPANT_CAPACITY; index++) {
-      this.columns.push(text(`MatchResultsLine${I2S(index)}`, INNER_LEFT, f32(0.553), INNER_WIDTH, f32(0.045), MENU_STYLE.bodySize));
+      this.columns.push(text(`MatchResultsLine${formatInt(index)}`, INNER_LEFT, f32(0.553), INNER_WIDTH, f32(0.045), MENU_STYLE.bodySize));
     }
     for (let choice = 0; choice < RESULT_CHOICE_NAMES.length; choice++) {
       const button = createFrame("ScriptDialogButton", this.root, 0, 0);
