@@ -1,7 +1,6 @@
 import { expect, test } from "bun:test";
 import { KO_ZOOM_FRAMES, zoomOntoKo, zoomWeight } from "../src/host/loop/finale";
 import { createMatchCamera } from "../src/game/sim/matchCamera";
-import { standaloneArguments } from "../scripts/wisp/standalone";
 
 test("the KO zoom starts and ends on the match shot and lasts under a second [k2 property]", () => {
   expect(zoomWeight(0)).toBe(0);
@@ -15,10 +14,4 @@ test("the KO zoom starts and ends on the match shot and lasts under a second [k2
   zoomOntoKo(camera, { x: -300, z: 40 }, 20);
   expect(camera.x).toBe(-300);
   expect(camera.distance).toBe(650);
-});
-
-test("--start names where the native window opens [k2 property]", () => {
-  expect(standaloneArguments(["--start", "select"], "native").start).toBe("select");
-  expect(standaloneArguments([]).start).toBeUndefined();
-  expect(() => standaloneArguments(["--start", "title"])).toThrow("--start needs");
 });

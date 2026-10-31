@@ -125,7 +125,6 @@ src/game/sim/heroSpecials.tests.ts	14	0.033
 src/game/sim/heroStatus.tests.ts	5	0.006
 src/game/fighters/beastmaster/specials.tests.ts	10	0.195
 src/game/sim/heroes/cairne.tests.ts	24	0.088
-src/game/fighters/chen/moves.tests.ts	3	0.005
 src/game/fighters/dreadlord/specials.tests.ts	12	0.048
 src/game/sim/heroes/exCoreHeroes.tests.ts	8	0.020
 src/game/sim/heroes/fighterArt.tests.ts	1	0.002
