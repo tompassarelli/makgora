@@ -255,12 +255,14 @@ function playerAssetsOf(playerAssetsOnly: boolean, map: string | undefined): { r
 const NATIVE_GAME_MODULE = join(import.meta.dir, "nativeGame.ts");
 
 export const standalonePlay: Command = (args) => Effect.gen(function*() {
-  const { runStandalone, standaloneNetArguments, standaloneWindowArgument } = yield* Effect.tryPromise({ try: () => import("wisp/scripts/wisp/standalone"), catch: (cause) => new RenderFailure({ cause }) });
+  const { runStandalone, standaloneEmulatedCallsArgument, standaloneNetArguments, standaloneWindowArgument } = yield* Effect.tryPromise({ try: () => import("wisp/scripts/wisp/standalone"), catch: (cause) => new RenderFailure({ cause }) });
   const net = standaloneNetArguments(args);
   if (typeof net === "string") return yield* new UsageFailure({ problem: net });
   const windowed = standaloneWindowArgument(net.rest);
   if (typeof windowed === "string") return yield* new UsageFailure({ problem: windowed });
-  const options = yield* Effect.try({ try: () => standaloneArguments(windowed.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
+  const counted = standaloneEmulatedCallsArgument(windowed.rest);
+  if (typeof counted === "string") return yield* new UsageFailure({ problem: counted });
+  const options = yield* Effect.try({ try: () => standaloneArguments(counted.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
   const { playerAssets, start, chosen, ...run } = options;
   if (windowed.window === "native" && (options.presentation !== undefined || options.fourFighters === true)) {
     return yield* new UsageFailure({ problem: "--window native steps Smashcraft's default session; drop --presentation and --four-fighters or use --window chrome" });
@@ -275,6 +277,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}), ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) }) }, {
     ...run,
     ...(playerAssets === undefined ? {} : { gpuLease: false }),
+    ...(counted.emulatedCalls === undefined ? {} : { emulatedCalls: counted.emulatedCalls }),
     ...(net.net === undefined ? {} : { net: net.net }),
     ...(windowed.window === undefined ? {} : { window: windowed.window }),
     ...(windowed.window === "native" ? { nativeGame: { module: nativeModule, export: "SMASHCRAFT_NATIVE_GAME" } } : {}),

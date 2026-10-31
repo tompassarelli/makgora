@@ -87,6 +87,7 @@
   Linux, which links the Wayland, X11 and Vulkan libraries into the library, so no dev shell or
   `LD_LIBRARY_PATH` is needed) (wisp:docs/native-window-plan.md, "Where a consumer gets the library").
   Private map and Warcraft assets stay in the existing local asset store.
+- `--emulated-calls FILE` (either window) writes the headless client's emulated-native call counts to FILE as JSON when the run ends: one count per Warcraft native name, a native never called absent. A migrated game API family reads zero (wisp:docs/game-api-plan.md, "The measurement that proves it"). Native window run: `bun wisp play --standalone --window native --start select --script PAD --headless --frames N --emulated-calls FILE`.
 - Host and join: `bun wisp play --standalone --host [--port N]` prints a join
   code and its direct addresses; the other player runs
   `bun wisp play --standalone --join CODE` (or `ADDRESS:PORT`). Both meet at
