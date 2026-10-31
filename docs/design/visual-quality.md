@@ -571,6 +571,15 @@ the existing teal linear fog. TS-c keeps the waterfall on the left with
 Classic's installed ordinary stock waterfall, which is misty; `WaterfallNoMist`
 has no Classic copy.
 
+Blackrock's native-window sky is a painted look (`skyLook` in
+smashcraft:ts/src/game/presentation/hazardStageScenery.ts): a dark smoky zenith,
+heavy ash cloud cover and a low ember glow at the fog-coloured horizon, so the sky
+shades from smoke to heat where it was one flat red (Tom's second playtest, 2026-10-31).
+Its two flames stand on two dark volcano cones, which are the stage's own
+knoll model stretched tall, with each flame's light at the summit. They hung at
+the tips of the thin spires before, with no vent under them; no fire or smoke
+emitter on the stage has no visible source.
+
 Blackrock's row is in place (#292). Its two forge fires carry light-only
 omni models (smashcraft:ts/src/game/assets/stagePointLights.ts): warm orange,
 a slow flicker of ±12.5%, and a reach that ends at least 3,000 units behind

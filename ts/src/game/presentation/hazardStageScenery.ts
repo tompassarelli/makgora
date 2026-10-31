@@ -141,6 +141,7 @@ export const GRYPHON_SCENERY: StageScenery = {
 export const BLACKROCK_SCENERY: StageScenery = {
   farZ: 17000.0,
   sky: STAGE_SKY_MODELS[12] ?? "",
+  skyLook: { zenith: [f32(0.03), f32(0.025), f32(0.03)], cover: f32(0.75), sunAzimuth: 70, sunElevation: 6, sun: [f32(0.7), f32(0.26), f32(0.08)], stars: f32(0.0), glow: f32(0.7) },
   fog: { start: 8000.0, end: 16000.0, red: 0.5, green: 0.125, blue: 0.0625 },
   floor: { model: STAGE_LAVA_MODEL, z: -1300.0, color: [118, 73, 64] },
   pieces: [
@@ -168,8 +169,10 @@ export const BLACKROCK_SCENERY: StageScenery = {
     { model: BASALT, x: -2500.0, y: 4800.0, z: -1600.0, scale: 7.0, yaw: 190.0, matrixScale: [1.75, 1.0, 5.5], color: [30, 28, 30] },
     { model: BASALT, x: -3300.0, y: 4000.0, z: -1550.0, scale: 6.0, yaw: 20.0, matrixScale: [2.25, 1.0, 2.5], color: [30, 28, 30] },
     { model: BASALT, x: 3200.0, y: 4050.0, z: -1550.0, scale: 6.0, yaw: 150.0, matrixScale: [2.25, 1.0, 2.0], color: [30, 28, 30] },
-    { model: TRAP, x: 2000.0, y: 4550.0, z: 880.0, scale: 2.0, yaw: 0.0 },
-    { model: PILLAR, x: -2800.0, y: 4550.0, z: 930.0, scale: 1.25, yaw: 0.0 },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: 2100.0, y: 4000.0, z: -1500.0, scale: 1.0, yaw: 30.0, matrixScale: [14.0, 14.0, 14.0], color: [58, 40, 36] },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: -2500.0, y: 4000.0, z: -1500.0, scale: 1.0, yaw: 200.0, matrixScale: [13.0, 13.0, 12.0], color: [58, 40, 36] },
+    { model: TRAP, x: 2100.0, y: 4000.0, z: 300.0, scale: 2.0, yaw: 0.0 },
+    { model: PILLAR, x: -2500.0, y: 4000.0, z: 60.0, scale: 2.0, yaw: 0.0 },
   ],
 };
 
