@@ -38,8 +38,8 @@ export function passStartControls(clients: StartClients, step: (count: number) =
   step(2);
 }
 
-const NOT_NOW_X = f32(NOT_NOW_BOX.x + f32(NOT_NOW_BOX.width / 2));
-const NOT_NOW_Y = f32(NOT_NOW_BOX.y - f32(NOT_NOW_BOX.height / 2));
+export const NOT_NOW_X = f32(NOT_NOW_BOX.x + f32(NOT_NOW_BOX.width / 2));
+export const NOT_NOW_Y = f32(NOT_NOW_BOX.y - f32(NOT_NOW_BOX.height / 2));
 
 export const tutorialPrompted = (client: StartClient): boolean => client.frames?.shownText().includes(NOT_NOW_LABEL) === true;
 

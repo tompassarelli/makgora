@@ -29,7 +29,7 @@ import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "./headless";
 import { deliverKey } from "./deliverKey";
 import { headlessRender, playerRender } from "./headlessRender";
 import { createNetStandalone, smashcraftMapHash } from "./net";
-import { ACTIONS, CPU_OPPONENT, SELECTION_SCRIPT, selectionClicks, selectionPresses } from "./selectionScript";
+import { ACTIONS, CPU_OPPONENT, SELECTION_SCRIPT, selectionPointer, selectionPresses } from "./selectionScript";
 
 const BINDINGS = presetBindings(DEFAULT_PRESET);
 const ESCAPE_KEY = 0x1b;
@@ -86,7 +86,8 @@ export async function createStandaloneSession(options: { readonly script?: strin
   const scripted = script?.startsWith(SELECTION_SCRIPT) === true;
   const selection = scripted || start === "select";
   const driven = script !== undefined && !scripted;
-  const presses = scripted ? selectionPresses(script) : [], clicks = scripted ? selectionClicks(script) : [];
+  const presses = scripted ? selectionPresses(script) : [];
+  const pointer = scripted ? selectionPointer(script) : undefined;
   let steps = 0;
   const runtime = installHeadless(!driven || presentation === "pool-confirmed" || presentation === "pool-predicted" ? PREDICTED_HEADLESS : SMASHCRAFT_HEADLESS);
   let restoreTutorialOffers = (): void => {};
@@ -166,7 +167,8 @@ export async function createStandaloneSession(options: { readonly script?: strin
           tap = beatTap;
         } else if (!driven) {
           const now = steps++;
-          for (const click of clicks) if (click.step === now) clients.click(0, click.x, click.y);
+          const reading = pointer?.(now);
+          if (reading !== undefined) feedPointer(reading);
           if (!scripted && input.pointer !== undefined) feedPointer(input.pointer);
           if (!scripted && input.keys !== undefined) feedKeys(input.keys);
           const next = heldKeys(scripted ? { buttons: presses.filter(press => now >= press.step && now < press.step + 3).map(press => press.button), axisX: 0, axisY: 0 } : input);
