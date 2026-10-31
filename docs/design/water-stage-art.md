@@ -150,7 +150,7 @@ Measured on a native-window capture at match zoom, 1920x1080, in both facings.
 Luma is Rec709 on 8-bit sRGB (0 to 255). A block is a square of 0.2 of the frame
 height of open water (no deck, fighter, foam line or reaction inside it); p50 and
 p99 are that block's median and 99th-percentile luma. Reference values are from the
-Forever frames; ours are from the 2026-10-31 captures on the sheet.
+Forever frames; ours are from Tom's native-window Tomb capture of 2026-10-31 (3:03 PM), four blocks of open water.
 
 Surface
 
@@ -167,9 +167,9 @@ Surface
    below it (deck thickness is 0.07 of frame height at match zoom). Fighters and the
    deck draw in front and the sea never tints them.
 4. **Fine, quiet ripples.** Luma standard deviation in a block: at most 6 in deep
-   water and 12 in lit shallows (Forever 1 to 5 and 11; ours 20 on Tomb).
+   water and 12 in lit shallows (Forever 1 to 5 and 11; ours 24 to 30 on Tomb).
 5. **Low highlights.** In a block p99 is at most 1.75 times p50 (Forever 1.2 to 1.74;
-   ours 2.3 on Tomb) and no open-water pixel exceeds luma 200 on a stage with no
+   ours 1.9 to 2.8 on Tomb) and no open-water pixel exceeds luma 200 on a stage with no
    visible sun. Zero caustic web on the surface: the water shader's surface
    caustics are 0 for Tomb and Naxxramas. Light lines belong on a bed seen through
    clear shallow water only: soft, broken, on the bed under the surface, bed p99 at
@@ -236,3 +236,14 @@ The redesign pass lands when a capture of Tomb and of Naxxramas at match zoom, b
 facings, plus one with a fighter entering, one swimming and one leaving the Tomb sea
 passes rules 1 to 16 by measurement, and two cold viewers shown the sheet's target
 column and then the capture call them the same style.
+
+### Style sheet status (2026-10-31)
+
+The sheet shows our Tomb from Tom's native-window capture of 3:03 PM and Naxxramas
+from his capture of 3:11 AM (before the poison look pass), because a fresh native
+run was held by the laptop's game reserve and gex45's load; a fresh capture of each
+is still to be taken and measured against rules 1 to 16 before the redesign pass
+lands. Across five rounds of two cold viewers each, the target frames and palette
+read as one muted, scene-lit teal style to every viewer; the dissent was only that
+the drawn splash and glitter specs sit beside frames, which the redesign pass
+resolves by rendering them in the engine. Their notes are beside the sheet.
