@@ -342,15 +342,6 @@ export class MatchPresentation {
     }
   }
 
-  /** Where the first winning body stands on the results stage, or undefined when nobody won or no results are up. */
-  winnerX(): number | undefined {
-    const view = this.resultView;
-    if (view === undefined) return undefined;
-    const bodies = this.resultBodies(view);
-    const index = bodies.findIndex(body => body.winner);
-    return index < 0 ? undefined : resultFighterPlacement(this.resultStage, index, bodies.length).x;
-  }
-
   resultsShown(): boolean {
     return this.resultView !== undefined && this.pending === undefined;
   }

@@ -33,7 +33,7 @@ import { surfaceCount, surfaceLine, surfaceZAt } from "../sim/stage";
 import { setWorldMotionValue } from "../sim/motion";
 import { advanceFreezeTraps } from "../sim/summons";
 import { steppedFrames } from "./frameCount";
-import { advanceMatchCamera, copyMatchCamera, sameCameraSubjects } from "../sim/matchCamera";
+import { advanceMatchCamera, copyMatchCamera, createMatchCamera, sameCameraSubjects } from "../sim/matchCamera";
 import { nextJab } from "../sim/moves";
 import { advanceOffscreenDamage } from "../sim/offscreenDamage";
 import type { FrameControls } from "./controls";
@@ -76,7 +76,7 @@ export function configureMatchTeams(game: Readonly<MatchState>, world: Roster): 
 }
 
 export function initializeMatchFighters(game: Readonly<MatchState>, world: Roster): void {
-  game.camera.initialized = false;
+  copyMatchCamera(game.camera, createMatchCamera());
   configureMatchTeams(game, world);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;

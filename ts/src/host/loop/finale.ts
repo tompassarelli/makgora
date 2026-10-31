@@ -1,8 +1,7 @@
-import { f32 } from "wisp/src/sim/f32";
 import type { MatchCamera } from "../../game/sim/matchCamera";
 
-/** The match's closing shots, which read the sim and never write to it: turning one off must leave the state digest untouched. */
-export const finale = { koZoom: true, orbit: true, zoomFramesShown: 0, orbitFramesShown: 0 };
+/** The match's closing shot, which reads the sim and never writes to it: turning it off must leave the state digest untouched. */
+export const finale = { koZoom: true, zoomFramesShown: 0 };
 
 export const KO_ZOOM_FRAMES = 45;
 const ZOOM_IN_FRAMES = 15;
@@ -39,24 +38,3 @@ export function zoomOntoKo(camera: MatchCamera, zoom: KoZoom, frame: number): vo
 }
 
 export const koZoomActive = (zoom: KoZoom | undefined, frame: number): zoom is KoZoom => finale.koZoom && zoom !== undefined && frame < KO_ZOOM_FRAMES;
-
-export const ORBIT_START_FRAME = 90;
-const ORBIT_FRAMES = 300;
-const ORBIT_SWEEP_DEGREES = 70.0;
-const ORBIT_TILT_DEGREES = 12.0;
-const ORBIT_PUSH = f32(0.3);
-
-/** The results camera's heading and tilt. */
-export interface OrbitView {
-  readonly rotation: number;
-  readonly angle: number;
-}
-
-/** Sweeps the results camera around the winner from `ORBIT_START_FRAME` on: it slides to the winner, pushes in, swings its heading by 70 degrees and tilts down 12. */
-export function orbitWinner(camera: MatchCamera, winnerX: number, frame: number, rotation: number, angle: number): OrbitView {
-  const progress = finale.orbit ? smooth((frame - ORBIT_START_FRAME) / ORBIT_FRAMES) : 0.0;
-  if (progress > 0.0) finale.orbitFramesShown++;
-  camera.x += (winnerX - camera.x) * progress;
-  camera.distance *= 1.0 - ORBIT_PUSH * progress;
-  return { rotation: rotation + ORBIT_SWEEP_DEGREES * progress, angle: angle - ORBIT_TILT_DEGREES * progress };
-}

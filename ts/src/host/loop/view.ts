@@ -508,7 +508,7 @@ export function renderPersistentPresentation(s: ShellState): void {
 
 const meter = escapeMeterView();
 
-function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect: number, angle: number, duration: number, rotation: number = ARENA_CAMERA.rotation): void {
+function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect: number, angle: number, duration: number): void {
   const { x: centerX, y: centerY } = s.origin;
   const targetX = centerX + framing.x;
   if (duration > 0.0) {
@@ -518,7 +518,7 @@ function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect:
     const right = centerX + bounds.right;
     SetCameraBounds(left, centerY, right, centerY, left, centerY, right, centerY);
   } else SetCameraBounds(targetX, centerY, targetX, centerY, targetX, centerY, targetX, centerY);
-  SetCameraField(CAMERA_FIELD_ROTATION, rotation, 0.0);
+  SetCameraField(CAMERA_FIELD_ROTATION, ARENA_CAMERA.rotation, 0.0);
   SetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, angle, 0.0);
   SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, framing.distance, duration);
   SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + framing.z, duration);
@@ -537,7 +537,7 @@ export function lockArenaCamera(s: ShellState): void {
   if (game.phase !== Phase.result && !game.camera.initialized) advanceMatchCamera(s.previewCamera, world, game.stageChoice);
   const height = BlzGetLocalClientHeight();
   const aspect = height > 0 ? I2R(BlzGetLocalClientWidth()) / I2R(height) : 16.0 / 9.0;
-  const orbit = aimArenaCamera(s, aspect);
+  const angle = aimArenaCamera(s, aspect);
   if (game.phase !== Phase.result && s.viewExtreme !== undefined) extremeCamera(s.camera, game.stageChoice, aspect, s.viewExtreme);
   if (s.viewExtreme !== undefined) ClearTextMessages();
   if (game.phase !== Phase.result && s.showcaseFocus !== undefined) s.camera.x = SHOWCASE_PAD_X[s.showcaseFocus];
@@ -556,7 +556,7 @@ export function lockArenaCamera(s: ShellState): void {
   finalCamera(framing, game.stageChoice);
   probeCamera(s.probe, game.camera, framing, centerX, FLOOR_HEIGHT);
   const duration = s.cameraTween === true && game.phase === Phase.match && !s.session.paused ? FRAME_SECONDS : 0.0;
-  applyArenaCamera(s, framing, aspect, orbit.angle, duration, orbit.rotation);
+  applyArenaCamera(s, framing, aspect, angle, duration);
   shakeRoarCamera(world, game.phase, s.session.paused, FLOOR_HEIGHT + framing.z);
   if (s.build.analogPadDiagnostic === true) {
 

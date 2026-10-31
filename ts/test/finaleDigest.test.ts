@@ -5,11 +5,9 @@ import { NEUTRAL_INPUT, createStandaloneSession } from "../scripts/wisp/standalo
 const MATCH_FRAME_LIMIT = 20000;
 const RESULT_FRAMES = 480;
 
-async function digestsOf(closingShots: boolean): Promise<{ readonly digests: string[]; readonly zoom: number; readonly orbit: number }> {
+async function digestsOf(closingShots: boolean): Promise<{ readonly digests: string[]; readonly zoom: number }> {
   finale.koZoom = closingShots;
-  finale.orbit = closingShots;
   finale.zoomFramesShown = 0;
-  finale.orbitFramesShown = 0;
   const session = await createStandaloneSession({ start: "results" });
   const digests: string[] = [];
   try {
@@ -25,16 +23,14 @@ async function digestsOf(closingShots: boolean): Promise<{ readonly digests: str
   } finally {
     session.close();
   }
-  return { digests, zoom: finale.zoomFramesShown, orbit: finale.orbitFramesShown };
+  return { digests, zoom: finale.zoomFramesShown };
 }
 
-test("the final-KO zoom and the victory orbit leave every frame's state digest as it was [k1 scenario]", async () => {
+test("the final-KO zoom leaves every frame's state digest as it was [k1 scenario]", async () => {
   const off = await digestsOf(false);
   const on = await digestsOf(true);
   finale.koZoom = true;
-  finale.orbit = true;
-  expect(off.zoom + off.orbit).toBe(0);
+  expect(off.zoom).toBe(0);
   expect(on.zoom).toBeGreaterThan(0);
-  expect(on.orbit).toBeGreaterThan(0);
   expect(on.digests).toEqual(off.digests);
 }, 120_000);
