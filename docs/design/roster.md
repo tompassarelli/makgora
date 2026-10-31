@@ -1229,7 +1229,7 @@ Standing grab 9/2/27, reach 0.65H, short tail coil. No dragging or moving hold. 
 ### B specials
 
 [The pack design](beastmaster.md) replaces the original single-Bear kit: Wild
-Axes return, side special calls Bear then Stampede, down special calls a
+Axes fly out and vanish, side special calls Bear then Stampede, down special calls a
 Quilbeast then its volley, and grounded up special calls Hawk then its dive.
 Airborne up special remains Hawk Lift. Each animal owns a position, health,
 lifetime and command state, and all three may coexist.

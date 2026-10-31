@@ -10,9 +10,8 @@ const h = (multiple: number): number => f32(HERO_REFERENCE_HEIGHT * f32(multiple
 const AIR_SPECIAL_LANDING_LAG = 20;
 const axe = (spawnFrame: number, height: number): SpecialProjectile => ({
   spawnFrame, offsetX: h(f32(0.35)), offsetZ: h(height),
-  velocityX: h(f32(0.12)), velocityZ: 0.0, life: 80, radius: h(f32(0.12)),
-  effect: hit(3.4094698429107666, "POKE", 40), returnEffect: hit(2.7275757789611816, "LINK", 65),
-  returns: { age: 24, speed: h(f32(0.15)) }, reflectable: true, limit: 1,
+  velocityX: h(f32(0.12)), velocityZ: 0.0, life: 24, radius: h(f32(0.12)),
+  effect: hit(3.4094698429107666, "POKE", 40), reflectable: true, limit: 1,
   model: "Abilities\\Weapons\\Axe\\AxeMissile.mdx",
 });
 export const WILD_AXES = [axe(16, f32(0.35)), axe(20, f32(0.65))];
@@ -83,7 +82,7 @@ const hawkLift = (rise: number, drift: number, steer: number): AuthoredSpecial =
   placement: { ...HAWK_PLACEMENT, frame: 10 },
 });
 export const BEASTMASTER_SPECIALS: FighterSpecials = {
-  neutral: { name: "Wild Axes", description: "Throw two axes; move to guide their return through the enemy.", ground: wildAxes(false), air: wildAxes(true) },
+  neutral: { name: "Wild Axes", description: "Throw two axes that fly straight out and vanish at the end of their travel.", ground: wildAxes(false), air: wildAxes(true) },
   side: { name: "Summon Bear", description: "Call Bear; press again and it roars, charges far ahead and mauls for heavy knockback while three thunder lizards stampede.", ground: SUMMON_BEAR, recall: BEAR_COMMAND },
   up: { name: "Summon Hawk", description: "Call Hawk, then command a fast dive that stuns whoever it strikes. In the air, Hawk carries him up.", ground: SUMMON_HAWK, recall: HAWK_DIVE, recallGroundOnly: true, air: hawkLift(h(f32(3.48)), h(f32(0.3)), h(f32(3.02))) },
   down: { name: "Summon Quilbeast", description: "Set a large Quilbeast firing position; press again for a three-quill volley from it.", ground: SUMMON_QUILBEAST, air: { endFrame: SUMMON_QUILBEAST.endFrame, landingLag: AIR_SPECIAL_LANDING_LAG,

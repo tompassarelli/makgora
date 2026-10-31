@@ -20,7 +20,7 @@ With the shared recovery band, his authored normal, throw and pack damage is
 
 | Input | Action and reward | Commitment and response |
 | --- | --- | --- |
-| Neutral: Wild Axes | Two axes leave on frames 16 and 20 at different heights. Each travels about 3H, then returns to Beastmaster; the returning hit pulls inward for an axe-normal or Bear chase. Free, 4.5 damage outward and 3.6 returning. Moving changes their return route. | Ends frame 35; 20 landing frames in air. Two axes maximum. Shield, jump between their heights, or approach beneath them. Each axe disappears on contact, so an outward hit cannot also hit on return. |
+| Neutral: Wild Axes | Two axes leave on frames 16 and 20 at different heights. Each travels about 3H in a straight line and disappears at the end of its travel (changed 2026-10-31: Tom asked for axes that no longer return). Free, 4.5 damage each. | Ends frame 35; 20 landing frames in air. Two axes maximum. Shield, jump between their heights, or approach beneath them. Each axe disappears on contact. |
 | Side: Summon Bear | Without Bear, call it on frame 29 for 20 mana. Bear stands 1.1H tall with a 0.4H body, follows 0.8H behind on its own deck and survives 480 frames or 30 damage. | Ends frame 49, ground only. Punish the call or attack the Bear. |
 | Side with Bear: Stampede | Order Bear's 12-frame roaring warning, then an 8-frame 2.6H charge that runs past Beastmaster and mauls up to about 2.4H ahead of him, then 26 recovery frames; the 13.2-damage maul launches outward at 40 degrees with kill-class knockback. Three thunder lizards run ahead from Beastmaster on frames 2, 5 and 8, each 3.6 damage, crossing about 6H of stage; at mid range their flinches land first and hold the target for the maul, so the maul's launch is the last hit. Ground pressure at mid range and an edgeguard against low recoveries. | Costs 12 mana, ends frame 32, cannot repeat while Bear charges or is stunned. Jump over the line, shield, strike Bear during warning, or hit Beastmaster to cancel the command. |
 | Down: Summon Quilbeast | Call a 0.8H-tall Quilbeast (0.32H body) on frame 18 for 12 mana; it holds its ground position and fires one 2.7-damage quill after settling, then at 90-frame intervals. It survives 600 frames or 18 damage. Quills poke at horizontal approaches while Beastmaster advances. | Ends frame 32, ground only. The low animal can be struck; its straight shots can be jumped, shielded or reflected. No automatic targeting. |
@@ -39,7 +39,7 @@ body blocking comes from owning an animal. Commands do not repair animals.
 In neutral, Wild Axes makes the opponent choose a route while Beastmaster
 establishes Quilbeast. Bear punishes a grounded approach; Hawk discourages a
 predictable jump. Down tilt and the existing low down throw start a chase;
-Bear or the returning axe can cover a tech direction. Hawk's dive stuns
+Bear can cover a tech direction. Hawk's dive stuns
 its target for a grounded smash or axe follow-up. These are attempted
 follow-ups, not a guaranteed string or a grab loop. At the edge, Quilbeast
 covers the horizontal route and Hawk dives below the lip; Stampede covers a
@@ -63,8 +63,6 @@ copy. Stock Warcraft models remain private inputs.
 - [DotA Beastmaster](https://www.dota2.com/hero/beastmaster) and Valve's
   [7.07 hero rework](https://www.dota2.com/duelingfates): Wild Axes and Call of
   the Wild provide the hero identity. No DotA damage amplification is added.
-- [Toon Link](https://www.smashbros.com/wiiu-3ds/us/characters/toon_link.html):
-  Wild Axes borrows the boomerang idea of controlling a second route on return.
 - [Rosalina & Luma](https://www.smashbros.com/wiiu-3ds/us/characters/rosetta.html):
   Bear borrows pressure from a separate position and the cost of losing a partner.
 - [Duck Hunt](https://www.smashbros.com/en_US/fighter/59.html): Quilbeast borrows
