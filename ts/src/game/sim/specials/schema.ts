@@ -157,6 +157,8 @@ export interface SpecialProjectile {
 
   readonly pool?: ProjectilePool | undefined;
 
+  readonly splitCredit?: true | undefined;
+
   /** Spawns under the nearest opponent instead of at the owner's offset. */
   readonly atFoe?: boolean | undefined;
 
@@ -237,6 +239,9 @@ export interface SpecialPlacement {
   readonly crumble?: number | undefined;
   readonly atMark?: SpecialProjectile | undefined;
   readonly aura?: true | undefined;
+  readonly aimedSpeed?: number | undefined;
+  readonly splits?: { readonly afterHits: number; readonly into: number; readonly apart: number; readonly half: SpecialPlacement } | undefined;
+  readonly refusedWhileOut?: true | undefined;
 
   readonly companion?: SpecialCompanion | undefined;
   readonly taunt?: { readonly radius: number; readonly pull: number } | undefined;
@@ -244,30 +249,23 @@ export interface SpecialPlacement {
 }
 
 export interface SpecialCompanion {
-
   readonly behavior?: "sentry" | "flying" | undefined;
   readonly followHeight?: number | undefined;
   readonly lungeDrop?: number | undefined;
   readonly volleyFrames?: readonly number[] | undefined;
   readonly waveFrame?: number | undefined;
   readonly engage?: number | undefined;
-
   readonly followSpeed: number;
   readonly followBehind: number;
-
   readonly returnSpeed: number;
-
   readonly lungeStartup: number;
   readonly lungeActive: number;
   readonly lungeRecovery: number;
   readonly lungeTravel: number;
-
   readonly bite: StrikeCapsule;
   readonly biteEffect: HitEffect;
   readonly biteStatus?: AppliedStatus | undefined;
-
   readonly stunFrames: number;
-
   readonly leash: number;
   readonly leashFrames: number;
 }

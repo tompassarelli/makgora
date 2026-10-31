@@ -530,6 +530,7 @@ export interface PlacedObject {
   modeFrame: number;
   apart: number;
   bitten: number;
+  hits: number;
   surface: number | undefined;
 }
 
@@ -842,12 +843,12 @@ export function createFighter(character: Character, startX: number, facing: numb
   return fighter;
 }
 
-/** Animals a pack holds at most: a Beastmaster's quilbeast and hawk, a Shadow Hunter's two Big Bad Voodoo wards, Chen's Storm and Fire spirits, or a Peon's five Tower Rush towers. */
+/** Animals a pack holds at most: a Beastmaster's quilbeast and hawk, a Shadow Hunter's two Big Bad Voodoo wards, Chen's Storm and Fire spirits, a Firelord's two Lava Spawns, or a Peon's five Tower Rush towers. */
 export const PACK_CAPACITY = 5;
 
 function packLength(character: Character): number {
   if (character === Character.peon) return PACK_CAPACITY;
-  return character === Character.beastmaster || character === Character.shadowHunter || character === Character.chen ? 2 : 0;
+  return character === Character.beastmaster || character === Character.shadowHunter || character === Character.chen || character === Character.firelord ? 2 : 0;
 }
 
 // Every fighter keeps PACK_CAPACITY placed objects for its pack, kept out of
@@ -870,7 +871,7 @@ export function packSpares(fighter: Readonly<Fighter>): readonly PlacedObject[] 
 
 
 export function createPlacedObject(): PlacedObject {
-  return { life: 0, age: 0, x: 0.0, z: 0.0, direction: 1, durability: 0.0, serial: 0, spec: undefined, struck: noSlots(), specialStruck: 0, mode: 0, modeFrame: 0, apart: 0, bitten: 0, surface: undefined };
+  return { life: 0, age: 0, x: 0.0, z: 0.0, direction: 1, durability: 0.0, serial: 0, spec: undefined, struck: noSlots(), specialStruck: 0, mode: 0, modeFrame: 0, apart: 0, bitten: 0, hits: 0, surface: undefined };
 }
 
 export function placedObject(fighter: Readonly<Fighter>, slot = 0): Resting<PlacedObject> {

@@ -14,7 +14,7 @@ import type { Resting } from "./fighterRest";
 import { HERO_PROJECTILE_CAP, spawnHeroProjectileAt } from "./specials/heroProjectiles";
 import { placeHeroStrike } from "./specials/heroContact";
 import { runningHeroSpecial } from "./specials/runningMove";
-import { CompanionMode, type SpecialPlacement } from "./specials/schema";
+import { CompanionMode, type SpecialPlacement, type SpecialProjectile } from "./specials/schema";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
 import { projectileDamage } from "./projectiles";
 import { type Roster, fighterAt, isActive } from "./roster";
@@ -22,6 +22,8 @@ import { type Capsule, attackCapsule, capsulesIntersect, emptyCapsule, placeCaps
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { max, min } from "../core/numbers";
 import { surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
+import { squareRootFloat32 } from "wisp/src/sim/binary32";
+import { splitSpawns } from "./specials/spawnSplit";
 
 
 const ORIGINAL_PROJECTILE_RADIUS = 12.0;
@@ -188,10 +190,37 @@ function towardNearestFoe(world: Roster, ownerSlot: number, placed: Resting<Plac
   return direction;
 }
 
+const AIM_HEIGHT = 45.0;
+
+function fireAimed(world: Roster, owner: Fighter, ownerSlot: number, placed: PlacedObject, shot: Readonly<SpecialProjectile>, speed: number): void {
+  let nearest = -1.0;
+  let aimX = 0.0;
+  let aimZ = 0.0;
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
+    if (!isActive(world, slot) || !canHit(world, ownerSlot, slot)) continue;
+    const foe = fighterAt(world, slot);
+    if (foe.status.out) continue;
+    const dx = f32(foe.motion.x - placed.x);
+    const dz = f32(f32(foe.motion.z + AIM_HEIGHT) - f32(placed.z + shot.offsetZ));
+    const squared = f32(f32(dx * dx) + f32(dz * dz));
+    if (nearest >= 0.0 && squared >= nearest) continue;
+    nearest = squared;
+    aimX = dx;
+    aimZ = dz;
+  }
+  if (nearest < 0.0) return;
+  if (aimX !== 0.0) placed.direction = aimX < 0.0 ? -1 : 1;
+  const length = nearest > 0.0 ? squareRootFloat32(nearest) : 1.0;
+  const velocity = nearest > 0.0 ? { velocityX: f32(f32(aimX / length) * speed), velocityZ: f32(f32(aimZ / length) * speed) } : { velocityX: f32(placed.direction * speed), velocityZ: 0.0 };
+  const x = f32(placed.x + f32(placed.direction * shot.offsetX));
+  spawnHeroProjectileAt(owner, shot, x, f32(placed.z + shot.offsetZ), 1, false, owner.attack.serial + 1, undefined, velocity);
+}
+
 export function advancePlacedObjects(world: Roster, stage: number, matchFrame: number): void {
   for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {
     if (!isActive(world, ownerSlot)) continue;
     const owner = fighterAt(world, ownerSlot);
+    splitSpawns(owner);
     for (let animal = 0; animal <= owner.pack.length; animal++) {
       const spec = placedObject(owner, animal).spec;
       if (placedObject(owner, animal).life <= 0 || spec === undefined) continue;
@@ -230,6 +259,10 @@ export function advancePlacedObjects(world: Roster, stage: number, matchFrame: n
       const last = spec.fireAges[spec.fireAges.length - 1];
       const shot = spec.finalShot !== undefined && placed.age === last ? spec.finalShot : spec.shot;
       if (fires && shot !== undefined && (channeled || ownedProjectiles(owner) < HERO_PROJECTILE_CAP)) {
+        if (spec.aimedSpeed !== undefined) {
+          fireAimed(world, owner, ownerSlot, placed, shot, spec.aimedSpeed);
+          continue;
+        }
         if (spec.aimed === true) placed.direction = towardNearestFoe(world, ownerSlot, placed);
         const x = f32(placed.x + f32(placed.direction * shot.offsetX));
         spawnHeroProjectileAt(owner, shot, x, f32(placed.z + shot.offsetZ), placed.direction, false, owner.attack.serial + 1);

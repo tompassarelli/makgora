@@ -20,7 +20,8 @@ import { ownedCount } from "./ownedProjectiles";
 import { partnerCallBlocked } from "../duoPartner";
 import { castVariant, spendEmpowered } from "./empowered";
 import { isHeroSpecialAction, runningHeroSpecial, inWindow, applyWindows, projectileAnchor } from "./runningMove";
-import { recallProjectiles, projectilesFit, spawnHeroProjectileAt, endLiveCasts, holdOrb } from "./heroProjectiles";
+import { castFits } from "./placements";
+import { recallProjectiles, spawnHeroProjectileAt, endLiveCasts, holdOrb } from "./heroProjectiles";
 import { swingFullCharge, holdCharge, throwFullDroppingCharge } from "./heroForms";
 import { holdSteeredShot, faceHeldStick } from "./heroMotion";
 import { applyFrameEffectsBeforeLedge, applyFrameEffectsBeforePlacements, applyFrameEffectsAfterPlacements } from "./frameEffects";
@@ -64,7 +65,7 @@ export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<Fight
   if (move.oncePerAirtime === true && airborne && (f.special.airtimeUses & (1 << slot)) !== 0) return undefined;
   if (move.command?.order === CompanionOrder.lunge && !companionReady(f, move.command.slot)) return undefined;
   const variant = castVariant(world, f, move);
-  if (!projectilesFit(f, specialForm(kit, form, variant))) return undefined;
+  if (!castFits(f, specialForm(kit, form, variant))) return undefined;
   choice.slot = slot;
   choice.form = form;
   choice.variant = variant;
@@ -181,6 +182,7 @@ export function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: num
   placed.modeFrame = 0;
   placed.apart = 0;
   placed.bitten = 0;
+  placed.hits = 0;
   placed.surface = f.motion.surface;
 }
 

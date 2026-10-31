@@ -46,6 +46,7 @@ interface PlacedFields {
   modeFrame: number;
   apart: number;
   bitten: number;
+  hits: number;
   surface: number | undefined;
 }
 
@@ -175,7 +176,7 @@ function placedObjectResting(placed: Resting<PlacedFields>): boolean {
   if (placed.spec !== undefined || placed.surface !== undefined || placed.direction !== 1) return false;
   if (!positiveZero(placed.life) || !positiveZero(placed.age) || !positiveZero(placed.x) || !positiveZero(placed.z) || !positiveZero(placed.durability)) return false;
   if (!positiveZero(placed.serial) || !positiveZero(placed.specialStruck) || !positiveZero(placed.mode) || !positiveZero(placed.modeFrame)) return false;
-  if (!positiveZero(placed.apart) || !positiveZero(placed.bitten)) return false;
+  if (!positiveZero(placed.apart) || !positiveZero(placed.bitten) || !positiveZero(placed.hits)) return false;
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) if (placed.struck[slot] !== undefined) return false;
   return true;
 }

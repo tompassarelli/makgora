@@ -227,6 +227,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
     if (expectedPlaced.modeFrame !== actualPlaced.modeFrame) return `${animalName(animal)}ModeFrame`;
     if (expectedPlaced.apart !== actualPlaced.apart) return `${animalName(animal)}Apart`;
     if (expectedPlaced.bitten !== actualPlaced.bitten) return `${animalName(animal)}Bitten`;
+    if (expectedPlaced.hits !== actualPlaced.hits) return `${animalName(animal)}Hits`;
     if ((expectedPlaced.surface ?? -1) !== (actualPlaced.surface ?? -1)) return `${animalName(animal)}Surface`;
   }
   if (expected.freezeTrap.cooldown !== actual.freezeTrap.cooldown) return "freezeTrapCooldown";

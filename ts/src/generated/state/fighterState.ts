@@ -513,6 +513,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
       placed.modeFrame = sourcePlaced.modeFrame;
       placed.apart = sourcePlaced.apart;
       placed.bitten = sourcePlaced.bitten;
+      placed.hits = sourcePlaced.hits;
       placed.surface = sourcePlaced.surface;
       placed.spec = sourcePlaced.spec;
     }
@@ -535,6 +536,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
       placed.modeFrame = 0;
       placed.apart = 0;
       placed.bitten = 0;
+      placed.hits = 0;
       placed.surface = undefined;
       placed.spec = undefined;
     }
@@ -1024,6 +1026,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
       { const a = placed.modeFrame, b = sourcePlaced.modeFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
       { const a = placed.apart, b = sourcePlaced.apart; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
       { const a = placed.bitten, b = sourcePlaced.bitten; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+      { const a = placed.hits, b = sourcePlaced.hits; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
       { const a = placed.surface, b = sourcePlaced.surface; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
     }
   }
@@ -1498,6 +1501,9 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
         sink.int(prefix, `${animalName}ModeFrame`, placed.modeFrame);
         sink.int(prefix, `${animalName}Apart`, placed.apart);
         sink.int(prefix, `${animalName}Bitten`, placed.bitten);
+      }
+      if (placed.hits !== 0) sink.int(prefix, `${animalName}Hits`, placed.hits);
+      if (placed.spec?.companion !== undefined) {
         sink.int(prefix, `${animalName}Surface`, placed.surface ?? -1);
       }
       sink.text(kits.placedSpec(`${prefix}.${animalName}Spec`, placed.spec));

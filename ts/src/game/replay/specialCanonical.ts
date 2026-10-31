@@ -139,6 +139,14 @@ function writePlacementRules(spec: Readonly<SpecialPlacement>, prefix: string, r
     for (let index = 0; index < spec.spread.offsets.length; index++) real(`spread.offset[${index}]`, at(spec.spread.offsets, index));
   }
   if (spec.aimed === true) int("aimed", 1);
+  if (spec.aimedSpeed !== undefined) real("aimedSpeed", spec.aimedSpeed);
+  if (spec.refusedWhileOut === true) int("refusedWhileOut", 1);
+  if (spec.splits !== undefined) {
+    int("splits.afterHits", spec.splits.afterHits);
+    int("splits.into", spec.splits.into);
+    real("splits.apart", spec.splits.apart);
+    result.push(specialPlacementCanonical(spec.splits.half, `${prefix}.splits.half`));
+  }
   if (spec.crumble !== undefined) int("crumble", spec.crumble);
   result.push(optionalField(`${prefix}.taunt.radius`, spec.taunt?.radius, canonicalRealField), optionalField(`${prefix}.taunt.pull`, spec.taunt?.pull, canonicalRealField));
   result.push(optionalField(`${prefix}.windWalk.frames`, spec.windWalk?.frames, canonicalInt), optionalField(`${prefix}.windWalk.hop`, spec.windWalk?.hop, canonicalRealField));

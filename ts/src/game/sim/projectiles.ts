@@ -25,6 +25,7 @@ import { latchesOn } from "./hookLatch";
 import { hookLatchesLedge } from "./specials/ledgeTether";
 import { SHIELD_PROJECTILE_DAMAGE_MULTIPLIER, SHIELD_PROJECTILE_SPEED_MULTIPLIER, grantParry, shieldCircleIntersects } from "./shield";
 import { at } from "wisp/src/runtime/lookup";
+import { creditSpawnHit } from "./specials/spawnSplit";
 import { solidSurfaceAt, solidSurfaceCount, surfaceCount, surfaceLeft, surfaceLine, surfacePass, surfaceRight, surfaceZ } from "./stage";
 
 export const BLASTER_PROJECTILE_SPEED = 36.0;
@@ -179,6 +180,7 @@ function applyProjectileHit(world: Roster, ownerSlot: number, targetSlot: number
   if (projectile.kind === ProjectileKind.hero && spec !== undefined) {
     copyHitEffect(projectileHit, heroProjectileEffect(projectile, spec));
     projectileHit.damage = projectileDamage(projectile);
+    if (spec.splitCredit === true && !shieldContact && projectile.damageMultiplier === 1.0) creditSpawnHit(fighterAt(world, ownerSlot));
     collectDamageContact(world, ownerSlot, targetSlot, projectileHit, spec.launchesFromCentre === true ? sideOfCentre(world, ownerSlot, target, projectile) : projectile.direction, spec.burn === undefined ? ContactKind.launch : ContactKind.damageOnly, false, undefined, shieldContact, spec.status, projectile.z);
     return;
   }

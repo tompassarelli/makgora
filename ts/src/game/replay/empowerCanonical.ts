@@ -13,4 +13,5 @@ export function writeEmpowered(int: IntWriter, move: Readonly<AuthoredSpecial>):
 
 export function writePierce(int: IntWriter, spec: Readonly<SpecialProjectile>): void {
   if (spec.pierces === true) int("pierces", 1);
+  if (spec.splitCredit === true) int("splitCredit", 1);
 }
