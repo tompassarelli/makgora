@@ -123,7 +123,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
           });
           console.error(`net: fighter selection with ${humans} players at frame ${lockstep.frame}`);
         }
-        if (!controlsClosed && lockstep.frame > SETUP_FRAME && controlsGreeted(client)) {
+        if (!controlsClosed && lockstep.frame > SETUP_FRAME && lastPhase === Phase.characterMenu && controlsGreeted(client)) {
           if (!lockstep.click(slot, DONE_X, DONE_Y)) throw new Error(`net: slot ${slot} has no Done button under the pointer`);
           controlsClosed = true;
         }
