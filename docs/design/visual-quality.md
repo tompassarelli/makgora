@@ -98,6 +98,17 @@ fails line 1.
 | 7 | **Finished from every angle shown** | Any part the stage's cameras reveal is missing, unwrapped, stretched, untextured or left at a placeholder, including undersides, backs and the far end of a deck |
 | 8 | **Readable at distance** | Corners and silhouettes are not bold enough to read at far camera, or fine detail makes the fighter's band harder to see (see the fighter L* check above) |
 
+Tom's Rivals of Aether 2 match captures (kept local in
+~/.local/state/smashcraft/shots/roa2-refs, added 2026-10-31) are look targets
+for the next three lines, as the Smash references are for the filled frame
+above; nothing is copied from them (game-ip).
+
+| | Line | Fails when |
+| --- | --- | --- |
+| 9 | **The fighters hold the only full contrast and full saturation** | A stage piece, effect or backdrop reaches the fighters' brightest value or their most saturated colour, so a fighter no longer pops out of the frame (roa2-match-207, -211, -212: the stage sits in a narrow, softer range and the fighters carry the peaks) |
+| 10 | **The backdrop fades to one haze colour** | Each farther layer does not lose contrast and saturation toward a single haze colour, or layers fade to different hues; the farthest layer should nearly match the haze (roa2-match-207, -211, -212) |
+| 11 | **Hit effects are flat cel-shaded shapes with speed lines** | A hit effect is a soft glow, a gradient blob or a smoke puff instead of a flat, hard-edged, cel-shaded shape with speed lines that show its direction (roa2-match-210, -213) |
+
 Effects follow the same lines with their own reading: line 1 is whether the
 effect's shape, colour and timing say what the move does; line 4 is no hard
 quad edges or clipped sprites; line 5 is no frame-for-frame repeats inside one
