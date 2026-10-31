@@ -1,0 +1,20 @@
+# Blackrock cannon, two fighters, facing right: a is caught as in right.pad and held through the warning; b runs off the same ledge a few frames behind, falls past the occupied barrel inside its catch radius and is not caught or stopped; the strip runs from just before the catch to the first frames of a's rise.
+#! chat -dev quick stage 12
+20 a stick 1 0
+88 b stick 1 0
+95 a stick -1 0
+118 b stick -1 0
+125 a tap B 1
+138 b tap B 1
+177 a capture
+181 a capture
+186 a capture
+190 a capture
+194 a capture
+198 a capture
+200 a tap A 2
+203 a capture
+209 a capture
+213 a capture
+217 a capture
+225 a capture
