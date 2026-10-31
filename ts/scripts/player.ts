@@ -26,6 +26,14 @@ if (typeof chosen === "string") {
   process.exit(2);
 }
 
+// a compiled player embeds Wisp's worker as simWorker.js, which Wisp names with its .ts source
+const SourceWorker = globalThis.Worker;
+globalThis.Worker = class extends SourceWorker {
+  constructor(url: string | URL, options?: WorkerOptions) {
+    super(typeof url === "string" ? url.replace(/\.ts$/, ".js") : url, options);
+  }
+};
+
 const EXE = process.platform === "win32" ? ".exe" : "";
 for (const [variable, tool] of [["SMASHCRAFT_PACKAGER", "map-pack"], ["CASC_EXTRACTOR", "casc-extract"]] as const) {
   const beside = join(dirname(process.execPath), `${tool}${EXE}`);
