@@ -58,6 +58,7 @@ function chainProjectiles(projectile: SpecialProjectile | undefined, into: Speci
   into.push(projectile);
   chainProjectiles(projectile.expiresInto, into);
   chainProjectiles(projectile.burstInto, into);
+  chainProjectiles(projectile.unfloored?.as, into);
 }
 
 function strikeProjectiles(strike: Readonly<TargetedStrike> | undefined, into: SpecialProjectile[]): void {

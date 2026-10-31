@@ -92,7 +92,6 @@ function markX(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, stag
 }
 
 function markBaseZ(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, stage: number, matchFrame: number, x: number): number {
-  if (spec.onlyOnFloor !== undefined) return floorUnder(owner, spec.onlyOnFloor.reach, stage, matchFrame, x) ?? owner.motion.z;
   if (spec.dropsToFloor !== true || owner.motion.grounded) return owner.motion.z;
   const pastLedge = runningHeroSpecial(owner)?.needsFloorBelow === true ? floorBelow(stage, matchFrame, owner.motion.x, owner.motion.z) : undefined;
   return floorBelow(stage, matchFrame, x, owner.motion.z) ?? pastLedge ?? owner.motion.z;
@@ -112,13 +111,11 @@ function aimedOffset(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>
   return owner.special.aimZ < 0 ? reach.mid : reach.far;
 }
 
-const refusesFloor = (owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, stage: number, matchFrame: number, x: number): boolean =>
-  spec.onlyOnFloor !== undefined && floorUnder(owner, spec.onlyOnFloor.reach, stage, matchFrame, x) === undefined;
-
-function floorUnder(owner: Readonly<Fighter>, reach: number, stage: number, matchFrame: number, x: number): number | undefined {
-  const { grounded, z } = owner.motion;
-  const floor = floorBelow(stage, matchFrame, x, grounded ? f32(z + reach) : z);
-  return floor === undefined || (grounded && floor < f32(z - reach)) ? undefined : floor;
+function floored(spec: Readonly<SpecialProjectile>, stage: number, matchFrame: number, x: number, z: number): Readonly<SpecialProjectile> {
+  const unfloored = spec.unfloored;
+  if (unfloored === undefined) return spec;
+  const floor = floorBelow(stage, matchFrame, x, f32(z + unfloored.within));
+  return floor !== undefined && floor >= f32(z - unfloored.within) ? spec : unfloored.as;
 }
 
 function spawnX(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, drawn: Readonly<Projectile> | undefined, foe: Readonly<Fighter> | undefined, centreX: number, stage: number, matchFrame: number): number {
@@ -135,13 +132,12 @@ export function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjec
   const foe = spec.atFoe === true ? nearestFoe(world, owner) : undefined;
   const centreX = f32(f32(mainDeckLeft(stage) + mainDeckRight(stage)) * 0.5);
   const x = spawnX(owner, spec, drawn, foe, centreX, stage, matchFrame);
-  if (refusesFloor(owner, spec, stage, matchFrame, x)) return;
   const z = drawn !== undefined ? f32(drawn.z + spec.offsetZ) : spec.atStageCentre === true ? f32(mainDeckZAt(stage, x) + spec.offsetZ) : foe !== undefined ? f32(foe.motion.z + spec.offsetZ) : f32(markBaseZ(owner, spec, stage, matchFrame, x) + spec.offsetZ);
   if (spec.needsLineOfSight === true && !clearLine(stage, owner.motion.x, z, x, z)) return;
   const up = owner.special.aimZ > 0 && spec.upVelocityX !== undefined;
   const surface = riddenDeck(spec, drawn, stage, matchFrame, x, z);
   armLedgeTether(owner, spec);
-  if (spec.fan === undefined) spawnHeroProjectileAt(owner, spec, x, z, owner.facing, up, serial, surface, aimedDown(owner, spec));
+  if (spec.fan === undefined) spawnHeroProjectileAt(owner, floored(spec, stage, matchFrame, x, z), x, z, owner.facing, up, serial, surface, aimedDown(owner, spec));
   else for (const velocity of spec.fan) spawnHeroProjectileAt(owner, spec, x, z, owner.facing, false, serial, surface, velocity);
 }
 
@@ -199,7 +195,7 @@ function castMakes(move: Readonly<AuthoredSpecial> | undefined, spec: Readonly<S
 
 function chainHolds(shot: Readonly<SpecialProjectile> | undefined, spec: Readonly<SpecialProjectile>): boolean {
   if (shot === undefined) return false;
-  return shot === spec || chainHolds(shot.burstInto, spec) || chainHolds(shot.expiresInto, spec);
+  return shot === spec || chainHolds(shot.burstInto, spec) || chainHolds(shot.expiresInto, spec) || chainHolds(shot.unfloored?.as, spec);
 }
 
 export function endLiveCasts(f: Fighter, kit: Readonly<SpecialKit>): void {

@@ -51,7 +51,7 @@ function aimedSpotCanonical(spec: Readonly<SpecialProjectile>, prefix: string): 
     real("aimedReach.mid", spec.aimedReach.mid);
     real("aimedReach.far", spec.aimedReach.far);
   }
-  if (spec.onlyOnFloor !== undefined) real("onlyOnFloor.reach", spec.onlyOnFloor.reach);
+  if (spec.unfloored !== undefined) real("unfloored.within", spec.unfloored.within);
   if (spec.launchesFromCentre === true) result.push(canonicalInt(`${prefix}.launchesFromCentre`, 1));
   return result.join("");
 }
@@ -100,6 +100,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
   result.push(aimedSpotCanonical(spec, prefix));
   if (spec.burstInto !== undefined) result.push(specialProjectileCanonical(spec.burstInto, `${prefix}.burstInto`));
   if (spec.expiresInto !== undefined) result.push(specialProjectileCanonical(spec.expiresInto, `${prefix}.expiresInto`));
+  if (spec.unfloored !== undefined) result.push(specialProjectileCanonical(spec.unfloored.as, `${prefix}.unfloored.as`));
   return result.join("");
 }
 

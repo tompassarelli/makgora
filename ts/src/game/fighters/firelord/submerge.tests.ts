@@ -1,4 +1,4 @@
-import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
+import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { canonicalState } from "../../replay/canonical";
 import { copyReplayState, createReplaySnapshot } from "../../replay/snapshot";
@@ -128,6 +128,8 @@ test("With no live crater Submerge surfaces a fixed step ahead, facing either wa
   closeTo(expired.caster.motion.x, SUBMERGE_FALLBACK_REACH, "an expired crater is no target");
 });
 
+const PLATFORM_INSET = 40.0;
+
 interface Platform { readonly stage: number; readonly index: number; readonly left: number; readonly right: number; readonly z: number }
 
 function platformAbove(): Platform {
@@ -137,7 +139,7 @@ function platformAbove(): Platform {
       const right = surfaceRight(stage, index, 0);
       const z = surfaceZAt(stage, index, 0, f32((left + right) / 2.0));
       const fixed = surfaceLeft(stage, index, 400) === left && surfaceRight(stage, index, 400) === right && surfaceZAt(stage, index, 400, f32((left + right) / 2.0)) === z;
-      if (fixed && z > 40.0 && f32(right - left) > f32(4.0 * RAZE_RADIUS) + RAZE_REACH.near) return { stage, index, left, right, z };
+      if (fixed && z > 40.0 && f32(right - left) > f32(f32(PLATFORM_INSET + RAZE_REACH.near) + RAZE_RADIUS)) return { stage, index, left, right, z };
     }
   }
   throw new Error("no fixed platform on any stage");
@@ -145,9 +147,9 @@ function platformAbove(): Platform {
 
 test("Submerge from the main deck surfaces on the platform where the crater was cast [k3 measure docs/design/roster.md]", () => {
   const platform = platformAbove();
-  const d = duel(FAR_AWAY, 1, f32(platform.left + 40.0));
+  const d = duel(FAR_AWAY, 1, f32(platform.left + PLATFORM_INSET));
   d.state.match.stageChoice = platform.stage;
-  stand(d, f32(platform.left + 40.0), platform.z, platform.index);
+  stand(d, f32(platform.left + PLATFORM_INSET), platform.z, platform.index);
   d.caster.motion.grounded = true;
   raze(d);
   untilCraters(d, 1);
@@ -162,16 +164,13 @@ test("Submerge from the main deck surfaces on the platform where the crater was 
   assertEquals(d.caster.motion.surface, platform.index);
 });
 
-test("A crater cast from the air lies on the floor below, and one past a ledge or without a floor is no target [k3 measure docs/design/roster.md]", () => {
+test("A raze leaves a crater only where it erupted on a floor: none from mid-air or past a ledge, so Submerge has no target there [k3 measure docs/design/roster.md]", () => {
   const air = duel(FAR_AWAY);
   lift(air.caster, 300.0, 0.0);
   step(air, "down", DOWN, DOWN);
   assertEquals(air.caster.special.action !== SpecialAction.none, true, "raze started in the air");
   idle(air, 70);
-  const [fallen] = craters(air.caster);
-  assertEquals(fallen !== undefined, true, "a crater below the air cast");
-  assertGreaterThan(fallen?.z ?? NaN, -1.0);
-  assertEquals((fallen?.z ?? NaN) < f32(4.0 * RAZE_RADIUS), true, "it sits at the floor, not at the caster's height");
+  assertEquals(craters(air.caster).length, 0, "no crater from a raze in mid-air");
 
   const edge = f32(mainDeckRight(0) - RAZE_REACH.mid + 10.0);
   const ledge = duel(FAR_AWAY, 1, edge);

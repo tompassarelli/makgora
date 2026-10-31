@@ -6,7 +6,7 @@ import { copyReplayState, createReplaySnapshot } from "../../replay/snapshot";
 import { ProjectileKind } from "../../sim/codes";
 import type { Fighter, Projectile } from "../../sim/fighter";
 import { mainDeckRight } from "../../sim/stage";
-import { LAVA_RAZE, RAZE_DAMAGE, RAZE_END_FRAME, RAZE_ERUPT_FRAMES, RAZE_LAUNCH_ANGLE, RAZE_MOTION_WINDOW, RAZE_READ_FRAME, RAZE_REACH, RAZE_RADIUS, RAZE_UNIT } from "./specials";
+import { CRATER, FLOATING_TELL, RAZE_DAMAGE, RAZE_END_FRAME, RAZE_ERUPT_FRAMES, RAZE_FRONT, RAZE_GLOW_FRAMES, RAZE_LAUNCH_ANGLE, RAZE_MOTION_WINDOW, RAZE_READ_FRAME, RAZE_REACH, RAZE_TELL_FRAMES, RAZE_UNIT, TELL } from "./specials";
 import { ANGLES } from "../../sim/heroes/authoring";
 import { type Duel, type Press, type Stick, duel, lift, placeFoe, step } from "./testDuel";
 
@@ -14,7 +14,6 @@ const PRESS_TICK = 16;
 const PLACE_TICK = PRESS_TICK + RAZE_READ_FRAME - 1;
 const FAR_AWAY = 2000.0;
 const DIAGONAL = f32(0.7);
-const TELL = LAVA_RAZE.ground.projectiles?.[0];
 const NEUTRAL: Stick = { x: 0, z: 0 };
 
 type Script = (offset: number, facing: number) => Stick;
@@ -53,7 +52,7 @@ const closeTo = (actual: number | undefined, expected: number, label = ""): void
 
 const live = (f: Readonly<Fighter>): Projectile[] => f.projectiles.filter((projectile) => projectile.life > 0 && projectile.kind === ProjectileKind.hero);
 
-interface Placed { readonly z: number; readonly ahead: number }
+interface Placed { readonly z: number; readonly ahead: number; readonly casterZ: number; readonly floating: boolean }
 
 const NEUTRAL_DOWN_PRESS: Stick = { x: 0, z: -1 };
 
@@ -61,8 +60,8 @@ function placedAt(facing: number, script: Script, setup?: (d: Duel) => void, cas
   const d = duel(FAR_AWAY, facing, casterX);
   setup?.(d);
   cast(d, script, PLACE_TICK, facing, special);
-  const tell = live(d.caster).find((projectile) => projectile.spec === TELL);
-  return tell === undefined ? undefined : { z: tell.z, ahead: f32(f32(tell.x - d.caster.motion.x) * facing) };
+  const tell = live(d.caster).find((projectile) => projectile.spec === TELL || projectile.spec === FLOATING_TELL);
+  return tell === undefined ? undefined : { z: tell.z, ahead: f32(f32(tell.x - d.caster.motion.x) * facing), casterZ: d.caster.motion.z, floating: tell.spec === FLOATING_TELL };
 }
 
 const reachOf = (placed: Placed | undefined): number | undefined => placed?.ahead;
@@ -95,8 +94,8 @@ test("Lava Raze reads the stick history up to the press and nothing after it, fa
   }
 });
 
-test("Lava Raze's three eruptions are one unit wide apart and tile with no gap [k3 measure docs/design/roster.md]", () => {
-  closeTo(RAZE_UNIT, f32(2.0 * RAZE_RADIUS));
+test("Lava Raze's three eruptions are evenly spaced one unit apart from his front out to the far one [k3 measure docs/design/roster.md]", () => {
+  closeTo(f32(RAZE_REACH.near - RAZE_FRONT), RAZE_UNIT);
   closeTo(f32(RAZE_REACH.mid - RAZE_REACH.near), RAZE_UNIT);
   closeTo(f32(RAZE_REACH.far - RAZE_REACH.mid), RAZE_UNIT);
 });
@@ -186,7 +185,7 @@ const MID_PERCENT = 40.0;
 const CHAIN_PERCENT = 60.0;
 const CHAIN_FROM_PERCENT = 50.0;
 const CHAIN_TO_PERCENT = 70.0;
-const ESCAPE_PERCENT = 80.0;
+const ESCAPE_PERCENT = 86.0;
 
 interface Chained { readonly hits: number; readonly hitstunBeforeSecond: number; readonly hitstunAfterFirst: number }
 
@@ -248,7 +247,7 @@ test("A second Lava Raze, pressed the frame the first ends, hits a foe still in 
   for (let percent = CHAIN_FROM_PERCENT; percent <= CHAIN_TO_PERCENT; percent += 10.0) assertEquals(chainsAt(percent, NO_ESCAPE), true, `chain at ${percent} percent`);
 });
 
-test("No Lava Raze chain is infinite: a mash-out escapes it by 60 percent, every DI by 80, and each hit adds 12 percent [k3 measure docs/design/roster.md]", () => {
+test("No Lava Raze chain is infinite: a mash-out escapes it by 60 percent, every DI by 86, and each hit adds 12 percent [k3 measure docs/design/roster.md]", () => {
   for (const [label, escape] of ESCAPES) {
     for (const percent of [ESCAPE_PERCENT, 90.0, 100.0, 120.0]) assertEquals(chainsAt(percent, escape), false, `${label} escapes at ${percent} percent`);
   }
@@ -257,17 +256,41 @@ test("No Lava Raze chain is infinite: a mash-out escapes it by 60 percent, every
   assertEquals(f32(CHAIN_FROM_PERCENT + f32(3.0 * RAZE_DAMAGE)) >= ESCAPE_PERCENT, true, "three more hits from the first chaining percent pass the escape percent");
 });
 
-test("Lava Raze does not open past a ledge, and in the air erupts on the ground below the aimed point [k3 measure docs/design/roster.md]", () => {
-  const edge = mainDeckRight(0);
-  const nearEdge = f32(edge - RAZE_REACH.mid + 10.0);
-  closeTo(reachOf(placedAt(1, held(0, -1), undefined, nearEdge)), RAZE_REACH.near, "the near eruption fits on the deck");
-  assertEquals(placedAt(1, held(DIAGONAL, -DIAGONAL), undefined, nearEdge), undefined, "two units out is past the edge");
-  assertEquals(placedAt(1, quarterCircle(3, 3), undefined, nearEdge), undefined, "three units out is past the edge");
-  const high = (d: Duel): void => lift(d.caster, 300.0, d.caster.motion.x);
-  const below = placedAt(1, quarterCircle(3, 3), high);
-  assertEquals(below?.z, 0.0, "from the air it sits on the ground");
-  closeTo(reachOf(below), RAZE_REACH.far);
-  assertEquals(placedAt(1, quarterCircle(3, 3), high, nearEdge), undefined, "from the air over the void it does not appear");
+const AIMS: readonly (readonly [Reach, Script])[] = [["near", held(0, -1)], ["mid", held(DIAGONAL, -DIAGONAL)], ["far", quarterCircle(3, 3)]];
+
+test("Lava Raze erupts at its reach ahead and at his own height, on the deck and past the ledge from the ground, and over the deck and the void from the air, facing either way [k3 measure docs/design/roster.md]", () => {
+  for (const facing of [1, -1]) {
+    const nearEdge = f32(f32(mainDeckRight(0) - f32(RAZE_REACH.mid - 10.0)) * facing);
+    const overVoid = f32(f32(mainDeckRight(0) + 200.0) * facing);
+    const high = (d: Duel): void => lift(d.caster, 700.0, d.caster.motion.x);
+    for (const [reach, script] of AIMS) {
+      const standing = placedAt(facing, script, undefined, nearEdge);
+      closeTo(reachOf(standing), RAZE_REACH[reach], `${reach} from the ground facing ${facing}`);
+      assertEquals(standing?.z, 0.0, `${reach} from the ground sits at the deck's height facing ${facing}`);
+      assertEquals(standing?.floating, reach !== "near", `${reach} from the ground opens a crack only on the deck facing ${facing}`);
+      for (const [where, casterX] of [["over the deck", 0.0], ["over the void", overVoid]] as const) {
+        const flying = placedAt(facing, script, high, casterX);
+        closeTo(reachOf(flying), RAZE_REACH[reach], `${reach} in the air ${where} facing ${facing}`);
+        closeTo(flying?.z, flying?.casterZ ?? Number.NaN, `${reach} in the air ${where} sits at his height facing ${facing}`);
+        assertEquals(flying?.floating, true, `${reach} in the air ${where} opens no crack facing ${facing}`);
+      }
+    }
+  }
+});
+
+test("A Lava Raze past the ledge hits a foe hanging just off it at the stage's height, and a raze in mid-air leaves no scorch, facing either way [k3 measure docs/design/roster.md]", () => {
+  for (const facing of [1, -1]) {
+    const nearEdge = f32(f32(mainDeckRight(0) - f32(RAZE_REACH.mid - 10.0)) * facing);
+    const d = duel(RAZE_REACH.far, facing, nearEdge);
+    let struck = false;
+    for (let tick = 1; tick <= PLACE_TICK + RAZE_TELL_FRAMES + RAZE_ERUPT_FRAMES + RAZE_GLOW_FRAMES + 4; tick++) {
+      if (!struck) lift(d.foe, 0.0, f32(nearEdge + f32(RAZE_REACH.far * facing)));
+      step(d, pressAt(tick), quarterCircle(3, 3)(tick - PRESS_TICK, facing));
+      struck = struck || d.foe.status.damage > 0.0;
+    }
+    assertEquals(d.foe.status.damage, RAZE_DAMAGE, `the foe off the ledge is hit facing ${facing}`);
+    assertEquals(live(d.caster).some((projectile) => projectile.spec === CRATER), false, `no scorch in mid-air facing ${facing}`);
+  }
 });
 
 const SLOW_QUARTER_CIRCLE = ending([[0, -1, 1], [1, -1, 4], [1, 0, 5]]);

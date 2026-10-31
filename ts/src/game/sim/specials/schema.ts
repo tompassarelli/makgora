@@ -169,8 +169,8 @@ export interface SpecialProjectile {
   /** Spawns at one of these distances ahead of the caster, not at `offsetX`, by the move's aim: `far` when it points forward and not down, `mid` when down and forward, `near` otherwise. */
   readonly aimedReach?: { readonly near: number; readonly mid: number; readonly far: number } | undefined;
 
-  /** Spawns only where a floor lies under its spot, on that floor: within `reach` of the caster's feet while he stands, at any depth below him in the air. */
-  readonly onlyOnFloor?: { readonly reach: number } | undefined;
+  /** Spawns as `as` instead where no floor lies within `within` of its spot's height. */
+  readonly unfloored?: { readonly within: number; readonly as: SpecialProjectile } | undefined;
 
   /** Launches each target sideways away from the spot's centre, left of it to the left and right of it to the right; a target exactly on it goes away from the owner. The effect's launchX gives the angle and its sign is ignored. */
   readonly launchesFromCentre?: true | undefined;

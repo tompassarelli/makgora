@@ -9,7 +9,7 @@ import { standinCastBody } from "../standin/moves";
 
 const h = (multiple: number): number => f32(HERO_REFERENCE_HEIGHT * f32(multiple));
 
-export const RAZE_UNIT = h(f32(0.7));
+export const RAZE_UNIT = h(f32(f32(3.1) / 3.0));
 export const RAZE_RADIUS = h(f32(0.35));
 export const RAZE_FRONT = hurtCapsule(Character.firelord).radius;
 export const RAZE_REACH: { readonly near: number; readonly mid: number; readonly far: number } = {
@@ -24,7 +24,7 @@ export const RAZE_GLOW_FRAMES = 14;
 export const RAZE_END_FRAME = 30;
 export const RAZE_AIR_LANDING_LAG = 20;
 export const RAZE_DAMAGE = 12.0;
-const RAZE_FLOOR_REACH = h(f32(0.3));
+const RAZE_FLOOR_STEP = h(f32(0.3));
 
 const TELL_MODEL = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx";
 const COLUMN_MODEL = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx";
@@ -48,19 +48,25 @@ export const CRATER: SpecialProjectile = {
   spawnFrame: 0, offsetZ: 0.0, activeFrom: CRATER_FRAMES + 1, effect: groundHit(0.0, 85, 0.0, 0.0, HitElement.fire),
 };
 
-const GLOW: SpecialProjectile = {
+const glow = (crater: SpecialProjectile | undefined): SpecialProjectile => ({
   ...base, ...column(RAZE_GLOW_FRAMES, f32(COLUMN_FROM + f32(COLUMN_RATE * f32(RAZE_ERUPT_FRAMES / 60)))),
-  spawnFrame: 0, offsetZ: RAZE_RADIUS, activeFrom: RAZE_GLOW_FRAMES + 1, effect: groundHit(0.0, 85, 0.0, 0.0, HitElement.fire), expiresInto: CRATER,
-};
+  spawnFrame: 0, offsetZ: RAZE_RADIUS, activeFrom: RAZE_GLOW_FRAMES + 1, effect: groundHit(0.0, 85, 0.0, 0.0, HitElement.fire), expiresInto: crater,
+});
 
-const ERUPTION: SpecialProjectile = {
+const eruption = (crater: SpecialProjectile | undefined): SpecialProjectile => ({
   ...base, ...column(RAZE_ERUPT_FRAMES, COLUMN_FROM),
-  spawnFrame: 0, offsetZ: RAZE_RADIUS, effect: groundHit(RAZE_DAMAGE, RAZE_LAUNCH_ANGLE, 92.0, 30.0, HitElement.fire), launchesFromCentre: true, expiresInto: GLOW,
-};
+  spawnFrame: 0, offsetZ: RAZE_RADIUS, effect: groundHit(RAZE_DAMAGE, RAZE_LAUNCH_ANGLE, 92.0, 30.0, HitElement.fire), launchesFromCentre: true, expiresInto: glow(crater),
+});
 
-const TELL: SpecialProjectile = {
-  ...base, model: TELL_MODEL, spawnFrame: RAZE_READ_FRAME, offsetZ: 0.0, life: RAZE_TELL_FRAMES, activeFrom: RAZE_TELL_FRAMES + 1,
-  effect: groundHit(0.0, 85, 0.0, 0.0, HitElement.fire), aimedReach: RAZE_REACH, onlyOnFloor: { reach: RAZE_FLOOR_REACH }, dropsToFloor: true, expiresInto: ERUPTION,
+const tell = {
+  ...base, spawnFrame: RAZE_READ_FRAME, offsetZ: 0.0, life: RAZE_TELL_FRAMES, activeFrom: RAZE_TELL_FRAMES + 1,
+  effect: groundHit(0.0, 85, 0.0, 0.0, HitElement.fire), aimedReach: RAZE_REACH,
+} as const;
+
+export const FLOATING_TELL: SpecialProjectile = { ...tell, expiresInto: eruption(undefined) };
+
+export const TELL: SpecialProjectile = {
+  ...tell, model: TELL_MODEL, unfloored: { within: RAZE_FLOOR_STEP, as: FLOATING_TELL }, expiresInto: eruption(CRATER),
 };
 
 export const QUARTER_CIRCLE_FORWARD: StickMotion = { window: RAZE_MOTION_WINDOW, steps: [{ x: 0, z: -1 }, { x: 1, z: -1 }, { x: 1, z: 0 }] };
@@ -79,7 +85,7 @@ const raze = (air: boolean): AuthoredSpecial => ({
 
 export const LAVA_RAZE: SpecialKit = {
   name: "Lava Raze", selectedByMotion: QUARTER_CIRCLE_FORWARD,
-  description: "A glowing crack opens in the ground and erupts in lava. Down, or no direction, opens it one step ahead; down and forward, two; a quarter-circle from down through down and forward to forward, three. In the air it erupts on the ground below. The eruption throws foes away from its centre.",
+  description: "A glowing crack opens in the ground and erupts in lava. Down, or no direction, opens it one step ahead; down and forward, two; a quarter-circle from down through down and forward to forward, three. It erupts at his own height, so in the air or past a ledge it can erupt in mid-air, with no crack before it or scorch after it. The eruption throws foes away from its centre.",
   ground: raze(false), air: raze(true),
 };
 
