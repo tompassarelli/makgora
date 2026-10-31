@@ -29,14 +29,8 @@ import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "./headless";
 import { deliverKey } from "./deliverKey";
 import { headlessRender, playerRender } from "./headlessRender";
 import { createNetStandalone, smashcraftMapHash } from "./net";
+import { ACTIONS, CPU_OPPONENT, SELECTION_SCRIPT, selectionClicks, selectionPresses } from "./selectionScript";
 
-const ACTIONS: Readonly<Record<string, Action>> = {
-  attack: Action.attack, special: Action.special, jump: Action.jump,
-  grab: Action.grab, shield: Action.leftTrigger, walk: Action.modX,
-  left: Action.moveLeft, right: Action.moveRight, up: Action.moveUp, down: Action.moveDown,
-  cLeft: Action.cLeft, cRight: Action.cRight,
-  cUp: Action.cUp, cDown: Action.cDown,
-};
 const BINDINGS = presetBindings(DEFAULT_PRESET);
 const ESCAPE_KEY = 0x1b;
 export const NEUTRAL_INPUT: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
@@ -64,19 +58,6 @@ export function heldKeys(input: StandaloneInput): Set<number> {
 const FOUR_FIGHTERS = ["-dev slots 1 14", "-dev fighter 2 Blademaster", "-dev fighter 3 Illidan", "-dev fighter 4 Warden", "-dev time 2"];
 const FOUR_FIGHTER_STOCKS = 99;
 
-
-/** A script whose first line is this stays on character select instead of starting a match, so a scene check can draw the selection screen. Its other lines are `STEP BUTTON`, which holds that button (attack, special, jump, left and so on) for 3 steps from STEP, and `STEP click X Y`, which clicks at X, Y of Warcraft's 0.8 by 0.6 screen once at STEP; `start` and `back` (Esc) work as buttons too, and a `cpu` word on the first line (`#! select cpu`) fills slot 2 with a one-stock Wren Expert so a match ends by itself; a click on Done closes the controls panel that opens first. */
-const SELECTION_SCRIPT = "#! select";
-const CPU_OPPONENT = "cpu";
-const MENU_BUTTONS = new Set(["start", "back"]);
-
-const selectionLines = (script: string) => script.split("\n").map(line => line.trim().split(/\s+/)).filter(([step]) => /^\d+$/.test(step ?? ""));
-
-const selectionPresses = (script: string): readonly { readonly step: number; readonly button: string }[] =>
-  selectionLines(script).flatMap(([step, button]) => button !== undefined && (ACTIONS[button] !== undefined || MENU_BUTTONS.has(button)) ? [{ step: Number(step), button }] : []);
-
-const selectionClicks = (script: string): readonly { readonly step: number; readonly x: number; readonly y: number }[] =>
-  selectionLines(script).flatMap(([step, verb, x, y]) => verb === "click" ? [{ step: Number(step), x: Number(x), y: Number(y) }] : []);
 
 export type StandaloneStart = "match" | "select" | "results";
 
@@ -108,6 +89,8 @@ export async function createStandaloneSession(options: { readonly script?: strin
   const presses = scripted ? selectionPresses(script) : [], clicks = scripted ? selectionClicks(script) : [];
   let steps = 0;
   const runtime = installHeadless(!driven || presentation === "pool-confirmed" || presentation === "pool-predicted" ? PREDICTED_HEADLESS : SMASHCRAFT_HEADLESS);
+  let restoreTutorialOffers = (): void => {};
+  const release = (): void => { restoreTutorialOffers(); runtime.restore(); };
   try {
 
     const platform = join(import.meta.dir, "../../src/platform");
@@ -117,6 +100,8 @@ export async function createStandaloneSession(options: { readonly script?: strin
     const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/developerCommands.ts"));
     const { views }: { views(state: State): { readonly settings: readonly { endPreview(): void; isOpen(): boolean; close(): void }[] } } = await import(join(platform, "../host/loop/ui.ts"));
     const { tutorialOffers }: { tutorialOffers: { enabled: boolean } } = await import(join(platform, "../game/ui/tutorialMenu.ts"));
+    const offersBefore = tutorialOffers.enabled;
+    restoreTutorialOffers = () => { tutorialOffers.enabled = offersBefore; };
     tutorialOffers.enabled = offersPrompt(start, savedFiles);
     const { drawnFrame }: { drawnFrame(state: State): { readonly frame: number } } = await import(join(platform, "../host/loop/drawnFrame.ts"));
     const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import(join(import.meta.dir, "botMatch.ts"));
@@ -199,10 +184,10 @@ export async function createStandaloneSession(options: { readonly script?: strin
       digest: () => value(() => ({ frame: shell().runtime.simulationFrame, digest: frameDigest(shell().world, shell().runtime.simulationFrame) })),
       difference: (recorded) => value(() => describeDigestDifference(digestDifference(shell().world, shell().runtime.simulationFrame, recorded))),
       finished: () => value(() => shell().game.phase === Phase.result),
-      close() { if (!closed) { closed = true; runtime.restore(); } },
+      close() { if (!closed) { closed = true; release(); } },
     };
   } catch (error) {
-    runtime.restore();
+    release();
     throw error;
   }
 }
