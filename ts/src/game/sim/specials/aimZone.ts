@@ -1,6 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../fighter";
 import type { Controls } from "../roster";
+import { stickMoved } from "../stickHistory";
 import type { AuthoredSpecial } from "./schema";
 
 const SECTOR_TANGENT = 0.41421356797218323;
@@ -38,10 +39,11 @@ export function changesAimZone(f: Readonly<Fighter>, x: number, z: number): bool
 }
 
 export function steerAim(special: Fighter["special"], move: Readonly<AuthoredSpecial>, input: Readonly<Controls>): void {
+  if (move.aimByMotion !== undefined) return;
   if (freeAims(move) && aimFree(special, input)) return;
   const x = chargedAimX(input);
   const z = chargedAimZ(input);
-  if (x === 0 && z === 0 && move.liveAim !== true) return;
+  if (x === 0 && z === 0) return;
   special.aimX = x;
   special.aimZ = z;
 }
@@ -58,7 +60,26 @@ export function aimFree(special: Fighter["special"], input: Readonly<Controls>):
   return true;
 }
 
-export function startAim(special: Fighter["special"], move: Readonly<AuthoredSpecial>, input: Readonly<Controls>): void {
+function motionAim(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>): boolean {
+  const aim = move.aimByMotion;
+  if (aim === undefined) return false;
+  const side = f.facing < 0 ? -1 : 1;
+  let aimX = aim.otherwise.aimX;
+  let aimZ = aim.otherwise.aimZ;
+  for (const entry of aim.motions) {
+    if (!stickMoved(f, entry.motion)) continue;
+    aimX = entry.aimX;
+    aimZ = entry.aimZ;
+    break;
+  }
+  f.special.aimX = aimX * side;
+  f.special.aimZ = aimZ;
+  return true;
+}
+
+export function startAim(f: Fighter, move: Readonly<AuthoredSpecial>, input: Readonly<Controls>): void {
+  if (motionAim(f, move)) return;
+  const { special } = f;
   const aimX = input.specialX !== 0 ? input.specialX : input.direction;
   const aimZ = input.specialZ !== 0 ? input.specialZ : input.verticalDirection;
   special.aimX = aimX < 0 ? -1 : aimX > 0 ? 1 : 0;

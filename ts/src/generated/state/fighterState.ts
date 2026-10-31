@@ -398,6 +398,10 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   platform.downHeld = sourcePlatform.downHeld;
   platform.downAge = sourcePlatform.downAge;
   platform.dropConsumed = sourcePlatform.dropConsumed;
+  const stick = target.stick;
+  const sourceStick = source.stick;
+  stick.recent = sourceStick.recent;
+  stick.older = sourceStick.older;
   const cannon: StageCannon = target.cannon;
   if ((source.restingGroups & REST_CANNON) === 0) {
     const sourceCannon = source.cannon;
@@ -923,6 +927,10 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   if (platform.downHeld !== sourcePlatform.downHeld) return false;
   if (platform.downAge !== sourcePlatform.downAge) return false;
   if (platform.dropConsumed !== sourcePlatform.dropConsumed) return false;
+  const stick = target.stick;
+  const sourceStick = source.stick;
+  { const a = stick.recent, b = sourceStick.recent; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = stick.older, b = sourceStick.older; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if ((target.restingGroups & source.restingGroups & REST_CANNON) === 0) {
     const cannon = target.cannon;
     const sourceCannon = source.cannon;
@@ -1092,6 +1100,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   const grab = fighter.grab;
   const ledge = fighter.ledge;
   const platform = fighter.platform;
+  const stick = fighter.stick;
   const cannon = fighter.cannon;
   const water = fighter.water;
   const status = fighter.status;
@@ -1371,6 +1380,8 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.bool(prefix, "platformDownHeld", platform.downHeld);
   sink.int(prefix, "platformDownAge", platform.downAge);
   sink.bool(prefix, "platformDropConsumed", platform.dropConsumed);
+  if (stick.recent !== 0) sink.int(prefix, "stickRecent", stick.recent);
+  if (stick.older !== 0) sink.int(prefix, "stickOlder", stick.older);
   sink.int(prefix, "cannonHeld", cannon.held ?? -1);
   sink.int(prefix, "cannonFiring", cannon.firing ?? -1);
   sink.int(prefix, "cannonCooldown", cannon.cooldown);

@@ -52,6 +52,7 @@ function aimedSpotCanonical(spec: Readonly<SpecialProjectile>, prefix: string): 
     real("aimedReach.far", spec.aimedReach.far);
   }
   if (spec.onlyOnFloor !== undefined) real("onlyOnFloor.reach", spec.onlyOnFloor.reach);
+  if (spec.launchesFromCentre === true) result.push(canonicalInt(`${prefix}.launchesFromCentre`, 1));
   return result.join("");
 }
 

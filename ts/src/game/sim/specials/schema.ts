@@ -4,6 +4,7 @@ import type { MoveRegion, StrikeCapsule } from "../heroMoves";
 import type { HitEffect } from "../hitRegions";
 import type { AppliedStatus } from "../appliedStatus";
 import type { HurtPose } from "../hurtboxes";
+import type { StickMotion } from "../stickMotion";
 import type { ProjectileBounce, ProjectileVelocity, SpecialGaze } from "./volleys";
 import type { CastWindows, FrameWindow, SpecialChannel } from "./castWindows";
 import type { SpecialBeam } from "./specialBeam";
@@ -100,6 +101,17 @@ export interface TargetedStrike {
   readonly curse?: SpecialCurse | undefined;
 }
 
+export interface MotionAim {
+  readonly motion: StickMotion;
+  readonly aimX: number;
+  readonly aimZ: number;
+}
+
+export interface AimByMotion {
+  readonly motions: readonly MotionAim[];
+  readonly otherwise: { readonly aimX: number; readonly aimZ: number };
+}
+
 export interface SpecialProjectile {
   readonly spawnFrame: number;
   readonly offsetX: number;
@@ -156,6 +168,9 @@ export interface SpecialProjectile {
 
   /** Spawns only where a floor lies under its spot, on that floor: within `reach` of the caster's feet while he stands, at any depth below him in the air. */
   readonly onlyOnFloor?: { readonly reach: number } | undefined;
+
+  /** Launches each target sideways away from the spot's centre, left of it to the left and right of it to the right; a target exactly on it goes away from the owner. The effect's launchX gives the angle and its sign is ignored. */
+  readonly launchesFromCentre?: true | undefined;
 
   /** Spawns at the move's live mark of this spec, offset from it, and not at all once that mark is gone. */
   readonly atMark?: SpecialProjectile | undefined;
@@ -331,8 +346,8 @@ export interface AuthoredSpecial extends CastWindows {
   readonly fallLandingLag?: number | undefined;
 
   readonly aimFrames?: number | undefined;
-  /** Through `aimFrames` its aim is the stick as held each frame, neutral included, where an ordinary aim keeps the last direction pointed. */
-  readonly liveAim?: true | undefined;
+  /** Picks the aim on the press from the stick's recent motion, the first listed motion the stick history completed within its window, else `otherwise`; the stick after the press does not steer it. Aims are facing-relative in x. */
+  readonly aimByMotion?: AimByMotion | undefined;
   readonly facesStick?: boolean | undefined;
   readonly hurt?: readonly HurtPose[] | undefined;
 
@@ -403,6 +418,9 @@ export interface SpecialFollowUp {
 export interface SpecialKit {
 
   readonly name: string;
+
+  /** A press with this motion in the stick history picks this kit, whichever direction the press itself reads. */
+  readonly selectedByMotion?: StickMotion | undefined;
 
   readonly description: string;
   readonly ground: AuthoredSpecial;

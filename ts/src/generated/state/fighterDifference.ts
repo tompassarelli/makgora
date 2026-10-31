@@ -334,6 +334,8 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.platform.downHeld !== actual.platform.downHeld) return "platformDownHeld";
   if (expected.platform.downAge !== actual.platform.downAge) return "platformDownAge";
   if (expected.platform.dropConsumed !== actual.platform.dropConsumed) return "platformDropConsumed";
+  if (expected.stick.recent !== actual.stick.recent) return "stickRecent";
+  if (expected.stick.older !== actual.stick.older) return "stickOlder";
   if ((expected.cannon.held ?? -1) !== (actual.cannon.held ?? -1)) return "cannonHeld";
   if ((expected.cannon.firing ?? -1) !== (actual.cannon.firing ?? -1)) return "cannonFiring";
   if (expected.cannon.cooldown !== actual.cannon.cooldown) return "cannonCooldown";

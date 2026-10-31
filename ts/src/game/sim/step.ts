@@ -35,6 +35,7 @@ import { tauntPull } from "./taunt";
 // One local for the sea: this module is near Lua's 200-local limit.
 import * as sea from "./water";
 import { stickX } from "./stick";
+import { trackStick } from "./stickTrack";
 import { respawnFighter } from "./respawn";
 import { checkBlastZone } from "./stocks";
 import { advanceSurfaceRecovery, advanceWallJump, leaveMainDeckBody, resolveSolidSurfaceContacts } from "./surfaces";
@@ -288,6 +289,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const { motion, shield, jump, dodge, status } = f;
   motion.deltaX = 0.0;
   motion.deltaZ = 0.0;
+  trackStick(f, input);
   if (advanceOut(world, slot, respawnX)) return;
   renewSmashDirectionalInfluenceString(f);
   if (inStageCannon(f)) return;

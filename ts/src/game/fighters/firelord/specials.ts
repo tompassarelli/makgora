@@ -3,7 +3,8 @@ import { Character, HitElement } from "../../sim/codes";
 import { hurtCapsule } from "../../sim/geometry/contactGeometry";
 import { groundHit } from "../../sim/heroes/groundNormals";
 import { HERO_REFERENCE_HEIGHT } from "../../sim/heroMoves";
-import type { AuthoredSpecial, SpecialKit, SpecialProjectile } from "../../sim/specials/schema";
+import type { AimByMotion, AuthoredSpecial, SpecialKit, SpecialProjectile } from "../../sim/specials/schema";
+import type { StickMotion } from "../../sim/stickMotion";
 import { standinCastBody } from "../standin/moves";
 
 const h = (multiple: number): number => f32(HERO_REFERENCE_HEIGHT * f32(multiple));
@@ -15,10 +16,12 @@ export const RAZE_REACH: { readonly near: number; readonly mid: number; readonly
   near: f32(RAZE_FRONT + RAZE_UNIT), mid: f32(RAZE_FRONT + f32(2.0 * RAZE_UNIT)), far: f32(RAZE_FRONT + f32(3.0 * RAZE_UNIT)),
 };
 export const RAZE_READ_FRAME = 14;
+export const RAZE_MOTION_WINDOW = 10;
+export const RAZE_LAUNCH_ANGLE = 60;
 export const RAZE_TELL_FRAMES = 10;
 export const RAZE_ERUPT_FRAMES = 4;
 export const RAZE_GLOW_FRAMES = 14;
-export const RAZE_END_FRAME = 48;
+export const RAZE_END_FRAME = 30;
 export const RAZE_AIR_LANDING_LAG = 20;
 export const RAZE_DAMAGE = 12.0;
 const RAZE_FLOOR_REACH = h(f32(0.3));
@@ -44,7 +47,7 @@ const GLOW: SpecialProjectile = {
 
 const ERUPTION: SpecialProjectile = {
   ...base, ...column(RAZE_ERUPT_FRAMES, COLUMN_FROM),
-  spawnFrame: 0, offsetZ: RAZE_RADIUS, effect: groundHit(RAZE_DAMAGE, 85, 92.0, 30.0, HitElement.fire), expiresInto: GLOW,
+  spawnFrame: 0, offsetZ: RAZE_RADIUS, effect: groundHit(RAZE_DAMAGE, RAZE_LAUNCH_ANGLE, 92.0, 30.0, HitElement.fire), launchesFromCentre: true, expiresInto: GLOW,
 };
 
 const TELL: SpecialProjectile = {
@@ -52,14 +55,22 @@ const TELL: SpecialProjectile = {
   effect: groundHit(0.0, 85, 0.0, 0.0, HitElement.fire), aimedReach: RAZE_REACH, onlyOnFloor: { reach: RAZE_FLOOR_REACH }, dropsToFloor: true, expiresInto: ERUPTION,
 };
 
+export const QUARTER_CIRCLE_FORWARD: StickMotion = { window: RAZE_MOTION_WINDOW, steps: [{ x: 0, z: -1 }, { x: 1, z: -1 }, { x: 1, z: 0 }] };
+const DOWN_FORWARD: StickMotion = { window: 1, steps: [{ x: 1, z: -1 }] };
+
+const AIM: AimByMotion = {
+  motions: [{ motion: QUARTER_CIRCLE_FORWARD, aimX: 1, aimZ: 0 }, { motion: DOWN_FORWARD, aimX: 1, aimZ: -1 }],
+  otherwise: { aimX: 0, aimZ: -1 },
+};
+
 const raze = (air: boolean): AuthoredSpecial => ({
   name: "Lava Raze", endFrame: RAZE_END_FRAME, landingLag: air ? RAZE_AIR_LANDING_LAG : undefined,
-  aimFrames: RAZE_READ_FRAME, liveAim: true, hurt: standinCastBody(Character.firelord, 8, RAZE_READ_FRAME + RAZE_TELL_FRAMES),
+  aimByMotion: AIM, hurt: standinCastBody(Character.firelord, 8, RAZE_READ_FRAME + RAZE_TELL_FRAMES),
   projectiles: [TELL],
 });
 
 export const LAVA_RAZE: SpecialKit = {
-  name: "Lava Raze",
-  description: "A glowing crack opens in the ground and erupts in lava. The stick as the crack opens picks where: down, or no direction, one step ahead; down and forward, two; forward, three. In the air it erupts on the ground below.",
+  name: "Lava Raze", selectedByMotion: QUARTER_CIRCLE_FORWARD,
+  description: "A glowing crack opens in the ground and erupts in lava. Down, or no direction, opens it one step ahead; down and forward, two; a quarter-circle from down through down and forward to forward, three. In the air it erupts on the ground below. The eruption throws foes away from its centre.",
   ground: raze(false), air: raze(true),
 };

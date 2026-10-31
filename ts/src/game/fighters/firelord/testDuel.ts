@@ -38,16 +38,20 @@ export function duel(foeAhead: number, facing = 1, casterX = 0.0): Duel {
   return { state, caster, foe, tick: 0 };
 }
 
-const PRESSES: Readonly<Record<Press, { readonly held: number; readonly pressed: number; readonly specialZ?: number }>> = {
+const PRESSES: Readonly<Record<Press, { readonly held: number; readonly pressed: number }>> = {
   hold: { held: maskOf(Action.special), pressed: 0 },
-  down: { held: maskOf(Action.special), pressed: maskOf(Action.special), specialZ: -1 },
+  down: { held: maskOf(Action.special), pressed: maskOf(Action.special) },
   none: { held: 0, pressed: 0 },
 };
 
-export function step(d: Duel, press: Press, stick: Stick = { x: 0, z: 0 }): void {
+const BEYOND = 0.5;
+const beyond = (value: number): number => (value > BEYOND ? 1 : value < -BEYOND ? -1 : 0);
+
+export function step(d: Duel, press: Press, stick: Stick = { x: 0, z: 0 }, special?: Stick): void {
   d.tick++;
   const fields = PRESSES[press];
-  const row = inputRow({ ...fields, axisX: Math.round(stick.x * 127), axisZ: Math.round(stick.z * 127) });
+  const pressed = press === "down";
+  const row = inputRow({ ...fields, axisX: Math.round(stick.x * 127), axisZ: Math.round(stick.z * 127), specialX: pressed ? beyond(special?.x ?? stick.x) : 0, specialZ: pressed ? beyond(special?.z ?? stick.z) : 0 });
   if (row === undefined) throw new Error("Firelord input row");
   adaptInput(row, d.caster, d.tick, d.state.controls.inputs[0], d.state.controls.commands[0]);
   stepMatch(d.state.match, d.state.world, d.state.controls, d.tick);
@@ -66,4 +70,9 @@ export function lift(fighter: Fighter, height: number, x = fighter.motion.x): vo
   setWorldMotionValue(fighter.motion.meleeX, fighter.motion.x);
   setWorldMotionValue(fighter.motion.meleeZ, fighter.motion.z);
   setWorldMotionValue(fighter.motion.meleeVelocityZ, fighter.motion.vz);
+}
+
+export function placeFoe(d: Duel, x: number): void {
+  d.foe.motion.x = x;
+  setWorldMotionValue(d.foe.motion.meleeX, x);
 }

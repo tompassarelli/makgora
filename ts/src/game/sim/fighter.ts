@@ -402,6 +402,12 @@ interface Grab {
 
 
 
+/** The stick's last 14 frames as 4-bit zones, newest in the low nibble of `recent` and carrying on into `older`; see stickHistory.ts. */
+interface StickHistory {
+  recent: number;
+  older: number;
+}
+
 interface PlatformInput {
   downHeld: boolean;
   downAge: number;
@@ -553,6 +559,7 @@ export interface Fighter {
   readonly grab: Grab;
   readonly ledge: Ledge;
   readonly platform: PlatformInput;
+  readonly stick: StickHistory;
   readonly cannon: Readonly<StageCannon>;
   readonly water: Readonly<Water>;
   readonly status: Status;
@@ -820,6 +827,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     grab: { pummels: 0, grabbedFrames: 0, heldFrames: 0, queuedThrow: GrabAction.none, action: GrabAction.none, frame: 0, serial: 0, mashX: 0, mashZ: 0, owner: undefined, target: undefined, reel: 0 },
     ledge: { state: LedgeState.none, side: 0, frame: 0, serial: 0, intangible: 0, regrab: 0, grabs: 0 },
     platform: { downHeld: false, downAge: 3, dropConsumed: false },
+    stick: { recent: 0, older: 0 },
     cannon: { held: undefined, firing: undefined, cooldown: 0, passing: false },
     water: { inWater: false, frames: 0, entries: 0, hydraFrame: 0, hydraX: 0.0, hydraStrikeFrame: -1 },
     status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorKnockback: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionHits: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, cursedBy: undefined, curseFrames: 0, healed: 0.0, summonFrames: 0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, soakFrames: 0, soakLevel: 0, poisonStacks: 0, poisonStackFrames: 0, buff: 0, buffFrames: 0, manaShield: false, petrifyIn: 0, petrified: false, petrifyDamage: 0.0, aura: false, auraFrames: 0, slowFrames: 0, slowScale: 0.0, stacks: 0, struckBy: undefined },

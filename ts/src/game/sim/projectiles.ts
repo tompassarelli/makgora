@@ -167,13 +167,19 @@ export function originalProjectileEffect(projectile: Readonly<Projectile>): Read
   return projectileHit;
 }
 
+function sideOfCentre(world: Roster, ownerSlot: number, target: Readonly<Fighter>, projectile: Readonly<Projectile>): number {
+  if (target.motion.x !== projectile.x) return target.motion.x < projectile.x ? -1 : 1;
+  const owner = fighterAt(world, ownerSlot);
+  return owner.motion.x < projectile.x ? 1 : owner.motion.x > projectile.x ? -1 : owner.facing < 0 ? -1 : 1;
+}
+
 function applyProjectileHit(world: Roster, ownerSlot: number, targetSlot: number, projectile: Readonly<Projectile>, shieldContact: boolean): void {
   const target = fighterAt(world, targetSlot);
   const { spec } = projectile;
   if (projectile.kind === ProjectileKind.hero && spec !== undefined) {
     copyHitEffect(projectileHit, heroProjectileEffect(projectile, spec));
     projectileHit.damage = projectileDamage(projectile);
-    collectDamageContact(world, ownerSlot, targetSlot, projectileHit, projectile.direction, spec.burn === undefined ? ContactKind.launch : ContactKind.damageOnly, false, undefined, shieldContact, spec.status, projectile.z);
+    collectDamageContact(world, ownerSlot, targetSlot, projectileHit, spec.launchesFromCentre === true ? sideOfCentre(world, ownerSlot, target, projectile) : projectile.direction, spec.burn === undefined ? ContactKind.launch : ContactKind.damageOnly, false, undefined, shieldContact, spec.status, projectile.z);
     return;
   }
   const { kind } = projectile;

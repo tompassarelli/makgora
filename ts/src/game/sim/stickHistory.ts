@@ -1,0 +1,20 @@
+import { idiv, imod } from "wisp/src/sim/intMath";
+import type { Fighter } from "./fighter";
+import type { FighterSpecials, SpecialKit } from "./specials/schema";
+import { OLDEST_WEIGHT, type StickMotion, motionCompleted, zoneCode } from "./stickMotion";
+
+export function recordStick(f: Fighter, sectorX: number, sectorZ: number): void {
+  const { stick } = f;
+  stick.older = imod(stick.older, OLDEST_WEIGHT) * 16 + idiv(stick.recent, OLDEST_WEIGHT);
+  stick.recent = imod(stick.recent, OLDEST_WEIGHT) * 16 + zoneCode(sectorX, sectorZ);
+}
+
+export function stickMoved(f: Readonly<Fighter>, motion: Readonly<StickMotion>): boolean {
+  return motionCompleted(f.stick.recent, f.stick.older, f.facing < 0 ? -1 : 1, motion);
+}
+
+const kitReadsMotion = (kit: Readonly<SpecialKit>): boolean => kit.selectedByMotion !== undefined || kit.ground.aimByMotion !== undefined || kit.air?.aimByMotion !== undefined;
+
+export function readsStickMotion(specials: Readonly<FighterSpecials>): boolean {
+  return kitReadsMotion(specials.neutral) || kitReadsMotion(specials.side) || kitReadsMotion(specials.up) || kitReadsMotion(specials.down);
+}

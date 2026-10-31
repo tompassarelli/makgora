@@ -1,5 +1,6 @@
 import { releaseCommandGrabLock } from "./commandGrabLock";
 import { startAim, steerAim } from "./aimZone";
+import { requestedSlot } from "./slotRequest";
 import { max, min } from "../../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
@@ -24,10 +25,6 @@ import { swingFullCharge, holdCharge, throwFullDroppingCharge } from "./heroForm
 import { holdSteeredShot, faceHeldStick } from "./heroMotion";
 import { applyFrameEffectsBeforeLedge, applyFrameEffectsBeforePlacements, applyFrameEffectsAfterPlacements } from "./frameEffects";
 
-function requestedSlot(input: Readonly<Controls>): SpecialSlot {
-  return input.specialZ > 0 ? SpecialSlot.up : input.specialZ < 0 ? SpecialSlot.down : input.specialX !== 0 ? SpecialSlot.side : SpecialSlot.neutral;
-}
-
 function recallHolds(f: Readonly<Fighter>, kit: Readonly<SpecialKit>): boolean {
   if (kit.recallWhile === "armor") return f.status.armorFrames > 0;
   if (kit.recallWhile === "projectile") {
@@ -51,7 +48,7 @@ const choice: HeroSpecialChoice = { slot: SpecialSlot.neutral, form: SpecialForm
 
 export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<FighterSpecials>, input: Readonly<Controls>, out: SpecialRefusal, world?: Roster): HeroSpecialChoice | undefined {
   out.groundOnly = false;
-  const slot = requestedSlot(input);
+  const slot = requestedSlot(f, specials, input);
   if ((f.special.cooldowns[SpecialAction.heroNeutral + slot] ?? 0) > 0) return undefined;
   const kit = specialKit(specials, slot);
   const airborne = !f.motion.grounded;
@@ -94,7 +91,7 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
   special.form = chosen.form;
   special.variant = chosen.variant;
   special.grabFrame = 0;
-  startAim(special, move, input);
+  startAim(f, move, input);
   for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;
   special.hit = false;
   special.guarded = false;

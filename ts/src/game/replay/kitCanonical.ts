@@ -9,6 +9,7 @@ import { type AuthoredMove, type FighterMoves, travelStopFlags } from "../sim/he
 import type { AuthoredSpecial, FighterSpecials } from "../sim/specials/schema";
 import { type FighterHurtboxes, type HurtPart, HurtState } from "../sim/hurtboxes";
 import { writeSelfHeal } from "../sim/specials/selfHeal";
+import { zoneCode } from "../sim/stickMotion";
 
 export function fighterMovesCanonical(moves: FighterMoves | undefined, prefix = "moves"): string {
   if (moves === undefined) return "";
@@ -179,6 +180,24 @@ function writeSpecialBase(move: Readonly<AuthoredSpecial>, name: string, result:
   int("landingLag", move.landingLag ?? -1);
   if (move.fallLandingLag !== undefined) int("fallLandingLag", move.fallLandingLag);
   if (move.facesStick === true) int("facesStick", 1);
+  writeAimByMotion(move, name, result);
+}
+
+function writeAimByMotion(move: Readonly<AuthoredSpecial>, name: string, result: string[]): void {
+  const aim = move.aimByMotion;
+  if (aim === undefined) return;
+  const { int } = fieldWriters(name, result);
+  int("aimByMotion.otherwiseX", aim.otherwise.aimX);
+  int("aimByMotion.otherwiseZ", aim.otherwise.aimZ);
+  for (let index = 0; index < aim.motions.length; index++) {
+    const entry = at(aim.motions, index);
+    int(`aimByMotion[${index}].window`, entry.motion.window);
+    int(`aimByMotion[${index}].aimX`, entry.aimX);
+    int(`aimByMotion[${index}].aimZ`, entry.aimZ);
+    for (let step = 0; step < entry.motion.steps.length; step++) {
+      int(`aimByMotion[${index}].step[${step}]`, zoneCode(at(entry.motion.steps, step).x, at(entry.motion.steps, step).z));
+    }
+  }
 }
 
 function writeSpecialArmor(move: Readonly<AuthoredSpecial>, name: string, result: string[]): void {
