@@ -3,81 +3,31 @@
 
 
 import { max, min } from "../core/numbers";
-import { divideFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
-import { Character, DownState, LedgeState, ParryBuffer, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
-import {
-  SPOT_DODGE_FRAMES,
-  GROUND_ROLL_FRAMES,
-  WALL_TECH_STARTUP_FRAMES,
-  canAttack,
-  canStartAttack,
-  inGrabContext,
-  isFloorTeching,
-  isForwardGroundRoll,
-  isGroundDodging,
-  isTumbling,
-} from "./conditions";
-import {
-  DOWN_ROLL_FRAMES,
-  DOWN_STAND_FRAMES,
-  GROUND_ROLL_MOVE_END,
-  GROUND_ROLL_MOVE_START,
-  GROUND_ROLL_SPEED,
-  TECH_IN_PLACE_FRAMES,
-  TECH_ROLL_FRAMES,
-  advanceDownState,
-  finishLanding,
-  resolveDownGroundContact,
-} from "./down";
-import {
-  FAST_FALL_INPUT_WINDOW,
-  type Fighter,
-  PLATFORM_DROP_INPUT_WINDOW,
-  TURNAROUND_SPECIAL_WINDOW_FRAMES,
-  WALL_JUMP_FLICK_FRAMES,
-  WALL_TECH_JUMP_INPUT_WINDOW_FRAMES,
-} from "./fighter";
-import { advanceGroundMovement, clearDash, readLandingExit, restingTraction, wantsCrouch } from "./groundMovement";
-import { heroEgg, jumpCancelHeroSpecial } from "./specials/engine";
-import { heroFloats, heroMotionHolds, heroSpecialJumps } from "./specials/heroMotion";
+import { DownState } from "./codes";
+import { inGrabContext, isFloorTeching, isGroundDodging } from "./conditions";
+import { DOWN_ROLL_FRAMES, DOWN_STAND_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES, finishLanding } from "./down";
+import { type Fighter, WALL_TECH_JUMP_INPUT_WINDOW_FRAMES } from "./fighter";
+import { clearDash } from "./groundMovement";
+import { heroEgg } from "./specials/engine";
+import { heroFloats } from "./specials/heroMotion";
 import { tickEmpowered } from "./specials/empowered";
-import { carryHeroStatus, heroStatusFall } from "./heroStatus";
-import { closeParasol, endParasolAerial, parasolFall, reopenParasol } from "./parasol";
+import { endParasolAerial } from "./parasol";
 import { hopHeroStatus } from "./hexHop";
-import { demonHunterAuthoredMotion, demonHunterHoldsHeight, demonHunterJumpCancel } from "./specials";
-import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge, endFinishedAirDodge } from "./jumpsAndDodges";
-import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
-import { advanceLedge, catchWavedashLedge, wavedashLedgeSide } from "./ledge";
+import { demonHunterHoldsHeight } from "./specials";
+import { AIR_DODGE_DECAY_FRAMES, endFinishedAirDodge } from "./jumpsAndDodges";
+import { catchWavedashLedge, wavedashLedgeSide } from "./ledge";
 import { EdgePass, passThroughEdge, rideWall, teleportsThisFrame } from "./edgeRecovery";
-import { DOWN_ATTACK_FRAMES, EARLY_ASCENT_GRAB_FRAMES, SMASH_MAX_HOLD_FRAMES, attackFall, attackStartupFrames, isSmashAttack, skipFlurryWhenReleased, smashChargeFrame } from "./moves";
-import {
-  addMeleeWorldValues,
-  airDriftVelocity,
-  applyMeleeGravity,
-  moveMeleeVerticalVelocity,
-  moveMeleeX,
-  moveMeleeZ,
-  totalVelocityX,
-} from "./motion";
+import { DOWN_ATTACK_FRAMES, SMASH_MAX_HOLD_FRAMES, isSmashAttack, skipFlurryWhenReleased, smashChargeFrame } from "./moves";
+import { addMeleeWorldValues, moveMeleeX, totalVelocityX } from "./motion";
 import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
 import { travelBeforeBodies, travelBeforeLedge } from "./travelStop";
 import { canTeeter, grabHoldsEdge, shieldPressed, stopGrabAtEdge, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
-import { beginCarryJump, carryThrowRequested, isCarrying, limitCarrySpeed, lowerCarryJump } from "./cargoCarry";
+import { isCarrying } from "./cargoCarry";
 import { moveTravelStep } from "./heroMoves";
-import {
-  advanceGuard,
-  advanceShieldInputClocks,
-  bufferParryOption,
-  decayShieldMotion,
-  regenerateShield,
-  shieldDrain,
-  shieldDrainShouldResume,
-  clearPowershield,
-} from "./shield";
-import { advanceShieldBreak, beginShieldBreak } from "./shieldBreak";
-import { applyAutomaticSmashDirectionalInfluence, applySmashDirectionalInfluence, discardPendingSmashDirectionalInfluence, renewSmashDirectionalInfluenceString } from "./smashDirectionalInfluence";
+import { advanceGuard, regenerateShield, clearPowershield } from "./shield";
+import { renewSmashDirectionalInfluenceString } from "./smashDirectionalInfluence";
 import * as stageSurfaces from "./stage";
 
 import { endCannonPass, inStageCannon, windPush } from "./stageHazards";
@@ -88,33 +38,13 @@ import { stickX } from "./stick";
 import { respawnFighter } from "./respawn";
 import { checkBlastZone } from "./stocks";
 import { advanceSurfaceRecovery, advanceWallJump, leaveMainDeckBody, resolveSolidSurfaceContacts } from "./surfaces";
-import { forwardRollTurnFrame, rollTravel } from "./geometry/rollTravel";
-import { advanceTechInput, techContactWindow } from "./geometry/techInput";
 import { freezeMinimumFrames, cancelAttack, clearDownState, clearOwnedFreezeTrap, thawFighter } from "./transitions";
 import { advanceMash } from "./mash";
-import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
-import { aerialJumps, heavyFall, jumpBuffed, speedBuffed } from "./itemBuffs";
+import { aerialJumps } from "./itemBuffs";
 import { mutableFreezeTrap } from "./fighterRest";
 import { advancePetrify } from "./gaze";
-import {
-  advanceDownMotion,
-  advanceTechAndRegrab,
-  applyFrameDirectionalInfluence,
-  applyTumbleExit,
-  applyVerticalMotion,
-  beginDodgeInput,
-  beginJumpInput,
-  canSteerFrame,
-  cancelJumpStates,
-  decayMotion,
-  dragFighterMotion,
-  drainShieldEnergy,
-  readStickFrame,
-  resolveCrouch,
-  steerMotion,
-  takeParryOption,
-  tickHitlag,
-} from "./motionSteps";
+import { advanceTechAndRegrab, applyFrameDirectionalInfluence, applyTumbleExit, applyVerticalMotion, beginDodgeInput, beginJumpInput, canSteerFrame, decayMotion, dragFighterMotion, readStickFrame, resolveCrouch, steerMotion, takeParryOption, tickHitlag } from "./motionSteps";
+import { advanceFrameTimersAndDown, advanceGrabStops, advanceGroundTakeoff, advanceHitstunAndJumpCancel, advanceLedgeOrShieldStops, advanceStartupStops, airborneDrill, authoredMotionHeld, isWallTechStartup, movementDirection } from "./fighterMotionPhases";
 
 function attackStartupTravel(world: Roster, slot: number, stage: number, matchFrame: number): number {
   const f = fighterAt(world, slot);
@@ -222,48 +152,6 @@ function advanceActionClocks(f: Fighter, input: Readonly<Controls>): boolean {
     }
   }
   return false;
-}
-
-
-function advanceJumpSquat(f: Fighter, input: Readonly<Controls>, squatBeforeInput: number): boolean {
-  const { jump, motion } = f;
-  const physics = f.tuning.physics;
-
-  const illidan = f.character === Character.demonHunter;
-  if (jump.ascent > 0) jump.ascent = motion.grounded || jump.ascent >= EARLY_ASCENT_GRAB_FRAMES ? 0 : jump.ascent + 1;
-  if (!(jump.squat > 0 && f.launch.hitlag === 0 && (illidan || squatBeforeInput > 0))) return false;
-  jump.squat--;
-  if (jump.squat !== 0) return false;
-  motion.grounded = false;
-  const jumpX = f32(f32(motion.vx * physics.jumpMomentum) + f32(input.direction * physics.jumpHorizontalSpeed));
-  motion.vx = max(-physics.jumpHorizontalCap, min(physics.jumpHorizontalCap, jumpX));
-  motion.vz = jumpBuffed(f, jump.held ? physics.fullJumpSpeed : physics.shortJumpSpeed);
-  jump.ascent = 1;
-  jump.serial++;
-  jump.isDouble = false;
-  if (jump.dodgeQueued) {
-    jump.dodgeQueued = false;
-    beginAirDodge(f, jump.dodgeX, jump.dodgeZ, true);
-    jump.dodgeX = 0;
-    jump.dodgeZ = 0;
-  }
-  return !illidan;
-}
-
-function advanceGroundDodge(f: Fighter, groundDodgeStarted: boolean): void {
-  const { dodge } = f;
-  if (dodge.groundFrame <= 0 || groundDodgeStarted) return;
-  dodge.groundFrame++;
-  const dodgeFrames = dodge.groundDirection === 0 ? SPOT_DODGE_FRAMES : GROUND_ROLL_FRAMES;
-  const turnFrame = forwardRollTurnFrame(f.character);
-  if (isForwardGroundRoll(f) && dodge.groundFrame === turnFrame) f.facing = -dodge.groundEntryFacing;
-  if (dodge.groundFrame > dodgeFrames) {
-    if (isForwardGroundRoll(f) && turnFrame === undefined) f.facing = -dodge.groundEntryFacing;
-    dodge.groundFrame = 0;
-    dodge.groundDirection = 0;
-    dodge.groundEntryFacing = 0;
-    f.motion.vx = 0.0;
-  }
 }
 
 
@@ -397,7 +285,7 @@ export function resolveSurfaceMotion(f: Fighter, world: Roster, slot: number, st
 
 export function advanceFighterMotion(world: Roster, slot: number, stage: number, matchFrame: number, input: Readonly<Controls>, respawnX: number): void {
   const f = fighterAt(world, slot);
-  const { motion, launch, shield, attack, jump, dodge, status } = f;
+  const { motion, shield, jump, dodge, status } = f;
   motion.deltaX = 0.0;
   motion.deltaZ = 0.0;
   if (advanceOut(world, slot, respawnX)) return;
@@ -415,49 +303,28 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const parryDirection = shield.parryBufferDirection;
   const parryOption = takeParryOption(f, input);
   advanceTechAndRegrab(f, input);
-  if (f.ledge.state !== LedgeState.none) {
-    advanceLedge(world, slot, stage, input);
-    return;
-  }
-  if (shield.breakState !== ShieldBreak.none && advanceShieldBreak(world, slot, stage, matchFrame, input)) return;
-  if (drainShieldEnergy(f, world, slot, stage, input)) return;
+  if (advanceLedgeOrShieldStops(f, world, slot, stage, matchFrame, input)) return;
   tickRecoveryClocks(f);
   const wallJumped = advanceSurfaceRecovery(f, input);
-  const wallTechStartup = f.surfaceRecovery.state === SurfaceContact.techWall && f.surfaceRecovery.frame < WALL_TECH_STARTUP_FRAMES;
+  const wallTechStartup = isWallTechStartup(f);
   applyFrameDirectionalInfluence(f, world, slot, stage, matchFrame, input, hitlagBefore);
   if (status.out) return;
   const carrying = isCarrying(f);
-  if (wallTechStartup || (inGrabContext(f) && !carrying)) {
-    if (launch.hitlag <= 0) status.invincible = max(0, status.invincible - 1);
-    checkBlastZone(world, slot, stage);
-    return;
-  }
+  if (advanceStartupStops(f, world, slot, stage, wallTechStartup, carrying)) return;
   const smashChargePaused = advanceActionFrame(f, input);
-  if (f.grab.target !== undefined && !carrying) {
-    checkBlastZone(world, slot, stage);
-    return;
-  }
-  if (launch.hitlag <= 0) launch.hitstun = max(0, launch.hitstun - 1);
-  if (launch.hitstun === 0) launch.throwHitstun = false;
-  const squatBeforeInput = jump.squat;
-  if (input.jumpPressed) cancelJumpStates(f, input);
+  if (advanceGrabStops(f, world, slot, stage, carrying)) return;
+  const squatBeforeInput = advanceHitstunAndJumpCancel(f, input);
   const wet = sea.wet(f, stage);
   const waterJumped = beginJumpInput(f, input, carrying, wallJumped, parryOption, wet, squatBeforeInput);
   const groundDodgeStarted = beginDodgeInput(f, input, parryOption, parryDirection);
-  const groundTakeoff = advanceJumpSquat(f, input, squatBeforeInput);
-  if (carrying && groundTakeoff) lowerCarryJump(f);
-  if (launch.hitlag > 0) return;
-  advanceShieldInputClocks(f, input);
-  advanceGroundDodge(f, groundDodgeStarted);
-  checkBlastZone(world, slot, stage);
-  if (status.out) return;
-  if (advanceDownMotion(f, world, slot, stage, matchFrame, input)) return;
+  const groundTakeoff = advanceGroundTakeoff(f, input, carrying, squatBeforeInput);
+  if (advanceFrameTimersAndDown(f, world, slot, stage, matchFrame, input, groundDodgeStarted)) return;
   const dodgeActive = dodge.airMotionFrames > 0;
   const wantsShield = advanceShieldFrameTimers(f, input, carrying);
-  const direction = carrying && carryThrowRequested(f, input) ? 0 : input.direction;
+  const direction = movementDirection(f, input, carrying);
   applyTumbleExit(f, tumbleExitFlick);
   hopHeroStatus(f, slot, stage, matchFrame);
-  const authoredMotion = carryHeroStatus(f) || heroMotionHolds(f) || demonHunterAuthoredMotion(f);
+  const authoredMotion = authoredMotionHeld(f);
   const authoredHeight = authoredMotion || demonHunterHoldsHeight(f) || heroFloats(f);
   const egg = heroEgg(f);
   const canSteer = canSteerFrame(f, authoredMotion, egg, dodgeActive, smashChargePaused);
@@ -469,7 +336,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const oldZ = motion.z;
   const dashEntry = f32(dashEntryDisplacementAdjustment + attackStartupTravel(world, slot, stage, matchFrame));
   decayMotion(f, dodgeActive);
-  const drill = motion.grounded ? undefined : attackFall(attack.style, attack.frame, f.tuning.moves);
+  const drill = airborneDrill(f);
   moveAlongSurface(f, stage, matchFrame, horizontalStick, dashEntry, canSteer, wantsShield, groundTakeoff);
   applyVerticalMotion(f, input, stage, matchFrame, drill, egg, wet, waterJumped, dodgeActive, authoredHeight, groundTakeoff);
   resolveSurfaceMotion(f, world, slot, stage, matchFrame, input, oldX, oldZ, carried, horizontalStick);
