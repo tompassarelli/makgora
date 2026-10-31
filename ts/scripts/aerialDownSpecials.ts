@@ -37,7 +37,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.shadowHunter]: "aerial Hex orb; lands into the grounded cast",
   [Character.pitLord]: "aerial Rain of Fire; lands into the grounded cast",
   [Character.beastmaster]: "downward quill volley; commands a deployed Quilbeast",
-  [Character.lichKing]: "downward shadow pulse with the Defile hit",
+  [Character.lichKing]: "Harvest Soul channel while falling, a hold move (a tap ends it); raises the Ghoul at a full meter",
   [Character.thrall]: "falling two-sided Doomhammer Slam",
   [Character.jaina]: "downward water bolt; recall works while falling",
   [Character.sylvanas]: "Life Drain grab while falling",

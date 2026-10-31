@@ -10,15 +10,23 @@ const LINE_WIDTH = f32(0.0006);
 const ULTIMATE_FILL = "ReplaceableTextures\\TeamColor\\TeamColor04.blp";
 const ULTIMATE_PULSE = "ReplaceableTextures\\TeamColor\\TeamColor05.blp";
 const DRAIN = "ReplaceableTextures\\TeamColor\\TeamColor03.blp";
-export const METER_TEXTURES = [ULTIMATE_FILL, ULTIMATE_PULSE, DRAIN] as const;
+const CHARGE_FILL = "ReplaceableTextures\\TeamColor\\TeamColor02.blp";
+export const METER_TEXTURES = [ULTIMATE_FILL, ULTIMATE_PULSE, DRAIN, CHARGE_FILL] as const;
+const CHARGE_GAP = f32(0.3);
+const CHARGE_HEIGHT = f32(0.6);
+const CHARGE_PARTIAL_ALPHA = 190;
 const DRAIN_ALPHA = 210;
-const FRAME_LEVELS = [22, 23, 24, 25] as const;
+const FRAME_LEVELS = [22, 23, 24, 25, 22, 23] as const;
 
 export class MeterBar {
   private readonly ultimateBack: Frame;
   private readonly ultimateFill: Frame;
   private readonly ultimatePulse: Frame;
   private readonly drain: Frame;
+  private readonly chargeBack: Frame;
+  private readonly chargeFill: Frame;
+  private chargeShown = false;
+  private shownCharge = -1.0;
   private readonly feedback: MeterFeedback = meterFeedback();
   private barWidth = -1.0;
   private barHeight = -1.0;
@@ -36,6 +44,11 @@ export class MeterBar {
     this.ultimateFill = createBackdrop(`MeterUltimateFill${suffix}`, parent, context + 1);
     this.ultimatePulse = createBackdrop(`MeterUltimatePulse${suffix}`, parent, context + 2);
     this.drain = createBackdrop(`MeterDrain${suffix}`, parent, context + 3);
+    this.chargeBack = createBackdrop(`MeterChargeBack${suffix}`, parent, context + 4);
+    this.chargeFill = createBackdrop(`MeterChargeFill${suffix}`, parent, context + 5);
+    setFrameTexture(this.chargeBack, PANEL_TEXTURE, 0, true);
+    setFrameTexture(this.chargeFill, CHARGE_FILL, 0, true);
+    setFramePoint(this.chargeFill, FramePoint.left, this.chargeBack, FramePoint.left, 0.0, 0.0);
     setFrameTexture(this.ultimateBack, PANEL_TEXTURE, 0, true);
     setFrameTexture(this.ultimateFill, ULTIMATE_FILL, 0, true);
     setFrameTexture(this.ultimatePulse, ULTIMATE_PULSE, 0, true);
@@ -52,7 +65,7 @@ export class MeterBar {
   }
 
   private frames(): Frame[] {
-    return [this.ultimateBack, this.ultimateFill, this.ultimatePulse, this.drain];
+    return [this.ultimateBack, this.ultimateFill, this.ultimatePulse, this.drain, this.chargeBack, this.chargeFill];
   }
 
   place(ultimateBar: PlateRect): void {
@@ -63,15 +76,34 @@ export class MeterBar {
       setFrameSize(this.ultimateBack, ultimateBar.width, ultimateBar.height);
       setFrameSize(this.ultimatePulse, ultimateBar.width, ultimateBar.height);
       setFrameSize(this.drain, ultimateBar.width, ultimateBar.height);
+      setFrameSize(this.chargeBack, ultimateBar.width, f32(ultimateBar.height * CHARGE_HEIGHT));
+      this.shownCharge = -1.0;
     }
     if (ultimateBar.left !== this.barX || ultimateBar.centerY !== this.barY) {
       this.barX = ultimateBar.left;
       this.barY = ultimateBar.centerY;
       setFrameAbsPoint(this.ultimateBack, FramePoint.center, ultimateBar.left + ultimateBar.width / 2.0, ultimateBar.centerY);
+      const below = f32(ultimateBar.height * f32(f32(0.5 + CHARGE_GAP) + f32(CHARGE_HEIGHT / 2.0)));
+      setFrameAbsPoint(this.chargeBack, FramePoint.center, ultimateBar.left + ultimateBar.width / 2.0, ultimateBar.centerY - below);
     }
   }
 
-  update(shown: boolean, ultimate: number, ultimateReady: boolean, drains: number): void {
+  private updateCharge(fill: number): void {
+    const shown = fill >= 0.0;
+    if (shown !== this.chargeShown) {
+      this.chargeShown = shown;
+      setFrameVisible(this.chargeBack, shown);
+      setFrameVisible(this.chargeFill, shown);
+      this.shownCharge = -1.0;
+    }
+    if (!shown || fill === this.shownCharge) return;
+    this.shownCharge = fill;
+    setFrameSize(this.chargeFill, Math.max(LINE_WIDTH, this.barWidth * fill), f32(this.barHeight * CHARGE_HEIGHT));
+    setFrameAlpha(this.chargeFill, fill >= 1.0 ? 255 : CHARGE_PARTIAL_ALPHA);
+  }
+
+  update(shown: boolean, ultimate: number, ultimateReady: boolean, drains: number, charge = -1.0): void {
+    this.updateCharge(shown ? charge : -1.0);
     advanceMeterFeedback(this.feedback, drains);
     this.tick++;
     if (shown !== this.visible) {

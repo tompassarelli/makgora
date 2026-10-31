@@ -135,6 +135,11 @@ export function projectileDamage(projectile: Readonly<Projectile>): number {
 }
 
 
+export function projectileEffect(projectile: Readonly<Projectile>): Readonly<HitEffect> {
+  const { kind, spec } = projectile;
+  return kind === ProjectileKind.hero && spec !== undefined ? heroProjectileEffect(projectile, spec) : originalProjectileEffect(projectile);
+}
+
 export function originalProjectileEffect(projectile: Readonly<Projectile>): Readonly<HitEffect> {
   const { kind } = projectile;
   projectileHit.element = kind === ProjectileKind.eyeBeam ? HitElement.fire : HitElement.normal;

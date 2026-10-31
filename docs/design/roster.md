@@ -172,7 +172,7 @@ Use the project’s existing knockback, hitlag, hitstun, DI, shieldstun, and sta
 
 Calibrate classes in an empty test stage against a reference weight at 60 percent, no DI and no walls. Indicative displacement along the launch direction after 30 ticks: LINK 0.6–1.2H; POKE 1.2–2.0H; LAUNCH 2.0–3.0H; EDGE 2.5–3.5H; KILL 3.5–5.0H; SPIKE downward 2.5–3.5H before gravity. These are test bands, not a second knockback formula. Publish the actual coefficients and measured outcomes once calibrated. Adjust hitstun separately through the established formula rather than assuming distance proves a true combo. LINK never guarantees a follow-up without testing DI, percentage, weight, and move timing.
 
-No critical-hit RNG, random evasion, chance-on-hit stuns, or automatic spell counters. Every fighter is distinctive through expressive standard actions, designed case by case (Tom, 9 Oct 2026, #148). Fighters have no passives (Tom, 9 Oct 2026, #384). Floats, extra jumps and visible double-jump armour are movement properties, like weight and air speed, and are learned by playing. One universal meter, the ultimate meter, filled only by centre-stage orbs (#335; one meter since 2026-10-29); no character stacks, charges, resource timers or further bars. Ordinary move durations, cooldowns, statuses and placed-object HP remain action state. Damage is Smash-style percent damage; a healing move lowers it directly. Damage-over-time ticks do not cause hitlag, hitstun or knockback. A status applies only on an actual body hit, not on shield.
+No critical-hit RNG, random evasion, chance-on-hit stuns, or automatic spell counters. Every fighter is distinctive through expressive standard actions, designed case by case (Tom, 9 Oct 2026, #148). Fighters have no passives (Tom, 9 Oct 2026, #384). Floats, extra jumps and visible double-jump armour are movement properties, like weight and air speed, and are learned by playing. One universal meter, the ultimate meter, filled only by centre-stage orbs (#335; one meter since 2026-10-29); no character stacks, charges, resource timers or further bars, except the Lich King's visible Harvest Soul meter (Tom, 1 Nov 2026). Ordinary move durations, cooldowns, statuses and placed-object HP remain action state. Damage is Smash-style percent damage; a healing move lowers it directly. Damage-over-time ticks do not cause hitlag, hitstun or knockback. A status applies only on an actual body hit, not on shield.
 
 ### Proposed resource profile
 
@@ -1391,8 +1391,8 @@ Tom asked on 2026-10-31, after a playtest, for three changes, all in:
 **Identity (#167, Tom delegated 7 Oct):** Arthas in the Helm of Domination, a
 heavy Frostmourne swordsman who commands the dead, from Warcraft III and the
 Icecrown Citadel encounter. Distinct from the Lich (Kel'Thuzad), a light frost
-caster: the Lich King wins with blade reach and kill power and controls space
-with Defile and the Val'kyr. He is slow on foot and in the air, so fast
+caster: the Lich King wins with blade reach and kill power, controls space
+with the Val'kyr and Death Grip, and raises a Ghoul from the souls he harvests. He is slow on foot and in the air, so fast
 pressure inside the blade and juggles are his weakness.
 
 Source: smashcraft:ts/src/game/fighters/lich-king/moves.ts, lichKingSpecials.ts,
@@ -1419,7 +1419,8 @@ above; damage and launch classes are provisional. The move list
 | Down air, Frostmourne Plunge | 14/5/37, land 26 | 14 | 0.55H below | Spikes in the air, 55 degrees on the ground |
 
 Grab 9/2/30. Throws: forward 10 (EDGE), back 12 (KILL), up 8 (JUGGLE), and
-**Harvest Soul**, the down throw: 6 (CHASE).
+**Soul Reaper**, the down throw: 6 (CHASE). The down throw was called Harvest
+Soul until 1 Nov, when that name went to his down special.
 
 
 
@@ -1453,15 +1454,43 @@ the Val'kyr to neutral and made the side special Death Grip.
 - **Ascension of the Damned** (up, 15 mana): an ice column lifts him 2H over
   frames 8-30, steered 0.35H, inside a frost vortex that strikes once (9),
   then a helpless fall. The free form rises 1.3H with no vortex.
-- **Defile** (down, 20 mana, ground only): a shadow pool 0.6H ahead on frame
-  20, where he can see, for 180 frames. Its rim warns for 18 pool frames,
-  then turns bright violet: each 2-damage strike is at least 36 frames apart
-  and grows the radius by 6, from 0.3H to at most 0.6H. Airborne foes are safe;
-  shields block without growing it. One at a time, 320 frames between casts,
-  leaving at least 120 frames with no pool. He commits through frame 50:
-  jump away, roll out, shield, or punish the cast. The rim follows the actual
-  radius, including growth; an overlapping grounded body can touch it from
-  outside its centre. Delegated rework, 7 Oct (#174).
+- **Harvest Soul** (down; Tom's design, 1 Nov, replacing Defile; numbers
+  delegated): hold the button and from frame 15 a soul tether (the stock Drain
+  Life lightning) joins his hand to the nearest foe at any range, through
+  platforms and the stage, and banks one soul a frame into his soul meter, a
+  teal bar under his ultimate meter on his HUD plate. A full meter is 180 souls:
+  three seconds of unbroken channel. He stands rooted while he holds; in the air
+  he falls and lands with 20 frames of landing lag. With several foes he binds
+  the nearest; a foe that is out, intangible, respawning or spell-immune
+  cannot be bound, and the tether moves to the next nearest, banking nothing
+  while nobody can take it. Releasing, shielding or jumping ends the channel;
+  so does any hit, but he keeps every soul drained so far, and a later hold
+  carries on from there. The meter fills to full and stops; it empties when he
+  loses a stock.
+- **Raise Ghoul** (down at a full meter): the press spends the whole meter at
+  once and on frame 18 a Ghoul (the stock Classic Ghoul) claws up out of the
+  ground 0.55H ahead in a Raise Skeleton burst; he recovers on frame 38. The
+  Ghoul is an AI ally: it walks at 5.5 units a frame (he walks 8) to the nearest
+  foe, claws when within 70 (frame 12 of a 46-frame swing, 4 damage, POKE at 40
+  degrees, one hit per foe per swing), hops after a foe on a platform above it
+  and drops after one below. It takes percent and knockback as a light fighter
+  (weight 70; he is 84), has one air jump to get back to the stage, and dies
+  only past the blast zone; it does not age, wear down or leash. Only one at a
+  time: while it stands down special does nothing and banks nothing, so a
+  knocked-out Ghoul costs him a fresh three-second channel. It goes when he
+  loses a stock and at match end, holds no stock, never appears in results,
+  cannot grab, shield or take items, and stops starting swings while he is
+  grabbed or in hitstun. It pressures but cannot win alone: its claw is a
+  4-damage poke whose low knockback builds percent rather than taking stocks.
+- **Why a soul meter again** (1 Nov): on 9 Oct (#148) Tom cut every counted or
+  hidden fighter effect, including the Lich King's banked souls, which filled
+  silently from landed normals and his down throw and were spent automatically
+  by Howling Blast; the roster rule since is one universal meter and no
+  character bars. Tom's Harvest Soul design brings a soul meter back for this
+  kit only, and it differs in the ways that rule was about: the meter fills
+  only from a deliberate, visible, punishable channel; it is drawn on the HUD;
+  and the same button spends it on a summon both players see. It is the one
+  exception to "no character bars" below.
 
 ### Ultimate (designed, not built)
 
@@ -1476,8 +1505,8 @@ selection line is "What" (the campaign unit has no Ready line).
 
 **Gameplan** (lichKingGameplan.ts, #105): he holds the sweep's tip spacing,
 pulls a zoning foe into his blade with Death Grip and follows with a tilt,
-makes the target act with Defile, starts tech chases from
-Frozen Ground and Harvest Soul, and kills with the smashes, his back air and a
+channels Harvest Soul from long range and raises the Ghoul at a full meter,
+starts tech chases from Frozen Ground and Soul Reaper, and kills with the smashes, his back air and a
 Val'kyr carry near the ledge.
 
 ### Play-style profile
@@ -2014,7 +2043,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Shadow Hunter | Glaive drill, ward placement and crossfire | Banked Voodoo damage |
 | Pit Lord | Wide cleaver swings and armoured charge move | Third-contact cleave bonus |
 | Beastmaster | Commanded bear, Quilbeast and hawk positions | Timed Pack Hunt bonus |
-| Lich King | Frostmourne reach, Val'kyr carry and growing Defile | Banked souls and soul forms |
+| Lich King | Frostmourne reach, Val'kyr carry, Death Grip and the Harvest Soul channel | Souls banked from ordinary hits and soul forms (a channelled, visible soul meter returned 1 Nov) |
 | Thrall | Mounted hammer reach, lightning and wolves | Counted Windfury |
 | Jaina | Staff strikes, Blizzard placement and Water Elemental | Faster hidden meter regeneration |
 | Sylvanas | Bow-and-dagger actions, Silence and chosen escape | Banked Black Quiver damage |

@@ -527,6 +527,11 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
       placed.apart = sourcePlaced.apart;
       placed.bitten = sourcePlaced.bitten;
       placed.hits = sourcePlaced.hits;
+      placed.percent = sourcePlaced.percent;
+      placed.hitstun = sourcePlaced.hitstun;
+      placed.velocityX = sourcePlaced.velocityX;
+      placed.velocityZ = sourcePlaced.velocityZ;
+      placed.jumps = sourcePlaced.jumps;
       placed.surface = sourcePlaced.surface;
       placed.spec = sourcePlaced.spec;
     }
@@ -550,6 +555,11 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
       placed.apart = 0;
       placed.bitten = 0;
       placed.hits = 0;
+      placed.percent = 0.0;
+      placed.hitstun = 0;
+      placed.velocityX = 0.0;
+      placed.velocityZ = 0.0;
+      placed.jumps = 0;
       placed.surface = undefined;
       placed.spec = undefined;
     }
@@ -1053,6 +1063,11 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
       { const a = placed.apart, b = sourcePlaced.apart; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
       { const a = placed.bitten, b = sourcePlaced.bitten; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
       { const a = placed.hits, b = sourcePlaced.hits; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+      { const a = placed.percent, b = sourcePlaced.percent; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+      { const a = placed.hitstun, b = sourcePlaced.hitstun; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+      { const a = placed.velocityX, b = sourcePlaced.velocityX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+      { const a = placed.velocityZ, b = sourcePlaced.velocityZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+      { const a = placed.jumps, b = sourcePlaced.jumps; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
       { const a = placed.surface, b = sourcePlaced.surface; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
     }
   }
@@ -1538,6 +1553,11 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
         sink.int(prefix, `${animalName}Bitten`, placed.bitten);
       }
       if (placed.hits !== 0) sink.int(prefix, `${animalName}Hits`, placed.hits);
+      if (placed.percent !== 0) sink.real(prefix, `${animalName}Percent`, placed.percent);
+      if (placed.hitstun !== 0) sink.int(prefix, `${animalName}Hitstun`, placed.hitstun);
+      if (placed.velocityX !== 0) sink.real(prefix, `${animalName}VelocityX`, placed.velocityX);
+      if (placed.velocityZ !== 0) sink.real(prefix, `${animalName}VelocityZ`, placed.velocityZ);
+      if (placed.jumps !== 0) sink.int(prefix, `${animalName}Jumps`, placed.jumps);
       if (placed.spec?.companion !== undefined) {
         sink.int(prefix, `${animalName}Surface`, placed.surface ?? -1);
       }

@@ -139,7 +139,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Neutral special: Val'kyr Shadowguard | DarkSummoningMissileLaunch | DarkSummoningTarget | DarkSummoningTarget + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 | Side special: Death Grip | DeathCoil | Ensnare | Ensnare + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 | Up special: Ascension of the Damned | FrostArmor | FrostBoltHit | FrostBoltHit + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
-| Down special: Defile | DeathPactTarget | FrostWyrmAttack1 | FrostWyrmAttack1 + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
+| Down special: Harvest Soul | DarkRitual | DarkSummoningTarget | DarkSummoningTarget + FrostWyrmAttack1 | MetalMediumSliceMetal |  |
 
 ## Thrall
 

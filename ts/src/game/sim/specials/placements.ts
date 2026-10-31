@@ -12,7 +12,14 @@ function placementStillOut(f: Readonly<Fighter>, spec: Readonly<SpecialPlacement
   return placedObject(f, spec.slot).life > 0 || (spec.splits !== undefined && placedObject(f, spec.splits.into).life > 0);
 }
 
+function placesStillOut(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>): boolean {
+  if (placementStillOut(f, move.placement)) return true;
+  const followUps = move.followUps;
+  if (followUps !== undefined) for (const followUp of followUps) if (placementStillOut(f, followUp.special.placement)) return true;
+  return false;
+}
+
 /** A cast starts only when its projectiles fit under the caps and it does not place an object that is still out. */
 export function castFits(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>): boolean {
-  return projectilesFit(f, move) && !placementStillOut(f, move.placement);
+  return projectilesFit(f, move) && !placesStillOut(f, move);
 }

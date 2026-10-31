@@ -1,3 +1,4 @@
+import { chargeMeterFill } from "../../game/presentation/chargeMeter";
 import { DEFAULT_FIGHTER } from "../../game/roster/kits";
 import { leadsDuo } from "../../game/sim/duoStatus";
 import { journalIngress } from "../../game/session/build";
@@ -46,7 +47,7 @@ export function updateSlotHud(s: ShellState, ui: UiObjects, slot: ParticipantSlo
   if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
     const fighter = fighterAt(s.world, slot);
     ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined, costumeTintFor(game, slot, fighter.character), costumeFor(game, slot), leadsDuo(s.world, slot));
-    ui.meterBars[slot].hud.update(showMatch, fighter.meter.ultimate, ultimateReady(fighter, game.ultimatesOff), fighter.visuals.manaDrained);
+    ui.meterBars[slot].hud.update(showMatch, fighter.meter.ultimate, ultimateReady(fighter, game.ultimatesOff), fighter.visuals.manaDrained, chargeMeterFill(fighter));
   } else {
     ui.huds[slot].update(false, DEFAULT_FIGHTER, slot, 0.0, 0);
     ui.meterBars[slot].hud.update(false, 0, false, 0);

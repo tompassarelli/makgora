@@ -8,6 +8,7 @@ export const LICH_KING_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.downTilt, near: 80.0, far: 150.0 },
     { move: GameplanSpecial.side, near: 200.0, far: 330.0 },
     { move: GameplanSpecial.neutral, near: 120.0, far: 260.0 },
+    { move: GameplanSpecial.down, near: 420.0, far: 1400.0 },
   ],
   approach: [
 
@@ -23,7 +24,7 @@ export const LICH_KING_GAMEPLAN: FighterGameplan = {
     { starter: GameplanThrow.up, followUps: [AttackStyle.upAir] },
     { starter: GameplanSpecial.side, followUps: [AttackStyle.forwardTilt, AttackStyle.upTilt, AttackStyle.downTilt] },
 
-    { starter: GameplanThrow.down, followUps: [AttackStyle.forwardTilt, GameplanSpecial.down] },
+    { starter: GameplanThrow.down, followUps: [AttackStyle.forwardTilt, AttackStyle.dashAttack] },
   ],
   kills: [
     { move: AttackStyle.forwardSmash, fromPercent: 75.0 },

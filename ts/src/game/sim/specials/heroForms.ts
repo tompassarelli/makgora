@@ -24,10 +24,10 @@ export function swingFullCharge(f: Fighter, move: Readonly<AuthoredSpecial>): vo
   }
 }
 
-export function holdCharge(f: Fighter, charge: Readonly<SpecialCharge> | undefined): boolean {
+export function holdCharge(f: Fighter, charge: Readonly<SpecialCharge> | undefined, banks = true): boolean {
   const { special } = f;
   if (charge === undefined || special.form >= FOLLOW_UP_FORM || special.frame !== charge.hold + 1 || !chargeHolds(charge, special.charge)) return false;
-  special.charge = chargeBanked(charge, special.charge);
+  if (banks) special.charge = chargeBanked(charge, special.charge);
   special.frame = charge.hold;
   special.lockFrames++;
   f.attack.cooldown++;

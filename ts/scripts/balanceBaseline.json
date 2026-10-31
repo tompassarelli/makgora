@@ -21631,22 +21631,38 @@
    "authored.specials.up.ground.regions.0.hit.effect.base": 20,
    "authored.specials.up.ground.regions.0.hit.effect.launchX": 0.1736481785774231,
    "authored.specials.up.ground.regions.0.hit.effect.launchZ": 0.9848077297210693,
-   "authored.specials.down.ground.endFrame": 50,
-   "authored.specials.down.ground.cooldownFrames": 320,
-   "authored.specials.down.ground.projectiles.0.effect.damage": 2.5,
-   "authored.specials.down.ground.projectiles.0.effect.growth": 30,
-   "authored.specials.down.ground.projectiles.0.effect.base": 30,
-   "authored.specials.down.ground.projectiles.0.effect.launchX": 0.1736481785774231,
-   "authored.specials.down.ground.projectiles.0.effect.launchZ": 0.9848077297210693,
-   "authored.specials.down.ground.projectiles.0.pool.growth": 6,
-   "authored.specials.down.air.endFrame": 50,
-   "authored.specials.down.air.cooldownFrames": 320,
-   "authored.specials.down.air.projectiles.0.effect.damage": 2.5,
-   "authored.specials.down.air.projectiles.0.effect.growth": 30,
-   "authored.specials.down.air.projectiles.0.effect.base": 30,
-   "authored.specials.down.air.projectiles.0.effect.launchX": 0.1736481785774231,
-   "authored.specials.down.air.projectiles.0.effect.launchZ": 0.9848077297210693,
+   "authored.specials.down.ground.endFrame": 16,
+   "authored.specials.down.ground.followUps.0.special.endFrame": 14,
+   "authored.specials.down.ground.followUps.1.special.endFrame": 4,
+   "authored.specials.down.ground.followUps.2.special.endFrame": 38,
+   "authored.specials.down.ground.followUps.2.special.placement.mark.effect.damage": 0,
+   "authored.specials.down.ground.followUps.2.special.placement.mark.effect.growth": 63.75,
+   "authored.specials.down.ground.followUps.2.special.placement.mark.effect.base": 18,
+   "authored.specials.down.ground.followUps.2.special.placement.mark.effect.launchX": 0,
+   "authored.specials.down.ground.followUps.2.special.placement.mark.effect.launchZ": 1,
+   "authored.specials.down.ground.followUps.2.special.placement.companion.biteEffect.damage": 4,
+   "authored.specials.down.ground.followUps.2.special.placement.companion.biteEffect.growth": 63.75,
+   "authored.specials.down.ground.followUps.2.special.placement.companion.biteEffect.base": 18,
+   "authored.specials.down.ground.followUps.2.special.placement.companion.biteEffect.launchX": 0.7660444378852844,
+   "authored.specials.down.ground.followUps.2.special.placement.companion.biteEffect.launchZ": 0.6427876353263855,
+   "authored.specials.down.air.endFrame": 16,
    "authored.specials.down.air.landingLag": 20,
+   "authored.specials.down.air.followUps.0.special.endFrame": 14,
+   "authored.specials.down.air.followUps.0.special.landingLag": 20,
+   "authored.specials.down.air.followUps.1.special.endFrame": 4,
+   "authored.specials.down.air.followUps.1.special.landingLag": 20,
+   "authored.specials.down.air.followUps.2.special.endFrame": 38,
+   "authored.specials.down.air.followUps.2.special.landingLag": 20,
+   "authored.specials.down.air.followUps.2.special.placement.mark.effect.damage": 0,
+   "authored.specials.down.air.followUps.2.special.placement.mark.effect.growth": 63.75,
+   "authored.specials.down.air.followUps.2.special.placement.mark.effect.base": 18,
+   "authored.specials.down.air.followUps.2.special.placement.mark.effect.launchX": 0,
+   "authored.specials.down.air.followUps.2.special.placement.mark.effect.launchZ": 1,
+   "authored.specials.down.air.followUps.2.special.placement.companion.biteEffect.damage": 4,
+   "authored.specials.down.air.followUps.2.special.placement.companion.biteEffect.growth": 63.75,
+   "authored.specials.down.air.followUps.2.special.placement.companion.biteEffect.base": 18,
+   "authored.specials.down.air.followUps.2.special.placement.companion.biteEffect.launchX": 0.7660444378852844,
+   "authored.specials.down.air.followUps.2.special.placement.companion.biteEffect.launchZ": 0.6427876353263855,
    "normal.0.startupFrames": 5,
    "normal.0.activeFrames": 3,
    "normal.0.endingFrames": 13,
@@ -22193,7 +22209,7 @@
    "throw.6.contactFrame": 24,
    "throw.6.totalFrames": 50
   },
-  "play": "{\"range\":{\"near\":110,\"far\":185},\"spacing\":[{\"move\":6,\"near\":105,\"far\":190},{\"move\":8,\"near\":80,\"far\":150},{\"move\":31,\"near\":200,\"far\":330},{\"move\":30,\"near\":120,\"far\":260}],\"approach\":[{\"via\":\"shoot\",\"moves\":[31,6],\"weight\":2},{\"via\":\"shoot\",\"moves\":[33,7,5]},{\"via\":\"run\",\"moves\":[19,5]}],\"defense\":[\"shield\",\"retreat\",\"shield\",\"jump\"],\"combos\":[{\"starter\":8,\"followUps\":[6,5]},{\"starter\":7,\"followUps\":[15,7]},{\"starter\":42,\"followUps\":[15]},{\"starter\":31,\"followUps\":[6,7,8]},{\"starter\":43,\"followUps\":[6,33]}],\"kills\":[{\"move\":4,\"fromPercent\":75},{\"move\":2,\"fromPercent\":90},{\"move\":14,\"fromPercent\":100},{\"move\":30,\"fromPercent\":80},{\"move\":41,\"fromPercent\":120}],\"recovery\":{\"aim\":\"ledge\",\"upSpecial\":\"last\"},\"avoid\":[\"close\",\"air\"]}",
+  "play": "{\"range\":{\"near\":110,\"far\":185},\"spacing\":[{\"move\":6,\"near\":105,\"far\":190},{\"move\":8,\"near\":80,\"far\":150},{\"move\":31,\"near\":200,\"far\":330},{\"move\":30,\"near\":120,\"far\":260},{\"move\":33,\"near\":420,\"far\":1400}],\"approach\":[{\"via\":\"shoot\",\"moves\":[31,6],\"weight\":2},{\"via\":\"shoot\",\"moves\":[33,7,5]},{\"via\":\"run\",\"moves\":[19,5]}],\"defense\":[\"shield\",\"retreat\",\"shield\",\"jump\"],\"combos\":[{\"starter\":8,\"followUps\":[6,5]},{\"starter\":7,\"followUps\":[15,7]},{\"starter\":42,\"followUps\":[15]},{\"starter\":31,\"followUps\":[6,7,8]},{\"starter\":43,\"followUps\":[6,19]}],\"kills\":[{\"move\":4,\"fromPercent\":75},{\"move\":2,\"fromPercent\":90},{\"move\":14,\"fromPercent\":100},{\"move\":30,\"fromPercent\":80},{\"move\":41,\"fromPercent\":120}],\"recovery\":{\"aim\":\"ledge\",\"upSpecial\":\"last\"},\"avoid\":[\"close\",\"air\"]}",
   "feel": {
    "normal.0.hit.0": {
     "advantage": -12
@@ -22565,11 +22581,11 @@
     "advantage": -32,
     "killPercent": 243
    },
-   "special.down.ground.projectiles.0": {
-    "advantage": -28
+   "special.down.ground.followUps.2.special.placement.mark": {
+    "advantage": -37
    },
-   "special.down.air.projectiles.0": {
-    "advantage": -28
+   "special.down.air.followUps.2.special.placement.mark": {
+    "advantage": -37
    },
    "throw.3": {
     "advantage": 0,

@@ -410,7 +410,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Val'kyr Shadowguard", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\Cripple\\CrippleTarget.mdx", "ahead", f32(0.8)) },
     side: { spell: "Death Grip", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.8)) },
     up: { spell: "Ascension of the Damned", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx", "body", 0.5) },
-    down: { spell: "Defile", startup: RUNE, active: drawn("Abilities\\Spells\\Undead\\UnholyAura\\UnholyAura.mdx", "feet") },
+    down: { spell: "Harvest Soul", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdx", "hand", f32(0.7)) },
   },
   [Character.beastmaster]: {
     neutral: { spell: "Wild Axes", startup: BEAST, active: cue("Abilities\\Weapons\\Axe\\AxeMissile.mdx", "hand", 1.0) },

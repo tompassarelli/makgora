@@ -268,6 +268,17 @@ export interface SpecialCompanion {
   readonly stunFrames: number;
   readonly leash: number;
   readonly leashFrames: number;
+  readonly body?: CompanionBody | undefined;
+}
+
+export interface CompanionBody {
+  readonly weight: number;
+  readonly gravity: number;
+  readonly fallSpeed: number;
+  readonly hopSpeed: number;
+  readonly hopReach: number;
+  readonly airJumps: number;
+  readonly airDrift: number;
 }
 
 export const CompanionOrder = { lunge: 1, return: 2 } as const;
@@ -300,6 +311,8 @@ export interface SpecialCharge {
   readonly releases?: true | undefined;
   /** Starting the move swings whatever is stored, a partial charge at its stored stage, at once and without charging. */
   readonly throwsStored?: true | undefined;
+  readonly meter?: true | undefined;
+  readonly tether?: true | undefined;
 }
 
 export interface AuthoredSpecial extends CastWindows {

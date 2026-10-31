@@ -1,3 +1,5 @@
+import { restCompanionBody } from "../companionBody";
+import { bindTether } from "./foeTether";
 import { releaseCommandGrabLock } from "./commandGrabLock";
 import { startAim, steerAim } from "./aimZone";
 import { requestedSlot } from "./slotRequest";
@@ -183,6 +185,7 @@ export function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: num
   placed.apart = 0;
   placed.bitten = 0;
   placed.hits = 0;
+  restCompanionBody(placed, spec.companion?.body);
   placed.surface = f.motion.surface;
 }
 
@@ -230,7 +233,7 @@ function shortenOnPress(f: Fighter, window: Readonly<FrameWindow> | undefined, i
 export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Controls>, world?: Roster, matchFrame = 0): void {
   const move = runningHeroSpecial(f);
   if (move === undefined) return;
-  if (holdOrb(f, move, input) || holdCharge(f, move.charge)) return;
+  if (holdOrb(f, move, input) || holdCharge(f, move.charge, bindTether(world, f, move.charge))) return;
   if (holdSteeredShot(f, move, input)) return;
   advanceRefire(f, move.refire, input);
   advanceChannel(f, move.channel, input);

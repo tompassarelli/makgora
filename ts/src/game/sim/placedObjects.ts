@@ -14,9 +14,10 @@ import type { Resting } from "./fighterRest";
 import { HERO_PROJECTILE_CAP, spawnHeroProjectileAt } from "./specials/heroProjectiles";
 import { placeHeroStrike } from "./specials/heroContact";
 import { runningHeroSpecial } from "./specials/runningMove";
-import { CompanionMode, type SpecialPlacement, type SpecialProjectile } from "./specials/schema";
-import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
-import { projectileDamage } from "./projectiles";
+import { type CompanionBody, CompanionMode, type SpecialPlacement, type SpecialProjectile } from "./specials/schema";
+import { type HitEffect, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
+import { launchCompanionBody } from "./companionBody";
+import { projectileDamage, projectileEffect } from "./projectiles";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { type Capsule, attackCapsule, capsulesIntersect, emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
@@ -44,6 +45,7 @@ export interface StrikeResult {
   action: SpecialAction;
   projectile: number;
   damage: number;
+  effect: Readonly<HitEffect> | undefined;
 }
 
 export interface StrikeMarks {
@@ -52,10 +54,11 @@ export interface StrikeMarks {
 }
 
 export function strikeResult(): StrikeResult {
-  return { kind: StrikeKind.none, slot: -1, direction: 0, style: undefined, action: SpecialAction.none, projectile: -1, damage: 0.0 };
+  return { kind: StrikeKind.none, slot: -1, direction: 0, style: undefined, action: SpecialAction.none, projectile: -1, damage: 0.0, effect: undefined };
 }
 
 const ignored = strikeResult();
+const struck = strikeResult();
 
 export function placeStrikeBody(target: Capsule, x: number, z: number, radius: number, height: number): void {
   target.x1 = x;
@@ -89,6 +92,7 @@ export function normalStrike(marks: StrikeMarks, target: Readonly<Capsule>, sour
     result.action = SpecialAction.none;
     result.projectile = -1;
     result.damage = region.effect.damage;
+    result.effect = region.effect;
     return true;
   }
   return false;
@@ -113,6 +117,7 @@ export function specialStrike(marks: StrikeMarks, target: Readonly<Capsule>, sou
     result.action = source.special.action;
     result.projectile = -1;
     result.damage = path.hit.effect.damage;
+    result.effect = path.hit.effect;
     return true;
   }
   return false;
@@ -136,6 +141,7 @@ export function projectileStrike(target: Readonly<Capsule>, sourceSlot: number, 
     result.action = SpecialAction.none;
     result.projectile = index;
     result.damage = projectileDamage(projectile);
+    result.effect = projectileEffect(projectile);
     return index;
   }
   return -1;
@@ -151,6 +157,19 @@ function placedDamage(placed: PlacedObject, sourceSlot: number, source: Fighter)
     mutableProjectile(source, index).life = 0;
   }
   return f32(f32(normal + special) + projectiles);
+}
+
+function launchStruck(placed: PlacedObject, traits: Readonly<CompanionBody>): void {
+  if (struck.effect !== undefined) launchCompanionBody(placed, traits, struck.effect, struck.direction, struck.damage);
+}
+
+function strikeBody(placed: PlacedObject, traits: Readonly<CompanionBody>, sourceSlot: number, source: Fighter): void {
+  if (normalStrike(placed, body, sourceSlot, source, struck)) launchStruck(placed, traits);
+  if (specialStrike(placed, body, sourceSlot, source, struck)) launchStruck(placed, traits);
+  for (let index = projectileStrike(body, sourceSlot, source, 0, struck); index >= 0; index = projectileStrike(body, sourceSlot, source, index + 1, struck)) {
+    launchStruck(placed, traits);
+    mutableProjectile(source, index).life = 0;
+  }
 }
 
 // Wind Walk: it slips out of sight and steps away from whoever struck it, never past the end of the floor it stands on.
@@ -240,6 +259,11 @@ export function advancePlacedObjects(world: Roster, stage: number, matchFrame: n
         if (!canHit(world, sourceSlot, ownerSlot) || !isActive(world, sourceSlot)) continue;
         const source = fighterAt(world, sourceSlot);
         if (source.status.out) continue;
+        const companionBody = spec.companion?.body;
+        if (companionBody !== undefined) {
+          strikeBody(placed, companionBody, sourceSlot, source);
+          continue;
+        }
         const damage = placedDamage(placed, sourceSlot, source);
         if (damage > 0.0 && spec.windWalk !== undefined) {
           windWalk(placed, spec, spec.windWalk.hop, source.motion.x, stage, matchFrame);
@@ -249,7 +273,7 @@ export function advancePlacedObjects(world: Roster, stage: number, matchFrame: n
         if (damage > 0.0) staggerCompanion(placed);
       }
       placed.age++;
-      placed.life--;
+      if (spec.companion?.body === undefined) placed.life--;
       if (placed.durability <= 0.0 && placed.life > crumble) placed.life = crumble;
       if (placed.life <= crumble) continue;
       let scheduled = false;

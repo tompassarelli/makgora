@@ -34,6 +34,7 @@ import { IMMOLATE_SOUNDS } from "../presentation/elementLooks";
 import { SummonPresentation } from "./summonPresentation";
 import { PoisonStackPresentation } from "./poisonStackPresentation";
 import { SpellPassPresentation } from "./spellPassPresentation";
+import { TetherPresentation } from "./tetherPresentation";
 import { SoundBank, SoundKind } from "./soundBank";
 import { bindPrototype } from "../../platform/rebind";
 import { Beam, createBeam, createEffect, destroyBeam, destroyEffect, Effect, moveBeam, setBeamColor, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
@@ -92,6 +93,9 @@ export class SpecialEffects {
   private readonly sounds = new SoundBank();
   private readonly stackPresentation: PoisonStackPresentation;
   private readonly spellPass: SpellPassPresentation;
+  private readonly tether: TetherPresentation;
+  private readonly fighterX: number[] = [];
+  private readonly fighterZ: number[] = [];
 
   private readonly front: number;
   private readonly beamLine = emptyCapsule();
@@ -103,6 +107,7 @@ export class SpecialEffects {
     this.sounds.prepare(SoundKind.label, [IMMOLATE_SOUNDS.start, IMMOLATE_SOUNDS.end]);
     this.stackPresentation = new PoisonStackPresentation(origin);
     this.spellPass = new SpellPassPresentation(origin);
+    this.tether = new TetherPresentation(origin, this.front);
     this.slots = PARTICIPANT_SLOTS.map((participant) => {
       const cursor = createImpactPresentationCursor();
       const bear = new SummonPresentation(SUMMON_BEAR, origin);
@@ -140,11 +145,13 @@ export class SpecialEffects {
     for (const slot of this.slots) bindPrototype(slot.bear, SummonPresentation.prototype);
     bindPrototype(this.stackPresentation, PoisonStackPresentation.prototype);
     bindPrototype(this.spellPass, SpellPassPresentation.prototype);
+    bindPrototype(this.tether, TetherPresentation.prototype);
   }
 
   clear(): void {
     this.stackPresentation.clear();
     this.spellPass.clear();
+    this.tether.clear();
     this.slots.forEach((slot, index) => {
       resetImpactPresentationCursor(slot.cursor);
       slot.bear.hide();
@@ -291,6 +298,7 @@ export class SpecialEffects {
       this.hideSiphon(effects);
       this.hideLaser(effects);
       this.hideGrip(effects);
+      this.tether.hide(slot);
       this.park(effects.aura, slot, AURA);
       this.park(effects.wingTrail, slot, WING_TRAIL);
       this.park(effects.drainFlash, slot, DRAIN_FLASH);
@@ -298,6 +306,9 @@ export class SpecialEffects {
     }
     effects.lastX = fighter.motion.x;
     effects.lastZ = fighter.motion.z;
+    this.fighterX[slot] = fighter.motion.x;
+    this.fighterZ[slot] = fighter.motion.z;
+    this.tether.present(fighter, slot, this.fighterX, this.fighterZ);
     this.presentSiphon(effects, fighter);
     this.presentLaser(effects, fighter);
     this.presentGrip(effects, fighter);
@@ -427,6 +438,7 @@ export class SpecialEffects {
   destroy(): void {
     this.stackPresentation.destroy();
     this.spellPass.destroy();
+    this.tether.destroy();
     for (const slot of this.slots) {
       this.releaseImmolationLoop(slot);
       releaseWhenDone(slot.immolationLoop);

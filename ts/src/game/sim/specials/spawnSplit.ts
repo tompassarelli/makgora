@@ -1,3 +1,4 @@
+import { restCompanionBody } from "../companionBody";
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import { type Fighter, mutablePlacedObject, placedObject } from "../fighter";
@@ -36,6 +37,7 @@ export function splitSpawns(owner: Fighter): void {
       placed.modeFrame = 0;
       placed.apart = 0;
       placed.bitten = 0;
+      restCompanionBody(placed, undefined);
     }
   }
 }

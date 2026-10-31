@@ -31,6 +31,7 @@ const SPIRIT_BIRTH_FRAMES = 30;
 const SPIRIT_BIRTH_SECONDS = f32(0.5);
 const SPIRIT_CAST_FRAMES = 30;
 const VANISHED_ALPHA = 40;
+const TUMBLE_PITCH = f32(-0.6);
 
 function placementPaths(character: Character): string[] {
   const paths = [heroLook(character)?.placedModel?.path ?? PLACED_OBJECT_MODEL];
@@ -257,13 +258,14 @@ export class PlacedObjectEffects {
         }
       }
     }
+    if (placed.hitstun > 0) { attackStart = -1; pitch = TUMBLE_PITCH; speed = 0.0; }
     if (bear === "CHARGING") { attackStart = -1; pitch = f32(-0.85); speed = 0.0; }
     else if (bear === "ATTACKING" || bear === "RESTING" && mode === CompanionMode.lunge) speed = 1.5;
     setEffectPitch(model, pitch);
     setEffectTimeScale(model, speed);
     const moved = this.lastX[slot] !== undefined && this.lastX[slot] !== x;
     this.lastX[slot] = x;
-    const anim = attackStart >= 0 ? 2 : moved ? 1 : 0;
+    const anim = attackStart >= 0 ? 2 : moved && placed.hitstun <= 0 ? 1 : 0;
     const attackStarts = (this.attackStarts ??= []);
     if (this.anims[slot] === anim && attackStarts[slot] === attackStart) return;
     this.anims[slot] = anim;

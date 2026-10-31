@@ -546,6 +546,11 @@ export interface PlacedObject {
   apart: number;
   bitten: number;
   hits: number;
+  percent: number;
+  hitstun: number;
+  velocityX: number;
+  velocityZ: number;
+  jumps: number;
   surface: number | undefined;
 }
 
@@ -888,7 +893,7 @@ export function packSpares(fighter: Readonly<Fighter>): readonly PlacedObject[] 
 
 
 export function createPlacedObject(): PlacedObject {
-  return { life: 0, age: 0, x: 0.0, z: 0.0, direction: 1, durability: 0.0, serial: 0, spec: undefined, struck: noSlots(), specialStruck: 0, mode: 0, modeFrame: 0, apart: 0, bitten: 0, hits: 0, surface: undefined };
+  return { life: 0, age: 0, x: 0.0, z: 0.0, direction: 1, durability: 0.0, serial: 0, spec: undefined, struck: noSlots(), specialStruck: 0, mode: 0, modeFrame: 0, apart: 0, bitten: 0, hits: 0, percent: 0.0, hitstun: 0, velocityX: 0.0, velocityZ: 0.0, jumps: 0, surface: undefined };
 }
 
 export function placedObject(fighter: Readonly<Fighter>, slot = 0): Resting<PlacedObject> {

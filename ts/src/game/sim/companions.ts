@@ -9,12 +9,13 @@ import { type Fighter, type PlacedObject, mutablePlacedObject, placedObject } fr
 import { runningHeroSpecial } from "./specials/runningMove";
 import { spawnHeroProjectileAt } from "./specials/heroProjectiles";
 import { repelSpell } from "./specials/spellImmunity";
-import { CompanionMode, type SpecialCompanion } from "./specials/schema";
+import { type CompanionBody, CompanionMode, type SpecialCompanion } from "./specials/schema";
+import { advanceCompanionBody, hopCompanionBody } from "./companionBody";
 import { applyAttackHit } from "./hits";
 import { HurtContact, strikeHurtContact } from "./hurtboxes";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { shieldCircleIntersects } from "./shield";
-import { surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
+import { mainDeckZAt, surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
 import { emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 
@@ -75,6 +76,7 @@ function advanceAnimal(world: Roster, ownerSlot: number, stage: number, matchFra
   const owner = fighterAt(world, ownerSlot);
   const partner = placed.spec?.companion;
   if (placed.life <= 0 || partner === undefined) return;
+  if (partner.body !== undefined && advanceCompanionBody(placed, partner.body, stage, matchFrame)) return;
   if (partner.behavior === "flying" && runningHeroSpecial(owner)?.helpless === true) {
     placed.x = owner.motion.x;
     placed.z = f32(owner.motion.z + 95.0);
@@ -121,7 +123,7 @@ function advanceAnimal(world: Roster, ownerSlot: number, stage: number, matchFra
       placed.modeFrame = 0;
     }
   } else if (partner.engage !== undefined) {
-    if (!ownerBusy(owner)) advanceBrute(world, ownerSlot, placed, partner, partner.engage);
+    if (!ownerBusy(owner)) advanceBrute(world, ownerSlot, placed, partner, partner.engage, stage);
   } else if (partner.behavior !== "sentry") {
     const heel = f32(owner.motion.x - f32(owner.facing * partner.followBehind));
     const walked = stepToward(placed, heel, partner.followSpeed);
@@ -139,6 +141,7 @@ function advanceAnimal(world: Roster, ownerSlot: number, stage: number, matchFra
     placed.x = min(right, max(left, placed.x));
     placed.z = surfaceZAt(stage, surface, matchFrame, placed.x);
   }
+  if (partner.body !== undefined) return;
   placed.apart = owner.status.out || Math.abs(f32(owner.motion.x - placed.x)) > partner.leash ? placed.apart + 1 : 0;
   if (placed.apart >= partner.leashFrames) placed.life = 0;
 }
@@ -159,12 +162,26 @@ function nearestFoe(world: Roster, ownerSlot: number, placed: Readonly<PlacedObj
   return nearest;
 }
 
-function advanceBrute(world: Roster, ownerSlot: number, placed: PlacedObject, partner: Readonly<SpecialCompanion>, engage: number): void {
+function chaseHeight(placed: PlacedObject, body: Readonly<CompanionBody>, foe: Readonly<Fighter>, stage: number): boolean {
+  const climb = f32(foe.motion.z - placed.z);
+  if (climb > body.hopReach && foe.motion.grounded) {
+    hopCompanionBody(placed, body, placed.direction, body.hopSpeed);
+    return true;
+  }
+  if (climb < -body.hopReach && foe.motion.grounded && placed.z > mainDeckZAt(stage, placed.x)) {
+    hopCompanionBody(placed, body, placed.direction, 0.0);
+    return true;
+  }
+  return false;
+}
+
+function advanceBrute(world: Roster, ownerSlot: number, placed: PlacedObject, partner: Readonly<SpecialCompanion>, engage: number, stage: number): void {
   const slot = nearestFoe(world, ownerSlot, placed);
   if (slot < 0) return;
   const foe = fighterAt(world, slot);
   const dx = f32(foe.motion.x - placed.x);
   if (dx !== 0.0) placed.direction = dx < 0.0 ? -1 : 1;
+  if (partner.body !== undefined && Math.abs(dx) <= f32(engage * 3.0) && chaseHeight(placed, partner.body, foe, stage)) return;
   if (Math.abs(dx) > engage || Math.abs(f32(foe.motion.z - placed.z)) > engage) {
     stepToward(placed, foe.motion.x, partner.followSpeed);
     return;

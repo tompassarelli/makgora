@@ -5,7 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
 import type { AppliedStatus } from "../../sim/appliedStatus";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, frames } from "../../sim/specials/schema";
+import { type AuthoredSpecial, type CompanionBody, type FighterSpecials, FollowUpInput, type SpecialCharge, type SpecialCompanion, type SpecialPlacement, type SpecialProjectile, frames } from "../../sim/specials/schema";
 import { capsule, hit } from "./moves";
 import { VALKYR_MODEL } from "../../assets/importedModelInfo";
 
@@ -85,22 +85,38 @@ function ascension(height: number, steer: number): AuthoredSpecial {
 
 
 
-const DEFILE_POOL: SpecialProjectile = {
-  model: "Abilities\\Spells\\Undead\\UnholyAura\\UnholyAura.mdx",
+export const SOUL_CHARGE: SpecialCharge = { hold: 14, full: 180, stages: 1, meter: true, tether: true };
+const SOUL_WINDOW = frames(1, SOUL_CHARGE.hold + 1);
+export const GHOUL_RISE_FRAME = 18;
 
-  modelRadius: 1223.0,
-  spawnFrame: 20, offsetX: h(f32(0.6)), offsetZ: 6.0, velocityX: 0.0, velocityZ: 0.0,
-  life: 180, activeFrom: 18, radius: h(f32(0.3)),
-  effect: { damage: 2.5, growth: 30.0, base: 30.0, launchX: f32(0.173648178), launchZ: f32(0.984807753), electric: false, element: HitElement.dark },
-  reflectable: false, limit: 1, needsLineOfSight: true,
-  pool: { every: 36, growth: 6.0, maxRadius: h(f32(0.6)) },
+const GHOUL_BODY: CompanionBody = {
+  weight: 70.0, gravity: f32(1.2), fallSpeed: 14.0, hopSpeed: 24.0, hopReach: h(f32(0.5)), airJumps: 1, airDrift: 5.0,
 };
-const DEFILE: AuthoredSpecial = {
-  endFrame: 50,
-  cooldownFrames: 320,
-  groundOnly: true,
-  projectiles: [DEFILE_POOL],
+export const GHOUL: SpecialCompanion = {
+  engage: 70.0, followSpeed: f32(5.5), followBehind: 0.0, returnSpeed: f32(5.5),
+  lungeStartup: 12, lungeActive: 4, lungeRecovery: 30, lungeTravel: 16.0,
+  bite: capsule(10.0, 30.0, 55.0, 50.0, 20.0), biteEffect: hit(4.0, "POKE", 40, 1.0, HitElement.normal),
+  stunFrames: 0, leash: 0.0, leashFrames: 0, body: GHOUL_BODY,
 };
+const GHOUL_RISING: SpecialProjectile = {
+  model: "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx",
+  spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0, life: 40, radius: 1.0, activeFrom: 41,
+  effect: hit(0.0, "POKE", 90), reflectable: false, limit: 1,
+};
+export const GHOUL_PLACEMENT: SpecialPlacement = {
+  frame: GHOUL_RISE_FRAME, offsetX: h(f32(0.55)), radius: 22.0, height: 96.0, durability: 1.0, life: 1, fireAges: [],
+  refusedWhileOut: true, mark: GHOUL_RISING, companion: GHOUL,
+  model: { path: "Units\\Undead\\Ghoul\\Ghoul.mdx", height: 140.0, alpha: 255 },
+};
+const raiseGhoul = (landingLag: number | undefined): AuthoredSpecial => ({ name: "Raise Ghoul", endFrame: 38, landingLag, spendsCharge: true, placement: GHOUL_PLACEMENT });
+const harvestSoul = (landingLag: number | undefined): AuthoredSpecial => ({
+  endFrame: SOUL_CHARGE.hold + 2, landingLag, charge: SOUL_CHARGE, jumpCancelFrame: SOUL_CHARGE.hold,
+  followUps: [
+    { window: SOUL_WINDOW, input: FollowUpInput.release, chargeStage: 0, special: { name: "Harvest Soul", endFrame: 14, landingLag } },
+    { window: SOUL_WINDOW, input: FollowUpInput.shield, special: { name: "Harvest Soul", endFrame: 4, landingLag } },
+    { window: frames(0, 0), chargeStage: SOUL_CHARGE.stages, special: raiseGhoul(landingLag) },
+  ],
+});
 
 export const LICH_KING_SPECIALS: FighterSpecials = {
   neutral: {
@@ -122,12 +138,9 @@ export const LICH_KING_SPECIALS: FighterSpecials = {
 
   },
   down: {
-    name: "Defile",
-    description: "Plant Frostmourne to spread a shadow pool; hurting a grounded foe grows it and flashes the edge. Jump out; recasts must wait.",
-    ground: DEFILE,
-    air: { ...DEFILE, groundOnly: false, landingLag: AIR_LANDING_LAG,
-      projectiles: [{ model: DEFILE_POOL.model, modelRadius: DEFILE_POOL.modelRadius, spawnFrame: DEFILE_POOL.spawnFrame,
-        offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: -8.0, life: 24,
-        radius: DEFILE_POOL.radius, effect: DEFILE_POOL.effect, reflectable: DEFILE_POOL.reflectable, limit: DEFILE_POOL.limit }] },
+    name: "Harvest Soul",
+    description: "Hold to tether the nearest foe at any range and drain souls into his meter; a hit breaks the tether but keeps what he drained. With a full meter, raise a Ghoul that fights beside him until it is knocked out; one at a time.",
+    ground: harvestSoul(undefined),
+    air: harvestSoul(AIR_LANDING_LAG),
   },
 };
