@@ -10,8 +10,8 @@ ensure(assetsArg && outputArg && variantArg, "usage: bun tools/animations/illida
 const [assets, output] = [assetsArg, outputArg].map(p => resolve(p));
 ensure(relative(resolve(import.meta.dir, "../.."), output).startsWith(".."), "Illidan art stays outside the checkout");
 
-interface Variant { readonly lean: number; readonly head: number; readonly pelvis: number; readonly sweep: number; readonly elbow: number; readonly hand: number; readonly splay: number; readonly swing: number; readonly bob: number; readonly slide: number; readonly slideR: number; readonly drop: number; readonly lateral: number; readonly alternate: number; readonly cross: number; readonly counter: number; readonly pelvisYaw: number; readonly crouch: number; readonly knee: number; readonly shin: number; readonly handGuard: number }
-const GAIT = { alternate: 0, cross: 0, counter: 0, pelvisYaw: 0, crouch: 0, knee: 0, shin: 0, handGuard: 0 };
+interface Variant { readonly lean: number; readonly head: number; readonly pelvis: number; readonly sweep: number; readonly elbow: number; readonly hand: number; readonly splay: number; readonly swing: number; readonly bob: number; readonly slide: number; readonly slideR: number; readonly drop: number; readonly lateral: number; readonly alternate: number; readonly cross: number; readonly counter: number; readonly pelvisYaw: number; readonly crouch: number; readonly knee: number; readonly shin: number; readonly handGuard: number; readonly burst: number }
+const GAIT = { alternate: 0, cross: 0, counter: 0, pelvisYaw: 0, crouch: 0, knee: 0, shin: 0, handGuard: 0, burst: .55 };
 const VARIANTS: Readonly<Record<string, Variant>> = {
   low: { lean: 52, head: .55, pelvis: .4, sweep: 78, elbow: 8, hand: 46, splay: 14, swing: .35, bob: 2, slide: 0, slideR: 0, drop: 0, lateral: 0, ...GAIT },
   fox: { lean: 42, head: .5, pelvis: .35, sweep: 66, elbow: 10, hand: 38, splay: 16, swing: .4, bob: 2, slide: 0, slideR: 0, drop: 0, lateral: 0, ...GAIT },
@@ -87,7 +87,7 @@ function rewrite(name: "Locomotion Run" | "Locomotion Initial Dash Burst", ramp:
   const strideReach = Math.max(1e-6, ...sampled.map(s => Math.abs(stride(s))));
   const results = new Map<string, quat[]>(CONTROLLED.map(n => [n, []]));
   sampled.forEach((s, i) => {
-    const u = 1, build = ramp ? .55 + .45 * ease(Math.min(1, i / 6)) : 1;
+    const u = 1, build = ramp ? v.burst + (1 - v.burst) * ease(Math.min(1, i / 6)) : 1;
     const root = s.Bone_Root!;
     const target = new Map<string, quat>();
     const lean = v.lean * build + v.bob * Math.sin(2 * Math.PI * 2 * i / (frames.length - 1));
