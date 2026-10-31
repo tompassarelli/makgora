@@ -47,9 +47,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Jaina Proudmoore | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in forward smash; tech away dash grab, up throw, down smash; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 60% → up air against 5/5 DI |
 | Jaina Proudmoore | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash; tech away neutral special; missed tech short hop, down air; trap neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Jaina Proudmoore | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Sylvanas Windrunner | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash; tech away neutral special; missed tech short hop, down air; trap short hop, down air covers tech in place, missed tech | up throw at 0% → up air against 5/5 DI |
-| Sylvanas Windrunner | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in down smash; tech away neutral special; missed tech short hop, down air; trap short hop, down air covers tech in place, missed tech | up throw at 0% → up air against 5/5 DI |
-| Sylvanas Windrunner | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash; tech away dash, dash attack; missed tech short hop, down air; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up air against 5/5 DI |
+| Sylvanas Windrunner | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash, dash, dash attack; tech away neutral special; missed tech short hop, down air; trap forward smash, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up air against 5/5 DI |
+| Sylvanas Windrunner | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash, dash, dash attack; tech away neutral special; missed tech short hop, down air; trap forward smash, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up air against 5/5 DI |
+| Sylvanas Windrunner | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash, dash attack; missed tech forward smash; trap dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up air against 5/5 DI |
 | Cairne Bloodhoof | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash, full hop, down air, full hop, forward air; tech in up smash, dash, dash attack; tech away short hop, forward air; missed tech down smash, full hop, down air, full hop, forward air; trap down smash, full hop, down air, full hop, forward air covers tech in place, tech in, missed tech | up throw at 40% → up tilt against 5/5 DI |
 | Cairne Bloodhoof | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash, down smash, forward smash; tech in full hop +4, down air, short hop, forward air; tech away dash grab, back throw; missed tech down smash, down smash, forward smash; trap down smash, down smash, forward smash covers tech in place, tech in, missed tech | up throw at 60% → up tilt against 4/5 DI |
 | Cairne Bloodhoof | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place full hop, down air, full hop, down air, down smash; tech in down smash; tech away forward smash; missed tech full hop, down air, full hop, down air, down smash; trap full hop, down air, full hop, down air, down smash covers tech in place, tech away, missed tech | up throw at 40% → up tilt against 5/5 DI |
@@ -266,7 +266,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Jaina Proudmoore | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Sylvanas Windrunner | light | up throw | 1/1 | 1/1 KD in short hop, back air, out down smash | 1/1 in short hop, back air, out down smash | 1/1 in dash, dash attack, out down smash |
+| Sylvanas Windrunner | light | up throw | 1/1 | 1/1 in forward smash, out down smash | 1/1 in short hop, back air, out down smash | 1/1 in dash, dash attack, out down smash |
 | Sylvanas Windrunner | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
@@ -274,7 +274,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Sylvanas Windrunner | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Sylvanas Windrunner | heavy | up throw | 1/1 in down smash, out up smash | 1/1 in short hop, back air, out up smash | 1/1 KD in short hop, back air, out up smash | 1/1 KD in short hop, back air, out up smash |
+| Sylvanas Windrunner | heavy | up throw | 1/1 in down smash, out forward smash | 1/1 in short hop, back air, out forward smash | 1/1 KD | 1/1 in short hop, back air, out forward smash |
 | Sylvanas Windrunner | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
