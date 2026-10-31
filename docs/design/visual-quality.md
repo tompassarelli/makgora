@@ -758,7 +758,7 @@ contrast-nordrassil-*.png.
 
 Look-lead's direction, on Tom's Silithus look references (burnt-orange haze sky,
 brown-tan sand ground, purple-grey carved stone; World of Warcraft screenshots
-used as look targets only): the sky is an original gradient (zenith 150,70,34,
+used as look targets only; the values here are the amber take, scaled down in "Ahn'Qiraj brightness" below): the sky is an original gradient (zenith 150,70,34,
 horizon 224,130,54, nadir 150,100,60), the fog is 191,112,48 from 3,400 to
 10,000, the floor under the deck is tan (tint 214,170,116), the deck top is
 RuinsDoodads1 sandstone (tint 238,212,164), and the deck lip, body and
@@ -791,6 +791,39 @@ for this stage on Tom's references; every other stage keeps the limit at 0.
 
 Ideas: a hue-aware separation term (chroma against the backdrop's chroma) would
 credit the warm fighters on this stage, whose lightness bands overlap the haze.
+
+### Ahn'Qiraj brightness (31 Oct 2026)
+
+Tom asked on 31 Oct 2026 for the burnt-orange palette above at about the
+brightness of 93346bf02f (the dark pass lifted one value step, sky horizon 40,32,30),
+in the native window and Warcraft III alike: the amber take read bright in both,
+and 50bde56355's lift had never been undone. The hues and structure are
+unchanged; every backdrop value is scaled down, the deck top least because
+fighters stand on it: sky zenith 33,15,7, horizon 49,29,12, nadir 33,22,13;
+fog 44,24,12 (0.171875, 0.09375, 0.046875) from 3,400 to 10,000; floor tint
+58,46,31; scenery tint 30,27,36 and structure pieces 41,37,53 (far) and 32,28,43
+(near); deck top 179,159,123, lip 91,82,107, body 60,53,76 and underside
+43,38,56. A first scaling at about 0.4 of the amber values (sky horizon 72,42,17)
+still read at backdrop L* 15 to 26 against fighter lower quartiles of 14 to 16.
+
+Classic native captures on gex45 pair 1 at match zoom (Shadow Hunter against
+Chen Stormstout, both orders, near and far; Rokhan and Chen stand in them), the
+backdrop-only frames, mean luma of the sky strip (top 12.5% to 37.5% of the frame)
+and of the whole backdrop above the deck (12.5% to 57.5%):
+
+| View (pair order) | Sky strip before → after | Backdrop before → after | Fighter band gap before → after (L*) |
+| --- | --- | --- | --- |
+| near (Shadow Hunter first) | 122.9 → 33.0 | 106.9 → 28.9 | -17.2 → -1.7 |
+| far (Shadow Hunter first) | 117.0 → 34.8 | 95.8 → 29.3 | -7.3 → +0.8 |
+| near (Chen first) | 127.8 → 33.0 | 110.1 → 28.9 | -25.1 → -0.4 |
+| far (Chen first) | 120.7 → 34.8 | 97.8 → 29.3 | +2.2 → +2.8 |
+
+The gap is the first fighter's; the second fighter's gap stays -42.8 L* before and
+after in all four views, a floor of its band (L* 9.0 to 51.7), not of the backdrop.
+The native window drew the amber take at sky-strip luma 110 in the same framing
+(Wisp window capture of main before this change), against 123 in Classic.
+Captures: ~/.local/state/smashcraft/shots/aq-classic/ (classic-before-*,
+classic-after-*; pass1-* is the intermediate take).
 
 ### Gryphon Aerie backdrop rock (31 Oct 2026)
 
