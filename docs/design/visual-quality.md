@@ -62,7 +62,7 @@ Smashcraft capture has shown yet; *(guess)* marks an inference.
 ## Art quality rubric: stage, fighter and effect art
 
 The judged half of the remaster bar. Wisp's `remaster_check` example
-(wisp:docs/native-window-plan.md, "Remaster at load") measures what a texture
+(wisp:docs/native-window-plan.md, "Measured gates"; run it with `cargo run --release -p wisp-window --example remaster_check -- --out ~/.local/state/smashcraft/shots --imports MAP_IMPORTS_DIR` from wisp/window, which saves side-by-side crops of the worst ten textures as `remaster-check-*.png` there) measures what a texture
 upscaler can change; this rubric judges everything a person authors or
 dresses: a stage's scenery and deck, a fighter's skin or model, an effect.
 It comes from a professional artist's annotated critique of an AI-remastered
@@ -90,7 +90,7 @@ fails line 1.
 | | Line | Fails when |
 | --- | --- | --- |
 | 1 | **Same concept as Classic** | A cold reader names a different object, material or mood than the Classic art gives, or a Classic landmark no longer reads at gameplay zoom |
-| 2 | **One palette** | Materials drift to hues the original never used, or a piece sits apart from its neighbours; distinct materials should still share hue hints. Hue and saturation drift of a remastered texture is also measured: `remaster_check` fails it past 3 degrees or 0.03 |
+| 2 | **One palette** | Materials drift to hues the original never used, or a piece sits apart from its neighbours; distinct materials should still share hue hints. Hue and saturation drift of a remastered texture is also measured: `remaster_check` fails it past 6 degrees or 0.04 |
 | 3 | **Believable materials at their scale** | A texture reads blurry with no volume, as cheap procedural noise in place of painted detail (wood grain that is a filter, stone with no mortar), or at the wrong scale (shingles the size of doors, planks wider than the fighter) |
 | 4 | **Clean joins** | Kitbashed parts overlap with visible joins, z-fight, show baking artefacts, or leave a visible seam where a texture tiles or an atlas island meets its neighbour |
 | 5 | **No repetition in view** | The same block, plank or prop repeats identically within one frame (vary rotation, damage, scale or trim) |
