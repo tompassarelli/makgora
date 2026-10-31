@@ -32,7 +32,7 @@ export const GOLD_SACK_FULL_SCALE = f32(1.3);
 const GOLD_CLINK = "ReceiveGold";
 export const GOLD_SACK_ON_BACK = { x: -14.0, z: 84.0 } as const;
 const GOLD_SACK_GLINT = "Abilities\\Spells\\Items\\ResourceItems\\ResourceEffectTarget.mdx";
-const GOLD_SACK_COIN_SPILL = "Abilities\\Spells\\Other\\Transmute\\PileofGold.mdx";
+export const GOLD_SACK_COIN_SPILL = "Abilities\\Spells\\Other\\Transmute\\PileofGold.mdx";
 const GLINT_SCALE = f32(0.8);
 const FULL_GLINT_SCALE = f32(1.6);
 const COIN_SPILL_SCALE = f32(0.35);
@@ -61,7 +61,7 @@ export function peonExtraCues(character: Character): readonly SackCues[] {
 
 function goldSackCueState(fighter: Readonly<Fighter>): PeonCueState<never> {
   const { form, frame } = fighter.special;
-  const { hit } = fighter.attack;
+  const { hit } = fighter.special;
   const branch = form >= FOLLOW_UP_FORM ? idiv(form, FOLLOW_UP_FORM) - 1 : -1;
   if (branch > GOLD_SACK_CHARGE.stages) return { cues: undefined, phase: "none" };
   if (branch < 0) {

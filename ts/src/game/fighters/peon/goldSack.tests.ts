@@ -17,6 +17,8 @@ import { fighterAt } from "../../sim/roster";
 import { clearSpecialOnStock } from "../../sim/transitions";
 import { FOLLOW_UP_FORM, chargeStage } from "../../sim/specials/schema";
 import { GOLD_SACK_CHARGE, GOLD_SACK_DAMAGE, GOLD_SACK_FIRST_ACTIVE } from "./specials";
+import { GOLD_SACK_COIN_SPILL } from "../../presentation/peonCues";
+import { specialCueState } from "../../presentation/specialCues";
 
 const FULL = GOLD_SACK_CHARGE.full;
 const HOLD = GOLD_SACK_CHARGE.hold;
@@ -292,4 +294,21 @@ test("An air Gold Sack bonk that lands before its first active frame still swing
   idle(d, 60);
   assertEquals(d.foe.status.damage, f32(at(GOLD_SACK_DAMAGE, GOLD_SACK_CHARGE.stages)), "the full bonk lands on the ground");
   assertEquals(d.peon.special.charge, 0);
+});
+
+test("Gold Sack: a bonk that connects reaches the coin spill's active phase on the frames after the hit and never on a miss [k1 scenario]", () => {
+  const coinFrames = (foeAhead: number): number => {
+    const d = duel(foeAhead);
+    step(d, "press");
+    step(d, "none");
+    let frames = 0;
+    for (let frame = 0; frame < 90; frame++) {
+      step(d, "none");
+      const state = specialCueState(d.peon);
+      if (state.phase === "active" && state.cues?.active.model === GOLD_SACK_COIN_SPILL) frames++;
+    }
+    return frames;
+  };
+  assertGreaterThan(coinFrames(IN_REACH), 0);
+  assertEquals(coinFrames(900.0), 0, "a bonk that misses shows no coins");
 });
