@@ -48,7 +48,7 @@ function addPiece(s: ShellState, piece: Readonly<SceneryPiece>, animation: Effec
   if (piece.color !== undefined) setEffectColor(effect, piece.color[0], piece.color[1], piece.color[2]);
   setEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
   if (drawn.matrixScale !== undefined) setEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
-  playEffectAnimation(effect, animation);
+  playEffectAnimation(effect, piece.unlit === true ? EffectAnimation.death : animation);
   if (piece.still === true) setEffectTimeScale(effect, 0.0);
   return effect;
 }

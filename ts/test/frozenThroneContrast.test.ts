@@ -10,7 +10,9 @@ const FLOE = "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx";
 const NEAR_BAND_BACK = 2500;
 const DECK_END = 1300;
 const FIGHTER_DIM = 150;
-const PEDESTAL = "IceCrownPillar";
+const STAIR_FRONT = 1300;
+const SKULL_PILLAR = "Doodads\\Icecrown\\Props\\IceTorch\\IceTorch.mdx";
+const CHAIN = "Doodads\\Dungeon\\Props\\Chain";
 
 test("no Frozen Throne tower or near glacier stands within reach of the deck's ends [k2 property]", () => {
   const towers = placedPieces(FROZEN_THRONE_STAGE).filter(piece => /IceCrown(Pillar|Obelisk)|Glacier/.test(piece.model) && Math.abs(piece.x) > 600);
@@ -30,7 +32,7 @@ test("every Frozen Throne prop near the deck stands on the deck or on an ice flo
     const xs = corners.map(([x]) => x * piece.scale + piece.x), ys = corners.map(([, y]) => y * piece.scale + piece.y);
     return { left: Math.min(...xs), right: Math.max(...xs), front: Math.min(...ys), back: Math.max(...ys), top: bounds.max[2] * mz * piece.scale + piece.z };
   };
-  const props = pieces.filter(piece => piece.model !== FLOE && piece.model !== STAGE_SNOW_MODEL && piece.y < NEAR_BAND_BACK);
+  const props = pieces.filter(piece => piece.model !== FLOE && piece.model !== STAGE_SNOW_MODEL && !piece.model.startsWith(CHAIN) && piece.y < NEAR_BAND_BACK);
   expect(props.length).toBeGreaterThanOrEqual(6);
   const stranded = props.filter(piece => {
     const onDeck = piece.z === 0 && Math.abs(piece.y) <= MAIN_DECK_HALF_DEPTH;
@@ -51,16 +53,28 @@ test("the Frozen Throne's ice floes and side ledges are tinted below the fighter
   }
 });
 
-test("every raised Frozen Throne platform stands on a pedestal under its middle [k2 property]", () => {
-  const pedestals = placedPieces(FROZEN_THRONE_STAGE).filter(piece => piece.model.includes(PEDESTAL) && piece.y < 200);
+test("no Frozen Throne piece stands under a raised platform: the platforms float, with no stem or support [k2 property]", () => {
+  const near = stageScenery(FROZEN_THRONE_STAGE).pieces.filter(piece => piece.y < STAIR_FRONT);
   for (let index = 1; index < surfaceCount(FROZEN_THRONE_STAGE); index++) {
-    const middle = (surfaceLeft(FROZEN_THRONE_STAGE, index, 0) + surfaceRight(FROZEN_THRONE_STAGE, index, 0)) / 2;
-    expect(pedestals.some(piece => Math.abs(piece.x - middle) <= 20)).toBe(true);
+    const left = surfaceLeft(FROZEN_THRONE_STAGE, index, 0), right = surfaceRight(FROZEN_THRONE_STAGE, index, 0);
+    expect(near.filter(piece => piece.x >= left && piece.x <= right).map(piece => piece.model)).toEqual([]);
+  }
+});
+
+test("the Frozen Throne keeps its two skull pillars, one each side of the throne, each chained toward it [k2 property]", () => {
+  const pieces = stageScenery(FROZEN_THRONE_STAGE).pieces;
+  const pillars = pieces.filter(piece => piece.model === SKULL_PILLAR);
+  expect(pillars.map(piece => Math.sign(piece.x)).sort()).toEqual([-1, 1]);
+  expect(pillars.every(piece => piece.unlit === true)).toBe(true);
+  const chains = pieces.filter(piece => piece.model.startsWith(CHAIN));
+  for (const pillar of pillars) {
+    const hung = chains.filter(chain => Math.sign(chain.x) === Math.sign(pillar.x) && Math.abs(chain.x) < Math.abs(pillar.x) && Math.abs(chain.y - pillar.y) <= 60);
+    expect(hung.length).toBeGreaterThan(0);
   }
 });
 
 test("the Frozen Throne's top stair tier ends on a landing at its own height that runs under the dais [k2 property]", () => {
-  const floes = placedPieces(FROZEN_THRONE_STAGE).filter(piece => piece.model === FLOE && piece.x === 0 && piece.y >= 1300 && piece.y < 2000 && piece.matrixScale?.[1] === 2.5);
+  const floes = placedPieces(FROZEN_THRONE_STAGE).filter(piece => piece.model === FLOE && piece.x === 0 && piece.y >= 1300 && piece.y < 2000 && (piece.matrixScale?.[1] ?? 0) >= 2.5);
   const top = floes.filter(piece => piece.y < 1700).sort((a, b) => b.z - a.z)[0];
   const landing = floes.find(piece => piece.y > 1800);
   expect(top).toBeDefined();

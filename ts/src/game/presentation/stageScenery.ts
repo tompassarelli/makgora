@@ -29,6 +29,8 @@ export interface SceneryPiece {
   readonly flying?: true;
   /** The model plays its floating idle; a still piece holds its first frame so a stacked spire does not bob. */
   readonly still?: true;
+  /** The piece plays its Death sequence and holds its end: a brazier stands with its flame out. */
+  readonly unlit?: true;
 }
 
 /** The native window's painted sky for a stage, which keeps one time of day: the zenith colour, the cloud cover, the sun's (or moon's) place and colour, and how far stars and a horizon glow show. Colours are 0 to 1; the horizon is the fog's colour. */
@@ -98,7 +100,7 @@ const FROZEN_THRONE: StageScenery = {
     { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1480.0, z: -165.0, scale: 1.0, yaw: 270.0, matrixScale: [11.0, 2.5, 1.25], color: [64, 82, 104], still: true },
     { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1440.0, z: -110.0, scale: 1.0, yaw: 270.0, matrixScale: [9.0, 2.5, 1.25], color: [64, 82, 104], still: true },
     { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1400.0, z: -55.0, scale: 1.0, yaw: 270.0, matrixScale: [7.0, 2.5, 1.25], color: [64, 82, 104], still: true },
-    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1360.0, z: 0.0, scale: 1.0, yaw: 270.0, matrixScale: [5.0, 2.5, 1.25], color: [64, 82, 104], still: true },
+    { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1360.0, z: 0.0, scale: 1.0, yaw: 270.0, matrixScale: [5.0, 3.75, 1.25], color: [64, 82, 104], still: true },
     { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 1973.0, z: 0.0, scale: 1.0, yaw: 270.0, matrixScale: [1.25, 2.5, 1.25], color: [64, 82, 104], still: true },
     { model: "Doodads\\Icecrown\\Structures\\IC_IceArch\\IC_IceArch.mdx", x: 0.0, y: 4800.0, z: -1500.0, scale: 7.5, yaw: 270.0, color: [46, 60, 82] },
     { model: "Doodads\\Icecrown\\Rocks\\Glacier\\Glacier2.mdx", x: -2300.0, y: 5200.0, z: -2200.0, scale: 5.0, yaw: 60.0, matrixScale: [1.25, 1.0, 2.25], color: [44, 64, 90] },
@@ -109,9 +111,10 @@ const FROZEN_THRONE: StageScenery = {
     { model: "Doodads\\Icecrown\\Props\\IceCrownObelisk\\IceCrownObelisk0.mdx", x: 3100.0, y: 3400.0, z: -1000.0, scale: 5.0, yaw: 250.0, color: [45, 58, 80] },
     { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: -2800.0, y: 3000.0, z: -800.0, scale: 4.0, yaw: 15.0, color: [45, 58, 80] },
     { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: 2800.0, y: 3000.0, z: -800.0, scale: 4.0, yaw: 140.0, color: [45, 58, 80] },
-    { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: -340.0, y: 60.0, z: 0.0, scale: 0.625, yaw: 270.0, color: [44, 56, 76] },
-    { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: 340.0, y: 60.0, z: 0.0, scale: 0.625, yaw: 270.0, color: [44, 56, 76] },
-    { model: "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx", x: 0.0, y: 60.0, z: 0.0, scale: 1.25, yaw: 270.0, matrixScale: [0.5, 0.5, 1.0], color: [44, 56, 76] },
+    { model: "Doodads\\Icecrown\\Props\\IceTorch\\IceTorch.mdx", x: -260.0, y: 1400.0, z: 34.0, scale: 3.0, yaw: 270.0, matrixScale: [1.0, 1.0, 1.625], color: [150, 156, 170], unlit: true },
+    { model: "Doodads\\Icecrown\\Props\\IceTorch\\IceTorch.mdx", x: 260.0, y: 1400.0, z: 34.0, scale: 3.0, yaw: 270.0, matrixScale: [1.0, 1.0, 1.625], color: [150, 156, 170], unlit: true },
+    { model: "Doodads\\Dungeon\\Props\\Chain\\Chain0.mdx", x: -105.0, y: 1380.0, z: 20.0, scale: 5.0, yaw: 0.0, color: [120, 128, 142] },
+    { model: "Doodads\\Dungeon\\Props\\Chain\\Chain0.mdx", x: 105.0, y: 1380.0, z: 20.0, scale: 5.0, yaw: 180.0, color: [120, 128, 142] },
     { model: STAGE_SNOW_MODEL, x: 0.0, y: 4000.0, z: 0.0, scale: 1.0, yaw: 0.0 },
   ],
 };
