@@ -1,7 +1,7 @@
-# Mak'gora 0.3.0
+# Mak'gora 0.3.1
 *A platform fighter inside Warcraft III*
 
-**Pick one of 31 Warcraft heroes, fight across floating stages and knock your rivals off the screen.** Free, for 1 to 4 players. Put **Mak'gora 0.3.0.w3x** in your Warcraft III Maps folder, set Graphics to Classic and open it from Custom Game.
+**Pick one of 31 Warcraft heroes, fight across floating stages and knock your rivals off the screen.** Free, for 1 to 4 players. Put **Mak'gora 0.3.1.w3x** in your Warcraft III Maps folder, set Graphics to Classic and open it from Custom Game.
 ## New in 0.3
 - **Onyxia joins** as Lady Katrana Prestor, who can reveal the black dragon.
 - **Costumes:** up to eight per fighter, picked on character select.

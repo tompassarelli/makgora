@@ -2,12 +2,12 @@
 
 Private drafts for Tom to approve before anything is posted under his name. `PROJECT_URL` is the Mak'gora project thread drafted in [hive-project.md](hive-project.md) and `PATREON_URL` the Patreon page; both are filled in once they exist.
 
-## Mak'gora 0.3.0: Hive thread reply
+## Mak'gora 0.3.1: Hive thread reply
 
-Posted as a reply in the map's Hive thread after the 0.3.0 map is uploaded (BBCode):
+Posted as a reply in the map's Hive thread after the 0.3.1 map is uploaded (BBCode):
 
 ```
-[B]Mak'gora 0.3.0 is out[/B]
+[B]Mak'gora 0.3.1 is out[/B]
 Smashcraft is now [B]Mak'gora[/B]. New in 0.3:
 [LIST]
 [*]Onyxia joins as Lady Katrana Prestor, who can reveal the black dragon
@@ -19,9 +19,9 @@ Smashcraft is now [B]Mak'gora[/B]. New in 0.3:
 Controllers work through [URL="https://github.com/tompassarelli/padbridge/releases/latest"]padbridge[/URL], and a ranked ladder is coming. News and the roadmap: [URL="PROJECT_URL"]Mak'gora project page[/URL]. Games and feedback: [URL="https://discord.gg/JQGZs2UJR"]Discord[/URL].
 ```
 
-## Mak'gora 0.3.0: Discord announcement
+## Mak'gora 0.3.1: Discord announcement
 
-**Mak'gora 0.3.0 is out!** Smashcraft has a new name: Mak'gora.
+**Mak'gora 0.3.1 is out!** Smashcraft has a new name: Mak'gora.
 
 New in 0.3: Onyxia joins (Lady Katrana Prestor, who can reveal the black dragon), up to eight costumes per fighter, a new-player mode that shows your keys on screen, a longer Tutorial, the new names Samuro, Rokhan, Mannoroth, Arthas, Stitches and Mrgl & Grgl, and reworks for Thrall, Mal'Ganis, Firelord, Stitches and Rexxar.
 

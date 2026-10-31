@@ -5,6 +5,7 @@
 
 
 import type { Rgba } from "./blp";
+import { GAME_TITLE } from "../src/game/ui/title";
 
 export const PREVIEW_ENTRY = "war3mapMap.blp";
 export const PREVIEW_SIZE = 256;
@@ -161,10 +162,14 @@ const GLYPHS: Record<string, readonly string[]> = {
   R: ["11110", "10001", "10001", "11110", "10100", "10010", "10001"],
   F: ["11111", "10000", "10000", "11110", "10000", "10000", "10000"],
   T: ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
+  K: ["10001", "10010", "10100", "11000", "10100", "10010", "10001"],
+  G: ["01111", "10000", "10000", "10011", "10001", "10001", "01111"],
+  O: ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+  "'": ["00100", "00100", "01000", "00000", "00000", "00000", "00000"],
 };
 
 
-function drawTitle(canvas: Canvas, text = "SMASHCRAFT") {
+function drawTitle(canvas: Canvas, text = GAME_TITLE.toUpperCase()) {
   const cell = 4, gap = 4, letter = 5 * cell, top = 14;
   const total = text.length * letter + (text.length - 1) * gap;
   const left = Math.floor((PREVIEW_SIZE - total) / 2);
