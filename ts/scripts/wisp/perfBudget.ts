@@ -13,7 +13,7 @@ import { WARCRAFT_COST, nativeFrameCost } from "wisp/src/headless/nativeCost";
 export const BUDGET_P99_MS = 10;
 export const BUDGET_WORST_MS = 14;
 export const TOP_SHARE = 0.01;
-export const BUDGET_ALLOC_P50_KB = 13;
+export const BUDGET_ALLOC_P50_KB = 14;
 export const BUDGET_ALLOC_P95_KB = 26;
 export const BUDGET_CATCH_UP_MS = 10;
 

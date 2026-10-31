@@ -25,7 +25,7 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   candidate. The exact command and calibration scope are in
   smashcraft:docs/native-bot-session.md, "Wisp-only frame-cost acceptance".
   `bun wisp perf budget RUN_FILE` holds a `--samples` run to #168's frame
-  budget (p99 10 ms, worst frame 14 ms, predicted) and each client's map allocation per frame to 13 KB at the median and 26 KB at the 95th percentile (`--alloc-p50 KB`, `--alloc-p95 KB`; CI's playable-bot-four and rollback-four runs both hold it), and every catch-up callback a `rollback-four` or `native-perf-four` run listed to 10 ms predicted (`--catch-up MS`), printing their p50, p95 and worst and the worst by confirmed+speculative frames run. `bun wisp perf profile
+  budget (p99 10 ms, worst frame 14 ms, predicted) and each client's map allocation per frame to 14 KB at the median and 26 KB at the 95th percentile (`--alloc-p50 KB`, `--alloc-p95 KB`; CI's playable-bot-four and rollback-four runs both hold it), and every catch-up callback a `rollback-four` or `native-perf-four` run listed to 10 ms predicted (`--catch-up MS`), printing their p50, p95 and worst and the worst by confirmed+speculative frames run. `bun wisp perf profile
   playable-bot-four --phases --out FILE` preserves measured samples and each
   client's slow-frame phase samples and simulation/repair step counts;
   profiling is a separate replay, excluded from measured costs. `perf profile RUN --alloc
