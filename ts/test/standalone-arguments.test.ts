@@ -19,3 +19,8 @@ test("--start names where the native window opens [k2 property]", () => {
   expect(standaloneArguments([]).start).toBeUndefined();
   expect(() => standaloneArguments(["--start", "title"])).toThrow("--start needs");
 });
+
+test("--digests names the file the native window writes its frame digests to, and only the native window writes it [k2 property]", () => {
+  expect(standaloneArguments(["--digests", "digests.txt"], "native").digests).toBe("digests.txt");
+  expect(() => standaloneArguments(["--digests", "digests.txt"])).toThrow("add --window native");
+});

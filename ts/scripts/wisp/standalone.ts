@@ -205,7 +205,7 @@ export const smashcraftStandalone = (render: StandaloneGame["render"]): Standalo
 });
 
 const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only"]);
-const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen"]);
+const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests"]);
 
 export function standaloneArguments(args: readonly string[], window: "chrome" | "native" = "chrome") {
   let frames: number | undefined;
@@ -232,11 +232,17 @@ export function standaloneArguments(args: readonly string[], window: "chrome" | 
     }
   }
   const startOptions = startArguments(texts);
-  const script = texts.get("--script"), out = texts.get("--out"), map = texts.get("--map"), headless = flags.has("--headless"), fourFighters = flags.has("--four-fighters");
+  const script = texts.get("--script"), digests = digestsOf(texts, window), out = texts.get("--out"), map = texts.get("--map"), headless = flags.has("--headless"), fourFighters = flags.has("--four-fighters");
   if (headless && (frames === undefined || (out === undefined && window === "chrome"))) throw new Error(window === "native" ? "--headless needs --frames N" : "--headless needs --frames N and --out DIR");
   const playerAssets = playerAssetsOf(flags.has("--player-assets-only"), map);
   if (fourFighters && script !== undefined) throw new Error("--four-fighters plays its own inputs; drop --script");
-  return { ...(fourFighters ? { fourFighters } : {}), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
+  return { ...(fourFighters ? { fourFighters } : {}), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
+}
+
+function digestsOf(texts: ReadonlyMap<string, string>, window: "chrome" | "native"): { readonly digests?: string } {
+  const digests = texts.get("--digests");
+  if (digests !== undefined && window !== "native") throw new Error("--digests is written by the native window; add --window native");
+  return digests === undefined ? {} : { digests };
 }
 
 function startArguments(texts: ReadonlyMap<string, string>): { readonly start?: StandaloneStart; readonly chosen?: string } {
@@ -266,9 +272,9 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const counted = standaloneEmulatedCallsArgument(windowed.rest);
   if (typeof counted === "string") return yield* new UsageFailure({ problem: counted });
   const options = yield* Effect.try({ try: () => standaloneArguments(counted.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
-  const { playerAssets, start, chosen, ...run } = options;
-  if (windowed.window === "native" && (options.presentation !== undefined || options.fourFighters === true)) {
-    return yield* new UsageFailure({ problem: "--window native steps Smashcraft's default session; drop --presentation and --four-fighters or use --window chrome" });
+  const { playerAssets, start, chosen, digests, ...run } = options;
+  if (windowed.window === "native" && options.fourFighters === true) {
+    return yield* new UsageFailure({ problem: "--window native steps Smashcraft's default session; drop --four-fighters or use --window chrome" });
   }
   const game = smashcraftStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
   const query = new URLSearchParams();
@@ -276,6 +282,8 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   if (options.start !== undefined) query.set("start", options.start);
   if (!options.headless) query.set("save", "1");
   if (chosen !== undefined) query.set("chosen", chosen);
+  if (options.presentation !== undefined) query.set("presentation", options.presentation);
+  if (digests !== undefined) query.set("digests", digests);
   const nativeModule = query.size === 0 ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
   return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...(options.fourFighters === true ? { fourFighters: true } : {}), ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) }) }, {
     ...run,

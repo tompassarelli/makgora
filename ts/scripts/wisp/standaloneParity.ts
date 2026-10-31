@@ -1,6 +1,8 @@
-import { readFileSync } from "node:fs";
-import { relative, resolve } from "node:path";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, relative, resolve } from "node:path";
 import { Effect, Schema } from "effect";
+import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { parseReplay } from "../../src/game/replay/matchReplay";
 import { assembleReplays, CHECKED_IN_CORPUS, findRecordings, joinedLines, localCorpus } from "./corpus";
 import { NEUTRAL_INPUT, createStandaloneSession } from "./standalone";
@@ -19,9 +21,10 @@ type Presentation = typeof PRESENTATIONS[number];
 
 const DEFAULT_PRESENTATIONS: readonly Presentation[] = ["native", "pool-predicted"];
 
-export function standaloneParityArguments(args: readonly string[]): { readonly pad: string; readonly presentations: readonly Presentation[] } | string {
+export function standaloneParityArguments(args: readonly string[]): { readonly pad: string; readonly presentations: readonly Presentation[]; readonly window: "chrome" | "native" } | string {
   let pad: string | undefined;
   let presentations = DEFAULT_PRESENTATIONS;
+  let window: "chrome" | "native" = "chrome";
   for (let index = 0; index < args.length; index++) {
     const arg = args[index];
     if (arg === "--presentation") {
@@ -29,10 +32,14 @@ export function standaloneParityArguments(args: readonly string[]): { readonly p
       const unknown = names.find((name): name is string => !PRESENTATIONS.some((known) => known === name));
       if (names.length === 0 || unknown !== undefined) return `--presentation needs ${PRESENTATIONS.join(", ")} separated by commas`;
       presentations = PRESENTATIONS.filter((known) => names.includes(known));
+    } else if (arg === "--window") {
+      const value = args[++index];
+      if (value !== "chrome" && value !== "native") return "--window needs chrome or native";
+      window = value;
     } else if (arg === undefined || arg.startsWith("--") || pad !== undefined) return `unknown standalone option: ${arg}`;
     else pad = arg;
   }
-  return pad === undefined ? "parity standalone takes a pad script" : { pad, presentations };
+  return pad === undefined ? "parity standalone takes a pad script" : { pad, presentations, window };
 }
 
 const nativeDigests = (pad: string, presentation: Presentation) => Effect.gen(function*() {
@@ -51,30 +58,58 @@ const nativeDigests = (pad: string, presentation: Presentation) => Effect.gen(fu
   return { recording: recording.id, digests };
 });
 
+interface Played {
+  readonly compared: number;
+  readonly divergent: number;
+  readonly first: string | undefined;
+}
+
+const comparison = (native: ReadonlyMap<number, string>, played: (visit: (frame: number, digest: string, difference: () => string) => void) => void): Played => {
+  let compared = 0, divergent = 0;
+  let first: string | undefined;
+  played((frame, digest, difference) => {
+    const recorded = native.get(frame);
+    if (recorded === undefined) return;
+    compared++;
+    if (recorded === digest) return;
+    divergent++;
+    first ??= `first divergent frame ${frame}: digest ${digest}, native ${recorded}${difference()}`;
+  });
+  return { compared, divergent, first };
+};
+
 const playPad = (script: string, presentation: Presentation, native: ReadonlyMap<number, string>) => Effect.tryPromise({
   try: async () => {
     const last = Math.max(...native.keys());
     const session = await createStandaloneSession({ script, presentation });
     try {
-      let compared = 0, divergent = 0;
-      let first: string | undefined;
-      while (session.digest().frame < last) {
-        session.step(NEUTRAL_INPUT);
-        const { frame, digest } = session.digest();
-        const recorded = native.get(frame);
-        if (recorded === undefined) continue;
-        compared++;
-        if (recorded === digest) continue;
-        divergent++;
-        first ??= `first divergent frame ${frame}: digest ${digest}, native ${recorded}: ${session.difference(recorded)}`;
-      }
-      return { compared, divergent, first };
+      return comparison(native, (visit) => {
+        while (session.digest().frame < last) {
+          session.step(NEUTRAL_INPUT);
+          const { frame, digest } = session.digest();
+          visit(frame, digest, () => `: ${session.difference(native.get(frame) ?? "")}`);
+        }
+      });
     } finally {
       session.close();
     }
   },
   catch: (cause) => new StandaloneParityFailure({ problem: `the standalone run under ${presentation} stopped: ${String(cause)}` }),
 });
+
+const playPadInNativeWindow = (path: string, presentation: Presentation, native: ReadonlyMap<number, string>) => {
+  const directory = mkdtempSync(join(tmpdir(), "standalone-parity-"));
+  return Effect.gen(function*() {
+  const digests = join(directory, "digests.txt");
+  const last = Math.max(...native.keys());
+  const run = yield* captureProcess("play --standalone --window native", path, [process.execPath, "scripts/wisp.ts", "play", "--standalone", "--window", "native", "--headless", "--frames", `${last}`, "--script", path, "--presentation", presentation, "--digests", digests], { cwd: tsDirectory }).pipe(
+    Effect.mapError((cause) => new StandaloneParityFailure({ problem: `the native window run under ${presentation} did not start: ${cause.message}` })),
+  );
+  if (run.exitCode !== 0) return yield* new StandaloneParityFailure({ problem: `the native window run under ${presentation} exited ${run.exitCode}: ${run.stderr.trim()}` });
+  const rows = readFileSync(digests, "utf8").split("\n").filter((line) => line !== "").map((line) => line.split(" "));
+  return comparison(native, (visit) => { for (const [frame, digest] of rows) visit(Number(frame), digest ?? "", () => ""); });
+  }).pipe(Effect.ensuring(Effect.sync(() => rmSync(directory, { recursive: true, force: true }))));
+};
 
 export const standaloneParity = (args: readonly string[]) => Effect.gen(function*() {
   const parsed = standaloneParityArguments(args);
@@ -85,10 +120,10 @@ export const standaloneParity = (args: readonly string[]) => Effect.gen(function
   let failed = 0;
   for (const presentation of parsed.presentations) {
     const native = yield* nativeDigests(pad, presentation);
-    const result = yield* playPad(script, presentation, native.digests);
+    const result = yield* (parsed.window === "native" ? playPadInNativeWindow(path, presentation, native.digests) : playPad(script, presentation, native.digests));
     const ok = result.divergent === 0 && result.compared === native.digests.size;
     if (!ok) failed++;
-    console.log(`${ok ? "PASS" : "FAIL"} ${pad} under ${presentation} (native ${native.recording}): ${result.compared}/${native.digests.size} frames compared, ${result.divergent} divergent${result.first === undefined ? "" : `: ${result.first}`}`);
+    console.log(`${ok ? "PASS" : "FAIL"} ${pad}${parsed.window === "native" ? " in the native window" : ""} under ${presentation} (native ${native.recording}): ${result.compared}/${native.digests.size} frames compared, ${result.divergent} divergent${result.first === undefined ? "" : `: ${result.first}`}`);
   }
   if (failed > 0) return yield* new StandaloneParityFailure({ problem: `the standalone window differs from the native client under ${failed} presentations` });
 });

@@ -40,6 +40,13 @@ is a corpus recording (`ts/test/corpus/STAMP/{a,b}`) whose `session.json` adds
 command fails when a presentation has none. Without recordings, the same pad
 plays to identical digests under `native` and `pool-predicted` (1100 frames).
 
+With `--window native` the pad runs in the native window itself (`play --standalone
+--window native --headless --script PAD --presentation P --digests FILE`, run once
+per presentation): the window's game module writes each stepped frame's digest to
+FILE and the command compares those with the same recordings. It needs a display
+and a gpu lease, so on the GPU host run it inside a private desktop and
+`machine-capacity run --class gpu`.
+
 Record the native side on a LAN pair with the driver maps `bun wisp map build
 --profile native-driver` (presentation `native`) and `--profile
 native-driver-predicted` (`pool-predicted`): `lan fresh MAP --pair K --turn-ms 60`,
