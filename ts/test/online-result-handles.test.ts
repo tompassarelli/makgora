@@ -15,13 +15,14 @@ import { testHeadless } from "./headless";
 const headless = testHeadless(PREDICTED_HEADLESS);
 
 const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-online-result-handles", devConsole: true };
+const EFFECT_LIFE = /^(?:AddSpecialEffect\w*|DestroyEffect)$/;
 const HANDLE_LIFE = /^(?:Add(?:SpecialEffect|Lightning)\w*|Create\w+|BlzCreate\w+|Destroy\w+|BlzDestroy\w+|Remove\w+)$/;
 const KEYS = presetBindings(DEFAULT_PRESET);
 const key = (action: Action) => keyFor(KEYS, action, 0) ?? 0;
 
 const drift = (frame: number) => (Math.abs((frame % 24) - 12) / 12) * 0.1;
 
-test("two online clients whose frame clocks drift apart create and destroy Warcraft handles on the same turns through a KO that ends the match, its results and the way back to character select [k1 scenario]", () => {
+test("two online clients whose frame clocks drift apart create and destroy Warcraft handles on the same turns through a KO that ends the match, its results and the way back to character select, and the results screen makes and frees no effects, since native clients reach it on different turns [k1 scenario]", () => {
   const clients = headless.clients({ install, start: () => startBuild(BUILD) }, [0, 1], { delivery: syncDelivery(MEASURED_BATTLE_NET, 732) });
   const [early, late] = clients.clients;
   if (early === undefined || late === undefined) throw new Error("two clients expected");
@@ -31,6 +32,7 @@ test("two online clients whose frame clocks drift apart create and destroy Warcr
     early.run(() => { shown = shellState()?.game.phase ?? -1; });
     return shown;
   };
+  const resultEffects: string[] = [];
   const step = (count: number) => {
     for (let frame = 0; frame < count; frame++) {
       const next = clients.frame + 1;
@@ -39,6 +41,7 @@ test("two online clients whose frame clocks drift apart create and destroy Warcr
       clients.frames(1);
       const turns = clients.clients.map(client => {
         const made = client.log.filter(({ name }) => HANDLE_LIFE.test(name)).map(({ name, args }) => `${name}(${args.map(String).join(", ")})`);
+        if (phase() === Phase.result) resultEffects.push(...client.log.filter(({ name }) => EFFECT_LIFE.test(name)).map(({ name, args }) => `${name}(${args.map(String).join(", ")})`));
         client.forget(client.log.length);
         return made;
       });
@@ -62,6 +65,7 @@ test("two online clients whose frame clocks drift apart create and destroy Warcr
   step(240);
   for (const slot of [0, 1]) clients.everywhere(() => { const s = shellState(); if (s !== undefined) pickResult(s, slot, ResultPick.characters); });
   until(Phase.characterMenu, 600);
+  expect(resultEffects).toEqual([]);
   step(120);
   for (const client of clients.clients) expect(client.errors).toEqual([]);
 });

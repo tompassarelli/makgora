@@ -31,7 +31,7 @@ import { resultFighterPlacement } from "../presentation/arenaCamera";
 import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { defeatClip, resultBodies, resultPoseAt, type ResultBody, type ResultClips } from "../presentation/resultPose";
-import { createEffect, destroyEffect, Effect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw, setEffectZ } from "wisp/game/effects";
+import { clearEffectSubAnimations, createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { Frame, FramePoint, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { player } from "wisp/game/players";
 import { preloadAsset } from "wisp/game/files";
@@ -41,6 +41,7 @@ import { formatInt, toReal } from "wisp/game/text";
 
 export const RESULTS_DELAY_FRAMES = 90;
 export const LEVEL_UP_FRAME = 12;
+const LEVEL_UP_MODEL = "Abilities\\Spells\\Other\\Levelup\\LevelupCaster.mdx";
 
 const FACING_CAMERA = f32(-1.5707963705062866);
 
@@ -68,8 +69,8 @@ interface VictoryPose {
   readonly character: Character;
   readonly costume: number;
   readonly role: DuoRole;
-  model: Effect | undefined;
-  modelPath: string | undefined;
+  readonly models: readonly (readonly [string, Effect])[];
+  shown: Effect | undefined;
   readonly clips: ResultClips;
 }
 
@@ -100,6 +101,7 @@ export class MatchPresentation {
   private readonly resultSounds: Sound[] = [];
   private resultEffectsMuted = false;
   private resultBurst = false;
+  private readonly bursts: Effect[] = [];
   pending: ResultsView | undefined;
   private delay = 0;
 
@@ -120,6 +122,11 @@ export class MatchPresentation {
     setFrameLevel(this.countdown, 10);
     setFrameEnabled(this.countdown, false);
     setFrameVisible(this.countdown, false);
+    for (const _slot of PARTICIPANT_SLOTS) {
+      const burst = createEffect(LEVEL_UP_MODEL, origin.x, origin.y);
+      hideEffect(burst, origin);
+      this.bursts.push(burst);
+    }
   }
 
   private playFile(path: string): Sound | undefined {
@@ -261,9 +268,11 @@ export class MatchPresentation {
         if (!row.winner || this.resultFrames !== LEVEL_UP_FRAME) continue;
         this.resultBurst = true;
         const placement = resultFighterPlacement(this.resultStage, index, bodies.length);
-        const burst = createEffect("Abilities\\Spells\\Other\\Levelup\\LevelupCaster.mdx", this.origin.x + placement.x, this.origin.y);
-        setEffectZ(burst, this.origin.z + placement.z);
-        destroyEffect(burst);
+        const burst = at(this.bursts, index);
+        setEffectPosition(burst, this.origin.x + placement.x, this.origin.y, this.origin.z + placement.z);
+        setEffectScale(burst, 1.0);
+        clearEffectSubAnimations(burst);
+        playEffectAnimation(burst, EffectAnimation.death);
       }
     }
     if (this.pending === undefined) return false;
@@ -309,7 +318,22 @@ export class MatchPresentation {
       if (winnerClip === undefined || idleClip === undefined) continue;
       const readyIndex = originalClipNamed(character, "stand ready");
       const heldClip = readyIndex === undefined ? idleClip : originalClip(character, readyIndex) ?? idleClip;
-      this.poses[slot] = { character, costume: role === DuoRole.partner ? PARTNER_COSTUME : costumeFor(game, slot), role, model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, standClip: idleClip, defeatClip: defeatClip(character) } };
+      const costume = role === DuoRole.partner ? PARTNER_COSTUME : costumeFor(game, slot);
+      const clips: ResultClips = { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, standClip: idleClip, defeatClip: defeatClip(character) };
+      const models: (readonly [string, Effect])[] = [];
+      for (const clip of [clips.winnerClip, clips.heldClip, clips.standClip, clips.defeatClip]) {
+        if (clip === undefined) continue;
+        const modelPath = costumeClipModel(character, costume, clip);
+        if (models.some(([shown]) => shown === modelPath)) continue;
+        const model = createEffect(modelPath, this.origin.x, this.origin.y);
+        hideEffect(model, this.origin);
+        setEffectTeamColor(model, player(slot));
+        setEffectBlendTime(model, 0.0);
+        setEffectAnimation(model, "Stand");
+        setEffectTimeScale(model, 0.0);
+        models.push([modelPath, model]);
+      }
+      this.poses[slot] = { character, costume, role, models, shown: undefined, clips };
     }
   }
 
@@ -326,20 +350,10 @@ export class MatchPresentation {
       if (pose === undefined) continue;
       const { clip, time } = resultPoseAt(pose.clips, row.winner, toReal(this.resultFrames) / 60.0);
       const modelPath = costumeClipModel(pose.character, pose.costume, clip);
-      if (pose.model !== undefined && pose.modelPath !== modelPath) {
-        destroyEffect(pose.model);
-        pose.model = undefined;
-      }
-      if (pose.model === undefined) {
-        pose.model = createEffect(modelPath, this.origin.x, this.origin.y);
-        pose.modelPath = modelPath;
-        hideEffect(pose.model, this.origin);
-        setEffectTeamColor(pose.model, player(row.slot));
-        setEffectBlendTime(pose.model, 0.0);
-        setEffectAnimation(pose.model, "Stand");
-        setEffectTimeScale(pose.model, 0.0);
-      }
-      const model = pose.model;
+      const model = pose.models.find(([path]) => path === modelPath)?.[1];
+      if (model === undefined) continue;
+      if (pose.shown !== undefined && pose.shown !== model) hideEffect(pose.shown, this.origin);
+      pose.shown = model;
       const placement = resultFighterPlacement(this.resultStage, index, bodies.length);
       setEffectPosition(model, this.origin.x + placement.x, this.origin.y, this.origin.z + placement.z);
       setEffectYaw(model, FACING_CAMERA);
@@ -356,10 +370,11 @@ export class MatchPresentation {
     for (const played of this.resultSounds) stopSound(played, false, true);
     this.resultSounds.length = 0;
     if (this.resultBurst) {
-      // A model's event sound outlives DestroyEffect, so the level-up burst's sound is cut through its volume groups.
+      // A model's event sound outlives hiding its effect, so the level-up burst's sound is cut through its volume groups.
       setVolumeGroup(VolumeGroup.spells, 0.0);
       setVolumeGroup(VolumeGroup.combat, 0.0);
       this.resultEffectsMuted = true;
+      for (const burst of this.bursts) hideEffect(burst, this.origin);
     }
     this.pending = undefined;
     this.resultView = undefined;
@@ -367,7 +382,11 @@ export class MatchPresentation {
     this.resultBurst = false;
     this.posing = undefined;
     this.banner.hide();
-    this.releasePoses();
+    for (const pose of this.poses) {
+      if (pose?.shown === undefined) continue;
+      hideEffect(pose.shown, this.origin);
+      pose.shown = undefined;
+    }
   }
 
 
@@ -410,11 +429,7 @@ export class MatchPresentation {
 
   private releasePoses(): void {
     for (const slot of PARTICIPANT_SLOTS) {
-      const pose = this.poses[slot];
-      if (pose?.model !== undefined) {
-        hideEffect(pose.model, this.origin);
-        destroyEffect(pose.model);
-      }
+      for (const [, model] of this.poses[slot]?.models ?? []) destroyEffect(model);
       this.poses[slot] = undefined;
       this.partners[slot] = undefined;
     }
