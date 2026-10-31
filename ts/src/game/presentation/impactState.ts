@@ -8,6 +8,7 @@ import { DodgeCue, type ImpactEvents, ImpactLanding, JumpCue } from "./impactEve
 import { STRONG_SPARK_SCALE, TIER_SPARK_SCALE } from "./moveTiers";
 import type { MatchCamera } from "../sim/matchCamera";
 import { cameraRay, rayPoint } from "./arenaCamera";
+import { PlatformCatch } from "./platformDust";
 
 
 export const IMPACT_HIT = 0;
@@ -34,8 +35,10 @@ export const IMPACT_ICE_HIT = 20;
 export const IMPACT_ELECTRIC_SHIELD = 21;
 export const IMPACT_PUMMEL = 22;
 export const IMPACT_ARCANE_HIT = 23;
+export const IMPACT_PLATFORM_BURST = 24;
+export const IMPACT_PLATFORM_LIP = 25;
 export const IMPACTS_PER_KIND = 8;
-export const IMPACT_KIND_COUNT = 24;
+export const IMPACT_KIND_COUNT = 26;
 export const IMPACT_COUNT = IMPACTS_PER_KIND * IMPACT_KIND_COUNT;
 export const KO_STAR_FLIGHT_FRAMES = 90;
 export const KO_STAR_SPARKLE_LEAD = 6;
@@ -235,6 +238,8 @@ function baseImpactLifetime(kind: number): number {
     case IMPACT_SHIELD_HIT: return CONTACT_FRAMES;
     case IMPACT_TECH: return 15;
     case IMPACT_DUST: return 32;
+    case IMPACT_PLATFORM_BURST: return 16;
+    case IMPACT_PLATFORM_LIP: return 14;
     case IMPACT_SIDE_KO: return 24;
     default: return 12;
   }
@@ -311,7 +316,13 @@ export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, 
     surfaceFlash(state, IMPACT_MISSED_TECH, events);
     surfaceFlash(state, IMPACT_DUST, events);
   }
-  if (events.ordinaryLanding) {
+  const { platform } = events;
+  if (platform.kind !== PlatformCatch.none) {
+    const reach = f32(10.0 + f32(platform.size * 8.0));
+    spawn(state, IMPACT_PLATFORM_BURST, f32(x - reach), f32(z + 1.0), -1, platform.size);
+    spawn(state, IMPACT_PLATFORM_BURST, f32(x + reach), f32(z + 1.0), 1, platform.size);
+    spawn(state, IMPACT_PLATFORM_LIP, platform.lipX, platform.lipZ, 0, platform.size);
+  } else if (events.ordinaryLanding) {
     spawn(state, IMPACT_DUST, f32(x - 12.0), f32(z + 2.0), -1, f32(0.7));
     spawn(state, IMPACT_DUST, f32(x + 12.0), f32(z + 2.0), 1, f32(0.7));
   }
@@ -389,13 +400,16 @@ export function projectImpact(state: Readonly<ImpactState>, i: number, camera: R
   const progress = f32(f32(age * 1.0) / impactLifetime(kind));
   let scale = f32(1.0 + f32(progress * 0.25));
   const dust = kind === IMPACT_DUST;
+  const burst = kind === IMPACT_PLATFORM_BURST || kind === IMPACT_PLATFORM_LIP;
   if (dust) scale = f32(0.75 + f32(progress * f32(1.1)));
+  else if (kind === IMPACT_PLATFORM_BURST) scale = f32(f32(0.8) + f32(progress * 0.5));
+  else if (kind === IMPACT_PLATFORM_LIP) scale = f32(f32(0.7) + f32(progress * f32(0.3)));
   else if (kind === IMPACT_MISSED_TECH) scale = f32(f32(0.7) + f32(progress * 0.5));
   const fade = f32(1.0 - progress);
-  const opacity = dust ? f32(220 * strength) : 255.0;
+  const opacity = dust ? f32(220 * strength) : burst ? min(255.0, f32(230 * strength)) : 255.0;
   // Stock particles ignore alpha; keep live slots drawn until parked.
   return impactPose(out, max(1, toInt(f32(f32(opacity * fade) * fade))), f32(scale * strength), f32(originX + travel(drift, age)),
-    f32(f32(originZ + travel(at(state.driftZ, i), age)) + (dust ? f32(progress * 9) : 0.0)), at(state.pitch, i));
+    f32(f32(originZ + travel(at(state.driftZ, i), age)) + (dust ? f32(progress * 9) : kind === IMPACT_PLATFORM_BURST ? f32(progress * 4) : 0.0)), at(state.pitch, i));
 }
 
 function impactPose(out: ImpactPose | undefined, alpha: number, scale: number, x: number, z: number, pitch: number): ImpactPose {

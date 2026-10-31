@@ -1,0 +1,26 @@
+# Platform-landing dust (Tom's playtest, 2026-11-01): a mounts the left
+# platform holding down, short-hops back onto it (soft landing), full-hops and
+# fast-falls onto it, wavelands right along it, drops through to the main
+# stage (ordinary landing) and wavedashes right on the main stage.
+#! chat -dev quick stage 2
+178 a stick 0 -1
+180 a tap B 8
+220 a stick 0 0
+250 a tap B 1
+320 a tap B 8
+356 a stick 0 -1
+358 a stick 0 0
+420 a tap B 1
+424 a stick 1 -1
+424 a shield 1
+425 a stick 0 0
+425 a shield 0
+500 a stick 0 -1
+502 a stick 0 0
+570 a tap B 1
+574 a stick 1 -1
+574 a shield 1
+575 a stick 0 0
+575 a shield 0
+720 a press VIEW
+790 a release VIEW

@@ -50,6 +50,28 @@ no fixed global sound clock, and the floor's material changes the step sound
 and dust. Dashing, braking, jumping, aerial jumps, landing, grabbing and
 throwing each have their own cue at the start of the action.
 
+### Platform landings
+
+Tom asked on 2026-11-01, after a playtest, for landing on a platform to raise
+a more noticeable dust cloud so the landing reads, and left open whether it
+should look like the wavedash dust. It is distinct, so each tells its own story:
+a wavedash or waveland keeps its directional slide trail behind the fighter (the
+braking dust each frame the slide slows), and catching a pass-through platform
+raises a symmetric ground burst. Falling onto a platform, the rise-and-stand
+mount (rising into a platform while holding down, [Platforms](../../gameplay-design.md#platforms))
+and a waveland onto a platform each draw two flattened dust clouds (the
+Smashcraft dust at 1.6 times width and half height) that spread outward along
+the platform top for 16 frames, plus a thin dust line (0.12 times height, about
+140 units wide at size 1, kept on the platform) along the platform lip for 14
+frames, so the eye sees which surface caught the fighter; a waveland keeps its
+slide trail as well. Size and opacity follow landing speed: 1 plus 0.8
+times the square of the fall speed over the fighter's fast-fall speed, so a
+soft landing draws at about 1 and a fast-fall landing at 1.8; a mount draws at
+1. The burst replaces the ordinary landing puff on a platform; a landing on
+the main stage keeps the small puff, because the burst's message is that a
+pass-through surface caught the fighter and it would lose that meaning if every
+landing drew it (`platformDust.ts` in smashcraft:ts/src/game/presentation/).
+
 ## Smashcraft's Warcraft presentation
 
 The mapping lives in smashcraft:ts/src/game/presentation/hitPresentation.ts.
@@ -74,6 +96,7 @@ not claims that Warcraft renders Melee's artwork or exact animation programs.
 | Ledge catch / recovery | Smashcraft shield star (Melee's contact spark at the lip) / Smashcraft dust (climb dust) | quiet BlinkTarget |
 | Ground jump / aerial jump | Smashcraft dust / jump ring | quiet BlinkTarget |
 | Walk / run / dash / ordinary landing | Smashcraft dust | DeepFootstep / DeepFootstep2; distinct volume and pitch |
+| Platform landing / rise-and-stand mount / waveland onto a platform | Smashcraft dust as a flat platform burst both ways and a thin lip line along the platform top | DeepFootstep, as an ordinary landing |
 | Blast KO / star close / respawn | Smashcraft KO burst / Dispel Magic / Resurrection | ThunderClap for KO, DispelMagic at pitch 2.0 for the star KO twinkle; original fighter death cues remain |
 
 Inspection command in developer builds: `-dev quick`, then `-dev effects N`.

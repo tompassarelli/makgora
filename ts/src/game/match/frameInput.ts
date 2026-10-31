@@ -11,7 +11,7 @@ import { copySummonPoseInto } from "../presentation/summonPose";
 import { type Roster, copyControls, fighterAt, isActive, neutralControls, sameControls } from "../sim/roster";
 import { type FrameControls, createFrameControls } from "./controls";
 import type { PacingAndPresentation } from "./pacingAndPresentation";
-import { type MatchState, Phase, computerActive } from "../lobby/lobbyState";
+import { type MatchState, Phase, computerActive, stageClock } from "../lobby/lobbyState";
 import { produceComputerInput, repeatComputerInput } from "./botPlay";
 import { type EarlierFrame, type StepScope, observedFrameLegalActions, observedFrameStartedActions, stepMatch, configureMatchTeams } from "./step";
 import { latchPresses, releasePresses } from "./training";
@@ -230,7 +230,7 @@ export function executeMatchFrame(row: MatchFrameInput, game: MatchState, world:
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) { advanceSummons(runtime.summons, undefined, slot); continue; }
     const f = fighterAt(world, slot);
-    finishImpactEventsAfter(runtime.frameImpacts[slot], f, world);
+    finishImpactEventsAfter(runtime.frameImpacts[slot], f, world, game.stageChoice, stageClock(game));
     if (scope !== undefined && !participantActive(scope.mask, slot) && participantActive(scope.reused, slot)) {
       emitImpacts(runtime.impacts, runtime.frameImpacts[slot], frame, slot);
       reusePresentation(runtime, scope.after, slot);
@@ -271,7 +271,7 @@ export function restoreMatchFrame(row: MatchFrameInput, game: MatchState, world:
 
     observedFrameLegalActions[slot] = runtime.observedLegal[slot];
     observedFrameStartedActions[slot] = runtime.observedStarted[slot];
-    if (isActive(world, slot)) finishImpactEventsAfter(runtime.frameImpacts[slot], fighterAt(world, slot), world);
+    if (isActive(world, slot)) finishImpactEventsAfter(runtime.frameImpacts[slot], fighterAt(world, slot), world, game.stageChoice, stageClock(game));
   }
   return runtime.simulationFrame === frame;
 }
@@ -288,7 +288,7 @@ export function borrowMatchFrame(row: MatchFrameInput, world: Roster, runtime: P
     if (!isActive(world, slot)) continue;
     const events = after.runtime.frameImpacts[slot];
     captureImpactEventsBefore(events, fighterAt(world, slot));
-    finishImpactEventsAfter(events, fighterAt(after.world, slot), after.world);
+    finishImpactEventsAfter(events, fighterAt(after.world, slot), after.world, after.match.stageChoice, stageClock(after.match));
   }
   return true;
 }

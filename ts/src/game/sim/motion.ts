@@ -173,7 +173,7 @@ export function totalVelocityX(f: Fighter): number {
   return f32(f32(f32(f.motion.vx + f.launch.knockbackX) + f.shield.pushbackX) + f.shield.recoilX);
 }
 
-export function totalVelocityZ(f: Fighter): number {
+export function totalVelocityZ(f: Readonly<Fighter>): number {
   return f32(f32(f.motion.vz + f.launch.knockbackZ) + f.shield.recoilZ);
 }
 

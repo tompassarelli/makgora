@@ -29,7 +29,7 @@ import { createMatchCamera, type MatchCamera } from "../sim/matchCamera";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
-import { impactAnimation, impactColour, impactModel, impactModelScale, impactSoundNames, impactStartSeconds, presentImpactSounds, presentStarKoTwinkle, presentStartSounds, type ImpactSoundSink } from "../presentation/hitPresentation";
+import { impactAnimation, impactColour, impactMatrixScale, impactModel, impactModelScale, impactSoundNames, impactStartSeconds, presentImpactSounds, presentStarKoTwinkle, presentStartSounds, type ImpactSoundSink } from "../presentation/hitPresentation";
 import { VOICE_CAP, VoiceClass, admitVoice, createVoiceBudget, liveVoices, resetVoiceBudget } from "../presentation/voiceBudget";
 import { SoundBank, SoundKind } from "./soundBank";
 import { tierSoundPaths } from "../presentation/moveTiers";
@@ -43,7 +43,7 @@ import { KO_BLUR_DISTANCE, type KoFlash, createKoFlash, endKoFlash, koFlashLevel
 import type { Fighter } from "../sim/fighter";
 import { heroLook } from "../roster/looks";
 import { bodyCostume, bodyVariants, costumeClipModel } from "../roster/costumes";
-import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectPitch, setEffectRoll, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createEffect, destroyEffect, Effect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPitch, setEffectRoll, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { CameraField, FilterBlendMode, FilterTexMapFlags, setCameraField, setFilterBlendMode, setFilterDuration, setFilterEndColor, setFilterEndUV, setFilterStartColor, setFilterStartUV, setFilterTexMapFlags, setFilterTexture, showFilter } from "wisp/game/view";
 import { player } from "wisp/game/players";
 import { preloadAsset } from "wisp/game/files";
@@ -53,7 +53,6 @@ const KO_VARIANTS = bodyVariants(RENDERED_FIGHTERS);
 const KO_FIGHTERS = KO_VARIANTS.length;
 const KO_BODY_COUNT = IMPACTS_PER_KIND * 2 * KO_FIGHTERS;
 const STAR_KO_FIRST = IMPACT_STAR_KO * IMPACTS_PER_KIND;
-
 
 const SAME_HIT_FRAMES = 2;
 
@@ -428,12 +427,13 @@ export class CombatEffects {
     parked[i] = false;
     this.busyKinds[kind] = true;
     this.tint(model, i, kind, strength);
-
     const depth = kind === IMPACT_STAR_KO ? STAR_KO_DEPTH
       : isContactImpact(kind) || kind === IMPACT_GRAB || kind === IMPACT_THROW ? -120.0 : 0.0;
     setEffectAlpha(model, pose.alpha);
     setEffectScale(model, pose.scale * impactModelScale(kind));
     setEffectPitch(model, pose.pitch);
+    const matrix = impactMatrixScale(kind);
+    if (matrix !== undefined) setEffectMatrixScale(model, at(matrix, 0), at(matrix, 1), at(matrix, 2));
     placeEffect(model, this.x + pose.x, this.y + depth, this.z + pose.z);
   }
 

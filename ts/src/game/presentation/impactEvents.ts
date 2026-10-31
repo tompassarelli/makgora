@@ -18,6 +18,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { ProjectileKind, SpecialAction } from "../sim/codes";
 import { heroDefinition } from "../roster/kits";
 import { type AuthoredSpecial, type SpecialProjectile, specialKit } from "../sim/specials/schema";
+import { type PlatformCatchEvent, capturePlatformCatchBefore, createPlatformCatch, detectPlatformCatch } from "./platformDust";
 
 
 export const ImpactLanding = { none: 0, tech: 1, missedTech: 2 } as const;
@@ -113,6 +114,7 @@ export interface ImpactEvents {
   shieldReflect: boolean;
   shieldBreak: boolean;
   ordinaryLanding: boolean;
+  readonly platform: PlatformCatchEvent;
   movementDust: boolean;
   runningDust: boolean;
   launchTrail: boolean;
@@ -155,7 +157,7 @@ export function createImpactEvents(): ImpactEvents {
     ledgeCatch: false, ledgeRecovery: false, ledgeX: 0.0, ledgeZ: 0.0, hit: false, electric: false,
     element: HitElement.normal, strength: 0, tier: 0, swing: -1, variant: 0, perform: -1, performSerial: 0, impact: -1, fuse: -1, fuseSerial: 0, fuseX: 0.0, fuseZ: 0.0, previousFuseSerial: 0, hitCharacter: 1, hitMove: -1, strong: false,
     shieldCharacter: 1, shieldMove: -1, shieldVariant: 0, pummel: false, shieldElectric: false, footstep: "none",
-    shieldHit: false, shieldReflect: false, shieldBreak: false, ordinaryLanding: false,
+    shieldHit: false, shieldReflect: false, shieldBreak: false, ordinaryLanding: false, platform: createPlatformCatch(),
     movementDust: false, runningDust: false, launchTrail: false, dodgeTrail: false, airDodge: false,
     respawn: false, jump: JumpCue.none, jumpOriginX: 0.0, jumpOriginZ: 0.0, character: 1, facing: 1,
     koDirectionX: 0, koDirectionZ: 0, landing: ImpactLanding.none, dodge: DodgeCue.none, direction: 0, x: 0.0, z: 0.0, hitZ: 0.0,
@@ -182,6 +184,7 @@ export function captureImpactEventsBefore(events: ImpactEvents, fighter: Readonl
   events.previousX = fighter.motion.x;
   events.previousZ = fighter.motion.z;
   events.previousVelocityX = fighter.motion.vx;
+  capturePlatformCatchBefore(events.platform, fighter);
   events.previousDownFrame = fighter.down.frame;
   events.previousGrabVisualSerial = fighter.visuals.grab;
   events.previousThrowVisualSerial = fighter.visuals.throw;
@@ -339,7 +342,7 @@ function contactBandHeight(character: number, band: number): number {
   return f32(f32(max(body.z1, body.z2) + body.radius) * (CONTACT_BANDS[band] ?? 0.5));
 }
 
-export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<Fighter>, world?: Readonly<Roster>): void {
+export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<Fighter>, world?: Readonly<Roster>, stage?: number, stageFrame = 0): void {
   const { motion, status, ground, surfaceRecovery, visuals, jump, launch, shield, down, attack, ledge, dodge } = fighter;
   events.character = fighter.character;
   events.facing = fighter.facing;
@@ -443,6 +446,7 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
   }
   events.shieldBreak = present && events.previousShieldBreak === ShieldBreak.none && shield.breakState !== ShieldBreak.none;
   events.ordinaryLanding = present && !events.previouslyGrounded && motion.grounded && down.state === DownState.none;
+  detectPlatformCatch(events.platform, fighter, events.ordinaryLanding, stage, stageFrame);
   if (present && jump.serial !== events.previousJumpSerial && !events.ledgeRecovery) {
     events.jump = surfaceRecovery.state === SurfaceContact.techWall ? JumpCue.wall
       : jump.isDouble ? JumpCue.double : events.previouslyGrounded ? JumpCue.ground : JumpCue.air;

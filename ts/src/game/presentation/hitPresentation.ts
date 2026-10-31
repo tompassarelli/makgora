@@ -1,3 +1,4 @@
+import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
 import { SurfaceContact } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
@@ -13,7 +14,7 @@ import { JOB_DONE_VOICE } from "./matchAudio";
 import { ELEMENTS } from "./elementLooks";
 import { tierSoundPaths } from "./moveTiers";
 import { STRONG_SPARK_SCALE } from "./moveTiers";
-import { IMPACT_ARCANE_HIT, IMPACT_FIRE_HIT, IMPACT_SLASH_HIT, IMPACT_ICE_HIT, IMPACT_ELECTRIC_SHIELD, IMPACT_PUMMEL } from "./impactState";
+import { IMPACT_ARCANE_HIT, IMPACT_FIRE_HIT, IMPACT_SLASH_HIT, IMPACT_ICE_HIT, IMPACT_ELECTRIC_SHIELD, IMPACT_PUMMEL, IMPACT_PLATFORM_BURST, IMPACT_PLATFORM_LIP } from "./impactState";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_JUMP_MODEL, IMPACT_SHIELD_MODEL, IMPACT_HIT_MODEL, IMPACT_KO_MODEL } from "../assets/impactAssetInfo";
 
 
@@ -36,7 +37,7 @@ export function impactModel(kind: number): string {
     case 7: return IMPACT_JUMP_MODEL;
     case 11: return IMPACT_JUMP_MODEL;
 
-    case 15: return IMPACT_DUST_MODEL;
+    case 15: case IMPACT_PLATFORM_BURST: case IMPACT_PLATFORM_LIP: return IMPACT_DUST_MODEL;
     case 8: return IMPACT_KO_MODEL;
     case 9: return "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx";
     case IMPACT_FIRE_HIT: return IMPACT_HIT_MODEL;
@@ -64,7 +65,8 @@ export function impactColour(kind: number, strength: number): readonly number[] 
 export function impactAnimation(kind: number): string {
   return kind === 0 || kind === 1 || kind === 2 || kind === 3 || kind === 4 || kind === 6 || kind === 7 || kind === 8 || kind === 9 || kind === 10
     || kind === 11 || kind === 12 || kind === 14 || kind === 15 || kind === IMPACT_FIRE_HIT || kind === IMPACT_PUMMEL
-    || kind === IMPACT_SLASH_HIT || kind === IMPACT_ARCANE_HIT || kind === 5 || kind === IMPACT_ELECTRIC_SHIELD ? "Stand" : "Birth";
+    || kind === IMPACT_SLASH_HIT || kind === IMPACT_ARCANE_HIT || kind === 5 || kind === IMPACT_ELECTRIC_SHIELD
+    || kind === IMPACT_PLATFORM_BURST || kind === IMPACT_PLATFORM_LIP ? "Stand" : "Birth";
 }
 
 
@@ -79,6 +81,14 @@ export function impactStartSeconds(kind: number): number {
 
 
 
+
+const PLATFORM_BURST_MATRIX: readonly number[] = [f32(1.6), 1.0, 0.5];
+const PLATFORM_LIP_MATRIX: readonly number[] = [f32(1.65), 1.0, f32(0.12)];
+
+// Applied after pitch each frame: setting yaw, pitch or roll resets an effect's matrix scale.
+export function impactMatrixScale(kind: number): readonly number[] | undefined {
+  return kind === IMPACT_PLATFORM_BURST ? PLATFORM_BURST_MATRIX : kind === IMPACT_PLATFORM_LIP ? PLATFORM_LIP_MATRIX : undefined;
+}
 
 export function impactModelScale(kind: number): number {
   if (kind === 5) return 1.0;
