@@ -7,8 +7,11 @@ import { AttackStyle, Character } from "../src/game/sim/codes";
 import { hurtCapsule } from "../src/game/sim/geometry/contactGeometry";
 import { fighterAt } from "../src/game/sim/roster";
 import { authoredTuning } from "../src/game/sim/tuning";
-import { type ShowcaseRow, showcaseRows } from "../src/game/session/showcaseTimeline";
+import { type ShowcaseRow, showcaseMoves, showcaseRows } from "../src/game/session/showcaseTimeline";
 import { showcaseFixtures } from "../src/platform/captureFixtures";
+import { DISJOINT_CUES, disjointNormals } from "../src/game/presentation/disjointCues";
+import { createFighter } from "../src/game/sim/fighter";
+import { VASHJ_TRAIL_MODEL } from "../src/game/sim/ultimates";
 
 const vashj = Character.ladyVashj;
 const upSmash = (row: ShowcaseRow): boolean => row.move.kind === "normal" && row.move.code === AttackStyle.upSmash;
@@ -69,3 +72,24 @@ test("the dummy staged for Lady Vashj's up smash and gaze faces her, stays clear
     }
   }
 }, 120_000);
+
+test("the dummy staged for each of Lady Vashj's seven read moves stands in its reach, clear of her body [k2 property]", () => {
+  const body = hurtCapsule(vashj), top = Math.max(body.z1, body.z2) + body.radius;
+  const read = [AttackStyle.jab, AttackStyle.upTilt, AttackStyle.downSmash, AttackStyle.neutralAir, AttackStyle.backAir, AttackStyle.forwardSmash];
+  const staged = showcaseMoves(vashj).filter(move => (move.kind === "normal" && read.includes(move.code)) || move.kind === "ultimate");
+  expect(staged.length).toBe(read.length + 1);
+  for (const move of staged) {
+    const high = move.lift !== undefined && move.lift + 60 - top > body.radius;
+    expect(`${move.slot} ${high || Math.abs(move.gap ?? 0) >= body.radius * 2}`).toBe(`${move.slot} true`);
+  }
+});
+
+test("Lady Vashj's weapon trail is drawn on exactly jab, up tilt, down smash, neutral air, back air and forward smash, and the gaze draws it across its cone [k2 property]", () => {
+  const drawn = disjointNormals(createFighter(vashj, 0.0, 1));
+  expect([...drawn].sort((a, b) => a - b)).toEqual([AttackStyle.jab, AttackStyle.upTilt, AttackStyle.downSmash, AttackStyle.neutralAir, AttackStyle.backAir, AttackStyle.forwardSmash].sort((a, b) => a - b));
+  expect(DISJOINT_CUES[vashj]?.model).toBe(VASHJ_TRAIL_MODEL);
+  const gaze = authoredTuning(vashj).ultimate;
+  const streaks = (gaze?.projectiles ?? []).filter(shot => shot.model === VASHJ_TRAIL_MODEL);
+  expect(streaks.length).toBeGreaterThan(1);
+  for (const shot of streaks) expect(shot.spawnFrame).toBeGreaterThanOrEqual(gaze?.gaze?.window.first ?? 0);
+});

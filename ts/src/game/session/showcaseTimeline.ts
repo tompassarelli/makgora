@@ -239,9 +239,23 @@ function aerialContact(move: Readonly<AuthoredMove> | undefined, style: AttackSt
 function aerialPlacement(move: Readonly<AuthoredMove> | undefined, style: AttackStyle, character: Character): { readonly gap: number | undefined; readonly lift: number | undefined } {
   const region = aerialContact(move, style);
   if (region === undefined) return { gap: undefined, lift: undefined };
+  const body = hurtCapsule(character).radius;
   const gap = Math.floor(centreX(region)), lift = Math.floor(centreZ(region) - SHOWCASE_DUMMY_MIDDLE);
   const beside = lift > -SHOWCASE_DUMMY_MIDDLE / 2 && lift < hurtCapsule(character).z2 / 2;
+  if (beside && Math.abs(gap) < body * 2 && move !== undefined) {
+    const reach = outerReach(move.regions, body * 2);
+    if (reach !== undefined) return { gap: reach.gap, lift: Math.floor(centreZ(reach.region) - SHOWCASE_DUMMY_MIDDLE) };
+  }
   return { gap: beside ? clearOfBody(character, gap, move?.regions) : gap, lift };
+}
+
+function outerReach(regions: readonly MoveRegion[], clear: number): { readonly gap: number; readonly region: MoveRegion } | undefined {
+  const reach = furthest(regions);
+  if (reach === undefined) return undefined;
+  const ahead = regions.reduce((best, region) => region.hit.maxX > best.hit.maxX ? region : best);
+  const front = ahead.hit.maxX * 0.75 >= clear ? { gap: Math.floor(ahead.hit.maxX * 0.75), region: ahead } : undefined;
+  const gap = reach.front ? Math.floor(reach.region.hit.maxX * 0.75) : Math.floor(reach.region.hit.minX * 0.75);
+  return front ?? (Math.abs(gap) >= clear ? { gap, region: reach.region } : undefined);
 }
 
 function clearOfBody(character: Character, gap: number | undefined, source: Readonly<AuthoredSpecial> | readonly MoveRegion[] | undefined): number | undefined {
