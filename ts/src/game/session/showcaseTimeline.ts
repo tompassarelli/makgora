@@ -243,19 +243,18 @@ function aerialPlacement(move: Readonly<AuthoredMove> | undefined, style: Attack
   const gap = Math.floor(centreX(region)), lift = Math.floor(centreZ(region) - SHOWCASE_DUMMY_MIDDLE);
   const beside = lift > -SHOWCASE_DUMMY_MIDDLE / 2 && lift < hurtCapsule(character).z2 / 2;
   if (beside && Math.abs(gap) < body * 2 && move !== undefined) {
-    const reach = outerReach(move.regions, body * 2);
+    const reach = outerReach(move.regions, body * 2, region.hit.effect.launchX < 0.0);
     if (reach !== undefined) return { gap: reach.gap, lift: Math.floor(centreZ(reach.region) - SHOWCASE_DUMMY_MIDDLE) };
   }
   return { gap: beside ? clearOfBody(character, gap, move?.regions) : gap, lift };
 }
 
-function outerReach(regions: readonly MoveRegion[], clear: number): { readonly gap: number; readonly region: MoveRegion } | undefined {
-  const reach = furthest(regions);
-  if (reach === undefined) return undefined;
+function outerReach(regions: readonly MoveRegion[], clear: number, backward: boolean): { readonly gap: number; readonly region: MoveRegion } | undefined {
+  if (regions.length === 0) return undefined;
   const ahead = regions.reduce((best, region) => region.hit.maxX > best.hit.maxX ? region : best);
-  const front = ahead.hit.maxX * 0.75 >= clear ? { gap: Math.floor(ahead.hit.maxX * 0.75), region: ahead } : undefined;
-  const gap = reach.front ? Math.floor(reach.region.hit.maxX * 0.75) : Math.floor(reach.region.hit.minX * 0.75);
-  return front ?? (Math.abs(gap) >= clear ? { gap, region: reach.region } : undefined);
+  const behind = regions.reduce((best, region) => region.hit.minX < best.hit.minX ? region : best);
+  const front = { gap: Math.floor(ahead.hit.maxX * 0.75), region: ahead }, back = { gap: Math.floor(behind.hit.minX * 0.75), region: behind };
+  return (backward ? [back, front] : [front, back]).find(side => Math.abs(side.gap) >= clear);
 }
 
 function clearOfBody(character: Character, gap: number | undefined, source: Readonly<AuthoredSpecial> | readonly MoveRegion[] | undefined): number | undefined {

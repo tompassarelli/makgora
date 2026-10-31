@@ -318,7 +318,7 @@ function stageScriptedMove(s: ShellState, slot: number, args: readonly string[])
   if (gap !== "-") {
     mover.motion.x = 0.0;
     target.motion.x = (facing === "left" ? -1 : 1) * S2R(gap);
-    target.facing = facing === "left" ? 1 : -1;
+    target.facing = (facing === "left" ? 1 : -1) * (S2R(gap) < 0.0 ? -1 : 1);
   }
   startScriptedMove(s, slot, kind, code, facing);
   if (lift !== undefined && mover.motion.grounded) hangTarget(target, S2R(lift), mover.attack.style === undefined ? 0 : attackStartupFrames(mover.attack.style, mover.tuning.moves));

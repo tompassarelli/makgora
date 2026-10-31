@@ -32,15 +32,16 @@ test("Lady Vashj's up smash hangs the dummy at its spear tip above her head and 
   }
 });
 
-test("the dummy staged for Lady Vashj's up smash and gaze faces her, stays clear of her body and is struck or petrified in both facings in the headless sim [k2 property]", async () => {
+test("the dummy staged for Lady Vashj's up smash, gaze and back air faces her, stays clear of her body and is struck or petrified in both facings in the headless sim [k2 property]", async () => {
   const platform = join(import.meta.dir, "../src/platform");
   const { shell } = await import(join(platform, "../host/loop/state.ts"));
   const { nativeDriverCommand } = await import(join(platform, "nativeDriver.ts"));
   const entry = await import(join(platform, "../host/entries/nativeDriverMain.ts"));
   const fixtures = showcaseFixtures(vashj);
   const body = hurtCapsule(vashj), top = Math.max(body.z1, body.z2) + body.radius;
-  const staged = showcaseRows(vashj).filter(row => upSmash(row) || gaze(row));
-  expect(staged.length).toBe(4);
+  const backAir = (row: ShowcaseRow): boolean => row.move.kind === "normal" && row.move.code === AttackStyle.backAir;
+  const staged = showcaseRows(vashj).filter(row => upSmash(row) || gaze(row) || backAir(row));
+  expect(staged.length).toBe(6);
   for (const row of staged) {
     const fixture = fixtures.find(({ name }) => name === `${fighterSlug(vashj)}-${row.row}`);
     expect(fixture).toBeDefined();
@@ -92,4 +93,13 @@ test("Lady Vashj's weapon trail is drawn on exactly jab, up tilt, down smash, ne
   const streaks = (gaze?.projectiles ?? []).filter(shot => shot.model === VASHJ_TRAIL_MODEL);
   expect(streaks.length).toBeGreaterThan(1);
   for (const shot of streaks) expect(shot.spawnFrame).toBeGreaterThanOrEqual(gaze?.gaze?.window.first ?? 0);
+});
+
+test("Lady Vashj's back air stages the dummy behind her, on the side its hit launches toward, clear of her body and the dummy's [k2 property]", () => {
+  const body = hurtCapsule(vashj);
+  const regions = authoredTuning(vashj).moves?.normals[AttackStyle.backAir]?.regions ?? [];
+  expect(regions.every(region => region.hit.effect.launchX < 0.0)).toBe(true);
+  const rows = showcaseRows(vashj).filter(row => row.move.kind === "normal" && row.move.code === AttackStyle.backAir);
+  expect(rows.length).toBe(2);
+  for (const { move, facing } of rows) expect(`${facing} behind ${(move.gap ?? 0) <= -body.radius * 3}`).toBe(`${facing} behind true`);
 });
