@@ -117,6 +117,7 @@ export interface FighterMoves {
   readonly stacks?: { readonly cap: number; readonly weightPerStack: number } | undefined;
   readonly dashAttack: AttackStyle;
   readonly grabRegion?: Readonly<HitRegion> | undefined;
+  readonly grapple?: Readonly<GrappleSpec> | undefined;
 
 
   readonly hurtboxes?: FighterHurtboxes | undefined;
@@ -230,4 +231,18 @@ export function heroHurtPose(first: number, last: number, parts: readonly HurtPa
 
 export function travelStopFlags(move: Readonly<AuthoredMove>): number {
   return (move.travelStopsAtBody === true ? 1 : 0) + (move.travelStopsAtLedge === true ? 2 : 0);
+}
+
+/** A claw on a chain: fired by the airborne grab input, it latches a platform or the stage and swings its owner from it. */
+export interface GrappleSpec {
+  readonly handHeight: number;
+  readonly reach: number;
+  readonly latchRadius: number;
+  readonly hangFrames: number;
+  readonly reelSpeed: number;
+  readonly minLength: number;
+  readonly maxLength: number;
+  readonly aimUpX: number;
+  readonly aimUpZ: number;
+  readonly pullUpMargin: number;
 }

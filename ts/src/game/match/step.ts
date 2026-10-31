@@ -1,4 +1,5 @@
 import { clearAttackBuffer, copyAttackBuffer, hasPendingAttack, holdAttack, takeAttack } from "../input/attackBuffer";
+import { aimGrapple } from "../sim/grapple";
 import { attackStyleForGrounding } from "../input/combat";
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/participants";
@@ -256,7 +257,8 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     const command = takeAttack(commands, frame, canStartAttackStyle(f, requestedStyle(commands.pending?.style)));
     const dashGrabInput = f.motion.grounded && f.ground.dashFrame > 0 && f.tuning.dashGrab.startupFrames > 0 && command?.style === AttackStyle.grab;
     const catchDash = f.ground.dashGrabWindow > 0 && command?.style === AttackStyle.grab && f.tuning.dashGrab.startupFrames > 0;
-    const style = dashGrabInput || catchDash ? DASH_GRAB_REQUEST : attackStyleForGrounding(requestedStyle(command?.style), f.motion.grounded, f.facing, command?.facing ?? 0);
+    const grapples = !f.motion.grounded && command?.style === AttackStyle.grab && f.tuning.moves?.grapple !== undefined;
+    const style = grapples ? AttackStyle.grapple : dashGrabInput || catchDash ? DASH_GRAB_REQUEST : attackStyleForGrounding(requestedStyle(command?.style), f.motion.grounded, f.facing, command?.facing ?? 0);
     if (catchDash) f.ground.dashGrabWindow = 0;
     if (f.motion.grounded && style !== undefined && command !== undefined && command.facing !== 0) f.facing = command.facing;
     const serial = f.attack.serial;
@@ -264,6 +266,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     if (style !== undefined && canStartAttackStyle(f, style)) observedFrameLegalActions[slot] |= actionBits;
     beginFighterAttack(world, slot, style, command?.mayCharge === true && controls.inputs[slot].attackHeld, command?.cStick === true, command?.strongUp === true);
     if (f.attack.serial !== serial) observedFrameStartedActions[slot] |= actionBits;
+    if (f.attack.serial !== serial && f.attack.style === AttackStyle.grapple) aimGrapple(f, controls.inputs[slot]);
     if (hadDashGrabWindow[slot] && f.ground.dashGrabWindow > 0 && !f.attack.dashGrab) f.ground.dashGrabWindow = Math.max(0, f.ground.dashGrabWindow - 1);
   }
   for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot)) prepareBansheeContacts(fighterAt(world, slot));

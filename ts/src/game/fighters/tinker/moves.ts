@@ -29,6 +29,7 @@ const none = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, 
 
 export const TINKER_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
+  grapple: { handHeight: 55.0, reach: 150.0, latchRadius: 14.0, hangFrames: 120, reelSpeed: 3.0, minLength: 30.0, maxLength: 190.0, aimUpX: f32(0.7071067690849304), aimUpZ: f32(0.7071067690849304), pullUpMargin: 40.0 },
   hurtboxes: { stand: [BODY], attacks: {
     [AttackStyle.jab]: limb(4, 5, 38.0, 48.0), [AttackStyle.jab2]: limb(4, 5, 40.0, 56.0),
     [AttackStyle.jab3]: limb(6, 8, 43.0, 48.0), [AttackStyle.grab]: limb(8, 9, 55.0, 46.0),
@@ -59,6 +60,7 @@ export const TINKER_MOVES: FighterMoves = {
     [AttackStyle.upAir]: heroMove(8, 4, 23, 14, [region(8, 11, claw(-20.0, 88.0, 24.0, 143.0, 13.0), tinkerHit(6.854493141174316, "launch", 85))]),
     [AttackStyle.downAir]: heroMove(16, 4, 31, 22, [region(16, 19, claw(6.0, 22.0, 14.0, 0.0, 16.0), tinkerHit(10.281740188598633, "spike", 270, 1.0, HitElement.fire), tinkerHit(10.281740188598633, "spike", 55, 1.0, HitElement.fire))]),
     [AttackStyle.grab]: heroMove(8, 2, 25, 0, [region(8, 9, claw(20.0, 45.0, 64.0, 46.0, 12.0), none)]),
+    [AttackStyle.grapple]: heroMove(11, 4, 26, 18, [region(11, 14, claw(20.0, 55.0, 150.0, 55.0, 10.0), tinkerHit(4.0, "poke", 40))]),
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { ...none, damage: 3.0 } },

@@ -332,6 +332,14 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if (expected.ledge.intangible !== actual.ledge.intangible) return "ledgeIntangible";
   if (expected.ledge.regrab !== actual.ledge.regrab) return "ledgeRegrab";
   if (expected.ledge.grabs !== actual.ledge.grabs) return "ledgeGrabs";
+  if (expected.grapple.state !== actual.grapple.state) return "grappleState";
+  if (expected.grapple.frame !== actual.grapple.frame) return "grappleFrame";
+  if (expected.grapple.surface !== actual.grapple.surface) return "grappleSurface";
+  if (expected.grapple.anchorX !== actual.grapple.anchorX) return "grappleAnchorX";
+  if (expected.grapple.anchorZ !== actual.grapple.anchorZ) return "grappleAnchorZ";
+  if (expected.grapple.length !== actual.grapple.length) return "grappleLength";
+  if (expected.grapple.spent !== actual.grapple.spent) return "grappleSpent";
+  if (expected.grapple.aim !== actual.grapple.aim) return "grappleAim";
   if (expected.platform.downHeld !== actual.platform.downHeld) return "platformDownHeld";
   if (expected.platform.downAge !== actual.platform.downAge) return "platformDownAge";
   if (expected.platform.dropConsumed !== actual.platform.dropConsumed) return "platformDropConsumed";

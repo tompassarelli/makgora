@@ -15,6 +15,7 @@ import {
   SpecialCarry,
   GrabAction,
   GroundAction,
+  GrappleState,
   LedgeState,
   ParasolState,
   ParryBuffer,
@@ -414,6 +415,17 @@ interface PlatformInput {
   dropConsumed: boolean;
 }
 
+interface Grapple {
+  state: GrappleState;
+  frame: number;
+  surface: number;
+  anchorX: number;
+  anchorZ: number;
+  length: number;
+  spent: boolean;
+  aim: number;
+}
+
 interface Ledge {
   state: LedgeState;
   side: number;
@@ -559,6 +571,7 @@ export interface Fighter {
   readonly surfaceRecovery: SurfaceRecovery;
   readonly grab: Grab;
   readonly ledge: Ledge;
+  readonly grapple: Grapple;
   readonly platform: PlatformInput;
   readonly stick: StickHistory;
   readonly cannon: Readonly<StageCannon>;
@@ -827,6 +840,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     },
     grab: { pummels: 0, grabbedFrames: 0, heldFrames: 0, queuedThrow: GrabAction.none, action: GrabAction.none, frame: 0, serial: 0, mashX: 0, mashZ: 0, owner: undefined, target: undefined, reel: 0 },
     ledge: { state: LedgeState.none, side: 0, frame: 0, serial: 0, intangible: 0, regrab: 0, grabs: 0 },
+    grapple: { state: GrappleState.none, frame: 0, surface: 0, anchorX: 0.0, anchorZ: 0.0, length: 0.0, spent: false, aim: 0 },
     platform: { downHeld: false, downAge: 3, dropConsumed: false },
     stick: { recent: 0, older: 0 },
     cannon: { held: undefined, firing: undefined, cooldown: 0, passing: false },

@@ -4,7 +4,7 @@ import type { Fighter, PlacedObject, Projectile } from "../../game/sim/fighter";
 import type { Bear, FreezeTrap, StageCannon, Water } from "../../game/sim/fighterRest";
 import { max } from "../../game/core/numbers";
 import { PARTICIPANT_CAPACITY } from "../../game/input/participants";
-import { DownState, DuoOrder, GroundAction, HERO_STATUS_GROUPS, HeroStatusKind, ItemKind, LedgeState, ParryBuffer, SPECIAL_ACTION_CAPACITY, ShieldBreak, SpecialAction, SurfaceContact } from "../../game/sim/codes";
+import { DownState, DuoOrder, GrappleState, GroundAction, HERO_STATUS_GROUPS, HeroStatusKind, ItemKind, LedgeState, ParryBuffer, SPECIAL_ACTION_CAPACITY, ShieldBreak, SpecialAction, SurfaceContact } from "../../game/sim/codes";
 import { REST_BEAR, REST_CANNON, REST_FREEZE_TRAP, REST_PLACED, REST_WATER } from "../../game/sim/fighterRest";
 import { TECH_PRESS_AGE_LIMIT } from "../../game/sim/geometry/techInput";
 import { groundedJumps } from "../../game/sim/itemBuffs";
@@ -393,6 +393,16 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
   ledge.intangible = sourceLedge.intangible;
   ledge.regrab = sourceLedge.regrab;
   ledge.grabs = sourceLedge.grabs;
+  const grapple = target.grapple;
+  const sourceGrapple = source.grapple;
+  grapple.state = sourceGrapple.state;
+  grapple.frame = sourceGrapple.frame;
+  grapple.surface = sourceGrapple.surface;
+  grapple.anchorX = sourceGrapple.anchorX;
+  grapple.anchorZ = sourceGrapple.anchorZ;
+  grapple.length = sourceGrapple.length;
+  grapple.spent = sourceGrapple.spent;
+  grapple.aim = sourceGrapple.aim;
   const platform = target.platform;
   const sourcePlatform = source.platform;
   platform.downHeld = sourcePlatform.downHeld;
@@ -924,6 +934,16 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = ledge.intangible, b = sourceLedge.intangible; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = ledge.regrab, b = sourceLedge.regrab; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = ledge.grabs, b = sourceLedge.grabs; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const grapple = target.grapple;
+  const sourceGrapple = source.grapple;
+  { const a = grapple.state, b = sourceGrapple.state; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grapple.frame, b = sourceGrapple.frame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grapple.surface, b = sourceGrapple.surface; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grapple.anchorX, b = sourceGrapple.anchorX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grapple.anchorZ, b = sourceGrapple.anchorZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grapple.length, b = sourceGrapple.length; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  if (grapple.spent !== sourceGrapple.spent) return false;
+  { const a = grapple.aim, b = sourceGrapple.aim; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const platform = target.platform;
   const sourcePlatform = source.platform;
   if (platform.downHeld !== sourcePlatform.downHeld) return false;
@@ -1102,6 +1122,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   const recovery = fighter.surfaceRecovery;
   const grab = fighter.grab;
   const ledge = fighter.ledge;
+  const grapple = fighter.grapple;
   const platform = fighter.platform;
   const stick = fighter.stick;
   const cannon = fighter.cannon;
@@ -1380,6 +1401,14 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.int(prefix, "ledgeIntangible", ledge.intangible);
   sink.int(prefix, "ledgeRegrab", ledge.regrab);
   sink.int(prefix, "ledgeGrabs", ledge.grabs);
+  sink.int(prefix, "grappleState", grapple.state);
+  sink.int(prefix, "grappleFrame", grapple.frame);
+  sink.int(prefix, "grappleSurface", grapple.surface);
+  sink.real(prefix, "grappleAnchorX", grapple.anchorX);
+  sink.real(prefix, "grappleAnchorZ", grapple.anchorZ);
+  sink.real(prefix, "grappleLength", grapple.length);
+  sink.bool(prefix, "grappleSpent", grapple.spent);
+  sink.int(prefix, "grappleAim", grapple.aim);
   sink.bool(prefix, "platformDownHeld", platform.downHeld);
   sink.int(prefix, "platformDownAge", platform.downAge);
   sink.bool(prefix, "platformDropConsumed", platform.dropConsumed);
@@ -1613,6 +1642,7 @@ export function blastFighterFields(f: Fighter): void {
   const tech = f.tech;
   const recovery = f.surfaceRecovery;
   const ledge = f.ledge;
+  const grapple = f.grapple;
   const status = f.status;
   const duo = f.duo;
   const victim = f.victim;
@@ -1670,6 +1700,14 @@ export function blastFighterFields(f: Fighter): void {
   ledge.intangible = 0;
   ledge.regrab = 0;
   ledge.grabs = 0;
+  grapple.state = GrappleState.none;
+  grapple.frame = 0;
+  grapple.surface = 0;
+  grapple.anchorX = 0.0;
+  grapple.anchorZ = 0.0;
+  grapple.length = 0.0;
+  grapple.spent = false;
+  grapple.aim = 0;
   launch.groundKnockbackX = 0.0;
   launch.knockbackAge = undefined;
   launch.damageLevel = 0;
@@ -1734,6 +1772,7 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   const recovery = f.surfaceRecovery;
   const grab = f.grab;
   const ledge = f.ledge;
+  const grapple = f.grapple;
   const platform = f.platform;
   const status = f.status;
   const duo = f.duo;
@@ -1864,6 +1903,14 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
   ledge.intangible = 0;
   ledge.regrab = 0;
   ledge.grabs = 0;
+  grapple.state = GrappleState.none;
+  grapple.frame = 0;
+  grapple.surface = 0;
+  grapple.anchorX = 0.0;
+  grapple.anchorZ = 0.0;
+  grapple.length = 0.0;
+  grapple.spent = false;
+  grapple.aim = 0;
   platform.downHeld = false;
   platform.downAge = 3;
   platform.dropConsumed = false;

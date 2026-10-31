@@ -53,7 +53,7 @@ const UNCANCELLED_AERIAL_LANDING_LAG = {
 } as const;
 
 export function isAerialAttack(style: AttackStyle | undefined): boolean {
-  return style !== undefined && style >= AttackStyle.neutralAir && style <= AttackStyle.downAir;
+  return style !== undefined && ((style >= AttackStyle.neutralAir && style <= AttackStyle.downAir) || style === AttackStyle.grapple);
 }
 
 
@@ -168,6 +168,7 @@ export function attackDamage(style: AttackStyle): number {
     case AttackStyle.forwardSmash:
       return 18.0;
     case AttackStyle.grab:
+    case AttackStyle.grapple:
       return 0.0;
     case AttackStyle.forwardTilt:
     case AttackStyle.forwardTiltUp:
@@ -225,6 +226,7 @@ export function attackStartupFrames(style: AttackStyle, moves?: FighterMoves): n
       return 3;
     case AttackStyle.forwardAir:
     case AttackStyle.upAir:
+    case AttackStyle.grapple:
     case AttackStyle.grab:
     case AttackStyle.forwardTilt:
     case AttackStyle.downTilt:

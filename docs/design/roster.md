@@ -1108,7 +1108,9 @@ away from the edge.
 
 ### Grab and throws
 
-Standing grab 10/2/29, reach 0.80H, telescoping clamp. No tether to ledges. Pummel: small piston tap.
+Standing grab 10/2/29, reach 0.80H, telescoping clamp. Pummel: small piston tap.
+
+**Grapple claw (air grab, 31 October 2026, Tom asked for an air grab that latches to platforms and swings):** pressing grab in the air fires a claw on a chain instead of a grab. It reaches 1.5H forward, or 45 degrees up with the stick held up, startup 10, active 4, recovery 26, landing lag 18, and a claw that touches a fighter is a 4% POKE hit (a tether poke, no catch). A claw tip that touches a platform underside or edge, or the main deck edge or underside, latches on its first active frame: the chain length is fixed at the latch distance and Tinker swings from it as a pendulum with the velocity he carried, gravity driving the swing and the stick steering as in the air. Up on the stick reels in 3 units a frame (down pays out, to 190); reeling to 30 pulls him onto the platform, or onto the deck by the nearer edge. The anchor is stored as a platform and a local offset, so it rides a drifting platform. While hanging he can use aerials and specials; jump lets go without spending a jump, keeping the swing velocity; a hit cuts the chain; the claw slips after 120 hanging frames or on an air dodge. One latch per airtime: landing, grabbing a ledge or being hit restores it. Ground grab and throws are unchanged. Open-air claws, and claws after the latch is spent, cannot latch and are plain end-lag whiffs.
 
 | Throw | Animation and release | Damage | Release and recovery | Launch |
 | --- | --- | --- | --- | --- |

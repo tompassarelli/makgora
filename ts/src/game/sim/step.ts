@@ -5,6 +5,7 @@
 import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { DownState } from "./codes";
+import { advanceGrapple, grappleInput } from "./grapple";
 import { inGrabContext, isFloorTeching, isGroundDodging } from "./conditions";
 import { DOWN_ROLL_FRAMES, DOWN_STAND_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES, finishLanding } from "./down";
 import { type Fighter, WALL_TECH_JUMP_INPUT_WINDOW_FRAMES } from "./fighter";
@@ -284,8 +285,9 @@ export function resolveSurfaceMotion(f: Fighter, world: Roster, slot: number, st
   motion.deltaZ = f32(motion.z - oldZ);
 }
 
-export function advanceFighterMotion(world: Roster, slot: number, stage: number, matchFrame: number, input: Readonly<Controls>, respawnX: number): void {
+export function advanceFighterMotion(world: Roster, slot: number, stage: number, matchFrame: number, pressed: Readonly<Controls>, respawnX: number): void {
   const f = fighterAt(world, slot);
+  const input = grappleInput(f, pressed);
   const { motion, shield, jump, dodge, status } = f;
   motion.deltaX = 0.0;
   motion.deltaZ = 0.0;
@@ -342,4 +344,5 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   moveAlongSurface(f, stage, matchFrame, horizontalStick, dashEntry, canSteer, wantsShield, groundTakeoff);
   applyVerticalMotion(f, input, stage, matchFrame, drill, egg, wet, waterJumped, dodgeActive, authoredHeight, groundTakeoff);
   resolveSurfaceMotion(f, world, slot, stage, matchFrame, input, oldX, oldZ, carried, horizontalStick);
+  advanceGrapple(f, stage, matchFrame, input);
 }

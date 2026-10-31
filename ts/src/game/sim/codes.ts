@@ -141,10 +141,14 @@ export const AttackStyle = {
 
   jab2: 20,
   jab3: 21,
+  grapple: 22,
 } as const;
 export type AttackStyle = (typeof AttackStyle)[keyof typeof AttackStyle];
 
-export const LAST_ATTACK_STYLE = AttackStyle.jab3;
+export const LAST_ATTACK_STYLE = AttackStyle.grapple;
+
+export const GrappleState = { none: 0, latched: 1 } as const;
+export type GrappleState = (typeof GrappleState)[keyof typeof GrappleState];
 
 export const DASH_GRAB_REQUEST = 11;
 
