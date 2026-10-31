@@ -4,7 +4,7 @@ import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { surfaceCount } from "../sim/stage";
 import { hasCannon, hasTide, hasWind } from "../sim/stageHazards";
 import { hasLava } from "../sim/lava";
-import { STAGE_LAVA_MODEL } from "../../generated/stages/terrainAssetInfo";
+import { STAGE_GROUND_MODEL, STAGE_LAVA_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, WIND_STREAK_MODEL } from "./stageHazards";
 import { placedPieces, stageScenery } from "./stageScenery";
 import { platformParts } from "./stockPlatforms";
@@ -47,7 +47,7 @@ export function stageModels(stage: number): string[] {
     for (const part of platformParts(stage, index).slice(1)) models.push(part.model);
   }
   if (hasCannon(stage)) models.push(CANNON_MODEL);
-  if (hasLava(stage)) models.push(STAGE_LAVA_MODEL);
+  if (hasLava(stage)) models.push(STAGE_LAVA_MODEL, STAGE_GROUND_MODEL);
   if (hasTide(stage)) models.push(HYDRA_CREST_MODEL, HYDRA_RING_MODEL);
   if (hasWind(stage)) models.push(WIND_STREAK_MODEL);
   for (const piece of placedPieces(stage)) models.push(piece.model);

@@ -12,7 +12,7 @@ export function createLavaRims(s: ShellState): void {
     const drawn = drawnScale(rim);
     setEffectScale(effect, drawn.scale);
     if (drawn.matrixScale !== undefined) setEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
-    setEffectColor(effect, 64, 30, 20);
+    setEffectColor(effect, 84, 40, 28);
     playEffectAnimation(effect, ANIM_TYPE_STAND);
     s.stageLavaRims.push(effect);
   }

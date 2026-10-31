@@ -179,7 +179,7 @@ export function hiddenBelow(stage: number): number | undefined {
 const LAVA_RIM_MARGIN = 16.0;
 
 export function lavaRimPiece(side: -1 | 1): SceneryPiece {
-  return { model: STAGE_LAVA_MODEL, x: side * LAVA_CENTER_X, y: 0.0, z: 0.5, scale: 1.0, matrixScale: [(2 * (LAVA_HALF_WIDTH + LAVA_RIM_MARGIN)) / 100, 1.25, 1.0], yaw: 0.0 };
+  return { model: STAGE_GROUND_MODEL, x: side * LAVA_CENTER_X, y: 0.0, z: 0.5, scale: 1.0, matrixScale: [(2 * (LAVA_HALF_WIDTH + LAVA_RIM_MARGIN)) / 100, 1.25, 1.0], yaw: 0.0 };
 }
 
 export function lavaPiece(side: -1 | 1): SceneryPiece {
