@@ -23,6 +23,7 @@ import { fighterModelReplaced } from "../presentation/fighterForm";
 import type { FighterDraw } from "../presentation/fighterDraw";
 import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
 import { costumeClipModel } from "../roster/costumes";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectOrientation, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 const PETRIFIED_GREY = 150;
 const CHILL_TINT = { red: 120, green: 190, blue: 255 };
@@ -59,11 +60,11 @@ export class FighterPoolPresentation {
     this.scale = scale;
     const lightPath = originalLightPath(character);
     if (lightPath !== undefined) {
-      const light = AddSpecialEffect(lightPath, x, y);
-      BlzSetSpecialEffectPosition(light, x, y, z);
-      BlzSetSpecialEffectScale(light, this.scale);
-      BlzSetSpecialEffectAnimationBlendTime(light, 0.0);
-      BlzSetSpecialEffectTimeScale(light, 0.0);
+      const light = createEffect(lightPath, x, y);
+      setEffectPosition(light, x, y, z);
+      setEffectScale(light, this.scale);
+      setEffectBlendTime(light, 0.0);
+      setEffectTimeScale(light, 0.0);
       this.suppress(light);
       this.light = light;
     }
@@ -71,11 +72,11 @@ export class FighterPoolPresentation {
     for (let index = 0; index < count; index++) {
       const clip = originalClip(character, index);
       if (clip === undefined) break;
-      const model = AddSpecialEffect(costumeClipModel(character, costume, clip), x, y);
-      BlzSetSpecialEffectColorByPlayer(model, Player(participant));
-      BlzSetSpecialEffectAnimationBlendTime(model, 0.0);
-      BlzSetSpecialEffectAnimation(model, "Stand");
-      BlzSetSpecialEffectTimeScale(model, 0.0);
+      const model = createEffect(costumeClipModel(character, costume, clip), x, y);
+      setEffectTeamColor(model, Player(participant));
+      setEffectBlendTime(model, 0.0);
+      setEffectAnimation(model, "Stand");
+      setEffectTimeScale(model, 0.0);
       hideEffect(model, origin);
       this.clips.push(model);
     }
@@ -88,8 +89,8 @@ export class FighterPoolPresentation {
 
 
   private suppress(light: effect): void {
-    BlzSetSpecialEffectAnimation(light, ORIGINAL_LIGHT_INACTIVE_ANIMATION);
-    BlzSetSpecialEffectTime(light, ORIGINAL_LIGHT_GATE_SECONDS);
+    setEffectAnimation(light, ORIGINAL_LIGHT_INACTIVE_ANIMATION);
+    setEffectTime(light, ORIGINAL_LIGHT_GATE_SECONDS);
   }
 
   private endBlend(): void {
@@ -156,25 +157,25 @@ export class FighterPoolPresentation {
     placeEffect(model, x, y, z);
     if (changed || this.yaw !== yaw || this.pitch !== pitch) {
       // Native yaw can discard an earlier effect scale (#360's floes), so the scale follows every yaw.
-      BlzSetSpecialEffectOrientation(model, yaw, pitch, 0.0);
-      BlzSetSpecialEffectScale(model, this.scale);
+      setEffectOrientation(model, yaw, pitch, 0.0);
+      setEffectScale(model, this.scale);
       this.yaw = yaw;
       this.pitch = pitch;
     }
     if (changed || this.seconds !== seconds) {
-      BlzSetSpecialEffectTime(model, (clip.timeline ? clip.startSeconds : 0.0) + seconds);
+      setEffectTime(model, (clip.timeline ? clip.startSeconds : 0.0) + seconds);
       this.seconds = seconds;
     }
     if (this.light !== undefined) {
       placeEffect(this.light, x, y, z);
       if (this.lightYaw !== yaw) {
-        BlzSetSpecialEffectYaw(this.light, yaw);
-        BlzSetSpecialEffectScale(this.light, this.scale);
+        setEffectYaw(this.light, yaw);
+        setEffectScale(this.light, this.scale);
         this.lightYaw = yaw;
       }
       if (!this.lightVisible) {
-        BlzSetSpecialEffectAnimation(this.light, ORIGINAL_LIGHT_ACTIVE_ANIMATION);
-        BlzSetSpecialEffectTime(this.light, ORIGINAL_LIGHT_GATE_SECONDS);
+        setEffectAnimation(this.light, ORIGINAL_LIGHT_ACTIVE_ANIMATION);
+        setEffectTime(this.light, ORIGINAL_LIGHT_GATE_SECONDS);
         this.lightVisible = true;
       }
     }
@@ -228,13 +229,13 @@ export class FighterPoolPresentation {
     if (transformation.cues?.vanishes === true && isIntangible(fighter)) alpha = 0;
     if (fighterModelReplaced(fighter)) alpha = 0;
     if (changed || this.red !== red || this.green !== green || this.blue !== blue) {
-      BlzSetSpecialEffectColor(model, red, green, blue);
+      setEffectColor(model, red, green, blue);
       this.red = red;
       this.green = green;
       this.blue = blue;
     }
     if (changed || this.alpha !== alpha) {
-      BlzSetSpecialEffectAlpha(model, alpha);
+      setEffectAlpha(model, alpha);
       this.alpha = alpha;
     }
     const from = this.blendFrom === undefined ? undefined : this.clips[this.blendFrom];
@@ -244,23 +245,23 @@ export class FighterPoolPresentation {
       this.endBlend();
       return;
     }
-    BlzSetSpecialEffectPosition(from, x, y, z);
-    BlzSetSpecialEffectScale(from, this.scale);
-    BlzSetSpecialEffectColor(from, red, green, blue);
-    BlzSetSpecialEffectAlpha(from, fade);
+    setEffectPosition(from, x, y, z);
+    setEffectScale(from, this.scale);
+    setEffectColor(from, red, green, blue);
+    setEffectAlpha(from, fade);
   }
 
   destroy(): void {
 
     if (this.light !== undefined) {
       this.suppress(this.light);
-      DestroyEffect(this.light);
+      destroyEffect(this.light);
     }
 
     this.endBlend();
     const shown = this.visible === undefined ? undefined : this.clips[this.visible];
     if (shown !== undefined) hideEffect(shown, this.origin);
-    for (const model of this.clips) DestroyEffect(model);
+    for (const model of this.clips) destroyEffect(model);
     this.clips.length = 0;
     this.visible = undefined;
   }

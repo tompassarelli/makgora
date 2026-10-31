@@ -4,6 +4,7 @@ import { GOLD_SACK_MODEL, GOLD_SACK_FULL_SCALE, GOLD_SACK_ON_BACK, goldSackStore
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
+import { createEffect, destroyEffect, setEffectScale, setEffectYaw } from "wisp/game/effects";
 
 export class GoldSackPresentation {
   private readonly sack: effect;
@@ -11,7 +12,7 @@ export class GoldSackPresentation {
   private shown = false;
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
-    this.sack = AddSpecialEffect(GOLD_SACK_MODEL, origin.x, origin.y);
+    this.sack = createEffect(GOLD_SACK_MODEL, origin.x, origin.y);
     hideEffect(this.sack, origin);
   }
 
@@ -25,8 +26,8 @@ export class GoldSackPresentation {
     const scale = fighterModelScale(fighter);
     fitFighterPlacement(this.placement, fighter, stage);
     placeEffect(this.sack, this.origin.x + this.placement.x + GOLD_SACK_ON_BACK.x * scale * facing, this.origin.y, this.origin.z + this.placement.z + GOLD_SACK_ON_BACK.z * scale);
-    BlzSetSpecialEffectYaw(this.sack, facingYaw(facing));
-    BlzSetSpecialEffectScale(this.sack, GOLD_SACK_FULL_SCALE * scale);
+    setEffectYaw(this.sack, facingYaw(facing));
+    setEffectScale(this.sack, GOLD_SACK_FULL_SCALE * scale);
   }
 
   drawnEffects(into: effect[]): void {
@@ -40,6 +41,6 @@ export class GoldSackPresentation {
 
   destroy(): void {
     hideEffect(this.sack, this.origin);
-    DestroyEffect(this.sack);
+    destroyEffect(this.sack);
   }
 }

@@ -7,6 +7,7 @@ import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { squareRoot } from "../sim/warcraftMath";
 import type { MatchCamera } from "../sim/matchCamera";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectOrientation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 /** A white copy of the fighter's model held on the fighter's pose, moved `lift` units toward the camera (away when negative) and grown by `grow` round the body's middle. */
 export class PosedWhiteModel {
@@ -14,10 +15,10 @@ export class PosedWhiteModel {
   private shown = false;
 
   constructor(private readonly character: Character, private readonly origin: WorldOrigin, private readonly bodyScale: number) {
-    this.model = AddSpecialEffect(WHITE_FIGHTER_MODELS[character] ?? "", origin.x, origin.y);
-    BlzSetSpecialEffectAnimationBlendTime(this.model, 0.0);
-    BlzSetSpecialEffectAnimation(this.model, "Stand");
-    BlzSetSpecialEffectTimeScale(this.model, 0.0);
+    this.model = createEffect(WHITE_FIGHTER_MODELS[character] ?? "", origin.x, origin.y);
+    setEffectBlendTime(this.model, 0.0);
+    setEffectAnimation(this.model, "Stand");
+    setEffectTimeScale(this.model, 0.0);
     hideEffect(this.model, origin);
   }
 
@@ -25,8 +26,8 @@ export class PosedWhiteModel {
     const index = draw.index;
     const clip = index === undefined ? undefined : originalClip(this.character, index);
     if (clip === undefined) return false;
-    BlzSetSpecialEffectTime(this.model, clip.startSeconds + draw.seconds);
-    BlzSetSpecialEffectOrientation(this.model, facingYaw(draw.facing), draw.pitch, 0.0);
+    setEffectTime(this.model, clip.startSeconds + draw.seconds);
+    setEffectOrientation(this.model, facingYaw(draw.facing), draw.pitch, 0.0);
     const x = this.origin.x + draw.x, y = this.origin.y + draw.y, z = this.origin.z + draw.z - (grow - 1.0) * height * 0.5;
     const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
     const distance = camera.distance;
@@ -36,14 +37,14 @@ export class PosedWhiteModel {
     const length = squareRoot(towardX * towardX + towardY * towardY + towardZ * towardZ);
     const toward = length > Math.abs(lift) * 2.0 ? lift / length : 0.0;
     placeEffect(this.model, x + towardX * toward, y + towardY * toward, z + towardZ * toward);
-    BlzSetSpecialEffectScale(this.model, this.bodyScale * (1.0 - toward) * grow);
+    setEffectScale(this.model, this.bodyScale * (1.0 - toward) * grow);
     this.shown = true;
     return true;
   }
 
   tint(alpha: number, red: number, green: number, blue: number): void {
-    BlzSetSpecialEffectAlpha(this.model, alpha);
-    BlzSetSpecialEffectColor(this.model, red, green, blue);
+    setEffectAlpha(this.model, alpha);
+    setEffectColor(this.model, red, green, blue);
   }
 
   hide(): void {
@@ -57,6 +58,6 @@ export class PosedWhiteModel {
 
   destroy(): void {
     hideEffect(this.model, this.origin);
-    DestroyEffect(this.model);
+    destroyEffect(this.model);
   }
 }

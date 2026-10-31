@@ -5,6 +5,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
 import { facingYaw } from "../../game/render/effects";
 import { DAMAGE_BLEND_PROBE_MODELS } from "../../platform/damageBlendProbeModels";
+import { createEffect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 interface Case {
   readonly model: effect;
@@ -28,10 +29,10 @@ export function start(this: void): void {
       if (source === undefined) throw new Error("Damage probe donor missing");
       for (const clock of [0, 1]) {
         const x = -240.0 + donor * 320.0 + clock * 160.0;
-        const model = AddSpecialEffect(source.path, x, 0.0);
-        BlzSetSpecialEffectPosition(model, x, 0.0, FLOOR_HEIGHT + (facing > 0 ? 100.0 : -100.0));
-        BlzSetSpecialEffectYaw(model, facingYaw(facing));
-        BlzSetSpecialEffectScale(model, 1.0);
+        const model = createEffect(source.path, x, 0.0);
+        setEffectPosition(model, x, 0.0, FLOOR_HEIGHT + (facing > 0 ? 100.0 : -100.0));
+        setEffectYaw(model, facingYaw(facing));
+        setEffectScale(model, 1.0);
         cases.push({ model, sourceSeconds: source.sourceSeconds, clock });
       }
     }
@@ -48,21 +49,21 @@ export function start(this: void): void {
     const phase = floorMod(frame, 180);
     if (phase === 0) {
       for (const entry of cases) {
-        BlzSetSpecialEffectAnimationBlendTime(entry.model, 0.0);
-        BlzSetSpecialEffectTimeScale(entry.model, 0.0);
-        BlzSetSpecialEffectAnimation(entry.model, "Stand");
-        BlzSetSpecialEffectTime(entry.model, entry.sourceSeconds);
+        setEffectBlendTime(entry.model, 0.0);
+        setEffectTimeScale(entry.model, 0.0);
+        setEffectAnimation(entry.model, "Stand");
+        setEffectTime(entry.model, entry.sourceSeconds);
       }
       report(frame, "interrupted");
     } else if (phase === 60) {
       for (const entry of cases) {
-        BlzSetSpecialEffectAnimationBlendTime(entry.model, f32(0.05));
-        BlzSetSpecialEffectAnimation(entry.model, "Stand Hit");
-        BlzSetSpecialEffectTimeScale(entry.model, entry.clock);
+        setEffectBlendTime(entry.model, f32(0.05));
+        setEffectAnimation(entry.model, "Stand Hit");
+        setEffectTimeScale(entry.model, entry.clock);
       }
       report(frame, "blend-start");
     } else if (phase === 66) {
-      for (const entry of cases) BlzSetSpecialEffectTimeScale(entry.model, 0.0);
+      for (const entry of cases) setEffectTimeScale(entry.model, 0.0);
       report(frame, "held-pain");
     }
     frame++;

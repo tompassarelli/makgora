@@ -5,6 +5,7 @@ import { SHIELD_P1_MODEL, SHIELD_P2_MODEL, SHIELD_P3_MODEL, SHIELD_P4_MODEL } fr
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
 import { projectedShield } from "../presentation/shieldPose";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 function shieldModel(slot: number): string {
   return slot === 0 ? SHIELD_P1_MODEL : slot === 1 ? SHIELD_P2_MODEL : slot === 2 ? SHIELD_P3_MODEL : SHIELD_P4_MODEL;
@@ -18,11 +19,11 @@ export class ShieldPresentation {
     slot: number,
     private readonly origin: WorldOrigin,
   ) {
-    this.model = AddSpecialEffect(shieldModel(slot), origin.x, origin.y);
-    BlzSetSpecialEffectAnimationBlendTime(this.model, 0.0);
-    BlzSetSpecialEffectAnimation(this.model, "Stand");
-    BlzSetSpecialEffectTimeScale(this.model, 0.0);
-    BlzSetSpecialEffectTime(this.model, 0.0);
+    this.model = createEffect(shieldModel(slot), origin.x, origin.y);
+    setEffectBlendTime(this.model, 0.0);
+    setEffectAnimation(this.model, "Stand");
+    setEffectTimeScale(this.model, 0.0);
+    setEffectTime(this.model, 0.0);
     this.hide();
   }
 
@@ -38,9 +39,9 @@ export class ShieldPresentation {
     }
     (this.parked ??= [])[0] = false;
     placeEffect(this.model, this.origin.x + pose.x, this.origin.y, this.origin.z + pose.z);
-    BlzSetSpecialEffectScale(this.model, pose.scale);
-    BlzSetSpecialEffectColor(this.model, pose.red, pose.green, pose.blue);
-    BlzSetSpecialEffectAlpha(this.model, 255);
+    setEffectScale(this.model, pose.scale);
+    setEffectColor(this.model, pose.red, pose.green, pose.blue);
+    setEffectAlpha(this.model, 255);
   }
 
   drawnEffects(into: effect[]): void {
@@ -49,6 +50,6 @@ export class ShieldPresentation {
 
   destroy(): void {
     this.hide();
-    DestroyEffect(this.model);
+    destroyEffect(this.model);
   }
 }

@@ -20,6 +20,7 @@ import { cameraLift } from "./cameraLift";
 import { tintProjectile } from "./projectileTint";
 import { addPoolEffect, addPoolEffects } from "./projectilePoolEffects";
 import { EyeBeamLine } from "./eyeBeamLine";
+import { clearEffectSubAnimations, createBeam, createEffect, destroyBeam, destroyEffect, moveBeam, playEffectAnimation, resetEffectMatrix, setBeamColor, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPitch, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx",
@@ -109,8 +110,8 @@ export class ProjectilePresentation {
     opponents: readonly Character[] = [],
   ) {
     if (character === Character.rifleman) for (let index = 0; index < 2; index++) {
-      const line = AddLightningEx("LEAS", false, origin.x, origin.y, origin.z - PARKED_LINE_DEPTH, origin.x, origin.y, origin.z - PARKED_LINE_DEPTH);
-      SetLightningColor(line, 1.0, 0.0, 0.0, 0.0);
+      const line = createBeam("LEAS", origin.x, origin.y, origin.z - PARKED_LINE_DEPTH, origin.x, origin.y, origin.z - PARKED_LINE_DEPTH);
+      setBeamColor(line, 1.0, 0.0, 0.0, 0.0);
       this.aimedShot.push(line);
       this.lineShown.push(false);
     }
@@ -133,9 +134,9 @@ export class ProjectilePresentation {
         if (character === Character.lichKing && path.includes("ImpaleHitTarget")) {
           for (let layer = 0; layer <= RAISED_LAYOUT.length; layer++) {
             crowd.push(this.models.length);
-            const raisedModel = AddSpecialEffect(layer < RAISED_LAYOUT.length ? RAISED_SKELETON : RAISED_BURST, origin.x, origin.y);
-            BlzSetSpecialEffectAnimationBlendTime(raisedModel, 0.0);
-            BlzSetSpecialEffectAnimation(raisedModel, "birth");
+            const raisedModel = createEffect(layer < RAISED_LAYOUT.length ? RAISED_SKELETON : RAISED_BURST, origin.x, origin.y);
+            setEffectBlendTime(raisedModel, 0.0);
+            setEffectAnimation(raisedModel, "birth");
             this.models.push(raisedModel);
             this.visible.push(false);
           }
@@ -145,10 +146,10 @@ export class ProjectilePresentation {
           const layers: number[] = [];
           for (let layer = 0; layer < (character === Character.lichKing ? 2 : 1); layer++) {
             layers.push(this.models.length);
-            const boundary = AddSpecialEffect(defilePool && layer > 0 ? DEFILE_FROST : IMPACT_DEFILE_MODEL, origin.x, origin.y);
-            BlzSetSpecialEffectAnimationBlendTime(boundary, 0.0);
-            BlzSetSpecialEffectAnimation(boundary, "stand");
-            BlzSetSpecialEffectTime(boundary, 0.0);
+            const boundary = createEffect(defilePool && layer > 0 ? DEFILE_FROST : IMPACT_DEFILE_MODEL, origin.x, origin.y);
+            setEffectBlendTime(boundary, 0.0);
+            setEffectAnimation(boundary, "stand");
+            setEffectTime(boundary, 0.0);
             this.models.push(boundary);
             this.visible.push(false);
           }
@@ -165,7 +166,7 @@ export class ProjectilePresentation {
 
   private hide(model: effect, parked: ParkedFlags, index: number): void {
     if (!parkCue(model, this.origin, parked, index)) return;
-    for (const pool of this.pools) if (pool.park !== undefined && pool.effects.includes(index)) BlzSetSpecialEffectAnimation(model, pool.park);
+    for (const pool of this.pools) if (pool.park !== undefined && pool.effects.includes(index)) setEffectAnimation(model, pool.park);
   }
 
   clear(): void {
@@ -205,12 +206,12 @@ export class ProjectilePresentation {
     const scaleZ = f32(grown / height);
     const x = this.origin.x + f32(placed.x - f32(centerX * scaleX));
     const z = this.origin.z + f32(f32(grown * 0.5) - f32(centerZ * scaleZ));
-    BlzResetSpecialEffectMatrix(model);
-    BlzSetSpecialEffectMatrixScale(model, scaleX * (1.0 - lift), RISEN_DEPTH * (1.0 - lift), scaleZ * (1.0 - lift));
-    BlzSetSpecialEffectPosition(model, x + (eyeX - x) * lift, y, z + (eyeZ - z) * lift);
-    BlzSetSpecialEffectAlpha(model, RISEN_ALPHA);
-    BlzSetSpecialEffectAnimation(model, "birth");
-    BlzSetSpecialEffectColor(model, 120, 95, 70);
+    resetEffectMatrix(model);
+    setEffectMatrixScale(model, scaleX * (1.0 - lift), RISEN_DEPTH * (1.0 - lift), scaleZ * (1.0 - lift));
+    setEffectPosition(model, x + (eyeX - x) * lift, y, z + (eyeZ - z) * lift);
+    setEffectAlpha(model, RISEN_ALPHA);
+    setEffectAnimation(model, "birth");
+    setEffectColor(model, 120, 95, 70);
   }
 
   private placeRaised(slot: number): void {
@@ -226,13 +227,13 @@ export class ProjectilePresentation {
       if (raisedModel === undefined) continue;
       const layout = RAISED_LAYOUT[index];
       const x = this.origin.x + placed.x + f32((layout?.x ?? 0.0) * placed.radius);
-      BlzResetSpecialEffectMatrix(raisedModel);
-      BlzSetSpecialEffectYaw(raisedModel, layout?.yaw ?? 0.0);
-      BlzSetSpecialEffectPosition(raisedModel, x + (eyeX - x) * lift, y, z + (eyeZ - z) * lift);
-      BlzSetSpecialEffectScale(raisedModel, f32((layout === undefined ? 1.5 : index === 1 ? 1.25 : f32(1.1)) * (1.0 - lift)));
-      BlzSetSpecialEffectAlpha(raisedModel, age === 0 && layout !== undefined ? 0 : 255);
-      BlzSetSpecialEffectTime(raisedModel, layout === undefined ? f32(f32(0.2) + f32(f32(0.3) * age)) : f32(f32(1.35) + f32(f32(0.3) * age)));
-      BlzSetSpecialEffectTimeScale(raisedModel, 0.0);
+      resetEffectMatrix(raisedModel);
+      setEffectYaw(raisedModel, layout?.yaw ?? 0.0);
+      setEffectPosition(raisedModel, x + (eyeX - x) * lift, y, z + (eyeZ - z) * lift);
+      setEffectScale(raisedModel, f32((layout === undefined ? 1.5 : index === 1 ? 1.25 : f32(1.1)) * (1.0 - lift)));
+      setEffectAlpha(raisedModel, age === 0 && layout !== undefined ? 0 : 255);
+      setEffectTime(raisedModel, layout === undefined ? f32(f32(0.2) + f32(f32(0.3) * age)) : f32(f32(1.35) + f32(f32(0.3) * age)));
+      setEffectTimeScale(raisedModel, 0.0);
     }
   }
 
@@ -261,7 +262,7 @@ export class ProjectilePresentation {
       const x = fighter.motion.x + fighter.facing * shot.offsetX;
       const z = fighter.motion.z + shot.offsetZ;
       if (frame >= 4 && frame <= 32) {
-        MoveLightningEx(aim, false, this.origin.x + x, this.origin.y - 12.0, this.origin.z + z, this.origin.x + x + fighter.facing * 1200.0, this.origin.y - 12.0, this.origin.z + z);
+        moveBeam(aim, this.origin.x + x, this.origin.y - 12.0, this.origin.z + z, this.origin.x + x + fighter.facing * 1200.0, this.origin.y - 12.0, this.origin.z + z);
       }
       if (frame >= shot.spawnFrame && frame < shot.spawnFrame + 6) {
         if (this.tracerFrame < shot.spawnFrame || frame < this.tracerFrame) {
@@ -272,7 +273,7 @@ export class ProjectilePresentation {
         }
         const projectile = fighter.projectiles.find(entry => entry.spec === shot && entry.life > 0);
         if (projectile !== undefined) this.tracerEnd = Math.max(this.tracerEnd, Math.min(360.0, (projectile.x - this.tracerX) * this.tracerFacing));
-        MoveLightningEx(trace, false, this.origin.x + this.tracerX, this.origin.y - 12.0, this.origin.z + this.tracerZ, this.origin.x + this.tracerX + this.tracerFacing * this.tracerEnd, this.origin.y - 12.0, this.origin.z + this.tracerZ);
+        moveBeam(trace, this.origin.x + this.tracerX, this.origin.y - 12.0, this.origin.z + this.tracerZ, this.origin.x + this.tracerX + this.tracerFacing * this.tracerEnd, this.origin.y - 12.0, this.origin.z + this.tracerZ);
       }
     }
     if (frame >= 4 && frame <= 32) this.showLine(0, 1.0, 0.0, 0.0);
@@ -285,7 +286,7 @@ export class ProjectilePresentation {
   private showLine(index: number, red: number, green: number, blue: number): void {
     const line = this.aimedShot[index];
     if (line === undefined) return;
-    SetLightningColor(line, red, green, blue, 1.0);
+    setBeamColor(line, red, green, blue, 1.0);
     this.lineShown[index] = true;
   }
 
@@ -293,8 +294,8 @@ export class ProjectilePresentation {
     const line = this.aimedShot[index];
     if (line === undefined || this.lineShown[index] !== true) return;
     const { x, y, z } = this.origin;
-    MoveLightningEx(line, false, x, y, z - PARKED_LINE_DEPTH, x, y, z - PARKED_LINE_DEPTH);
-    SetLightningColor(line, 1.0, 0.0, 0.0, 0.0);
+    moveBeam(line, x, y, z - PARKED_LINE_DEPTH, x, y, z - PARKED_LINE_DEPTH);
+    setBeamColor(line, 1.0, 0.0, 0.0, 0.0);
     this.lineShown[index] = false;
   }
 
@@ -334,8 +335,8 @@ export class ProjectilePresentation {
       if (born && projectile !== undefined && !risen && !tell && !defile) {
         const birth = BIRTH_MISSILES.some((name) => pool?.path.includes(name) === true);
         if (cue?.birth === undefined) {
-          if (draw?.seconds === undefined) BlzSetSpecialEffectAnimation(model, draw?.sequence ?? pose.animationSequence ?? (birth ? "birth" : "stand"));
-          BlzSetSpecialEffectTime(model, draw?.seconds ?? 0.0);
+          if (draw?.seconds === undefined) setEffectAnimation(model, draw?.sequence ?? pose.animationSequence ?? (birth ? "birth" : "stand"));
+          setEffectTime(model, draw?.seconds ?? 0.0);
           this.reseek[slot] = draw?.reseek === true;
           this.birthLife[slot] = projectile.life;
         }
@@ -344,25 +345,25 @@ export class ProjectilePresentation {
       } else if (this.reseek[slot] === true && !paused && projectile !== undefined && projectile.life < (this.birthLife[slot] ?? projectile.life)) {
         // Warcraft discards an animation seek in the callback selecting its sequence (#58 native rulers).
         const elapsed = f32(((this.birthLife[slot] ?? projectile.life) - projectile.life) / 60.0);
-        BlzSetSpecialEffectTime(model, f32((draw?.seconds ?? 0.0) + elapsed));
+        setEffectTime(model, f32((draw?.seconds ?? 0.0) + elapsed));
         this.reseek[slot] = false;
       }
-      BlzSetSpecialEffectYaw(model, pose.yaw);
-      BlzSetSpecialEffectPitch(model, pose.pitch);
-      BlzSetSpecialEffectRoll(model, draw?.roll ?? 0.0);
-      BlzSetSpecialEffectPosition(model, this.origin.x + pose.x + (pose.yaw === 0.0 ? 1 : -1) * (draw?.x ?? 0.0), this.origin.y, this.origin.z + pose.modelZ + (draw?.z ?? 0.0));
-      BlzSetSpecialEffectScale(model, pose.modelScale * (cue?.scale ?? 1.0));
+      setEffectYaw(model, pose.yaw);
+      setEffectPitch(model, pose.pitch);
+      setEffectRoll(model, draw?.roll ?? 0.0);
+      setEffectPosition(model, this.origin.x + pose.x + (pose.yaw === 0.0 ? 1 : -1) * (draw?.x ?? 0.0), this.origin.y, this.origin.z + pose.modelZ + (draw?.z ?? 0.0));
+      setEffectScale(model, pose.modelScale * (cue?.scale ?? 1.0));
       tintProjectile(model, cue);
-      if (draw?.width !== undefined || draw?.height !== undefined) BlzSetSpecialEffectMatrixScale(model, draw.width ?? 1.0, 1.0, draw.height ?? 1.0);
-      BlzSetSpecialEffectAlpha(model, 255);
-      BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
+      if (draw?.width !== undefined || draw?.height !== undefined) setEffectMatrixScale(model, draw.width ?? 1.0, 1.0, draw.height ?? 1.0);
+      setEffectAlpha(model, 255);
+      setEffectTimeScale(model, paused ? 0.0 : 1.0);
       if (draw?.seconds !== undefined) {
-        BlzSetSpecialEffectTime(model, draw.seconds);
-        BlzSetSpecialEffectTimeScale(model, 0.0);
+        setEffectTime(model, draw.seconds);
+        setEffectTimeScale(model, 0.0);
       }
       if (rebirth) {
-        BlzSpecialEffectClearSubAnimations(model);
-        BlzPlaySpecialEffect(model, ANIM_TYPE_BIRTH);
+        clearEffectSubAnimations(model);
+        playEffectAnimation(model, ANIM_TYPE_BIRTH);
       }
       if (!paused && projectile !== undefined) this.lives[slot] = projectile.life;
       if (risen) {
@@ -378,33 +379,33 @@ export class ProjectilePresentation {
         }
       }
       if (born && projectile !== undefined && (risen || tell || defile)) {
-        BlzSetSpecialEffectAnimation(model, defile ? "stand" : "birth");
+        setEffectAnimation(model, defile ? "stand" : "birth");
         this.serials[slot] = projectile.serial;
         this.specs[slot] = projectile.spec;
       }
       if (risen) {
-        BlzSetSpecialEffectTime(model, STATIONARY_SECONDS);
-        BlzSetSpecialEffectTimeScale(model, 0.0);
+        setEffectTime(model, STATIONARY_SECONDS);
+        setEffectTimeScale(model, 0.0);
       } else if (tell && projectile?.spec !== undefined) {
-        BlzSetSpecialEffectTime(model, f32((projectile.spec.life - projectile.life) / 60));
+        setEffectTime(model, f32((projectile.spec.life - projectile.life) / 60));
       } else if (cue?.birth === undefined && pose.animationSeconds !== undefined) {
-        if (!this.visible[slot] && pose.animationSequence !== undefined) BlzSetSpecialEffectAnimation(model, pose.animationSequence);
-        BlzSetSpecialEffectTime(model, pose.animationSeconds);
-        BlzSetSpecialEffectTimeScale(model, 0.0);
+        if (!this.visible[slot] && pose.animationSequence !== undefined) setEffectAnimation(model, pose.animationSequence);
+        setEffectTime(model, pose.animationSeconds);
+        setEffectTimeScale(model, 0.0);
       } else if (cue?.birth === undefined && projectile?.spec !== undefined && projectile.velocityX === 0.0 && projectile.velocityZ === 0.0) {
 
         if (pool !== undefined && STATIONARY_PARTICLE_MODELS.includes(pool.path)) {
-          if ((born || !paused) && restartsStationaryField(pool.path, projectile.spec.life - projectile.life, born)) BlzSetSpecialEffectTime(model, STATIONARY_SECONDS);
+          if ((born || !paused) && restartsStationaryField(pool.path, projectile.spec.life - projectile.life, born)) setEffectTime(model, STATIONARY_SECONDS);
         } else {
-          BlzSetSpecialEffectTime(model, STATIONARY_SECONDS);
-          BlzSetSpecialEffectTimeScale(model, 0.0);
+          setEffectTime(model, STATIONARY_SECONDS);
+          setEffectTimeScale(model, 0.0);
         }
       }
       if (defile && projectile?.spec !== undefined) {
         const age = projectile.spec.life - projectile.life;
-        BlzSetSpecialEffectScale(model, f32(pose.dangerRadius / 180.0));
-        BlzSetSpecialEffectTime(model, f32(Math.max(0, age - (projectile.spec.activeFrom ?? 0)) / 60));
-        BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
+        setEffectScale(model, f32(pose.dangerRadius / 180.0));
+        setEffectTime(model, f32(Math.max(0, age - (projectile.spec.activeFrom ?? 0)) / 60));
+        setEffectTimeScale(model, paused ? 0.0 : 1.0);
         if (!pose.armed) taken[slot] = false;
         else this.lingering[slot] = 1;
       }
@@ -421,29 +422,29 @@ export class ProjectilePresentation {
             taken[boundarySlot] = false;
             continue;
           }
-          BlzResetSpecialEffectMatrix(boundary);
-          BlzSetSpecialEffectRoll(boundary, f32(Math.PI * 0.5));
-          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 12.0, this.origin.z + pose.z + f32(pose.dangerRadius * f32(0.45)));
-          BlzSetSpecialEffectScale(boundary, f32(pose.dangerRadius / 720.0));
-          BlzSetSpecialEffectColor(boundary, 155, 210, 255);
-          BlzSetSpecialEffectAlpha(boundary, 255);
-          if (!this.visible[boundarySlot]) BlzSetSpecialEffectAnimation(boundary, "birth");
-          BlzSetSpecialEffectTime(boundary, f32(pulseFrame / 60));
-          BlzSetSpecialEffectTimeScale(boundary, paused ? 0.0 : 1.0);
+          resetEffectMatrix(boundary);
+          setEffectRoll(boundary, f32(Math.PI * 0.5));
+          setEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 12.0, this.origin.z + pose.z + f32(pose.dangerRadius * f32(0.45)));
+          setEffectScale(boundary, f32(pose.dangerRadius / 720.0));
+          setEffectColor(boundary, 155, 210, 255);
+          setEffectAlpha(boundary, 255);
+          if (!this.visible[boundarySlot]) setEffectAnimation(boundary, "birth");
+          setEffectTime(boundary, f32(pulseFrame / 60));
+          setEffectTimeScale(boundary, paused ? 0.0 : 1.0);
         } else {
           const look = discLook(this.disc, draw, pose, defile, fighter?.character === Character.lich, defile && projectile?.spec?.pool !== undefined ? projectile.spec.life - projectile.life : -1);
-          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + look.lift);
-          BlzSetSpecialEffectScale(boundary, look.radius);
+          setEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + look.lift);
+          setEffectScale(boundary, look.radius);
           if (defile || draw?.discVertical === true) {
-            BlzResetSpecialEffectMatrix(boundary);
-            BlzSetSpecialEffectRoll(boundary, f32(Math.PI * 0.5));
+            resetEffectMatrix(boundary);
+            setEffectRoll(boundary, f32(Math.PI * 0.5));
             // Warcraft may apply matrix scale before or after the roll, so the rim's 0.6 height is stretched on Y and Z alike.
-            BlzSetSpecialEffectMatrixScale(boundary, 1.0, f32(1.0 / f32(0.6)), f32(1.0 / f32(0.6)));
+            setEffectMatrixScale(boundary, 1.0, f32(1.0 / f32(0.6)), f32(1.0 / f32(0.6)));
           }
-          BlzSetSpecialEffectColor(boundary, look.red, look.green, look.blue);
-          BlzSetSpecialEffectAlpha(boundary, look.alpha);
-          if (!this.visible[boundarySlot]) BlzSetSpecialEffectTime(boundary, 0.0);
-          BlzSetSpecialEffectTimeScale(boundary, 0.0);
+          setEffectColor(boundary, look.red, look.green, look.blue);
+          setEffectAlpha(boundary, look.alpha);
+          if (!this.visible[boundarySlot]) setEffectTime(boundary, 0.0);
+          setEffectTimeScale(boundary, 0.0);
           if (defile && pose.armed) this.lingering[boundarySlot] = 1;
         }
       }
@@ -469,14 +470,14 @@ export class ProjectilePresentation {
   setPaused(paused: boolean): void {
     for (let index = 0; index < this.models.length; index++) {
       const model = this.models[index];
-      if (model !== undefined) BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : this.visible[index] === true ? 1.0 : PARKED_CUE_TIME_SCALE);
+      if (model !== undefined) setEffectTimeScale(model, paused ? 0.0 : this.visible[index] === true ? 1.0 : PARKED_CUE_TIME_SCALE);
     }
   }
 
   destroy(): void {
     this.clear();
-    for (const model of this.models) DestroyEffect(model);
-    for (const line of this.aimedShot) DestroyLightning(line);
+    for (const model of this.models) destroyEffect(model);
+    for (const line of this.aimedShot) destroyBeam(line);
     this.eyeBeam.destroy();
     this.aimedShot.length = 0;
     this.lineShown.length = 0;

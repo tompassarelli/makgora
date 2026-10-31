@@ -6,6 +6,7 @@ import { fighterAt, isActive } from "../../game/sim/roster";
 import { presentedMatch } from "./presentedMatch";
 import type { ShellState } from "./state";
 import { views } from "./ui";
+import { setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 
 export function holdAgeSeekedEffects(s: ShellState): void {
@@ -21,8 +22,8 @@ export function holdAgeSeekedEffects(s: ShellState): void {
       const draw = path === undefined ? undefined : PROJECTILE_DRAW_OFFSETS[path];
       if (projectile?.spec === undefined || model === undefined || draw?.reseek !== true) continue;
       // Warcraft discards an animation seek in the callback selecting its sequence, so each held callback seeks again.
-      BlzSetSpecialEffectTime(model, f32((draw.seconds ?? 0.0) + f32((projectile.spec.life - projectile.life) / 60.0)));
-      BlzSetSpecialEffectTimeScale(model, 0.0);
+      setEffectTime(model, f32((draw.seconds ?? 0.0) + f32((projectile.spec.life - projectile.life) / 60.0)));
+      setEffectTimeScale(model, 0.0);
     }
   }
 }

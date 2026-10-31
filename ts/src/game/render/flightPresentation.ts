@@ -3,6 +3,7 @@ import { fitFighterPlacement } from "../presentation/fighterPlacement";
 import type { FlightLook } from "../presentation/model/look";
 import type { Fighter } from "../sim/fighter";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
+import { createEffect, destroyEffect, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 export class FlightPresentation {
   private readonly flames: effect;
@@ -13,8 +14,8 @@ export class FlightPresentation {
   private eggShown = false;
 
   constructor(private readonly flight: Readonly<FlightLook>, private readonly origin: Readonly<WorldOrigin>) {
-    this.flames = AddSpecialEffect(flight.flames, origin.x, origin.y);
-    this.egg = AddSpecialEffect(flight.egg, origin.x, origin.y);
+    this.flames = createEffect(flight.flames, origin.x, origin.y);
+    this.egg = createEffect(flight.egg, origin.x, origin.y);
     hideEffect(this.flames, origin);
     hideEffect(this.egg, origin);
   }
@@ -33,9 +34,9 @@ export class FlightPresentation {
     }
     fitFighterPlacement(this.placement, fighter, stage);
     placeEffect(model, this.origin.x + this.placement.x, this.origin.y, this.origin.z + this.placement.z + pose.z);
-    BlzSetSpecialEffectYaw(model, facingYaw(fighter.facing));
-    BlzSetSpecialEffectScale(model, pose.scale);
-    BlzSetSpecialEffectTimeScale(model, paused || fighter.launch.hitlag > 0 ? 0.0 : 1.0);
+    setEffectYaw(model, facingYaw(fighter.facing));
+    setEffectScale(model, pose.scale);
+    setEffectTimeScale(model, paused || fighter.launch.hitlag > 0 ? 0.0 : 1.0);
     return true;
   }
 
@@ -50,7 +51,7 @@ export class FlightPresentation {
   destroy(): void {
     for (const model of [this.flames, this.egg]) {
       hideEffect(model, this.origin);
-      DestroyEffect(model);
+      destroyEffect(model);
     }
   }
 }

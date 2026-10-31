@@ -11,6 +11,7 @@ import { fighterPortrait } from "../roster/looks";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "../ui/frames";
 import { MENU_FONT, PANEL_TEXTURE } from "../ui/hudLayout";
 import { type ParkedFlags, type WorldOrigin, parkOnce } from "./effects";
+import { createEffect, destroyEffect, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 
 const ZONE_EFFECTS = 4;
@@ -68,31 +69,31 @@ export class ClassicPresentation {
     if (boss === undefined) return;
     this.boss = boss;
     const { x, y, z } = this.origin;
-    this.body = AddSpecialEffect(boss.model, x, y + boss.depth);
-    BlzSetSpecialEffectScale(this.body, boss.scale);
-    BlzSetSpecialEffectColor(this.body, boss.tint[0], boss.tint[1], boss.tint[2]);
-    BlzSetSpecialEffectYaw(this.body, -QUARTER_TURN);
+    this.body = createEffect(boss.model, x, y + boss.depth);
+    setEffectScale(this.body, boss.scale);
+    setEffectColor(this.body, boss.tint[0], boss.tint[1], boss.tint[2]);
+    setEffectYaw(this.body, -QUARTER_TURN);
     for (let index = 0; index < ZONE_EFFECTS; index++) {
-      const tell = AddSpecialEffect(BOSS_TELEGRAPH_MODEL, x, y);
-      BlzSetSpecialEffectAnimationBlendTime(tell, 0.0);
-      BlzSetSpecialEffectAnimation(tell, "Neutral Big");
-      BlzSetSpecialEffectTime(tell, 0.5);
-      BlzSetSpecialEffectTimeScale(tell, 0.0);
-      BlzSetSpecialEffectRoll(tell, QUARTER_TURN);
+      const tell = createEffect(BOSS_TELEGRAPH_MODEL, x, y);
+      setEffectBlendTime(tell, 0.0);
+      setEffectAnimation(tell, "Neutral Big");
+      setEffectTime(tell, 0.5);
+      setEffectTimeScale(tell, 0.0);
+      setEffectRoll(tell, QUARTER_TURN);
       this.tells.push(tell);
-      this.hits.push(AddSpecialEffect(boss.hitArt, x, y));
+      this.hits.push(createEffect(boss.hitArt, x, y));
     }
     for (let index = 0; index < ZONE_EFFECTS * 2; index++) this.parked[index] = false;
     this.lastStrike = -1;
     this.lastPhase = BossPhase.opening;
-    BlzSetSpecialEffectPosition(this.body, x, y + boss.depth, z + boss.standZ);
+    setEffectPosition(this.body, x, y + boss.depth, z + boss.standZ);
   }
 
 
   endMatch(): void {
-    if (this.body !== undefined) DestroyEffect(this.body);
-    for (const art of this.tells) DestroyEffect(art);
-    for (const art of this.hits) DestroyEffect(art);
+    if (this.body !== undefined) destroyEffect(this.body);
+    for (const art of this.tells) destroyEffect(art);
+    for (const art of this.hits) destroyEffect(art);
     this.body = undefined;
     this.tells = [];
     this.hits = [];
@@ -106,15 +107,15 @@ export class ClassicPresentation {
     const clock = bossClock(game.matchFrame, game.startHold);
     const { origin } = this;
 
-    BlzSetSpecialEffectPosition(body, origin.x + bossPosition(boss, clock).x, origin.y + boss.depth, origin.z + boss.standZ);
+    setEffectPosition(body, origin.x + bossPosition(boss, clock).x, origin.y + boss.depth, origin.z + boss.standZ);
     const flash = game.run.boss.flash > 0;
-    BlzSetSpecialEffectColor(body, flash ? 255 : boss.tint[0], flash ? 90 : boss.tint[1], flash ? 90 : boss.tint[2]);
+    setEffectColor(body, flash ? 255 : boss.tint[0], flash ? 90 : boss.tint[1], flash ? 90 : boss.tint[2]);
     const now = bossMoment(boss, clock, moment);
     const strike = boss.strikes[now.index];
     if (now.strike !== this.lastStrike || now.phase !== this.lastPhase) {
-      if (now.phase === BossPhase.tell) BlzPlaySpecialEffect(body, ANIM_TYPE_SPELL);
-      else if (now.phase === BossPhase.active) BlzPlaySpecialEffect(body, ANIM_TYPE_ATTACK);
-      else if (now.phase === BossPhase.rest) BlzPlaySpecialEffect(body, ANIM_TYPE_STAND);
+      if (now.phase === BossPhase.tell) playEffectAnimation(body, ANIM_TYPE_SPELL);
+      else if (now.phase === BossPhase.active) playEffectAnimation(body, ANIM_TYPE_ATTACK);
+      else if (now.phase === BossPhase.rest) playEffectAnimation(body, ANIM_TYPE_STAND);
       this.lastStrike = now.strike;
       this.lastPhase = now.phase;
     }
@@ -127,20 +128,20 @@ export class ClassicPresentation {
       const showHit = zone !== undefined && now.strike >= 0 && now.phase === BossPhase.active;
       if (showTell && strike !== undefined && zone !== undefined) {
         this.parked[index] = false;
-        BlzSetSpecialEffectScale(tell, 1.0);
-        BlzResetSpecialEffectMatrix(tell);
-        BlzSetSpecialEffectRoll(tell, QUARTER_TURN);
-        BlzSetSpecialEffectMatrixScale(tell, f32(zone.halfWidth / MARKER_HALF), f32(f32(zone.top - zone.bottom) / f32(2.0 * MARKER_HALF)), 1.0);
+        setEffectScale(tell, 1.0);
+        resetEffectMatrix(tell);
+        setEffectRoll(tell, QUARTER_TURN);
+        setEffectMatrixScale(tell, f32(zone.halfWidth / MARKER_HALF), f32(f32(zone.top - zone.bottom) / f32(2.0 * MARKER_HALF)), 1.0);
 
-        BlzSetSpecialEffectPosition(tell, origin.x + zoneCenter(strike, zone, game.run.boss.aimX), origin.y - 220.0, origin.z + f32(f32(zone.bottom + zone.top) / 2.0));
-        BlzSetSpecialEffectAlpha(tell, 255);
-        BlzSetSpecialEffectAnimation(tell, "Neutral Big");
-        BlzSetSpecialEffectTime(tell, 0.5);
+        setEffectPosition(tell, origin.x + zoneCenter(strike, zone, game.run.boss.aimX), origin.y - 220.0, origin.z + f32(f32(zone.bottom + zone.top) / 2.0));
+        setEffectAlpha(tell, 255);
+        setEffectAnimation(tell, "Neutral Big");
+        setEffectTime(tell, 0.5);
       } else parkOnce(tell, origin, this.parked, index);
       if (showHit && strike !== undefined && zone !== undefined) {
         this.parked[ZONE_EFFECTS + index] = false;
-        BlzSetSpecialEffectScale(hit, f32(zone.halfWidth / 70.0));
-        BlzSetSpecialEffectPosition(hit, origin.x + zoneCenter(strike, zone, game.run.boss.aimX), origin.y, origin.z + Math.max(0.0, zone.bottom));
+        setEffectScale(hit, f32(zone.halfWidth / 70.0));
+        setEffectPosition(hit, origin.x + zoneCenter(strike, zone, game.run.boss.aimX), origin.y, origin.z + Math.max(0.0, zone.bottom));
       } else parkOnce(hit, origin, this.parked, ZONE_EFFECTS + index);
     }
   }

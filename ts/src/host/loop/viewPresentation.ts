@@ -14,26 +14,27 @@ import { at } from "wisp/src/runtime/lookup";
 import { presentedCueTrace } from "./diagnostics";
 import type { UiObjects } from "./ui";
 import type { ShellState } from "./state";
+import { setEffectColor, setEffectPitch, setEffectPosition, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 export function presentStageMotion(s: ShellState, drawn: number, matchFrame: number, world: Readonly<Roster>): void {
   const beforePlatform = framesUntilPlatformMoves(drawn, matchFrame);
   for (let index = 0; index < s.stageDeckParts.length; index++) {
     const light = stageEdgeLight(drawn, index, matchFrame);
     if (light === undefined) break;
-    BlzSetSpecialEffectPosition(at(s.stageDeckParts, index), s.origin.x + light.x, s.origin.y + light.y, s.origin.z + light.z);
+    setEffectPosition(at(s.stageDeckParts, index), s.origin.x + light.x, s.origin.y + light.y, s.origin.z + light.z);
   }
   for (let index = 1; index < s.stageDecks.length; index++) {
     if (!surfaceMoves(drawn, index)) continue;
     const x = s.origin.x + (surfaceLeft(drawn, index, matchFrame) + surfaceRight(drawn, index, matchFrame)) / 2;
-    BlzSetSpecialEffectPosition(at(s.stageDecks, index), x, s.origin.y, s.origin.z + surfaceZ(drawn, index, matchFrame));
+    setEffectPosition(at(s.stageDecks, index), x, s.origin.y, s.origin.z + surfaceZ(drawn, index, matchFrame));
     const warns = beforePlatform !== undefined && beforePlatform <= PLATFORM_CUE_FRAMES;
-    BlzSetSpecialEffectColor(at(s.stageDecks, index), 255, warns ? 170 : 255, warns ? 40 : 255);
+    setEffectColor(at(s.stageDecks, index), 255, warns ? 170 : 255, warns ? 40 : 255);
   }
   if (s.stageCannon !== undefined && cannonOn(drawn, matchFrame)) {
-    BlzSetSpecialEffectPosition(s.stageCannon, s.origin.x + cannonX(matchFrame), s.origin.y, s.origin.z + CANNON_Z - CANNON_MODEL_BASE);
-    BlzSetSpecialEffectPitch(s.stageCannon, cannonRock(matchFrame));
+    setEffectPosition(s.stageCannon, s.origin.x + cannonX(matchFrame), s.origin.y, s.origin.z + CANNON_Z - CANNON_MODEL_BASE);
+    setEffectPitch(s.stageCannon, cannonRock(matchFrame));
     const warned = cannonWarned(world);
-    BlzSetSpecialEffectColor(s.stageCannon, 255, warned ? 70 : 255, warned ? 40 : 255);
+    setEffectColor(s.stageCannon, 255, warned ? 70 : 255, warned ? 40 : 255);
   }
 }
 
@@ -50,13 +51,13 @@ export function presentHydra(s: ShellState, drawn: number, world: Readonly<Roste
       hideEffect(crest, s.origin);
       continue;
     }
-    BlzSetSpecialEffectScale(ring, strikeZ === undefined ? 0.75 : 1.0);
-    BlzSetSpecialEffectColor(ring, 48, 72, 64);
-    BlzSetSpecialEffectPosition(ring, s.origin.x + x, s.origin.y, s.origin.z + SEA_SURFACE_Z + 8.0);
-    BlzSetSpecialEffectScale(crest, strikeZ === undefined ? 0.75 : 1.0);
-    BlzSetSpecialEffectYaw(crest, Math.PI / 2.0);
-    BlzSetSpecialEffectPosition(crest, s.origin.x + x, s.origin.y + 40.0, s.origin.z + (strikeZ ?? SEA_SURFACE_Z - 60.0));
-    BlzSetSpecialEffectTimeScale(crest, 0.0);
+    setEffectScale(ring, strikeZ === undefined ? 0.75 : 1.0);
+    setEffectColor(ring, 48, 72, 64);
+    setEffectPosition(ring, s.origin.x + x, s.origin.y, s.origin.z + SEA_SURFACE_Z + 8.0);
+    setEffectScale(crest, strikeZ === undefined ? 0.75 : 1.0);
+    setEffectYaw(crest, Math.PI / 2.0);
+    setEffectPosition(crest, s.origin.x + x, s.origin.y + 40.0, s.origin.z + (strikeZ ?? SEA_SURFACE_Z - 60.0));
+    setEffectTimeScale(crest, 0.0);
   }
 }
 

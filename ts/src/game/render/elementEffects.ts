@@ -9,6 +9,7 @@ import { ELEMENTS, HIT_CUES, type HitCueSeen, advanceHitCueSeen, elementLook, hi
 import { fighterModelScale } from "../presentation/fighterScale";
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 
 const SHOWN = ELEMENTS.filter((element) => elementLook(element).victim !== undefined);
@@ -31,8 +32,8 @@ export class ElementEffects {
 
   constructor(private readonly origin: WorldOrigin) {
     this.front = origin.y - 10.0;
-    this.models = PARTICIPANT_SLOTS.flatMap(() => SHOWN.map((element) => AddSpecialEffect(elementLook(element).victim ?? "", origin.x, origin.y)));
-    this.hitCues = PARTICIPANT_SLOTS.flatMap(() => HIT_CUES.map((cue) => AddSpecialEffect(cue.look.model, origin.x, origin.y)));
+    this.models = PARTICIPANT_SLOTS.flatMap(() => SHOWN.map((element) => createEffect(elementLook(element).victim ?? "", origin.x, origin.y)));
+    this.hitCues = PARTICIPANT_SLOTS.flatMap(() => HIT_CUES.map((cue) => createEffect(cue.look.model, origin.x, origin.y)));
     this.clear();
   }
 
@@ -69,10 +70,10 @@ export class ElementEffects {
         continue;
       }
       parked[at] = false;
-      if (this.hitSerials[slot] !== visuals.hit) BlzSetSpecialEffectTime(model, 0.0);
+      if (this.hitSerials[slot] !== visuals.hit) setEffectTime(model, 0.0);
       placeEffect(model, this.origin.x + fighter.motion.x, this.front, this.origin.z + fighter.motion.z + 45.0 * scale);
-      BlzSetSpecialEffectScale(model, elementLook(visuals.hitElement).victimScale * scale);
-      BlzSetSpecialEffectAlpha(model, 255);
+      setEffectScale(model, elementLook(visuals.hitElement).victimScale * scale);
+      setEffectAlpha(model, 255);
     }
     this.hitSerials[slot] = visuals.hit;
     for (let cue = 0; cue < HIT_CUES.length; cue++) this.presentHitCue(fighter, slot, cue, scale);
@@ -91,8 +92,8 @@ export class ElementEffects {
     (this.parked ??= [])[this.models.length + at] = false;
     const { look } = kind;
     if (this.hitCueShown[at] !== fighter.visuals.hit) {
-      BlzSetSpecialEffectAnimation(model, look.sequence);
-      BlzSetSpecialEffectTime(model, look.seconds);
+      setEffectAnimation(model, look.sequence);
+      setEffectTime(model, look.seconds);
       this.hitCueShown[at] = fighter.visuals.hit;
       const sound = this.hitSounds[cue];
       if (sound !== undefined) {
@@ -103,15 +104,15 @@ export class ElementEffects {
       }
     }
     placeEffect(model, this.origin.x + fighter.motion.x, this.front, this.origin.z + fighter.motion.z + look.z * scale);
-    BlzSetSpecialEffectScale(model, look.scale * scale);
-    BlzSetSpecialEffectAlpha(model, 255);
+    setEffectScale(model, look.scale * scale);
+    setEffectAlpha(model, 255);
   }
 
   setPaused(paused: boolean): void {
-    for (const model of [...this.models, ...this.hitCues]) BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
+    for (const model of [...this.models, ...this.hitCues]) setEffectTimeScale(model, paused ? 0.0 : 1.0);
   }
 
   destroy(): void {
-    for (const model of [...this.models, ...this.hitCues]) DestroyEffect(model);
+    for (const model of [...this.models, ...this.hitCues]) destroyEffect(model);
   }
 }

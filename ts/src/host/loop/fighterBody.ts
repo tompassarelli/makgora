@@ -13,6 +13,7 @@ import { FIGHTER_OBJECTS } from "../../game/objectData";
 import { applyFighterObject } from "../../platform/objectData";
 import { fitFighterPlacement } from "../../game/presentation/fighterPlacement";
 import { fighterModelScale } from "../../game/presentation/fighterScale";
+import { createEffect, destroyEffect, setEffectPosition, setEffectScale } from "wisp/game/effects";
 
 
 const CROW_FORM = 0x416d7266;
@@ -56,7 +57,7 @@ export function createFighterBody(owner: player, fighter: Readonly<Fighter>, ori
   UnitAddAbility(unit, LOCUST);
   PauseUnit(unit, true);
   // Online, Warcraft handles must be born on the same turn on every client, so the dizzy stars are made with the body and only shown and hidden on drawn frames.
-  const dizzy = AddSpecialEffect(DIZZY_MODEL, origin.x, origin.y);
+  const dizzy = createEffect(DIZZY_MODEL, origin.x, origin.y);
   hideEffect(dizzy, origin);
   const body: FighterBody = { unit, dizzy, dizzyShown: false, renderedSelection: 0, color: -1 };
   placeFighterBody(body, fighter, origin);
@@ -76,12 +77,12 @@ export function renderDizzy(body: FighterBody, fighter: Readonly<Fighter>, playi
     return;
   }
   const x = origin.x + fighter.motion.x;
-  if (!body.dizzyShown) BlzSetSpecialEffectScale(body.dizzy, 1.0);
+  if (!body.dizzyShown) setEffectScale(body.dizzy, 1.0);
   body.dizzyShown = true;
-  BlzSetSpecialEffectPosition(body.dizzy, x, origin.y, f32(origin.z + fighter.motion.z + 115));
+  setEffectPosition(body.dizzy, x, origin.y, f32(origin.z + fighter.motion.z + 115));
 }
 
 export function removeFighterBody(body: FighterBody): void {
-  DestroyEffect(body.dizzy);
+  destroyEffect(body.dizzy);
   RemoveUnit(body.unit);
 }

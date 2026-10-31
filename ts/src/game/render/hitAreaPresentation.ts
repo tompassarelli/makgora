@@ -9,6 +9,7 @@ import type { Fighter } from "../sim/fighter";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { squareRoot } from "../sim/warcraftMath";
 import type { WorldOrigin } from "./effects";
+import { createBeam, destroyBeam, moveBeam, setBeamColor } from "wisp/game/effects";
 
 
 const MAX_SHAPES = 16;
@@ -26,14 +27,14 @@ export class HitAreaPresentation {
 
   constructor(private readonly origin: WorldOrigin) {
     for (let index = 0; index < MAX_SHAPES * SEGMENTS_PER_SHAPE; index++) {
-      const line = AddLightningEx(LIGHTNING, false, origin.x, origin.y, origin.z - 4096.0, origin.x, origin.y, origin.z - 4096.0);
-      SetLightningColor(line, 1.0, 1.0, 1.0, 0.0);
+      const line = createBeam(LIGHTNING, origin.x, origin.y, origin.z - 4096.0, origin.x, origin.y, origin.z - 4096.0);
+      setBeamColor(line, 1.0, 1.0, 1.0, 0.0);
       this.lines.push(line);
     }
   }
 
   destroy(): void {
-    for (const line of this.lines) DestroyLightning(line);
+    for (const line of this.lines) destroyBeam(line);
     this.lines.length = 0;
   }
 
@@ -49,7 +50,7 @@ export class HitAreaPresentation {
     }
     for (let index = segment; index < this.drawnSegments; index++) {
       const line = this.lines[index];
-      if (line !== undefined) SetLightningColor(line, 1.0, 1.0, 1.0, 0.0);
+      if (line !== undefined) setBeamColor(line, 1.0, 1.0, 1.0, 0.0);
     }
     this.drawnSegments = segment;
   }
@@ -58,11 +59,11 @@ export class HitAreaPresentation {
     const line = this.lines[segment];
     if (line === undefined) return segment;
     const { x, y, z } = this.origin;
-    MoveLightningEx(line, false, x + x1, y + DEPTH, z + z1, x + x2, y + DEPTH, z + z2);
-    if (kind === HitAreaKind.strike) SetLightningColor(line, 1.0, f32(0.2), f32(0.2), 1.0);
-    else if (kind === HitAreaKind.shield) SetLightningColor(line, 1.0, f32(0.8), f32(0.2), 1.0);
-    else if (kind === HitAreaKind.protected) SetLightningColor(line, f32(0.3), f32(0.6), 1.0, 1.0);
-    else SetLightningColor(line, f32(0.3), 1.0, f32(0.3), 1.0);
+    moveBeam(line, x + x1, y + DEPTH, z + z1, x + x2, y + DEPTH, z + z2);
+    if (kind === HitAreaKind.strike) setBeamColor(line, 1.0, f32(0.2), f32(0.2), 1.0);
+    else if (kind === HitAreaKind.shield) setBeamColor(line, 1.0, f32(0.8), f32(0.2), 1.0);
+    else if (kind === HitAreaKind.protected) setBeamColor(line, f32(0.3), f32(0.6), 1.0, 1.0);
+    else setBeamColor(line, f32(0.3), 1.0, f32(0.3), 1.0);
     return segment + 1;
   }
 

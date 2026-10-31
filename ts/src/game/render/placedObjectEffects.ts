@@ -15,6 +15,7 @@ import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./eff
 import { bearState } from "../presentation/bearFeedback";
 import { BearFeedback } from "./bearFeedback";
 import { bindPrototype } from "../../platform/rebind";
+import { createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectBlendTime, setEffectPitch, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 
 const PLACED_OBJECT_MODEL = "Units\\Orc\\SerpentWard\\SerpentWard.mdx";
@@ -77,7 +78,7 @@ export class PlacedObjectEffects {
     this.models = [];
     this.paths = [];
     for (const slot of PARTICIPANT_SLOTS) for (let animal = 0; animal < ANIMALS; animal++) {
-      this.models.push(AddSpecialEffect(PLACED_OBJECT_MODEL, origin.x, origin.y));
+      this.models.push(createEffect(PLACED_OBJECT_MODEL, origin.x, origin.y));
       this.paths.push(PLACED_OBJECT_MODEL);
     }
     this.clear();
@@ -93,18 +94,18 @@ export class PlacedObjectEffects {
     for (let animal = 0; animal < ANIMALS; animal++) {
       const index = slot * ANIMALS + animal;
       const current = this.models[index];
-      for (const model of Object.values(prepared[index] ?? {})) if (model !== undefined && model !== current) DestroyEffect(model);
+      for (const model of Object.values(prepared[index] ?? {})) if (model !== undefined && model !== current) destroyEffect(model);
       const looks: { [path: string]: effect | undefined } = {};
       if (current !== undefined) looks[this.paths[index] ?? PLACED_OBJECT_MODEL] = current;
       for (const path of paths) {
         let model = looks[path];
         if (model === undefined) {
-          model = AddSpecialEffect(path, this.origin.x, this.origin.y);
-          BlzSetSpecialEffectAnimationBlendTime(model, 0.0);
+          model = createEffect(path, this.origin.x, this.origin.y);
+          setEffectBlendTime(model, 0.0);
           parkOnce(model, this.origin, [], 0);
           looks[path] = model;
         }
-        if (path === imagePath) BlzSetSpecialEffectColorByPlayer(model, Player(slot));
+        if (path === imagePath) setEffectTeamColor(model, Player(slot));
       }
       prepared[index] = looks;
       parked[index] = false;
@@ -185,11 +186,11 @@ export class PlacedObjectEffects {
     const { x, y, z } = this.origin;
     placeEffect(model, x + placed.x, y, z + placed.z);
     const turn = look.turn ?? 0.0;
-    BlzSetSpecialEffectYaw(model, placed.direction > 0 ? -turn : f32(f32(3.14159274) + turn));
+    setEffectYaw(model, placed.direction > 0 ? -turn : f32(f32(3.14159274) + turn));
     const bear = placed === fighter.placed ? bearState(fighter) : undefined;
     this.pose(model, slot, placed, spec, look, bear);
-    BlzSetSpecialEffectScale(model, f32(spec.height / look.height * (bear === "CHARGING" ? 1.25 : 1.0)));
-    BlzSetSpecialEffectAlpha(model, placedAlpha(placed, spec, look));
+    setEffectScale(model, f32(spec.height / look.height * (bear === "CHARGING" ? 1.25 : 1.0)));
+    setEffectAlpha(model, placedAlpha(placed, spec, look));
   }
 
   private pose(model: effect, slot: number, placed: Resting<PlacedObject>, spec: Readonly<SpecialPlacement>, look: PlacedLook, bear: ReturnType<typeof bearState>): void {
@@ -211,8 +212,8 @@ export class PlacedObjectEffects {
     if (this.anims[slot] === anim && attackStarts[slot] === start) return;
     this.anims[slot] = anim;
     attackStarts[slot] = start;
-    BlzPlaySpecialEffect(model, anim === 3 ? ANIM_TYPE_DEATH : anim === 4 ? ANIM_TYPE_BIRTH : anim === 2 ? ANIM_TYPE_SPELL : ANIM_TYPE_STAND);
-    BlzSetSpecialEffectTimeScale(model, anim === 4 ? f32(SPIRIT_BIRTH_SECONDS / f32(SPIRIT_BIRTH_FRAMES / 60.0)) : 1.0);
+    playEffectAnimation(model, anim === 3 ? ANIM_TYPE_DEATH : anim === 4 ? ANIM_TYPE_BIRTH : anim === 2 ? ANIM_TYPE_SPELL : ANIM_TYPE_STAND);
+    setEffectTimeScale(model, anim === 4 ? f32(SPIRIT_BIRTH_SECONDS / f32(SPIRIT_BIRTH_FRAMES / 60.0)) : 1.0);
   }
 
 
@@ -222,8 +223,8 @@ export class PlacedObjectEffects {
     if (this.anims[slot] === anim && attackStarts[slot] === placed.serial) return;
     this.anims[slot] = anim;
     attackStarts[slot] = placed.serial;
-    BlzPlaySpecialEffect(model, anim === 3 ? ANIM_TYPE_DEATH : anim === 4 ? ANIM_TYPE_BIRTH : ANIM_TYPE_STAND);
-    BlzSetSpecialEffectTimeScale(model, anim === 3 ? f32(DEATH_SECONDS / f32(crumble / 60.0)) : anim === 4 ? f32(BIRTH_SECONDS / f32(built / 60.0)) : 1.0);
+    playEffectAnimation(model, anim === 3 ? ANIM_TYPE_DEATH : anim === 4 ? ANIM_TYPE_BIRTH : ANIM_TYPE_STAND);
+    setEffectTimeScale(model, anim === 3 ? f32(DEATH_SECONDS / f32(crumble / 60.0)) : anim === 4 ? f32(BIRTH_SECONDS / f32(built / 60.0)) : 1.0);
   }
 
   private animate(model: effect, slot: number, placed: Resting<PlacedObject>, bear: ReturnType<typeof bearState>): void {
@@ -257,8 +258,8 @@ export class PlacedObjectEffects {
     }
     if (bear === "CHARGING") { attackStart = -1; pitch = f32(-0.85); speed = 0.0; }
     else if (bear === "ATTACKING" || bear === "RESTING" && mode === CompanionMode.lunge) speed = 1.5;
-    BlzSetSpecialEffectPitch(model, pitch);
-    BlzSetSpecialEffectTimeScale(model, speed);
+    setEffectPitch(model, pitch);
+    setEffectTimeScale(model, speed);
     const moved = this.lastX[slot] !== undefined && this.lastX[slot] !== x;
     this.lastX[slot] = x;
     const anim = attackStart >= 0 ? 2 : moved ? 1 : 0;
@@ -266,13 +267,13 @@ export class PlacedObjectEffects {
     if (this.anims[slot] === anim && attackStarts[slot] === attackStart) return;
     this.anims[slot] = anim;
     attackStarts[slot] = attackStart;
-    BlzPlaySpecialEffect(model, anim === 2 ? ANIM_TYPE_ATTACK : anim === 1 ? ANIM_TYPE_WALK : ANIM_TYPE_STAND);
-    if (bear === "ATTACKING") BlzSetSpecialEffectTime(model, f32(0.5));
+    playEffectAnimation(model, anim === 2 ? ANIM_TYPE_ATTACK : anim === 1 ? ANIM_TYPE_WALK : ANIM_TYPE_STAND);
+    if (bear === "ATTACKING") setEffectTime(model, f32(0.5));
   }
 
   destroy(): void {
-    for (const model of this.models) DestroyEffect(model);
-    for (let index = 0; index < this.models.length; index++) for (const model of Object.values(this.prepared?.[index] ?? {})) if (model !== undefined && model !== this.models[index]) DestroyEffect(model);
+    for (const model of this.models) destroyEffect(model);
+    for (let index = 0; index < this.models.length; index++) for (const model of Object.values(this.prepared?.[index] ?? {})) if (model !== undefined && model !== this.models[index]) destroyEffect(model);
     this.feedback.destroy();
   }
 }

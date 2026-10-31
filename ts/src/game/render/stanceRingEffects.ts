@@ -4,6 +4,7 @@ import { DuoOrder, DuoRole } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { STANCE_RING_MODEL } from "../presentation/specialCues";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 const RING_SCALE = f32(0.4);
 
@@ -14,7 +15,7 @@ export class StanceRingEffects {
   private parked: ParkedFlags | undefined;
 
   constructor(private readonly origin: WorldOrigin) {
-    this.rings = PARTICIPANT_SLOTS.map(() => AddSpecialEffect(STANCE_RING_MODEL, origin.x, origin.y));
+    this.rings = PARTICIPANT_SLOTS.map(() => createEffect(STANCE_RING_MODEL, origin.x, origin.y));
     this.clear();
   }
 
@@ -37,17 +38,17 @@ export class StanceRingEffects {
       return;
     }
     if (parked[slot] !== false) {
-      BlzSetSpecialEffectAnimation(ring, "stand");
-      BlzSetSpecialEffectTime(ring, 0.0);
-      BlzSetSpecialEffectTimeScale(ring, 0.0);
+      setEffectAnimation(ring, "stand");
+      setEffectTime(ring, 0.0);
+      setEffectTimeScale(ring, 0.0);
     }
     parked[slot] = false;
     placeEffect(ring, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
-    BlzSetSpecialEffectScale(ring, RING_SCALE);
-    BlzSetSpecialEffectAlpha(ring, 255);
+    setEffectScale(ring, RING_SCALE);
+    setEffectAlpha(ring, 255);
   }
 
   destroy(): void {
-    for (const ring of this.rings) DestroyEffect(ring);
+    for (const ring of this.rings) destroyEffect(ring);
   }
 }

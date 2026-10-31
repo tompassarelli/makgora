@@ -8,6 +8,7 @@ import type { Fighter } from "../sim/fighter";
 import { FROST_ARMOR_SHELL_MODEL } from "../presentation/specialCues";
 import { frostShellScale } from "../presentation/frostShell";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime } from "wisp/game/effects";
 
 interface FrostSlot {
   readonly trap: effect;
@@ -25,9 +26,9 @@ export class FrostEffects {
 
   constructor(private readonly origin: WorldOrigin) {
     this.slots = PARTICIPANT_SLOTS.map(() => ({
-      trap: AddSpecialEffect(FROST_TRAP_MODEL, origin.x, origin.y),
-      ice: AddSpecialEffect(FROST_ICE_MODEL, origin.x, origin.y),
-      shell: AddSpecialEffect(FROST_ARMOR_SHELL_MODEL, origin.x, origin.y),
+      trap: createEffect(FROST_TRAP_MODEL, origin.x, origin.y),
+      ice: createEffect(FROST_ICE_MODEL, origin.x, origin.y),
+      shell: createEffect(FROST_ARMOR_SHELL_MODEL, origin.x, origin.y),
     }));
     this.clear();
   }
@@ -55,16 +56,16 @@ export class FrostEffects {
     if (trap.life > 0 && !out) {
       parked[2 * slot] = false;
       placeEffect(frost.trap, x + trap.x, y, z + trap.z);
-      BlzSetSpecialEffectScale(frost.trap, 1.0);
-      BlzSetSpecialEffectAlpha(frost.trap, trap.arming > 0 ? 100 : 255);
+      setEffectScale(frost.trap, 1.0);
+      setEffectAlpha(frost.trap, trap.arming > 0 ? 100 : 255);
     } else {
       parkOnce(frost.trap, this.origin, parked, 2 * slot);
     }
     if (fighter.status.frozenFrames > 0 && !fighter.status.petrified && !out) {
       parked[2 * slot + 1] = false;
       placeEffect(frost.ice, x + fighter.motion.x, y, z + fighter.motion.z);
-      BlzSetSpecialEffectScale(frost.ice, 1.0);
-      BlzSetSpecialEffectAlpha(frost.ice, 255);
+      setEffectScale(frost.ice, 1.0);
+      setEffectAlpha(frost.ice, 255);
     } else {
       parkOnce(frost.ice, this.origin, parked, 2 * slot + 1);
     }
@@ -72,13 +73,13 @@ export class FrostEffects {
     const shellScale = frostShellScale(fighter, SHELL_SCALE);
     if (shellScale > 0.0) {
       if (parked[shellIndex] !== false) {
-        BlzSetSpecialEffectAnimation(frost.shell, "stand");
-        BlzSetSpecialEffectTime(frost.shell, 0.0);
+        setEffectAnimation(frost.shell, "stand");
+        setEffectTime(frost.shell, 0.0);
       }
       parked[shellIndex] = false;
       placeEffect(frost.shell, x + fighter.motion.x, y, z + fighter.motion.z + SHELL_HEIGHT);
-      BlzSetSpecialEffectScale(frost.shell, shellScale);
-      BlzSetSpecialEffectAlpha(frost.shell, 255);
+      setEffectScale(frost.shell, shellScale);
+      setEffectAlpha(frost.shell, 255);
     } else {
       parkOnce(frost.shell, this.origin, parked, shellIndex);
     }
@@ -86,9 +87,9 @@ export class FrostEffects {
 
   destroy(): void {
     for (const { trap, ice, shell } of this.slots) {
-      DestroyEffect(trap);
-      DestroyEffect(ice);
-      DestroyEffect(shell);
+      destroyEffect(trap);
+      destroyEffect(ice);
+      destroyEffect(shell);
     }
   }
 }

@@ -1,15 +1,16 @@
 import { PROJECTILE_DRAW_OFFSETS } from "../presentation/projectileArt";
 import type { WorldOrigin } from "./effects";
+import { createEffect, setEffectAnimation, setEffectTime } from "wisp/game/effects";
 
 /** Makes one parked projectile effect at the draw's first pose and returns its index in models. */
 export function addPoolEffect(models: effect[], visible: boolean[], drawn: string, origin: WorldOrigin): number {
   const index = models.length;
-  const model = AddSpecialEffect(drawn, origin.x, origin.y);
+  const model = createEffect(drawn, origin.x, origin.y);
   models.push(model);
   const draw = PROJECTILE_DRAW_OFFSETS[drawn];
   if (draw?.sequence !== undefined) {
-    BlzSetSpecialEffectAnimation(model, draw.sequence);
-    BlzSetSpecialEffectTime(model, draw.seconds ?? 0.0);
+    setEffectAnimation(model, draw.sequence);
+    setEffectTime(model, draw.seconds ?? 0.0);
   }
   visible.push(false);
   return index;

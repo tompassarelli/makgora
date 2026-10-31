@@ -2,6 +2,7 @@ import { type SpherePose, emptySpherePose, spherePose } from "../presentation/sp
 import type { OrbitLook } from "../presentation/model/look";
 import type { Fighter } from "../sim/fighter";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
+import { createEffect, destroyEffect, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 export class SpherePresentation {
   private readonly spheres: effect[] = [];
@@ -10,7 +11,7 @@ export class SpherePresentation {
 
   constructor(private readonly orbit: Readonly<OrbitLook>, private readonly origin: Readonly<WorldOrigin>) {
     for (let index = 0; index < orbit.count; index++) {
-      const model = AddSpecialEffect(orbit.model, origin.x, origin.y);
+      const model = createEffect(orbit.model, origin.x, origin.y);
       hideEffect(model, origin);
       this.spheres.push(model);
     }
@@ -28,9 +29,9 @@ export class SpherePresentation {
       }
       shown = true;
       placeEffect(model, this.origin.x + pose.x, this.origin.y + pose.depth, this.origin.z + pose.z);
-      BlzSetSpecialEffectYaw(model, facingYaw(fighter.facing));
-      BlzSetSpecialEffectScale(model, pose.scale);
-      BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
+      setEffectYaw(model, facingYaw(fighter.facing));
+      setEffectScale(model, pose.scale);
+      setEffectTimeScale(model, paused ? 0.0 : 1.0);
     }
     this.shown = shown;
   }
@@ -46,7 +47,7 @@ export class SpherePresentation {
   destroy(): void {
     for (const model of this.spheres) {
       hideEffect(model, this.origin);
-      DestroyEffect(model);
+      destroyEffect(model);
     }
   }
 }

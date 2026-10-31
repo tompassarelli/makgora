@@ -45,6 +45,7 @@ import { KO_BLUR_DISTANCE, type KoFlash, createKoFlash, endKoFlash, koFlashLevel
 import type { Fighter } from "../sim/fighter";
 import { heroLook } from "../roster/looks";
 import { bodyCostume, bodyVariants, costumeClipModel } from "../roster/costumes";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectPitch, setEffectRoll, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 
 const KO_VARIANTS = bodyVariants(SELECTABLE_CHARACTERS);
@@ -143,7 +144,7 @@ export class CombatEffects {
     this.sounds.prepare(SoundKind.combatFile, names.files);
     this.sounds.prepare(SoundKind.combatLabel, names.labels);
     for (let i = 0; i < IMPACT_COUNT; i++) {
-      const model = AddSpecialEffect(impactModel(floorDiv(i, IMPACTS_PER_KIND)), origin.x, origin.y);
+      const model = createEffect(impactModel(floorDiv(i, IMPACTS_PER_KIND)), origin.x, origin.y);
       this.tint(model, i, floorDiv(i, IMPACTS_PER_KIND), 0.0);
       parkOnce(model, this, parked, i);
       this.impacts.push(model);
@@ -153,11 +154,11 @@ export class CombatEffects {
       const index = originalClipNamed(character, "stand hit");
       const clip = index === undefined ? undefined : originalClip(character, index);
       const timeline = clip?.timeline === true ? clip : undefined;
-      const model = AddSpecialEffect(timeline === undefined ? fighterModel(character) : costumeClipModel(character, costume, timeline), origin.x, origin.y);
-      BlzSetSpecialEffectAnimation(model, timeline === undefined ? "stand hit" : "Stand");
-      BlzSetSpecialEffectAnimationBlendTime(model, 0.0);
-      BlzSetSpecialEffectTimeScale(model, 0.0);
-      BlzSetSpecialEffectTime(model, timeline === undefined ? f32(0.1) : f32(timeline.startSeconds + f32(0.1)));
+      const model = createEffect(timeline === undefined ? fighterModel(character) : costumeClipModel(character, costume, timeline), origin.x, origin.y);
+      setEffectAnimation(model, timeline === undefined ? "stand hit" : "Stand");
+      setEffectBlendTime(model, 0.0);
+      setEffectTimeScale(model, 0.0);
+      setEffectTime(model, timeline === undefined ? f32(0.1) : f32(timeline.startSeconds + f32(0.1)));
       parkOnce(model, this, parked, IMPACT_COUNT + i);
       this.koBodies.push(model);
     }
@@ -357,8 +358,8 @@ export class CombatEffects {
     const last = shownAges[i];
     if (last !== undefined && age !== undefined && age < last) hideEffect(model, this);
     if (last === undefined || age !== undefined && age < last) {
-      BlzSetSpecialEffectAnimation(model, impactAnimation(kind));
-      BlzSetSpecialEffectTime(model, impactStartSeconds(kind));
+      setEffectAnimation(model, impactAnimation(kind));
+      setEffectTime(model, impactStartSeconds(kind));
     }
     if (kind === IMPACT_STAR_KO && age !== undefined && age >= KO_STAR_FLIGHT_FRAMES && (last === undefined || last < KO_STAR_FLIGHT_FRAMES || age < last)) {
       this.soundFrame = frame;
@@ -399,18 +400,18 @@ export class CombatEffects {
       parked[IMPACT_COUNT + i] = false;
       this.colourKo(model, i, pose.owner);
       placeEffect(model, this.x + pose.x, this.y + pose.y, this.z + pose.z);
-      BlzSetSpecialEffectScale(model, characterModelScale(pose.character) * pose.scale);
-      BlzSetSpecialEffectPitch(model, pose.pitch);
-      BlzSetSpecialEffectYaw(model, pose.yaw);
-      BlzSetSpecialEffectRoll(model, pose.roll);
-      BlzSetSpecialEffectAlpha(model, pose.alpha);
+      setEffectScale(model, characterModelScale(pose.character) * pose.scale);
+      setEffectPitch(model, pose.pitch);
+      setEffectYaw(model, pose.yaw);
+      setEffectRoll(model, pose.roll);
+      setEffectAlpha(model, pose.alpha);
     }
   }
 
   private colourKo(model: effect, i: number, owner: number): void {
     if (this.koOwners[i] === owner) return;
     this.koOwners[i] = owner;
-    BlzSetSpecialEffectColorByPlayer(model, Player(owner));
+    setEffectTeamColor(model, Player(owner));
   }
 
   private tint(model: effect, i: number, kind: number, strength: number): void {
@@ -418,7 +419,7 @@ export class CombatEffects {
     const tints = (this.tints ??= []);
     if (colour === undefined || tints[i] === colour) return;
     tints[i] = colour;
-    BlzSetSpecialEffectColor(model, colour[0] ?? 255, colour[1] ?? 255, colour[2] ?? 255);
+    setEffectColor(model, colour[0] ?? 255, colour[1] ?? 255, colour[2] ?? 255);
   }
 
   private place(model: effect, i: number, kind: number, pose: ReturnType<typeof projectImpact>, strength: number): void {
@@ -429,9 +430,9 @@ export class CombatEffects {
 
     const depth = kind === IMPACT_STAR_KO ? STAR_KO_DEPTH
       : isContactImpact(kind) || kind === IMPACT_GRAB || kind === IMPACT_THROW ? -120.0 : 0.0;
-    BlzSetSpecialEffectAlpha(model, pose.alpha);
-    BlzSetSpecialEffectScale(model, pose.scale * impactModelScale(kind));
-    BlzSetSpecialEffectPitch(model, pose.pitch);
+    setEffectAlpha(model, pose.alpha);
+    setEffectScale(model, pose.scale * impactModelScale(kind));
+    setEffectPitch(model, pose.pitch);
     placeEffect(model, this.x + pose.x, this.y + depth, this.z + pose.z);
   }
 
@@ -474,8 +475,8 @@ export class CombatEffects {
 
       if (state.ages[i] === undefined) {
         if (age === 0) {
-          BlzSetSpecialEffectAnimation(model, impactAnimation(kind));
-          BlzSetSpecialEffectTime(model, impactStartSeconds(kind));
+          setEffectAnimation(model, impactAnimation(kind));
+          setEffectTime(model, impactStartSeconds(kind));
         }
         this.place(model, i, kind, projectImpact(late, i, this.camera, this.pose), late.strength[i] ?? 0.0);
       }
@@ -486,12 +487,12 @@ export class CombatEffects {
   }
 
   setPaused(paused: boolean): void {
-    for (const model of this.impacts) BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
+    for (const model of this.impacts) setEffectTimeScale(model, paused ? 0.0 : 1.0);
   }
 
   destroy(): void {
-    for (const model of this.impacts) DestroyEffect(model);
-    for (const model of this.koBodies) DestroyEffect(model);
+    for (const model of this.impacts) destroyEffect(model);
+    for (const model of this.koBodies) destroyEffect(model);
     this.impacts.length = 0;
     this.koBodies.length = 0;
   }

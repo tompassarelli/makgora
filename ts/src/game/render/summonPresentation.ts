@@ -3,6 +3,7 @@
 import { summonClip, summonClipCount } from "../presentation/summonClipInfo";
 import type { SummonProjection } from "../presentation/summonState";
 import { type WorldOrigin, hideEffect, placeEffect } from "./effects";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 export class SummonPresentation {
   private readonly clips: effect[] = [];
@@ -15,10 +16,10 @@ export class SummonPresentation {
     const count = summonClipCount(summon);
     for (let index = 0; index < count; index++) {
       const clip = summonClip(summon, index);
-      const model = AddSpecialEffect(clip.modelPath, origin.x, origin.y);
-      BlzSetSpecialEffectAnimationBlendTime(model, 0.0);
-      BlzSetSpecialEffectAnimation(model, "Stand");
-      BlzSetSpecialEffectTimeScale(model, 0.0);
+      const model = createEffect(clip.modelPath, origin.x, origin.y);
+      setEffectBlendTime(model, 0.0);
+      setEffectAnimation(model, "Stand");
+      setEffectTimeScale(model, 0.0);
       hideEffect(model, origin);
       this.clips.push(model);
     }
@@ -41,16 +42,16 @@ export class SummonPresentation {
       this.visible = pose.clipIndex;
     }
     placeEffect(model, this.origin.x + pose.x, this.origin.y, this.origin.z + pose.z);
-    BlzSetSpecialEffectYaw(model, pose.yaw);
-    BlzSetSpecialEffectScale(model, pose.scale);
-    BlzSetSpecialEffectTime(model, pose.seconds);
-    BlzSetSpecialEffectAlpha(model, 255);
+    setEffectYaw(model, pose.yaw);
+    setEffectScale(model, pose.scale);
+    setEffectTime(model, pose.seconds);
+    setEffectAlpha(model, 255);
   }
 
   destroy(): void {
 
     this.hide();
-    for (const model of this.clips) DestroyEffect(model);
+    for (const model of this.clips) destroyEffect(model);
     this.clips.length = 0;
   }
 }

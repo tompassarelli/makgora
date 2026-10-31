@@ -31,6 +31,7 @@ import { resultFighterPlacement } from "../presentation/arenaCamera";
 import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { defeatClip, resultBodies, resultPoseAt, type ResultBody, type ResultClips } from "../presentation/resultPose";
+import { createEffect, destroyEffect, setEffectAnimation, setEffectBlendTime, setEffectPosition, setEffectScale, setEffectTeamColor, setEffectTime, setEffectTimeScale, setEffectYaw, setEffectZ } from "wisp/game/effects";
 
 
 export const RESULTS_DELAY_FRAMES = 90;
@@ -255,9 +256,9 @@ export class MatchPresentation {
         if (!row.winner || this.resultFrames !== LEVEL_UP_FRAME) continue;
         this.resultBurst = true;
         const placement = resultFighterPlacement(this.resultStage, index, bodies.length);
-        const burst = AddSpecialEffect("Abilities\\Spells\\Other\\Levelup\\LevelupCaster.mdx", this.origin.x + placement.x, this.origin.y);
-        BlzSetSpecialEffectZ(burst, this.origin.z + placement.z);
-        DestroyEffect(burst);
+        const burst = createEffect("Abilities\\Spells\\Other\\Levelup\\LevelupCaster.mdx", this.origin.x + placement.x, this.origin.y);
+        setEffectZ(burst, this.origin.z + placement.z);
+        destroyEffect(burst);
       }
     }
     if (this.pending === undefined) return false;
@@ -321,24 +322,24 @@ export class MatchPresentation {
       const { clip, time } = resultPoseAt(pose.clips, row.winner, I2R(this.resultFrames) / 60.0);
       const modelPath = costumeClipModel(pose.character, pose.costume, clip);
       if (pose.model !== undefined && pose.modelPath !== modelPath) {
-        DestroyEffect(pose.model);
+        destroyEffect(pose.model);
         pose.model = undefined;
       }
       if (pose.model === undefined) {
-        pose.model = AddSpecialEffect(modelPath, this.origin.x, this.origin.y);
+        pose.model = createEffect(modelPath, this.origin.x, this.origin.y);
         pose.modelPath = modelPath;
         hideEffect(pose.model, this.origin);
-        BlzSetSpecialEffectColorByPlayer(pose.model, Player(row.slot));
-        BlzSetSpecialEffectAnimationBlendTime(pose.model, 0.0);
-        BlzSetSpecialEffectAnimation(pose.model, "Stand");
-        BlzSetSpecialEffectTimeScale(pose.model, 0.0);
+        setEffectTeamColor(pose.model, Player(row.slot));
+        setEffectBlendTime(pose.model, 0.0);
+        setEffectAnimation(pose.model, "Stand");
+        setEffectTimeScale(pose.model, 0.0);
       }
       const model = pose.model;
       const placement = resultFighterPlacement(this.resultStage, index, bodies.length);
-      BlzSetSpecialEffectPosition(model, this.origin.x + placement.x, this.origin.y, this.origin.z + placement.z);
-      BlzSetSpecialEffectYaw(model, FACING_CAMERA);
-      BlzSetSpecialEffectScale(model, bodyModelScale(pose.character, pose.role));
-      BlzSetSpecialEffectTime(model, time);
+      setEffectPosition(model, this.origin.x + placement.x, this.origin.y, this.origin.z + placement.z);
+      setEffectYaw(model, FACING_CAMERA);
+      setEffectScale(model, bodyModelScale(pose.character, pose.role));
+      setEffectTime(model, time);
     }
   }
 
@@ -407,7 +408,7 @@ export class MatchPresentation {
       const pose = this.poses[slot];
       if (pose?.model !== undefined) {
         hideEffect(pose.model, this.origin);
-        DestroyEffect(pose.model);
+        destroyEffect(pose.model);
       }
       this.poses[slot] = undefined;
       this.partners[slot] = undefined;

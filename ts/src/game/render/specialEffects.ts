@@ -36,6 +36,7 @@ import { PoisonStackPresentation } from "./poisonStackPresentation";
 import { SpellPassPresentation } from "./spellPassPresentation";
 import { SoundBank, SoundKind } from "./soundBank";
 import { bindPrototype } from "../../platform/rebind";
+import { createBeam, createEffect, destroyBeam, destroyEffect, moveBeam, setBeamColor, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 interface SpecialSlot {
   readonly bear: SummonPresentation;
@@ -101,24 +102,24 @@ export class SpecialEffects {
     this.slots = PARTICIPANT_SLOTS.map((participant) => {
       const cursor = createImpactPresentationCursor();
       const bear = new SummonPresentation(SUMMON_BEAR, origin);
-      const aura = AddSpecialEffect(IMPACT_ROLL_MODEL, x, y);
-      const felFlames = AddSpecialEffect(STOCK_MODELS.immolationTarget, x, y);
-      const cannonFlames = AddSpecialEffect(STOCK_MODELS.cannonFlames, x, y);
-      const manaHand = AddSpecialEffect(STOCK_MODELS.manaBurnTarget, x, y);
-      const wingTrail = AddSpecialEffect(IMPACT_DUST_MODEL, x, y);
-      const drainFlash = AddSpecialEffect(IMPACT_TECH_MODEL, x, y);
-      const silence = AddSpecialEffect(STOCK_MODELS.silenceTarget, x, y);
-      const curse = AddSpecialEffect(STOCK_MODELS.doomTarget, x, y);
-      const frog = AddSpecialEffect(HEX_FROG_MODEL, x, y);
-      const siphon = AddLightningEx(SIPHON_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
-      SetLightningColor(siphon, 1.0, 1.0, 1.0, 0.0);
-      const laser = AddLightningEx(LASER_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
-      SetLightningColor(laser, 1.0, 1.0, 1.0, 0.0);
-      const chain = AddLightningEx(CHAIN_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
-      SetLightningColor(chain, 1.0, 1.0, 1.0, 0.0);
-      BlzSetSpecialEffectTimeScale(aura, 0.0);
-      BlzSetSpecialEffectTimeScale(wingTrail, 0.0);
-      BlzSetSpecialEffectTimeScale(drainFlash, 0.0);
+      const aura = createEffect(IMPACT_ROLL_MODEL, x, y);
+      const felFlames = createEffect(STOCK_MODELS.immolationTarget, x, y);
+      const cannonFlames = createEffect(STOCK_MODELS.cannonFlames, x, y);
+      const manaHand = createEffect(STOCK_MODELS.manaBurnTarget, x, y);
+      const wingTrail = createEffect(IMPACT_DUST_MODEL, x, y);
+      const drainFlash = createEffect(IMPACT_TECH_MODEL, x, y);
+      const silence = createEffect(STOCK_MODELS.silenceTarget, x, y);
+      const curse = createEffect(STOCK_MODELS.doomTarget, x, y);
+      const frog = createEffect(HEX_FROG_MODEL, x, y);
+      const siphon = createBeam(SIPHON_LIGHTNING, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
+      setBeamColor(siphon, 1.0, 1.0, 1.0, 0.0);
+      const laser = createBeam(LASER_LIGHTNING, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
+      setBeamColor(laser, 1.0, 1.0, 1.0, 0.0);
+      const chain = createBeam(CHAIN_LIGHTNING, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
+      setBeamColor(chain, 1.0, 1.0, 1.0, 0.0);
+      setEffectTimeScale(aura, 0.0);
+      setEffectTimeScale(wingTrail, 0.0);
+      setEffectTimeScale(drainFlash, 0.0);
       const immolationLoop = CreateSoundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
       return {
         bear, aura, felFlames, cannonFlames, manaHand, wingTrail, drainFlash, silence, curse, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, cursor, immolationLoop,
@@ -181,10 +182,10 @@ export class SpecialEffects {
     this.stackPresentation.setPaused(paused);
     this.spellPass.setPaused(paused);
     for (const { felFlames, cannonFlames, manaHand, silence } of this.slots) {
-      BlzSetSpecialEffectTimeScale(felFlames, scale);
-      BlzSetSpecialEffectTimeScale(cannonFlames, scale);
-      BlzSetSpecialEffectTimeScale(manaHand, scale);
-      BlzSetSpecialEffectTimeScale(silence, scale);
+      setEffectTimeScale(felFlames, scale);
+      setEffectTimeScale(cannonFlames, scale);
+      setEffectTimeScale(manaHand, scale);
+      setEffectTimeScale(silence, scale);
     }
   }
 
@@ -193,9 +194,9 @@ export class SpecialEffects {
     this.placed(slot, effect);
     const scale = fighterModelScale(fighter);
     placeEffect(model, this.origin.x + fighter.motion.x + x * scale, this.front, this.origin.z + fighter.motion.z + z * scale);
-    BlzSetSpecialEffectScale(model, size * scale);
-    BlzSetSpecialEffectAlpha(model, 255);
-    BlzSetSpecialEffectTimeScale(model, fighter.launch.hitlag > 0 || fighter.status.frozenFrames > 0 ? 0.0 : 1.0);
+    setEffectScale(model, size * scale);
+    setEffectAlpha(model, 255);
+    setEffectTimeScale(model, fighter.launch.hitlag > 0 || fighter.status.frozenFrames > 0 ? 0.0 : 1.0);
   }
 
 
@@ -239,10 +240,10 @@ export class SpecialEffects {
     this.spellPass.present(fighter, index);
     if (!fighter.status.out && fighter.status.condition === HeroStatusKind.hex) {
       this.show(slot.frog, index, FROG, fighter, 0.0, 0.0, f32(1.6));
-      BlzSetSpecialEffectYaw(slot.frog, facingYaw(fighter.facing));
+      setEffectYaw(slot.frog, facingYaw(fighter.facing));
     } else this.park(slot.frog, index, FROG);
     if (fighter.character === Character.demonHunter && !fighter.status.out) {
-      if (entered && action === SpecialAction.demonHunterImmolate) BlzSetSpecialEffectTime(felFlames, 0.0);
+      if (entered && action === SpecialAction.demonHunterImmolate) setEffectTime(felFlames, 0.0);
 
       const immolating = action === SpecialAction.demonHunterImmolate;
 
@@ -270,9 +271,9 @@ export class SpecialEffects {
     }
     this.placed(slot, effect);
     placeEffect(model, this.origin.x + pose.x, this.front, this.origin.z + pose.z);
-    BlzSetSpecialEffectColor(model, pose.red, pose.green, pose.blue);
-    BlzSetSpecialEffectScale(model, pose.scale);
-    BlzSetSpecialEffectAlpha(model, pose.alpha);
+    setEffectColor(model, pose.red, pose.green, pose.blue);
+    setEffectScale(model, pose.scale);
+    setEffectAlpha(model, pose.alpha);
   }
 
 
@@ -298,14 +299,14 @@ export class SpecialEffects {
 
   private hideSiphon(slot: SpecialSlot): void {
     if (!slot.siphonShown) return;
-    SetLightningColor(slot.siphon, 1.0, 1.0, 1.0, 0.0);
+    setBeamColor(slot.siphon, 1.0, 1.0, 1.0, 0.0);
     slot.siphonShown = false;
   }
 
   private hideLaser(slot: SpecialSlot): void {
     if (!slot.laserShown) return;
-    SetLightningColor(slot.laser, 1.0, 1.0, 1.0, 0.0);
-    SetLightningColor(slot.chain, 1.0, 1.0, 1.0, 0.0);
+    setBeamColor(slot.laser, 1.0, 1.0, 1.0, 0.0);
+    setBeamColor(slot.chain, 1.0, 1.0, 1.0, 0.0);
     slot.laserShown = false;
   }
 
@@ -319,10 +320,10 @@ export class SpecialEffects {
     const line = beamSegment(this.beamLine, fighter, beam, region.strike.radius);
     const { x, z } = this.origin;
     const shown = beam.chain === true ? effects.chain : effects.laser;
-    SetLightningColor(beam.chain === true ? effects.laser : effects.chain, 1.0, 1.0, 1.0, 0.0);
-    MoveLightningEx(shown, false, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
-    if (beam.chain === true) SetLightningColor(shown, 1.0, 1.0, 1.0, 1.0);
-    else SetLightningColor(shown, 1.0, f32(0.3), f32(0.15), 1.0);
+    setBeamColor(beam.chain === true ? effects.laser : effects.chain, 1.0, 1.0, 1.0, 0.0);
+    moveBeam(shown, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
+    if (beam.chain === true) setBeamColor(shown, 1.0, 1.0, 1.0, 1.0);
+    else setBeamColor(shown, 1.0, f32(0.3), f32(0.15), 1.0);
     effects.laserShown = true;
   }
 
@@ -333,9 +334,9 @@ export class SpecialEffects {
       return;
     }
     const { x, z } = this.origin;
-    SetLightningColor(effects.laser, 1.0, 1.0, 1.0, 0.0);
-    MoveLightningEx(effects.chain, false, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
-    SetLightningColor(effects.chain, 1.0, 1.0, 1.0, 1.0);
+    setBeamColor(effects.laser, 1.0, 1.0, 1.0, 0.0);
+    moveBeam(effects.chain, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
+    setBeamColor(effects.chain, 1.0, 1.0, 1.0, 1.0);
     effects.laserShown = true;
   }
 
@@ -358,9 +359,9 @@ export class SpecialEffects {
       const startZ = strike?.z1 ?? 54.0;
       const endX = held && victim !== undefined ? victim.lastX : fighter.motion.x + fighter.facing * (strike?.x2 ?? 68.0);
       const endZ = held && victim !== undefined ? victim.lastZ + 54.0 : fighter.motion.z + (strike?.z2 ?? 54.0);
-      MoveLightningEx(effects.siphon, false, this.origin.x + fighter.motion.x + fighter.facing * startX, this.front, this.origin.z + fighter.motion.z + startZ,
+      moveBeam(effects.siphon, this.origin.x + fighter.motion.x + fighter.facing * startX, this.front, this.origin.z + fighter.motion.z + startZ,
         this.origin.x + endX, this.front, this.origin.z + endZ);
-      SetLightningColor(effects.siphon, drain ? f32(0.8) : f32(0.65), drain ? f32(0.2) : f32(0.35), drain ? f32(0.5) : 1.0, 1.0);
+      setBeamColor(effects.siphon, drain ? f32(0.8) : f32(0.65), drain ? f32(0.2) : f32(0.35), drain ? f32(0.5) : 1.0, 1.0);
       effects.siphonShown = true;
       return;
     }
@@ -377,9 +378,9 @@ export class SpecialEffects {
     const reach = tether === undefined ? 0.0 : min(1.0, f32(f32(fighter.attack.frame + 1) / f32(attackStartup(fighter, AttackStyle.grab) + 1)));
     const endX = victim !== undefined ? victim.lastX : fighter.motion.x + fighter.facing * f32((tether?.x2 ?? 0.0) * reach);
     const endZ = victim !== undefined ? victim.lastZ + 55.0 : fighter.motion.z + (tether?.z2 ?? 0.0);
-    MoveLightningEx(effects.siphon, false, x + fighter.motion.x + fighter.facing * 40.0 * scale, this.front, z + fighter.motion.z + 65.0 * scale,
+    moveBeam(effects.siphon, x + fighter.motion.x + fighter.facing * 40.0 * scale, this.front, z + fighter.motion.z + 65.0 * scale,
       x + endX, this.front, z + endZ);
-    SetLightningColor(effects.siphon, 1.0, 1.0, 1.0, 1.0);
+    setBeamColor(effects.siphon, 1.0, 1.0, 1.0, 1.0);
     effects.siphonShown = true;
   }
 
@@ -401,10 +402,10 @@ export class SpecialEffects {
       this.releaseImmolationLoop(slot);
       KillSoundWhenDone(slot.immolationLoop);
       slot.bear.destroy();
-      for (const model of [slot.aura, slot.felFlames, slot.cannonFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, slot.frog]) DestroyEffect(model);
-      DestroyLightning(slot.siphon);
-      DestroyLightning(slot.laser);
-      DestroyLightning(slot.chain);
+      for (const model of [slot.aura, slot.felFlames, slot.cannonFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, slot.frog]) destroyEffect(model);
+      destroyBeam(slot.siphon);
+      destroyBeam(slot.laser);
+      destroyBeam(slot.chain);
     }
   }
 }

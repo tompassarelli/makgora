@@ -3,6 +3,7 @@ import { fighterModelScale } from "../presentation/fighterScale";
 import type { Fighter } from "../sim/fighter";
 import { SEA_SURFACE_Z, hasTide } from "../sim/stageHazards";
 import { type ParkedFlags, type WorldOrigin, hideEffect, parkOnce, placeEffect } from "./effects";
+import { createEffect, destroyEffect, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 export const SEA_SPLASH_MODEL = "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx";
 /** Frames the splash model plays before it is parked again; the native window's rings and foam outlast it. */
@@ -20,7 +21,7 @@ export class SeaSplashPresentation {
   private age = SPLASH_FRAMES;
 
   constructor(private readonly origin: WorldOrigin) {
-    this.splash = AddSpecialEffect(SEA_SPLASH_MODEL, origin.x, origin.y);
+    this.splash = createEffect(SEA_SPLASH_MODEL, origin.x, origin.y);
     this.hide();
   }
 
@@ -34,14 +35,14 @@ export class SeaSplashPresentation {
     if (wet !== this.wet && !paused) {
       this.wet = wet;
       this.age = 0;
-      BlzSetSpecialEffectTime(this.splash, 0.0);
-      BlzSetSpecialEffectColor(this.splash, WATER_TINT[0], WATER_TINT[1], WATER_TINT[2]);
-      BlzSetSpecialEffectScale(this.splash, f32(fighterModelScale(fighter) * (wet ? ENTRY_SCALE : EXIT_SCALE)));
+      setEffectTime(this.splash, 0.0);
+      setEffectColor(this.splash, WATER_TINT[0], WATER_TINT[1], WATER_TINT[2]);
+      setEffectScale(this.splash, f32(fighterModelScale(fighter) * (wet ? ENTRY_SCALE : EXIT_SCALE)));
       this.parked[SPLASH] = false;
       placeEffect(this.splash, this.origin.x + fighter.motion.x, this.origin.y - 12.0, this.origin.z + SEA_SURFACE_Z);
     }
     if (this.age < SPLASH_FRAMES) {
-      BlzSetSpecialEffectTimeScale(this.splash, paused ? 0.0 : 1.0);
+      setEffectTimeScale(this.splash, paused ? 0.0 : 1.0);
       if (!paused) this.age++;
     } else parkOnce(this.splash, this.origin, this.parked, SPLASH);
   }
@@ -53,6 +54,6 @@ export class SeaSplashPresentation {
 
   destroy(): void {
     hideEffect(this.splash, this.origin);
-    DestroyEffect(this.splash);
+    destroyEffect(this.splash);
   }
 }

@@ -4,6 +4,7 @@ import { type Roster, fighterAt } from "../sim/roster";
 import { HOOK_LINK_COUNT, HOOK_LINK_LENGTH, HOOK_LINK_MODEL, HOOK_LINK_ROLL, HOOK_LINK_SCALE, HOOK_LINK_SPACING, type HookChainSpan, emptyHookChainSpan, hookChainLength, hookChainSpan, hookLinkCount } from "../presentation/hookChain";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { hideEffect, placeEffect, type WorldOrigin } from "./effects";
+import { createEffect, destroyEffect, setEffectPitch, setEffectRoll, setEffectScale } from "wisp/game/effects";
 
 /** The Butcher's hook chain: evenly spaced links from his hand to the hook, or to the foe he reels in. */
 export class HookChainPresentation {
@@ -14,7 +15,7 @@ export class HookChainPresentation {
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
     for (let index = 0; index < HOOK_LINK_COUNT; index++) {
-      const link = AddSpecialEffect(HOOK_LINK_MODEL, origin.x, origin.y);
+      const link = createEffect(HOOK_LINK_MODEL, origin.x, origin.y);
       hideEffect(link, origin);
       this.links.push(link);
     }
@@ -41,9 +42,9 @@ export class HookChainPresentation {
         continue;
       }
       const along = f32((backward ? index + 1 : index) / count);
-      BlzSetSpecialEffectScale(link, scale);
-      BlzSetSpecialEffectPitch(link, pitch);
-      BlzSetSpecialEffectRoll(link, HOOK_LINK_ROLL);
+      setEffectScale(link, scale);
+      setEffectPitch(link, pitch);
+      setEffectRoll(link, HOOK_LINK_ROLL);
       placeEffect(link, this.origin.x + f32(fromX + f32(dx * along)), this.origin.y, this.origin.z + f32(fromZ + f32(dz * along)));
     }
     this.shown = count;
@@ -66,7 +67,7 @@ export class HookChainPresentation {
 
   destroy(): void {
     this.hide();
-    for (const link of this.links) DestroyEffect(link);
+    for (const link of this.links) destroyEffect(link);
     this.links.length = 0;
   }
 }

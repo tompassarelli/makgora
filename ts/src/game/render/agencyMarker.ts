@@ -2,6 +2,7 @@ import { FighterAgencyForecast, type FighterAgency } from "../presentation/fight
 import type { Fighter } from "../sim/fighter";
 import { hideEffect, type WorldOrigin, placeEffect } from "./effects";
 import { f32 } from "wisp/src/sim/f32";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 
 export class AgencyMarker {
@@ -10,13 +11,13 @@ export class AgencyMarker {
   private shown = false;
 
   constructor(private readonly origin: WorldOrigin) {
-    this.halo = AddSpecialEffect("Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl", origin.x, origin.y);
-    BlzSetSpecialEffectAnimationBlendTime(this.halo, 0.0);
-    BlzSetSpecialEffectAnimation(this.halo, "Stand");
-    BlzSetSpecialEffectTimeScale(this.halo, 0.0);
-    BlzSetSpecialEffectTime(this.halo, 0.5);
+    this.halo = createEffect("Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl", origin.x, origin.y);
+    setEffectBlendTime(this.halo, 0.0);
+    setEffectAnimation(this.halo, "Stand");
+    setEffectTimeScale(this.halo, 0.0);
+    setEffectTime(this.halo, 0.5);
 
-    BlzSetSpecialEffectRoll(this.halo, f32(Math.PI / 2.0));
+    setEffectRoll(this.halo, f32(Math.PI / 2.0));
     hideEffect(this.halo, origin);
   }
 
@@ -28,9 +29,9 @@ export class AgencyMarker {
     this.shown = true;
 
     placeEffect(this.halo, this.origin.x + fighter.motion.x, this.origin.y + 40.0, this.origin.z + fighter.motion.z + 90.0);
-    BlzSetSpecialEffectScale(this.halo, 1.75);
-    BlzSetSpecialEffectAlpha(this.halo, 255);
-    BlzSetSpecialEffectColor(this.halo, agency === "none" ? 255 : 0, agency === "none" ? 100 : 255, agency === "none" ? 40 : 0);
+    setEffectScale(this.halo, 1.75);
+    setEffectAlpha(this.halo, 255);
+    setEffectColor(this.halo, agency === "none" ? 255 : 0, agency === "none" ? 100 : 255, agency === "none" ? 40 : 0);
   }
 
   hide(): void {
@@ -45,6 +46,6 @@ export class AgencyMarker {
 
   destroy(): void {
     hideEffect(this.halo, this.origin);
-    DestroyEffect(this.halo);
+    destroyEffect(this.halo);
   }
 }

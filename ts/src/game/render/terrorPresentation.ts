@@ -6,6 +6,7 @@ import { terrorResisted } from "../presentation/terrorCues";
 import { HeroStatusKind } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, hideEffect, parkOnce, placeEffect } from "./effects";
+import { createEffect, destroyEffect, resetEffectMatrix, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 export const HOWL_TARGET_MODEL = "Abilities\\Spells\\Other\\HowlOfTerror\\HowlTarget.mdx";
 export const RESIST_FLASH_MODEL = "Abilities\\Spells\\Items\\SpellShieldAmulet\\SpellShieldCaster.mdx";
@@ -26,11 +27,11 @@ export class TerrorPresentation {
   private resistAge = RESIST_FRAMES;
 
   constructor(private readonly origin: WorldOrigin) {
-    this.ring = AddSpecialEffect(IMPACT_DEFILE_MODEL, origin.x, origin.y);
-    BlzSetSpecialEffectAnimation(this.ring, "stand");
-    BlzSetSpecialEffectTimeScale(this.ring, 0.0);
-    this.fear = AddSpecialEffect(HOWL_TARGET_MODEL, origin.x, origin.y);
-    this.resist = AddSpecialEffect(RESIST_FLASH_MODEL, origin.x, origin.y);
+    this.ring = createEffect(IMPACT_DEFILE_MODEL, origin.x, origin.y);
+    setEffectAnimation(this.ring, "stand");
+    setEffectTimeScale(this.ring, 0.0);
+    this.fear = createEffect(HOWL_TARGET_MODEL, origin.x, origin.y);
+    this.resist = createEffect(RESIST_FLASH_MODEL, origin.x, origin.y);
     this.hide();
   }
 
@@ -46,20 +47,20 @@ export class TerrorPresentation {
     if (fighter.status.condition === HeroStatusKind.fear && !fighter.status.out) {
       this.parked[FEAR] = false;
       placeEffect(this.fear, x, this.origin.y - 8.0, z + f32(150.0 * scale));
-      BlzSetSpecialEffectScale(this.fear, scale);
-      BlzSetSpecialEffectTimeScale(this.fear, paused || fighter.launch.hitlag > 0 ? 0.0 : 1.0);
+      setEffectScale(this.fear, scale);
+      setEffectTimeScale(this.fear, paused || fighter.launch.hitlag > 0 ? 0.0 : 1.0);
     } else parkOnce(this.fear, this.origin, this.parked, FEAR);
     if (terrorResisted(fighter, this.hits, roaring)) this.resistAge = 0;
     this.hits = fighter.visuals.hit;
     if (this.resistAge < RESIST_FRAMES && !fighter.status.out) {
       if (this.resistAge === 0) {
-        BlzSetSpecialEffectTime(this.resist, 0.0);
-        BlzSetSpecialEffectColor(this.resist, 255, 255, 255);
+        setEffectTime(this.resist, 0.0);
+        setEffectColor(this.resist, 255, 255, 255);
       }
       this.parked[RESIST] = false;
       placeEffect(this.resist, x, this.origin.y - 12.0, z + f32(60.0 * scale));
-      BlzSetSpecialEffectScale(this.resist, f32(f32(0.8) * scale));
-      BlzSetSpecialEffectTimeScale(this.resist, paused ? 0.0 : 1.0);
+      setEffectScale(this.resist, f32(f32(0.8) * scale));
+      setEffectTimeScale(this.resist, paused ? 0.0 : 1.0);
       if (!paused) this.resistAge++;
     } else parkOnce(this.resist, this.origin, this.parked, RESIST);
   }
@@ -71,14 +72,14 @@ export class TerrorPresentation {
       return;
     }
     this.parked[RING] = false;
-    BlzSetSpecialEffectPosition(this.ring, this.origin.x + ring.x, this.origin.y - 8.0, this.origin.z + ring.z);
-    BlzSetSpecialEffectScale(this.ring, ring.radius);
-    BlzResetSpecialEffectMatrix(this.ring);
-    BlzSetSpecialEffectRoll(this.ring, f32(Math.PI * 0.5));
+    setEffectPosition(this.ring, this.origin.x + ring.x, this.origin.y - 8.0, this.origin.z + ring.z);
+    setEffectScale(this.ring, ring.radius);
+    resetEffectMatrix(this.ring);
+    setEffectRoll(this.ring, f32(Math.PI * 0.5));
     // Warcraft may apply matrix scale before or after the roll, so the rim's 0.6 height is stretched on Y and Z alike.
-    BlzSetSpecialEffectMatrixScale(this.ring, 1.0, f32(1.0 / RIM_HEIGHT), f32(1.0 / RIM_HEIGHT));
-    BlzSetSpecialEffectColor(this.ring, FEL_RED[0], FEL_RED[1], FEL_RED[2]);
-    BlzSetSpecialEffectAlpha(this.ring, ring.alpha);
+    setEffectMatrixScale(this.ring, 1.0, f32(1.0 / RIM_HEIGHT), f32(1.0 / RIM_HEIGHT));
+    setEffectColor(this.ring, FEL_RED[0], FEL_RED[1], FEL_RED[2]);
+    setEffectAlpha(this.ring, ring.alpha);
   }
 
   hide(): void {
@@ -89,7 +90,7 @@ export class TerrorPresentation {
   destroy(): void {
     for (const model of [this.ring, this.fear, this.resist]) {
       hideEffect(model, this.origin);
-      DestroyEffect(model);
+      destroyEffect(model);
     }
   }
 }

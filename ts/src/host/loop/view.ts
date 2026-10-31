@@ -64,6 +64,7 @@ import { clockSeconds } from "./trace";
 import { frameCaptureStage } from "../../platform/captureStage";
 import { markLoreClear, presentMatchPanels, presentMessages, updateSlotHud } from "./viewHud";
 import { presentHydra, presentSlot, presentStageMotion } from "./viewPresentation";
+import { createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectYaw } from "wisp/game/effects";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -115,41 +116,41 @@ export function createStatusFrames(): StatusFrames {
 function clearStageDecks(s: ShellState): void {
   for (const effect of s.stageHydra ?? []) {
     hideEffect(effect, s.origin);
-    DestroyEffect(effect);
+    destroyEffect(effect);
   }
   s.stageHydra = [];
   for (const effect of s.stageWind) {
     hideEffect(effect, s.origin);
-    DestroyEffect(effect);
+    destroyEffect(effect);
   }
   s.stageWind.length = 0;
   if (s.stageCannon !== undefined) {
     hideEffect(s.stageCannon, s.origin);
-    DestroyEffect(s.stageCannon);
+    destroyEffect(s.stageCannon);
     s.stageCannon = undefined;
   }
   if (s.stageLava !== undefined) {
     hideEffect(s.stageLava, s.origin);
-    DestroyEffect(s.stageLava);
+    destroyEffect(s.stageLava);
     s.stageLava = undefined;
   }
   for (const deck of s.stageDecks) {
     hideEffect(deck, s.origin);
-    DestroyEffect(deck);
+    destroyEffect(deck);
   }
   s.stageDecks.length = 0;
   for (const part of s.stageDeckParts) {
     hideEffect(part, s.origin);
-    DestroyEffect(part);
+    destroyEffect(part);
   }
   s.stageDeckParts.length = 0;
 }
 
 function placePart(deck: effect, part: Readonly<PlatformPart>, x: number, y: number, z: number): void {
-  BlzSetSpecialEffectPosition(deck, x + part.x, y + part.y, z + part.z);
+  setEffectPosition(deck, x + part.x, y + part.y, z + part.z);
   // Native yaw discards an earlier matrix scale (0.0.103 drew Frozen Throne's floes unsquashed), so the scale goes last.
-  BlzSetSpecialEffectYaw(deck, part.yaw * (Math.PI / 180.0));
-  BlzSetSpecialEffectMatrixScale(deck, part.scale[0], part.scale[1], part.scale[2]);
+  setEffectYaw(deck, part.yaw * (Math.PI / 180.0));
+  setEffectMatrixScale(deck, part.scale[0], part.scale[1], part.scale[2]);
 }
 
 
@@ -163,14 +164,14 @@ export function drawStage(s: ShellState): void {
     const left = surfaceLeft(stage, index, stageFrame);
     const right = surfaceRight(stage, index, stageFrame);
     const x = origin.x + (left + right) / 2;
-    const deck = AddSpecialEffect(deckModel(stage, index), x, origin.y);
+    const deck = createEffect(deckModel(stage, index), x, origin.y);
     const z = origin.z + surfaceZ(stage, index, stageFrame);
-    BlzSetSpecialEffectPosition(deck, x, origin.y, z);
+    setEffectPosition(deck, x, origin.y, z);
     const parts = platformParts(stage, index);
     if (parts.length > 0) {
 
       for (const [order, part] of parts.entries()) {
-        const effect = order === 0 ? deck : AddSpecialEffect(part.model, x, origin.y);
+        const effect = order === 0 ? deck : createEffect(part.model, x, origin.y);
         placePart(effect, part, x, origin.y, z);
         if (order > 0) s.stageDeckParts.push(effect);
       }
@@ -178,39 +179,39 @@ export function drawStage(s: ShellState): void {
       continue;
     }
     const scale = slabScale(stage, index, right - left);
-    if (scale !== undefined) BlzSetSpecialEffectMatrixScale(deck, scale[0], scale[1], scale[2]);
+    if (scale !== undefined) setEffectMatrixScale(deck, scale[0], scale[1], scale[2]);
     s.stageDecks.push(deck);
   }
   if (cannonOn(stage, stageFrame)) {
-    s.stageCannon = AddSpecialEffect(CANNON_MODEL, origin.x + cannonX(stageFrame), origin.y);
-    BlzSetSpecialEffectPosition(s.stageCannon, origin.x + cannonX(stageFrame), origin.y, origin.z + CANNON_Z - CANNON_MODEL_BASE);
-    BlzSetSpecialEffectScale(s.stageCannon, 1.5);
+    s.stageCannon = createEffect(CANNON_MODEL, origin.x + cannonX(stageFrame), origin.y);
+    setEffectPosition(s.stageCannon, origin.x + cannonX(stageFrame), origin.y, origin.z + CANNON_Z - CANNON_MODEL_BASE);
+    setEffectScale(s.stageCannon, 1.5);
   }
   for (let index = 0; index < 6; index++) {
     const light = stageEdgeLight(stage, index, stageFrame);
     if (light === undefined) break;
-    const effect = AddSpecialEffect(STAGE_EDGE_LIGHT_MODEL, origin.x + light.x, origin.y + light.y);
-    BlzSetSpecialEffectPosition(effect, origin.x + light.x, origin.y + light.y, origin.z + light.z);
-    BlzSetSpecialEffectScale(effect, 0.75);
-    BlzSetSpecialEffectColor(effect, 96, 255, 64);
-    BlzPlaySpecialEffect(effect, ANIM_TYPE_STAND);
+    const effect = createEffect(STAGE_EDGE_LIGHT_MODEL, origin.x + light.x, origin.y + light.y);
+    setEffectPosition(effect, origin.x + light.x, origin.y + light.y, origin.z + light.z);
+    setEffectScale(effect, 0.75);
+    setEffectColor(effect, 96, 255, 64);
+    playEffectAnimation(effect, ANIM_TYPE_STAND);
     s.stageDeckParts.push(effect);
   }
   if (hasLava(stage)) {
     const piece = lavaPiece(lavaSide(stageFrame));
-    s.stageLava = AddSpecialEffect(piece.model, origin.x + piece.x, origin.y + piece.y);
-    BlzSetSpecialEffectPosition(s.stageLava, origin.x + piece.x, origin.y + piece.y, origin.z + piece.z);
+    s.stageLava = createEffect(piece.model, origin.x + piece.x, origin.y + piece.y);
+    setEffectPosition(s.stageLava, origin.x + piece.x, origin.y + piece.y, origin.z + piece.z);
     const drawn = drawnScale(piece);
-    BlzSetSpecialEffectScale(s.stageLava, drawn.scale);
-    if (drawn.matrixScale !== undefined) BlzSetSpecialEffectMatrixScale(s.stageLava, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
-    BlzPlaySpecialEffect(s.stageLava, ANIM_TYPE_STAND);
+    setEffectScale(s.stageLava, drawn.scale);
+    if (drawn.matrixScale !== undefined) setEffectMatrixScale(s.stageLava, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
+    playEffectAnimation(s.stageLava, ANIM_TYPE_STAND);
     presentLava(s, stage, stageFrame);
   }
   s.drawnStage = stage;
   if (hasTide(stage)) {
     for (const _slot of PARTICIPANT_SLOTS) {
       for (const model of [HYDRA_RING_MODEL, HYDRA_CREST_MODEL]) {
-        const effect = AddSpecialEffect(model, origin.x, origin.y);
+        const effect = createEffect(model, origin.x, origin.y);
         hideEffect(effect, origin);
         s.stageHydra?.push(effect);
       }
@@ -218,7 +219,7 @@ export function drawStage(s: ShellState): void {
   }
   if (hasWind(stage)) {
     for (let index = 0; index < WIND_STREAK_COUNT; index++) {
-      const effect = AddSpecialEffect(WIND_STREAK_MODEL, origin.x, origin.y);
+      const effect = createEffect(WIND_STREAK_MODEL, origin.x, origin.y);
       hideEffect(effect, origin);
       s.stageWind.push(effect);
     }
@@ -233,9 +234,9 @@ function presentWind(s: ShellState, stage: number, frame: number): void {
       hideEffect(effect, s.origin);
       continue;
     }
-    BlzSetSpecialEffectScale(effect, 2.0);
-    BlzSetSpecialEffectPosition(effect, s.origin.x + streak.x, s.origin.y, s.origin.z + streak.z);
-    BlzSetSpecialEffectYaw(effect, streak.direction > 0 ? 0.0 : Math.PI);
+    setEffectScale(effect, 2.0);
+    setEffectPosition(effect, s.origin.x + streak.x, s.origin.y, s.origin.z + streak.z);
+    setEffectYaw(effect, streak.direction > 0 ? 0.0 : Math.PI);
   }
 }
 
@@ -244,10 +245,10 @@ function presentLava(s: ShellState, stage: number, frame: number): void {
   const lava = s.stageLava;
   if (lava === undefined || !hasLava(stage)) return;
   const piece = lavaPiece(lavaSide(frame));
-  BlzSetSpecialEffectPosition(lava, s.origin.x + piece.x, s.origin.y + piece.y, s.origin.z + piece.z);
+  setEffectPosition(lava, s.origin.x + piece.x, s.origin.y + piece.y, s.origin.z + piece.z);
   const look = lavaLook(stage, frame);
-  BlzSetSpecialEffectAlpha(lava, look.alpha);
-  BlzSetSpecialEffectColor(lava, look.red, look.green, look.blue);
+  setEffectAlpha(lava, look.alpha);
+  setEffectColor(lava, look.red, look.green, look.blue);
 }
 
 

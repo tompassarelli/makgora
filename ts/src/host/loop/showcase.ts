@@ -10,23 +10,24 @@ import { hideFighter } from "./fighterCloak";
 import { startQuickMatch } from "./menus";
 import type { ShellState } from "./state";
 import { renderPersistentPresentation } from "./view";
+import { createEffect, destroyEffect, setEffectColor, setEffectPosition, setEffectScale } from "wisp/game/effects";
 
 const SHOWCASE_STAGE = 0;
 const matchStarted = (s: Readonly<ShellState>): boolean => s.game.phase === Phase.match;
 const PAD_COLOURS: readonly (readonly [number, number, number])[] = [[255, 64, 64], [64, 96, 255], [64, 255, 224], [192, 64, 255]];
 
 function drawPadMarkers(s: ShellState): void {
-  for (const marker of s.showcaseMarkers) DestroyEffect(marker);
+  for (const marker of s.showcaseMarkers) destroyEffect(marker);
   s.showcaseMarkers.length = 0;
   const { origin } = s;
   const z = origin.z + surfaceZ(SHOWCASE_STAGE, 0, stageClock(s.game));
   for (const slot of PARTICIPANT_SLOTS) {
     const x = origin.x + SHOWCASE_PAD_X[slot];
-    const marker = AddSpecialEffect(STAGE_EDGE_LIGHT_MODEL, x, origin.y);
-    BlzSetSpecialEffectPosition(marker, x, origin.y, z);
-    BlzSetSpecialEffectScale(marker, 0.5 + 0.25 * slot);
+    const marker = createEffect(STAGE_EDGE_LIGHT_MODEL, x, origin.y);
+    setEffectPosition(marker, x, origin.y, z);
+    setEffectScale(marker, 0.5 + 0.25 * slot);
     const [red, green, blue] = PAD_COLOURS[slot] ?? [255, 255, 255];
-    BlzSetSpecialEffectColor(marker, red, green, blue);
+    setEffectColor(marker, red, green, blue);
     s.showcaseMarkers.push(marker);
   }
 }

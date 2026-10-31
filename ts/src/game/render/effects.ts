@@ -5,6 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH } from "../presentation/arenaCamera";
 import { Character } from "../sim/codes";
 import { EffectMotion } from "./motion";
+import { setEffectPosition, setEffectScale, setEffectTimeScale } from "wisp/game/effects";
 
 
 export interface WorldOrigin {
@@ -45,8 +46,8 @@ export function facingYaw(facing: number): number {
 
 export function hideEffect(model: effect, origin: Readonly<WorldOrigin>): void {
   effectMotion().release(model);
-  BlzSetSpecialEffectScale(model, 0.0);
-  BlzSetSpecialEffectPosition(model, origin.x, origin.y, origin.z - FLOOR_HEIGHT - HIDDEN_EFFECT_DEPTH);
+  setEffectScale(model, 0.0);
+  setEffectPosition(model, origin.x, origin.y, origin.z - FLOOR_HEIGHT - HIDDEN_EFFECT_DEPTH);
 }
 
 
@@ -72,7 +73,7 @@ export const PARKED_CUE_TIME_SCALE = 16.0;
 
 export function parkCue(model: effect, origin: Readonly<WorldOrigin>, parked: ParkedFlags, index: number): boolean {
   if (!parkOnce(model, origin, parked, index)) return false;
-  BlzSetSpecialEffectTimeScale(model, PARKED_CUE_TIME_SCALE);
+  setEffectTimeScale(model, PARKED_CUE_TIME_SCALE);
   return true;
 }
 
@@ -83,7 +84,7 @@ declare global {
 
 
 export function effectMotion(): EffectMotion<effect> {
-  return (globalThis.__smashcraftEffectMotion ??= new EffectMotion<effect>((model, x, y, z) => BlzSetSpecialEffectPosition(model, x, y, z)));
+  return (globalThis.__smashcraftEffectMotion ??= new EffectMotion<effect>((model, x, y, z) => setEffectPosition(model, x, y, z)));
 }
 
 

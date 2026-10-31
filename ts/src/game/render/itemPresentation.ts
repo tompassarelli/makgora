@@ -9,6 +9,7 @@ import { mainDeckZAt } from "../sim/stage";
 import { AvatarView, avatarView } from "../presentation/ultimateVoice";
 import { AVATAR_ALPHA, AVATAR_COLOR, AVATAR_MODEL, AVATAR_SECONDS, ITEM_MODELS, type ItemColor, itemBlinkOff, itemColor, itemTelegraphAlpha, itemTelegraphScale } from "../presentation/itemLook";
 import { hideEffect, type WorldOrigin } from "./effects";
+import { createEffect, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectPosition, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 
 const BURST_FRAMES = 45;
@@ -37,12 +38,12 @@ interface Carrier {
 }
 
 function create(path: string, origin: Readonly<WorldOrigin>): effect {
-  const model = AddSpecialEffect(path, origin.x, origin.y);
+  const model = createEffect(path, origin.x, origin.y);
   hideEffect(model, origin);
   return model;
 }
 
-const paint = (model: effect, color: ItemColor) => BlzSetSpecialEffectColor(model, color.red, color.green, color.blue);
+const paint = (model: effect, color: ItemColor) => setEffectColor(model, color.red, color.green, color.blue);
 
 export class ItemPresentation {
   private readonly speedPickup: effect;
@@ -79,14 +80,14 @@ export class ItemPresentation {
   }
 
   private place(model: effect, x: number, z: number, scale: number): void {
-    BlzSetSpecialEffectPosition(model, this.origin.x + x, this.origin.y, this.origin.z + z);
-    BlzSetSpecialEffectScale(model, scale);
+    setEffectPosition(model, this.origin.x + x, this.origin.y, this.origin.z + z);
+    setEffectScale(model, scale);
   }
 
   private fire(burst: Burst, frame: number, x: number, z: number, scale: number, color: ItemColor): void {
     this.place(burst.model, x, z, scale);
     paint(burst.model, color);
-    BlzSetSpecialEffectTime(burst.model, 0.0);
+    setEffectTime(burst.model, 0.0);
     burst.start = frame;
     burst.shown = true;
   }
@@ -107,7 +108,7 @@ export class ItemPresentation {
     if (left !== undefined) {
       this.place(this.telegraph, 0.0, deck + 2.0, itemTelegraphScale(left));
       paint(this.telegraph, itemColor(items.nextKind));
-      BlzSetSpecialEffectAlpha(this.telegraph, itemTelegraphAlpha(left));
+      setEffectAlpha(this.telegraph, itemTelegraphAlpha(left));
       this.telegraphShown = true;
     } else if (this.telegraphShown) {
       hideEffect(this.telegraph, this.origin);
@@ -127,7 +128,7 @@ export class ItemPresentation {
     const pickup = kind === ItemKind.speed ? this.speedPickup : kind === ItemKind.heavy ? this.heavyPickup : undefined;
     if (pickup !== undefined) {
       paint(pickup, itemColor(kind));
-      BlzSetSpecialEffectYaw(pickup, f32(frame * SPIN_PER_FRAME));
+      setEffectYaw(pickup, f32(frame * SPIN_PER_FRAME));
     }
     if (playing && items.spawnSerial !== this.spawnSerial && kind !== ItemKind.none) this.fire(this.spawn, frame, 0.0, deck + 10.0, f32(0.6), itemColor(kind));
     this.settle(this.spawn, frame, playing);
@@ -155,17 +156,17 @@ export class ItemPresentation {
         const fade = itemBlinkOff(buffFrames) ? 70 : 255;
         this.place(carrier.ring, x, z + 3.0, f32(0.95));
         paint(carrier.ring, color);
-        BlzSetSpecialEffectAlpha(carrier.ring, fade);
+        setEffectAlpha(carrier.ring, fade);
         if (buff === ItemKind.speed) {
           this.place(carrier.trail, x, z, f32(0.8));
           paint(carrier.trail, color);
-          BlzSetSpecialEffectAlpha(carrier.trail, fade);
+          setEffectAlpha(carrier.trail, fade);
         } else hideEffect(carrier.trail, this.origin);
         if (buff === ItemKind.heavy && !carrier.avatarBuff) {
           this.place(carrier.shell, x, z + 10.0, 1.0);
           paint(carrier.shell, HEAVY_SHELL);
-          BlzSetSpecialEffectAlpha(carrier.shell, fade);
-          BlzSetSpecialEffectYaw(carrier.shell, f32(frame * SPIN_PER_FRAME));
+          setEffectAlpha(carrier.shell, fade);
+          setEffectYaw(carrier.shell, f32(frame * SPIN_PER_FRAME));
         } else hideEffect(carrier.shell, this.origin);
         carrier.shown = true;
       } else if (carrier.shown) {
@@ -177,20 +178,20 @@ export class ItemPresentation {
       const view = fighter === undefined || fighter.status.out ? AvatarView.hidden : avatarView(fighter.character, fighter.special.action, fighter.special.frame, carrier.avatarBuff && buffFrames > 0);
       if (view !== AvatarView.hidden && carrier.avatar !== undefined) {
         this.place(carrier.avatar, x, z, 1.0);
-        BlzSetSpecialEffectYaw(carrier.avatar, fighter !== undefined && fighter.facing < 0 ? f32(3.14159274) : 0.0);
+        setEffectYaw(carrier.avatar, fighter !== undefined && fighter.facing < 0 ? f32(3.14159274) : 0.0);
         if (!carrier.avatarShown) {
-          BlzSetSpecialEffectAnimation(carrier.avatar, "spell");
-          BlzSetSpecialEffectTime(carrier.avatar, AVATAR_SECONDS);
+          setEffectAnimation(carrier.avatar, "spell");
+          setEffectTime(carrier.avatar, AVATAR_SECONDS);
         }
         if (view === AvatarView.held) {
-          BlzSetSpecialEffectTime(carrier.avatar, AVATAR_SECONDS);
-          BlzSetSpecialEffectTimeScale(carrier.avatar, 0.0);
+          setEffectTime(carrier.avatar, AVATAR_SECONDS);
+          setEffectTimeScale(carrier.avatar, 0.0);
           paint(carrier.avatar, AVATAR_COLOR);
-          BlzSetSpecialEffectAlpha(carrier.avatar, itemBlinkOff(buffFrames) ? idiv(AVATAR_ALPHA, 2) : AVATAR_ALPHA);
+          setEffectAlpha(carrier.avatar, itemBlinkOff(buffFrames) ? idiv(AVATAR_ALPHA, 2) : AVATAR_ALPHA);
         } else {
-          BlzSetSpecialEffectTimeScale(carrier.avatar, 1.0);
+          setEffectTimeScale(carrier.avatar, 1.0);
           paint(carrier.avatar, AVATAR_CAST_COLOR);
-          BlzSetSpecialEffectAlpha(carrier.avatar, 255);
+          setEffectAlpha(carrier.avatar, 255);
         }
         carrier.avatarShown = true;
       } else if (carrier.avatar !== undefined && carrier.avatarShown) {

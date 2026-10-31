@@ -5,6 +5,7 @@ import { hideEffect } from "../../game/render/effects";
 import type { ShellState, StageDrifter } from "./state";
 import { clockSeconds } from "./trace";
 import { arenaFogOffset, arenaFogEnd, cameraZOverride } from "../../game/presentation/arenaCamera";
+import { createEffect, destroyEffect, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 
 function updateStageFog(s: ShellState): void {
   if (s.stageFogHidden === true || s.stageFogOverride === true) return;
@@ -37,22 +38,22 @@ function drawStageFog(s: ShellState): void {
 function addPiece(s: ShellState, piece: Readonly<SceneryPiece>, animation: animtype): effect {
   const x = s.origin.x + piece.x;
   const y = s.origin.y + piece.y;
-  const effect = AddSpecialEffect(piece.model, x, y);
-  BlzSetSpecialEffectPosition(effect, x, y, s.origin.z + piece.z);
+  const effect = createEffect(piece.model, x, y);
+  setEffectPosition(effect, x, y, s.origin.z + piece.z);
   const drawn = drawnScale(piece);
-  BlzSetSpecialEffectScale(effect, drawn.scale);
-  if (piece.color !== undefined) BlzSetSpecialEffectColor(effect, piece.color[0], piece.color[1], piece.color[2]);
-  BlzSetSpecialEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
-  if (drawn.matrixScale !== undefined) BlzSetSpecialEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
-  BlzPlaySpecialEffect(effect, animation);
-  if (piece.still === true) BlzSetSpecialEffectTimeScale(effect, 0.0);
+  setEffectScale(effect, drawn.scale);
+  if (piece.color !== undefined) setEffectColor(effect, piece.color[0], piece.color[1], piece.color[2]);
+  setEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
+  if (drawn.matrixScale !== undefined) setEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
+  playEffectAnimation(effect, animation);
+  if (piece.still === true) setEffectTimeScale(effect, 0.0);
   return effect;
 }
 
 function addDrifter(s: ShellState, piece: Readonly<DriftingPiece>): StageDrifter {
   const pose = driftPose(piece, clockSeconds(s.trace));
   const effect = addPiece(s, { ...piece, x: pose.x, z: pose.z, yaw: 0.0 }, ANIM_TYPE_WALK);
-  BlzSetSpecialEffectYaw(effect, pose.yaw);
+  setEffectYaw(effect, pose.yaw);
   return { effect, piece };
 }
 
@@ -60,7 +61,7 @@ export function presentDrifters(s: ShellState): void {
   const seconds = clockSeconds(s.trace);
   for (const { effect, piece } of s.stageDrifters) {
     const pose = driftPose(piece, seconds);
-    BlzSetSpecialEffectPosition(effect, s.origin.x + pose.x, s.origin.y + piece.y, s.origin.z + pose.z);
+    setEffectPosition(effect, s.origin.x + pose.x, s.origin.y + piece.y, s.origin.z + pose.z);
   }
 }
 
@@ -74,7 +75,7 @@ export function drawStageScenery(s: ShellState): void {
   for (const effect of [...(s.stageScenery ?? []), ...s.stageDrifters.map(drifter => drifter.effect)]) {
 
     hideEffect(effect, s.origin);
-    DestroyEffect(effect);
+    destroyEffect(effect);
   }
   const scenery = stageScenery(s.game.stageChoice);
 
@@ -96,9 +97,9 @@ export function drawStageScenery(s: ShellState): void {
 export function preloadStageAssets(origin: Readonly<{ x: number; y: number; z: number }>): void {
   const { x, y } = origin;
   for (const model of preloadModels()) {
-    const effect = AddSpecialEffect(model, x, y);
+    const effect = createEffect(model, x, y);
     hideEffect(effect, origin);
-    DestroyEffect(effect);
+    destroyEffect(effect);
   }
   for (const sky of preloadSkies()) SetSkyModel(sky);
 }
@@ -116,23 +117,23 @@ export function showBackdrop(s: ShellState, visible: boolean): void {
     const piece = pieces[index];
     if (!visible || piece === undefined) hideEffect(effect, s.origin);
     else {
-      BlzSetSpecialEffectPosition(effect, s.origin.x + piece.x, s.origin.y + piece.y, s.origin.z + piece.z);
+      setEffectPosition(effect, s.origin.x + piece.x, s.origin.y + piece.y, s.origin.z + piece.z);
       const drawn = drawnScale(piece);
-      BlzSetSpecialEffectScale(effect, drawn.scale);
+      setEffectScale(effect, drawn.scale);
 
       if (drawn.matrixScale !== undefined) {
-        BlzResetSpecialEffectMatrix(effect);
-        BlzSetSpecialEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
-        BlzSetSpecialEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
+        resetEffectMatrix(effect);
+        setEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
+        setEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
       }
     }
   }
   for (const { effect, piece } of s.stageDrifters) {
-    if (visible) BlzSetSpecialEffectScale(effect, piece.scale);
+    if (visible) setEffectScale(effect, piece.scale);
     else hideEffect(effect, s.origin);
   }
   if (visible) presentDrifters(s);
-  for (const deck of [...s.stageDecks, ...s.stageDeckParts]) BlzSetSpecialEffectAlpha(deck, alpha);
+  for (const deck of [...s.stageDecks, ...s.stageDeckParts]) setEffectAlpha(deck, alpha);
   showStageFog(s, visible);
 }
 
@@ -152,7 +153,7 @@ export function showStageLighting(s: ShellState, authored: boolean): void {
   const pieces = placedPieces(s.game.stageChoice, authored);
   for (const [index, effect] of (s.stageScenery ?? []).entries()) {
     const color = pieces[index]?.color;
-    if (color !== undefined) BlzSetSpecialEffectColor(effect, color[0], color[1], color[2]);
+    if (color !== undefined) setEffectColor(effect, color[0], color[1], color[2]);
   }
 }
 
@@ -172,8 +173,8 @@ export function leverCommand(s: ShellState, name: string, a: string, b: string):
     if (effect === undefined || piece === undefined) return;
     if (b === "off") hideEffect(effect, s.origin);
     else {
-      BlzSetSpecialEffectPosition(effect, s.origin.x + piece.x, s.origin.y + piece.y, s.origin.z + piece.z);
-      BlzSetSpecialEffectScale(effect, piece.scale);
+      setEffectPosition(effect, s.origin.x + piece.x, s.origin.y + piece.y, s.origin.z + piece.z);
+      setEffectScale(effect, piece.scale);
     }
   }
 }

@@ -65,36 +65,23 @@ test("every parked ribbon projectile effect waits in its model's park sequence a
     clients.start();
     const origin = { x: 0.0, y: PLAYABLE_BOUNDS.centreY, z: FLOOR_HEIGHT };
     const parkedZ = origin.z - FLOOR_HEIGHT - HIDDEN_EFFECT_DEPTH;
-    const models = new Map<unknown, string>();
-    const lastZ = new Map<unknown, number>();
-    const lastAnimation = new Map<unknown, string>();
+    const lastZ = new Map<number, number>();
     let launches = 0, checked = 0;
     const wrongly: string[] = [];
     client.run(() => {
-      const natives = globalThis as unknown as Record<string, (...args: unknown[]) => unknown>;
-      const add = natives.AddSpecialEffect, position = natives.BlzSetSpecialEffectPosition, animate = natives.BlzSetSpecialEffectAnimation;
-      if (add === undefined || position === undefined || animate === undefined) throw new Error("missing effect natives");
-      natives.AddSpecialEffect = (model, x, y) => {
-        const handle = add(model, x, y);
-        models.set(handle, model as string);
-        return handle;
-      };
-      natives.BlzSetSpecialEffectPosition = (handle, x, y, z) => {
-        if ((z as number) > parkedZ && (lastZ.get(handle) ?? 0.0) <= parkedZ && models.get(handle) !== undefined && RIBBON_PARK_SEQUENCES[models.get(handle) ?? ""] !== undefined) launches++;
-        lastZ.set(handle, z as number);
-        return position(handle, x, y, z);
-      };
-      natives.BlzSetSpecialEffectAnimation = (handle, name) => {
-        lastAnimation.set(handle, String(name));
-        return animate(handle, name);
-      };
       const presentation = new ProjectilePresentation(Character.tyrande, origin);
       const audit = () => {
-        for (const [handle, model] of models) {
-          const parkSequence = RIBBON_PARK_SEQUENCES[model];
-          if (typeof parkSequence !== "string" || (lastZ.get(handle) ?? 0.0) > parkedZ) continue;
+        for (const pose of client.effects.snapshot({})) {
+          const parkSequence = RIBBON_PARK_SEQUENCES[pose.model];
+          if (typeof parkSequence !== "string") continue;
+          const before = lastZ.get(pose.handle.id) ?? 0.0;
+          lastZ.set(pose.handle.id, pose.z);
+          if (pose.z > parkedZ) {
+            if (before <= parkedZ) launches++;
+            continue;
+          }
           checked++;
-          if (lastAnimation.get(handle)?.toLowerCase() !== parkSequence.toLowerCase()) wrongly.push(`${model} waits in ${lastAnimation.get(handle) ?? "its first sequence"}`);
+          if (String(pose.animation).toLowerCase() !== parkSequence.toLowerCase()) wrongly.push(`${pose.model} waits in ${pose.animation ?? "its first sequence"}`);
         }
       };
       audit();

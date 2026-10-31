@@ -2,6 +2,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../../game/input/partic
 import { isActive } from "../../game/sim/roster";
 import { hideEffect } from "../../game/render/effects";
 import type { ShellState } from "./state";
+import { effectScale, effectX, effectY, effectZ, setEffectPosition, setEffectScale } from "wisp/game/effects";
 
 export interface HiddenFighter {
   unitShown: boolean;
@@ -53,10 +54,10 @@ function concealCues(s: ShellState, slot: ParticipantSlot): void {
   const concealed = concealedCues[slot];
   if (concealed === undefined) return;
   for (const model of cueEffects(s, slot)) {
-    const scale = BlzGetSpecialEffectScale(model);
+    const scale = effectScale(model);
     if (scale === 0.0) continue;
     const index = concealed.models.indexOf(model);
-    const place = { scale, x: BlzGetLocalSpecialEffectX(model), y: BlzGetLocalSpecialEffectY(model), z: BlzGetLocalSpecialEffectZ(model) };
+    const place = { scale, x: effectX(model), y: effectY(model), z: effectZ(model) };
     if (index < 0) {
       concealed.models.push(model);
       concealed.places.push(place);
@@ -71,8 +72,8 @@ function revealCues(s: ShellState, slot: ParticipantSlot): void {
   for (const model of cueEffects(s, slot)) {
     const place = concealed.places[concealed.models.indexOf(model)];
     if (place === undefined) continue;
-    BlzSetSpecialEffectPosition(model, place.x, place.y, place.z);
-    BlzSetSpecialEffectScale(model, place.scale);
+    setEffectPosition(model, place.x, place.y, place.z);
+    setEffectScale(model, place.scale);
   }
   concealed.models.length = 0;
   concealed.places.length = 0;
@@ -84,7 +85,7 @@ export function concealFighter(s: ShellState, slot: ParticipantSlot): void {
   const body = s.participants[slot].body;
   if (body !== undefined && hidden.body) ShowUnit(body.unit, false);
   if (body !== undefined && hidden.bare) BlzShowUnitTeamGlow(body.unit, false);
-  if (hidden.body || hidden.bare) for (const model of fighterEffects(s, slot)) BlzSetSpecialEffectScale(model, 0.0);
+  if (hidden.body || hidden.bare) for (const model of fighterEffects(s, slot)) setEffectScale(model, 0.0);
   if (hidden.cues) concealCues(s, slot);
 }
 
@@ -130,7 +131,7 @@ export function hideFighter(s: ShellState, slot: ParticipantSlot, hidden: boolea
   if (was === undefined || !was.body) return true;
   s.hiddenFighters[slot] = cloaked(was, { body: false }, was.unitShown);
   ShowUnit(body.unit, was.unitShown);
-  if (body.dizzyShown) BlzSetSpecialEffectScale(body.dizzy, 1.0);
+  if (body.dizzyShown) setEffectScale(body.dizzy, 1.0);
   s.ui?.fighters[slot]?.pool?.redraw();
   return true;
 }

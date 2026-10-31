@@ -5,6 +5,7 @@ import type { Fighter } from "../sim/fighter";
 import { type MeterCue, type MeterCueFit, type MeterCueState, type MeterCueView, ULTIMATE_BURST, ULTIMATE_BURST_FRAMES, ultimateBurst, ULTIMATE_CAST_VOLUME, clearCastCue, clearMeterCueState, confirmCastCue, createCastCue, createMeterCueState, hideCastCue, meterCueFit, observeMeterCues, presentCastCue, ultimateCastFrame, ultimateFirstEffectFrame } from "../presentation/meterCues";
 import { type WorldOrigin, effectMotion, hideEffect, placeEffect } from "./effects";
 import { ultimateCastSound } from "../presentation/moveSounds";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 class MeterCueModel {
   private model: effect | undefined;
@@ -14,7 +15,7 @@ class MeterCueModel {
   // Online, Warcraft handles must be born on the same turn on every client, so shared play parks one handle made at startup instead of making one when the cue shows.
   constructor(private readonly cue: MeterCue, private readonly fit: MeterCueFit, private readonly origin: WorldOrigin, private readonly shared: boolean) {
     if (!shared) return;
-    this.model = AddSpecialEffect(cue.model, origin.x, origin.y);
+    this.model = createEffect(cue.model, origin.x, origin.y);
     hideEffect(this.model, origin);
   }
 
@@ -30,13 +31,13 @@ class MeterCueModel {
       return true;
     }
     const { x, y, z } = this.at(fighter, front);
-    if (!this.shared) this.model = AddSpecialEffect(this.cue.model, x, y);
+    if (!this.shared) this.model = createEffect(this.cue.model, x, y);
     const model = this.model;
     if (model === undefined) return true;
     placeEffect(model, x, y, z);
-    BlzSetSpecialEffectScale(model, this.fit.scale);
-    if (this.cue.alpha !== undefined) BlzSetSpecialEffectAlpha(model, this.cue.alpha);
-    BlzSetSpecialEffectTimeScale(model, 1.0);
+    setEffectScale(model, this.fit.scale);
+    if (this.cue.alpha !== undefined) setEffectAlpha(model, this.cue.alpha);
+    setEffectTimeScale(model, 1.0);
     this.restart(model);
     return true;
   }
@@ -48,7 +49,7 @@ class MeterCueModel {
     placeEffect(model, x, y, z);
     if (!this.seekAgain) return;
     // Warcraft discards animation seeks in the callback selecting the animation (#58 native rulers).
-    BlzSetSpecialEffectTime(model, 0.0);
+    setEffectTime(model, 0.0);
     this.seekAgain = false;
   }
 
@@ -57,7 +58,7 @@ class MeterCueModel {
   }
 
   setPaused(paused: boolean): void {
-    if (this.shown && this.model !== undefined) BlzSetSpecialEffectTimeScale(this.model, paused ? 0.0 : 1.0);
+    if (this.shown && this.model !== undefined) setEffectTimeScale(this.model, paused ? 0.0 : 1.0);
   }
 
   clear(): void {
@@ -68,13 +69,13 @@ class MeterCueModel {
 
   destroy(): void {
     this.clear();
-    if (this.model !== undefined) DestroyEffect(this.model);
+    if (this.model !== undefined) destroyEffect(this.model);
     this.model = undefined;
   }
 
   private restart(model: effect): void {
-    if (this.cue.sequence !== undefined) BlzSetSpecialEffectAnimation(model, this.cue.sequence);
-    BlzSetSpecialEffectTime(model, 0.0);
+    if (this.cue.sequence !== undefined) setEffectAnimation(model, this.cue.sequence);
+    setEffectTime(model, 0.0);
     this.seekAgain = true;
   }
 
@@ -93,7 +94,7 @@ class MeterCueModel {
     if (this.shared) hideEffect(model, this.origin);
     else {
       effectMotion().release(model);
-      DestroyEffect(model);
+      destroyEffect(model);
       this.model = undefined;
     }
   }

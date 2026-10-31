@@ -4,6 +4,7 @@ import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { STOCK_MODELS, type WorldOrigin, hideEffect, placeEffect } from "./effects";
 import { SoundBank, SoundKind } from "./soundBank";
+import { createEffect, destroyEffect, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
 
 export const POISON_BURST_MODEL = "Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdx";
 export const POISON_BURST_SOUND = "PoisonArrowHit";
@@ -27,10 +28,10 @@ export class PoisonStackPresentation {
   constructor(private readonly origin: WorldOrigin) {
     this.sounds.prepare(SoundKind.label, [POISON_BURST_SOUND]);
     for (let slot = 0; slot < PARTICIPANT_SLOTS.length; slot++) {
-      const glow = AddSpecialEffect(STOCK_MODELS.curseTarget, origin.x, origin.y);
-      BlzSetSpecialEffectColor(glow, 190, 255, 30);
+      const glow = createEffect(STOCK_MODELS.curseTarget, origin.x, origin.y);
+      setEffectColor(glow, 190, 255, 30);
       this.glow.push(glow);
-      this.burst.push(AddSpecialEffect(POISON_BURST_MODEL, origin.x, origin.y));
+      this.burst.push(createEffect(POISON_BURST_MODEL, origin.x, origin.y));
       this.seenPops.push(0);
       this.burstLeft.push(0);
       this.shown.push(false);
@@ -51,8 +52,8 @@ export class PoisonStackPresentation {
     for (let slot = 0; slot < this.glow.length; slot++) {
       const glow = this.glow[slot];
       const burst = this.burst[slot];
-      if (glow !== undefined) BlzSetSpecialEffectTimeScale(glow, scale);
-      if (burst !== undefined) BlzSetSpecialEffectTimeScale(burst, scale);
+      if (glow !== undefined) setEffectTimeScale(glow, scale);
+      if (burst !== undefined) setEffectTimeScale(burst, scale);
     }
   }
 
@@ -66,8 +67,8 @@ export class PoisonStackPresentation {
     const stacks = fighter.status.out ? 0 : fighter.status.poisonStacks;
     if (stacks > 0) {
       placeEffect(glow, x, this.origin.y, z + GLOW_HEIGHT * body);
-      BlzSetSpecialEffectScale(glow, f32(GLOW_BASE_SCALE + f32(stacks * GLOW_STACK_SCALE)) * body);
-      BlzSetSpecialEffectAlpha(glow, GLOW_BASE_ALPHA + stacks * GLOW_STACK_ALPHA);
+      setEffectScale(glow, f32(GLOW_BASE_SCALE + f32(stacks * GLOW_STACK_SCALE)) * body);
+      setEffectAlpha(glow, GLOW_BASE_ALPHA + stacks * GLOW_STACK_ALPHA);
       this.shown[slot] = true;
     } else if (this.shown[slot] === true) {
       hideEffect(glow, this.origin);
@@ -76,7 +77,7 @@ export class PoisonStackPresentation {
     if (fighter.visuals.poisonBursts !== this.seenPops[slot]) {
       this.seenPops[slot] = fighter.visuals.poisonBursts;
       this.burstLeft[slot] = POISON_BURST_FRAMES;
-      BlzSetSpecialEffectTime(burst, 0.0);
+      setEffectTime(burst, 0.0);
       this.sounds.playAt(SoundKind.label, POISON_BURST_SOUND, x, this.origin.y, z);
     }
     const left = this.burstLeft[slot] ?? 0;
@@ -87,11 +88,11 @@ export class PoisonStackPresentation {
       return;
     }
     placeEffect(burst, x, this.origin.y, z + BURST_HEIGHT * body);
-    BlzSetSpecialEffectScale(burst, BURST_SCALE * body);
+    setEffectScale(burst, BURST_SCALE * body);
   }
 
   destroy(): void {
-    for (const model of [...this.glow, ...this.burst]) DestroyEffect(model);
+    for (const model of [...this.glow, ...this.burst]) destroyEffect(model);
   }
 
   private hide(slot: number): void {
