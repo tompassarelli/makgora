@@ -6,6 +6,7 @@ import { type MeterCue, type MeterCueFit, type MeterCueState, type MeterCueView,
 import { type WorldOrigin, effectMotion, hideEffect, placeEffect } from "./effects";
 import { ultimateCastSound } from "../presentation/moveSounds";
 import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { playSound, releaseWhenDone, setSoundPosition, setSoundVolume, soundFromLabel, stopSound } from "wisp/game/sound";
 
 class MeterCueModel {
   private model: effect | undefined;
@@ -116,7 +117,7 @@ export class MeterCueEffects {
     this.front = origin.y - 12.0;
     const burst = ultimateBurst(character);
     this.burst = new MeterCueModel(burst, meterCueFit(burst, character), origin, shared);
-    this.ultimateSound = CreateSoundFromLabel(this.ultimateLabel, false, true, true, 10, 10);
+    this.ultimateSound = soundFromLabel(this.ultimateLabel, false, true, true, 10, 10);
   }
 
   confirm(frame: number, fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean, trace?: (text: string) => void): void {
@@ -187,7 +188,7 @@ export class MeterCueEffects {
     this.traced.superAura = false;
     this.traced.burst = false;
     this.lit = undefined;
-    StopSound(this.ultimateSound, false, false);
+    stopSound(this.ultimateSound, false, false);
   }
 
   private hideModels(): void {
@@ -199,13 +200,13 @@ export class MeterCueEffects {
     this.burst.destroy();
     clearMeterCueState(this.heard);
     clearCastCue(this.burstCast);
-    KillSoundWhenDone(this.ultimateSound);
+    releaseWhenDone(this.ultimateSound);
   }
 
   private play(cue: sound, fighter: Readonly<Fighter>, volume: number): void {
-    StopSound(cue, false, false);
-    SetSoundPosition(cue, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
-    SetSoundVolume(cue, volume);
-    StartSound(cue);
+    stopSound(cue, false, false);
+    setSoundPosition(cue, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
+    setSoundVolume(cue, volume);
+    playSound(cue);
   }
 }

@@ -47,6 +47,7 @@ import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEff
 import { setCameraField, setFilterBlendMode, setFilterDuration, setFilterEndColor, setFilterEndUV, setFilterStartColor, setFilterStartUV, setFilterTexMapFlags, setFilterTexture, showFilter } from "wisp/game/view";
 import { player } from "wisp/game/players";
 import { preloadAsset } from "wisp/game/files";
+import { stopSound } from "wisp/game/sound";
 
 const KO_VARIANTS = bodyVariants(SELECTABLE_CHARACTERS);
 const KO_FIGHTERS = KO_VARIANTS.length;
@@ -302,7 +303,7 @@ export class CombatEffects {
     const admitted = admitVoice(this.voices, this.soundFrame, cls, sound);
     if (!admitted.play) return;
     const evicted = this.voiceHandles[admitted.slot];
-    if (admitted.replaced && evicted !== undefined) StopSound(evicted, false, false);
+    if (admitted.replaced && evicted !== undefined) stopSound(evicted, false, false);
     this.voiceHandles[admitted.slot] = this.sounds.playAt(file ? SoundKind.combatFile : SoundKind.combatLabel, sound, this.x + x, this.y, this.z + z, floorDiv(volume * admitted.percent, 100), pitch);
     this.soundPlayed?.(sound, volume, pitch, cls, admitted.slot, liveVoices(this.voices, this.soundFrame));
   };

@@ -10,6 +10,7 @@ import { fighterModelScale } from "../presentation/fighterScale";
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
 import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEffectScale, setEffectTime, setEffectTimeScale } from "wisp/game/effects";
+import { playSound, setSoundPosition, setSoundVolume, soundFromLabel, stopSound } from "wisp/game/sound";
 
 
 const SHOWN = ELEMENTS.filter((element) => elementLook(element).victim !== undefined);
@@ -28,7 +29,7 @@ export class ElementEffects {
 
   private readonly hitCueShown: number[] = PARTICIPANT_SLOTS.flatMap(() => HIT_CUES.map(() => -1));
 
-  private readonly hitSounds: readonly (sound | undefined)[] = HIT_CUES.map((cue) => cue.look.sound === undefined ? undefined : CreateSoundFromLabel(cue.look.sound, false, true, true, 10, 10));
+  private readonly hitSounds: readonly (sound | undefined)[] = HIT_CUES.map((cue) => cue.look.sound === undefined ? undefined : soundFromLabel(cue.look.sound, false, true, true, 10, 10));
 
   constructor(private readonly origin: WorldOrigin) {
     this.front = origin.y - 10.0;
@@ -97,10 +98,10 @@ export class ElementEffects {
       this.hitCueShown[at] = fighter.visuals.hit;
       const sound = this.hitSounds[cue];
       if (sound !== undefined) {
-        StopSound(sound, false, false);
-        SetSoundPosition(sound, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
-        SetSoundVolume(sound, 127);
-        StartSound(sound);
+        stopSound(sound, false, false);
+        setSoundPosition(sound, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
+        setSoundVolume(sound, 127);
+        playSound(sound);
       }
     }
     placeEffect(model, this.origin.x + fighter.motion.x, this.front, this.origin.z + fighter.motion.z + look.z * scale);

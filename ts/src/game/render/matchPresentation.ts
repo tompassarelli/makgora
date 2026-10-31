@@ -35,6 +35,7 @@ import { createEffect, destroyEffect, setEffectAnimation, setEffectBlendTime, se
 import { setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { player } from "wisp/game/players";
 import { preloadAsset } from "wisp/game/files";
+import { clearMusic, createSound, endTheme, playMusic, playSound, playTheme, resetVolumeGroups, setSoundCutoff, setSoundDistances, setSoundDuration, setSoundPosition, setSoundVolume, setVolumeGroup, soundFileDuration, stopMusic, stopSound } from "wisp/game/sound";
 
 
 export const RESULTS_DELAY_FRAMES = 90;
@@ -44,21 +45,21 @@ const FACING_CAMERA = f32(-1.5707963705062866);
 
 const createItemSounds = (): sound[] => [MatchCue.lastStock, MatchCue.itemSpawn, MatchCue.confirm].map(cue => {
     const path = cueSound(cue);
-    const sound = CreateSound(path, false, true, true, 10, 10, "DefaultEAXON");
-    SetSoundDuration(sound, GetSoundFileDuration(path));
-    SetSoundVolume(sound, 127);
-    SetSoundDistances(sound, 1500.0, 10000.0);
-    SetSoundDistanceCutoff(sound, 10000.0);
+    const sound = createSound(path, false, true, true, 10, 10, "DefaultEAXON");
+    setSoundDuration(sound, soundFileDuration(path));
+    setSoundVolume(sound, 127);
+    setSoundDistances(sound, 1500.0, 10000.0);
+    setSoundCutoff(sound, 10000.0);
     return sound;
   });
 
 const createOrbSounds = (): sound[] => [MatchCue.itemSpawn, MatchCue.meterReady, MatchCue.confirm].map(cue => {
     const path = cueSound(cue);
-    const sound = CreateSound(path, false, true, true, 10, 10, "DefaultEAXON");
-    SetSoundDuration(sound, GetSoundFileDuration(path));
-    SetSoundVolume(sound, 127);
-    SetSoundDistances(sound, 1500.0, 10000.0);
-    SetSoundDistanceCutoff(sound, 10000.0);
+    const sound = createSound(path, false, true, true, 10, 10, "DefaultEAXON");
+    setSoundDuration(sound, soundFileDuration(path));
+    setSoundVolume(sound, 127);
+    setSoundDistances(sound, 1500.0, 10000.0);
+    setSoundCutoff(sound, 10000.0);
     return sound;
   });
 
@@ -88,7 +89,7 @@ export class MatchPresentation {
   private readonly menu = createMenuObservation();
   private readonly menuCues = createMenuCues();
   // Hover differs by client; create its handle at shared startup on every client.
-  private readonly hoverSound = CreateSound(cueSound(MatchCue.hover), false, false, false, 10, 10, "DefaultEAXON");
+  private readonly hoverSound = createSound(cueSound(MatchCue.hover), false, false, false, 10, 10, "DefaultEAXON");
   private music: string | undefined;
   private readonly voices: (sound | undefined)[] = [];
   private readonly sounds = new SoundBank();
@@ -107,8 +108,8 @@ export class MatchPresentation {
   private resultView: ResultsView | undefined;
 
   constructor(private readonly origin: Readonly<WorldOrigin>, private readonly banner: ResultsDisplay) {
-    SetSoundDuration(this.hoverSound, GetSoundFileDuration(cueSound(MatchCue.hover)));
-    SetSoundVolume(this.hoverSound, 70);
+    setSoundDuration(this.hoverSound, soundFileDuration(cueSound(MatchCue.hover)));
+    setSoundVolume(this.hoverSound, 70);
     for (const path of presentationSoundPaths(SELECTABLE_CHARACTERS, STAGE_CATALOG.map(stage => stage.id))) preloadAsset(path);
     this.sounds.prepare(SoundKind.interfaceFile, interfaceSoundPaths(SELECTABLE_CHARACTERS));
     const parent = gameUi();
@@ -149,8 +150,8 @@ export class MatchPresentation {
 
   cue(cue: MatchCue): void {
     if (cue === MatchCue.hover) {
-      StopSound(this.hoverSound, false, false);
-      StartSound(this.hoverSound);
+      stopSound(this.hoverSound, false, false);
+      playSound(this.hoverSound);
       return;
     }
     this.playFile(cueSound(cue));
@@ -160,16 +161,16 @@ export class MatchPresentation {
   playMusic(path: string): void {
     if (this.music === path) return;
     this.music = path;
-    EndThematicMusic();
-    StopMusic(false);
-    ClearMapMusic();
-    PlayMusic(path);
+    endTheme();
+    stopMusic(false);
+    clearMusic();
+    playMusic(path);
   }
 
 
   voice(slot: number, path: string): void {
     const previous = this.voices[slot];
-    if (previous !== undefined) StopSound(previous, false, false);
+    if (previous !== undefined) stopSound(previous, false, false);
     this.voices[slot] = this.playFile(path);
   }
 
@@ -178,7 +179,7 @@ export class MatchPresentation {
     if (game.phase === Phase.stageMenu && this.menu.phase === Phase.characterMenu) {
       for (const slot of PARTICIPANT_SLOTS) {
         const voice = this.voices[slot];
-        if (voice !== undefined) StopSound(voice, false, false);
+        if (voice !== undefined) stopSound(voice, false, false);
         this.voices[slot] = undefined;
       }
     }
@@ -193,7 +194,7 @@ export class MatchPresentation {
   beginMatch(stageMusic: string, game: Readonly<MatchState>, world: Readonly<Roster>): void {
     this.hideResults();
     if (this.resultEffectsMuted) {
-      VolumeGroupReset();
+      resetVolumeGroups();
       this.resultEffectsMuted = false;
     }
     this.preparePoses(game, world);
@@ -223,18 +224,18 @@ export class MatchPresentation {
     for (let index = 0; index < this.itemSounds.length; index++) {
       if ((itemCues & (1 << index)) === 0) continue;
       const sound = at(this.itemSounds, index);
-      StopSound(sound, false, false);
-      SetSoundPosition(sound, this.origin.x, this.origin.y, this.origin.z + mainDeckZAt(game.stageChoice, 0.0));
-      StartSound(sound);
+      stopSound(sound, false, false);
+      setSoundPosition(sound, this.origin.x, this.origin.y, this.origin.z + mainDeckZAt(game.stageChoice, 0.0));
+      playSound(sound);
     }
     const orbCues = confirmedOrbCues(this.orbObservation, game.orbs, orbWarned(game));
     const point = orbPoint(game.stageChoice);
     for (let index = 0; index < this.orbSounds.length; index++) {
       if ((orbCues & (1 << index)) === 0) continue;
       const sound = at(this.orbSounds, index);
-      StopSound(sound, false, false);
-      SetSoundPosition(sound, this.origin.x + point.x, this.origin.y, this.origin.z + point.z);
-      StartSound(sound);
+      stopSound(sound, false, false);
+      setSoundPosition(sound, this.origin.x + point.x, this.origin.y, this.origin.z + point.z);
+      playSound(sound);
     }
     for (let index = 0; index < this.cues.length; index++) this.cue(at(this.cues, index));
     return this.cues;
@@ -279,9 +280,9 @@ export class MatchPresentation {
     const { winner } = view;
     this.banner.show(view.rows);
     this.music = undefined;
-    StopMusic(true);
+    stopMusic(true);
     const theme = victoryMusic(winner);
-    if (theme !== undefined) PlayThematicMusic(theme);
+    if (theme !== undefined) playTheme(theme);
     if (winner === undefined) return;
     for (const path of [cueSound(MatchCue.cheer), warcryVoice(winner)]) {
       const played = this.playFile(path);
@@ -351,12 +352,12 @@ export class MatchPresentation {
   }
 
   hideResults(): void {
-    for (const played of this.resultSounds) StopSound(played, false, true);
+    for (const played of this.resultSounds) stopSound(played, false, true);
     this.resultSounds.length = 0;
     if (this.resultBurst) {
       // A model's event sound outlives DestroyEffect, so the level-up burst's sound is cut through its volume groups.
-      VolumeGroupSetVolume(SOUND_VOLUMEGROUP_SPELLS, 0.0);
-      VolumeGroupSetVolume(SOUND_VOLUMEGROUP_COMBAT, 0.0);
+      setVolumeGroup(SOUND_VOLUMEGROUP_SPELLS, 0.0);
+      setVolumeGroup(SOUND_VOLUMEGROUP_COMBAT, 0.0);
       this.resultEffectsMuted = true;
     }
     this.pending = undefined;

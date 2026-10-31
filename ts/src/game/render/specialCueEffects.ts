@@ -24,6 +24,7 @@ import { CueLinger, type CuePlace } from "../presentation/cueLinger";
 import { clearEffectSubAnimations, createEffect, destroyEffect, playEffectAnimation, setEffectAlpha, setEffectAnimation, setEffectColor, setEffectPitch, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { displayTimedText } from "wisp/game/frames";
 import { localPlayer } from "wisp/game/players";
+import { playSound, releaseWhenDone, setSoundPosition, setSoundVolume, soundFromLabel, stopSound } from "wisp/game/sound";
 
 interface CueModel {
   readonly cue: Cue;
@@ -92,7 +93,7 @@ export class SpecialCueEffects {
     if (character === Character.kaelthas) this.banish = new BanishBeamEffects(origin, this.front, this.scale);
     for (const shown of fighterRenderedCues(character)) {
       const cue = shown;
-      if (cue.sound !== undefined && this.cueSounds[cue.sound] === undefined) this.cueSounds[cue.sound] = CreateSoundFromLabel(cue.sound, false, true, true, 10, 10);
+      if (cue.sound !== undefined && this.cueSounds[cue.sound] === undefined) this.cueSounds[cue.sound] = soundFromLabel(cue.sound, false, true, true, 10, 10);
       if (POPCORN_CUE_MODELS[cue.model] !== true) this.cues.push({ cue, model: createEffect(cue.model, origin.x, origin.y) });
       else if (shared && this.voices[cue.model] === undefined) {
         const models: effect[] = [];
@@ -126,7 +127,7 @@ export class SpecialCueEffects {
     this.confirmedKey = 0;
     this.confirmedFrame = 0;
     this.popcornNow = 0.0;
-    for (const sound of Object.values(this.cueSounds)) if (sound !== undefined) StopSound(sound, false, false);
+    for (const sound of Object.values(this.cueSounds)) if (sound !== undefined) stopSound(sound, false, false);
   }
 
 
@@ -148,10 +149,10 @@ export class SpecialCueEffects {
     if (cue?.sound !== undefined && fighter !== undefined && (cue !== this.confirmedCue || key !== this.confirmedKey || frame < this.confirmedFrame)) {
       const sound = this.cueSounds[cue.sound];
       if (sound !== undefined) {
-        StopSound(sound, false, false);
-        SetSoundPosition(sound, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
-        SetSoundVolume(sound, 127);
-        StartSound(sound);
+        stopSound(sound, false, false);
+        setSoundPosition(sound, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
+        setSoundVolume(sound, 127);
+        playSound(sound);
       }
     }
     if (cue !== undefined && fighter !== undefined && POPCORN_CUE_MODELS[cue.model] === true && (cue !== this.confirmedCue || key !== this.confirmedKey || (cue.birth?.eachFrame === true && frame !== this.confirmedFrame))) {
@@ -412,7 +413,7 @@ export class SpecialCueEffects {
     this.areas.destroy();
     this.banish?.destroy();
     destroyEffect(this.missing);
-    for (const sound of Object.values(this.cueSounds)) if (sound !== undefined) KillSoundWhenDone(sound);
+    for (const sound of Object.values(this.cueSounds)) if (sound !== undefined) releaseWhenDone(sound);
     for (const { model } of this.cues) destroyEffect(model);
     this.cues.length = 0;
     for (const voices of Object.values(this.voices)) for (const model of voices?.models ?? []) destroyEffect(model);

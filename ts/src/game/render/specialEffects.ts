@@ -37,6 +37,7 @@ import { SpellPassPresentation } from "./spellPassPresentation";
 import { SoundBank, SoundKind } from "./soundBank";
 import { bindPrototype } from "../../platform/rebind";
 import { createBeam, createEffect, destroyBeam, destroyEffect, moveBeam, setBeamColor, setEffectAlpha, setEffectColor, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { playSound, releaseWhenDone, setSoundPosition, soundFromLabel, stopSound } from "wisp/game/sound";
 
 interface SpecialSlot {
   readonly bear: SummonPresentation;
@@ -120,7 +121,7 @@ export class SpecialEffects {
       setEffectTimeScale(aura, 0.0);
       setEffectTimeScale(wingTrail, 0.0);
       setEffectTimeScale(drainFlash, 0.0);
-      const immolationLoop = CreateSoundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
+      const immolationLoop = soundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
       return {
         bear, aura, felFlames, cannonFlames, manaHand, wingTrail, drainFlash, silence, curse, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, cursor, immolationLoop,
         previousSpecial: SpecialAction.none, previousSpecialFrame: 0,
@@ -164,7 +165,7 @@ export class SpecialEffects {
   }
 
   private releaseImmolationLoop(slot: SpecialSlot): void {
-    StopSound(slot.immolationLoop, false, false);
+    stopSound(slot.immolationLoop, false, false);
   }
 
   private placed(slot: number, effect: number): void {
@@ -219,13 +220,13 @@ export class SpecialEffects {
     };
     if (lit) {
       play(IMMOLATE_SOUNDS.start);
-      SetSoundPosition(slot.immolationLoop, x, this.origin.y, z);
-      StartSound(slot.immolationLoop);
+      setSoundPosition(slot.immolationLoop, x, this.origin.y, z);
+      playSound(slot.immolationLoop);
     } else if (out) {
-      StopSound(slot.immolationLoop, false, true);
+      stopSound(slot.immolationLoop, false, true);
       play(IMMOLATE_SOUNDS.end);
     } else if (fighter.special.action === SpecialAction.demonHunterImmolate) {
-      SetSoundPosition(slot.immolationLoop, x, this.origin.y, z);
+      setSoundPosition(slot.immolationLoop, x, this.origin.y, z);
     }
   }
 
@@ -400,7 +401,7 @@ export class SpecialEffects {
     this.spellPass.destroy();
     for (const slot of this.slots) {
       this.releaseImmolationLoop(slot);
-      KillSoundWhenDone(slot.immolationLoop);
+      releaseWhenDone(slot.immolationLoop);
       slot.bear.destroy();
       for (const model of [slot.aura, slot.felFlames, slot.cannonFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, slot.frog]) destroyEffect(model);
       destroyBeam(slot.siphon);
