@@ -15,7 +15,7 @@ const EXPECTED = [
   { name: "failInnermost", text: "throw new Error(" },
   { name: "runMiddle", text: "failInnermost(label);" },
   { name: "runOuter", text: "runMiddle(label);" },
-  { name: "stackDemoCommand", text: "runOuter(GetEventPlayerChatString());" },
+  { name: "stackDemoCommand", text: "runOuter(chatText());" },
 ] as const;
 
 function fail(message: string): never {
