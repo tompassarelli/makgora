@@ -22,6 +22,7 @@ interface LedgerTick {
   readonly offset: number;
   count: number;
   readonly natives: number[];
+  readonly labels: string[];
 }
 
 interface LedgerWindow {
@@ -67,15 +68,18 @@ function keptWindow(ledger: Readonly<HandleLedger>, window: number): LedgerWindo
   return kept !== undefined && kept.window === window ? kept : undefined;
 }
 
-export function noteHandleCall(ledger: HandleLedger, native: number): void {
+export function noteHandleCall(ledger: HandleLedger, native: number, label = ""): void {
   const record = windowAt(ledger, floorDiv(ledger.tick, LEDGER_TICKS));
   record.total++;
   const offset = ledger.tick - record.window * LEDGER_TICKS;
   const last = record.ticks[record.ticks.length - 1];
-  const tick = last !== undefined && last.offset === offset ? last : { offset, count: 0, natives: [] };
+  const tick = last !== undefined && last.offset === offset ? last : { offset, count: 0, natives: [], labels: [] };
   if (tick !== last) record.ticks.push(tick);
   tick.count++;
-  if (tick.natives.length < NAMES_PER_TICK) tick.natives.push(native);
+  if (tick.natives.length < NAMES_PER_TICK) {
+    tick.natives.push(native);
+    tick.labels.push(label);
+  }
 }
 
 export function advanceHandleLedger(ledger: HandleLedger): void {
@@ -92,7 +96,7 @@ export function installHandleLedger(ledger: HandleLedger): void {
     if (typeof native !== "function") return;
     const call = native as (this: void, ...args: unknown[]) => unknown;
     globals[name] = (...args: unknown[]) => {
-      noteHandleCall(ledger, code);
+      noteHandleCall(ledger, code, typeof args[0] === "string" ? args[0] : "");
       return call(...args);
     };
   });
@@ -128,6 +132,8 @@ export function takeLedgerReport(ledger: HandleLedger): string | undefined {
 }
 
 const nativeName = (code: number): string => LEDGER_NATIVES[code] ?? "?";
+const fileName = (path: string): string => path.split("\\").pop() ?? path;
+const labelled = (code: number, label: string): string => label === "" ? nativeName(code) : `${nativeName(code)}[${fileName(label)}]`;
 
 function firstDifference(own: Readonly<LedgerWindow>, other: LedgerReport): number | undefined {
   const sent = own.ticks.slice(0, SENT_TICKS);
@@ -155,7 +161,7 @@ export function receiveLedgerReport(ledger: HandleLedger, local: number, sender:
   const theirs = other.ticks.find(entry => entry.offset === offset);
   const where = offset < 0 ? `in ticks ${formatInt(window)}-${formatInt(window + LEDGER_TICKS - 1)}` : `at tick ${formatInt(tick)}`;
   const line = `handle ledger: p${formatInt(local)} and p${formatInt(sender)} differ ${where}:`
-    + ` p${formatInt(local)} made or freed ${formatInt(offset < 0 ? own.total : mine?.count ?? 0)} (${(mine?.natives ?? []).map(code => nativeName(code)).join(" ")})`
+    + ` p${formatInt(local)} made or freed ${formatInt(offset < 0 ? own.total : mine?.count ?? 0)} (${(mine?.natives ?? []).map((code, index) => labelled(code, mine?.labels[index] ?? "")).join(" ")})`
     + ` and p${formatInt(sender)} ${formatInt(offset < 0 ? other.total : theirs?.count ?? 0)} (${theirs === undefined ? "" : nativeName(theirs.native)})`;
   ledger.lines.push(line);
   writeLine(handleLedgerFile(local, tick), line);

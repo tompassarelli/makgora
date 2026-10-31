@@ -12,7 +12,7 @@ const headless = testHeadless(PREDICTED_HEADLESS);
 
 const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-handle-ledger" };
 
-test("two online clients agree on their Warcraft handle ledger, and a timer only one of them creates is named, with its tick, on both clients [k1 scenario]", () => {
+test("two online clients agree on their Warcraft handle ledger, and an effect only one of them creates is named, with its model file and tick, on both clients [k1 scenario]", () => {
   const clients = headless.clients({ install, start: () => startBuild(BUILD) }, [0, 1], { delivery: syncDelivery(MEASURED_BATTLE_NET, 681) });
   const [early, late] = clients.clients;
   if (early === undefined || late === undefined) throw new Error("two clients expected");
@@ -29,11 +29,11 @@ test("two online clients agree on their Warcraft handle ledger, and a timer only
   let skewed = -1;
   late.run(() => {
     skewed = handleLedger().tick;
-    CreateTimer();
+    AddSpecialEffect("Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdl", 0, 0);
   });
   clients.frames(300);
   const [earlyLines, lateLines] = lines();
-  expect(earlyLines).toEqual([`handle ledger: p0 and p1 differ at tick ${skewed}: p0 made or freed 0 () and p1 1 (CreateTimer)`]);
-  expect(lateLines).toEqual([`handle ledger: p1 and p0 differ at tick ${skewed}: p1 made or freed 1 (CreateTimer) and p0 0 ()`]);
+  expect(earlyLines).toEqual([`handle ledger: p0 and p1 differ at tick ${skewed}: p0 made or freed 0 () and p1 1 (AddSpecialEffect)`]);
+  expect(lateLines).toEqual([`handle ledger: p1 and p0 differ at tick ${skewed}: p1 made or freed 1 (AddSpecialEffect[FrostNovaTarget.mdl]) and p0 0 ()`]);
   for (const client of clients.clients) expect(client.errors).toEqual([]);
 });
