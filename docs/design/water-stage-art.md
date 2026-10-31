@@ -105,3 +105,134 @@ waves breaking along the shoreline with a lighter wet edge behind them.
 Original generated art and CC0 meshes only; sources and licences are in
 [references](../references.md). Nothing from Blizzard beyond the player's own
 install at runtime.
+
+## Style target (2026-10-31)
+
+Tom chose to commit fully to stylised water and approved the proxy's recommendation
+the same evening (paraphrased): the surface follows World of Warcraft Forever's
+water and the reactions take the water's own colour and light. He then sent eight
+Forever frames as the primary surface target, replaced "painted colour bands" with
+depth-tinted translucency, and ruled that Rivals of Aether 2 is not the look (its
+flat cel colours, drawn outlines and bright cartoon highlights are out); from it
+we take a few readability ideas, drawn in Forever's soft painted-natural style.
+This section
+governs wherever it differs from the palette, foam and reference lines above:
+foam is no longer `#f4fbfa` and no longer a hard-edged line, and the sea has no
+caustic web. The one-page sheet is
+`~/.local/state/smashcraft/shots/water-style/style-sheet.png` (references stay
+outside Git); the redesign pass is judged against the rules below.
+
+### What the references show
+
+- **Forever, the surface** (pond, lake, open sea, river, dusk and sunset frames):
+  deep muted teal-green; translucent, so the bed, stones and a sunken hull show in
+  the shallows and fade with depth; fine low-contrast ripples; broad low highlights;
+  nothing glossy, no caustic web on the surface. Everything is scene-lit.
+- **Forever, motion**: foam exists only where water moves or meets something, as
+  thin translucent broken white streaks that follow the flow and fade at both ends.
+  A swimmer's ring is a faint, soft, slightly darker or lighter distortion of the
+  surface, not a drawn line. Calm water reflects the far bank and sky dimly and
+  broken by ripples. A low sun leaves a glitter path of short broken horizontal
+  dashes that widen and scatter toward the camera.
+- **Rivals 2, readability ideas only**: a fighter entering the water throws a tall,
+  short-lived splash column and spray, a fighter knocked in throws a wide splash
+  fan, and one standing in it keeps a short crown and a small whitecap around the
+  legs; faint concentric rings spread from fighters and from posts standing in the
+  water; nearby objects (posts, deck) reflect in the water below them; clear
+  shallow water shows its bed with a broken network of soft light lines lying on
+  the bed under the surface, and dark weed shapes below; the water plane reads
+  clearly apart from the playable deck. Colour, brightness and lifetime follow the
+  Forever rules, at lower contrast than Rivals.
+
+### Rules
+
+Measured on a native-window capture at match zoom, 1920x1080, in both facings.
+Luma is Rec709 on 8-bit sRGB (0 to 255). A block is a square of 0.2 of the frame
+height of open water (no deck, fighter, foam line or reaction inside it); p50 and
+p99 are that block's median and 99th-percentile luma. Reference values are from the
+Forever frames; ours are from the 2026-10-31 captures on the sheet.
+
+Surface
+
+1. **Palette.** Body ramps through three stops by depth: shallow `#42655e`, mid
+   `#244942`, deep `#0f2c34` (Forever's lit shallows, open sea and deep water). Body
+   saturation (HSV) at most 0.5 anywhere on the sea. Hue stays teal-green; a stage's
+   own light tints it. Naxxramas poison keeps its green hue and thickness and takes
+   rules 2 to 5 and 7 to 16 with its own stops.
+2. **Depth, not bands.** One continuous shallow-to-deep ramp, zero visible steps:
+   no luma step over 8 between points 4 px apart on a vertical line through the sea
+   (shore foam, horizon and fighters excepted).
+3. **Translucent.** The submerged deck, supports and rocks show through at 60% of
+   their dry luma at the waterline and fade to under 10% by 1.5 deck thicknesses
+   below it (deck thickness is 0.07 of frame height at match zoom). Fighters and the
+   deck draw in front and the sea never tints them.
+4. **Fine, quiet ripples.** Luma standard deviation in a block: at most 6 in deep
+   water and 12 in lit shallows (Forever 1 to 5 and 11; ours 20 on Tomb).
+5. **Low highlights.** In a block p99 is at most 1.75 times p50 (Forever 1.2 to 1.74;
+   ours 2.3 on Tomb) and no open-water pixel exceeds luma 200 on a stage with no
+   visible sun. Zero caustic web on the surface: the water shader's surface
+   caustics are 0 for Tomb and Naxxramas. Light lines belong on a bed seen through
+   clear shallow water only: soft, broken, on the bed under the surface, bed p99 at
+   most 1.5 times the bed's p50 and fading to nothing where the ramp passes mid. No heavy
+   swells: the swell term raises no block's p99/p50 past this rule.
+6. **Sun glitter, only where the sun is low and in view** (Durotar Skies and
+   Ahn'Qiraj; none on Tomb or Naxxramas). A path from the sun's screen x toward the
+   camera made of dashes at most 4 px tall, each a broken horizontal highlight in the
+   sun's colour at most 0.7 opaque; dashes cover at most 35% of the path's area, so
+   no smooth band forms, and they widen and scatter toward the camera.
+7. **Dim reflection.** Reflected backdrop luma at most 45% of its source, displaced
+   2 to 6 px by the ripples so its edges break; the sea hazes toward the fog colour
+   at the horizon with no line brighter than the sky beside it.
+
+Foam
+
+8. **Only where water moves or meets something.** A foam line at each waterline in
+   the sim's edge list (deck, platform supports, stacks, shore) and soft streaks
+   along the tide's flow; none elsewhere, and none at all in the slack.
+9. **Soft, broken, tinted.** Streaks 20 to 120 px long, opacity at most 0.55, ends
+   fading over at least a third of their length, a waterline covered at most 60% of
+   its length at a time, never a closed loop. Peak luma at most 1.6 times the local
+   water's p50 and at most 190; foam colour is the water's crest colour mixed at most
+   55% toward the horizon colour, never `#f4fbfa`, never a pixel with all three
+   channels over 215.
+
+Reactions (rings, wake, splash, droplets)
+
+10. **Ring.** A soft distortion plus a faint tint, not a drawn line: peak luma
+    within plus or minus 20 of the local water, edge gradient at least 6 px wide, at
+    most 2 rings per fighter at once, each fading out within 45 frames. A fighter
+    that is not touching the surface makes none. Each deck support or post standing
+    in the water gets the same ring, at most 1 at a time and fainter, plus a soft
+    foam wisp on its upstream side under rules 8 and 9.
+11. **Wake.** At most one V of 2 soft streaks behind a swimmer, at most 3 fighter
+    widths long, opacity at most 0.4, gone within 30 frames of the fighter stopping.
+12. **Splash and droplets.** One splash per crossing, in or out, 8 to 14 droplets,
+    a column up to 0.5 fighter heights tall (a fighter knocked in at speed:
+    a fan up to 1.0 tall and 24 droplets, same luma caps), no spray pixel over luma 200, tinted
+    with the water's crest and light, parked or faded by frame 36. A fighter that
+    keeps moving through the surface leaves a soft churn at the waterline, at most
+    0.4 opaque, gone within 20 frames of the fighter leaving it; one standing in
+    it keeps a crown up to 0.25 fighter heights and a small whitecap around the
+    legs, at most 0.55 opaque, with no ring pattern drawn as a line. Reaction hue stays within 25 degrees of the water body's hue:
+    no green, opaque or thick wash over a teal sea. Never solid white: no reaction
+    pixel has all three channels over 200.
+13. **Objects reflect.** The deck's underside, posts and stacks reflect in the
+    water directly below them, under rule 7, at least 12 luma darker than the object
+    and rippled, so the waterline reads as a contact.
+14. **Plane apart from the deck.** At every waterline the sea's median luma differs
+    from the deck's adjacent face by at least 25, and the sea carries no stone, grid
+    or deck texture.
+
+Legibility
+
+15. **Fighters stay first.** The sea's p99 luma stays under the lowest fighter
+    body's median luma at both camera extremes, and the fighter-contrast check in
+    visual-quality keeps its threshold.
+16. **Frame budget.** Water and reactions stay inside the 8.3 ms frame at 2880x1920.
+
+### Judged how
+
+The redesign pass lands when a capture of Tomb and of Naxxramas at match zoom, both
+facings, plus one with a fighter entering, one swimming and one leaving the Tomb sea
+passes rules 1 to 16 by measurement, and two cold viewers shown the sheet's target
+column and then the capture call them the same style.
