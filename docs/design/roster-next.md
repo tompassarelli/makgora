@@ -81,6 +81,44 @@ a decision from Tom.
   - File: `TyrandeDismountedV2.mdx`, 5,181 polygons. The pack also holds `TyrandeDismountedAV2.mdx` (the same body with a team-colour cape), the mounted `TyrandeV2.mdx` and `TyrandeAV2.mdx`, two portraits and two arrow missiles, all unused.
   - Credit line: "Tyrande Whisperwind (Re-Classic) by johnwar (Hive Workshop), built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas models and kangyun's Tyrande, used with kangyun's permission."
 
+#### Onyxia's two models (read 31 October 2026)
+
+Tom chose both pages for Onyxia (2026-10-31). The live pages were read
+through a plain Chrome on gex45's private desktop past Hive's Cloudflare
+check; the Onyxia page matches the Wayback Machine's 25 June 2025 copy.
+
+- **Onyxia**, https://www.hiveworkshop.com/threads/onyxia.348925/
+  - Author: Symphoneum. Filed under Reforged HD Models; tagged Open Source;
+    state Pending (not yet reviewed by staff). Created 6 May 2023, updated
+    11 June 2023 ("Added a Lore Accurate version").
+  - Source, in the author's words: "This model was made using WC3R assets
+    from Sapphiron, Therifas, the Red Dragon, the Green Dragon, the Black
+    Dragon, and the Snapdragon. Textures were reworked using GIMP." Warcraft
+    III Reforged assets, no World of Warcraft files.
+  - Conditions: "Please credit Symphoneum if you use this model in a
+    project." No edit ban.
+  - Files: the Lore Accurate `Onyxia.mdx` (21,208 polygons) and
+    `Onyxia_portrait.mdx` (17,578 polygons), with ten DDS textures
+    (diffuse, ORM and normal maps); flying animations only.
+  - Credit line: "Onyxia by Symphoneum (Hive Workshop), built from Warcraft
+    III Reforged models."
+- **Lady Katrana Prestor (WOW Classic Version)**, https://www.hiveworkshop.com/threads/lady-katrana-prestor-wow-classic-version.375457/
+  - Not used. The page is filed under "Ported Models", its author line is
+    "ZugothNDeadly, Blizzard Entertainment", and its title names the World
+    of Warcraft Classic version: a model ported from World of Warcraft's
+    files, which smashcraft's clean-room rule forbids. State Pending,
+    created 16 October 2026, `LadyKatranaPrestor.mdx`, 1,344 polygons.
+  - Candidates read the same day for gate 145: Footman16's
+    [Katrana Prestor](https://www.hiveworkshop.com/threads/katrana-prestor.362851/)
+    (approved and recommended; an edit of AndrewOverload519's Female Human
+    Mage and kangyun's Whitemane staff with both permissions posted; "if you
+    decide to use this resource please give credits"; its one texture is
+    "based on her texture from WoW as well as some freehand", and its icons
+    are crops of Hearthstone art), and DSDK's
+    [Lady Katrana Prestor](https://www.hiveworkshop.com/threads/lady-katrana-prestor.354279/)
+    (awaiting update: the reviewer asked for proof of permission from Sxar,
+    and a reply notes a WoW hair texture, `Hair01_00.blp`).
+
 ### H1 intake (29 October 2026)
 
 Both models were downloaded through a plain headful Chrome on gex45's private

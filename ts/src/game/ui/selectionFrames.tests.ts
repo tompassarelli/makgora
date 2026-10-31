@@ -7,14 +7,14 @@ import { GRID_FIGHTERS, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, tile
 const FACTION_ORDER = [
   "uther", "jaina-proudmoore", "mountain-king", "medivh", "kael'thas-sunstrider", "thrall", "grom-hellscream", "cairne-bloodhoof",
   "beastmaster", "blademaster", "shadow-hunter", "peon", "lich-king", "lich", "sylvanas-windrunner", "dreadlord",
-  "anub'arak", "butcher", "malfurion-stormrage", "tyrande", "illidan", "warden", "archimonde", "pit-lord",
-  "lady-vashj", "akama", "chen-stormstout", "firelord", "goblin-tinker", "goblin-alchemist", "murloc",
+  "anub'arak", "butcher", "malfurion-stormrage", "tyrande", "illidan", "warden",
+  "lady-vashj", "akama", "chen-stormstout", "firelord", "goblin-tinker", "goblin-alchemist", "murloc", "pit-lord", "archimonde",
 ];
 
 const playableSlugs = (): string[] => PLAYABLE_CHARACTERS.map(character => fighterSlug(character));
 const expectedOrder = (): string[] => FACTION_ORDER.filter(slug => playableSlugs().includes(slug));
 
-test("The character select grid lists Human, Orc, Undead, Night Elf, Burning Legion and Neutral fighters in reading order, eight to a row, with Random last [k3 measure docs/design/roster.md]", () => {
+test("The character select grid lists Human, Orc, Undead, Night Elf and Neutral fighters in reading order, then Mannoroth and Archimonde, eight to a row, with Random last [k3 measure docs/design/roster.md]", () => {
   const expected = expectedOrder();
   assertEquals(GRID_FIGHTERS.length, expected.length);
   for (let tile = 0; tile < expected.length; tile++) assertEquals(fighterSlug(characterOfTile(tile)), expected[tile]);

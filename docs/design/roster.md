@@ -10,6 +10,8 @@
 
 > **Select grid order (30 October 2026):** the character select grid lists the fighters by faction in reading order, Human, Orc, Undead, Night Elf, Burning Legion, then Neutral, with the Random tile last; `SELECT_GRID_ORDER` in `ts/src/game/ui/selectionLayout.ts` holds the order and `selectionFrames.tests.ts` pins it. Chen sits with the Neutral fighters (Tom, 30 October 2026).
 
+> **Select grid order (31 October 2026):** the grid now ends with Mannoroth (Pit Lord) and Archimonde, just before the Random tile, after the Neutral fighters; Onyxia takes the place between them when she replaces the Goblin Alchemist ([onyxia.md](onyxia.md); Tom, 31 October 2026).
+
 Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 29 fighters (Tom, 28 October 2026, [roster-next.md](roster-next.md)) until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), and [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343). No further additions are planned.
 
 We explored Definitive Edition models, found they differ widely from the Classic models (for example, Sylvanas's Definitive body is about 55% wider than her Classic one, so shared animations and hurtboxes would need rescaling), and the game focuses on the Classic models.

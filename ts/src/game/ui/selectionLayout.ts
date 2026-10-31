@@ -42,10 +42,11 @@ export const MOVES_BODY_BOX: TextBox = { left: f32(0.12), top: f32(0.4), width: 
 export const MOVES_BUTTON_TOP = f32(0.075);
 export const MOVES_BUTTON_HEIGHT = f32(0.032);
 
-/** The select grid's fighters in reading order, grouped by faction (Human, Orc, Undead, Night Elf, Burning Legion, Neutral); the Random tile follows them. */
+/** The select grid's fighters in reading order, grouped by faction (Human, Orc, Undead, Night Elf, Neutral), then Mannoroth and Archimonde; the Random tile follows them. */
 export const SELECT_GRID_ORDER: readonly Character[] = [
   Character.uther, Character.jaina, Character.mountainKing, Character.medivh, Character.kaelthas, Character.thrall, Character.grom,
   Character.cairne, Character.beastmaster, Character.blademaster, Character.shadowHunter, Character.peon, Character.lichKing, Character.lich, Character.sylvanas,
-  Character.dreadlord, Character.anubarak, Character.butcher, Character.malfurion, Character.tyrande, Character.demonHunter, Character.warden, Character.archimonde, Character.pitLord,
+  Character.dreadlord, Character.anubarak, Character.butcher, Character.malfurion, Character.tyrande, Character.demonHunter, Character.warden,
   Character.ladyVashj, Character.akama, Character.chen, Character.firelord, Character.tinker, Character.alchemist, Character.murloc,
+  Character.pitLord, Character.archimonde,
 ];
