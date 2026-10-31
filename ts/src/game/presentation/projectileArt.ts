@@ -194,6 +194,7 @@ export const RIBBON_PARK_SEQUENCES: { readonly [model: string]: string | null } 
   "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx": "Birth",
   "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx": null,
   "Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx": "Death",
+  "Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilMissile.mdl": "Death",
   "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx": "Birth",
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": "Death",
   "Abilities\\Weapons\\WaterElementalMissile\\WaterElementalMissile.mdx": null,
