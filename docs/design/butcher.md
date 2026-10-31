@@ -98,15 +98,19 @@ Specials:
   with his stock. The on state and its clock are rollback state.
   Tom asked on 2026-10-31 for Rot to leave a lingering trail so it controls
   space like a trap. While it is on and he stands on a floor, a rot patch
-  (stock `DeathAndDecayTarget`, 0.4 of the cloud's radius, 36 units) is
+  (a flattened stock `PlagueCloudCaster`, 0.4 of the cloud's radius, 36 units) is
   dropped under him at once when none lives, then every 12 frames he has moved
-  24 units or more from the newest. A patch stays 150 frames, outlasting the
+  24 units or more from the newest. A patch stays 180 frames, outlasting the
   cloud, and wounds and slows a foe on it with the cloud's own 1% and 15% on
   the same 10-frame clock, so a foe takes at most one wound a tick from the
-  cloud and every patch together. At most 12 patches live (the oldest goes
+  cloud and every patch together. At most 15 patches live (the oldest goes
   first), none drop in the air, and the patches are decorative projectiles
   saved with his other projectiles. The 24 units, the 12-frame spacing and the
-  12 patches are our numbers, not Tom's.
+  patch limit are our numbers, not Tom's. After a playtest on 2026-11-01 Tom
+  asked for the patches to last 3 s, up from 2.5 s (150 frames), with the limit
+  of 15 live patches (the life over the 12-frame spacing, rounded up) so a
+  running trail keeps every patch for the full 3 s; the limit fills all 16
+  projectile slots with his hook.
 - **Flesh Heap** (passive). Each KO he scores and each throw he lands adds a
   stack, up to 5; each adds 3% weight and 1% to Stitches' Charge's armour.
   He loses every stack with a stock. A KO goes to the fighter who last

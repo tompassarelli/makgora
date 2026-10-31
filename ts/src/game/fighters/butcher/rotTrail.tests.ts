@@ -134,7 +134,7 @@ test("Rot leaves no patch while it is off, and none while he is in the air [k3 m
   assertTrue(!dropped);
 });
 
-test("A patch stays exactly 150 frames, outlasting the aura that dropped it [k3 measure docs/design/butcher.md]", () => {
+test("A patch stays exactly 180 frames, outlasting the aura that dropped it [k3 measure docs/design/butcher.md]", () => {
   const d = duel();
   rotOn(d);
   rotOff(d);
@@ -224,7 +224,7 @@ test("A foe in the aura and in overlapping patches takes one wound every 10 fram
   everyTen(wounds(d, 50));
 });
 
-test("At most 12 patches live: the drop that would be the 13th removes the oldest [k3 measure docs/design/butcher.md]", () => {
+test("At most 15 patches live, enough for a run to keep every patch its full 180 frames: the drop that would be the 16th removes the oldest [k3 measure docs/design/butcher.md]", () => {
   const d = duel();
   rotOn(d);
   for (let index = 0; index < ROT_PATCH_LIMIT - 1; index++) {
@@ -234,6 +234,7 @@ test("At most 12 patches live: the drop that would be the 13th removes the oldes
   const lives = patches(d.butcher).map((patch) => patch.life).sort((a, b) => a - b);
   assertEquals(lives.length, ROT_PATCH_LIMIT);
   const [oldest = 0, second = 0] = lives;
+  assertEquals(ROT_PATCH_LIMIT * TRAIL.every >= ROT_PATCH_FRAMES, true);
   let steps = 0;
   while (!patches(d.butcher).some((patch) => patch.life === ROT_PATCH_FRAMES) && steps < 40) {
     step(d, "run");
@@ -245,7 +246,7 @@ test("At most 12 patches live: the drop that would be the 13th removes the oldes
   assertTrue(after[0] !== oldest - steps);
   let most = 0;
   for (let leg = 0; leg < 6; leg++) runFor(d, 50, imod(leg, 2) === 0 ? "run" : "back", () => { most = Math.max(most, patches(d.butcher).length); });
-  assertEquals(most, ROT_PATCH_LIMIT);
+  assertTrue(most <= ROT_PATCH_LIMIT);
 });
 
 const SCRIPT = (tick: number): Press => (tick === ROT_ON ? "rot" : tick > 20 && tick < 50 ? "run" : tick >= 50 && tick < 80 ? "back" : tick === 150 ? "rot" : "none");

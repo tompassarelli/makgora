@@ -1,4 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
+import { idiv } from "wisp/src/sim/intMath";
 import { HitElement } from "../../sim/codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../../sim/heroMoves";
 import { CHARGED_AIM_FRAMES, FollowUpInput, frames, type AuthoredSpecial, type FighterSpecials, type SpecialCharge, type SpecialFollowUp, type SpecialProjectile } from "../../sim/specials/schema";
@@ -62,9 +63,9 @@ const hookSwing: AuthoredSpecial = {
 };
 
 export const ROT_RADIUS = 90.0;
-export const ROT_PATCH_FRAMES = 150;
-export const ROT_PATCH_LIMIT = 12;
+export const ROT_PATCH_FRAMES = 180;
 export const ROT_PATCH_EVERY = 12;
+export const ROT_PATCH_LIMIT = idiv(ROT_PATCH_FRAMES + ROT_PATCH_EVERY - 1, ROT_PATCH_EVERY);
 const ROT_PATCH_MODEL = "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx";
 
 export const ROT_PATCH: SpecialProjectile = {
@@ -87,6 +88,6 @@ export const BUTCHER_SPECIALS: FighterSpecials = {
     ground: butchersCharge(false), air: butchersCharge(true) },
   up: { name: "Hook Swing", description: "He flings the hook up and ahead: if it bites the ledge it reels him there; otherwise he hops a short way and falls helpless.",
     ground: hookSwing },
-  down: { name: "Rot", description: "Toggle: a stinking cloud around him burns and slows anyone close, and bleeds him while it lasts. Moving on the ground with it on, he leaves rot on the floor that goes on burning and slowing foes who cross it for two and a half seconds after he has passed. Keep out of it.",
+  down: { name: "Rot", description: "Toggle: a stinking cloud around him burns and slows anyone close, and bleeds him while it lasts. Moving on the ground with it on, he leaves rot on the floor that goes on burning and slowing foes who cross it for three seconds after he has passed. Keep out of it.",
     ground: rot },
 };
