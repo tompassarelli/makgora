@@ -129,6 +129,11 @@ export function presentDelayControls(frames: DelayFrames, hostControl: boolean):
   for (const frame of frames.steps) BlzFrameSetVisible(frame, hostControl);
 }
 
+export function rulesKey(game: Readonly<MatchState>, clears: { count(): number }, fighter: number): string {
+  const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, classic, classicTier, lore, loreBattle: battle } = game;
+  return `${lore ? "1" : "0"} ${I2S(battle)} ${I2S(clears.count())} ${classic ? "1" : "0"} ${I2S(classicTier)} ${I2S(fighter)} ${I2S(stockCount)} ${I2S(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${I2S(trainer.behaviour)} ${I2S(trainer.escape)} ${I2S(trainer.tech)} ${I2S(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${I2S(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${I2S(items.enabledMask)} ${I2S(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"}`;
+}
+
 export function applyRuleButton(actions: SelectionActions, participantId: number, button: RuleButton): void {
   if (button.kind === "teamBattle") actions.toggleTeamBattle(participantId);
   else if (button.kind === "friendlyFire") actions.toggleFriendlyFire(participantId);

@@ -280,9 +280,7 @@ export function layoutHuds(s: ShellState, hints: boolean): void {
 }
 
 
-export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (choice: number, clicker: player) => void): void {
-  const ui = s.ui;
-  if (ui === undefined) return;
+function rebindScreens(ui: UiObjects, selectPause: (choice: number, clicker: player) => void, origin: ShellState["origin"]): void {
   if (ui.pause === undefined) ui.pause = new PauseMenu(selectPause);
   else {
     bindPrototype(ui.pause, PauseMenu.prototype);
@@ -295,13 +293,13 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     ui.pauseScreen.bindActions(selectPause);
   }
   const retainedItems: { readonly items?: ItemPresentation } = ui;
-  if (retainedItems.items === undefined) ui.items = new ItemPresentation(s.origin);
+  if (retainedItems.items === undefined) ui.items = new ItemPresentation(origin);
   else bindPrototype(ui.items, ItemPresentation.prototype);
   const retainedAuras: { readonly auras?: AuraPresentation } = ui;
-  if (retainedAuras.auras === undefined) ui.auras = new AuraPresentation(s.origin);
+  if (retainedAuras.auras === undefined) ui.auras = new AuraPresentation(origin);
   else bindPrototype(ui.auras, AuraPresentation.prototype);
   const retainedOrbs: { readonly orbs?: OrbPresentation } = ui;
-  if (retainedOrbs.orbs === undefined) ui.orbs = new OrbPresentation(s.origin);
+  if (retainedOrbs.orbs === undefined) ui.orbs = new OrbPresentation(origin);
   else bindPrototype(ui.orbs, OrbPresentation.prototype);
   const retainedMarkers: { readonly markers?: Slots<FighterMarker> } = ui;
   if (retainedMarkers.markers === undefined) ui.markers = each(slot => new FighterMarker(slot));
@@ -314,20 +312,24 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   const retainedChat: { readonly chat?: ChatPanel } = ui;
   if (retainedChat.chat === undefined) ui.chat = new ChatPanel(CHAT_STYLE);
   else bindPrototype(ui.chat, ChatPanel.prototype);
-  for (const slot of PARTICIPANT_SLOTS) {
-    bindPrototype(ui.huds[slot], FighterHud.prototype);
-    bindPrototype(ui.bubbles[slot], OffscreenBubble.prototype);
-    bindPrototype(ui.escapeMeters[slot], EscapeMeter.prototype);
-    bindPrototype(ui.selections[slot], SelectionPanel.prototype);
-    if (!ui.selections[slot].hasCpuSettingsFrames()) {
-      ui.selections[slot].destroy();
-      ui.selections[slot] = new SelectionPanel(actions.selection, slot, menuControls(s), sourceVersion());
-    } else ui.selections[slot].bindActions(actions.selection);
-    bindPrototype(ui.settings[slot], SettingsPanel.prototype);
-    const retainedSettings: { readonly root?: framehandle } = ui.settings[slot];
-    if (retainedSettings.root === undefined) ui.settings[slot] = new SettingsPanel(s.participants[slot].bindings, actions.settings, slot);
-    else ui.settings[slot].bindActions(actions.settings);
-  }
+}
+
+function rebindSlotPanels(s: ShellState, ui: UiObjects, actions: PanelActions, slot: ParticipantSlot): void {
+  bindPrototype(ui.huds[slot], FighterHud.prototype);
+  bindPrototype(ui.bubbles[slot], OffscreenBubble.prototype);
+  bindPrototype(ui.escapeMeters[slot], EscapeMeter.prototype);
+  bindPrototype(ui.selections[slot], SelectionPanel.prototype);
+  if (!ui.selections[slot].hasCpuSettingsFrames()) {
+    ui.selections[slot].destroy();
+    ui.selections[slot] = new SelectionPanel(actions.selection, slot, menuControls(s), sourceVersion());
+  } else ui.selections[slot].bindActions(actions.selection);
+  bindPrototype(ui.settings[slot], SettingsPanel.prototype);
+  const retainedSettings: { readonly root?: framehandle } = ui.settings[slot];
+  if (retainedSettings.root === undefined) ui.settings[slot] = new SettingsPanel(s.participants[slot].bindings, actions.settings, slot);
+  else ui.settings[slot].bindActions(actions.settings);
+}
+
+function rebindEffects(s: ShellState, ui: UiObjects, actions: PanelActions): void {
   bindPrototype(ui.stage, StagePanel.prototype);
   ui.stage.bindActions(actions.stage);
   bindPrototype(ui.combat, CombatEffects.prototype);
@@ -343,7 +345,9 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   else for (const slot of PARTICIPANT_SLOTS) {
     bindPrototype(ui.meterBars[slot].hud, MeterBar.prototype);
   }
+}
 
+function rebindMatchPanels(s: ShellState, ui: UiObjects): void {
   const retained: { readonly match?: MatchPresentation } = ui;
   const retainedResults: { readonly results?: ResultsBanner } = ui;
   if (retainedResults.results === undefined) ui.results = new ResultsBanner();
@@ -362,30 +366,42 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   } else bindPrototype(ui.elements, ElementEffects.prototype);
   if (ui.classic === undefined) ui.classic = new ClassicPresentation(s.origin);
   else bindPrototype(ui.classic, ClassicPresentation.prototype);
+}
+
+function rebindFighterRenderers(renderers: FighterRenderers): void {
+  bindPrototype(renderers.shield, ShieldPresentation.prototype);
+  bindPrototype(renderers.projectiles, ProjectilePresentation.prototype);
+  if (renderers.cues !== undefined) bindPrototype(renderers.cues, SpecialCueEffects.prototype);
+  if (renderers.meter !== undefined) {
+    bindPrototype(renderers.meter, MeterCueEffects.prototype);
+    renderers.meter.rebindModels(bindPrototype);
+  }
+  if (renderers.pool !== undefined) bindPrototype(renderers.pool, FighterPoolPresentation.prototype);
+  bindPrototype(renderers.agency, AgencyMarker.prototype);
+  bindPrototype(renderers.flash, BodyFlash.prototype);
+  bindPrototype(renderers.glow, MeterGlow.prototype);
+  if (renderers.goldSack !== undefined) bindPrototype(renderers.goldSack, GoldSackPresentation.prototype);
+  if (renderers.shurikenGlow !== undefined) bindPrototype(renderers.shurikenGlow, ShurikenGlowPresentation.prototype);
+  if (renderers.parasol !== undefined) bindPrototype(renderers.parasol, ParasolPresentation.prototype);
+  if (renderers.hookChain !== undefined) bindPrototype(renderers.hookChain, HookChainPresentation.prototype);
+  if (renderers.spheres !== undefined) bindPrototype(renderers.spheres, SpherePresentation.prototype);
+  if (renderers.flight !== undefined) bindPrototype(renderers.flight, FlightPresentation.prototype);
+  bindPrototype(renderers.agency.forecast, FighterAgencyForecast.prototype);
+  if (renderers.hitAreas !== undefined) bindPrototype(renderers.hitAreas, HitAreaPresentation.prototype);
+  bindPrototype(renderers.terror, TerrorPresentation.prototype);
+  bindPrototype(renderers.seaSplash, SeaSplashPresentation.prototype);
+}
+
+export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (choice: number, clicker: player) => void): void {
+  const ui = s.ui;
+  if (ui === undefined) return;
+  rebindScreens(ui, selectPause, s.origin);
+  for (const slot of PARTICIPANT_SLOTS) rebindSlotPanels(s, ui, actions, slot);
+  rebindEffects(s, ui, actions);
+  rebindMatchPanels(s, ui);
   for (const slot of PARTICIPANT_SLOTS) {
     const renderers = ui.fighters[slot];
-    if (renderers === undefined) continue;
-    bindPrototype(renderers.shield, ShieldPresentation.prototype);
-    bindPrototype(renderers.projectiles, ProjectilePresentation.prototype);
-    if (renderers.cues !== undefined) bindPrototype(renderers.cues, SpecialCueEffects.prototype);
-    if (renderers.meter !== undefined) {
-      bindPrototype(renderers.meter, MeterCueEffects.prototype);
-      renderers.meter.rebindModels(bindPrototype);
-    }
-    if (renderers.pool !== undefined) bindPrototype(renderers.pool, FighterPoolPresentation.prototype);
-    bindPrototype(renderers.agency, AgencyMarker.prototype);
-    bindPrototype(renderers.flash, BodyFlash.prototype);
-    bindPrototype(renderers.glow, MeterGlow.prototype);
-    if (renderers.goldSack !== undefined) bindPrototype(renderers.goldSack, GoldSackPresentation.prototype);
-    if (renderers.shurikenGlow !== undefined) bindPrototype(renderers.shurikenGlow, ShurikenGlowPresentation.prototype);
-    if (renderers.parasol !== undefined) bindPrototype(renderers.parasol, ParasolPresentation.prototype);
-    if (renderers.hookChain !== undefined) bindPrototype(renderers.hookChain, HookChainPresentation.prototype);
-    if (renderers.spheres !== undefined) bindPrototype(renderers.spheres, SpherePresentation.prototype);
-    if (renderers.flight !== undefined) bindPrototype(renderers.flight, FlightPresentation.prototype);
-    bindPrototype(renderers.agency.forecast, FighterAgencyForecast.prototype);
-    if (renderers.hitAreas !== undefined) bindPrototype(renderers.hitAreas, HitAreaPresentation.prototype);
-    bindPrototype(renderers.terror, TerrorPresentation.prototype);
-    bindPrototype(renderers.seaSplash, SeaSplashPresentation.prototype);
+    if (renderers !== undefined) rebindFighterRenderers(renderers);
   }
 }
 

@@ -66,7 +66,7 @@ import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, showT
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
-import { type DelayFrames, type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules, presentDelayControls } from "./selectionRules";
+import { type DelayFrames, type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules, presentDelayControls, rulesKey } from "./selectionRules";
 import { panelButton } from "./infoPanel";
 import type { LobbyNet, SelectionActions } from "./selectionActions";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
@@ -75,16 +75,13 @@ import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus,
 
 type SelectionButton = { kind: "tile"; tile: number } | CardButton | CpuButton | { kind: "start" } | { kind: "settings" } | RuleButton
   | { kind: "moves" } | { kind: "movesBack" } | { kind: "movesStep"; direction: -1 | 1 } | TutorialButton;
+type ClickOf<K extends SelectionButton["kind"]> = Extract<SelectionButton, { kind: K }>;
 
 const DELAY_TEXT_SIZE = f32(0.0095);
 const TILE_NAME_INSET = f32(0.008);
 const TILE_NAME_SIZE = f32(0.0078);
 const CPU_DEFAULTS: CpuDefaults = { opponent: CPU_OPPONENT_CHOICE_DEFAULT, tier: CPU_TIER_DEFAULT };
 
-function rulesKey(game: Readonly<MatchState>, clears: LoreClears, fighter: number): string {
-  const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, classic, classicTier, lore, loreBattle: battle } = game;
-  return `${lore ? "1" : "0"} ${I2S(battle)} ${I2S(clears.count())} ${classic ? "1" : "0"} ${I2S(classicTier)} ${I2S(fighter)} ${I2S(stockCount)} ${I2S(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${I2S(trainer.behaviour)} ${I2S(trainer.escape)} ${I2S(trainer.tech)} ${I2S(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${I2S(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${I2S(items.enabledMask)} ${I2S(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"}`;
-}
 
 function presentMatchRules(rules: RuleFrames, game: Readonly<MatchState>): void {
   const { stockCount, timeLimitMinutes, endless, automaticRematch, training, items, classic, lore } = game;
@@ -360,31 +357,49 @@ export class SelectionPanel {
   private click(button: SelectionButton, clicker: player): void {
     if (clicker !== Player(this.participantId)) return;
     if (this.cpuSlot !== undefined && button.kind !== "cpuStep" && button.kind !== "cpuClose") return;
-    if (button.kind === "tile") {
-      const game = this.choosing();
-      if (game === undefined || !tileOffered(game, button.tile)) return;
-      if (this.ownsLocalClient()) this.sendPlacement({ slot: this.drag.held ?? this.participantId, tile: button.tile });
-    }
-    else if (button.kind === "team") this.actions.changeTeam(this.participantId, button.slot, 1);
+    if (button.kind === "tile") this.clickTile(button.tile);
+    else if (button.kind === "team" || button.kind === "costume" || button.kind === "mode") this.clickCard(button);
+    else if (button.kind === "start" || button.kind === "settings" || button.kind === "moves" || button.kind === "movesBack" || button.kind === "movesStep") this.clickDialog(button);
+    else if (button.kind === "cpuSettings" || button.kind === "cpuStep" || button.kind === "cpuClose") this.clickCpu(button);
+    else if (button.kind === "tutorialOpen" || button.kind === "tutorialStep" || button.kind === "tutorialStart" || button.kind === "tutorialClose") this.clickTutorial(button);
+    else applyRuleButton(this.actions, this.participantId, button);
+  }
+
+  private clickTile(tile: number): void {
+    const game = this.choosing();
+    if (game === undefined || !tileOffered(game, tile)) return;
+    if (this.ownsLocalClient()) this.sendPlacement({ slot: this.drag.held ?? this.participantId, tile });
+  }
+
+  private clickCard(button: ClickOf<"team" | "costume" | "mode">): void {
+    if (button.kind === "team") this.actions.changeTeam(this.participantId, button.slot, 1);
     else if (button.kind === "costume") this.actions.changeCostume(this.participantId, button.slot, 1);
-    else if (button.kind === "mode") this.actions.cycleMode(this.participantId, button.slot);
-    else if (button.kind === "start") this.actions.start(this.participantId);
+    else this.actions.cycleMode(this.participantId, button.slot);
+  }
+
+  private clickDialog(button: ClickOf<"start" | "settings" | "moves" | "movesBack" | "movesStep">): void {
+    if (button.kind === "start") this.actions.start(this.participantId);
     else if (button.kind === "settings") this.actions.openSettings(this.participantId);
     else if (button.kind === "moves") this.openMoves();
     else if (button.kind === "movesBack") this.movesOpen = false;
-    else if (button.kind === "movesStep") this.movesCharacter = nextSelectableCharacter(this.movesCharacter, button.direction);
-    else if (button.kind === "cpuSettings") this.openCpuSettings(button.slot);
+    else this.movesCharacter = nextSelectableCharacter(this.movesCharacter, button.direction);
+  }
+
+  private clickCpu(button: ClickOf<"cpuSettings" | "cpuStep" | "cpuClose">): void {
+    if (button.kind === "cpuSettings") this.openCpuSettings(button.slot);
     else if (button.kind === "cpuStep") this.stepCpu(button.row, button.direction);
-    else if (button.kind === "cpuClose") this.closeCpuSettings();
-    else if (button.kind === "tutorialOpen") this.tutorialOpen = true;
+    else this.closeCpuSettings();
+  }
+
+  private clickTutorial(button: ClickOf<"tutorialOpen" | "tutorialStep" | "tutorialStart" | "tutorialClose">): void {
+    if (button.kind === "tutorialOpen") this.tutorialOpen = true;
     else if (button.kind === "tutorialStep") this.actions.stepTutorial(this.participantId, button.direction);
-    else if (button.kind === "tutorialStart" || button.kind === "tutorialClose") {
+    else {
       this.tutorialOpen = false;
       if (this.ownsLocalClient()) this.markSeen();
       if (button.kind === "tutorialStart") this.actions.startTutorial(this.participantId);
       else this.actions.closeTutorial(this.participantId);
     }
-    else applyRuleButton(this.actions, this.participantId, button);
   }
 
 
