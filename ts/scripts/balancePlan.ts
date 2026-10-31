@@ -10,6 +10,7 @@ import { JOB_SECONDS, measuredSeconds, ofKind, shardWork, type Work } from "./ba
 
 const Timings = Schema.Record(Schema.String, Schema.Finite);
 const TIMING_RUNS = 6;
+const RATE_LIMITED_PARALLEL = 4;
 const Runs = Schema.Struct({ workflow_runs: Schema.Array(Schema.Struct({ id: Schema.Finite })) });
 const Artifacts = Schema.Struct({ artifacts: Schema.Array(Schema.Struct({ id: Schema.Finite, name: Schema.String, expired: Schema.Boolean, workflow_run: Schema.Struct({ id: Schema.Finite }) })) });
 
@@ -61,7 +62,10 @@ const main = Effect.gen(function*() {
   const fields = shardWork(field).map((group) => group.join(","));
   const ceilings = shardWork(ceiling).map((group) => group.join(","));
   const probes = Number(process.env.PROBE ?? 40) === 0 ? [] : shardWork(probe).map((group) => group.join(","));
-  const admission = yield* runnerAdmission(repo, Number(process.env.GITHUB_RUN_ID));
+  const admission = yield* runnerAdmission(repo, Number(process.env.GITHUB_RUN_ID)).pipe(Effect.timeoutOrElse({
+    duration: "3 minutes",
+    orElse: () => Effect.succeed({ parallel: RATE_LIMITED_PARALLEL, measurement: `Hosted admission unread in 3 minutes (GitHub rate-limited this run's token); the dispatcher admitted it, so ${RATE_LIMITED_PARALLEL} farm slots` }),
+  }));
   console.error(`Timings from ${samples.length} measured artifacts: ${pairs.length} pairs in ${fields.length} field jobs, ${ceilings.length} ceiling jobs and ${probes.length} probe jobs, predicted longest <= ${JOB_SECONDS}s`);
   console.log(`parallel=${admission.parallel}\nadmission=${admission.measurement}; timings from ${samples.length} measured artifacts\nshards=${JSON.stringify(fields)}\nceilings=${JSON.stringify(ceilings)}\nprobes=${JSON.stringify(probes)}\njobs=${fields.length}`);
 });
