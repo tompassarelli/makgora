@@ -27,6 +27,9 @@ import { createEffect, destroyEffect, setEffectAlpha, setEffectAnimation, setEff
 import { player } from "wisp/game/players";
 
 const PETRIFIED_GREY = 150;
+// Warcraft freezes global sequences at time scale 0, so a shown body runs and is re-jumped to its clip time every frame.
+const RUNNING = 1.0;
+const HELD = 0.0;
 const CHILL_TINT = { red: 120, green: 190, blue: 255 };
 
 export class FighterPoolPresentation {
@@ -37,7 +40,6 @@ export class FighterPoolPresentation {
   private visible: number | undefined;
   private yaw: number | undefined;
   private pitch: number | undefined;
-  private seconds: number | undefined;
   private red: number | undefined;
   private green: number | undefined;
   private blue: number | undefined;
@@ -77,7 +79,7 @@ export class FighterPoolPresentation {
       setEffectTeamColor(model, player(participant));
       setEffectBlendTime(model, 0.0);
       setEffectAnimation(model, "Stand");
-      setEffectTimeScale(model, 0.0);
+      setEffectTimeScale(model, RUNNING);
       hideEffect(model, origin);
       this.clips.push(model);
     }
@@ -146,8 +148,10 @@ export class FighterPoolPresentation {
         this.blendFrom = previous;
         this.blendStart = frame;
         this.blendFrames = frames;
+        if (shown !== undefined) setEffectTimeScale(shown, HELD);
       } else if (shown !== undefined) hideEffect(shown, this.origin);
       this.visible = index;
+      setEffectTimeScale(model, RUNNING);
     }
     const seconds = draw.seconds;
     const x = this.origin.x + draw.x;
@@ -163,10 +167,7 @@ export class FighterPoolPresentation {
       this.yaw = yaw;
       this.pitch = pitch;
     }
-    if (changed || this.seconds !== seconds) {
-      setEffectTime(model, (clip.timeline ? clip.startSeconds : 0.0) + seconds);
-      this.seconds = seconds;
-    }
+    setEffectTime(model, (clip.timeline ? clip.startSeconds : 0.0) + seconds);
     if (this.light !== undefined) {
       placeEffect(this.light, x, y, z);
       if (this.lightYaw !== yaw) {
