@@ -1285,3 +1285,9 @@ Same captures on the shipped fog values, taken before the readable-throne rework
 | far (Chen first) | 28.6 → 27.0 | +5.6 → +7.1 | -21.5 → -17.2 |
 
 The near ring rises about half a unit because the lighter floor sits in the lower ring; the far ring falls from the dimmer arch and spire. The separation check still fails (limit 0, not loosened).
+
+## Global sequences on pooled bodies (#890)
+
+Warcraft freezes global sequences at time scale 0, so pooled fighters run at time scale 1 and the pool jumps the shown body one frame behind its clip time each frame; the frame it then advances lands on the clip time. `bun scripts/poseDrift.ts` over the 31 selectable fighters in full Expert CPU matches reads the shown pose within 0.001 frames of the clip time on every frame except a clip's opening frame (it cannot be jumped before its start and reads up to 1.000), with every global clock running.
+
+Native capture (2026-10-31, Classic, offline build 3.0.0.24268, `ts/test/native/captures/890-global-sequences/`, cc3aa07e5f): Stitches and Firelord standing facing left and facing right, six frames 10 apart each. Three fresh viewers each read all eight crops of the two fighters and named the same motion: Stitches' flies drift to a new place every frame around the body (and the cleaver on his back rocks), Firelord's red or blue diamond embers circle his lower body and pass behind it, and his fire halo and the flames at his feet flicker, in both facings.
