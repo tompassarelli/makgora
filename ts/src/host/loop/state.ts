@@ -324,6 +324,7 @@ export interface ShellState {
   stageCannon: effect | undefined;
 
   stageLava: effect | undefined;
+  readonly stageLavaRims: effect[];
   stageWind: effect[];
   stageHydra?: effect[];
   stageScenery: effect[] | undefined;
@@ -454,7 +455,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     produced: createFrameControls(), runtime: createPacingAndPresentation(), sessionWins: createSessionWins(), session: createMatchControls(),
     frameInput: createMatchFrameInput(),
     participants: [participant(0, persistence), participant(1, persistence), participant(2, persistence), participant(3, persistence)],
-    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, stageDrifters: [], shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, heldCamera: undefined, koZoom: undefined, lastKo: undefined, showcaseDemo: undefined, showcaseMarkers: [], capture: createCaptureStage(), captureBodies: [undefined, undefined, undefined, undefined], ui: undefined,
+    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageLavaRims: [], stageWind: [], stageScenery: undefined, stageDrifters: [], shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, heldCamera: undefined, koZoom: undefined, lastKo: undefined, showcaseDemo: undefined, showcaseMarkers: [], capture: createCaptureStage(), captureBodies: [undefined, undefined, undefined, undefined], ui: undefined,
     sounds: createModelSoundCursor(ORIGINAL_MODEL_SOUNDS),
     dev: { rollback: isShadow(input) ? input.rollback : 6, delay: isShadow(input) ? input.delay : 3, batch: DEFAULT_BATCH, rematchSeconds: REMATCH_COUNTDOWN_SECONDS }, devReceipts: 0, devStep: 1, devSteps: 1,
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),

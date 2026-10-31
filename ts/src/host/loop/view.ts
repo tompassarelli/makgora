@@ -35,6 +35,7 @@ import { roaring } from "../../game/presentation/terrorCues";
 import { shakeRoarCamera } from "./roarCamera";
 import { DamagePose, damagePose } from "../../game/presentation/damagePose";
 import { FIGHTER_PHASE_ALPHA, hideEffect } from "../../game/render/effects";
+import { createLavaRims, destroyLavaRims } from "./lavaRims";
 import type { FighterPose } from "../../game/presentation/fighterPose";
 import { FRAME_SECONDS } from "../../game/presentation/frameClock";
 import { chatBox } from "../../game/ui/nativeChat";
@@ -130,6 +131,7 @@ function clearStageDecks(s: ShellState): void {
     destroyEffect(s.stageCannon);
     s.stageCannon = undefined;
   }
+  destroyLavaRims(s);
   if (s.stageLava !== undefined) {
     hideEffect(s.stageLava, s.origin);
     destroyEffect(s.stageLava);
@@ -199,6 +201,7 @@ export function drawStage(s: ShellState): void {
     s.stageDeckParts.push(effect);
   }
   if (hasLava(stage)) {
+    createLavaRims(s);
     const piece = lavaPiece(lavaSide(stageFrame));
     s.stageLava = createEffect(piece.model, origin.x + piece.x, origin.y + piece.y);
     setEffectPosition(s.stageLava, origin.x + piece.x, origin.y + piece.y, origin.z + piece.z);
