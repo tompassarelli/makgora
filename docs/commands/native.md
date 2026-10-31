@@ -119,7 +119,9 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`). `-dev hi
   (`--audio-sink SINK` or `--no-audio`). `bun scripts/nativeCapture.ts plan
   PAD|DIR...` plays the scripts headlessly on the map's schedule and checks
   each `#! cue FROM[-TO] NAME: sound=… effect=… tint=b shake=b recoil=b teeter=b` line
-  against the held capture frames, without a Warcraft client.
+  against the held capture frames, without a Warcraft client. A pad with no cue
+  lines (a before/after capture judged by eye, such as `test/native/captures/shield-cap`)
+  plans as its held capture frames reached, with no verdict.
 - Voice budget (#30): `bun wisp map build --profile voice-check --out MAP.w3x`
   starts four Wren Expert computers over three stocks and two minutes as soon
   as fighter selection opens, paints the drawn stamp on every match frame, and

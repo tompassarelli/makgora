@@ -157,10 +157,9 @@ export function judge(cues: readonly Cue[], run: ReturnType<typeof play>) {
 
 export const planFixture = (fixture: CaptureFixture) => Effect.gen(function*() {
   const cues = yield* Effect.try({ try: () => parseCues(fixture.script), catch: cause => new PlanFailure({ problem: `${fixture.name}: ${String(cause)}` }) });
-  if (cues.length === 0 && fixture.reel === undefined) return yield* new PlanFailure({ problem: `${fixture.name}: no #! cue lines to check` });
   const loaded = yield* Effect.tryPromise({ try: loadPlatform, catch: cause => new PlanFailure({ problem: `load the map code: ${String(cause)}` }) });
   const run = yield* Effect.try({ try: () => play(loaded, fixture), catch: cause => new PlanFailure({ problem: String(cause) }) });
-  if (fixture.reel !== undefined) {
+  if (fixture.reel !== undefined || cues.length === 0) {
     console.log(`PLAN ${fixture.name}: ${run.held.length} held frames through the native-driver map entry (headless, no pixel verdict)`);
     return { fixture: fixture.name, cues: run.held.length, passed: run.held.length };
   }
