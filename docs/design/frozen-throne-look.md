@@ -12,16 +12,16 @@ Take one of the Frozen Throne remake (Tom, 2026-10-31). Layout, collision and pl
 
 ## Composition
 
-Palette: near-black teal sky, steel-blue ice, one cyan glow behind the stair, dark saronite for towers and pillars. Backdrop layers stay darker and lower in contrast than the fighters (stage-art rules 14 to 16); the crystals, stair and side ledges sit below fighter brightness (#875), so fighters stay the brightest shapes on the play plane.
+Palette: near-black teal sky, steel-blue ice, one cyan glow behind the stair, dark saronite for towers and pillars. Backdrop layers stay darker and lower in contrast than the fighters (stage-art rules 14 to 16); the crystals, causeway and side ledges sit below fighter brightness (#875), so fighters stay the brightest shapes on the play plane.
 
 Layer order, back to front:
 
 1. Sky: dark teal gradient with a dim green aurora band, original 256x128 texture (`ts/scripts/stageSky.ts`, `aurora`).
 2. Snow: the existing drifting-snow model.
-3. Throne: a high-backed dark chair standing on the top of a six-floe ice spire (y 2020 to 2150, base z -327): a tall back slab (`IceFloe3`), a crown of one `IceCrownObelisk` between two `IceCrownPillar` spikes above it, two armrest slabs and a seat slab in front, all in dark saronite blue so the chair reads as a silhouette against the cyan glow behind it. The foot of the spire hides behind the deck.
+3. Throne: a high-backed dark chair standing on the top of a six-floe ice spire (y 2020 to 2150, base z -177, lifted 150 above the take-three base for the causeway): a tall back slab (`IceFloe3`), a crown of one `IceCrownObelisk` between two `IceCrownPillar` spikes above it, two armrest slabs and a seat slab in front, all in dark saronite blue so the chair reads as a silhouette against the cyan glow behind it. The foot of the spire hides behind the deck.
 4. Great arch: one huge `IC_IceArch` at y 4800 framing the spire.
 5. Far ice spires: Glacier2 and Glacier5 stretched tall, left and right.
-6. Stair: none in take 3; the first stair's floes covered the throne's seat and arms at the near zoom, so the spire's pale top steps are the throne's dais.
+6. Causeway: the first stair restored, five still stock ice floes stepped from the deck's back edge (y 1360 to 1520, z 0 to -220), each lower and deeper than the one nearer the camera (depth scale 5 to 13, width 2.5, tint [64, 82, 104], below fighter brightness, #875), so the ice visibly climbs from the deck to the throne's dais (Tom's playtest, 2026-10-31, after the throne take removed the stair). The spire and chair (the floes, back slab, pillars, obelisk and arms at y 2020 to 2150) are lifted 150 so the stair ends under the chair's arms and does not cover the throne the way the first stair did. A floe's `matrixScale` is depth, width, thickness once yawed 270, so the stair is wide at the bottom and narrow at the top.
 7. Dais pillars: two `IceTorch` towers at x of 400 each side, clear of the throne.
 8. Crystal clusters: eight `Icecrown_Crystal3` standing behind the throne (y 2450 to 2550), tinted cyan: the backlight the throne's silhouette is read against.
 9. Gothic towers: `IceCrownObelisk` and `IceCrownPillar` pairs at x of 2500 to 2900, dark, pushed clear of the deck ends (#875).
