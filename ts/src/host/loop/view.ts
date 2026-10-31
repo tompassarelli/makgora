@@ -473,6 +473,7 @@ export function renderPersistentPresentation(s: ShellState): void {
     if (renderers !== undefined) {
       renderers.agency.present(live, live === undefined ? "act" : agencyMarks[slot]);
       renderers.terror.present(live, roared, s.session.paused);
+      renderers.seaSplash.present(live, drawn, s.session.paused);
     }
     ui.special.presentStatic(runtime.specials, live, slot);
     ui.special.presentSummons(runtime.summons, live, slot);
