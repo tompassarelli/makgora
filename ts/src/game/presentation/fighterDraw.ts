@@ -3,6 +3,7 @@ import type { Character } from "../sim/codes";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
+import { inCannonBarrel } from "../sim/stageHazards";
 import { heroCueWindows } from "./cueWindows";
 import { specialClip } from "./fighterClips";
 import { fitFighterPlacement } from "./fighterPlacement";
@@ -35,7 +36,7 @@ export function fitFighterDraw(out: FighterDraw, character: Character, fighter: 
   const index = startup?.index ?? pose.clipIndex ?? originalClipNamed(character, pose.clipName);
   const clip = index === undefined ? undefined : originalClip(character, index);
   out.index = clip === undefined ? undefined : index;
-  if (fighter.status.out || clip === undefined) return false;
+  if (fighter.status.out || inCannonBarrel(fighter) || clip === undefined) return false;
   const duration = clip.endSeconds - clip.startSeconds;
   const move = startup === undefined ? undefined : runningHeroSpecial(fighter);
   let seconds = startup === undefined ? Math.max(0.0, pose.clipTime)

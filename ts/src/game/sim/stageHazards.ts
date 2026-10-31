@@ -192,6 +192,8 @@ export const inStageCannon = (f: Readonly<Fighter>): boolean => f.cannon.held !=
 
 export const cannonRising = (f: Readonly<Fighter>): boolean => f.cannon.firing !== undefined && f.cannon.firing >= CANNON_SHOT_FRAMES;
 
+export const inCannonBarrel = (f: Readonly<Fighter>): boolean => f.cannon.held !== undefined && !cannonRising(f);
+
 
 export function cannonRiseZ(stage: number, risen: number): number {
   const left = f32(1.0 - f32(risen / CANNON_RISE_FRAMES));
@@ -265,7 +267,7 @@ function release(f: Fighter, stage: number): void {
 }
 
 function canBeCaught(f: Readonly<Fighter>, frame: number): boolean {
-  if (f.status.out || f.cannon.cooldown > 0 || inGrabContext(f) || f.ledge.state !== LedgeState.none) return false;
+  if (f.status.out || f.cannon.held !== undefined || f.cannon.cooldown > 0 || inGrabContext(f) || f.ledge.state !== LedgeState.none) return false;
   const dx = f32(f.motion.x - cannonX(frame));
   const dz = f32(f.motion.z - CANNON_Z);
   return f32(f32(dx * dx) + f32(dz * dz)) < f32(CANNON_CATCH_RADIUS * CANNON_CATCH_RADIUS);
@@ -289,16 +291,17 @@ export function advanceStageCannon(world: Roster, stage: number, frame: number, 
       continue;
     }
     const cannon = mutableCannon(f);
-    occupied = true;
     cannon.held = held + 1;
     const input = inputs[slot];
     if (cannon.firing === undefined && (cannon.held >= CANNON_HOLD_FRAMES || input?.attackPressed === true || input?.specialPressed === true)) cannon.firing = 0;
     if (cannon.firing === undefined) {
+      occupied = true;
       holdAt(f, cannonX(frame), CANNON_Z);
       continue;
     }
     cannon.firing++;
     if (cannon.firing < CANNON_SHOT_FRAMES) {
+      occupied = true;
       holdAt(f, cannonX(frame), CANNON_Z);
       continue;
     }

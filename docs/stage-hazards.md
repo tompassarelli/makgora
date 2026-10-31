@@ -33,8 +33,16 @@ at z −500 (the underside's lowest edge is z −300, so the whole barrel sits
 clear of it), 5 world units per frame, a 384-frame lap, rocking a little as
 it goes; the rock is only drawn and the shot ignores it. A fighter whose
 position comes within 120 units of the barrel's centre is caught, the first
-eligible fighter in slot order. Attack or Special, or a 150-frame timeout,
-starts a 10-frame warning (the barrel turns red), then the shot: straight up
+eligible fighter in slot order. The barrel holds one fighter at a time: from
+the catch until the shot a second fighter reaching it is not caught and is not
+stopped, and once the shot has left the barrel it catches again (that fighter's
+own 30 frames of immunity still apply). The occupant is part of the fighters'
+saved state (`cannon.held`), so it rolls back and enters the canonical state
+with them. While it holds a fighter the barrel spins about its long axis, 0.3
+radians per frame from the catch, not the idle rock, and the fighter's body,
+shadow, meter rim and overhead marker are hidden until the shot, when it
+reappears in the flames. Attack or Special, or a 150-frame timeout,
+starts a 10-frame warning (the barrel turns red, still spinning), then the shot: straight up
 whatever the barrel's lean, the fighter held in tumble and unable to act for a
 45-frame rise that eases out to a peak 240 above the deck, about a full hop.
 The rise keeps the x where the shot began, and every x on the path is inside

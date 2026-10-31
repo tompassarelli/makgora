@@ -7,7 +7,7 @@ import type { Fighter } from "../../game/sim/fighter";
 import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
 import { hideEffect } from "../../game/render/effects";
 import { stageEdgeLight } from "../../game/presentation/stageEdgeLights";
-import { PLATFORM_CUE_FRAMES, CANNON_MODEL_BASE, cannonWarned, framesUntilPlatformMoves, hydraStrikeZ, hydraWarningX } from "../../game/presentation/stageHazards";
+import { PLATFORM_CUE_FRAMES, CANNON_MODEL_BASE, cannonSpin, cannonWarned, framesUntilPlatformMoves, hydraStrikeZ, hydraWarningX } from "../../game/presentation/stageHazards";
 import { CANNON_Z, SEA_SURFACE_Z, cannonOn, cannonRock, cannonX } from "../../game/sim/stageHazards";
 import { surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from "../../game/sim/stage";
 import { at } from "wisp/src/runtime/lookup";
@@ -33,6 +33,7 @@ export function presentStageMotion(s: ShellState, drawn: number, matchFrame: num
   if (s.stageCannon !== undefined && cannonOn(drawn, matchFrame)) {
     setEffectPosition(s.stageCannon, s.origin.x + cannonX(matchFrame), s.origin.y, s.origin.z + CANNON_Z - CANNON_MODEL_BASE);
     setEffectPitch(s.stageCannon, cannonRock(matchFrame));
+    setEffectYaw(s.stageCannon, cannonSpin(world));
     const warned = cannonWarned(world);
     setEffectColor(s.stageCannon, 255, warned ? 70 : 255, warned ? 40 : 255);
   }

@@ -1,3 +1,4 @@
+import { f32 } from "wisp/src/sim/f32";
 import { type MatchState, stageClock } from "../lobby/lobbyState";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { BossKind } from "../classic/runState";
@@ -10,7 +11,7 @@ import type { Fighter } from "../sim/fighter";
 import { HYDRA_REACH, HYDRA_STRIKE_FRAME } from "../sim/water";
 import { SEA_SURFACE_Z } from "../sim/stageHazards";
 import {
-  CANNON_HOLD_FRAMES, CANNON_SHOT_FRAMES, WindPhase, cannonOn, framesUntilTideTurns, framesUntilWind, hasTide, tideNextDirection, windDirection, windOn, windPhase,
+  CANNON_HOLD_FRAMES, CANNON_SHOT_FRAMES, WindPhase, cannonOn, framesUntilTideTurns, framesUntilWind, hasTide, inCannonBarrel, tideNextDirection, windDirection, windOn, windPhase,
 } from "../sim/stageHazards";
 
 
@@ -32,6 +33,18 @@ export function cannonWarned(world: Readonly<Roster>): boolean {
     if (isActive(world, slot) && (fighterAt(world, slot).cannon.firing ?? CANNON_SHOT_FRAMES) < CANNON_SHOT_FRAMES) return true;
   }
   return false;
+}
+
+
+export const CANNON_SPIN_PER_FRAME = f32(0.3);
+
+export function cannonSpin(world: Readonly<Roster>): number {
+  for (const slot of PARTICIPANT_SLOTS) {
+    if (!isActive(world, slot)) continue;
+    const f = fighterAt(world, slot);
+    if (inCannonBarrel(f)) return (f.cannon.held ?? 0) * CANNON_SPIN_PER_FRAME;
+  }
+  return 0.0;
 }
 
 export const HYDRA_SUBMERGE_FRAMES = 18;

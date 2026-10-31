@@ -7,6 +7,7 @@ import { fighterOffscreen } from "../../game/presentation/fighterFraming";
 import type { MatchCamera } from "../../game/sim/matchCamera";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { partnerOwner } from "../../game/sim/duoOwner";
+import { inCannonBarrel } from "../../game/sim/stageHazards";
 import { MARKER_CLEARANCE, spreadMarkers } from "../../game/ui/fighterMarker";
 import { type NoticePlace, clearNoticePlace } from "../../game/ui/noticeLayout";
 import { unitsForPixels } from "../../game/ui/portraitFrames";
@@ -28,7 +29,7 @@ export function presentFighterMarkers(s: ShellState, framing: Readonly<MatchCame
   const showing = game.phase === Phase.match && !s.session.paused && !pauseHudHidden(s);
   for (const slot of PARTICIPANT_SLOTS) {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
-    SHOWN[slot] = showing && fighter !== undefined && !fighter.status.out && !fighterOffscreen(framing, aspect, fighter.character, fighter.motion.x, fighter.motion.z);
+    SHOWN[slot] = showing && fighter !== undefined && !fighter.status.out && !inCannonBarrel(fighter) && !fighterOffscreen(framing, aspect, fighter.character, fighter.motion.x, fighter.motion.z);
     if (fighter === undefined || SHOWN[slot] !== true) continue;
     const lifted = escaping[slot] === true;
     cameraPoint(framing, aspect, fighter.motion.x, lifted ? overheadAnchorZ(fighter) : standingTopZ(fighter), POINT);

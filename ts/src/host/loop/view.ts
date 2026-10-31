@@ -50,7 +50,7 @@ import { type StartControl, matchHelp, matchStartNotice, resultNotice, waitingMe
 import { isIntangible } from "../../game/sim/conditions";
 import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount, surfaceLeft, surfaceRight, surfaceZ } from "../../game/sim/stage";
-import { CANNON_Z, cannonOn, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
+import { CANNON_Z, cannonOn, cannonX, hasTide, hasWind, inCannonBarrel } from "../../game/sim/stageHazards";
 import { localParticipantSlot, traceParticipant } from "./diagnostics";
 import { colorFighterBody, paintFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
 import { concealFighter, concealFighters } from "./fighterCloak";
@@ -271,8 +271,8 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
     ShowUnit(body.unit, false);
   }
   const { pooled } = participant;
-  if (hidden !== undefined && cloaked) hidden.unitShown = !pooled && !fighter.status.out;
-  else ShowUnit(body.unit, !pooled && !fighter.status.out);
+  if (hidden !== undefined && cloaked) hidden.unitShown = !pooled && !fighter.status.out && !inCannonBarrel(fighter);
+  else ShowUnit(body.unit, !pooled && !fighter.status.out && !inCannonBarrel(fighter));
   if (body.renderedSelection !== pose.selectionSerial) {
     if (!pooled) {
 
