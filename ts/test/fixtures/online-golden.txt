@@ -19,10 +19,10 @@ golden p2 frame 111 rollback 5 from 19 depth 4
 golden p1 frame 117 rollback 6 from 21 depth 7
 golden p2 frame 117 rollback 6 from 21 depth 7
 golden p3 frame 117 rollback 5 from 21 depth 7
-golden p0 frame 120 confirmed 419169:474961
-golden p1 frame 120 confirmed 419169:474961
-golden p2 frame 120 confirmed 419169:474961
-golden p3 frame 120 confirmed 419169:474961
+golden p0 frame 120 confirmed 24973:423354
+golden p1 frame 120 confirmed 24973:423354
+golden p2 frame 120 confirmed 24973:423354
+golden p3 frame 120 confirmed 24973:423354
 golden p0 frame 126 rollback 5 from 26 depth 6
 golden p2 frame 126 rollback 7 from 26 depth 6
 golden p3 frame 126 rollback 6 from 26 depth 6
@@ -59,12 +59,12 @@ golden p0 frame 177 rollback 12 from 65 depth 4
 golden p1 frame 177 rollback 15 from 65 depth 5
 golden p3 frame 177 rollback 14 from 65 depth 4
 golden p0 frame 180 rollback 13 from 68 depth 3
-golden p0 frame 180 confirmed 746089:232261
+golden p0 frame 180 confirmed 351893:180654
 golden p1 frame 180 rollback 16 from 68 depth 3
-golden p1 frame 180 confirmed 746089:232261
+golden p1 frame 180 confirmed 351893:180654
 golden p2 frame 180 rollback 16 from 68 depth 3
-golden p2 frame 180 confirmed 746089:232261
-golden p3 frame 180 confirmed 746089:232261
+golden p2 frame 180 confirmed 351893:180654
+golden p3 frame 180 confirmed 351893:180654
 golden p0 frame 182 rollback 14 from 67 depth 5
 golden p2 frame 182 rollback 17 from 67 depth 5
 golden p3 frame 182 rollback 15 from 67 depth 5
@@ -93,10 +93,10 @@ golden p3 frame 228 rollback 21 from 101 depth 3
 golden p1 frame 239 rollback 23 from 109 depth 5
 golden p2 frame 239 rollback 22 from 109 depth 3
 golden p3 frame 239 rollback 22 from 109 depth 3
-golden p0 frame 240 confirmed 939987:41261
-golden p1 frame 240 confirmed 939987:41261
-golden p2 frame 240 confirmed 939987:41261
-golden p3 frame 240 confirmed 939987:41261
+golden p0 frame 240 confirmed 766491:447388
+golden p1 frame 240 confirmed 766491:447388
+golden p2 frame 240 confirmed 766491:447388
+golden p3 frame 240 confirmed 766491:447388
 golden p3 frame 245 rollback 23 from 115 depth 3
 golden p0 frame 248 rollback 21 from 107 depth 7
 golden p1 frame 248 rollback 24 from 107 depth 7
@@ -121,12 +121,12 @@ golden p1 frame 293 rollback 29 from 137 depth 6
 golden p2 frame 293 rollback 27 from 137 depth 5
 golden p3 frame 293 rollback 28 from 137 depth 4
 golden p0 frame 300 rollback 27 from 143 depth 3
-golden p0 frame 300 confirmed 98287:710469
+golden p0 frame 300 confirmed 924794:116593
 golden p1 frame 300 rollback 30 from 143 depth 3
-golden p1 frame 300 confirmed 98287:710469
-golden p2 frame 300 confirmed 98287:710469
+golden p1 frame 300 confirmed 924794:116593
+golden p2 frame 300 confirmed 924794:116593
 golden p3 frame 300 rollback 29 from 143 depth 5
-golden p3 frame 300 confirmed 98287:710469
+golden p3 frame 300 confirmed 924794:116593
 golden p0 frame 302 rollback 28 from 144 depth 4
 golden p1 frame 302 rollback 31 from 144 depth 4
 golden p2 frame 302 rollback 28 from 144 depth 4
@@ -161,10 +161,10 @@ golden p2 frame 356 rollback 35 from 177 depth 7
 golden p0 frame 359 rollback 35 from 184 depth 2
 golden p2 frame 359 rollback 36 from 184 depth 3
 golden p3 frame 359 rollback 38 from 184 depth 2
-golden p0 frame 360 confirmed 442442:631634
-golden p1 frame 360 confirmed 442442:631634
-golden p2 frame 360 confirmed 442442:631634
-golden p3 frame 360 confirmed 442442:631634
+golden p0 frame 360 confirmed 268946:37758
+golden p1 frame 360 confirmed 268946:37758
+golden p2 frame 360 confirmed 268946:37758
+golden p3 frame 360 confirmed 268946:37758
 golden p1 frame 363 rollback 39 from 187 depth 3
 golden p2 frame 363 rollback 37 from 187 depth 4
 golden p3 frame 363 rollback 39 from 187 depth 3
@@ -199,10 +199,10 @@ golden p3 frame 410 rollback 46 from 213 depth 7
 golden p0 frame 413 rollback 43 from 221 depth 2
 golden p2 frame 413 rollback 45 from 221 depth 5
 golden p3 frame 413 rollback 47 from 221 depth 2
-golden p0 frame 420 confirmed 970077:677511
-golden p1 frame 420 confirmed 970077:677511
-golden p2 frame 420 confirmed 970077:677511
-golden p3 frame 420 confirmed 970077:677511
+golden p0 frame 420 confirmed 694138:599821
+golden p1 frame 420 confirmed 694138:599821
+golden p2 frame 420 confirmed 694138:599821
+golden p3 frame 420 confirmed 694138:599821
 golden p0 frame 426 rollback 44 from 227 depth 5
 golden p1 frame 426 rollback 47 from 227 depth 5
 golden p2 frame 426 rollback 46 from 227 depth 5
@@ -228,10 +228,10 @@ golden p3 frame 471 rollback 53 from 247 depth 7
 golden p1 frame 479 rollback 52 from 257 depth 5
 golden p2 frame 479 rollback 52 from 257 depth 5
 golden p3 frame 479 rollback 54 from 257 depth 5
-golden p0 frame 480 confirmed 111973:920095
-golden p1 frame 480 confirmed 111973:920095
-golden p2 frame 480 confirmed 111973:920095
-golden p3 frame 480 confirmed 111973:920095
+golden p0 frame 480 confirmed 893518:643054
+golden p1 frame 480 confirmed 893518:643054
+golden p2 frame 480 confirmed 893518:643054
+golden p3 frame 480 confirmed 893518:643054
 golden p0 frame 483 rollback 49 from 257 depth 5
 golden p2 frame 483 rollback 53 from 257 depth 5
 golden p3 frame 483 rollback 55 from 257 depth 5
@@ -264,12 +264,12 @@ golden p0 frame 536 rollback 57 from 295 depth 7
 golden p1 frame 536 rollback 59 from 295 depth 2
 golden p3 frame 536 rollback 62 from 295 depth 2
 golden p0 frame 540 rollback 58 from 297 depth 5
-golden p0 frame 540 confirmed 167197:337065
+golden p0 frame 540 confirmed 738465:988736
 golden p1 frame 540 rollback 60 from 297 depth 4
-golden p1 frame 540 confirmed 167197:337065
+golden p1 frame 540 confirmed 738465:988736
 golden p2 frame 540 rollback 60 from 297 depth 4
-golden p2 frame 540 confirmed 167197:337065
-golden p3 frame 540 confirmed 167197:337065
+golden p2 frame 540 confirmed 738465:988736
+golden p3 frame 540 confirmed 738465:988736
 golden p1 frame 551 rollback 61 from 305 depth 3
 golden p2 frame 551 rollback 61 from 305 depth 5
 golden p3 frame 551 rollback 63 from 305 depth 3
@@ -301,10 +301,10 @@ golden p3 frame 594 rollback 69 from 331 depth 5
 golden p0 frame 599 rollback 66 from 333 depth 5
 golden p1 frame 599 rollback 68 from 333 depth 5
 golden p3 frame 599 rollback 70 from 333 depth 7
-golden p0 frame 600 confirmed 210086:465115
-golden p1 frame 600 confirmed 210086:465115
-golden p2 frame 600 confirmed 210086:465115
-golden p3 frame 600 confirmed 210086:465115
+golden p0 frame 600 confirmed 958131:64154
+golden p1 frame 600 confirmed 958131:64154
+golden p2 frame 600 confirmed 958131:64154
+golden p3 frame 600 confirmed 958131:64154
 golden p0 frame 602 rollback 67 from 339 depth 1
 golden p1 frame 602 rollback 69 from 339 depth 1
 golden p2 frame 602 rollback 68 from 339 depth 1
@@ -331,10 +331,10 @@ golden p0 frame 650 rollback 73 from 363 depth 7
 golden p1 frame 650 rollback 75 from 360 depth 6
 golden p2 frame 650 rollback 73 from 360 depth 6
 golden p3 frame 650 rollback 76 from 360 depth 6
-golden p0 frame 660 confirmed 385708:168721
-golden p1 frame 660 confirmed 385708:168721
-golden p2 frame 660 confirmed 385708:168721
-golden p3 frame 660 confirmed 385708:168721
+golden p0 frame 660 confirmed 512939:536245
+golden p1 frame 660 confirmed 512939:536245
+golden p2 frame 660 confirmed 512939:536245
+golden p3 frame 660 confirmed 512939:536245
 golden p0 frame 662 rollback 74 from 366 depth 6
 golden p2 frame 662 rollback 74 from 366 depth 6
 golden p3 frame 662 rollback 77 from 366 depth 6
@@ -368,10 +368,10 @@ golden p3 frame 713 rollback 84 from 403 depth 3
 golden p0 frame 719 rollback 82 from 407 depth 4
 golden p2 frame 719 rollback 81 from 407 depth 5
 golden p3 frame 719 rollback 85 from 407 depth 4
-golden p0 frame 720 confirmed 547187:634125
-golden p1 frame 720 confirmed 547187:634125
-golden p2 frame 720 confirmed 547187:634125
-golden p3 frame 720 confirmed 547187:634125
+golden p0 frame 720 confirmed 654096:200116
+golden p1 frame 720 confirmed 654096:200116
+golden p2 frame 720 confirmed 654096:200116
+golden p3 frame 720 confirmed 654096:200116
 golden p0 frame 725 rollback 83 from 414 depth 3
 golden p1 frame 725 rollback 83 from 414 depth 3
 golden p3 frame 725 rollback 86 from 414 depth 3
@@ -408,10 +408,10 @@ golden p2 frame 768 rollback 88 from 446 depth 1
 golden p1 frame 771 rollback 92 from 446 depth 2
 golden p2 frame 771 rollback 89 from 446 depth 4
 golden p3 frame 771 rollback 94 from 446 depth 2
-golden p0 frame 780 confirmed 513796:153594
-golden p1 frame 780 confirmed 513796:153594
-golden p2 frame 780 confirmed 513796:153594
-golden p3 frame 780 confirmed 513796:153594
+golden p0 frame 780 confirmed 310860:71091
+golden p1 frame 780 confirmed 310860:71091
+golden p2 frame 780 confirmed 310860:71091
+golden p3 frame 780 confirmed 310860:71091
 golden p0 frame 785 rollback 92 from 451 depth 5
 golden p2 frame 785 rollback 90 from 451 depth 5
 golden p3 frame 785 rollback 95 from 451 depth 5
@@ -441,10 +441,10 @@ golden p3 frame 833 rollback 101 from 485 depth 6
 golden p1 frame 836 rollback 99 from 489 depth 6
 golden p2 frame 836 rollback 96 from 489 depth 5
 golden p3 frame 836 rollback 102 from 489 depth 5
-golden p0 frame 840 confirmed 599475:147027
-golden p1 frame 840 confirmed 599475:147027
-golden p2 frame 840 confirmed 599475:147027
-golden p3 frame 840 confirmed 599475:147027
+golden p0 frame 840 confirmed 765477:653793
+golden p1 frame 840 confirmed 765477:653793
+golden p2 frame 840 confirmed 765477:653793
+golden p3 frame 840 confirmed 765477:653793
 golden p0 frame 842 rollback 99 from 489 depth 7
 golden p1 frame 842 rollback 100 from 489 depth 7
 golden p2 frame 842 rollback 97 from 489 depth 7
@@ -476,10 +476,10 @@ golden p3 frame 891 rollback 109 from 527 depth 1
 golden p0 frame 897 rollback 107 from 531 depth 5
 golden p1 frame 897 rollback 106 from 531 depth 5
 golden p3 frame 897 rollback 110 from 531 depth 4
-golden p0 frame 900 confirmed 890251:778003
-golden p1 frame 900 confirmed 890251:778003
-golden p2 frame 900 confirmed 890251:778003
-golden p3 frame 900 confirmed 890251:778003
+golden p0 frame 900 confirmed 147821:753838
+golden p1 frame 900 confirmed 147821:753838
+golden p2 frame 900 confirmed 147821:753838
+golden p3 frame 900 confirmed 147821:753838
 golden p0 frame 903 rollback 108 from 534 depth 6
 golden p1 frame 903 rollback 107 from 534 depth 3
 golden p2 frame 903 rollback 104 from 534 depth 3
@@ -512,10 +512,10 @@ golden p2 frame 951 rollback 111 from 570 depth 4
 golden p0 frame 953 rollback 115 from 567 depth 7
 golden p2 frame 953 rollback 112 from 567 depth 7
 golden p3 frame 953 rollback 118 from 567 depth 7
-golden p0 frame 960 confirmed 496932:310577
-golden p1 frame 960 confirmed 496932:310577
-golden p2 frame 960 confirmed 496932:310577
-golden p3 frame 960 confirmed 496932:310577
+golden p0 frame 960 confirmed 398558:282955
+golden p1 frame 960 confirmed 398558:282955
+golden p2 frame 960 confirmed 398558:282955
+golden p3 frame 960 confirmed 398558:282955
 golden p2 frame 963 rollback 113 from 579 depth 3
 golden p0 frame 966 rollback 116 from 573 depth 5
 golden p1 frame 966 rollback 114 from 573 depth 5
