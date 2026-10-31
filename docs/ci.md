@@ -59,7 +59,7 @@ fetch, rebase, scan and push:
    passed is remembered by the hash of its inputs (smashcraft:ts/scripts/landingInputs.ts:
    the group, the checks it runs and the blob of every tracked file their reach
    rules match), in the pre-push cache here and as a `farm-pass-GROUP-HASH`
-   artifact kept 7 days that every Farm test job looks up first (so Autoland's
+   Actions cache entry and artifact kept 7 days that every Farm test job looks up first (the cache first, since it spends no REST quota and main's entries reach every ref; the artifact for passes on farm/ scratch refs, whose cache entries only that ref sees; a failed lookup warns and runs the group) (so Autoland's
    suite and main's CI reuse it too, logging "GROUP reused: it passed before on inputs HASH"), so a retry or a
    rebase onto a moved main reruns only the groups whose files changed. The
    clean-room group's inputs are every tracked file (the clean room reads any

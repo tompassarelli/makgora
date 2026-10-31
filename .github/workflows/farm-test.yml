@@ -225,28 +225,55 @@ jobs:
           if [ "$run" = true ]; then
             key=$(git ls-tree -r --full-tree HEAD | (cd ts && bun scripts/landingInputs.ts "$GROUP" "$RUNNER_TEMP/changed") 2>/dev/null) || key=
             echo "key=$key" >> "$GITHUB_OUTPUT"
-            [ -z "$key" ] || [ "$FRESH" = 1 ] || passed=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=farm-pass-$GROUP-$key&per_page=100" --jq '[.artifacts[] | select(.expired | not)] | length' 2>/dev/null || echo 0)
-            if [ "${passed:-0}" -gt 0 ]; then
+            [ -z "$key" ] || [ "$FRESH" = 1 ] || echo "lookup=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "selected=$run" | tee -a "$GITHUB_OUTPUT"
+      # A pass is recorded as a cache entry (no REST quota; main's entries reach every ref) and as an artifact, which the lookup falls back to for passes on farm/ scratch refs.
+      - id: cached
+        if: steps.scope.outputs.lookup == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: farm-pass.txt
+          key: farm-pass-${{ matrix.group }}-${{ steps.scope.outputs.key }}
+          lookup-only: true
+      - id: reuse
+        env:
+          GROUP: ${{ matrix.group }}
+          KEY: ${{ steps.scope.outputs.key }}
+          LOOKUP: ${{ steps.scope.outputs.lookup }}
+          CACHED: ${{ steps.cached.outputs.cache-hit }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run=${{ steps.scope.outputs.selected }}
+          if [ "$run" = true ] && [ "$LOOKUP" = true ]; then
+            passed=0
+            if [ "$CACHED" = true ]; then
+              passed=1
+            else
+              passed=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=farm-pass-$GROUP-$KEY&per_page=100" --jq '[.artifacts[] | select(.expired | not)] | length' 2>/dev/null) || passed=
+              [[ "$passed" =~ ^[0-9]+$ ]] || { echo "::warning::$GROUP: the farm-pass artifact lookup failed, so the group runs"; passed=0; }
+            fi
+            if [ "$passed" -gt 0 ]; then
               run=false
-              echo "$GROUP reused: it passed before on inputs $key" > "skipped-check-$GROUP.txt"
-              echo "::notice::$GROUP reused: it passed before on inputs $key"
+              echo "$GROUP reused: it passed before on inputs $KEY" > "skipped-check-$GROUP.txt"
+              echo "::notice::$GROUP reused: it passed before on inputs $KEY"
             fi
           fi
           echo "run=$run" | tee -a "$GITHUB_OUTPUT"
-      - if: steps.scope.outputs.run == 'false'
+      - if: steps.reuse.outputs.run == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: farm-test-skipped-check-${{ matrix.group }}
           path: skipped-check-${{ matrix.group }}.txt
           retention-days: 3
       # Each group keeps its own Lua32 builds: parity's include the toward-zero variant.
-      - if: steps.scope.outputs.run == 'true' && !contains(fromJson('["computer-0","computer-1","clean-room","static"]'), matrix.group)
+      - if: steps.reuse.outputs.run == 'true' && !contains(fromJson('["computer-0","computer-1","clean-room","static"]'), matrix.group)
         uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
           key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}-${{ matrix.group }}
           restore-keys: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
-      - if: steps.scope.outputs.run == 'true'
+      - if: steps.reuse.outputs.run == 'true'
         name: Run the ${{ matrix.group }} checks
         working-directory: ts
         timeout-minutes: 20
@@ -262,15 +289,20 @@ jobs:
           fi
           bun node_modules/wisp/host/farm/farmShards.ts lua --shard 0 --exit-code "$failed" build/checks.tsv > "result-check-$GROUP.json"
           exit "$failed"
-      - if: success() && steps.scope.outputs.run == 'true' && steps.scope.outputs.key != ''
-        run: echo "${{ matrix.group }} passed on inputs ${{ steps.scope.outputs.key }}" > "$RUNNER_TEMP/farm-pass.txt"
-      - if: success() && steps.scope.outputs.run == 'true' && steps.scope.outputs.key != ''
+      - if: success() && steps.reuse.outputs.run == 'true' && steps.scope.outputs.key != ''
+        run: echo "${{ matrix.group }} passed on inputs ${{ steps.scope.outputs.key }}" | tee farm-pass.txt > "$RUNNER_TEMP/farm-pass.txt"
+      - if: success() && steps.reuse.outputs.run == 'true' && steps.scope.outputs.key != ''
+        uses: actions/cache/save@v4
+        with:
+          path: farm-pass.txt
+          key: farm-pass-${{ matrix.group }}-${{ steps.scope.outputs.key }}
+      - if: success() && steps.reuse.outputs.run == 'true' && steps.scope.outputs.key != ''
         uses: actions/upload-artifact@v4
         with:
           name: farm-pass-${{ matrix.group }}-${{ steps.scope.outputs.key }}
           path: ${{ runner.temp }}/farm-pass.txt
           retention-days: 7
-      - if: ${{ !cancelled() && steps.scope.outputs.run == 'true' }}
+      - if: ${{ !cancelled() && steps.reuse.outputs.run == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: farm-test-result-check-${{ matrix.group }}
