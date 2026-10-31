@@ -29,18 +29,16 @@ test("Lady Vashj's up smash hangs the dummy at its spear tip above her head and 
   }
 });
 
-test("the dummy staged for Lady Vashj's up smash, gaze and back air faces her, stays clear of her body and is struck or petrified in both facings in the headless sim [k2 property]", async () => {
+async function stagedReport(character: Character, staged: readonly ShowcaseRow[], clearRadii: number): Promise<string[]> {
+  const report: string[] = [];
   const platform = join(import.meta.dir, "../src/platform");
   const { shell } = await import(join(platform, "../host/loop/state.ts"));
   const { nativeDriverCommand } = await import(join(platform, "nativeDriver.ts"));
   const entry = await import(join(platform, "../host/entries/nativeDriverMain.ts"));
-  const fixtures = showcaseFixtures(vashj);
-  const body = hurtCapsule(vashj), top = Math.max(body.z1, body.z2) + body.radius;
-  const backAir = (row: ShowcaseRow): boolean => row.move.kind === "normal" && row.move.code === AttackStyle.backAir;
-  const staged = showcaseRows(vashj).filter(row => upSmash(row) || gaze(row) || backAir(row));
-  expect(staged.length).toBe(6);
+  const fixtures = showcaseFixtures(character);
+  const body = hurtCapsule(character), top = Math.max(body.z1, body.z2) + body.radius;
   for (const row of staged) {
-    const fixture = fixtures.find(({ name }) => name === `${fighterSlug(vashj)}-${row.row}`);
+    const fixture = fixtures.find(({ name }) => name === `${fighterSlug(character)}-${row.row}`);
     expect(fixture).toBeDefined();
     const runtime = installHeadless(SMASHCRAFT_HEADLESS);
     try {
@@ -59,17 +57,34 @@ test("the dummy staged for Lady Vashj's up smash, gaze and back air faces her, s
             frame = shell().runtime.simulationFrame;
             const mover = fighterAt(shell().world, 0), foe = fighterAt(shell().world, 1);
             if (!caught && foe.facing !== Math.sign(mover.motion.x - foe.motion.x)) facesHer = false;
-            if (Math.abs(foe.motion.x - mover.motion.x) < body.radius * 4 && foe.motion.z < top) clear = false;
+            if (Math.abs(foe.motion.x - mover.motion.x) < body.radius * clearRadii && foe.motion.z < top) clear = false;
             if (foe.status.damage > 0.0 || foe.status.petrifyIn > 0 || foe.status.petrified) caught = true;
           });
         }
       }
-      expect(`${row.row} ${row.move.slot} ${row.facing} caught ${caught} faces ${facesHer} clear ${clear}`).toBe(`${row.row} ${row.move.slot} ${row.facing} caught true faces true clear true`);
+      report.push(`${row.row} ${row.move.slot} ${row.facing} caught ${caught} faces ${facesHer} clear ${clear}`);
     } finally {
       runtime.restore();
     }
   }
+  return report;
+}
+
+const backAir = (row: ShowcaseRow): boolean => row.move.kind === "normal" && row.move.code === AttackStyle.backAir;
+const archimonde = Character.archimonde;
+const archimondeRead = [AttackStyle.jab, AttackStyle.forwardSmash, AttackStyle.forwardTilt, AttackStyle.downSmash, AttackStyle.neutralAir, AttackStyle.backAir];
+
+test("the dummy staged for Lady Vashj's up smash, gaze and back air faces her, stays clear of her body and is struck or petrified in both facings in the headless sim [k2 property]", async () => {
+  const staged = showcaseRows(vashj).filter(row => upSmash(row) || gaze(row) || backAir(row));
+  expect(staged.length).toBe(6);
+  expect(await stagedReport(vashj, staged, 4)).toEqual(staged.map(row => `${row.row} ${row.move.slot} ${row.facing} caught true faces true clear true`));
 }, 120_000);
+
+test("the dummy staged for Archimonde's jab, forward smash, forward tilt, down smash, neutral air and back air is struck in both facings and stays clear of his wide body [k2 property]", async () => {
+  const staged = showcaseRows(archimonde).filter(row => row.move.kind === "normal" && archimondeRead.includes(row.move.code));
+  expect(staged.length).toBe(archimondeRead.length * 2);
+  expect(await stagedReport(archimonde, staged, 3.5)).toEqual(staged.map(row => `${row.row} ${row.move.slot} ${row.facing} caught true faces true clear true`));
+}, 300_000);
 
 test("the dummy staged for each of Lady Vashj's seven read moves stands in its reach, clear of her body [k2 property]", () => {
   const body = hurtCapsule(vashj), top = Math.max(body.z1, body.z2) + body.radius;

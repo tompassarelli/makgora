@@ -22,6 +22,7 @@ const SHOWCASE_DEFAULT_GAP = 500;
 const SHOWCASE_DUMMY_MIDDLE = 60;
 const SHOWCASE_WIDE_BODY_RADIUS = 30;
 const SHOWCASE_BODY_CLEARANCE = 50;
+const SHOWCASE_WIDE_REACH = 4 / 3;
 const SHOWCASE_LATE_STRIKE = 8;
 const SHOWCASE_FOE_GAP = 220;
 const INCOMING_GAP = 300;
@@ -61,7 +62,7 @@ export function showcaseMoves(character: Character): ShowcaseMove[] {
   const original = heroDefinition(character) === undefined;
   const normals = Object.entries(AttackStyle).filter(([, code]) => tuning.moves?.normals[code] !== undefined
     || (original && code !== AttackStyle.grab && code !== AttackStyle.dashAttack));
-  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...(isAerialAttack(code) ? aerialPlacement(tuning.moves?.normals[code], code, character) : groundPlacement(tuning.moves?.normals[code], code, character)) }));
+  const moves: ShowcaseMove[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves), ...widened(character, isAerialAttack(code) ? aerialPlacement(tuning.moves?.normals[code], code, character) : groundPlacement(tuning.moves?.normals[code], code, character)) }));
   SHOWCASE_SPECIAL_SLOTS.forEach((slot, code) => {
     const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
     const charged = special === undefined ? undefined : heldShowcases(slot, code, special);
@@ -198,6 +199,13 @@ function strikeTip(region: MoveRegion): { readonly x: number; readonly z: number
 function risenPlacement(move: Readonly<AuthoredMove>): { readonly gap: number; readonly lift: number } {
   const lowest = move.regions.reduce((best, region) => centreZ(region) < centreZ(best) ? region : best);
   return { gap: Math.floor(centreX(lowest)), lift: Math.max(0, Math.floor(centreZ(lowest) - SHOWCASE_DUMMY_MIDDLE)) };
+}
+
+function widened<T extends { readonly gap?: number | undefined; readonly cross?: { readonly frame: number; readonly gap: number } | undefined }>(character: Character, placement: T): T {
+  if (hurtCapsule(character).radius <= SHOWCASE_WIDE_BODY_RADIUS) return placement;
+  const out = (gap: number | undefined): number | undefined => gap === undefined ? undefined : Math.floor(gap * SHOWCASE_WIDE_REACH);
+  const cross = placement.cross === undefined ? undefined : { frame: placement.cross.frame, gap: out(placement.cross.gap) ?? placement.cross.gap };
+  return { ...placement, gap: out(placement.gap), ...(cross === undefined ? {} : { cross }) };
 }
 
 function reachGap(move: Readonly<AuthoredMove> | undefined): number | undefined {
