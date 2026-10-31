@@ -1,6 +1,6 @@
 {
   "premerge": "farm-big",
-  "background": "farm-big",
+  "background": "ubuntu-latest",
   "hosted": "ubuntu-latest",
   "capacity": 11
 }
