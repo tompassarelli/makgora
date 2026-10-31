@@ -226,6 +226,9 @@ export const PEON_REST_CUES: MoveCues = {
 
 
 export const HERO_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]?: MoveCues } } = {
+  [Character.firelord]: {
+    up: { spell: "Lava Surf", startup: cue("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", "feet", f32(0.5)), active: cue("Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", "feet", f32(1.6)) },
+  },
   [Character.akama]: { neutral: SHURIKEN_CHARGE_CUES, up: SHADOW_STEP_CUES },
   [Character.malfurion]: {
     neutral: { spell: "Entangling Roots", startup: NATURE, active: cue("Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdx", "ahead", f32(0.35)) },

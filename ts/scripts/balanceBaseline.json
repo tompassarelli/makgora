@@ -41673,15 +41673,28 @@
    "authored.specials.side.ground.projectiles.1.effect.base": 0,
    "authored.specials.side.ground.projectiles.1.effect.launchX": 0.08715574443340302,
    "authored.specials.side.ground.projectiles.1.effect.launchZ": 0.9961947202682495,
-   "authored.specials.up.ground.endFrame": 40,
-   "authored.specials.up.ground.landingLag": 24,
-   "authored.specials.up.ground.regions.0.firstFrame": 9,
-   "authored.specials.up.ground.regions.0.lastFrame": 22,
-   "authored.specials.up.ground.regions.0.hit.effect.damage": 7,
-   "authored.specials.up.ground.regions.0.hit.effect.growth": 75,
-   "authored.specials.up.ground.regions.0.hit.effect.base": 24,
-   "authored.specials.up.ground.regions.0.hit.effect.launchX": 0.1736481785774231,
-   "authored.specials.up.ground.regions.0.hit.effect.launchZ": 0.9848077297210693,
+   "authored.specials.up.ground.endFrame": 34,
+   "authored.specials.up.ground.regions.0.firstFrame": 5,
+   "authored.specials.up.ground.regions.0.lastFrame": 8,
+   "authored.specials.up.ground.regions.0.hit.effect.damage": 2,
+   "authored.specials.up.ground.regions.0.hit.effect.growth": 0,
+   "authored.specials.up.ground.regions.0.hit.effect.base": 14,
+   "authored.specials.up.ground.regions.0.hit.effect.launchX": 0,
+   "authored.specials.up.ground.regions.0.hit.effect.launchZ": 1,
+   "authored.specials.up.ground.regions.1.firstFrame": 11,
+   "authored.specials.up.ground.regions.1.lastFrame": 14,
+   "authored.specials.up.ground.regions.1.hit.effect.damage": 2,
+   "authored.specials.up.ground.regions.1.hit.effect.growth": 0,
+   "authored.specials.up.ground.regions.1.hit.effect.base": 14,
+   "authored.specials.up.ground.regions.1.hit.effect.launchX": 0,
+   "authored.specials.up.ground.regions.1.hit.effect.launchZ": 1,
+   "authored.specials.up.ground.regions.2.firstFrame": 17,
+   "authored.specials.up.ground.regions.2.lastFrame": 20,
+   "authored.specials.up.ground.regions.2.hit.effect.damage": 4,
+   "authored.specials.up.ground.regions.2.hit.effect.growth": 63.15253829956055,
+   "authored.specials.up.ground.regions.2.hit.effect.base": 30,
+   "authored.specials.up.ground.regions.2.hit.effect.launchX": 0.1736481785774231,
+   "authored.specials.up.ground.regions.2.hit.effect.launchZ": 0.9848077297210693,
    "authored.specials.down.ground.endFrame": 30,
    "authored.specials.down.ground.hurt.0.firstFrame": 8,
    "authored.specials.down.ground.hurt.0.lastFrame": 24,
@@ -42056,7 +42069,13 @@
     "advantage": -20
    },
    "special.up.ground.regions.0": {
-    "advantage": -25
+    "advantage": -26
+   },
+   "special.up.ground.regions.1": {
+    "advantage": -20
+   },
+   "special.up.ground.regions.2": {
+    "advantage": -13
    },
    "special.down.ground.projectiles.0": {
     "advantage": -15

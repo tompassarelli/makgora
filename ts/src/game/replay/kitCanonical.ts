@@ -273,30 +273,33 @@ function writeSpecialMotion(move: Readonly<AuthoredSpecial>, name: string, resul
     if (move.guard.shieldFrames !== undefined) int("guard.shieldFrames", move.guard.shieldFrames);
   }
   const motion = move.motion ?? [];
-  for (let index = 0; index < motion.length; index++) {
-    const segment = at(motion, index);
-    int(`motion[${index}].first`, segment.first);
-    int(`motion[${index}].last`, segment.last);
-    real(`motion[${index}].velocityX`, segment.velocityX);
-    real(`motion[${index}].velocityZ`, segment.velocityZ);
-    real(`motion[${index}].aimedSpeed`, segment.aimedSpeed ?? 0.0);
-    if (segment.stopsAtBody === true) int(`motion[${index}].stopsAtBody`, 1);
-    real(`motion[${index}].driftSpeed`, segment.driftSpeed ?? 0.0);
-    if (segment.stopsAtShield === true) int(`motion[${index}].stopsAtShield`, 1);
-    if (segment.relocate !== undefined) int(`motion[${index}].relocate`, segment.relocate);
-    if (segment.relocateProjectile !== undefined) result.push(specialProjectileCanonical(segment.relocateProjectile, `${name}.motion[${index}].relocateProjectile`));
-    if (segment.relocateReach !== undefined) real(`motion[${index}].relocateReach`, segment.relocateReach);
-    if (segment.resurface !== undefined) {
-      result.push(specialProjectileCanonical(segment.resurface.at, `${name}.motion[${index}].resurface.at`));
-      real(`motion[${index}].resurface.fallbackReach`, segment.resurface.fallbackReach);
-    }
-    if (segment.seek !== undefined) {
-      real(`motion[${index}].seek.speed`, segment.seek.speed);
-      real(`motion[${index}].seek.turnCos`, segment.seek.turnCos);
-      real(`motion[${index}].seek.turnSin`, segment.seek.turnSin);
-    }
-    if (segment.stopsAtBody === true) int(`motion[${index}].stopsAtBody`, 1);
+  for (let index = 0; index < motion.length; index++) writeMotionSegment(at(motion, index), index, name, result);
+}
+
+function writeMotionSegment(segment: NonNullable<AuthoredSpecial["motion"]>[number], index: number, name: string, result: string[]): void {
+  const { int, real } = fieldWriters(name, result);
+  int(`motion[${index}].first`, segment.first);
+  int(`motion[${index}].last`, segment.last);
+  real(`motion[${index}].velocityX`, segment.velocityX);
+  real(`motion[${index}].velocityZ`, segment.velocityZ);
+  real(`motion[${index}].aimedSpeed`, segment.aimedSpeed ?? 0.0);
+  if (segment.stopsAtBody === true) int(`motion[${index}].stopsAtBody`, 1);
+  real(`motion[${index}].driftSpeed`, segment.driftSpeed ?? 0.0);
+  if (segment.liftSpeed !== undefined) real(`motion[${index}].liftSpeed`, segment.liftSpeed);
+  if (segment.stopsAtShield === true) int(`motion[${index}].stopsAtShield`, 1);
+  if (segment.relocate !== undefined) int(`motion[${index}].relocate`, segment.relocate);
+  if (segment.relocateProjectile !== undefined) result.push(specialProjectileCanonical(segment.relocateProjectile, `${name}.motion[${index}].relocateProjectile`));
+  if (segment.relocateReach !== undefined) real(`motion[${index}].relocateReach`, segment.relocateReach);
+  if (segment.resurface !== undefined) {
+    result.push(specialProjectileCanonical(segment.resurface.at, `${name}.motion[${index}].resurface.at`));
+    real(`motion[${index}].resurface.fallbackReach`, segment.resurface.fallbackReach);
   }
+  if (segment.seek !== undefined) {
+    real(`motion[${index}].seek.speed`, segment.seek.speed);
+    real(`motion[${index}].seek.turnCos`, segment.seek.turnCos);
+    real(`motion[${index}].seek.turnSin`, segment.seek.turnSin);
+  }
+  if (segment.stopsAtBody === true) int(`motion[${index}].stopsAtBody`, 1);
 }
 
 function writeSpecialGrabs(move: Readonly<AuthoredSpecial>, name: string, result: string[]): void {

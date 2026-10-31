@@ -2,6 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "../../sim/codes";
 import { CHILL } from "../../sim/chill";
 import { heroRegion } from "../../sim/heroMoves";
+import { surfRide } from "../../sim/specials/surfRide";
 import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../../sim/specials/schema";
 import type { AppliedStatus } from "../../sim/appliedStatus";
 import { murlocHit } from "./moves";
@@ -33,15 +34,11 @@ const bellySlide = (air: boolean): AuthoredSpecial => ({
 const SURF_REACH = 120.0;
 const SURF_HITS = [{ first: 6, last: 8 }, { first: 9, last: 11 }, { first: 12, last: 14 }];
 const surfHit = (last: boolean) => last ? murlocHit(2.0, 80, 63.15253829956055, 30.0) : murlocHit(2.0, 90, 0.0, 14.0);
-const TIDAL_SURF: AuthoredSpecial = {
-  endFrame: 34, oncePerAirtime: true, helpless: true, facesStick: true,
-  rehits: SURF_HITS.slice(1).map(({ first }) => first + 1),
-  motion: [
-    { ...frames(1, 5), velocityX: 0.0, velocityZ: 0.0 },
-    { ...frames(6, 25), velocityX: 0.0, velocityZ: 17.0, driftSpeed: 6.0, ride: { reach: SURF_REACH, offset: 30.0, catchUp: 30.0, aloneVelocityZ: 11.0 } },
-  ],
-  regions: SURF_HITS.map(({ first, last }, index) => heroRegion(first, last, { x1: 0.0, z1: 10.0, x2: -24.0, z2: 80.0, radius: 26.0 }, surfHit(index === SURF_HITS.length - 1))),
-};
+const TIDAL_SURF = surfRide({
+  endFrame: 34, windUp: 5, rideFrames: { first: 6, last: 25 }, rise: 17.0, drift: 6.0,
+  carry: { reach: SURF_REACH, offset: 30.0, catchUp: 30.0, aloneVelocityZ: 11.0 },
+  hits: SURF_HITS, hitEffect: surfHit, region: { x1: 0.0, z1: 10.0, x2: -24.0, z2: 80.0, radius: 26.0 },
+});
 
 export const REVIVE = { frame: 40, endFrame: 50, offsetX: 60.0 } as const;
 export const ORDER = { frame: 6, endFrame: 20 } as const;
