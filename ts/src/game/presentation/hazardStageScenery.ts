@@ -94,6 +94,7 @@ export const NORDRASSIL_SCENERY: StageScenery = {
 export const GRYPHON_SCENERY: StageScenery = {
   farZ: 13000.0,
   sky: STAGE_SKY_MODELS[11] ?? "",
+  skyLook: { zenith: [f32(0.2), f32(0.36), f32(0.62)], cover: f32(0.55), sunAzimuth: 120, sunElevation: 42, sun: [f32(1.0), f32(0.92), f32(0.76)], stars: 0.0, glow: f32(0.1) },
 
   fog: { start: 5000.0, end: 9000.0, red: 0.5, green: 0.625, blue: 0.75 },
   heightFog: { start: 5000.0, end: 9000.0, density: 0.25, heightStart: -1800.0, heightEnd: -500.0, maxDensity: 0.5, drawOverSky: true },

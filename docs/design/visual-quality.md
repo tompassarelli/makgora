@@ -830,8 +830,22 @@ the tool's 25% size cut: Illidan, fighter band 27.9–48.2 against backdrop band
 top and the Blacksmith behind him, not rock: darkening the near row from
 78,76,82 to 51,50,55 left the band unchanged. Dimming the Blacksmith, and a
 far-camera and second-pair-order capture, are not done. Captures:
-~/.local/state/smashcraft/shots/gryphon/ (the sky draws black in the native
-window with no sky look, a separate item).
+~/.local/state/smashcraft/shots/gryphon/.
+
+Gryphon's sky drew a dark gradient in the native window, where library 7bd7edc
+drew grey cloud smears. Wisp 2d6b04a6 replaced the old smear with a painted
+sky whose horizon is the active fog's colour (the clear colour when there is
+none), and the window drops any fog drawn over the sky; Gryphon is the only
+stage with over-sky fog (GA-4), so its horizon fell to the dark clear colour.
+In the native window the fog now stays a plain fog (`drawStageFog` clears
+draw-over-sky when `WispSetSkyLook` exists; Warcraft builds are unchanged) and
+Gryphon carries a sky look (zenith 0.2,0.36,0.62, cover 0.55, sun 120 degrees
+azimuth and 42 elevation, warm white): the sky reads pale blue behind the rocks
+with the fog colour 0.5,0.625,0.75 at the horizon. Capture:
+after-sky-near-murloc-illidan.png, same near view and tick as the rock captures,
+pinned Wisp 1a0561a2; one cold viewer named both fighters and looked at Illidan
+first. No cloud lobes show at this camera and the fog's height density is not
+modelled by the window.
 
 ### Nordrassil atmosphere (#294)
 

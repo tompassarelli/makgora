@@ -31,7 +31,8 @@ function drawStageFog(s: ShellState): void {
   const height = stageScenery(s.game.stageChoice).heightFog;
   if (height === undefined) return;
   BlzSetTerrainFogMaxLinearDensity(height.maxDensity);
-  BlzSetTerrainFogDrawOverSky(height.drawOverSky);
+  // The native window drops fog drawn over its painted sky and takes the sky's horizon from the fog, so there Gryphon's fog stays a plain fog.
+  BlzSetTerrainFogDrawOverSky(height.drawOverSky && typeof WispSetSkyLook !== "function");
 }
 
 
