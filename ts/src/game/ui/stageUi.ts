@@ -15,7 +15,7 @@ import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stag
 import { orbsSetting, hazardsSetting, rulesSummary } from "../session/messages";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
-import { StageCard } from "./stageCard";
+import { STAGE_CHIP_TEXTURE, StageCard } from "./stageCard";
 import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, START_BUTTON, startButtonContains } from "./selectionLayout";
 
 
@@ -129,7 +129,7 @@ export class StagePanel {
     this.poolSummary = stageText(this.poolRoot, "MeleeStagePoolSummary", f32(0.14), f32(0.2), f32(0.52), f32(0.042), f32(0.009), "");
     BlzFrameSetVisible(this.poolRoot, false);
     this.chip = createBackdrop("MeleeStageChip", root, 0);
-    BlzFrameSetTexture(this.chip, "war3mapImported\\StageChip.tga", 0, true);
+    BlzFrameSetTexture(this.chip, STAGE_CHIP_TEXTURE, 0, true);
     BlzFrameSetSize(this.chip, f32(0.04), f32(0.04));
     BlzFrameSetEnable(this.chip, false);
     const help = journal

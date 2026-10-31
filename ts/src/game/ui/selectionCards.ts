@@ -6,7 +6,7 @@ import { cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { boxContains } from "./selectionLayout";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
-import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../input/participants";
+import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/participants";
 import { type MatchState, canChooseComputer, canCycleSlotMode, costumeFor, fighterActive, humanFighterActive, humanPresent } from "../lobby/lobbyState";
 import {
   type SelectionDrag,
@@ -37,6 +37,11 @@ import { paintCostume } from "./costumeTint";
 import { placeTopLeft, setFrameText } from "./frames";
 import { presentLiveFighter } from "./liveCard";
 import { BAR_HEIGHT, BAR_TEXT, BOTTOM_BAR_TOP, TAG_SCALE, TAG_SIZE, art, hotspot, label, modeBox, nameText, placeBottomBar, portraitTexture, tileOfCharacter, titleCase } from "./selectionFrames";
+
+export const selectionCardTexture = (color: string): string => `war3mapImported\\SelectionCard${color}.tga`;
+const CHIP_TEXTURES: Slots<string> = ["war3mapImported\\SelectionChipP1.tga", "war3mapImported\\SelectionChipP2.tga", "war3mapImported\\SelectionChipP3.tga", "war3mapImported\\SelectionChipP4.tga"];
+const CPU_CHIP_TEXTURES: Slots<string> = ["war3mapImported\\SelectionChipCPUP1.tga", "war3mapImported\\SelectionChipCPUP2.tga", "war3mapImported\\SelectionChipCPUP3.tga", "war3mapImported\\SelectionChipCPUP4.tga"];
+export const selectionChipTexture = (slot: number, human: boolean): string => at(human ? CHIP_TEXTURES : CPU_CHIP_TEXTURES, slot);
 
 export type CardButton = { kind: "costume"; slot: number } | { kind: "team"; slot: number } | { kind: "mode"; slot: number } | { kind: "cpuSettings"; slot: number };
 
@@ -86,7 +91,7 @@ export interface CardFrames {
 export function createCard(root: framehandle, suffix: string, slot: number, add: (frame: framehandle, target: CardButton) => framehandle): CardFrames {
   const x = cardX(slot);
   const name = `${suffix}_${I2S(slot)}`;
-  const card = art(root, `MeleeCard${name}`, "war3mapImported\\SelectionCardGray.tga", x, CARD_TOP, CARD_WIDTH, CARD_HEIGHT);
+  const card = art(root, `MeleeCard${name}`, selectionCardTexture("Gray"), x, CARD_TOP, CARD_WIDTH, CARD_HEIGHT);
   const mode = BlzCreateFrameByType("BUTTON", `MeleeModeButton${name}`, root, "", 0);
   const modeArea = modeBox(slot);
   placeTopLeft(mode, modeArea.x, modeArea.y);
@@ -105,7 +110,7 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   const dotArea = costumeDotsBox(slot);
   const dotSize = cardSize(COSTUME_DOT);
   const dots = Array.from({ length: MAX_COSTUMES }, (_, index) => {
-    const dot = art(root, `MeleeCostumeDot${name}_${I2S(index)}`, `war3mapImported\\SelectionChipP${I2S(slot + 1)}.tga`, f32(dotArea.x + f32(index * f32(dotSize + cardSize(COSTUME_DOT_GAP)))), dotArea.y, dotSize, dotSize);
+    const dot = art(root, `MeleeCostumeDot${name}_${I2S(index)}`, selectionChipTexture(slot, true), f32(dotArea.x + f32(index * f32(dotSize + cardSize(COSTUME_DOT_GAP)))), dotArea.y, dotSize, dotSize);
     BlzFrameSetVisible(dot, false);
     return dot;
   });
@@ -115,7 +120,7 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
   const name_ = label(root, `MeleeName${name}`, cardRight(slot, f32(0.008)), cardDown(f32(0.173)), cardSize(f32(0.144)), cardSize(f32(0.019)), cardSize(f32(0.011)));
   const wins = createSessionWinsFrames(root, name, cardRight(slot, f32(0.054)), BOTTOM_BAR_TOP, BAR_TEXT);
   const status = label(root, `MeleeStatus${name}`, cardRight(slot, f32(0.014)), BOTTOM_BAR_TOP, cardSize(f32(0.132)), BAR_HEIGHT, BAR_TEXT);
-  const chip = art(root, `MeleeChip${name}`, `war3mapImported\\SelectionChipP${I2S(slot + 1)}.tga`, cardRight(slot, f32(0.06)), cardDown(f32(0.075)), cardSize(f32(0.06)), cardSize(f32(0.06)));
+  const chip = art(root, `MeleeChip${name}`, selectionChipTexture(slot, true), cardRight(slot, f32(0.06)), cardDown(f32(0.075)), cardSize(f32(0.06)), cardSize(f32(0.06)));
   BlzFrameSetLevel(chip, SELECT_LEVELS.cardChip);
   const box = cpuSettingsBox(slot);
   const settings = BlzCreateFrame("ScriptDialogButton", root, 0, 0);
@@ -131,7 +136,7 @@ export function createCard(root: framehandle, suffix: string, slot: number, add:
 
 export function presentCardTeam(frames: CardFrames, game: Readonly<MatchState>, slot: ParticipantSlot, participantId: number, menuFocus: MenuFocus | undefined, active: boolean, human: boolean, teamsShown: boolean, palette: number): void {
   const color = slotColor(palette);
-  BlzFrameSetTexture(frames.card, `war3mapImported\\SelectionCard${active ? color.name : "Gray"}.tga`, 0, true);
+  BlzFrameSetTexture(frames.card, selectionCardTexture(active ? color.name : "Gray"), 0, true);
   BlzFrameSetVisible(frames.team, teamsShown);
   BlzFrameSetVisible(frames.teamLabel, teamsShown);
   BlzFrameSetEnable(frames.team, teamsShown && (slot === participantId && human || canChooseComputer(game, participantId, slot)));
@@ -212,7 +217,7 @@ export function presentCardCpu(frames: CardFrames, game: Readonly<MatchState>, s
 
 export function presentCardChip(frames: CardFrames, drag: Readonly<SelectionDrag>, grid: RosterGrid, slot: number, active: boolean, ready: boolean, human: boolean, choice: number | undefined, x: number, y: number, remote: { readonly x: number; readonly y: number } | undefined): boolean {
   BlzFrameSetVisible(frames.chip, active);
-  BlzFrameSetTexture(frames.chip, `war3mapImported\\SelectionChip${human ? "" : "CPU"}P${I2S(slot + 1)}.tga`, 0, true);
+  BlzFrameSetTexture(frames.chip, selectionChipTexture(slot, human), 0, true);
   const local = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);
   const carried = local || remote !== undefined;
   const hand = remote !== undefined && !local ? remote : { x, y };

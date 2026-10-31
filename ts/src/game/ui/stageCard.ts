@@ -8,8 +8,9 @@ import { STAGE_SILHOUETTES, SILHOUETTE_PIECES } from "../../generated/stages/sta
 import { createBackdrop, createText, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
 
-const COAL = "ReplaceableTextures\\TeamColor\\TeamColor20.blp";
-const SNOW = "ReplaceableTextures\\TeamColor\\TeamColor21.blp";
+export const STAGE_CARD_COAL = "ReplaceableTextures\\TeamColor\\TeamColor20.blp";
+export const STAGE_CARD_SNOW = "ReplaceableTextures\\TeamColor\\TeamColor21.blp";
+export const STAGE_CHIP_TEXTURE = "war3mapImported\\StageChip.tga";
 
 export class StageCard {
   private readonly panel: framehandle;
@@ -23,7 +24,7 @@ export class StageCard {
   constructor(parent: framehandle, id: string, left: number, top: number, width: number, height: number, private readonly banner: boolean) {
     const panel = createBackdrop(`${id}Panel`, parent, 0);
     this.panel = panel;
-    BlzFrameSetTexture(panel, COAL, 0, true);
+    BlzFrameSetTexture(panel, STAGE_CARD_COAL, 0, true);
     placeTopLeft(panel, left, top);
     BlzFrameSetSize(panel, width, height);
     BlzFrameSetEnable(panel, false);
@@ -37,14 +38,14 @@ export class StageCard {
     this.boxTop = f32(top - height * f32(0.14));
     for (let index = 0; index < SILHOUETTE_PIECES; index++) {
       const piece = createBackdrop(`${id}Piece${I2S(index)}`, parent, index);
-      BlzFrameSetTexture(piece, SNOW, 0, true);
+      BlzFrameSetTexture(piece, STAGE_CARD_SNOW, 0, true);
       BlzFrameSetAlpha(piece, 230);
       BlzFrameSetEnable(piece, false);
       this.pieces.push(piece);
     }
     if (banner) {
       const strip = createBackdrop(`${id}Banner`, parent, 0);
-      BlzFrameSetTexture(strip, COAL, 0, true);
+      BlzFrameSetTexture(strip, STAGE_CARD_COAL, 0, true);
       BlzFrameSetAlpha(strip, 210);
       placeTopLeft(strip, left, f32(top - height * f32(0.78)));
       BlzFrameSetSize(strip, width, f32(height * f32(0.22)));
