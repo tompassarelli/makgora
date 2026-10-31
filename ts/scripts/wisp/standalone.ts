@@ -1,12 +1,12 @@
 import type { StandaloneGame, StandaloneInput, StandaloneSession } from "wisp/scripts/wisp/standalone";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import type { MapEntry } from "wisp/src/headless/client";
 import { createKeyFeed } from "wisp/src/headless/keyInput";
 import { createPointerFeed } from "wisp/src/headless/pointer";
 import { Effect } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { RenderFailure } from "wisp/scripts/wisp/headlessRender";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { installHeadless, readNativeDeclarations } from "wisp/scripts/wisp/headless";
 import { customMapData } from "wisp/scripts/wisp/headlessInput";
 import { describeDigestDifference, digestDifference, frameDigest } from "../../src/game/replay/frameDigest";
 import { Action } from "../../src/game/input/actions";
@@ -65,6 +65,9 @@ const offersPrompt = (start: StandaloneStart, savedFiles: string | undefined): b
 
 const clientOptions = (savedFiles: string | undefined) => savedFiles === undefined ? { keepCalls: 0 } : { keepCalls: 0, files: () => customMapData(savedFiles) };
 
+// a compiled player holds no Wisp source tree, so the build ships the declarations beside the executable
+const nativeDeclarations = () => import.meta.path.endsWith(".ts") ? readNativeDeclarations() : readNativeDeclarations(join(dirname(process.execPath), "warcraft.d.ts"));
+
 const OPPONENT_SLOT = 1;
 
 const asksForCpu = (script: string | undefined): boolean => script?.startsWith(SELECTION_SCRIPT) === true && script.split("\n", 1)[0]?.split(/\s+/).includes(CPU_OPPONENT) === true;
@@ -89,29 +92,28 @@ export async function createStandaloneSession(options: { readonly script?: strin
   const presses = scripted ? selectionPresses(script) : [];
   const pointer = scripted ? selectionPointer(script) : undefined;
   let steps = 0;
-  const runtime = installHeadless(!driven || presentation === "pool-confirmed" || presentation === "pool-predicted" ? PREDICTED_HEADLESS : SMASHCRAFT_HEADLESS);
+  const runtime = installHeadless(!driven || presentation === "pool-confirmed" || presentation === "pool-predicted" ? PREDICTED_HEADLESS : SMASHCRAFT_HEADLESS, nativeDeclarations());
   let restoreTutorialOffers = (): void => {};
   const release = (): void => { restoreTutorialOffers(); runtime.restore(); };
   try {
 
-    const platform = join(import.meta.dir, "../../src/platform");
     interface State { controlsGreeted?: number; readonly game: { readonly phase: number; stockCount: number }; readonly runtime: { readonly simulationFrame: number }; readonly world: Parameters<typeof frameDigest>[0] & Parameters<typeof isActive>[0] }
-    const { shell }: { shell(): State } = await import(join(platform, "../host/loop/state.ts"));
-    const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import(join(platform, "../host/loop/diagnostics.ts"));
-    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/developerCommands.ts"));
-    const { views }: { views(state: State): { readonly settings: readonly { endPreview(): void; isOpen(): boolean; close(): void }[] } } = await import(join(platform, "../host/loop/ui.ts"));
-    const { tutorialOffers }: { tutorialOffers: { enabled: boolean } } = await import(join(platform, "../game/ui/tutorialMenu.ts"));
+    const { shell }: { shell(): State } = await import("../../src/host/loop/state");
+    const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import("../../src/host/loop/diagnostics");
+    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import("../../src/host/loop/developerCommands");
+    const { views }: { views(state: State): { readonly settings: readonly { endPreview(): void; isOpen(): boolean; close(): void }[] } } = await import("../../src/host/loop/ui");
+    const { tutorialOffers }: { tutorialOffers: { enabled: boolean } } = await import("../../src/game/ui/tutorialMenu");
     const offersBefore = tutorialOffers.enabled;
     restoreTutorialOffers = () => { tutorialOffers.enabled = offersBefore; };
     tutorialOffers.enabled = offersPrompt(start, savedFiles);
-    const { drawnFrame }: { drawnFrame(state: State): { readonly frame: number } } = await import(join(platform, "../host/loop/drawnFrame.ts"));
-    const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import(join(import.meta.dir, "botMatch.ts"));
-    const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import(join(platform, "../host/loop/menus.ts"));
+    const { drawnFrame }: { drawnFrame(state: State): { readonly frame: number } } = await import("../../src/host/loop/drawnFrame");
+    const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import("./botMatch");
+    const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import("../../src/host/loop/menus");
     const build = { ...PLAYABLE_BUILD, devConsole: true, ...(presentation === undefined ? {} : { presentation }) };
-    const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(platform, "main.ts"));
-    const driverApi: { nativeDriverCommand(text: string): void; installSmashcraftNativeDriver(): void; startSmashcraftNativeDriver(): void } | undefined = !driven ? undefined : await import(join(platform, "nativeDriver.ts"));
+    const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import("../../src/platform/main");
+    const driverApi: { nativeDriverCommand(text: string): void; installSmashcraftNativeDriver(): void; startSmashcraftNativeDriver(): void } | undefined = !driven ? undefined : await import("../../src/platform/nativeDriver");
     const driverBuild = { ...NATIVE_DRIVER_BUILD, ...(presentation === undefined ? {} : { presentation }) };
-    const driver: MapEntry | undefined = !driven ? undefined : presentation === undefined ? await import(join(platform, "../host/entries/nativeDriverMain.ts")) : {
+    const driver: MapEntry | undefined = !driven ? undefined : presentation === undefined ? await import("../../src/host/entries/nativeDriverMain") : {
       install() { main.install(driverBuild); driverApi?.installSmashcraftNativeDriver(); },
       start() { main.startBuild(driverBuild); driverApi?.installSmashcraftNativeDriver(); driverApi?.startSmashcraftNativeDriver(); },
     };
