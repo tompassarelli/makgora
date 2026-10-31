@@ -93,84 +93,20 @@ jobs:
         run: bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
         working-directory: ts
 
-  filtered-checks:
-    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.13
-      - run: bun install --frozen-lockfile
-        working-directory: ts
-      - run: bun wisp parity tapes && bun wisp parity numeric
-        working-directory: ts
-      - if: ${{ !cancelled() }}
-        run: LUA_TESTS_STEP=stack bun scripts/lua-tests.ts
-        working-directory: ts
-      - if: ${{ !cancelled() }}
-        run: COMPILER_TIMINGS=1 bun scripts/compiler-benchmark.ts
-        working-directory: ts
-      - if: ${{ !cancelled() }}
-        run: bun scripts/typecheck-benchmark.ts
-        working-directory: ts
-        env:
-          CI_TIMING: report
-      - if: ${{ !cancelled() }}
-        run: git clone -q --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north" && bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check
-
-  development-loop:
+  # The rest of the full suite, as Farm test groups on hosted runners (every check of each group, full=1).
+  # A group whose inputs match a farm-pass-GROUP-KEY artifact (a landing gate's or an earlier main run's) logs
+  # "GROUP reused: it passed before on inputs KEY" and runs nothing. Smoke runs boot, perf and rollback on main.
+  farm:
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - if: runner.environment == 'github-hosted'
-        name: Install stock texture converter
-        run: sudo apt-get update -q && sudo apt-get install -y -q imagemagick
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.13
-      - run: bun install --frozen-lockfile
-        working-directory: ts
-      # No game files or copied game scripts outside the allowlist (wisp:docs/clean-room.md).
-      - run: bun scripts/cleanRoom.ts
-        working-directory: ts
-      - run: git clone --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north"
-      - run: bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check
-      # Hosted runners for this private repository are smaller than the development
-      # machine the timing targets describe; integration gates them on that machine.
-      - run: bun scripts/ci.ts
-        working-directory: ts
-        env:
-          CI_TIMING: report
-      - name: Report every selectable computer fighter
-        if: ${{ !cancelled() }}
-        run: bun scripts/cpuCoverage.ts
-        working-directory: ts
-      # Replay tapes and the numeric corpus in a stock Lua32 and in one whose
-      # raw float + - * round toward zero (wisp:docs/headless.md#raw-float-rounding):
-      # both must equal Bun, so no raw float operation leaks past the exact helpers.
-      - if: ${{ !cancelled() }}
-        run: bun wisp parity tapes && bun wisp parity numeric
-        working-directory: ts
-      # Every native recording in the checked-in corpus replays headless with 0
-      # divergent frames, each on the source that recorded it (wisp#69).
-      - if: ${{ !cancelled() }}
-        run: bun wisp parity corpus test/corpus
-        working-directory: ts
-      - if: ${{ !cancelled() }}
-        run: bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf
-        working-directory: ts
-      - name: perf target (#168)
-        if: ${{ !cancelled() && hashFiles('ts/build/playable-bot-four.perf') != '' }}
-        run: bun wisp perf budget build/playable-bot-four.perf
-        working-directory: ts
-      # This commit's p95 frame cost, allocation and map script size, in the job summary and log (`grep commit-metrics`).
-      - if: ${{ !cancelled() }}
-        run: bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
-        working-directory: ts
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/farm-test.yml
+    with:
+      ref: ${{ github.sha }}
+      farm-runner: ubuntu-latest
+      full: "1"
+      checks: ${{ github.ref == 'refs/heads/main' && '["parity-0","parity-1","parity-2","parity-3","lua","corpus","computer-0","computer-1","types","clean-room","static"]' || '["perf","parity-0","parity-1","parity-2","parity-3","lua","corpus","computer-0","computer-1","types","clean-room","static"]' }}
 
   # New structural debt (import cycle, layer violation, oversize file or function, rising hotspot) against structure.toml (north:harness/code-health).
   code-health:
@@ -199,7 +135,7 @@ jobs:
   # Autoland dispatches this workflow after a landing, and a dispatched run
   # starts no workflow_run, so it hands its own result to "Main is red".
   main-red:
-    needs: [smoke, filtered-checks, development-loop]
+    needs: [smoke, farm]
     if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5

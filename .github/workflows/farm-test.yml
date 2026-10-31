@@ -229,7 +229,7 @@ jobs:
             if [ "${passed:-0}" -gt 0 ]; then
               run=false
               echo "$GROUP reused: it passed before on inputs $key" > "skipped-check-$GROUP.txt"
-              echo "::notice::Autoland reusing $GROUP: passed before on inputs $key"
+              echo "::notice::$GROUP reused: it passed before on inputs $key"
             fi
           fi
           echo "run=$run" | tee -a "$GITHUB_OUTPUT"
