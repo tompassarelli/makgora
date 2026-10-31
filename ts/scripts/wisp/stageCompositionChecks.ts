@@ -132,3 +132,18 @@ export const FIGHTER_SEPARATION_CHECKS: readonly NativeCheck[] = STAGE_CATALOG.f
     },
   ];
 }));
+
+const STAIR_STAGE = 2;
+const STAIR_PAIR_ORDERS = [["ab", SEPARATION_PAIR], ["ba", "Chen Stormstout / Shadow Hunter"]] as const;
+
+export const FROZEN_THRONE_STAIR_CHECKS: readonly NativeCheck[] = STAIR_PAIR_ORDERS.map(([order, pair]): NativeCheck => ({
+  id: `897-stair-${order}`, closes: "smashcraft#897 box 1", map: "floating-stages", session: "floating-stages",
+  setup: [
+    { chat: "-dev reset" }, { chat: "-dev items off" }, { chat: "-dev drops off" }, { chat: "-dev hazards off" },
+    { chat: `-dev quick stage ${STAIR_STAGE} pair ${pair}` }, { waitMs: 5000 }, { keys: ["BackSpace"], client: "a" },
+    { chat: "-dev view near" }, { keys: ["h"], client: "a" }, { waitMs: 20000 },
+  ],
+  capture: [{ kind: "frames", name: "stair", client: "a" }, { kind: "frames", name: "stair", client: "b" }],
+  pass: entryRules(STAIR_STAGE),
+  look: `Frozen Throne, near match camera, ${pair}: the five-step ice stair reads as climbing from the deck to the throne's dais, and both fighters are the clearest shapes in the frame.`,
+}));

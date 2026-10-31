@@ -13,7 +13,7 @@ import { QUICK_CPU_COMMAND, QUICK_HERO_COMMAND, QUICK_TRAINING_COMMAND } from ".
 import { HIT_PRESENTATION_CASES } from "../../src/game/session/hitPresentationCases";
 import { HERO_ROSTER } from "../../src/game/roster/kits";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
-import { FIGHTER_SEPARATION_CHECKS, FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
+import { FIGHTER_SEPARATION_CHECKS, FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, FROZEN_THRONE_STAIR_CHECKS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
 import { gateChecks } from "./gateChecks";
 import { meterRimChecks } from "./meterRimChecks";
 import { hudChecks } from "./hudChecks";
@@ -340,6 +340,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     ...FLOATING_STAGE_CHECKS,
     ...STAGE_FOG_CHECKS,
     ...FIGHTER_SEPARATION_CHECKS,
+    ...FROZEN_THRONE_STAIR_CHECKS,
     ...contactLightChecks,
     ...slashLightChecks,
     {
