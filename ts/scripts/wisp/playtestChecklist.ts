@@ -70,7 +70,7 @@ export function playtestChecklist({ version, sha, previous, date, commits, issue
 export const handoffs = join(homedir(), ".local/state/agents/handoffs");
 export const checklistPath = (version: string, directory = handoffs) => join(directory, `playtest-${version.replaceAll(" ", "-")}.md`);
 
-const REPO = "repos/tompassarelli/smashcraft";
+const REPO = "repos/tompassarelli/makgora";
 const problem = (cause: { readonly message: string }) => new PlayProblem({ problem: cause.message });
 const host = (program: string, args: readonly string[]) =>
   runProcess(ChildProcess.make(program, args, { cwd: projectRoot, stdin: "ignore" })).pipe(Effect.mapError(problem));

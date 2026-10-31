@@ -38,7 +38,7 @@ export function releaseTreeDrift(snapshot: ReleaseSnapshot) {
 class ReleaseTreeFailure extends Schema.TaggedError<ReleaseTreeFailure, { readonly brand: unique symbol }>()("ReleaseTreeFailure", { problem: Schema.String }) {
   override get message() { return this.problem; }
 }
-const repo = () => process.env.GH_REPO ?? "tompassarelli/smashcraft";
+const repo = () => process.env.GH_REPO ?? "tompassarelli/makgora";
 const api = (path: string, ...args: string[]) => runProcess(ChildProcess.make("gh", ["api", `repos/${repo()}/${path}`, ...args]));
 const issuesAt = (path: string) => api(path, "--paginate", "--slurp").pipe(
   Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(Schema.Array(Schema.Array(ReleaseIssue))))),
