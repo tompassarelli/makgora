@@ -9,7 +9,8 @@ import { type StandaloneStart, createStandaloneSession, smashcraftStandalone } f
 
 livePortraits.enabled = true;
 
-const query = new URL(import.meta.url).searchParams;
+// a compiled player cannot import a module path with a query, so its options travel in the environment
+const query = import.meta.url.includes("?") ? new URL(import.meta.url).searchParams : new URLSearchParams(process.env.SMASHCRAFT_NATIVE_QUERY ?? "");
 const playerMap = query.get("map");
 const start = (query.get("start") ?? "match") as StandaloneStart;
 const chosen = query.get("chosen") ?? undefined;
