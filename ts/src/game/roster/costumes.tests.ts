@@ -1,10 +1,11 @@
-import { assertEquals, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { copyMatchState, costumeFor, createMatchState, cycleCostume, selectCharacter } from "../lobby/lobbyState";
 import { Character, DuoRole } from "../sim/codes";
 import { bodyCostume, bodyVariants, costumeClipModel, costumesFor, partnerLook } from "./costumes";
 import { f32 } from "wisp/src/sim/f32";
 import { PARTNER_COSTUME } from "../presentation/model/costume";
-import { fighterPortrait } from "./looks";
+import { fighterPortrait, portraitCostumes } from "./looks";
+import { costumeSkins as murlocSkins } from "../../generated/fighter-art/murloc";
 import { PORTRAIT_KINDS } from "./kits";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { costumeBody } from "../../generated/costumes/costumeBodies";
@@ -73,8 +74,27 @@ test("Murloc's partner look draws Grgl on his own timeline body at 0.9 scale, th
   const body = costumeBody(Character.murloc, PARTNER_COSTUME);
   if (body === undefined) throw new Error("Murloc's partner look has no generated body");
   assertEquals(costumeClipModel(Character.murloc, PARTNER_COSTUME, clip), body);
-  assertEquals(costumeClipModel(Character.murloc, 0, clip), clip.modelPath);
+  assertEquals(costumeClipModel(Character.murloc, 0, clip), costumeBody(Character.murloc, 0));
+  assertTrue(costumeClipModel(Character.murloc, 0, clip) !== body);
   assertEquals(partner.scale, f32(0.9));
   assertEquals(partnerLook(Character.murloc, DuoRole.leader), undefined);
   assertEquals(bodyVariants([Character.murloc]).map(variant => variant.costume).join(","), `0,${PARTNER_COSTUME}`);
+});
+
+test("Mrgl wears the green MurlocMutant skin and Grgl the red-brown MurlocWarrior skin, in the look, the generated skins and the bodies [k1 scenario]", () => {
+  const stock = "Units\\Creeps\\Murloc\\Murloc.blp";
+  const green = "Units\\Creeps\\MurlocMutant\\MurlocMutant.blp";
+  const red = "Units\\Creeps\\MurlocWarrior\\MurlocWarrior.blp";
+  const partner = partnerLook(Character.murloc, DuoRole.partner);
+  assertEquals(partner?.skin.textures[stock], red);
+  const leaders = costumesFor(Character.murloc);
+  for (const costume of leaders) assertEquals(costume.skin?.textures[stock], green);
+  const generated = new Map(murlocSkins.map(skin => [skin.index, skin.textures[stock]]));
+  assertEquals(generated.get(0), green);
+  assertEquals(generated.get(PARTNER_COSTUME), red);
+  const leaderBody = costumeBody(Character.murloc, 0);
+  const partnerBody = costumeBody(Character.murloc, PARTNER_COSTUME);
+  assertEquals(leaderBody === undefined || partnerBody === undefined || leaderBody === partnerBody, false);
+  for (let costume = 1; costume < leaders.length; costume++) assertEquals(costumeBody(Character.murloc, costume), leaderBody);
+  assertEquals(portraitCostumes(Character.murloc).join(","), "0");
 });

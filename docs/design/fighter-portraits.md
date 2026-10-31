@@ -100,9 +100,9 @@ head mesh binds nearly his whole small body, and Chen take a `zoom` and `shift` 
 The custom-game preview uses the red and blue player cards.
 
 Mrgl & Grgl show both of the duo in the tile, card and bust (Tom asked for it,
-2026-10-30): Mrgl stands in front on the stock Murloc body and Grgl behind him
+2026-10-30): Mrgl stands in front on his teal-green body (the MurlocMutant skin, outfit name `Teal`) and Grgl behind him
 and to image right on his partner costume body (`PARTNER_COSTUME`, the
-MurlocMutant skin at 0.9 scale, as the match draws him), both turned toward the
+red-brown MurlocWarrior skin at 0.9 scale, as the match draws him; colours swapped on 2026-11-01, see murloc.md), both turned toward the
 camera. `portraitScene` adds the partner's effect for any fighter whose look
 has a `partner`; the card is cut by the silhouette of both, and `duo` in
 `CORRECTIONS` frames the tile and bust around the box that holds both heads

@@ -53,14 +53,23 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     const timeline: string[] = [...new Set<string>(record.clips.filter((clip: { timeline?: boolean }) => clip.timeline === true).map((clip: { filename: string }) => clip.filename))];
     if (skins.length > 0 && timeline.length !== 1) throw new Error(`${fighter.name}: a costume skin needs one timeline body, found ${timeline.length}`);
     const costumes: { index: number; filename: string; modelPath: string; sha256: string; bytes: number }[] = [];
+    const aliases: { index: number; modelPath: string }[] = [];
     const facts: Record<string, ReturnType<typeof modelFacts>> = {};
     if (skins.length > 0) {
         const body = parseSource(await Bun.file(join(directory, timeline[0]!)).arrayBuffer());
+        const written = new Map<string, (typeof costumes)[number]>();
         for (const skin of skins) {
+            const same = written.get(JSON.stringify(skin.textures));
+            if (same !== undefined) {
+                aliases.push({ index: skin.index, modelPath: same.modelPath });
+                continue;
+            }
             const bytes = encodeVerified(skinnedBody(body, skin)), sha256 = hash(bytes);
             const filename = `${prefix}${skin.index}-${sha256}.mdx`, modelPath = `war3mapImported\\${filename}`;
             await Bun.write(join(directory, filename), bytes);
-            costumes.push({ index: skin.index, filename, modelPath, sha256, bytes: bytes.byteLength });
+            const entry = { index: skin.index, filename, modelPath, sha256, bytes: bytes.byteLength };
+            costumes.push(entry);
+            written.set(JSON.stringify(skin.textures), entry);
             facts[modelPath] = modelFacts(new Uint8Array(bytes));
             console.log(`${fighter.name} costume ${skin.index}: ${bytes.byteLength} bytes, ${Object.keys(skin.textures).length} texture swaps on ${timeline[0]}`);
         }
@@ -72,7 +81,7 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     replaceModelFacts([`war3mapImported\\${prefix}`], facts);
     const hadShard = existsSync(shard);
     if (costumes.length > 0) mkdirSync(COSTUMES, { recursive: true });
-    if (costumes.length > 0) writeGenerated(shard, [PRODUCER, '', 'export const bodies: Readonly<Record<number, string>> = {', ...costumes.map(costume => `  ${costume.index}: ${JSON.stringify(costume.modelPath)},`), '};', ''].join('\n'));
+    if (costumes.length > 0) writeGenerated(shard, [PRODUCER, '', 'export const bodies: Readonly<Record<number, string>> = {', ...[...costumes, ...aliases].sort((a, b) => a.index - b.index).map(costume => `  ${costume.index}: ${JSON.stringify(costume.modelPath)},`), '};', ''].join('\n'));
     else if (hadShard) await unlink(shard);
     if (costumes.length > 0 || hadShard) writeGenerated(INDEX, indexSource());
     console.log(`${fighter.name}: ${costumes.length} costume bodies`);

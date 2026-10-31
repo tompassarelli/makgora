@@ -7,5 +7,9 @@ export const rules: FighterRules = {
 };
 
 export const costumeSkins: readonly { readonly index: number; readonly textures: Readonly<Record<string, string>> }[] = [
-  { index: 8, textures: {"Units\\Creeps\\Murloc\\Murloc.blp":"Units\\Creeps\\MurlocMutant\\MurlocMutant.blp"} },
+  { index: 0, textures: {"Units\\Creeps\\Murloc\\Murloc.blp":"Units\\Creeps\\MurlocMutant\\MurlocMutant.blp"} },
+  { index: 1, textures: {"Units\\Creeps\\Murloc\\Murloc.blp":"Units\\Creeps\\MurlocMutant\\MurlocMutant.blp"} },
+  { index: 2, textures: {"Units\\Creeps\\Murloc\\Murloc.blp":"Units\\Creeps\\MurlocMutant\\MurlocMutant.blp"} },
+  { index: 3, textures: {"Units\\Creeps\\Murloc\\Murloc.blp":"Units\\Creeps\\MurlocMutant\\MurlocMutant.blp"} },
+  { index: 8, textures: {"Units\\Creeps\\Murloc\\Murloc.blp":"Units\\Creeps\\MurlocWarrior\\MurlocWarrior.blp"} },
 ];

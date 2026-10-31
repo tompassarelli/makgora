@@ -84,8 +84,17 @@ export function portraitCostumes(character: number): readonly number[] {
 }
 
 export function portraitOutfit(character: number, costume: number): string {
-  const skinned = heroLook(character)?.costumes?.[costume];
-  return skinned?.skin === undefined ? "" : skinned.name;
+  const costumes = heroLook(character)?.costumes ?? [];
+  const skin = costumes[costume]?.skin;
+  if (skin === undefined) return "";
+  return costumes.find(other => other.skin !== undefined && sameTextures(other.skin.textures, skin.textures))?.name ?? "";
+}
+
+function sameTextures(left: Readonly<Record<string, string>>, right: Readonly<Record<string, string>>): boolean {
+  const keys = Object.keys(left);
+  if (keys.length !== Object.keys(right).length) return false;
+  for (const key of keys) if (left[key] !== right[key]) return false;
+  return true;
 }
 
 export function fighterPortrait(character: number, kind: PortraitKind, slot?: number, costume = 0): string {

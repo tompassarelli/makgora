@@ -36,6 +36,7 @@ import { MAX_COSTUMES } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
 import { placeTopLeft, setMenuText } from "./frames";
 import { presentLiveFighter } from "./liveCard";
+import { fitName, placeName } from "./namePlate";
 import { BAR_HEIGHT, BAR_TEXT, BOTTOM_BAR_TOP, TAG_SCALE, TAG_SIZE, art, hotspot, label, modeBox, nameText, placeBottomBar, portraitTexture, tileOfCharacter, titleCase } from "./selectionFrames";
 import { createFrame, createFrameByType, Frame, setFrameAlpha, setFrameEnabled, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
@@ -165,7 +166,9 @@ export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>
   placeBottomBar(frames, slot, winsShown, statusText, `x${formatInt(sessionWins)}`);
   if (ready) {
     setFrameTexture(frames.portrait, portraitTexture(choice, false, palette, choice === undefined || choice < 0 ? 0 : costumeIndex(choice, game.costumeChoices[slot] ?? 0)), 0, true);
-    setMenuText(frames.name, nameText(choice));
+    const fitted = fitName(nameText(choice));
+    setMenuText(frames.name, fitted.text);
+    placeName(frames.name, slot, fitted);
   }
   presentLiveFighter(frames.render, frames.portrait, shown, choice, game.costumeChoices[slot] ?? 0, now);
 }

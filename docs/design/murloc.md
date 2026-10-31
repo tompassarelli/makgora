@@ -43,14 +43,16 @@ authored clips 9–89 export onto it unchanged, and whose silhouette or colour
 differs at match zoom. If none matches, the clips are retargeted onto the
 closest model. Definitive Edition art is never used (roster.md).
 
-Grgl model: `units\creeps\MurlocMutant\MurlocMutant.mdl`, bones match: yes.
-Probed 2026-10-30 through the CascLib extractor, classic layer only (no
-`_de`, `_hd` or `_v1` files). Against `Murloc.mdl` (37 bones, 9 sequences):
+Grgl's model is `units\creeps\Murloc\Murloc.mdl` like Mrgl's: the three stock skins below share it, so the pair differs by texture alone.
+
+Colours: Mrgl wears the stock MurlocMutant texture (`Units\Creeps\MurlocMutant\MurlocMutant.blp`, teal-green) and Grgl the stock MurlocWarrior texture (`Units\Creeps\MurlocWarrior\MurlocWarrior.blp`, red-brown); the pair read as two colours at match zoom, green in front. Tom asked on 2026-11-01 for Mrgl green and Grgl yellow, then for Grgl orange, and accepted the Warrior's red-brown (a hue-shifted copy of the Tiderunner texture was not needed). Before that Mrgl wore the Tiderunner's tan and Grgl the Mutant's green. Mrgl's skin is on every costume of `murlocLook` and Grgl's on the partner look (`fighters/murloc/look.ts`), both baked into costume bodies of the timeline body (skins.md). A future Murloc costume sets the pair's textures together, Mrgl's and Grgl's, from the three bone-compatible stock skins (Murloc tan, MurlocMutant green, MurlocWarrior red) plus the existing costume tint.
+
+Skin probe (2026-10-30, CascLib extractor, classic layer only, no `_de`, `_hd` or `_v1` files): against `Murloc.mdl` (37 bones, 9 sequences):
 `MurlocMutant` and `MurlocWarrior` have identical bone names, order, parents
 and vertices (only the texture differs), `MurlocFlesheater` has an extra
 `leg1` bone and different geometry, and `MurlocNightCrawler` has only 22
-bones. The Mutant's texture averages green against the Tiderunner's tan; the
-Warrior's red-brown is the fallback.
+bones. The Mutant's texture averages green against the Tiderunner's tan, and the
+Warrior's averages red-brown.
 
 The stock model has nine sequences: two stands, a ready stand (Stand -3), a
 walk, Attack - 1 (claw swipe), Attack Spell (a thrown arm), Death and two
@@ -262,7 +264,7 @@ One rule prevents each loop the pair could build. `bun wisp interactions --attac
 
 ## Presentation
 
-The selection name is "Mrgl & Grgl" and the HUD plate reads "Mrgl & Grgl" with
+The selection name is "Mrgl&Grgl" (one word, so the card's name plate holds it on one line at the normal font; Tom asked on 2026-11-01) and the HUD plate reads "Mrgl&Grgl" with
 the pair's one percent and no separate Grgl readout (the pip went with the
 shared percent on 2026-10-30; its text also overlapped the name). The camera frames Grgl as any active fighter,
 and a separated Grgl near a blast zone gets the off-screen indicator at
