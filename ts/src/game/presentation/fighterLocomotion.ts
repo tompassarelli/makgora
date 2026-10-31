@@ -21,14 +21,13 @@ const ORIGINAL_WALKS: Readonly<Record<number, (HeroClip | undefined)>> = {
 };
 const ILLIDAN_GAIT: HeroClip = { index: dh.DEMON_HUNTER_WALK_FORWARD_INDEX, seconds: 1.0, stance: 372.0 };
 const ILLIDAN_RUN: HeroClip = { index: dh.DEMON_HUNTER_RUN_FORWARD_INDEX, seconds: f32(0.6) };
-const ILLIDAN_DASH: HeroClip = { index: dh.DEMON_HUNTER_INITIAL_DASH_BURST_INDEX, seconds: dh.DEMON_HUNTER_INITIAL_DASH_BURST_SECONDS };
 
 
 export function groundLocomotionClip(character: Character, motion: IllidanLocomotion, table: Readonly<HeroClipTable> = characterClips(character)): HeroClip | undefined {
   if (character === Character.demonHunter) {
     if (motion === IllidanLocomotion.walk) return ILLIDAN_GAIT;
     if (motion === IllidanLocomotion.run) return ILLIDAN_RUN;
-    if (motion === IllidanLocomotion.dash) return ILLIDAN_DASH;
+    if (motion === IllidanLocomotion.dash) return ILLIDAN_RUN;
     return undefined;
   }
   const walk = table.walk ?? ORIGINAL_WALKS[character];

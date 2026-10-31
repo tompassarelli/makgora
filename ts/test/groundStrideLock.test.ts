@@ -13,12 +13,12 @@ const GAITS = [
   { motion: IllidanLocomotion.dash, gait: "run", speed: (physics: { dashSpeed: number; groundSpeedCap: number }) => min(physics.dashSpeed, physics.groundSpeedCap) },
 ] as const;
 const FLOATERS: readonly Character[] = [Character.firelord, Character.ladyVashj];
-const OWN_GAIT: readonly Character[] = [Character.demonHunter];
 const FOOT_SLIDE_TOLERANCE = 0.15;
 const MAIEV_STOCK_WALK = 2, MAIEV_AUTHORED_RUN = 78;
+const ILLIDAN_STOCK_WALK = 119, ILLIDAN_STOCK_RUN = 120;
 
-test("each grounded fighter's walk, run and dash play the clip its stride was measured on at ground speed over that stride, feet within 15% of the body, and Maiev walks on her authored run while her run and dash play the stock Walk [k3 measure docs/fighter-motion.md]", () => {
-  for (const character of SELECTABLE_CHARACTERS.filter((candidate) => !FLOATERS.includes(candidate) && !OWN_GAIT.includes(candidate))) {
+test("each grounded fighter's walk, run and dash play the clip its stride was measured on at ground speed over that stride, feet within 15% of the body, and Maiev walks on her authored run while her run and dash play the stock Walk, and Illidan runs and dashes on his stock Locomotion Run [k3 measure docs/fighter-motion.md]", () => {
+  for (const character of SELECTABLE_CHARACTERS.filter((candidate) => !FLOATERS.includes(candidate))) {
     const fighter = createFighter(character, 0.0, 1);
     for (const { motion, gait, speed } of GAITS) {
       fighter.motion.vx = speed(fighter.tuning.physics);
@@ -32,5 +32,6 @@ test("each grounded fighter's walk, run and dash play the clip its stride was me
     }
   }
 
+  expect(GAITS.map(({ motion }) => groundLocomotionClip(Character.demonHunter, motion)?.index)).toEqual([ILLIDAN_STOCK_WALK, ILLIDAN_STOCK_RUN, ILLIDAN_STOCK_RUN]);
   expect(GAITS.map(({ motion }) => groundLocomotionClip(Character.warden, motion)?.index)).toEqual([MAIEV_AUTHORED_RUN, MAIEV_STOCK_WALK, MAIEV_STOCK_WALK]);
 });
