@@ -1,6 +1,6 @@
 {
  "rifleman": {
-  "body": "RiflemanTimelineBody-8b9750ab541fbd830e11ddfdd28a26778c232b83594fac339d7b411ef5b5ff97.mdx",
+  "body": "RiflemanTimelineBody-3dea506bda110ebb3379e3302ba5ae54452df5cf698708116518670a5499a619.mdx",
   "fading": []
  },
  "demonHunter": {
@@ -11,19 +11,19 @@
   ]
  },
  "blademaster": {
-  "body": "BlademasterTimelineBody-531ae4050660ca681299f115fa2583494885d9302762126f02132a2edb54aef8.mdx",
+  "body": "BlademasterTimelineBody-4597aff63a912fa16b9866a11bb772c91cc551a41716d20c3e0ea337e1d61137.mdx",
   "fading": [
    72
   ]
  },
  "mountainKing": {
-  "body": "MountainKingTimelineBody-64e9794c355ecfec55fc77081dc60387d911bf7d957b476dbb7f44274e490b41.mdx",
+  "body": "MountainKingTimelineBody-a311bad28ca20c5c609ccddd36da157fc6e98450782f8ce5bba3fe3af9dbd19f.mdx",
   "fading": [
    11
   ]
  },
  "warden": {
-  "body": "WardenTimelineBody-4c61afd9707e2b774cfa41882be978804bd852072fc77872725900129a77a5b4.mdx",
+  "body": "WardenTimelineBody-434f5d0e3c58752b048606a03dc64d21ed7bd4a36c670ebcb579f2e7ac98caad.mdx",
   "fading": [
    8,
    38,
@@ -31,18 +31,18 @@
   ]
  },
  "lich": {
-  "body": "LichTimelineBody-64504e06a7d36eb8d0f9f2c9c5f3f03adc59d931c9af4bebd315856826be732f.mdx",
+  "body": "LichTimelineBody-0e37e2e958b404fe59a3762bb2460e4ab81785931894345116d453561c07c8cd.mdx",
   "fading": [
    7,
    9
   ]
  },
  "dreadlord": {
-  "body": "DreadlordTimelineBody-717fe194ab5ae5c974aee2a506831f38f11c7e40a86ad27d19eff1af55dfec3f.mdx",
+  "body": "DreadlordTimelineBody-fed1a8064d766dcf058ade3bbc0e8a9d11d61272c61aabb7af47e447c36ba6e8.mdx",
   "fading": []
  },
  "shadowHunter": {
-  "body": "ShadowHunterTimelineBody-08dcf1551fb9a1f28780b9b7816ccc7bc382b79e0c7548ab3f423e3adf12b636.mdx",
+  "body": "ShadowHunterTimelineBody-7337b5de5de2484301752dadfaf78ffa0c6edf396dd9fd8667334d4aac1703c1.mdx",
   "fading": [
    10,
    11,
@@ -50,7 +50,7 @@
   ]
  },
  "pitLord": {
-  "body": "PitLordTimelineBody-453234a7b010231c9504829d7e3b4d56365929f0c2ffe24c0ec7eaa71549601c.mdx",
+  "body": "PitLordTimelineBody-8d6bfe98d3543da65ed70136e338e857eec3bd1910b42d970aa341333822d4cc.mdx",
   "fading": [
    9,
    10,
@@ -60,7 +60,7 @@
   ]
  },
  "beastmaster": {
-  "body": "BeastmasterTimelineBody-ae5ba6794ff69129a9a7569ffd29c8b49d893a77b494f42d69729dde16888eac.mdx",
+  "body": "BeastmasterTimelineBody-bf9e7939bb0c8d7a858e7eadafd0644f25c9ecb475ac3e48665f1db2147931d8.mdx",
   "fading": [
    8,
    62
@@ -162,7 +162,7 @@
   ]
  },
  "archimonde": {
-  "body": "ArchimondeTimelineBody-25e372905b745d5622648ddefba76b0e12efee35514056852667eac46d05cb99.mdx",
+  "body": "ArchimondeTimelineBody-8201b27e28fe062508c8a04739bdae2bf5dab57e3ad7d5433e82814f0bb8446b.mdx",
   "fading": [
    5
   ]
