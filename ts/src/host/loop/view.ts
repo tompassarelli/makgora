@@ -1,4 +1,5 @@
 import { DEFAULT_FIGHTER } from "../../game/roster/kits";
+import { announcePlaying } from "./nativePlaying";
 import { leadsDuo } from "../../game/sim/duoStatus";
 import { partnerOwner } from "../../game/sim/duoOwner";
 import { presentDrawnBody } from "./fighterDrawView";
@@ -597,6 +598,7 @@ const shownMessages: { frames: object | undefined; helpVisible: boolean | undefi
 };
 
 export function renderUi(s: ShellState): void {
+  announcePlaying(s);
   if (resumePresentationHeld(s)) return;
   const { game } = s;
   const ui = views(s);

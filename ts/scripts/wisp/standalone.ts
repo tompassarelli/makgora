@@ -14,6 +14,7 @@ import { fighterAt, isActive } from "../../src/game/sim/roster";
 import { Character } from "../../src/game/sim/codes";
 import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
+import { preloadModels } from "../../src/game/presentation/stagePreload";
 import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "./headless";
 import { deliverKey } from "./deliverKey";
 import { headlessRender, playerRender } from "./headlessRender";
@@ -174,7 +175,7 @@ export async function createStandaloneSession(options: { readonly script?: strin
 
 export const smashcraftStandalone = (render: StandaloneGame["render"]): StandaloneGame => ({
   title: "Smashcraft",
-  render: { ...render, preloadModels: ["Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdx"] },
+  render: { ...render, preloadModels: [...preloadModels(), "Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdx"] },
   create: createStandaloneSession,
   net: { mapHash: smashcraftMapHash, create: createNetStandalone },
 });
