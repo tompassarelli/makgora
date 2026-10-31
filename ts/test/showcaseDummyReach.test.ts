@@ -106,7 +106,7 @@ test("Lady Vashj's back air stages the dummy behind her, on the side its hit lau
 });
 
 
-test("Lady Vashj's trail is drawn at least 0.9 large, the size that shows beside the hit spark, and her gaze beams drift apart into a cone with the trail drawn the same size [k2 property]", () => {
+test("Lady Vashj's trail is at least 0.9 large, her gaze beams drift both ways and the projectile art draws the trail at the cue's size and frame [k2 property]", () => {
   const cue = DISJOINT_CUES[vashj];
   expect(cue?.scale).toBeGreaterThanOrEqual(Math.fround(0.9));
   expect(PROJECTILE_DRAW_CUES[VASHJ_TRAIL_MODEL]?.scale).toBe(cue?.scale);
