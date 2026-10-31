@@ -5,7 +5,7 @@ name: Player build
 on:
   workflow_dispatch:
   push:
-    branches: ["main", "sc-807-**"]
+    branches: ["main"]
     paths: ["ts/scripts/player*.ts", "ts/scripts/wisp/**", "ts/src/**", "tools/player/**", ".github/workflows/player.yml", "map-version", "ts/wisp.lock", "ts/vendor/**"]
 
 permissions:
