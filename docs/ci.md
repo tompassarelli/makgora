@@ -294,11 +294,12 @@ its own; a new test runs on its name's hash shard until its first measurement.
 Everything runs from source: no private build inputs, no `.w3x` build.
 Runner placement comes from the reviewed `ts/runner-routing.json` file and one
 script, `ts/scripts/runnerRoute.ts`, which the workflow revision's own plan or
-`route` job runs. Trusted premerge jobs (Autoland's reports, farm-test's check groups
-except perf, CI's filtered checks and development loop) take the self-hosted `farm-big` runners by default and fall back to
+`route` job runs. Trusted premerge jobs (Autoland's reports and farm-test's check groups
+except perf) take the self-hosted `farm-big` runners by default and fall back to
 `ubuntu-latest` when the farm is full. The background class (Balance and Background sweeps) is set to `ubuntu-latest`
 since 2026-11-01: those jobs need no GPU, client or private input, Balance sizes its shard count to the hosted slots
 Autoland and Farm test leave free, and on gex45 they had filled the farm while leased agent builds queued 18 to 23 deep.
+CI's post-landing filtered-checks and development-loop jobs gate nothing and run on `ubuntu-latest` since 2026-11-01: on the farm the development loop hit its 20-minute timeout in 12 of 13 runs (mean 1223 s) and filtered-checks took 1224 s on average, against 483 s and 263 s on hosted runners.
 For a farm class: the script counts the repository's
 unfinished jobs asking for the `farm-big` label (the runners API needs an
 admin token the workflow lacks) and picks the farm only while the idle count,
