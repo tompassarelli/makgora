@@ -54,3 +54,7 @@ The throne is a dark high-backed chair on the spire's dais, centred behind the d
 - `matrixScale` order for these floes is depth, lateral, height (lateral is the second entry).
 - Checks: `bun tools/stage/contrast.ts --stock-light 2` passes; `headlessSeparation.ts` reports the same negative band gap as before the change on every row, and a smaller one on all twelve rows compared (it fails on origin/main too and is not the landing gate).
 - Captures: before and after, both pair orders, in the Wisp native window and the headless renderer under `~/.local/state/smashcraft/shots/ft-throne/`.
+
+## Stair in-game capture (#897)
+
+The restored stair was captured in a real Warcraft III pool pair at near match zoom, Shadow Hunter first and Chen Stormstout first, on the checkout's development map (31 Oct 2026; `bun wisp accept --only '897-*' --pair K --map STAGED.w3x`, frames in `~/.local/state/smashcraft/shots/ft-stair-ingame/` on gex45). One cold viewer in a fresh session saw the ice tiers rising from the deck's back edge to the throne block but called the link weak (the tiers meet the throne base without a landing, and two thin floating ice slivers connect to nothing), and said the fighters are not the clearest shapes: the cyan crystals behind the throne, the two skull braziers and the arch are brighter than the small, low fighters. The fighters-first half of the box is open.
