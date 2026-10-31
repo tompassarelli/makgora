@@ -592,3 +592,18 @@ probes, using at most eight hosted jobs at once. The final table prints panel,
 diversity, depth, declared path, ceiling and headroom pass/fail verdicts. Missing
 samples fail completeness; no kit is retuned by the measurement. The profile
 runner reports actual process CPU (user plus system) for production matches.
+
+## Projectile spam cooldowns (2026-10-31, #789)
+
+An Expert that only shields or never attacks lost every match to Sylvanas's
+Black Arrow spam (96 of 96), so no Expert choice was the answer and the move's
+rate was. A cooldown counts from the cast, so it cuts the spam rate while
+Expert's mixed play barely notices: Black Arrow 52 frames, Frost Nova 46 and
+Flame Strike 72. Between main 4bc5834452 (run 41172461896) and the candidate
+(run 41173676469) the probe moved Sylvanas 78.8% to 16.1%, Lich 54.2% to 27.7%
+and Kael'thas 26.7% to 26.5%, and Butcher stayed at 11.0%. Frost Nova's
+cooldown also delays its press-again burst, so keep it close to the 41-frame
+cast. The refit of Sylvanas's bow (61a1934ec7) took forward smash from 142 to
+76 reach, so its radius and the dash attack's go from 8 to 34, forward tilt's
+to 26, and each loses 3 recovery frames. Her field rose from 20.6% to 32.4%,
+and her damage stays put because a raise breaks the kill-percent lock.
