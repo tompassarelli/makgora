@@ -310,7 +310,7 @@ unshaded materials; the three stock skies preserve their stock animation.
 | Stage | Key / fill RGB; intensity | Sky | Distance fog start–end; RGB |
 | --- | --- | --- | --- |
 | Sky Deck | 255,255,255 / 214,214,250; 1 | Original neutral sky | 6,000–12,000; 0.6875,0.8125,0.9375 |
-| Frozen Throne | 226,240,255 / 150,172,220; 1.25 | Original glacier sky | 5,000–11,000; 0.375,0.625,0.875 |
+| Frozen Throne | 226,240,255 / 150,172,220; 1.25 | Original glacier sky | 5,000–11,000; 0.15625,0.28125,0.453125 (#875) |
 | Nordrassil | 236,246,232 / 136,178,172; 1 | Stock FelwoodSky aurora | 5,500–11,000; 0.25,0.5,0.375 |
 | Gryphon Aerie | 255,248,226 / 164,182,220; 0.2 | Original mountain sky | 5,500–11,500; 0.25,0.375,0.5 |
 | Durotar Skies | 255,226,180 / 190,152,134; 0.3 | Original dusty sky | 5,000–11,000; 0.75,0.5,0.25 |
@@ -1226,3 +1226,16 @@ and 900; both stop at least 1,550 units behind the fighting band. Their slow
 1,600/2,100 ms loops follow stage-art rule 8. One casts shadows. The models
 reuse Blackrock's two shipped light-only models: zero new imported bytes.
 ST-2's roofs and brick surfaces are the separate #276 material work.
+
+## Frozen Throne contrast (#875)
+
+Native Classic captures on gex45 at match tick 700, taken with the fog at 0.15, 0.28, 0.45 before it was set to the nearest exact 32-bit fractions that now ship (Shadow Hunter against Chen Stormstout, both orders, near and far zoom; `tools/stage/contrast.ts`, one scene, backdrop and mask run each). Dimming the crystals, stair, side ledges, arch and glaciers, pushing the gothic towers out to |x| 2500 to 2900, tinting the floor deep navy and darkening the distance fog (the native window takes its sky from the fog) gave:
+
+| View (pair order) | Fighter L\* | Ring L\* before → after | Fighter minus ring before → after | Worst separation gap before → after |
+| --- | --- | --- | --- | --- |
+| near (Shadow Hunter first) | 34.3 → 33.6 | 33.6 → 22.5 | +0.7 → +11.1 | -43.1 → -15.7 |
+| near (Chen first) | 33.9 → 33.1 | 35.5 → 24.7 | -1.6 → +8.4 | -41.7 → -19.0 |
+| far (Shadow Hunter first) | 36.4 → 34.6 | 42.5 → 27.9 | -6.1 → +6.7 | -41.9 → -18.3 |
+| far (Chen first) | 35.6 → 34.3 | 43.4 → 28.6 | -7.8 → +5.7 | -40.6 → -21.6 |
+
+Every view now draws both fighters brighter than the ring around them. The separation check (`--separation`, limit 0, not loosened) still fails: the backdrop behind each fighter keeps a 75th percentile of L\* 29 to 41 against fighters' lower quartile of 19 to 28, because the dark halves of Rokhan and Chen sit below the stair and spire. The next lever is the pale spire and stair.

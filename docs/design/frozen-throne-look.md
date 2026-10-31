@@ -12,7 +12,7 @@ Take one of the Frozen Throne remake (Tom, 2026-10-31). Layout, collision and pl
 
 ## Composition
 
-Palette: near-black teal sky, steel-blue ice, one cyan glow behind the stair, dark saronite for towers and pillars. Backdrop layers stay darker and lower in contrast than the fighters (stage-art rules 14 to 16); the only bright element is the crystal glow, tinted down to about 60% so fighters stay the brightest shapes on the play plane.
+Palette: near-black teal sky, steel-blue ice, one cyan glow behind the stair, dark saronite for towers and pillars. Backdrop layers stay darker and lower in contrast than the fighters (stage-art rules 14 to 16); the crystals, stair and side ledges sit below fighter brightness (#875), so fighters stay the brightest shapes on the play plane.
 
 Layer order, back to front:
 
@@ -21,11 +21,13 @@ Layer order, back to front:
 3. Throne spire: ten stock ice floes stacked and narrowing from dark at the foot to pale at the top (y 2100, z -420 to 262), crowned by an `IceCrownObelisk` seat between two `IceTorch` pylons at z 300; the foot hides behind the deck and the colour climbs from near-black teal to pale ice so the lit seat is the first thing the eye reaches.
 4. Great arch: one huge `IC_IceArch` at y 4800 framing the spire.
 5. Far ice spires: Glacier2 and Glacier5 stretched tall, left and right.
-6. Stair: five stacked stock ice floes narrowing upward, a plain stepped snow ramp, centred at y 1400 to 1520.
+6. Stair: five stacked stock ice floes narrowing upward, a plain stepped snow ramp, centred at y 1400 to 1520, tinted to a mid steel-blue (#875).
 7. Stair pillars: two `IceTorch` towers flanking the stair head.
 8. Crystal clusters: eight `Icecrown_Crystal3` either side of the stair, tinted cyan.
-9. Gothic towers: `IceCrownObelisk` and `IceCrownPillar` pairs at x of 1550 to 2000, dark.
-10. Floor: the existing dark ground under the deck.
+9. Gothic towers: `IceCrownObelisk` and `IceCrownPillar` pairs at x of 2500 to 2900, dark, pushed clear of the deck ends (#875).
+10. Floor: the existing ground under the deck, tinted deep navy so it is not a flat grey field (#875). The native window takes the sky from the distance fog, so the fog is a deep blue (0.15625, 0.28125, 0.453125) that keeps the sky quiet behind the fighters.
+
+The two side ledges are the same stock ice floe tinted steel-blue (`stockPlatforms.ts`), not the untinted white the first takes drew.
 
 ## Element map
 

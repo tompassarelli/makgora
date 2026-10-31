@@ -15,10 +15,13 @@ export interface PlatformPart {
   readonly scale: readonly [x: number, y: number, z: number];
 
   readonly yaw: number;
+
+  readonly color: readonly [red: number, green: number, blue: number];
 }
 
 const ICE_FLOE = "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx";
-const part = (model: string, x: number, y: number, z: number, scale: readonly [number, number, number], yaw = 0.0): PlatformPart => ({ model, x, y, z, scale, yaw });
+const part = (model: string, x: number, y: number, z: number, scale: readonly [number, number, number], yaw = 0.0, color: readonly [number, number, number] = [255, 255, 255]): PlatformPart => ({ model, x, y, z, scale, yaw, color });
+const LEDGE_ICE: readonly [number, number, number] = [80, 100, 124];
 
 
 
@@ -29,9 +32,9 @@ const part = (model: string, x: number, y: number, z: number, scale: readonly [n
 const FLOE: readonly [number, number, number] = [f32(1.43), 0.5, f32(0.19)];
 const FLOE_Z = f32(-8.7);
 const FROZEN_THRONE_PLATFORMS: readonly (readonly PlatformPart[])[] = [
-  [part(ICE_FLOE, f32(-1.5), 0, FLOE_Z, FLOE)],
-  [part(ICE_FLOE, f32(1.5), 0, FLOE_Z, FLOE, 180)],
-  [part(ICE_FLOE, f32(-1.5), 0, FLOE_Z, FLOE)],
+  [part(ICE_FLOE, f32(-1.5), 0, FLOE_Z, FLOE, 0, LEDGE_ICE)],
+  [part(ICE_FLOE, f32(1.5), 0, FLOE_Z, FLOE, 180, LEDGE_ICE)],
+  [part(ICE_FLOE, f32(-1.5), 0, FLOE_Z, FLOE, 0, LEDGE_ICE)],
 ];
 
 

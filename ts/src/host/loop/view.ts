@@ -155,6 +155,7 @@ function placePart(deck: effect, part: Readonly<PlatformPart>, x: number, y: num
   // Native yaw discards an earlier matrix scale (0.0.103 drew Frozen Throne's floes unsquashed), so the scale goes last.
   setEffectYaw(deck, part.yaw * (Math.PI / 180.0));
   setEffectMatrixScale(deck, part.scale[0], part.scale[1], part.scale[2]);
+  setEffectColor(deck, part.color[0], part.color[1], part.color[2]);
 }
 
 
