@@ -1,4 +1,4 @@
-import { copyFileSync, mkdtempSync, rmSync } from "node:fs";
+import { copyFileSync, mkdtempSync, rmSync, utimesSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
@@ -18,8 +18,9 @@ const workingTree = (cwd: string) => Effect.acquireUseRelease(
   Effect.try({ try: () => mkdtempSync(join(tmpdir(), "smashcraft-key-")), catch: (cause) => new MapBuildFailure({ operation: "make the key's scratch index", path: tmpdir(), cause }) }),
   (scratch) => Effect.gen(function*() {
     const index = join(scratch, "index");
+    // An index dated 1970 makes git treat every entry as racily clean and hash its file, so a same-size edit within one timestamp tick is still seen.
     const source = yield* git(cwd, ["rev-parse", "--path-format=absolute", "--git-path", "index"]);
-    yield* Effect.try({ try: () => copyFileSync(source, index), catch: (cause) => new MapBuildFailure({ operation: "copy the git index", path: source, cause }) });
+    yield* Effect.try({ try: () => { copyFileSync(source, index); utimesSync(index, 1, 1); }, catch: (cause) => new MapBuildFailure({ operation: "copy the git index", path: source, cause }) });
     yield* git(cwd, ["add", "--all", "."], { GIT_INDEX_FILE: index });
     return yield* git(cwd, ["write-tree"], { GIT_INDEX_FILE: index });
   }),

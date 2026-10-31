@@ -78,7 +78,7 @@ export const PEON_MOVES: FighterMoves = {
       peonHit(10.239999771118164, 40))),
     [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, axe(7, [[25.0, 75.0, 16.0, 119.0, 10.0], [25.0, 73.0, 20.0, 118.0, 10.0], [26.0, 72.0, 23.0, 117.0, 10.0], [26.0, 71.0, 26.0, 116.0, 10.0]], peonHit(8.192000389099121, 85, 68.94999694824219, 40.0))),
     [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, swing(6, [[74.0, 8.0], [74.0, 16.0], [66.0, 28.0]], 7.168000221252441, 70, 72.0, 45.0)),
-    [AttackStyle.dashAttack]: travelThrough(heroMove(DIVE_FIRST, SLIDE_LAST - DIVE_FIRST + 1, 19, 0, [
+    [AttackStyle.dashAttack]: travelThrough(heroMove(DIVE_FIRST, SLIDE_LAST - DIVE_FIRST + 1, 20, 0, [
       ...diveRegions(DIVE_FIRST, DIVE_CLEAN_LAST, DIVE, 4.0, 25.0, 104.0, 14.0),
       ...diveRegions(DIVE_CLEAN_LAST + 1, SLIDE_LAST, SLIDE, 20.0, 20.0, 116.0, 10.0),
     ], 150.0, true), SLIDE_LAST),
