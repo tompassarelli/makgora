@@ -262,7 +262,8 @@ function playerAssetsOf(playerAssetsOnly: boolean, map: string | undefined): { r
   return { playerAssets: { map } };
 }
 
-const NATIVE_GAME_MODULE = join(import.meta.dir, "nativeGame.ts");
+// a compiled player embeds its entrypoints as .js
+const NATIVE_GAME_MODULE = join(import.meta.dir, import.meta.path.endsWith(".ts") ? "nativeGame.ts" : "nativeGame.js");
 
 export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const { runStandalone, standaloneEmulatedCallsArgument, standaloneNetArguments, standaloneWindowArgument } = yield* Effect.tryPromise({ try: () => import("wisp/scripts/wisp/standalone"), catch: (cause) => new RenderFailure({ cause }) });
