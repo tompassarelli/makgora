@@ -310,7 +310,16 @@ and `/dev/uinput` jobs stay hosted because the farm image has none of them. The 
 dispatch input on Autoland, Farm test and Balance names the runner label for the
 trusted jobs in place of the choice: `-f farm-runner=ubuntu-latest` forces
 hosted runners, which is how to exercise the fallback. Background sweeps on main coalesce, whether pushed, dispatched or scheduled: a running sweep finishes, and a newer main replaces only the queued one, so the next run covers the newest main; runs on other refs never coalesce. Keep `capacity` equal to the number of
-smashcraft runners registered on gex45 (11). Planners read the workflow
+smashcraft runners registered on gex45 (11); the two on whiterabbit
+(paused while Tom's game runs, smashcraft:docs/commands/farm.md) take overflow
+and are not counted, so a paused laptop never leaves a planned job waiting.
+No workflow trigger an outsider controls can reach a `farm-big` runner: every
+farm-labelled job's `runs-on` either comes from a route job that `push`,
+`workflow_dispatch` and `schedule` events only can pick the farm in (a
+`pull_request` expression keeps `ubuntu-latest`), the workflows use no
+`pull_request_target`, `issue_comment`, `issues` or `repository_dispatch`
+trigger, push triggers need write access, and the repository's fork pull
+request approval policy is `all_external_contributors`. Planners read the workflow
 revision's file, so measuring an older commit or bisecting a failing shard
 does not depend on that old source containing current routing policy.
 

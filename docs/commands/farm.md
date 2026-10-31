@@ -74,3 +74,16 @@
   checks an extracted playable Lua bundle locally; its report names every match.
   Use the farm instead of a local cpuField or pad run: the repository is public, so the
   runners cost nothing, and this machine stays free.
+  The self-hosted `farm-big` runners live on two hosts: gex45 (11 smashcraft
+  runners, always on) and Tom's laptop whiterabbit (2 smashcraft runners of 4
+  CPUs and 8 GiB, the same rootless Podman image, one job per container, no
+  sudo and no access to his home or secrets). The laptop's runners pause while
+  its game reserve is on (`north capacity game-reserve`), its gaming hold is set
+  (`north capacity gaming`) or a Warcraft III client runs outside the agent and
+  native slices: idle runners stop within 10 seconds, a job already running
+  finishes, and the runners return when the signals clear. Both hosts take
+  the same `farm-big` jobs, so a job may land on either; nothing in a
+  workflow can name a host. Routing keeps counting only gex45's 11 runners
+  (`capacity` in ts/runner-routing.json), so a paused laptop never leaves a
+  planned job waiting. Both hosts come from the firn `farm-runners` module
+  (nixos-config:modules/farm-runners/default.nix).
