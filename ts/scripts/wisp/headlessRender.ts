@@ -10,6 +10,7 @@ import { mapCueModels } from "./cueModels";
 import type { Graphics, ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
 import { extractMapImports } from "wisp/scripts/wisp/mapImports";
 import { buildProject } from "./project";
+import { mapCommitMismatch } from "./mapBuildCommit";
 import { type RenderAssetOptions, renderAssetStore } from "./renderAssetStore";
 
 export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = mapCueModels()) {
@@ -37,6 +38,8 @@ export const playerRender = (map: string) => Effect.gen(function*() {
   const { packager } = buildProject();
   yield* ensurePackager(packager);
   const imports = yield* extractMapImports(map, packager);
+  const mismatch = yield* mapCommitMismatch(map, imports);
+  if (mismatch !== undefined) return yield* new MapBuildFailure({ operation: "match the map to this checkout", path: map, cause: mismatch });
   const { resolveAsset, readAsset } = renderAssetStore({ imports });
   return { ...arena(), resolveAsset, readAsset };
 });

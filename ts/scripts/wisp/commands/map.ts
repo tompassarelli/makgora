@@ -7,6 +7,7 @@ import { Console, Effect, Layer } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { type ArchiveEntry, type GeneratedFile, MapBuild, MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { runProcess } from "wisp/scripts/wisp/hostProcess";
+import { buildSentence } from "../mapBuildCommit";
 import { reuseOrBuild } from "wisp/scripts/wisp/mapReuse";
 import { checkoutInputs } from "../buildInputs";
 import { mapBuildKey } from "../mapBuildKey";
@@ -137,7 +138,7 @@ export const build: Command = (args) => Effect.gen(function*() {
       const checked = yield* checkCueModels(headlessRender({ assets: assets ?? declared.assets, imports })).pipe(step("cue models resolved"));
       yield* Console.log(`${checked} cue model resolutions passed`);
       if (inputsOnly) return yield* Console.log("map-build inputs passed; compilation and packaging skipped");
-      const compiled = MapBuild.use((maps) => maps.build({ ...map, base: base ?? declared.base, container: container ?? declared.container, ...(packager === undefined ? {} : { packager }), declaration: commit === undefined ? SMASHCRAFT_MAP : { ...SMASHCRAFT_MAP, description: `${SMASHCRAFT_MAP.description} Build ${commit}.` }, imports, objectData: generatedFiles() }));
+      const compiled = MapBuild.use((maps) => maps.build({ ...map, base: base ?? declared.base, container: container ?? declared.container, ...(packager === undefined ? {} : { packager }), declaration: commit === undefined ? SMASHCRAFT_MAP : { ...SMASHCRAFT_MAP, description: `${SMASHCRAFT_MAP.description} ${buildSentence(commit)}` }, imports, objectData: generatedFiles() }));
       yield* (process.env.WISP_MAP_REUSE === "off" ? compiled : mapBuildKey(projectRoot, buildArgs).pipe(Effect.flatMap((key) => reuseOrBuild({ key, out: map.out, build: compiled })))).pipe(Effect.andThen(checkMapSize(map.out, imports, bounded, edition)));
       if (predict) yield* writePlaytestCost(map.out).pipe(step("predict playtest Lua cost"));
     })),
