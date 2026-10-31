@@ -1,30 +1,3 @@
-import type { StrikeCapsule } from "../heroMoves";
-import type { HitEffect } from "../hitRegions";
-import type { AppliedStatus } from "../appliedStatus";
-
-export interface SpecialCompanion {
-  readonly behavior?: "sentry" | "flying" | undefined;
-  readonly followHeight?: number | undefined;
-  readonly lungeDrop?: number | undefined;
-  readonly volleyFrames?: readonly number[] | undefined;
-  readonly waveFrame?: number | undefined;
-  readonly engage?: number | undefined;
-  readonly followSpeed: number;
-  readonly followBehind: number;
-  readonly returnSpeed: number;
-  readonly lungeStartup: number;
-  readonly lungeActive: number;
-  readonly lungeRecovery: number;
-  readonly lungeTravel: number;
-  readonly bite: StrikeCapsule;
-  readonly biteEffect: HitEffect;
-  readonly biteStatus?: AppliedStatus | undefined;
-  readonly stunFrames: number;
-  readonly leash: number;
-  readonly leashFrames: number;
-  readonly body?: CompanionBody | undefined;
-}
-
 export interface CompanionBody {
   readonly weight: number;
   readonly gravity: number;
