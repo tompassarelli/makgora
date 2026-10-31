@@ -34,6 +34,10 @@ export const MATCH_HELP_BOX: TextBox = { left: f32(0.06), top: f32(0.54), width:
 
 export const MATCH_NOTICE_BOX: TextBox = { left: f32(0.06), top: f32(0.47), width: f32(0.34), height: f32(0.07) };
 
+export const MATCH_CLOCK_BOX: TextBox = { left: f32(0.252), top: f32(0.59), width: f32(0.264), height: f32(0.06) };
+
+export const MATCH_COUNTDOWN_BOX: TextBox = { left: f32(0.2), top: f32(0.41), width: f32(0.4), height: f32(0.14) };
+
 export const TRAINING_READOUT_BOX: TextBox = { left: f32(0.02), top: f32(0.48), width: f32(0.23), height: f32(0.08) };
 
 const READOUT_MARGIN = f32(0.004);

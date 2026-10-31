@@ -8,6 +8,7 @@ import { computerActive } from "../../game/lobby/lobbyState";
 
 import { itemBodyTint } from "../../game/presentation/itemLook";
 import { MATCH_HELP_BOX, MATCH_NOTICE_BOX } from "../../game/ui/hudLayout";
+import type { NoticePlace } from "../../game/ui/noticeLayout";
 import { CryDecision, createCryGate, cryStandIn, gateCry } from "../../game/presentation/hurtVoice";
 import { deckModel, slabScale } from "../../game/presentation/stagePreload";
 import { type PlatformPart, platformParts } from "../../game/presentation/stockPlatforms";
@@ -41,7 +42,7 @@ import { chatBox } from "../../game/ui/nativeChat";
 import { hideWarcraftChat } from "../../game/ui/warcraftChat";
 import { CANNON_MODEL, CANNON_MODEL_BASE, cannonWarned, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, PLATFORM_CUE_FRAMES, WIND_STREAK_COUNT, WIND_STREAK_MODEL, framesUntilPlatformMoves, hydraWarningX, hydraStrikeZ, lavaLook, windStreak } from "../../game/presentation/stageHazards";
 import { escapeMeterView, readEscapeMeter } from "../../game/presentation/escapeMeter";
-import { presentFighterMarkers } from "./fighterMarkers";
+import { keepNoticeClearOfMarkers, presentFighterMarkers } from "./fighterMarkers";
 import { drawnScale, lavaPiece } from "../../game/presentation/stageScenery";
 import { hasLava, lavaSide } from "../../game/sim/lava";
 import type { Fighter } from "../../game/sim/fighter";
@@ -590,8 +591,8 @@ const ESCAPING = [false, false, false, false];
 const BUBBLE_POINT: ScreenPoint = { column: 0.0, row: 0.0 };
 const METER_POINT: ScreenPoint = { column: 0.0, row: 0.0 };
 
-const shownMessages: { frames: object | undefined; helpVisible: boolean | undefined; noticeVisible: boolean | undefined; help: string | undefined; notice: string | undefined } = {
-  frames: undefined, helpVisible: undefined, noticeVisible: undefined, help: undefined, notice: undefined,
+const shownMessages: { frames: object | undefined; helpVisible: boolean | undefined; noticeVisible: boolean | undefined; help: string | undefined; notice: string | undefined; noticePlace: NoticePlace } = {
+  frames: undefined, helpVisible: undefined, noticeVisible: undefined, help: undefined, notice: undefined, noticePlace: { left: MATCH_NOTICE_BOX.left, top: MATCH_NOTICE_BOX.top },
 };
 
 export function renderUi(s: ShellState): void {
@@ -638,6 +639,8 @@ export function renderUi(s: ShellState): void {
     shownMessages.noticeVisible = undefined;
     shownMessages.help = undefined;
     shownMessages.notice = undefined;
+    shownMessages.noticePlace.left = MATCH_NOTICE_BOX.left;
+    shownMessages.noticePlace.top = MATCH_NOTICE_BOX.top;
   }
   const teaching = game.phase === Phase.match && game.training && s.trainingHints === true && !paused;
   const helpVisible = showMatch && teaching;
@@ -652,6 +655,7 @@ export function renderUi(s: ShellState): void {
     shownMessages.noticeVisible = noticeVisible;
     BlzFrameSetVisible(notice, noticeVisible);
   }
+  keepNoticeClearOfMarkers(notice, noticeVisible, shownMessages.noticePlace);
   if (!selecting) {
     if (game.phase === Phase.result) ui.results.update(resultNotice(game, s.status.text).replace("\n", "  ·  "), matchHelp(game, s.session.paused, startControl(s), localFighter, false), resultChoicesOpen(game) && local !== undefined ? s.resultFocus?.[local] ?? DEFAULT_RESULT_PICK : undefined);
     const helpText = matchHelp(game, s.session.paused, startControl(s), localFighter, game.phase === Phase.match);

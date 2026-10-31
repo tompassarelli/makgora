@@ -8,6 +8,7 @@ import type { MatchCamera } from "../../game/sim/matchCamera";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { partnerOwner } from "../../game/sim/duoOwner";
 import { MARKER_CLEARANCE, spreadMarkers } from "../../game/ui/fighterMarker";
+import { type NoticePlace, clearNoticePlace } from "../../game/ui/noticeLayout";
 import { unitsForPixels } from "../../game/ui/portraitFrames";
 import { pauseHudHidden } from "./pauseCamera";
 import { presentedMatch } from "./presentedMatch";
@@ -39,4 +40,9 @@ export function presentFighterMarkers(s: ShellState, framing: Readonly<MatchCame
     const owner = partnerOwner(fighter, slot);
     views(s).markers[slot].update(SHOWN[slot] === true, fighterColor(game, owner), humanFighterActive(game, slot), owner !== slot, fighter?.status.damage ?? 0.0, X[slot] ?? 0.0, Y[slot] ?? 0.0);
   }
+}
+
+
+export function keepNoticeClearOfMarkers(notice: framehandle, visible: boolean, place: NoticePlace): void {
+  if (visible && clearNoticePlace(place, X, Y, SHOWN)) BlzFrameSetAbsPoint(notice, FRAMEPOINT_TOPLEFT, place.left, place.top);
 }
