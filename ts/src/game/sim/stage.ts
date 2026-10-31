@@ -224,10 +224,11 @@ const FROZEN_THRONE_DECKS = [MAIN_DECK,
   fixed(175.0, 505.0, melee(27.200000762939453), true),
   fixed(-165.0, 165.0, melee(54.400001525878906), true),
 ];
+export const NORDRASSIL_TOP_PLATFORM_Z = melee(51.5);
 const NORDRASSIL_DECKS = [MAIN_DECK,
   fixed(-490.0, -310.0, melee(30.0), true),
   fixed(310.0, 490.0, melee(30.0), true),
-  fixed(-114.0, 114.0, melee(51.5), true),
+  fixed(-114.0, 114.0, NORDRASSIL_TOP_PLATFORM_Z, true),
 ];
 const GRYPHON_DECKS = [MAIN_DECK,
   fixed(-480.0, -291.0, melee(23.5), true),

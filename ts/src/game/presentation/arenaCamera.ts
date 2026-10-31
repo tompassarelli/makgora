@@ -7,7 +7,7 @@ import { copyMatchCamera, createMatchCamera, limitCamera, MATCH_CAMERA_ASPECT, t
 import { arctangentDegrees } from "../sim/mathTables";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt } from "../sim/stage";
 import { stageBounds } from "../sim/stageBounds";
-import { TOMB_OF_SARGERAS_STAGE } from "../sim/stage";
+import { NORDRASSIL_TOP_PLATFORM_Z, TOMB_OF_SARGERAS_STAGE, WIND_TEST_STAGE } from "../sim/stage";
 
 
 export const FLOOR_HEIGHT = 1800.0;
@@ -64,8 +64,17 @@ export function cameraFieldOfView(camera: Readonly<MatchCamera>, aspect: number)
   return f32(2.0 * arctangentDegrees(f32(camera.tangent * aspect)));
 }
 
+const CLOCK_CLEAR_ROW = f32(0.12);
+
+function clearClock(camera: MatchCamera, platformZ: number): void {
+  const reach = (0.5 - CLOCK_CLEAR_ROW) * 2.0 * camera.tangent;
+  const below = reach * camera.distance / (0.9848077297210693 + reach * 0.1736481785774231);
+  camera.z = Math.max(camera.z, platformZ - below);
+}
+
 export function finalCamera(camera: MatchCamera, stage: number): void {
   if (stage === TOMB_OF_SARGERAS_STAGE) camera.z = Math.max(camera.z, 80.0 - camera.distance * 0.1736481785774231);
+  if (stage === WIND_TEST_STAGE) clearClock(camera, NORDRASSIL_TOP_PLATFORM_Z);
 }
 
 
