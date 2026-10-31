@@ -10,6 +10,7 @@ import { ASSET_FAMILIES, FETCH_HINT, type Family, INPUTS_STORE, type Manifest, t
 import { reforgedStorage } from "./renderAssetStore";
 import { STEP_TOOLS, type StepName, stepCode } from "./fighterArtCode";
 import { cachedSteps, sha256, stepKeys } from "./fighterArtPlan";
+import { withLocks } from "./fileLock";
 import { SHARED_SHARD, shardFiles } from "./inputShards";
 import { MODEL_FACTS_DIRECTORY, modelFactsFile, writeGenerated } from "./modelFactsTable";
 import { projectRoot } from "./project";
@@ -138,6 +139,25 @@ const runTool = (fighter: Fighter, step: Step, work: Work) =>
 
 export interface FighterPlan { readonly fighter: Fighter; readonly keys: readonly string[]; readonly cached: number; readonly sourceBytes: number }
 
+const stepStored = (index: number, key: string) => existsSync(join(DERIVED_STORE, STEPS[index]!.name, key));
+
+const LOCK_HOLDER = "SMASHCRAFT_DERIVE_LOCK_HOLDER";
+
+export const withStepLocks = <A, E, R>(plans: readonly FighterPlan[], rebuild: boolean, use: (plans: readonly FighterPlan[]) => Effect.Effect<A, E, R>) => {
+  if (process.env[LOCK_HOLDER] !== undefined) return use(plans);
+  const locks = plans.flatMap(({ fighter, keys, cached }) => keys.slice(cached).map((key, offset) => {
+    const step = STEPS[cached + offset]!.name;
+    return { path: join(DERIVED_STORE, ".locks", `${step}-${key}`), waiting: `waiting for another derive running ${fighter.name} ${step} (input hash ${key.slice(0, 12)})` };
+  }));
+  return withLocks(locks, Effect.suspend(() => {
+    const fresh = plans.map((plan) => ({ ...plan, cached: cachedSteps(plan.keys, stepStored, rebuild) }));
+    for (const [index, plan] of fresh.entries()) for (let step = plans[index]!.cached; step < plan.cached; step++)
+      console.log(`${plan.fighter.name} ${STEPS[step]!.name}: cache hit on input hash ${plan.keys[step]!.slice(0, 12)}, stored by another derive`);
+    process.env[LOCK_HOLDER] = String(process.pid);
+    return use(fresh);
+  }));
+};
+
 export const planFighters = (names: readonly string[], rebuild: boolean) => Effect.gen(function*() {
   const manifest = yield* readManifest();
   const unstored = unstoredPins(manifest, ASSET_FAMILIES);
@@ -156,7 +176,7 @@ export const planFighters = (names: readonly string[], rebuild: boolean) => Effe
       const bytes = await Bun.file(join(assets, fighter.source)).bytes(), source = sha256(bytes);
       const rules = readFileSync(join(projectRoot, RULES, `${fighter.slug}.ts`)), external = sha256(shared, ...heroShards(manifest[HERO_MODELS], fighter));
       const keys = stepKeys({ steps: STEPS.map((step) => step.name), code, fighter: fighter.name, source, external, rules });
-      const cached = cachedSteps(keys, (index, key) => existsSync(join(DERIVED_STORE, STEPS[index]!.name, key)), rebuild);
+      const cached = cachedSteps(keys, stepStored, rebuild);
       return { fighter, keys, cached, sourceBytes: bytes.byteLength } satisfies FighterPlan;
     },
     catch: (cause) => failure("hash fighter source", join(assets, fighter.source), cause),

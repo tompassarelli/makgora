@@ -108,7 +108,11 @@ code:
    store/derived/STEP/KEY/, KEY hashing the fighter's source model and rules
    file, the step's source files and lockfiles, the earlier step's key and, after
    the export, the stock build and the hero-models and imported-models pins, so a
-   run redoes only the steps whose inputs changed. `--rebuild` ignores stored steps.
+   run redoes only the steps whose inputs changed. Before taking its lease, a
+   derive locks store/derived/.locks/STEP-KEY for every step it must run, so a
+   concurrent derive of the same inputs waits without a lease, logs a cache hit
+   on each step the first stored, and takes a lease only for what is still missing.
+   `--rebuild` ignores stored steps.
    The steps run in a scratch copy of the checkout, and only the derive writes
    their differences back; `--check` writes nothing and fails, listing them, when
    any pin or generated file differs or a fighter's rules drift from the game

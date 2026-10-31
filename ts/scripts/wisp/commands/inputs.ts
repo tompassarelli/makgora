@@ -8,7 +8,7 @@ import { Effect } from "effect";
 import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { runAdmitted } from "../../heavyCapacity";
-import { DERIVED_PATHS, buildFighterArt, planFighters } from "../fighterArt";
+import { DERIVED_PATHS, buildFighterArt, planFighters, withStepLocks } from "../fighterArt";
 import { deriveAdmission } from "../fighterArtPlan";
 import * as fighterArtData from "../../../codegen/fighterArtData";
 import { syncGenerated } from "../../../codegen/sync";
@@ -64,12 +64,14 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
   const rules = yield* Effect.try({ try: () => syncGenerated(fighterArtData.producers(), [fighterArtData.rulesDirectory], check), catch: (cause) => new MapBuildFailure({ operation: "render fighter rules", path: fighterArtData.rulesDirectory, cause: String(cause) }) });
   if (check && rules.length > 0) return yield* new UsageFailure({ problem: `fighter rules drift from the game data; run bun run generate in ts/ and commit: ${rules.join(", ")}` });
   if (rules.length > 0) console.log(`regenerated ${rules.join(", ")}`);
-  const { manifest, assets, plans } = yield* planFighters(names, rebuild);
-  const steps = plans.reduce((sum, plan) => sum + plan.keys.length - plan.cached, 0);
-  const admission = deriveAdmission(plans);
-  console.log(`${plans.length} fighters: ${steps} steps to run, ${plans.reduce((sum, plan) => sum + plan.cached, 0)} reused`);
-  if (admission !== undefined) yield* Effect.promise(() => runAdmitted(admission.class, "smashcraft:inputs-derive", DERIVE_LEASE_SECONDS));
-  const differing = yield* buildFighterArt(plans, manifest, assets, admission?.jobs ?? 2, !check);
+  const { manifest, assets, plans: planned } = yield* planFighters(names, rebuild);
+  const { plans, differing } = yield* withStepLocks(planned, rebuild, (plans) => Effect.gen(function*() {
+    const steps = plans.reduce((sum, plan) => sum + plan.keys.length - plan.cached, 0);
+    const admission = deriveAdmission(plans);
+    console.log(`${plans.length} fighters: ${steps} steps to run, ${plans.reduce((sum, plan) => sum + plan.cached, 0)} reused`);
+    if (admission !== undefined) yield* Effect.promise(() => runAdmitted(admission.class, "smashcraft:inputs-derive", DERIVE_LEASE_SECONDS));
+    return { plans, differing: yield* buildFighterArt(plans, manifest, assets, admission?.jobs ?? 2, !check) };
+  }));
   if (!check) return;
   const characters = plans.map(({ fighter }) => fighter.character);
   const measured = yield* Effect.tryPromise({
