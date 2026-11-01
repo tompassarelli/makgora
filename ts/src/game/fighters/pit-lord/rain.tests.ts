@@ -13,6 +13,7 @@ import { createFighter, type Fighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { fighterAt } from "../../sim/roster";
 import { HERO_REFERENCE_HEIGHT } from "../../sim/heroMoves";
+import { floorBelow, surfaceLeft, surfaceRight, surfaceZ } from "../../sim/stage";
 import { METEOR_HIT, RAIN_CHANNEL, RAIN_END, RAIN_LANDINGS } from "./specials";
 
 const WAVE = RAIN_CHANNEL.last - RAIN_CHANNEL.first + 1;
@@ -149,4 +150,57 @@ test("A rollback replays a held, a released and an interrupted Rain of Fire chan
   }
   const interrupted = replayFrom(70.0, RAIN_CHANNEL.first, replayPress(400), foeJabs(RAIN_CHANNEL.first + 6));
   assertEquals(interrupted.replayed, interrupted.expected, "interrupted");
+});
+
+const FIRE_BURST = "FireLordDeathExplode";
+
+function standOn(d: Duel, stage: number, surface: number, x: number, facing: number): void {
+  const z = surfaceZ(stage, surface, 0);
+  d.state.match.stageChoice = stage;
+  d.pitLord.motion.x = x;
+  d.pitLord.motion.z = z;
+  d.pitLord.motion.vx = 0.0;
+  d.pitLord.motion.vz = 0.0;
+  d.pitLord.motion.grounded = true;
+  d.pitLord.motion.surface = surface;
+  d.pitLord.facing = facing;
+  setWorldMotionValue(d.pitLord.motion.meleeZ, z);
+  setWorldMotionValue(d.pitLord.motion.meleeVelocityZ, 0.0);
+}
+
+function impactHeights(d: Duel, stage: number): number[] {
+  const gaps: number[] = [];
+  const seen = new Set<number>();
+  const standingZ = d.pitLord.motion.z;
+  step(d, "press");
+  for (let frame = 1; frame < RAIN_END + 20 && d.pitLord.special.action === SpecialAction.heroDown; frame++) {
+    step(d, frame < RAIN_CHANNEL.first + 8 ? "hold" : "none");
+    d.pitLord.projectiles.forEach((p, index) => {
+      if (p.life <= 0 || p.spec?.model?.includes(FIRE_BURST) !== true || seen.has(index * 1000 + p.life)) return;
+      seen.add(index * 1000 + p.life);
+      const floor = floorBelow(stage, d.tick, p.x, standingZ);
+      gaps.push(floor === undefined ? Number.NaN : f32(p.z - floor));
+    });
+  }
+  return gaps;
+}
+
+test("Rain of Fire's impact burst and burning patch sit on the floor the meteors land on, on the main deck and on a platform, facing either way [k1 scenario]", () => {
+  const platform = { left: surfaceLeft(1, 1, 0), right: surfaceRight(1, 1, 0) };
+  const scenes: readonly (readonly [string, number, number, number, number])[] = [
+    ["main deck right", 0, 0, 0.0, 1],
+    ["main deck left", 0, 0, 0.0, -1],
+    ["platform centre", 1, 1, (platform.left + platform.right) / 2, 1],
+    ["platform right edge facing out", 1, 1, platform.right - 4.0, 1],
+    ["right platform left edge facing the gap", 1, 2, surfaceLeft(1, 2, 0) + 4.0, -1],
+  ];
+  const off: string[] = [];
+  for (const [name, stage, surface, x, facing] of scenes) {
+    const d = duel(-IN_RAIN * facing, Character.peon);
+    standOn(d, stage, surface, x, facing);
+    const gaps = impactHeights(d, stage);
+    assertGreaterThan(gaps.length, 0, `${name}: the meteors burst`);
+    for (const gap of gaps) if (!(Math.abs(gap) < 0.001)) off.push(`${name}: ${gap}`);
+  }
+  assertEquals(off.join("; "), "", "bursts off the floor");
 });

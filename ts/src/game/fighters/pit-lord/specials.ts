@@ -45,7 +45,7 @@ const METEOR_DRIFT = h(f32(0.1));
 const METEOR_SINK = h(f32(0.18));
 const METEOR_CLEARANCE = h(f32(0.2));
 export const METEOR_HIT = hit(f32(2.0), "LINK", 80, 1.0, HitElement.fire);
-const IMPACT = drawnOnly("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 0, 12, 0.0, 0.0, f32(1.6));
+const IMPACT = drawnOnly("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 0, 12, 0.0, f32(-METEOR_CLEARANCE), f32(1.6));
 export const RAIN_LANDINGS = [f32(1.7), f32(2.6), f32(2.15)] as const;
 const meteor = (wave: number, landing: number): SpecialProjectile => ({
   spawnFrame: RAIN_CHANNEL.first + wave, offsetX: f32(h(landing) - f32(METEOR_DRIFT * METEOR_FALL)), offsetZ: f32(METEOR_CLEARANCE + f32(METEOR_SINK * METEOR_FALL)),

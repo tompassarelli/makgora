@@ -91,10 +91,14 @@ function markX(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, stag
   return ledge === undefined ? x : f32(ledge - f32(facing * spec.ledgeInset));
 }
 
+const GROUNDED_FLOOR_SLOP = 1.0;
+
 function markBaseZ(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, stage: number, matchFrame: number, x: number): number {
-  if (spec.dropsToFloor !== true || owner.motion.grounded) return owner.motion.z;
+  if (spec.dropsToFloor !== true) return owner.motion.z;
+  const landingX = f32(x + f32(f32(owner.facing * spec.velocityX) * spec.life));
+  if (owner.motion.grounded) return floorBelow(stage, matchFrame, landingX, f32(owner.motion.z + GROUNDED_FLOOR_SLOP)) ?? owner.motion.z;
   const pastLedge = runningHeroSpecial(owner)?.needsFloorBelow === true ? floorBelow(stage, matchFrame, owner.motion.x, owner.motion.z) : undefined;
-  return floorBelow(stage, matchFrame, x, owner.motion.z) ?? pastLedge ?? owner.motion.z;
+  return floorBelow(stage, matchFrame, landingX, owner.motion.z) ?? pastLedge ?? owner.motion.z;
 }
 
 function riddenDeck(spec: Readonly<SpecialProjectile>, drawn: Readonly<Projectile> | undefined, stage: number, matchFrame: number, x: number, z: number): number | undefined {
