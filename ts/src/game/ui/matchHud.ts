@@ -18,6 +18,9 @@ import { attachOutline, createOutline, createTemplateOutline, destroyOutline, se
 import { unitsForPixels } from "./portraitFrames";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
+import {
+  CLOCK_DIGIT_SIZE, CLOCK_HUNDREDTHS_BOX, CLOCK_HUNDREDTHS_LEFT, CLOCK_HUNDREDTHS_SIZE, CLOCK_HUNDREDTHS_TOP, CLOCK_MAIN_BOX, CLOCK_MAIN_LEFT, CLOCK_TOP,
+} from "./clockLayout";
 import { clockHundredths, clockMain, clockSeconds, hundredthsLabel } from "./clockReadout";
 import { createFrame, destroyFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameScale, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
@@ -25,15 +28,7 @@ import { formatInt } from "wisp/game/text";
 
 const CLOCK_LEVEL = 21;
 const CLOCK_OUTLINE_PX = 4;
-const CLOCK_BASELINE_LIFT = f32(0.0047);
 const CLOCK_TEMPLATE_SIZE = f32(0.036);
-const CLOCK_DIGIT_SIZE = f32(0.05);
-const CLOCK_HUNDREDTHS_SIZE = f32(0.0275);
-const CLOCK_TOP = f32(0.59);
-const CLOCK_SPLIT_X = f32(0.452);
-const CLOCK_GAP = f32(0.004);
-const CLOCK_MAIN_BOX = { width: f32(0.2), height: f32(0.06) } as const;
-const CLOCK_HUNDREDTHS_BOX = { width: f32(0.06), height: f32(0.04) } as const;
 const CLOCK_FILL = "|cffffffff";
 const CLOCK_RIM = "|cff0a0608";
 
@@ -77,8 +72,8 @@ class ClockDigits {
 }
 
 export class MatchClock {
-  private readonly main = new ClockDigits(890, CLOCK_DIGIT_SIZE, CLOCK_MAIN_BOX, f32(CLOCK_SPLIT_X - CLOCK_MAIN_BOX.width), CLOCK_TOP, TextAlignment.right);
-  private readonly hundredths = new ClockDigits(891, CLOCK_HUNDREDTHS_SIZE, CLOCK_HUNDREDTHS_BOX, f32(CLOCK_SPLIT_X + CLOCK_GAP), f32(CLOCK_TOP - CLOCK_MAIN_BOX.height + CLOCK_HUNDREDTHS_BOX.height + CLOCK_BASELINE_LIFT), TextAlignment.left);
+  private readonly main = new ClockDigits(890, CLOCK_DIGIT_SIZE, CLOCK_MAIN_BOX, CLOCK_MAIN_LEFT, CLOCK_TOP, TextAlignment.right);
+  private readonly hundredths = new ClockDigits(891, CLOCK_HUNDREDTHS_SIZE, CLOCK_HUNDREDTHS_BOX, CLOCK_HUNDREDTHS_LEFT, CLOCK_HUNDREDTHS_TOP, TextAlignment.left);
   private shownVisible = false;
   private shownSeconds: number | undefined;
   private shownHundredths: number | undefined;

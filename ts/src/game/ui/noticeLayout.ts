@@ -7,12 +7,12 @@ export interface NoticePlace {
   top: number;
 }
 
-const HIGHEST_TOP = f32(0.52);
 const LOWEST_TOP = f32(0.3);
 const LEFTMOST = f32(0.02);
 const RIGHTMOST = f32(0.46);
 const STEP = f32(0.01);
 const MARGIN = f32(0.006);
+const HIGHEST_TOP = f32((MATCH_CLOCK_BOX.top - MATCH_CLOCK_BOX.height - MARGIN + MATCH_COUNTDOWN_BOX.top + MATCH_NOTICE_BOX.height + MARGIN) / 2.0);
 
 const crosses = (left: number, top: number, box: TextBox): boolean =>
   left < box.left + box.width + MARGIN && box.left < left + MATCH_NOTICE_BOX.width + MARGIN

@@ -63,6 +63,16 @@ count and round up, so 342.85 s reads 05:42 with 85, 59.99 s reads 00:59 with
 99 and the last frame before the end reads 00:00 with 01. The pause screen
 shows the same MM:SS.
 
+### Clock size
+
+Tom asked on 2026-11-02 for the clock to be about the size of Melee's, as ours read much larger. Melee's clock was measured from uncropped public frames, as shares of the frame's height, which makes the numbers independent of 4:3 or 16:9 (SmashWiki's Melee screenshots "Great Bay Ingame Melee.png", 640x480 and read at 1:1, and "15MinuteMeleeGameplay.png", 997x748; a 1280x720 "Melee Match Start.jpg" agrees on the height). Outer sizes include the dark outline:
+
+- MM:SS digits stand 24 px of 480, **5.0%** of the height; the hundredths 20 px, **4.17%**, a little lower on the same baseline (0.2%).
+- The digits' outer top sits 54 px down, **11.25%** of the height; the group sits about 2% of the width right of centre, which ours keeps centred.
+- Melee's digits are wide: MM:SS is 119 px (24.8% of the height), the hundredths 40 px (8.3%), the whole group 169 px (35.2%). Our font is narrower, so at Melee's height ours is 16.3%, 5.7% and 22.9%. The height share is what the clock matches; the font stays.
+
+`src/game/ui/clockLayout.ts` holds the shares (`MELEE_CLOCK_SHARE`) and derives the sizes, boxes and split from them, and `test/clock-size.test.ts` pins them. Native 1280x720 captures of the Wisp window before and after (Illidan against a CPU on Tomb of Sargeras) read 51 px (7.08%) and 29 px (4.03%) at a 2.2% margin before, and **36 px (5.00%)**, **30 px (4.17%)** and a **81 px (11.25%)** margin after; the group is centred (x 557 to 721 of 1280) and clear of the fighters' damage tags. Captures: `~/.local/state/smashcraft/evidence/timer-size-20261102` (`before.png`, `after.png`).
+
 **No time limit** removes only the clock. **Endless** additionally removes the
 stock end: fighters respawn after knockouts, the HUD hides stocks and time,
 and any player can pause and press Escape to return to fighter selection.
