@@ -1734,8 +1734,15 @@ pass-through platforms have no catchable ledges. Melee's ledge options (climb, j
 variants by percent) are described on SmashWiki "Ledge"; the rules below are
 Smashcraft's.
 
-- **Who catches.** Falling and jumping fighters, helpless fall after an
-  up-special, fighters whose air dodge's 49-frame animation has ended, tumble once
+- **Who catches.** Falling and jumping fighters, every helpless fall
+  (special fall) whichever move or status ended in it: up-specials, side and
+  down specials that end airborne, whiffed air specials, a failed ledge tether,
+  and a shield slid off the edge, with no wait on the move's attack cooldown or
+  special lock (Melee's FallSpecial catches whatever put the fighter there;
+  Tom reported on 2026-11-01 that a Dreadlord whiffing an air Vampiric Pounce
+  fell helpless past the ledge without catching it, because the fall's first
+  tick still carried the move's one-tick cooldown and lock),
+  fighters whose air dodge's 49-frame animation has ended, tumble once
   hitstun ends, and fighters recovering from a tech or grab release. Aerial
   attacks (AttackAir), air dodges (EscapeAir), hitstun (Damage/DamageFly),
   shield-break flight, grabs and frozen fighters never catch. Melee's specials
