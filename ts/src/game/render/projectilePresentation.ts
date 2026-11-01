@@ -460,6 +460,7 @@ export class ProjectilePresentation {
           if (defile && pose.armed) this.lingering[boundarySlot] = 1;
         }
       }
+      if (draw?.discOnly === true && boundaries.length > 0) taken[slot] = false;
     }
     for (let index = 0; index < this.models.length; index++) {
       const model = this.models[index];

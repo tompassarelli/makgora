@@ -13,7 +13,8 @@ import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { AttackStyle } from "../sim/codes";
 import { moveTier } from "./moveTiers";
 import { hasFuseSound, hasImpactSound, hasPerformSound, specialMove, specialSlot, specialSoundMove } from "./moveSounds";
-import { runningHeroSpecial } from "../sim/specials/runningMove";
+import { isHeroSpecialAction, runningHeroSpecial } from "../sim/specials/runningMove";
+import { heroLook } from "../roster/looks";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { ProjectileKind, SpecialAction } from "../sim/codes";
 import { heroDefinition } from "../roster/kits";
@@ -112,6 +113,11 @@ export interface ImpactEvents {
   footstep: "none" | "walk" | "run" | "dash";
   shieldHit: boolean;
   shieldReflect: boolean;
+  reflector: boolean;
+  reflectForward: number;
+  reflectHeight: number;
+  reflectScale: number;
+  reflectSound: string;
   shieldBreak: boolean;
   ordinaryLanding: boolean;
   readonly platform: PlatformCatchEvent;
@@ -157,7 +163,7 @@ export function createImpactEvents(): ImpactEvents {
     ledgeCatch: false, ledgeRecovery: false, ledgeX: 0.0, ledgeZ: 0.0, hit: false, electric: false,
     element: HitElement.normal, strength: 0, tier: 0, swing: -1, variant: 0, perform: -1, performSerial: 0, impact: -1, fuse: -1, fuseSerial: 0, fuseX: 0.0, fuseZ: 0.0, previousFuseSerial: 0, hitCharacter: 1, hitMove: -1, strong: false,
     shieldCharacter: 1, shieldMove: -1, shieldVariant: 0, pummel: false, shieldElectric: false, footstep: "none",
-    shieldHit: false, shieldReflect: false, shieldBreak: false, ordinaryLanding: false, platform: createPlatformCatch(),
+    shieldHit: false, shieldReflect: false, reflector: false, reflectForward: 0.0, reflectHeight: 0.0, reflectScale: 1.0, reflectSound: "", shieldBreak: false, ordinaryLanding: false, platform: createPlatformCatch(),
     movementDust: false, runningDust: false, launchTrail: false, dodgeTrail: false, airDodge: false,
     respawn: false, jump: JumpCue.none, jumpOriginX: 0.0, jumpOriginZ: 0.0, character: 1, facing: 1,
     koDirectionX: 0, koDirectionZ: 0, landing: ImpactLanding.none, dodge: DodgeCue.none, direction: 0, x: 0.0, z: 0.0, hitZ: 0.0,
@@ -214,6 +220,7 @@ export function captureImpactEventsBefore(events: ImpactEvents, fighter: Readonl
   events.footstep = "none";
   events.shieldHit = false;
   events.shieldReflect = false;
+  events.reflector = false;
   events.shieldBreak = false;
   events.ordinaryLanding = false;
   events.movementDust = false;
@@ -440,6 +447,7 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
   events.shieldElectric = visuals.shieldElectric;
   events.shieldHit = present && visuals.shield !== events.previousShieldVisualSerial;
   events.shieldReflect = present && visuals.shieldReflect !== events.previousShieldReflectVisualSerial;
+  reflectorFlash(events, fighter);
   if (events.shieldHit) {
     events.shieldVariant = visuals.shield;
     strikingMove(fighter, world, true, events);
@@ -493,4 +501,16 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
     events.direction = dodge.groundDirection;
     events.dodge = events.direction === 0 ? DodgeCue.spot : DodgeCue.roll;
   }
+}
+
+
+function reflectorFlash(events: ImpactEvents, fighter: Readonly<Fighter>): void {
+  if (!events.shieldReflect || !isHeroSpecialAction(fighter.special.action) || runningHeroSpecial(fighter)?.reflects === undefined) return;
+  const look = heroLook(fighter.character)?.reflect;
+  if (look === undefined) return;
+  events.reflector = true;
+  events.reflectForward = look.forward;
+  events.reflectHeight = look.height;
+  events.reflectScale = look.scale;
+  events.reflectSound = look.sound;
 }

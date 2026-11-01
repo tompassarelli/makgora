@@ -10,11 +10,12 @@ import { type ImpactEvents, ImpactLanding, JumpCue } from "./impactEvents";
 import { hoistVoice, moveSoundLabels, playFuse, playHit, playImpact, playPerform, playShieldHit, soundFiles } from "./moveSounds";
 import { VoiceClass } from "./voiceBudget";
 import { Character } from "../sim/codes";
+import { heroLook } from "../roster/looks";
 import { JOB_DONE_VOICE } from "./matchAudio";
 import { ELEMENTS } from "./elementLooks";
 import { tierSoundPaths } from "./moveTiers";
 import { STRONG_SPARK_SCALE } from "./moveTiers";
-import { IMPACT_ARCANE_HIT, IMPACT_FIRE_HIT, IMPACT_SLASH_HIT, IMPACT_ICE_HIT, IMPACT_ELECTRIC_SHIELD, IMPACT_PUMMEL, IMPACT_PLATFORM_BURST, IMPACT_PLATFORM_LIP } from "./impactState";
+import { IMPACT_ARCANE_HIT, IMPACT_REFLECT, IMPACT_FIRE_HIT, IMPACT_SLASH_HIT, IMPACT_ICE_HIT, IMPACT_ELECTRIC_SHIELD, IMPACT_PUMMEL, IMPACT_PLATFORM_BURST, IMPACT_PLATFORM_LIP } from "./impactState";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_JUMP_MODEL, IMPACT_SHIELD_MODEL, IMPACT_HIT_MODEL, IMPACT_KO_MODEL } from "../assets/impactAssetInfo";
 
 
@@ -44,6 +45,7 @@ export function impactModel(kind: number): string {
     case IMPACT_SLASH_HIT: return IMPACT_HIT_MODEL;
     case IMPACT_ARCANE_HIT: return IMPACT_HIT_MODEL;
     case IMPACT_ICE_HIT: return "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdx";
+    case IMPACT_REFLECT: return IMPACT_HIT_MODEL;
     default: return "Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx";
   }
 }
@@ -52,10 +54,12 @@ export function impactModel(kind: number): string {
 const PLAIN_SPARK_COLOUR: readonly number[] = [255, 255, 255];
 const FIRE_SPARK_COLOUR: readonly number[] = [255, 100, 25];
 const ARCANE_SPARK_COLOUR: readonly number[] = [190, 110, 255];
+const REFLECT_SPARK_COLOUR: readonly number[] = [150, 225, 255];
 export const STRONG_SPARK_COLOUR: readonly number[] = [255, 205, 40];
 
 
 export function impactColour(kind: number, strength: number): readonly number[] | undefined {
+  if (kind === IMPACT_REFLECT) return REFLECT_SPARK_COLOUR;
   if (kind !== 0 && kind !== IMPACT_SLASH_HIT && kind !== IMPACT_FIRE_HIT && kind !== IMPACT_ARCANE_HIT) return undefined;
   if (strength === STRONG_SPARK_SCALE) return STRONG_SPARK_COLOUR;
   return kind === IMPACT_FIRE_HIT ? FIRE_SPARK_COLOUR : kind === IMPACT_ARCANE_HIT ? ARCANE_SPARK_COLOUR : PLAIN_SPARK_COLOUR;
@@ -65,7 +69,7 @@ export function impactColour(kind: number, strength: number): readonly number[] 
 export function impactAnimation(kind: number): string {
   return kind === 0 || kind === 1 || kind === 2 || kind === 3 || kind === 4 || kind === 6 || kind === 7 || kind === 8 || kind === 9 || kind === 10
     || kind === 11 || kind === 12 || kind === 14 || kind === 15 || kind === IMPACT_FIRE_HIT || kind === IMPACT_PUMMEL
-    || kind === IMPACT_SLASH_HIT || kind === IMPACT_ARCANE_HIT || kind === 5 || kind === IMPACT_ELECTRIC_SHIELD
+    || kind === IMPACT_SLASH_HIT || kind === IMPACT_ARCANE_HIT || kind === IMPACT_REFLECT || kind === 5 || kind === IMPACT_ELECTRIC_SHIELD
     || kind === IMPACT_PLATFORM_BURST || kind === IMPACT_PLATFORM_LIP ? "Stand" : "Birth";
 }
 
@@ -108,6 +112,12 @@ export interface ImpactSoundNames {
 export function impactSoundNames(characters: readonly Character[]): ImpactSoundNames {
   const files = new Set<string>(tierSoundPaths());
   const labels = new Set<string>(IMPACT_LABELS);
+  for (const character of characters) {
+    const sound = heroLook(character)?.reflect?.sound;
+    if (sound === undefined) continue;
+    labels.add(sound);
+    for (const path of soundFiles(sound)) files.add(path);
+  }
   for (const element of ELEMENTS) {
     const sound = elementLook(element).sound;
     if (sound === undefined) continue;
@@ -158,7 +168,8 @@ export function presentImpactSounds(events: Readonly<ImpactEvents>, sink: Impact
     else sink(electric ? "LightningBolt" : elementLook(events.element).sound ?? "LightningBolt", x, z, volume, 1.0, false, VoiceClass.hit);
   }
   if (events.shieldHit && events.shieldMove >= 0) playShieldHit(events.shieldCharacter, events.shieldMove, events.shieldVariant, fileSink(sink, x, z, VoiceClass.hit));
-  if (events.shieldHit || events.shieldReflect) sink(events.shieldElectric ? "LightningBolt" : "Defend", x, z, 90, events.shieldReflect ? 1.5 : 1.0, false, VoiceClass.hit);
+  if (events.reflector) sink(events.reflectSound, x, z, 100, 1.0, false, VoiceClass.hit);
+  else if (events.shieldHit || events.shieldReflect) sink(events.shieldElectric ? "LightningBolt" : "Defend", x, z, 90, events.shieldReflect ? 1.5 : 1.0, false, VoiceClass.hit);
   if (events.shieldBreak) sink("ThunderClap", x, z, 100, 1.0, false, VoiceClass.hit);
   if (events.grab) sink("EntanglingRoots", x, z, 70, 1.0, false, VoiceClass.special);
   if (events.jobDone) sink(JOB_DONE_VOICE, x, z, 110, 1.0, true, VoiceClass.special);

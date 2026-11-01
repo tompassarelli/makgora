@@ -55,9 +55,11 @@ import { HookChainPresentation } from "../../game/render/hookChainPresentation";
 import { GoldSackPresentation } from "../../game/render/goldSackPresentation";
 import { ShurikenGlowPresentation } from "../../game/render/shurikenGlowPresentation";
 import { SpherePresentation } from "../../game/render/spherePresentation";
+import { EmpoweredAuraPresentation } from "../../game/render/empoweredAuraPresentation";
 import { FlightPresentation } from "../../game/render/flightPresentation";
 import { fighterOrbit } from "../../game/presentation/sphereOrbit";
 import { fighterFlight } from "../../game/presentation/flightLook";
+import { fighterEmpoweredAura } from "../../game/presentation/empoweredAuraLook";
 import { BodyFlash } from "../../game/render/bodyFlash";
 import { MeterGlow } from "../../game/render/meterGlow";
 import { type FighterDraw, createFighterDraw } from "../../game/presentation/fighterDraw";
@@ -89,6 +91,7 @@ interface FighterRenderers {
   readonly hookChain: HookChainPresentation | undefined;
   readonly spheres: SpherePresentation | undefined;
   readonly flight: FlightPresentation | undefined;
+  readonly empoweredAura: EmpoweredAuraPresentation | undefined;
 
   readonly hitAreas: HitAreaPresentation | undefined;
   readonly terror: TerrorPresentation;
@@ -220,6 +223,7 @@ function endFighterRenderers(renderers: FighterRenderers | undefined): void {
   renderers?.hookChain?.destroy();
   renderers?.spheres?.destroy();
   renderers?.flight?.destroy();
+  renderers?.empoweredAura?.destroy();
   renderers?.hitAreas?.destroy();
   renderers?.terror.destroy();
   renderers?.seaSplash.destroy();
@@ -253,7 +257,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin, partner === undefined ? costumeFor(s.game, slot) : PARTNER_COSTUME, bodyScale) : undefined;
   ui.placed.prepareFighter(slot, character);
   const shared = sharedPlay();
-  const orbit = fighterOrbit(character), flight = fighterFlight(character);
+  const orbit = fighterOrbit(character), flight = fighterFlight(character), empoweredAura = fighterEmpoweredAura(character);
   ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared, bodyScale), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin, bodyScale), glow: new MeterGlow(character, s.origin, bodyScale), draw: createFighterDraw(),
     goldSack: character === Character.peon ? new GoldSackPresentation(s.origin) : undefined,
     shurikenGlow: character === Character.akama ? new ShurikenGlowPresentation(s.origin) : undefined,
@@ -261,6 +265,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
     hookChain: character === Character.butcher ? new HookChainPresentation(s.origin) : undefined,
     spheres: orbit === undefined ? undefined : new SpherePresentation(orbit, s.origin),
     flight: flight === undefined ? undefined : new FlightPresentation(flight, s.origin),
+    empoweredAura: empoweredAura === undefined ? undefined : new EmpoweredAuraPresentation(empoweredAura, s.origin),
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
     terror: new TerrorPresentation(s.origin),
     seaSplash: new SeaSplashPresentation(s.origin),
@@ -393,6 +398,7 @@ function rebindFighterRenderers(renderers: FighterRenderers): void {
   if (renderers.hookChain !== undefined) bindPrototype(renderers.hookChain, HookChainPresentation.prototype);
   if (renderers.spheres !== undefined) bindPrototype(renderers.spheres, SpherePresentation.prototype);
   if (renderers.flight !== undefined) bindPrototype(renderers.flight, FlightPresentation.prototype);
+  if (renderers.empoweredAura !== undefined) bindPrototype(renderers.empoweredAura, EmpoweredAuraPresentation.prototype);
   bindPrototype(renderers.agency.forecast, FighterAgencyForecast.prototype);
   if (renderers.hitAreas !== undefined) bindPrototype(renderers.hitAreas, HitAreaPresentation.prototype);
   bindPrototype(renderers.terror, TerrorPresentation.prototype);
@@ -442,6 +448,7 @@ export function clearMatchEffects(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.hookChain?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.spheres?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.flight?.hide();
+  for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.empoweredAura?.hide();
   ui.classic?.endMatch();
 }
 

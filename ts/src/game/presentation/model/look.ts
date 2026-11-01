@@ -32,6 +32,10 @@ export interface HeroLook {
 
   readonly flight?: FlightLook | undefined;
 
+  readonly empoweredAura?: EmpoweredAuraLook | undefined;
+
+  readonly reflect?: ReflectLook | undefined;
+
   readonly carry?: CarryLook | undefined;
 
   readonly costumes?: readonly Costume[] | undefined;
@@ -47,6 +51,20 @@ export interface PartnerLook {
 export interface CarryLook {
   readonly stand: HeroPose;
   readonly walk: HeroPose;
+}
+
+export interface ReflectLook {
+  readonly sound: string;
+  readonly scale: number;
+  readonly forward: number;
+  readonly height: number;
+}
+
+export interface EmpoweredAuraLook {
+  readonly model: string;
+  readonly scale: number;
+  readonly floor: number;
+  readonly shots: number;
 }
 
 export interface OrbitLook {

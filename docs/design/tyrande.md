@@ -95,6 +95,9 @@ Specials:
   next three Searing Arrows within 300 frames become moonlit arrows
   (`MoonPriestessMissile`): 6% each, and each passes through the first fighter
   it strikes to hit a second. The stance is the cost.
+  Presentation: the `TrueshotAura` ring stays under her feet for as long as
+  the sim holds empowered arrows (`special.empoweredShots`), shrinking with each
+  arrow spent, and goes with the last arrow or the 300-frame lapse.
 - **Moonlight Leap** (up). After 5 frames she rises 2.2 reference heights over
   20 frames with wide steering, tapping anyone she passes for 5% on frames
   6-12, under a moon-well trail (`MoonWellCasterArt`). Once per airtime, it
@@ -106,6 +109,9 @@ Specials:
   multipliers. Its frame-4 hit pushes a close foe with 2% and a set
   knockback. It can be jump-cancelled from frame 4, and a 24-frame cooldown
   keeps it from being chained. In the air it stalls her on frames 1-12.
+  Presentation: the one drawn shield disc is the whole cue, up for the reflect
+  window only (no hand burst or flying sparks); a projectile actually turned back
+  adds a flash in front of her and its own sound on that frame.
 - **Starfall** (ultimate). She channels in place for 116 frames. From frame
   22, four lanes 80, 200, 320 and 440 units ahead are marked 12 frames
   before each star falls; stars fall on every lane three times, on frames 34,

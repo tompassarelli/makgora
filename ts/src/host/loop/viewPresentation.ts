@@ -85,6 +85,7 @@ function presentSlotBody(s: ShellState, ui: UiObjects, slot: ParticipantSlot, ga
   renderers?.shurikenGlow?.present(posed, game.stageChoice);
   renderers?.spheres?.present(posed, runtime.simulationFrame, s.session.paused);
   renderers?.flight?.present(posed, game.stageChoice, s.session.paused);
+  renderers?.empoweredAura?.present(live, s.session.paused);
   if (renderers !== undefined) {
     renderers.agency.present(live, live === undefined ? "act" : mark);
     renderers.terror.present(live, roared, s.session.paused);

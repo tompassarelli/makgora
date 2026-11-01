@@ -43,6 +43,7 @@ import { HOOK_LINK_MODEL } from "./hookChain";
 import { HOWL_FIRST, HOWL_REACH } from "../fighters/pit-lord/specials";
 import { SYLVANAS_SPECIALS } from "../fighters/sylvanas/specials";
 import { WARDEN_SPECIALS } from "../fighters/warden/specials";
+import { ELUNE_SHIMMER } from "../fighters/tyrande/specials";
 import { QUICKDRAW_DRAW_CUES, QUICKDRAW_STANCE_CUES } from "./quickdrawCues";
 import { SHADOW_STEP_CUES } from "./shadowStepCues";
 import { SHURIKEN_CHARGE_CUES } from "./shurikenCues";
@@ -301,9 +302,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.tyrande]: {
     neutral: { spell: "Searing Arrows", startup: cue("Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl", "hand", f32(0.6)), active: cue("Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl", "hand", f32(0.6)) },
-    side: { spell: "Trueshot Aura", startup: ARCANE, active: cue("Abilities\\Spells\\NightElf\\TrueshotAura\\TrueshotAura.mdx", "feet", f32(0.8)) },
+    side: { spell: "Trueshot Aura", startup: ARCANE, active: ARCANE },
     up: { spell: "Moonlight Leap", startup: ARCANE, active: cue("Abilities\\Spells\\NightElf\\Starfall\\StarfallCaster.mdx", "feet", f32(0.6)) },
-    down: { spell: "Elune's Grace", startup: ARCANE, active: cue("Abilities\\Spells\\Items\\SpellShieldAmulet\\SpellShieldCaster.mdx", "ahead", f32(1.4)) },
+    down: { spell: "Elune's Grace", startup: drawn(ELUNE_SHIMMER, "ahead"), active: drawn(ELUNE_SHIMMER, "ahead") },
   },
   [Character.anubarak]: {
     neutral: { spell: "Impale", startup: BURROW, active: cue("Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl", "ahead", f32(0.6)) },

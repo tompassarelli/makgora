@@ -4,6 +4,8 @@ import { heroProjectileRadius, projectileActive } from "../sim/projectiles";
 import { ProjectileKind } from "../sim/codes";
 import type { SpecialProjectile } from "../sim/specials/schema";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
+import { reflectsProjectiles } from "../sim/specials/reflector";
+import { PROJECTILE_DRAW_OFFSETS } from "./projectileArt";
 
 interface ProjectilePose {
   visible: boolean;
@@ -38,6 +40,7 @@ export function projectedProjectile(fighter: Readonly<Fighter> | undefined, inde
   }
   const { velocityX, velocityZ } = projectile;
   const spec = projectile.kind === ProjectileKind.hero ? projectile.spec : undefined;
+  if (spec?.model !== undefined && PROJECTILE_DRAW_OFFSETS[spec.model]?.whileReflecting === true && !reflectsProjectiles(fighter)) return HIDDEN;
   const radius = spec?.pool === undefined ? 0.0 : heroProjectileRadius(projectile, spec);
   const age = spec === undefined ? 0 : spec.life - projectile.life;
   const first = spec?.activeFrom ?? 0;

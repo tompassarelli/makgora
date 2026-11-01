@@ -45,6 +45,7 @@ function cueEffects(s: ShellState, slot: ParticipantSlot): Effect[] {
   const renderers = s.ui?.fighters[slot];
   if (renderers === undefined) return drawn;
   renderers.cues?.drawnEffects(drawn);
+  renderers.empoweredAura?.drawnEffects(drawn);
   drawn.push(...renderers.projectiles.models);
   renderers.meter?.drawnEffects(drawn);
   s.ui?.special.slotEffects(slot, drawn);

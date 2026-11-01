@@ -176,7 +176,7 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx": { scale: f32(0.7), color: [255, 110, 30] },
 };
 
-export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly loopFrames?: number | undefined; readonly disc?: readonly [number, number, number] | undefined; readonly discVertical?: boolean | undefined; readonly fuse?: Fuse | undefined } | undefined } = {
+export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly loopFrames?: number | undefined; readonly disc?: readonly [number, number, number] | undefined; readonly discVertical?: boolean | undefined; readonly whileReflecting?: boolean | undefined; readonly discOnly?: boolean | undefined; readonly fuse?: Fuse | undefined } | undefined } = {
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { x: 0.0, z: 0.0, sequence: "birth", disc: [155, 225, 255], discVertical: true },
   "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": { x: 0.0, z: 0.0, disc: [255, 215, 115] },
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": { x: 0.0, z: 0.0, roll: f32(1.570796327) },
@@ -192,7 +192,8 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { x: 0.0, z: f32(-59.4), loopFrames: 12, disc: [150, 70, 230] },
   "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx": { x: 0.0, z: 0.0, sequence: "stand", height: f32(0.4) },
   "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25 },
-  [ELUNE_SHIMMER]: { x: 0.0, z: 0.0, disc: [205, 225, 255], discVertical: true },
+  // Elune's Grace spawns this mark on frame 3 for 12 frames; drawing it only inside the reflect window (frames 4-12) is what keeps the shield honest.
+  [ELUNE_SHIMMER]: { x: 0.0, z: 0.0, disc: [205, 225, 255], discVertical: true, whileReflecting: true, discOnly: true },
   [HOOK_MODEL]: { x: -20.0, z: 0.0 },
   "Doodads\\Dungeon\\Rocks\\Cave_FieryCrator\\Cave_FieryCrator.mdx": { x: 0.0, z: 0.0, width: f32(1.7), height: f32(0.5) },
   "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx": { x: 0.0, z: 0.0, width: f32(0.35), height: f32(1.2) },

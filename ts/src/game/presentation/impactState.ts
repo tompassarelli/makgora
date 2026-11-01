@@ -35,10 +35,11 @@ export const IMPACT_ICE_HIT = 20;
 export const IMPACT_ELECTRIC_SHIELD = 21;
 export const IMPACT_PUMMEL = 22;
 export const IMPACT_ARCANE_HIT = 23;
-export const IMPACT_PLATFORM_BURST = 24;
-export const IMPACT_PLATFORM_LIP = 25;
+export const IMPACT_PLATFORM_BURST = 25;
+export const IMPACT_PLATFORM_LIP = 26;
+export const IMPACT_REFLECT = 24;
 export const IMPACTS_PER_KIND = 8;
-export const IMPACT_KIND_COUNT = 26;
+export const IMPACT_KIND_COUNT = 27;
 export const IMPACT_COUNT = IMPACTS_PER_KIND * IMPACT_KIND_COUNT;
 export const KO_STAR_FLIGHT_FRAMES = 90;
 export const KO_STAR_SPARKLE_LEAD = 6;
@@ -303,7 +304,8 @@ export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, 
       : events.electric || events.element === HitElement.electric ? IMPACT_ELECTRIC_HIT : IMPACT_HIT;
     spawn(state, kind, x, events.hitZ, 0, events.strong && !events.pummel ? STRONG_SPARK_SCALE : TIER_SPARK_SCALE[events.tier] ?? 1.0);
   }
-  if (events.shieldHit || events.shieldReflect) spawn(state, events.shieldElectric ? IMPACT_ELECTRIC_SHIELD : IMPACT_SHIELD_HIT, x, f32(z + 50.0), 0, events.shieldReflect ? 1.5 : 1.0);
+  if (events.reflector) spawn(state, IMPACT_REFLECT, f32(x + f32(events.facing * events.reflectForward)), f32(z + events.reflectHeight), 0, events.reflectScale);
+  else if (events.shieldHit || events.shieldReflect) spawn(state, events.shieldElectric ? IMPACT_ELECTRIC_SHIELD : IMPACT_SHIELD_HIT, x, f32(z + 50.0), 0, events.shieldReflect ? 1.5 : 1.0);
   if (events.shieldBreak) spawn(state, IMPACT_SHIELD_HIT, x, f32(z + 50.0), 0, 2.0);
   if (events.landing === ImpactLanding.tech) spawn(state, IMPACT_TECH, x, f32(z + 3.0), 0, 1.0);
   else if (events.landing === ImpactLanding.missedTech) {
