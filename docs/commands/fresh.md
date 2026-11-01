@@ -45,6 +45,6 @@ client that still cannot leave it.
   warning for that item at centre stage.
 
 - Orb setup at fighter or stage selection: `-dev orbs on|off` controls
-  whether centre-stage orbs appear; the stage menu's "Orbs: On/Off" button does
+  whether centre-stage orbs appear (off by default since 2026-11-02, when the meter fills from the clock); the stage menu's "Orbs: On/Off" button does
   the same (smashcraft:docs/gameplay-design.md, "Centre-stage orbs").
 - Meter setup: `-dev meter N` sets the ultimate meter to N percent.

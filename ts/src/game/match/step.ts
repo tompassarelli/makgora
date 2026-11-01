@@ -41,7 +41,7 @@ import type { FrameControls } from "./controls";
 import { copyFighterState } from "../../generated/state/fighterState";
 import { type MatchState, Phase, advanceClock, holdingStart, humanFighterActive, keepsStocks, resolveStocks, stageClock } from "../lobby/lobbyState";
 import { advanceItems } from "./centreItem";
-import { advanceOrbs } from "./orbs";
+import { advanceClockMeter, advanceOrbs } from "./orbs";
 import { seatMurlocPartners } from "../fighters/murloc/duo";
 import { drivePartners } from "./partnerDrive";
 import { advanceDuoStocks } from "../fighters/murloc/duoStocks";
@@ -223,6 +223,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   advanceWater(world, stage, game.matchFrame, game.hazards);
   advanceItems(game, world, controls, frame);
   advanceOrbs(game, world);
+  advanceClockMeter(game, world);
   advanceStageCannon(world, stage, stageFrame, controls.inputs);
 
   captureGrabPauses(world);

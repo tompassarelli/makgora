@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { gainUltimate, ultimateCharged } from "../sim/meter";
+import { ULTIMATE_CLOCK_GAIN, gainUltimate, ultimateCharged } from "../sim/meter";
 import { ORB_GAIN, ORB_INTERVAL_FRAMES, collectsOrb, orbPoint, orbsActive, playedFrames, respawning, touchesOrb } from "../sim/orbs";
 import { type Roster, fighterAt, isContender } from "../sim/roster";
 import type { MatchState } from "../lobby/lobbyState";
@@ -23,6 +23,11 @@ function scheduleOrbs(game: MatchState, world: Roster): void {
   const played = playedFrames(game);
   if (played > 0 && floorMod(played, ORB_INTERVAL_FRAMES) === 0) game.orbs.held = true;
   if (game.orbs.held && !anyRespawning(world)) spawnOrb(game.orbs);
+}
+
+export function advanceClockMeter(game: Readonly<MatchState>, world: Roster): void {
+  if (game.orbs.on || game.training || playedFrames(game) <= 0) return;
+  for (const slot of PARTICIPANT_SLOTS) if (isContender(world, slot)) gainUltimate(fighterAt(world, slot), ULTIMATE_CLOCK_GAIN);
 }
 
 export function advanceOrbs(game: MatchState, world: Roster): void {

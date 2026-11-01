@@ -1177,15 +1177,18 @@ The specification answers these design questions for the expansion:
 | --- | --- |
 | Physical differences | Use each hero's relative weight, run and air-speed table as initial tuning. The complete candidate table spans weight 0.85–1.28, run 0.80–1.14 and air 0.75–1.22 (of 1.00 Melee units a frame since #190). Jump velocity and gravity initially inherit the reference. |
 | Archetypes | State each fighter's purpose and exploitable weakness before building its moves. |
-| Meter | One ultimate meter per fighter, filled only by centre-stage ultimate orbs, never by damage or the clock (#484; the second meter and the clock fill removed 2026-10-29); specials are free and the ultimate spends the whole meter (smashcraft:docs/design/mana.md). A + Special at a full ultimate meter is the ultimate. Existing per-move cooldowns remain part of each kit. |
+| Meter | One ultimate meter per fighter, filled by the match clock to full every 60 s by default, or with the Orbs rule on only by centre-stage ultimate orbs; never by damage (#484; the second meter removed 2026-10-29; orbs set aside as the default 2026-11-02); specials are free and the ultimate spends the whole meter (smashcraft:docs/design/mana.md). A + Special at a full ultimate meter is the ultimate. Existing per-move cooldowns remain part of each kit. |
 
 ### Build-and-spend mana and the ultimate meter
 
 Since #484 (26 Oct 2026) no meter comes from damage dealt or taken. On
-29 Oct 2026 Tom removed EX and the match-clock fill to simplify the game, so
-the one ultimate meter fills only from the orb at the centre of the stage
-([centre-stage orbs](#centre-stage-orbs)): one every 30 s, each worth half a
-meter, so two orbs make an ultimate. The meter keeps its value through a KO
+29 Oct 2026 Tom removed EX and the match-clock fill, leaving the orb at the
+centre of the stage as the one source. On 2 Nov 2026 Tom set the orb aside for
+now and asked for every fighter to have an ultimate once a minute by default, so
+the one ultimate meter fills from the match clock: full 60 s after the match
+starts and 60 s after each spend. The orb rule stays available and off
+([centre-stage orbs](#centre-stage-orbs)): with it on the clock fill stops and an
+orb every 30 s, each worth half a meter, is the only source. The meter keeps its value through a KO
 (smashcraft:docs/design/mana.md). Recovery remains available through the
 existing free up-special forms.
 
@@ -1209,7 +1212,8 @@ illustrates authored armor windows rather than universal invulnerability.
 rewards Instant Block with extra Tension; that supports paying precise
 defense here. The rejected alternative was one-button ultimates with idle
 refill: saving for a single large event would replace the exchange-by-exchange
-choice of contesting the centre for the next orb.
+choice of contesting the centre for the next orb. The 2 Nov 2026 clock default
+returns to a fixed timer for now, with the orb kept for a later decision.
 | Disjoints | Weapon extensions only; attached body parts keep hurtboxes. |
 | Throw escape | Mashing; retain the existing escape system and use the brief's fallback only where none exists. |
 | Simultaneous grabs | Both break, with symmetric separation and 12 frames of recovery. |
@@ -2492,6 +2496,11 @@ climb 25, tilt startup and travel about 16).
 
 ## Centre-stage orbs
 
+Tom asked on 2 Nov 2026 to set the orb aside for now: orbs are off by default in
+every mode and the meter fills from the match clock instead (60 s to full); the
+orb code, rule and tests are kept. The rest of this section describes the orb
+when its rule is on.
+
 Tom directed on 9 Oct 2026 that, in a game with meter, meter is advantage and
 should have a place on the stage (#385), and on 29 Oct 2026 made the orb the
 only source of the one ultimate meter, with one orb every 30 s at the centre
@@ -2565,10 +2574,10 @@ amount never varies.
   Fighters standing at centre often take an orb on the frame it spawns, so
   every pickup, wasted or not, plays the orb's Death burst at the orb point
   for half a second (presentation/orbLook.ts `sightOrb`).
-- **Rule.** Orbs are on in the standard ruleset; the stage menu's "Orbs:
-  On/Off" button, or `-dev orbs on|off`, turns them off. They never appear in
-  Training or in Classic and lore runs, so nobody gains meter there outside
-  the tutorial. `-dev meter N` and the tape op `test-meter SLOT PERCENT` set
+- **Rule.** Orbs are off by default since 2 Nov 2026; the stage menu's "Orbs:
+  On/Off" button, or `-dev orbs on|off`, turns them on. They never appear in
+  Training or in Classic and lore runs, and the tutorial hangs its own orb
+  for its orb lessons. `-dev meter N` and the tape op `test-meter SLOT PERCENT` set
   the ultimate meter to N percent.
 - **Computers** contest an orb after their reaction delay from the start of
   the warning, choosing per orb at their judgment: Expert contests every orb,

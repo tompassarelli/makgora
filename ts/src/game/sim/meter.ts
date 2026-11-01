@@ -1,9 +1,14 @@
+import { idiv } from "wisp/src/sim/intMath";
 import { max, min } from "../core/numbers";
 import type { Fighter } from "./fighter";
 
 export const ULTIMATE_METER_FRAMES = 7200;
 
 export const ULTIMATE_FRAMES_PER_PERCENT = 72;
+
+export const ULTIMATE_CLOCK_FRAMES = 60 * 60;
+
+export const ULTIMATE_CLOCK_GAIN = idiv(ULTIMATE_METER_FRAMES, ULTIMATE_CLOCK_FRAMES);
 
 export const ultimatePercent = (percent: number): number => percent * ULTIMATE_FRAMES_PER_PERCENT;
 

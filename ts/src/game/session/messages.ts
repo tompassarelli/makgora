@@ -78,8 +78,8 @@ export function rulesPillParts(game: Readonly<MatchState>): readonly string[] {
 }
 
 const pauseControl =(start: StartControl) => (start === "Start" ? "Start" : "Esc");
-const PLAYING_HELP_START = "Start: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; touch or hit the orb at centre stage to fill it).\nShield then Left/Right: roll; Down: dodge.";
-const PLAYING_HELP_BACKSPACE = "Esc: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; touch or hit the orb at centre stage to fill it).\nShield then Left/Right: roll; Down: dodge.";
+const PLAYING_HELP_START = "Start: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; it fills once a minute, or from orbs when Orbs is on).\nShield then Left/Right: roll; Down: dodge.";
+const PLAYING_HELP_BACKSPACE = "Esc: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; it fills once a minute, or from orbs when Orbs is on).\nShield then Left/Right: roll; Down: dodge.";
 export const pausedMessage = (start: StartControl) => `Paused — press ${pauseControl(start)} to resume.`;
 
 

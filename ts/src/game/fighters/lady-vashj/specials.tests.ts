@@ -47,6 +47,7 @@ function duel(foeAhead: number, charge: number): Duel {
   state.match.items.on = false;
   state.match.timeLimitMinutes = 0;
   state.match.ultimatesOff = true;
+  state.match.orbs.on = true;
   return { state, vashj, foe, tick: 0 };
 }
 

@@ -10,7 +10,10 @@ import { SELECTABLE_CHARACTERS } from "../roster/kits";
 import { AttackStyle, Character, GroundAction, ProjectileKind, SpecialAction } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
-import { ULTIMATE_METER_FRAMES, fillMeter } from "../sim/meter";
+import { ULTIMATE_CLOCK_FRAMES, ULTIMATE_CLOCK_GAIN, ULTIMATE_METER_FRAMES, fillMeter } from "../sim/meter";
+import { createMatchOrbs } from "../sim/orbState";
+import { cpuSkill } from "./cpuSkill";
+import { orbContest } from "./botPlay";
 import { setWorldMotionValue } from "../sim/motion";
 import { fighterAt } from "../sim/roster";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
@@ -92,13 +95,73 @@ function watchPickup(b: Bout, frames: number, first: (frame: number) => RowField
   return { taken: false, takenDuring: false, passedDuring };
 }
 
-test("No meter comes from three minutes of play without orbs [k3 measure docs/design/mana.md]", () => {
+test("Orbs are off by default: a new match state holds none and three minutes pass without one [k3 measure docs/design/mana.md]", () => {
+  assertFalse(createMatchOrbs().on);
   const b = bout(false);
   while (played(b) < 3 * 60 * 60) {
     step(b);
-    assertEquals(b.first.meter.ultimate + b.second.meter.ultimate, 0, `played ${played(b)}`);
+    assertFalse(b.state.match.orbs.live);
   }
   assertEquals(b.state.match.orbs.spawnSerial, 0);
+});
+
+test("With orbs off the meter fills from the clock to full at exactly 60 s of play, and again 60 s after each spend [k3 measure docs/design/mana.md]", () => {
+  assertEquals(ULTIMATE_CLOCK_GAIN * ULTIMATE_CLOCK_FRAMES, ULTIMATE_METER_FRAMES);
+  const b = bout(false);
+  playTo(b, 0);
+  assertEquals(b.first.meter.ultimate, 0);
+  assertEquals(b.second.meter.ultimate, 0);
+  let fullAt = -1;
+  while (fullAt < 0) {
+    step(b);
+    assertTrue(played(b) <= ULTIMATE_CLOCK_FRAMES);
+    if (b.first.meter.ultimate >= ULTIMATE_METER_FRAMES) fullAt = played(b);
+    else assertEquals(b.first.meter.ultimate, ULTIMATE_CLOCK_GAIN * played(b));
+  }
+  assertEquals(fullAt, ULTIMATE_CLOCK_FRAMES);
+  assertEquals(b.second.meter.ultimate, ULTIMATE_METER_FRAMES);
+  step(b, { held: A, pressed: A });
+  step(b, { held: A | S, pressed: S });
+  assertEquals(b.first.special.action, SpecialAction.heroUltimate);
+  assertEquals(b.first.meter.ultimate, 0);
+  const spentAt = played(b);
+  let refilled = -1;
+  while (refilled < 0) {
+    step(b);
+    assertTrue(played(b) - spentAt <= ULTIMATE_CLOCK_FRAMES);
+    if (b.first.meter.ultimate >= ULTIMATE_METER_FRAMES) refilled = played(b) - spentAt;
+    else assertEquals(b.first.meter.ultimate, ULTIMATE_CLOCK_GAIN * (played(b) - spentAt));
+  }
+  assertEquals(refilled, ULTIMATE_CLOCK_FRAMES);
+  assertEquals(b.state.match.orbs.spawnSerial, 0);
+});
+
+test("The clock fill is kept through a KO and replays to the same state [k1 scenario]", () => {
+  const b = bout(false);
+  playTo(b, 1000);
+  b.first.status.out = true;
+  b.first.status.respawn = 120;
+  const before = b.first.meter.ultimate;
+  assertEquals(before, ULTIMATE_CLOCK_GAIN * 1000);
+  playTo(b, 1100);
+  assertTrue(b.first.meter.ultimate >= before);
+  const again = bout(false);
+  playTo(again, 1000);
+  again.first.status.out = true;
+  again.first.status.respawn = 120;
+  playTo(again, 1100);
+  assertEquals(firstStateDifference(b.state, again.state), undefined);
+});
+
+test("Bots take the orb as no objective with orbs off, however close the next orb is [k1 scenario]", () => {
+  const off = bout(false);
+  const on = bout(true);
+  const skill = cpuSkill("wren", "expert");
+  playTo(off, ORB_INTERVAL_FRAMES - 10);
+  playTo(on, ORB_INTERVAL_FRAMES - 10);
+  const slots = [0, 1] as const;
+  assertTrue(slots.some(slot => orbContest(on.state.match, fighterAt(on.state.world, slot), slot, skill)));
+  for (const slot of slots) assertFalse(orbContest(off.state.match, fighterAt(off.state.world, slot), slot, skill));
 });
 
 test("An orb appears at 30 and 60 s, each warned 3 s ahead, and an untaken orb stays until the next replaces it [k3 measure docs/design/mana.md]", () => {

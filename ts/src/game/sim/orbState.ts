@@ -9,7 +9,7 @@ export interface MatchOrbs {
 }
 
 export function createMatchOrbs(): MatchOrbs {
-  return { on: true, live: false, held: false, spawnSerial: 0, pickupSerial: 0, lastTaker: -1, lastWasted: false };
+  return { on: false, live: false, held: false, spawnSerial: 0, pickupSerial: 0, lastTaker: -1, lastWasted: false };
 }
 
 export function copyMatchOrbs(target: MatchOrbs, source: Readonly<MatchOrbs>): void {
@@ -43,7 +43,7 @@ export function firstOrbsDifference(e: Readonly<MatchOrbs>, a: Readonly<MatchOrb
 }
 
 export function writeMatchOrbs(orbs: Readonly<MatchOrbs>, int: (name: string, value: number) => void, bool: (name: string, value: boolean) => void): void {
-  if (!orbs.on) bool("match.orbs.on", false);
+  if (orbs.on) bool("match.orbs.on", true);
   if (orbs.spawnSerial === 0 && !orbs.held && !orbs.live) return;
   bool("match.orbs.live", orbs.live);
   bool("match.orbs.held", orbs.held);
