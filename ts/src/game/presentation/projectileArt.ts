@@ -161,6 +161,9 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { scale: f32(1.2) },
   "Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx": { scale: 0.5 },
+  "Doodads\\Dungeon\\Rocks\\Cave_FieryCrator\\Cave_FieryCrator.mdx": { scale: f32(0.75) },
+  "Abilities\\Spells\\NightElf\\EntangleMine\\Roots.mdx": { scale: f32(0.5), color: [84, 54, 46] },
+  "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx": { scale: f32(0.7), color: [255, 110, 30] },
 };
 
 export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly loopFrames?: number | undefined; readonly disc?: readonly [number, number, number] | undefined; readonly discVertical?: boolean | undefined; readonly fuse?: Fuse | undefined } | undefined } = {
@@ -181,6 +184,8 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25 },
   [ELUNE_SHIMMER]: { x: 0.0, z: 0.0, disc: [205, 225, 255], discVertical: true },
   [HOOK_MODEL]: { x: -20.0, z: 0.0 },
+  "Doodads\\Dungeon\\Rocks\\Cave_FieryCrator\\Cave_FieryCrator.mdx": { x: 0.0, z: 0.0, width: f32(1.7), height: f32(0.5) },
+  "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx": { x: 0.0, z: 0.0, width: f32(0.35), height: f32(1.2) },
 };
 
 

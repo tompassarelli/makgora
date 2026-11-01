@@ -41355,6 +41355,26 @@
    "authored.specials.down.ground.projectiles.0.expiresInto.expiresInto.expiresInto.effect.base": 0,
    "authored.specials.down.ground.projectiles.0.expiresInto.expiresInto.expiresInto.effect.launchX": 0.08715574443340302,
    "authored.specials.down.ground.projectiles.0.expiresInto.expiresInto.expiresInto.effect.launchZ": 0.9961947202682495,
+   "authored.specials.down.ground.projectiles.1.effect.damage": 0,
+   "authored.specials.down.ground.projectiles.1.effect.growth": 0,
+   "authored.specials.down.ground.projectiles.1.effect.base": 0,
+   "authored.specials.down.ground.projectiles.1.effect.launchX": 0.08715574443340302,
+   "authored.specials.down.ground.projectiles.1.effect.launchZ": 0.9961947202682495,
+   "authored.specials.down.ground.projectiles.1.unfloored.as.effect.damage": 0,
+   "authored.specials.down.ground.projectiles.1.unfloored.as.effect.growth": 0,
+   "authored.specials.down.ground.projectiles.1.unfloored.as.effect.base": 0,
+   "authored.specials.down.ground.projectiles.1.unfloored.as.effect.launchX": 0.08715574443340302,
+   "authored.specials.down.ground.projectiles.1.unfloored.as.effect.launchZ": 0.9961947202682495,
+   "authored.specials.down.ground.projectiles.2.effect.damage": 0,
+   "authored.specials.down.ground.projectiles.2.effect.growth": 0,
+   "authored.specials.down.ground.projectiles.2.effect.base": 0,
+   "authored.specials.down.ground.projectiles.2.effect.launchX": 0.08715574443340302,
+   "authored.specials.down.ground.projectiles.2.effect.launchZ": 0.9961947202682495,
+   "authored.specials.down.ground.projectiles.3.effect.damage": 0,
+   "authored.specials.down.ground.projectiles.3.effect.growth": 0,
+   "authored.specials.down.ground.projectiles.3.effect.base": 0,
+   "authored.specials.down.ground.projectiles.3.effect.launchX": 0.08715574443340302,
+   "authored.specials.down.ground.projectiles.3.effect.launchZ": 0.9961947202682495,
    "authored.specials.down.air.endFrame": 30,
    "authored.specials.down.air.landingLag": 20,
    "authored.specials.down.air.hurt.0.firstFrame": 8,
@@ -41394,6 +41414,26 @@
    "authored.specials.down.air.projectiles.0.expiresInto.expiresInto.expiresInto.effect.base": 0,
    "authored.specials.down.air.projectiles.0.expiresInto.expiresInto.expiresInto.effect.launchX": 0.08715574443340302,
    "authored.specials.down.air.projectiles.0.expiresInto.expiresInto.expiresInto.effect.launchZ": 0.9961947202682495,
+   "authored.specials.down.air.projectiles.1.effect.damage": 0,
+   "authored.specials.down.air.projectiles.1.effect.growth": 0,
+   "authored.specials.down.air.projectiles.1.effect.base": 0,
+   "authored.specials.down.air.projectiles.1.effect.launchX": 0.08715574443340302,
+   "authored.specials.down.air.projectiles.1.effect.launchZ": 0.9961947202682495,
+   "authored.specials.down.air.projectiles.1.unfloored.as.effect.damage": 0,
+   "authored.specials.down.air.projectiles.1.unfloored.as.effect.growth": 0,
+   "authored.specials.down.air.projectiles.1.unfloored.as.effect.base": 0,
+   "authored.specials.down.air.projectiles.1.unfloored.as.effect.launchX": 0.08715574443340302,
+   "authored.specials.down.air.projectiles.1.unfloored.as.effect.launchZ": 0.9961947202682495,
+   "authored.specials.down.air.projectiles.2.effect.damage": 0,
+   "authored.specials.down.air.projectiles.2.effect.growth": 0,
+   "authored.specials.down.air.projectiles.2.effect.base": 0,
+   "authored.specials.down.air.projectiles.2.effect.launchX": 0.08715574443340302,
+   "authored.specials.down.air.projectiles.2.effect.launchZ": 0.9961947202682495,
+   "authored.specials.down.air.projectiles.3.effect.damage": 0,
+   "authored.specials.down.air.projectiles.3.effect.growth": 0,
+   "authored.specials.down.air.projectiles.3.effect.base": 0,
+   "authored.specials.down.air.projectiles.3.effect.launchX": 0.08715574443340302,
+   "authored.specials.down.air.projectiles.3.effect.launchZ": 0.9961947202682495,
    "normal.0.startupFrames": 4,
    "normal.0.activeFrames": 2,
    "normal.0.endingFrames": 14,
@@ -41759,6 +41799,18 @@
    "special.down.ground.projectiles.0.expiresInto.expiresInto.expiresInto": {
     "advantage": -29
    },
+   "special.down.ground.projectiles.1": {
+    "advantage": -15
+   },
+   "special.down.ground.projectiles.1.unfloored.as": {
+    "advantage": -15
+   },
+   "special.down.ground.projectiles.2": {
+    "advantage": -15
+   },
+   "special.down.ground.projectiles.3": {
+    "advantage": -15
+   },
    "special.down.air.projectiles.0": {
     "advantage": -15
    },
@@ -41781,6 +41833,18 @@
    },
    "special.down.air.projectiles.0.expiresInto.expiresInto.expiresInto": {
     "advantage": -29
+   },
+   "special.down.air.projectiles.1": {
+    "advantage": -15
+   },
+   "special.down.air.projectiles.1.unfloored.as": {
+    "advantage": -15
+   },
+   "special.down.air.projectiles.2": {
+    "advantage": -15
+   },
+   "special.down.air.projectiles.3": {
+    "advantage": -15
    },
    "throw.3": {
     "advantage": 0,

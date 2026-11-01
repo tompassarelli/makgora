@@ -26,12 +26,18 @@ export const RAZE_AIR_LANDING_LAG = 20;
 export const RAZE_DAMAGE = 12.0;
 const RAZE_FLOOR_STEP = h(f32(0.3));
 
-const TELL_MODEL = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx";
+const TELL_MODEL = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx";
 const COLUMN_MODEL = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx";
 // FlameStrike1.mdx draws its column only in birth, fading in by 1.05 s and out by 5.1 s; the eruption and its glow play that stretch across their frames.
 const COLUMN_FROM = f32(1.05);
 const COLUMN_RATE = f32(f32(f32(5.1) - f32(1.05)) / f32((RAZE_ERUPT_FRAMES + RAZE_GLOW_FRAMES) / 60));
 const COLUMN_ART_RADIUS = 155.0;
+export const RAZE_FISSURE_MODEL = "Doodads\\Dungeon\\Rocks\\Cave_FieryCrator\\Cave_FieryCrator.mdx";
+export const RAZE_TEAR_MODEL = "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx";
+export const RAZE_HAND_MODEL = "Abilities\\Spells\\NightElf\\EntangleMine\\Roots.mdx";
+const RAZE_SHOW_FRAMES = RAZE_TELL_FRAMES + RAZE_ERUPT_FRAMES + RAZE_GLOW_FRAMES;
+const HAND_PART_SPEED = f32(f32(RAZE_RADIUS * f32(2.4)) / RAZE_SHOW_FRAMES);
+const HAND_RISE_RATE = 8.0;
 
 const column = (life: number, from: number): Pick<SpecialProjectile, "model" | "modelRadius" | "modelOffsetZ" | "modelAnimation" | "life"> => ({
   model: COLUMN_MODEL, modelRadius: COLUMN_ART_RADIUS, modelOffsetZ: f32(-RAZE_RADIUS), life,
@@ -77,10 +83,22 @@ const AIM: AimByMotion = {
   otherwise: { aimX: 0, aimZ: -1 },
 };
 
+const decor = (model: string, velocityX: number, modelAnimation?: SpecialProjectile["modelAnimation"]): SpecialProjectile => ({
+  ...base, limit: 2, model, velocityX, spawnFrame: RAZE_READ_FRAME, offsetZ: 0.0, life: RAZE_SHOW_FRAMES, activeFrom: RAZE_SHOW_FRAMES + 1,
+  effect: groundHit(0.0, 85, 0.0, 0.0, HitElement.fire), aimedReach: RAZE_REACH,
+  ...modelAnimation === undefined ? {} : { modelAnimation },
+});
+
+const AIR_TEAR = decor(RAZE_TEAR_MODEL, 0.0);
+const FISSURE: SpecialProjectile = { ...decor(RAZE_FISSURE_MODEL, 0.0), unfloored: { within: RAZE_FLOOR_STEP, as: AIR_TEAR } };
+const HAND_RISE = { sequence: "birth", warningSeconds: 0.0, activeSeconds: 0.0, rate: HAND_RISE_RATE } as const;
+const LEFT_HAND = decor(RAZE_HAND_MODEL, f32(-HAND_PART_SPEED), HAND_RISE);
+const RIGHT_HAND = decor(RAZE_HAND_MODEL, HAND_PART_SPEED, HAND_RISE);
+
 const raze = (air: boolean): AuthoredSpecial => ({
   name: "Lava Raze", endFrame: RAZE_END_FRAME, landingLag: air ? RAZE_AIR_LANDING_LAG : undefined,
   aimByMotion: AIM, hurt: standinCastBody(Character.firelord, 8, RAZE_READ_FRAME + RAZE_TELL_FRAMES),
-  projectiles: [TELL],
+  projectiles: [TELL, FISSURE, LEFT_HAND, RIGHT_HAND],
 });
 
 export const LAVA_RAZE: SpecialKit = {

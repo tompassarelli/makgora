@@ -1,0 +1,22 @@
+# Firelord's Lava Raze in mid-air facing right, stick down, X after a double jump: the hands pry a short glowing tear in the air one step ahead from match frame 293 and the lava burst erupts through it on 303, with no crack or scorch on the floor.
+#! cue 290-303 tear: effect=FireTrapUp
+#! cue 290-320 hands: effect=Roots
+#! cue 300-320 burst: effect=FlameStrike1
+#! chat -dev quick hero firelord hit-areas
+250 a stick 1 0
+256 a tap B 2
+268 a tap B 2
+276 a stick 0 -1
+280 a tap X 2
+281 a capture
+288 a capture
+294 a capture
+297 a capture
+301 a capture
+303 a capture
+304 a capture
+306 a capture
+308 a capture
+312 a capture
+316 a capture
+320 a stick 0 0
