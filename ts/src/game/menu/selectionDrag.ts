@@ -164,11 +164,11 @@ export const HAND_TILE_HEIGHT = f32(0.72);
 // SelectionHand textures are drawn square, sized so the gauntlet rows span HAND_TILE_HEIGHT of a tile.
 export const handSize = (grid: RosterGrid): number => f32(f32(grid.cellHeight) * HAND_TILE_HEIGHT * HAND_TEXELS / HAND_ART_ROWS);
 
-// The texel that sits exactly on the mouse: the index fingertip, the middle fingertip, and the middle of the gap between thumb and index tips.
+// The texel that sits exactly on the mouse: the index fingertip of the up-left pointing hand, the fan's leading (longest) fingertip, and the middle of the gap between the pinch's thumb and index tips.
 const HAND_HOTSPOT: Readonly<Record<HandState, { readonly x: number; readonly y: number }>> = {
-  point: { x: 155.5, y: 6 },
-  fan: { x: 171.75, y: 26 },
-  pinch: { x: 103, y: 38 },
+  point: { x: 10.5, y: 18.5 },
+  fan: { x: 57, y: 7 },
+  pinch: { x: 16, y: 88 },
 };
 
 export const handLeft = (x: number, state: HandState, size: number): number => x - f32(HAND_HOTSPOT[state].x / HAND_TEXELS) * size;
@@ -212,12 +212,12 @@ export const CARRIED_CHIP_HAND_SHARE = f32(0.71);
 
 export const carriedChipSize = (grid: RosterGrid): number => f32(handSize(grid) * CARRIED_CHIP_HAND_SHARE);
 
-// A carried chip sits just below the pinch point, drawn under the hand so the thumb and fingers cover its upper part.
-export const CARRIED_CHIP_LIFT = f32(-0.12);
+// The pinch opens to the left, so a carried chip hangs to the left of the pinch point with its right rim between thumb and index tips, drawn under the hand so the tips cover that rim; the offset is in chip sizes.
+export const CARRIED_CHIP_OFFSET = { x: f32(-0.4), y: f32(0.0) };
 
-export const carriedChipLeft = (x: number, size: number): number => x - size * f32(0.5);
+export const carriedChipLeft = (x: number, size: number): number => x - size * f32(f32(0.5) - CARRIED_CHIP_OFFSET.x);
 
-export const carriedChipTop = (y: number, size: number): number => y + size * f32(f32(0.5) + CARRIED_CHIP_LIFT);
+export const carriedChipTop = (y: number, size: number): number => y + size * f32(f32(0.5) + CARRIED_CHIP_OFFSET.y);
 
 // A chip not yet on a fighter parks centred on this point of its player card.
 export const parkedChipCentre = (slot: number): { readonly x: number; readonly y: number } => ({ x: cardRight(slot, f32(0.126)), y: cardDown(f32(0.105)) });

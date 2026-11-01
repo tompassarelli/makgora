@@ -4,6 +4,7 @@ import { ALPHABET } from "../input/wire";
 import { type MatchState, humanPresent } from "../lobby/lobbyState";
 import { HAND_STATES, type HandState } from "../menu/selectionDrag";
 import { PARTICIPANT_SLOTS, type Slots } from "../input/participants";
+import { cardPalette } from "./selectionCards";
 import { slotColor } from "./slotColors";
 
 export interface HandPose {
@@ -18,6 +19,9 @@ export interface DrawnHand {
   readonly pose: HandPose & { readonly state: HandState };
   readonly colour: number;
 }
+
+// A hand is lettered with its slot (P1 to P4) in the colour its player card shows: the team colour in Team Battle, the slot colour otherwise.
+export const handColour = (game: Readonly<MatchState> | undefined, slot: number): number => slotColor(game === undefined ? slot : cardPalette(game, slot)).rgb;
 
 export const HIDDEN_HAND: HandPose = { state: undefined, chip: undefined, x: 0.0, y: 0.0 };
 
@@ -100,7 +104,7 @@ export class SelectionHands {
       const glide = this.glides[slot];
       const pose = slot === this.localSlot ? local : glide === undefined ? HIDDEN_HAND : glideAt(glide, now);
       if (pose.state === undefined || !humanPresent(game, slot)) continue;
-      hands.push({ slot, pose: { ...pose, state: pose.state }, colour: slotColor(slot).rgb });
+      hands.push({ slot, pose: { ...pose, state: pose.state }, colour: handColour(game, slot) });
     }
     return hands;
   }

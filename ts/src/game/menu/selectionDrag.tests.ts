@@ -1,8 +1,11 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
-import { bullseyeLeft, bullseyeSize, bullseyeTop, GAME_MENU_WAKE_UPDATES, gameMenuWake, carriedChipLeft, carriedChipSize, carriedChipTop, HAND_STATES, handLeft, handSize, handTop, menuCursor } from "./selectionDrag";
+import { bullseyeLeft, bullseyeSize, bullseyeTop, GAME_MENU_WAKE_UPDATES, gameMenuWake, carriedChipLeft, carriedChipSize, carriedChipTop, CARRIED_CHIP_OFFSET, HAND_STATES, handLeft, handSize, handTop, menuCursor } from "./selectionDrag";
 import { rosterGrid } from "./selectionGrid";
+
+// The chip texture's disc is 232 of its 256 texels.
+const DISC_RADIUS = f32(0.453);
 
 test("The cursor is the pointing hand over a control, the open hand over a tile and resting in a menu panel, the pointing hand resting on the select screen, the pinch with a chip, and the stock cursor shows only where no hand is drawn [k2 property]", () => {
   for (const allowed of [false, true]) {
@@ -97,7 +100,7 @@ test("The gauntlet is drawn at 0.67 to 0.77 of a roster tile's height at every g
     const width = size * HAND_ART_COLUMNS / HAND_TEXELS;
     assertTrue(height >= f32(0.67) * grid.cellHeight && height <= f32(0.77) * grid.cellHeight);
     assertTrue(Math.abs(width / height - HAND_ART_COLUMNS / HAND_ART_ROWS) < f32(1e-6));
-    assertTrue(Math.abs(HAND_ART_COLUMNS / HAND_ART_ROWS - 732 / 900) < f32(0.002));
+    assertTrue(Math.abs(HAND_ART_COLUMNS / HAND_ART_ROWS - 828 / 848) < f32(0.002));
   }
 });
 
@@ -113,16 +116,17 @@ test("Every hand state keeps its hotspot inside the hand frame and moves the fra
   }
 });
 
-test("A carried chip is centred over the pinch point with its lower rim below it, and narrower than the gauntlet [k2 property]", () => {
+test("A carried chip hangs left of the pinch point with its right rim between the thumb and index tips, level with it, and narrower than the gauntlet [k2 property]", () => {
   for (let count = 1; count <= 60; count++) {
     const grid = rosterGrid(count);
     const size = handSize(grid);
     const chip = carriedChipSize(grid);
     const x = f32(0.4);
     const y = f32(0.3);
-    assertTrue(Math.abs(carriedChipLeft(x, chip) + chip / 2 - x) < f32(0.00001));
+    assertTrue(Math.abs(carriedChipLeft(x, chip) + chip / 2 - (x + chip * CARRIED_CHIP_OFFSET.x)) < f32(0.00001));
+    assertTrue(carriedChipLeft(x, chip) + chip * (f32(0.5) + DISC_RADIUS) > x);
+    assertTrue(carriedChipLeft(x, chip) + chip * (f32(0.5) - DISC_RADIUS) < x);
     assertTrue(Math.abs(carriedChipTop(y, chip) - chip / 2 - y) < chip * f32(0.15));
-    assertTrue(carriedChipTop(y, chip) - chip < y);
     assertTrue(chip < size * HAND_ART_COLUMNS / HAND_TEXELS);
   }
 });

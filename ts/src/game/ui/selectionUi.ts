@@ -1,5 +1,4 @@
 import { SELECT_LEVELS } from "./selectLevels";
-import { slotColor } from "./slotColors";
 import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
 import { RULE_BUTTONS, rulePanel } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp } from "./ruleHelp";
@@ -47,7 +46,7 @@ import {
 } from "../menu/selectionDrag";
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { type HandFrames, createHandFrames, destroyHandFrames, presentHand } from "./selectionHandFrames";
-import { type HandPose, HIDDEN_HAND, SelectionHands } from "./selectionHands";
+import { type HandPose, HIDDEN_HAND, SelectionHands, handColour } from "./selectionHands";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
 import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_HEADER_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, nextSelectableCharacter, DEFAULT_FIGHTER } from "../roster/kits";
@@ -586,7 +585,7 @@ export class SelectionPanel {
     for (const slot of PARTICIPANT_SLOTS) {
       const frames = this.hands[slot];
       const remote = drawn.find(candidate => candidate.slot === slot);
-      const local = slot === this.participantId && localHand.state !== undefined ? { slot, pose: { ...localHand, state: localHand.state }, colour: slotColor(slot).rgb } : undefined;
+      const local = slot === this.participantId && localHand.state !== undefined ? { slot, pose: { ...localHand, state: localHand.state }, colour: handColour(game, slot) } : undefined;
       presentHand(frames, slot === this.participantId ? local : choosing ? remote : undefined, this.roster.grid);
     }
   }

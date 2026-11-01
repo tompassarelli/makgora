@@ -162,12 +162,13 @@ that regenerates the family.
 
 The public authored `tools/selection/art/wc3-hand-point.png`, `wc3-hand-fan.png`
 and `wc3-hand-pinch.png` are Tom's authored, AI-assisted gauntlet cursor art,
-approved for public shipping (2026-10-30). They come from his three JPEGs on a
-flat dark background; `bun tools/selection/key-hand-states.ts <folder of the
+approved for public shipping (2026-10-30; remade 2026-11-01 as a dark-iron,
+brass-trimmed gauntlet that points up-left, as Warcraft's own cursor does). They
+come from his three 1024x1024 JPEGs on a flat dark grey background; `bun tools/selection/key-hand-states.ts <folder of the
 JPEGs>` keys the background to transparency (outline kept), aligns the cuffs and
 writes the three PNGs on one canvas. The normal `bun tools/selection/build-art.ts`
 point-scales them into `SelectionHandPoint.tga`, `SelectionHandFan.tga` and
-`SelectionHandPinch.tga`, each a 256x256 canvas, and renders the four 128x96 `SelectionHandLabelP1-4.tga` player labels from `SelectionHandLabel.svg`; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Store the generated
+`SelectionHandPinch.tga`, each a 256x256 canvas, and renders the four 128x96 `SelectionHandLabelP1-4.tga` player labels from `SelectionHandLabel.svg` in white, which the label frame tints to its hand's card colour; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Store the generated
 `selection-assets` family and commit its hash with the source change.
 
 ### Warcraft's own cursor
@@ -190,9 +191,9 @@ of and 1 px below the cell's corner, and the 30x30 px the model samples from
 each cell cannot be moved by a texture; the target cells (row 2, and row 3
 columns 1 and 2) centre on the click point; row 3 columns 5 to 7 are the edge
 scroll arrows. `tools/selection/gameCursorArt.ts` fills them: the point gauntlet,
-mirrored so its index fingertip lands on the click point with the hand running
-right and down from it (the art points up and right, and the cell holds only
-7 px left of the click point), the bullseye ring for target, cyan for a
+trimmed and fitted to 24x24 px so its index fingertip lands on the click point
+with the hand running right and down from it (the art points up-left, as
+Warcraft's own cursor does, so it is not mirrored), the bullseye ring for target, cyan for a
 selectable target, red with a slash for an invalid one, and a pale arrow for scrolling.
 It writes `GameCursor.tga` into the `selection-assets` family, which is not
 imported as a TGA. A texture override changes only the art: it cannot move the

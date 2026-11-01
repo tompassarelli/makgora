@@ -10,7 +10,7 @@ export const CURSOR_TEXTURE = 'GameCursor';
 
 // Warcraft's cursor model samples the pointer cells so the click point sits 8 px right of and 1 px below a cell's corner.
 const POINTER_HOTSPOT = { x: 8, y: 1 };
-const POINTER_ART = { width: 24, height: 31, tipFromLeft: 5 };
+const POINTER_ART = { width: 24, height: 24, tipFromLeft: 1, tipFromTop: 1 };
 
 const POINTER_CELLS = [
   ...Array.from({ length: CURSOR_COLUMNS }, (_, column) => [column, 0] as const),
@@ -33,8 +33,8 @@ export const gameCursorArt = (source: string, output: string, run: Run) => Effec
   const target = join(output, 'GameCursorTarget.png');
   const invalid = join(output, 'GameCursorInvalid.png');
   const arrow = join(output, 'GameCursorArrow.png');
-  const offset = `${POINTER_HOTSPOT.x - POINTER_ART.tipFromLeft}x${POINTER_HOTSPOT.y}`;
-  yield* run(['magick', join(source, 'wc3-hand-point.png'), '-filter', 'point', '-resize', `${POINTER_ART.width}x${POINTER_ART.height}!`, '-flop', '-background', 'none', '-gravity', 'northwest', '-splice', offset, '-extent', cell, pointer]);
+  const offset = `${POINTER_HOTSPOT.x - POINTER_ART.tipFromLeft}x${POINTER_HOTSPOT.y - POINTER_ART.tipFromTop}`;
+  yield* run(['magick', join(source, 'wc3-hand-point.png'), '-trim', '+repage', '-filter', 'Lanczos', '-resize', `${POINTER_ART.width}x${POINTER_ART.height}!`, '-background', 'none', '-gravity', 'northwest', '-splice', offset, '-extent', cell, pointer]);
   yield* run(['magick', '-background', 'none', join(source, 'SelectionBullseye.svg'), '-resize', '30x30', '-gravity', 'center', '-extent', cell, reticle]);
   yield* run(['magick', reticle, '-fill', '#19e6ff', '-colorize', '70', target]);
   yield* run(['magick', reticle, '-fill', '#ff2a2a', '-colorize', '75', '-stroke', '#ff2a2a', '-strokewidth', '3', '-draw', 'line 8,24 24,8', invalid]);

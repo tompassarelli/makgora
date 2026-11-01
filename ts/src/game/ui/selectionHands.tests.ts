@@ -6,6 +6,7 @@ import { createMatchState, setHumanMask } from "../lobby/lobbyState";
 import type { HandState } from "../menu/selectionDrag";
 import { HAND_SEND_INTERVAL, HAND_UPDATES_PER_SECOND, type HandPose, HIDDEN_HAND, SelectionHands } from "./selectionHands";
 import { slotColor } from "./slotColors";
+import type { Team } from "../sim/teams";
 
 const POSITION_STEP = f32(0.0011);
 const STATES: readonly HandState[] = ["point", "fan", "pinch"];
@@ -87,4 +88,15 @@ test("A remote hand glides from where it was drawn to each new synced position w
   assertEquals(hand(later)?.state, "pinch");
   const chips = remote?.carriedChips(game, later);
   for (const slot of PARTICIPANT_SLOTS) assertEquals(chips?.[slot] !== undefined, slot === 1);
+});
+
+test("In Team Battle a hand is lettered in the colour of its card's team, and in the slot colour when teams are off [k1 scenario]", () => {
+  const { game, clients, step } = lobby(4);
+  step(100.0, [pose("point", f32(0.2), f32(0.2)), pose("fan", f32(0.3), f32(0.3)), pose("point", f32(0.4), f32(0.4)), pose("fan", f32(0.5), f32(0.5))]);
+  const settled = 100.0 + 2 * HAND_SEND_INTERVAL;
+  const colours = () => (clients[0]?.drawn(game, pose("point", f32(0.2), f32(0.2)), settled) ?? []).map(hand => hand.colour);
+  assertEquals(colours().join(","), BADGE_COLOURS.join(","));
+  game.teamBattle = true;
+  [1, 1, 3, 0].forEach((team, slot) => { game.teamChoices[slot] = team as Team; });
+  assertEquals(colours().join(","), [0x0042ff, 0x0042ff, 0x540081, 0xff0303].join(","));
 });

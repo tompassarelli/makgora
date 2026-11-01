@@ -12,7 +12,7 @@ tools/selection/art/SmashcraftRaceFrameOrc.fdf	generated	bun scripts/wisp/uiFram
 tools/selection/art/SmashcraftRaceFrameOrc.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
 tools/selection/art/SmashcraftRaceFrameUndead.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock console textures by in-game path
 tools/selection/art/SmashcraftRaceFrameUndead.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
-tools/selection/art/wc3-hand-point.png	original	Tom authored with AI and approved public shipping (2026-10-30); keyed from his smashcraft-hand-default.jpeg by tools/selection/key-hand-states.ts.
-tools/selection/art/wc3-hand-fan.png	original	Tom authored with AI and approved public shipping (2026-10-30); keyed from his smashcraft-hand-over-character-not-pinching.jpeg by tools/selection/key-hand-states.ts.
-tools/selection/art/wc3-hand-pinch.png	original	Tom authored with AI and approved public shipping (2026-10-30); keyed from his smashcraft-hand-pinching.jpeg by tools/selection/key-hand-states.ts.
+tools/selection/art/wc3-hand-point.png	original	Tom authored with AI (Gemini, made for this game: a dark-iron, brass-trimmed gauntlet pointing up-left) and approved public shipping (re-made 2026-11-01, replacing the steel gauntlet of 2026-10-30); keyed from his smashcraft-hand-default.jpeg by tools/selection/key-hand-states.ts.
+tools/selection/art/wc3-hand-fan.png	original	Tom authored with AI (Gemini, made for this game: a dark-iron, brass-trimmed gauntlet pointing up-left) and approved public shipping (re-made 2026-11-01, replacing the steel gauntlet of 2026-10-30); keyed from his smashcraft-hand-over-character-not-pinching.jpeg by tools/selection/key-hand-states.ts.
+tools/selection/art/wc3-hand-pinch.png	original	Tom authored with AI (Gemini, made for this game: a dark-iron, brass-trimmed gauntlet pointing up-left) and approved public shipping (re-made 2026-11-01, replacing the steel gauntlet of 2026-10-30); keyed from his smashcraft-hand-pinching.jpeg by tools/selection/key-hand-states.ts.
 docs/assets/smashcraft-banner.jpg	original	Tom's own Smashcraft logo for the README, supplied by Tom 2026-10-29 (smashcraft-logo-v2)

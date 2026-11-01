@@ -261,7 +261,7 @@ playing with them, 2026-10-30). The authored chip's 237-pixel rim spans a
 55–70% reference band by that request. The pointer target follows that frame size; the P1/P2 labels keep their art.
 
 The fighter select and stage menus replace the stock Warcraft cursor (the Human
-gauntlet) with Tom's steel gauntlet in three states: the default pointing hand
+gauntlet) with Tom's dark-iron, brass-trimmed gauntlet (remade 2026-11-01; it points up-left, as Warcraft's own cursor does) in three states: the default pointing hand
 (`SelectionHandPoint`) wherever the hand is neither over a fighter tile nor
 holding a chip, the open fanned hand (`SelectionHandFan`) over a fighter tile
 with no chip, and the pinch (`SelectionHandPinch`) while a chip is carried,
@@ -277,21 +277,22 @@ Matches, pause, title, results, settings, the tutorial and the CPU and moves
 panels keep the stock cursor or none.
 
 Each state is the same 256x256 texture with the cuff and palm in the same place,
-so a state change never jumps; the gauntlet is 202x248 texels at (4, 4), the 732x900
-keyed PNGs point-scaled uniformly (202/248 against the art's 0.813). It is drawn
+so a state change never jumps; the gauntlet is 242x248 texels at (4, 4), the 828x848
+keyed PNGs point-scaled uniformly (242/248 against the art's 0.976). It is drawn
 square at Melee's hand-to-tile proportion (asked for 2026-10-30, from a Melee
 character-select screenshot) and then 20% smaller after Tom played with it
 (2026-10-30): the gauntlet is 0.72 of a roster tile's height
 (`HAND_TILE_HEIGHT` in `selectionDrag.ts`, measured from the roster grid's cell
 height so it holds at every grid size and UI scale), about 0.7 of its width, 90 pixels
-tall against a 125-pixel tile at 1080p (113 before the reduction); the old pinch hand was 38.5 pixels. The 256x256
+tall against a 125-pixel tile at 1080p (113 before the reduction); the old pinch hand was 38.5 pixels. The 2026-11-01 gauntlet is squarer than the steel one (0.976 against 0.813 wide to tall), so at the same height it is 20% wider and its silhouette fills the same share of its box (0.49 to 0.55 of the keyed canvas against 0.51); the height stayed. The 256x256
 canvas has texels four times finer than the old 64x64 one, so the engine's bilinear
 sampling does not smear them. The hotspot sits exactly on the mouse position:
-texel (155.5, 6) for the pointing index fingertip, (171.75, 26) for the fanned
-hand's middle fingertip and (103, 38) for the gap between thumb and index
-tips. While a chip is carried its centre sits just below that pinch point (lowered 0.12 of the chip; Tom asked for it lower on 2026-10-30) and the chip
+texel (10.5, 18.5) for the pointing index fingertip, (57, 7) for the fanned
+hand's leading (longest) fingertip and (16, 88) for the gap between thumb and index
+tips, which open to the left. While a chip is carried its centre hangs 0.4 of the chip to the left of that pinch point,
+level with it (`CARRIED_CHIP_OFFSET`), and the chip
 frame is drawn beneath the hand (`SELECT_LEVELS.carriedChip`, `carriedChipLeft`,
-`carriedChipTop`), so the thumb and fingers cover its upper part the way Melee's
+`carriedChipTop`), so the thumb and index tips cover its right rim the way Melee's
 hand holds its token (Tom compared the two, 2026-10-30). The carried chip is
 0.71 of the hand's frame (`CARRIED_CHIP_HAND_SHARE`): in Melee's reference the
 token's disc is 51 px across a glove 62 px wide, 0.82, and the chip texture's disc
@@ -305,10 +306,12 @@ together once per 60 Hz tick from one mouse sample.
 
 Character select draws every connected human's hand, not only the local one
 (asked for 2026-10-30, after Melee's player hands): each hand carries a P1 to P4
-label in the slot's Warcraft colour (red, blue, teal, purple): the chip's own bold
+label in the colour its player card shows (red, blue, teal, purple: the slot's, or in
+Team Battle the colour of the chosen team, `handColour`): the chip's own bold
 outlined lettering at the chip's own size, inverted (the text in the player
-colour, no disc and no box), rendered by `tools/selection/art/SelectionHandLabel.svg`
-and centred on texel (95, 148) of the hand canvas, and a pinching hand's chip is
+colour, no disc and no box), rendered white by `tools/selection/art/SelectionHandLabel.svg`,
+tinted to that colour by the label frame (`setFrameColor`)
+and centred on texel (135, 119) of the hand canvas, the middle of the gauntlet's back-of-hand plate, and a pinching hand's chip is
 drawn at the hand. Each client knows only
 its own mouse (a pad's cursor is a mouse position too), so it sends its hand's
 state, carried chip and position as a six-character `select-hand` sync
