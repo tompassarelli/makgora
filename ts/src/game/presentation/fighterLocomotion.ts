@@ -40,10 +40,6 @@ export function groundLocomotionClip(character: Character, motion: IllidanLocomo
 
 export const GROUND_LOCOMOTION_RATE_CAP = f32(5.0);
 
-const RATE_CAP_OVERRIDES: Readonly<Record<number, number>> = { [Character.warden]: f32(6.25) };
-
-export const groundLocomotionRateCap = (character: Character): number => RATE_CAP_OVERRIDES[character] ?? GROUND_LOCOMOTION_RATE_CAP;
-
 export function uncappedGroundLocomotionRate(f: Readonly<Fighter>, motion: IllidanLocomotion, clip?: HeroClip): number {
   const gait = motion === IllidanLocomotion.walk ? "walk" : "run";
   const stride = DRAWN_STRIDES[lookCharacter(f.character)]?.[gait];
@@ -53,5 +49,5 @@ export function uncappedGroundLocomotionRate(f: Readonly<Fighter>, motion: Illid
 }
 
 export function groundLocomotionRate(f: Readonly<Fighter>, motion: IllidanLocomotion, clip?: HeroClip): number {
-  return min(uncappedGroundLocomotionRate(f, motion, clip), groundLocomotionRateCap(f.character));
+  return min(uncappedGroundLocomotionRate(f, motion, clip), GROUND_LOCOMOTION_RATE_CAP);
 }

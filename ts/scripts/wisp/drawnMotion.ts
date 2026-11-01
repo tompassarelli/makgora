@@ -132,13 +132,26 @@ export interface DrawnStride {
 }
 
 
+export function gaitCycles(xs: readonly number[], left: number, right: number): number {
+  const mid = (left + right) / 2, band = (right - left) / 4;
+  const side = (x: number) => x > mid + band ? 1 : x < mid - band ? -1 : 0;
+  const open = xs.findIndex((x) => side(x) !== 0);
+  if (open < 0) return 1;
+  let state = side(xs[open] ?? mid), changes = 0;
+  for (let step = 1; step < xs.length; step++) {
+    const next = side(xs[(open + step) % (xs.length - 1)] ?? mid);
+    if (next !== 0 && next !== state) { changes++; state = next; }
+  }
+  return Math.max(1, Math.round(changes / 2));
+}
+
 /** Foot travel in world units per second: grounded vertices that move, so a hem or pelvis dipping into the floor band does not dilute the feet. */
 export function drawnStrideOf(drawn: DrawnModel, clip: number, seconds: number): number {
   const samples = Array.from({ length: 61 }, (_, frame) => drawn.triangles(clip, seconds * frame / 60, 1));
   const first = samples[0];
   if (first === undefined) throw new Error("no stride samples");
   const floor = Math.min(...first.filter((_, index) => index % 2 === 1));
-  const speeds: number[] = [];
+  const feet: { excursion: number; cycles: number }[] = [];
   for (let index = 0; index < first.length; index += 2) {
     let low = 0;
     let left = Infinity;
@@ -148,11 +161,14 @@ export function drawnStrideOf(drawn: DrawnModel, clip: number, seconds: number):
       left = Math.min(left, vertices[index] ?? Infinity);
       right = Math.max(right, vertices[index] ?? -Infinity);
     }
-    if (low > 10) speeds.push(2 * (right - left) / seconds);
+    if (low > 10) feet.push({ excursion: right - left, cycles: gaitCycles(samples.map((vertices) => vertices[index] ?? 0), left, right) });
   }
-  const median = speeds.sort((x, y) => x - y)[speeds.length >> 1] ?? 0;
-  const moving = speeds.filter((speed) => speed >= median / 2);
-  return moving.reduce((sum, speed) => sum + speed, 0) / Math.max(1, moving.length);
+  const median = feet.map((foot) => foot.excursion).sort((x, y) => x - y)[feet.length >> 1] ?? 0;
+  const moving = feet.filter((foot) => foot.excursion >= median / 2);
+  const widest = Math.max(0, ...moving.map((foot) => foot.excursion));
+  const swinging = moving.filter((foot) => foot.excursion >= widest * 0.75).map((foot) => foot.cycles).sort((x, y) => x - y);
+  const cycles = swinging[swinging.length >> 1] ?? 1;
+  return moving.reduce((sum, foot) => sum + 2 * foot.excursion * cycles / seconds, 0) / Math.max(1, moving.length);
 }
 
 export function measureDrawnStride(bytes: ArrayBuffer, drawn: DrawnModel, character: Character, motion: "walk" | "run", model: string): DrawnStride {
