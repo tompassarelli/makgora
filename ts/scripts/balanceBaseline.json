@@ -23203,31 +23203,30 @@
    "authored.specials.neutral.ground.regions.0.hit.effect.launchX": 0.7660444378852844,
    "authored.specials.neutral.ground.regions.0.hit.effect.launchZ": 0.6427876353263855,
    "authored.specials.neutral.ground.landingLag": 18,
-   "authored.specials.side.ground.endFrame": 44,
-   "authored.specials.side.ground.cooldownFrames": 90,
-   "authored.specials.side.ground.projectiles.0.effect.damage": 4.0960001945495605,
-   "authored.specials.side.ground.projectiles.0.effect.growth": 64.08999633789062,
-   "authored.specials.side.ground.projectiles.0.effect.base": 28,
-   "authored.specials.side.ground.projectiles.0.effect.launchX": 0.5735764503479004,
-   "authored.specials.side.ground.projectiles.0.effect.launchZ": 0.8191520571708679,
-   "authored.specials.side.ground.projectiles.1.effect.damage": 4.0960001945495605,
-   "authored.specials.side.ground.projectiles.1.effect.growth": 64.08999633789062,
-   "authored.specials.side.ground.projectiles.1.effect.base": 28,
-   "authored.specials.side.ground.projectiles.1.effect.launchX": 0.5735764503479004,
-   "authored.specials.side.ground.projectiles.1.effect.launchZ": 0.8191520571708679,
-   "authored.specials.side.air.endFrame": 44,
-   "authored.specials.side.air.cooldownFrames": 90,
-   "authored.specials.side.air.projectiles.0.effect.damage": 4.0960001945495605,
-   "authored.specials.side.air.projectiles.0.effect.growth": 64.08999633789062,
-   "authored.specials.side.air.projectiles.0.effect.base": 28,
-   "authored.specials.side.air.projectiles.0.effect.launchX": 0.5735764503479004,
-   "authored.specials.side.air.projectiles.0.effect.launchZ": 0.8191520571708679,
-   "authored.specials.side.air.projectiles.1.effect.damage": 4.0960001945495605,
-   "authored.specials.side.air.projectiles.1.effect.growth": 64.08999633789062,
-   "authored.specials.side.air.projectiles.1.effect.base": 28,
-   "authored.specials.side.air.projectiles.1.effect.launchX": 0.5735764503479004,
-   "authored.specials.side.air.projectiles.1.effect.launchZ": 0.8191520571708679,
-   "authored.specials.side.air.landingLag": 20,
+   "authored.specials.side.ground.endFrame": 46,
+   "authored.specials.side.ground.cooldownFrames": 60,
+   "authored.specials.side.ground.landingLag": 22,
+   "authored.specials.side.ground.hurt.0.firstFrame": 8,
+   "authored.specials.side.ground.hurt.0.lastFrame": 35,
+   "authored.specials.side.ground.regions.0.firstFrame": 25,
+   "authored.specials.side.ground.regions.0.lastFrame": 32,
+   "authored.specials.side.ground.regions.0.hit.effect.damage": 8,
+   "authored.specials.side.ground.regions.0.hit.effect.growth": 70,
+   "authored.specials.side.ground.regions.0.hit.effect.base": 30,
+   "authored.specials.side.ground.regions.0.hit.effect.launchX": 0.7071067690849304,
+   "authored.specials.side.ground.regions.0.hit.effect.launchZ": 0.7071067690849304,
+   "authored.specials.side.air.endFrame": 46,
+   "authored.specials.side.air.cooldownFrames": 60,
+   "authored.specials.side.air.landingLag": 22,
+   "authored.specials.side.air.hurt.0.firstFrame": 8,
+   "authored.specials.side.air.hurt.0.lastFrame": 35,
+   "authored.specials.side.air.regions.0.firstFrame": 25,
+   "authored.specials.side.air.regions.0.lastFrame": 32,
+   "authored.specials.side.air.regions.0.hit.effect.damage": 8,
+   "authored.specials.side.air.regions.0.hit.effect.growth": 70,
+   "authored.specials.side.air.regions.0.hit.effect.base": 30,
+   "authored.specials.side.air.regions.0.hit.effect.launchX": 0.7071067690849304,
+   "authored.specials.side.air.regions.0.hit.effect.launchZ": 0.7071067690849304,
    "authored.specials.up.ground.endFrame": 40,
    "authored.specials.up.ground.landingLag": 30,
    "authored.specials.up.ground.regions.0.firstFrame": 4,
@@ -23340,39 +23339,61 @@
    "authored.specials.up.ground.hurt.0.lastFrame": 25,
    "authored.specials.up.ground.followUps.0.special.endFrame": 2,
    "authored.specials.up.ground.followUps.0.special.landingLag": 4,
-   "authored.specials.down.ground.endFrame": 50,
-   "authored.specials.down.ground.cooldownFrames": 90,
-   "authored.specials.down.ground.regions.0.firstFrame": 17,
-   "authored.specials.down.ground.regions.0.lastFrame": 20,
-   "authored.specials.down.ground.regions.0.hit.effect.damage": 11.263999938964844,
-   "authored.specials.down.ground.regions.0.hit.effect.growth": 69.0199966430664,
-   "authored.specials.down.ground.regions.0.hit.effect.base": 36,
-   "authored.specials.down.ground.regions.0.hit.effect.launchX": 0.258819043636322,
-   "authored.specials.down.ground.regions.0.hit.effect.launchZ": 0.9659258127212524,
-   "authored.specials.down.ground.regions.1.firstFrame": 17,
-   "authored.specials.down.ground.regions.1.lastFrame": 20,
-   "authored.specials.down.ground.regions.1.hit.effect.damage": 11.263999938964844,
-   "authored.specials.down.ground.regions.1.hit.effect.growth": 69.0199966430664,
-   "authored.specials.down.ground.regions.1.hit.effect.base": 36,
-   "authored.specials.down.ground.regions.1.hit.effect.launchX": -0.258819043636322,
-   "authored.specials.down.ground.regions.1.hit.effect.launchZ": 0.9659258127212524,
-   "authored.specials.down.air.endFrame": 50,
-   "authored.specials.down.air.cooldownFrames": 90,
-   "authored.specials.down.air.regions.0.firstFrame": 17,
-   "authored.specials.down.air.regions.0.lastFrame": 20,
-   "authored.specials.down.air.regions.0.hit.effect.damage": 11.263999938964844,
-   "authored.specials.down.air.regions.0.hit.effect.growth": 69.0199966430664,
-   "authored.specials.down.air.regions.0.hit.effect.base": 36,
-   "authored.specials.down.air.regions.0.hit.effect.launchX": 0.258819043636322,
-   "authored.specials.down.air.regions.0.hit.effect.launchZ": 0.9659258127212524,
-   "authored.specials.down.air.regions.1.firstFrame": 17,
-   "authored.specials.down.air.regions.1.lastFrame": 20,
-   "authored.specials.down.air.regions.1.hit.effect.damage": 11.263999938964844,
-   "authored.specials.down.air.regions.1.hit.effect.growth": 69.0199966430664,
-   "authored.specials.down.air.regions.1.hit.effect.base": 36,
-   "authored.specials.down.air.regions.1.hit.effect.launchX": -0.258819043636322,
-   "authored.specials.down.air.regions.1.hit.effect.launchZ": 0.9659258127212524,
+   "authored.specials.down.ground.endFrame": 44,
+   "authored.specials.down.ground.cooldownFrames": 150,
+   "authored.specials.down.ground.projectiles.0.effect.damage": 5,
+   "authored.specials.down.ground.projectiles.0.effect.growth": 40,
+   "authored.specials.down.ground.projectiles.0.effect.base": 34,
+   "authored.specials.down.ground.projectiles.0.effect.launchX": 0.6427876353263855,
+   "authored.specials.down.ground.projectiles.0.effect.launchZ": 0.7660444378852844,
+   "authored.specials.down.ground.variants.0.endFrame": 46,
+   "authored.specials.down.ground.variants.0.cooldownFrames": 90,
+   "authored.specials.down.ground.variants.0.projectiles.0.effect.damage": 5,
+   "authored.specials.down.ground.variants.0.projectiles.0.effect.growth": 60,
+   "authored.specials.down.ground.variants.0.projectiles.0.effect.base": 30,
+   "authored.specials.down.ground.variants.0.projectiles.0.effect.launchX": 0.5735764503479004,
+   "authored.specials.down.ground.variants.0.projectiles.0.effect.launchZ": 0.8191520571708679,
+   "authored.specials.down.ground.variants.0.projectiles.1.effect.damage": 5,
+   "authored.specials.down.ground.variants.0.projectiles.1.effect.growth": 60,
+   "authored.specials.down.ground.variants.0.projectiles.1.effect.base": 30,
+   "authored.specials.down.ground.variants.0.projectiles.1.effect.launchX": 0.5735764503479004,
+   "authored.specials.down.ground.variants.0.projectiles.1.effect.launchZ": 0.8191520571708679,
+   "authored.specials.down.ground.variants.1.endFrame": 36,
+   "authored.specials.down.ground.variants.1.cooldownFrames": 75,
+   "authored.specials.down.ground.variants.1.projectiles.0.effect.damage": 9,
+   "authored.specials.down.ground.variants.1.projectiles.0.effect.growth": 62,
+   "authored.specials.down.ground.variants.1.projectiles.0.effect.base": 40,
+   "authored.specials.down.ground.variants.1.projectiles.0.effect.launchX": 0.9063078165054321,
+   "authored.specials.down.ground.variants.1.projectiles.0.effect.launchZ": 0.4226182699203491,
+   "authored.specials.down.air.endFrame": 44,
+   "authored.specials.down.air.cooldownFrames": 150,
    "authored.specials.down.air.landingLag": 20,
+   "authored.specials.down.air.projectiles.0.effect.damage": 5,
+   "authored.specials.down.air.projectiles.0.effect.growth": 40,
+   "authored.specials.down.air.projectiles.0.effect.base": 34,
+   "authored.specials.down.air.projectiles.0.effect.launchX": 0.6427876353263855,
+   "authored.specials.down.air.projectiles.0.effect.launchZ": 0.7660444378852844,
+   "authored.specials.down.air.variants.0.endFrame": 46,
+   "authored.specials.down.air.variants.0.cooldownFrames": 90,
+   "authored.specials.down.air.variants.0.landingLag": 20,
+   "authored.specials.down.air.variants.0.projectiles.0.effect.damage": 5,
+   "authored.specials.down.air.variants.0.projectiles.0.effect.growth": 60,
+   "authored.specials.down.air.variants.0.projectiles.0.effect.base": 30,
+   "authored.specials.down.air.variants.0.projectiles.0.effect.launchX": 0.5735764503479004,
+   "authored.specials.down.air.variants.0.projectiles.0.effect.launchZ": 0.8191520571708679,
+   "authored.specials.down.air.variants.0.projectiles.1.effect.damage": 5,
+   "authored.specials.down.air.variants.0.projectiles.1.effect.growth": 60,
+   "authored.specials.down.air.variants.0.projectiles.1.effect.base": 30,
+   "authored.specials.down.air.variants.0.projectiles.1.effect.launchX": 0.5735764503479004,
+   "authored.specials.down.air.variants.0.projectiles.1.effect.launchZ": 0.8191520571708679,
+   "authored.specials.down.air.variants.1.endFrame": 36,
+   "authored.specials.down.air.variants.1.cooldownFrames": 75,
+   "authored.specials.down.air.variants.1.landingLag": 20,
+   "authored.specials.down.air.variants.1.projectiles.0.effect.damage": 9,
+   "authored.specials.down.air.variants.1.projectiles.0.effect.growth": 62,
+   "authored.specials.down.air.variants.1.projectiles.0.effect.base": 40,
+   "authored.specials.down.air.variants.1.projectiles.0.effect.launchX": 0.9063078165054321,
+   "authored.specials.down.air.variants.1.projectiles.0.effect.launchZ": 0.4226182699203491,
    "normal.0.startupFrames": 3,
    "normal.0.activeFrames": 2,
    "normal.0.endingFrames": 14,
@@ -23784,7 +23805,7 @@
    "throw.6.contactFrame": 19,
    "throw.6.totalFrames": 42
   },
-  "play": "{\"range\":{\"near\":45,\"far\":100},\"spacing\":[{\"move\":6,\"near\":30,\"far\":90},{\"move\":8,\"near\":30,\"far\":120},{\"move\":33,\"near\":45,\"far\":130},{\"move\":31,\"near\":150,\"far\":330},{\"move\":30,\"near\":180,\"far\":480}],\"approach\":[{\"via\":\"shoot\",\"moves\":[30,31],\"weight\":2},{\"via\":\"run\",\"moves\":[5,8,19,33],\"weight\":2}],\"defense\":[\"shield\",\"spotDodge\",\"retreat\"],\"combos\":[{\"starter\":7,\"followUps\":[15,7]},{\"starter\":8,\"followUps\":[6,5]},{\"starter\":43,\"followUps\":[19,7]}],\"kills\":[{\"move\":4,\"fromPercent\":80},{\"move\":14,\"fromPercent\":90},{\"move\":2,\"fromPercent\":90},{\"move\":41,\"fromPercent\":110}],\"recovery\":{\"aim\":\"ledge\",\"upSpecial\":\"last\"},\"avoid\":[\"edge\",\"air\"]}",
+  "play": "{\"range\":{\"near\":45,\"far\":100},\"spacing\":[{\"move\":6,\"near\":30,\"far\":90},{\"move\":8,\"near\":30,\"far\":120},{\"move\":31,\"near\":120,\"far\":340},{\"move\":33,\"near\":130,\"far\":320},{\"move\":30,\"near\":180,\"far\":480}],\"approach\":[{\"via\":\"shoot\",\"moves\":[33,30],\"weight\":2},{\"via\":\"run\",\"moves\":[33,31,5,8,19],\"weight\":2}],\"defense\":[\"shield\",\"spotDodge\",\"retreat\"],\"combos\":[{\"starter\":7,\"followUps\":[15,7]},{\"starter\":8,\"followUps\":[6,5]},{\"starter\":43,\"followUps\":[33,19,7]}],\"kills\":[{\"move\":4,\"fromPercent\":80},{\"move\":14,\"fromPercent\":90},{\"move\":2,\"fromPercent\":90},{\"move\":41,\"fromPercent\":110}],\"recovery\":{\"aim\":\"ledge\",\"upSpecial\":\"last\",\"sideSpecial\":true},\"avoid\":[\"edge\",\"air\"]}",
   "feel": {
    "normal.0.hit.0": {
     "advantage": -11
@@ -24031,17 +24052,13 @@
     "advantage": -26,
     "killPercent": 142
    },
-   "special.side.ground.projectiles.0": {
-    "advantage": -25
+   "special.side.ground.regions.0": {
+    "advantage": -15,
+    "killPercent": 173
    },
-   "special.side.ground.projectiles.1": {
-    "advantage": -17
-   },
-   "special.side.air.projectiles.0": {
-    "advantage": -25
-   },
-   "special.side.air.projectiles.1": {
-    "advantage": -17
+   "special.side.air.regions.0": {
+    "advantage": -15,
+    "killPercent": 173
    },
    "special.up.ground.regions.0": {
     "advantage": -32
@@ -24091,21 +24108,31 @@
    "special.up.ground.projectiles.2": {
     "advantage": -15
    },
-   "special.down.ground.regions.0": {
-    "advantage": -26,
-    "killPercent": 221
+   "special.down.ground.projectiles.0": {
+    "advantage": -22
    },
-   "special.down.ground.regions.1": {
-    "advantage": -26,
-    "killPercent": 221
+   "special.down.ground.variants.0.projectiles.0": {
+    "advantage": -26
    },
-   "special.down.air.regions.0": {
-    "advantage": -26,
-    "killPercent": 221
+   "special.down.ground.variants.0.projectiles.1": {
+    "advantage": -14
    },
-   "special.down.air.regions.1": {
-    "advantage": -26,
-    "killPercent": 221
+   "special.down.ground.variants.1.projectiles.0": {
+    "advantage": -18,
+    "killPercent": 146
+   },
+   "special.down.air.projectiles.0": {
+    "advantage": -22
+   },
+   "special.down.air.variants.0.projectiles.0": {
+    "advantage": -26
+   },
+   "special.down.air.variants.0.projectiles.1": {
+    "advantage": -14
+   },
+   "special.down.air.variants.1.projectiles.0": {
+    "advantage": -18,
+    "killPercent": 146
    },
    "throw.3": {
     "advantage": 0,
