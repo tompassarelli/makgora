@@ -2,7 +2,8 @@ import { swapSplashing } from "../fighters/murloc/duo";
 import { SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { ACTIVE_CUE_FRAMES } from "./cueWindows";
-import { type CueState, SWAP_SPLASH_CUES, specialCueState } from "./specialCues";
+import { SWAP_SPLASH_CUES, specialCueState } from "./specialCues";
+import type { CueState } from "./cue";
 
 const SWAP_SPLASH_STATE: CueState = { cues: SWAP_SPLASH_CUES, phase: "active" };
 

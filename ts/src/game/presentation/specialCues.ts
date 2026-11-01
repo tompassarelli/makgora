@@ -1,8 +1,6 @@
 
 
 
-
-
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
@@ -32,7 +30,8 @@ import {
   RIFLEMAN_SECOND_SHOT_FORM,
   RIFLEMAN_SECOND_SHOT_LAST,
 } from "../sim/specials";
-import { type CueBirth, SPECIAL_SLOTS, type SpecialSlot } from "./projectileArt";
+import { SPECIAL_SLOTS, type SpecialSlot } from "./projectileArt";
+import type { Cue, CueAnchor, CueState, MoveCues } from "./cue";
 import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
 import { FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
@@ -54,8 +53,6 @@ import { WYRM_RIDE, WYRM_SUMMON_FRAMES } from "../fighters/lich-king/specials";
 import { RISING_THUNDER_CUES } from "../fighters/thrall/cues";
 
 
-export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";
-
 export const MISSING_CUE_MODEL = "Objects\\InventoryItems\\QuestionMark\\QuestionMark.mdl";
 
 export const CUE_ANCHORS: { readonly [anchor in CueAnchor]: { readonly x: number; readonly z: number } } = {
@@ -70,53 +67,8 @@ export const CUE_ANCHORS: { readonly [anchor in CueAnchor]: { readonly x: number
   breath: { x: 124.0, z: 62.0 },
 };
 
-export interface Cue {
-  readonly model: string;
-  readonly anchor: CueAnchor;
-  readonly scale: number;
-  readonly anchorFrames?: readonly { readonly x: number; readonly z: number }[] | undefined;
-  readonly scaleEnd?: number | undefined;
-  readonly scaleFrames?: number | undefined;
-  readonly birth?: CueBirth | undefined;
-
-  readonly drawn?: boolean | undefined;
-
-
-
-
-
-
-  readonly sequence?: string | undefined;
-  readonly seconds?: number | undefined;
-  readonly pitch?: number | undefined;
-  readonly roll?: number | undefined;
-  readonly sound?: string | undefined;
-  readonly yaw?: number | undefined;
-  readonly depth?: number | undefined;
-  readonly timeScale?: number | undefined;
-  readonly alpha?: number | undefined;
-  readonly color?: readonly [number, number, number] | undefined;
-
-  readonly replacesBody?: boolean | undefined;
-  readonly rebirthFrames?: number | undefined;
-  /** When its move ends early, the cue keeps playing where it stood until this many frames after it first showed (presentation/cueLinger.ts). */
-  readonly lingerFrames?: number | undefined;
-}
 
 export const timed = (cue: Cue, sequence: string, seconds: number): Cue => ({ ...cue, sequence, seconds });
-
-
-export interface MoveCues {
-  readonly spell: string;
-  readonly startup: Cue;
-  readonly active: Cue;
-  /** The fighter's own body tint and alpha while either cue shows. */
-  readonly body?: { readonly red: number; readonly green: number; readonly blue: number; readonly alpha: number } | undefined;
-  /** The fighter is not drawn while intangible. */
-  readonly vanishes?: true | undefined;
-  readonly trail?: true | undefined;
-}
-
 
 
 const BIRTH_CUES = new Set([
@@ -160,7 +112,6 @@ const cue = (model: string, anchor: CueAnchor, scale: number): Cue => {
   return { model, anchor, scale, sequence, seconds, pitch };
 };
 const drawn = (model: string, anchor: CueAnchor): Cue => ({ model, anchor, scale: 1.0, drawn: true });
-
 
 
 const BLOODLUST = cue(GROM_BLOODLUST_MODEL, "hand", f32(0.8));
@@ -236,7 +187,6 @@ export const PEON_REST_CUES: MoveCues = {
   startup: cue("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", "body", f32(1.0)),
   active: { ...cue("Abilities\\Spells\\Undead\\Sleep\\SleepTarget.mdx", "body", f32(1.5)), rebirthFrames: 48 },
 };
-
 
 
 export const HERO_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]?: MoveCues } } = {
@@ -434,11 +384,6 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
 };
 
 
-
-
-
-
-
 const FEL_TELL = timed(cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "body", 0.5), "stand", f32(0.3));
 
 
@@ -460,8 +405,6 @@ export const ORIGINAL_CUES: { readonly [action: number]: MoveCues } = {
 
 
 // Cue absence uses "none" because Lua drops null array entries.
-
-
 
 
 export type BranchCue = MoveCues | "slot" | "none";
@@ -558,13 +501,6 @@ export function originalCueWindows(action: number, grounded: boolean): CueWindow
 }
 
 
-
-
-export interface CueState {
-  readonly cues: MoveCues | undefined;
-  readonly phase: "none" | "startup" | "active";
-}
-
 const NONE: CueState = { cues: undefined, phase: "none" };
 
 interface CueSource {
@@ -646,8 +582,15 @@ export function fighterMoveCues(character: Character): readonly MoveCues[] {
 }
 
 
+const FORM_CUES: { readonly [character in Character]?: readonly MoveCues[] } = {
+  [Character.dreadlord]: [DREADLORD_BITE_CUES],
+  [Character.kaelthas]: [KAEL_PHOENIX_FORM],
+  [Character.sylvanas]: [BANSHEE_FORM],
+  [Character.thrall]: GHOST_WOLF_CUES,
+};
+
 export function fighterCueList(character: Character): readonly Cue[] {
-  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.sylvanas ? [BANSHEE_FORM] : []), ...(character === Character.thrall ? GHOST_WOLF_CUES : []), ...peonExtraCues(character)].flatMap((cues) => [cues.startup, cues.active]);
+  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(FORM_CUES[character] ?? []), ...peonExtraCues(character)].flatMap((cues) => [cues.startup, cues.active]);
 }
 
 

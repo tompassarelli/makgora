@@ -11,7 +11,6 @@ import { OLDEST_WEIGHT, type StickStep, motionCompleted, zoneCode } from "../sim
 import { specialCooldownReady } from "../sim/specials/engine";
 import { gameplanOf } from "./botGameplan";
 import { projectileMeets, recovering } from "./botHeroKit";
-import type { BotStrategy } from "./botStrategy";
 
 const SLOTS = [SpecialSlot.neutral, SpecialSlot.side, SpecialSlot.up, SpecialSlot.down] as const;
 const SLOT_MOVES = [GameplanSpecial.neutral, GameplanSpecial.side, GameplanSpecial.up, GameplanSpecial.down] as const;
@@ -137,7 +136,15 @@ function hold(input: Controls, step: Readonly<StickStep>, side: number, press: b
   input.specialZ = step.z;
 }
 
-export function clearMotionCast(strategy: BotStrategy): void {
+export interface MotionCast {
+  motionSlot: number;
+  motionVariant: number;
+  motionStep: number;
+  motionSide: number;
+  motionFrame: number;
+}
+
+export function clearMotionCast(strategy: MotionCast): void {
   strategy.motionSlot = -1;
   strategy.motionVariant = 0;
   strategy.motionStep = 0;
@@ -145,7 +152,7 @@ export function clearMotionCast(strategy: BotStrategy): void {
   strategy.motionFrame = -1;
 }
 
-export function continueMotionCast(strategy: BotStrategy, f: Readonly<Fighter>, frame: number, input: Controls): boolean {
+export function continueMotionCast(strategy: MotionCast, f: Readonly<Fighter>, frame: number, input: Controls): boolean {
   const slot = strategy.motionSlot;
   if (slot < 0) return false;
   const specials = f.tuning.specials;
@@ -164,7 +171,7 @@ export function continueMotionCast(strategy: BotStrategy, f: Readonly<Fighter>, 
   return true;
 }
 
-function beginMotionCast(strategy: BotStrategy, f: Readonly<Fighter>, specials: Readonly<FighterSpecials>, slot: number, variant: number, frame: number, input: Controls): boolean {
+function beginMotionCast(strategy: MotionCast, f: Readonly<Fighter>, specials: Readonly<FighterSpecials>, slot: number, variant: number, frame: number, input: Controls): boolean {
   const steps = castSteps(baseMove(f, specials, slot), slot, variant);
   if (steps === undefined || steps.length === 0 || !castsAs(f, specials, slot, variant, steps)) return false;
   strategy.motionSlot = slot;
@@ -175,7 +182,7 @@ function beginMotionCast(strategy: BotStrategy, f: Readonly<Fighter>, specials: 
   return continueMotionCast(strategy, f, frame, input);
 }
 
-export function pressMotionCast(strategy: BotStrategy, f: Readonly<Fighter>, target: Readonly<Fighter>, slot: number, frame: number, observationAge: number, input: Controls): boolean {
+export function pressMotionCast(strategy: MotionCast, f: Readonly<Fighter>, target: Readonly<Fighter>, slot: number, frame: number, observationAge: number, input: Controls): boolean {
   const specials = f.tuning.specials;
   if (specials === undefined) return false;
   const kit = specialKit(specials, slot);
@@ -186,7 +193,7 @@ export function pressMotionCast(strategy: BotStrategy, f: Readonly<Fighter>, tar
   return beginMotionCast(strategy, f, specials, slot, variant, frame, input) || (variant !== 0 && beginMotionCast(strategy, f, specials, slot, 0, frame, input));
 }
 
-export function pressMotionPunish(strategy: BotStrategy, f: Readonly<Fighter>, target: Readonly<Fighter>, believed: number, frame: number, input: Controls): boolean {
+export function pressMotionPunish(strategy: MotionCast, f: Readonly<Fighter>, target: Readonly<Fighter>, believed: number, frame: number, input: Controls): boolean {
   const specials = f.tuning.specials;
   if (specials === undefined || strategy.motionSlot >= 0) return false;
   for (const slot of SLOTS) {

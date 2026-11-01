@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { GHOST_DASH, GHOST_DASH_SPEED, GHOST_GLIDE, GHOST_LEAP, GHOST_SHIFT } from "../fighters/thrall/ghostWolf";
 import { GHOST_WOLF_MODEL } from "../fighters/thrall/wolves";
 import { STOCK_WOLF_STRIDE } from "./projectileArt";
-import type { Cue, CueState, MoveCues } from "./specialCues";
+import type { Cue, CueState, MoveCues } from "./cue";
 
 const WOLF_SCALE = f32(0.65);
 const POUNCE_FRAMES = GHOST_GLIDE.last - GHOST_LEAP.first + 1;

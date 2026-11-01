@@ -6,10 +6,10 @@ import { Phase } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { createReplaySnapshot, type ReplayState } from "../replay/snapshot";
 import { copyFighterState } from "../../generated/state/fighterState";
-import type { Character } from "./codes";
-import { createFighter, type Fighter } from "./fighter";
-import { setWorldMotionValue } from "./motion";
-import { fighterAt } from "./roster";
+import type { Character } from "../sim/codes";
+import { createFighter, type Fighter } from "../sim/fighter";
+import { setWorldMotionValue } from "../sim/motion";
+import { fighterAt } from "../sim/roster";
 
 export type Press = "down" | "hold" | "none";
 

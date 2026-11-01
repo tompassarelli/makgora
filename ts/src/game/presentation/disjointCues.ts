@@ -5,7 +5,7 @@ import type { Fighter } from "../sim/fighter";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { type CueBirth } from "./projectileArt";
-import { type Cue } from "./specialCues";
+import type { Cue } from "./cue";
 import { REACH_CUE_NORMALS } from "./reachCueInfo";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegion, immolationRegion, wingDiveRegion } from "../sim/specials";
 

@@ -1,4 +1,4 @@
-import type { Cue } from "./specialCues";
+import type { Cue } from "./cue";
 
 /** Where a held cue stands in the world, the way it faces and its drawn scale. */
 export interface CuePlace {

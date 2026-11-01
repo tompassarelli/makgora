@@ -4,7 +4,7 @@ import type { Fighter } from "../sim/fighter";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { ultimateCharged } from "../sim/meter";
 import type { AuthoredSpecial } from "../sim/specials/schema";
-import type { Cue } from "./specialCues";
+import type { Cue } from "./cue";
 import { heroLook } from "../roster/looks";
 
 export interface MeterCue extends Cue {

@@ -2,7 +2,7 @@ import { assertEquals, assertGreaterThan, assertNear, assertTrue, test } from "w
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../../sim/codes";
 import { mainDeckRight, mainDeckZ } from "../../sim/stage";
-import { type Duel, lift, stickDuel, step } from "../../sim/stickDuel";
+import { type Duel, lift, stickDuel, step } from "../stickDuel";
 import { fighterModelReplaced } from "../../presentation/fighterForm";
 import { recovered } from "../../match/recoveryEnvelope";
 import { GHOST_DASH, GHOST_END_FRAME, GHOST_GLIDE, GHOST_LEAP } from "./ghostWolf";

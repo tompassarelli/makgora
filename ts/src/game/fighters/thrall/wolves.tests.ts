@@ -6,7 +6,7 @@ import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import type { Fighter, Projectile } from "../../sim/fighter";
 import type { SpecialProjectile } from "../../sim/specials/schema";
 import { floorBelow, mainDeckRight, mainDeckZ } from "../../sim/stage";
-import { type Duel, type Press, type Stick, lift, stickDuel, step } from "../../sim/stickDuel";
+import { type Duel, type Press, type Stick, lift, stickDuel, step } from "../stickDuel";
 import { DIRE_SPEED, DIRE_WOLF, SPIRIT_SPEED, SPIRIT_WOLF, TIMBER_SPEED, TIMBER_WOLVES, WOLF_RUN, WolfForm } from "./wolves";
 
 const PRESS_TICK = 12;

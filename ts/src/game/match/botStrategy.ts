@@ -17,6 +17,7 @@ import type { CpuDecisionPolicy } from "./cpuDecisionPolicy";
 import { HABIT_FIELDS, HabitChoice, habitContext } from "./botHabits";
 import { gameplanOf } from "./botGameplan";
 import { heroStanceFits, heroStanceSlot, pressHeroStance } from "./botHeroKit";
+import type { MotionCast } from "./botMotionCast";
 
 const HISTORY_LIMIT = 128;
 export const BURN_MEMORY_FRAMES = 150;
@@ -50,7 +51,7 @@ interface SavedBotRead {
   actionFacing: Direction;
 }
 
-export interface BotStrategy {
+export interface BotStrategy extends MotionCast {
   // Lua arrays keep their peak capacity, so snapshots share each history instead of copying it; replace it, never mutate it.
   history: readonly number[];
   observedFrame: number;
@@ -78,11 +79,6 @@ export interface BotStrategy {
   burnCount: number;
   burnGap: number;
   blockFrame: number;
-  motionSlot: number;
-  motionVariant: number;
-  motionStep: number;
-  motionSide: number;
-  motionFrame: number;
 
   readonly recentOptions: number[];
 }
