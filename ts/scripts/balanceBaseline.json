@@ -25340,7 +25340,7 @@
    "authored.moves.normals.16.regions.3.hit.groundedEffect.launchZ": 0.8191520571708679,
    "authored.moves.normals.19.startupFrames": 5,
    "authored.moves.normals.19.activeFrames": 8,
-   "authored.moves.normals.19.totalFrames": 35,
+   "authored.moves.normals.19.totalFrames": 33,
    "authored.moves.normals.19.landingLag": 0,
    "authored.moves.normals.19.regions.0.firstFrame": 5,
    "authored.moves.normals.19.regions.0.lastFrame": 12,
@@ -25805,7 +25805,7 @@
    "normal.18.hit.0.launchZ": 0.7071067690849304,
    "normal.19.startupFrames": 5,
    "normal.19.activeFrames": 8,
-   "normal.19.endingFrames": 22,
+   "normal.19.endingFrames": 20,
    "normal.19.landingLag": 0,
    "normal.19.hit.0.damage": 9.720000267028809,
    "normal.19.hit.0.growth": 92.79000091552734,
@@ -26083,7 +26083,7 @@
     "killPercent": 112
    },
    "normal.19.hit.0": {
-    "advantage": -23,
+    "advantage": -21,
     "killPercent": 122
    },
    "normal.20.hit.0": {
