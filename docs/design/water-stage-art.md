@@ -180,6 +180,10 @@ Surface
    camera made of dashes at most 4 px tall, each a broken horizontal highlight in the
    sun's colour at most 0.7 opaque; dashes cover at most 35% of the path's area, so
    no smooth band forms, and they widen and scatter toward the camera.
+   Tom's 1 November 2026 playtest asked for fine wind chop over the whole sea,
+   small crests catching the light and soft glint streaks on the near surface on
+   every water stage, Tomb included: the chop and its crest light and glints stay
+   inside rules 4 and 5 (luma deviation and p99 over p50 per block).
 7. **Dim reflection.** Reflected backdrop luma at most 45% of its source, displaced
    2 to 6 px by the ripples so its edges break; the sea hazes toward the fog colour
    at the horizon with no line brighter than the sky beside it.
