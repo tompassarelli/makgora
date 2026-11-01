@@ -39,7 +39,7 @@ export const PRESTOR_STOCK_SCALE = { unit: "KatranaPrestorHero", scale: 1.0 } as
 
 export const ONYXIA_DRAGON_MODEL = "war3mapImported\\OnyxiaDragon.mdx";
 
-export const ONYXIA_DRAGON_STOCK_SCALE = { unit: "OnyxiaDragon", scale: f32(0.4) } as const;
+export const ONYXIA_DRAGON_STOCK_SCALE = { unit: "OnyxiaDragon", scale: f32(0.48) } as const;
 
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string; readonly reanimated?: true }[] = [
   { entry: GROM_BLOODLUST_MODEL, file: "GromBloodlustQuiet.mdx" },

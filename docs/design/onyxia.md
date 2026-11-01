@@ -122,6 +122,16 @@ recorded in smashcraft:docs/design/roster-next.md#hive-model-terms.
   conversion of it (smashcraft:tools/animations/hd-to-classic.ts), which draws
   the diffuse texture only. It has flying animations only, so the dragon hovers
   with its claws on the floor.
+  Tom judged the first draw (scale 0.4, a standing body 154 units tall, 1.17
+  hero heights) too small beside a normal fighter and asked in a 2026-11-01
+  playtest for a standing body about 1.4 hero heights tall, wings not counted
+  (a Bowser-class size). The draw scale is now 0.48: the mean top of the
+  body geosets (not the wing geosets) over the Stand loop is 386 model units, so
+  the standing body is 185 units, 1.40 of the 132-unit hero reference height,
+  with the claws still on the floor. Her hurtbox already stood 1.4 hero
+  heights (height 1.4, width 1.6 in heroBodies.ts), so the body now matches the
+  drawn dragon; no hurtbox, reach or tuning number moved, and her balance read
+  is unchanged.
 - Prestor: [Katrana Prestor by Footman16](https://www.hiveworkshop.com/threads/katrana-prestor.362851/),
   Classic SD, 843 polygons, an edit of AndrewOverload519's Female Human Mage
   and kangyun's Sally Whitemane staff with both permissions posted. Tom chose
