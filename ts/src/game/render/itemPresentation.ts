@@ -67,7 +67,7 @@ export class ItemPresentation {
     this.carriers = PARTICIPANT_SLOTS.map(() => ({
       ring: create(ITEM_MODELS.glow, origin),
       trail: create(ITEM_MODELS.speedTrail, origin),
-      shell: create(ITEM_MODELS.heavyPickup, origin),
+      shell: create(ITEM_MODELS.heavyShell, origin),
       avatar: create(AVATAR_MODEL, origin),
       pickup: { model: create(ITEM_MODELS.burst, origin), start: 0, shown: false },
       end: { model: create(ITEM_MODELS.end, origin), start: 0, shown: false },
@@ -123,8 +123,8 @@ export class ItemPresentation {
         paint(this.glow, itemColor(kind));
       }
     }
-    if (kind === ItemKind.speed) this.place(this.speedPickup, 0.0, deck + ITEM_HEIGHT - 20.0, f32(0.32));
-    else if (kind === ItemKind.heavy) this.place(this.heavyPickup, 0.0, deck + ITEM_HEIGHT - 10.0, f32(0.75));
+    if (kind === ItemKind.speed) this.place(this.speedPickup, 0.0, deck + ITEM_HEIGHT - 20.0, f32(0.55));
+    else if (kind === ItemKind.heavy) this.place(this.heavyPickup, 0.0, deck + ITEM_HEIGHT - 10.0, f32(0.45));
     const pickup = kind === ItemKind.speed ? this.speedPickup : kind === ItemKind.heavy ? this.heavyPickup : undefined;
     if (pickup !== undefined) {
       paint(pickup, itemColor(kind));

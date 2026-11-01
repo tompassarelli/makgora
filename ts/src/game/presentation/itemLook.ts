@@ -73,8 +73,9 @@ export const itemTelegraphAlpha = (left: number): number => floorMod(left, 60) <
 
 
 export const ITEM_MODELS = {
-  speedPickup: "Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx",
-  heavyPickup: "Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx",
+  speedPickup: "Objects\\InventoryItems\\runicobject\\runicobject.mdx",
+  heavyPickup: "Objects\\InventoryItems\\Glyph\\Glyph.mdx",
+  heavyShell: "Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx",
   glow: "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl",
   burst: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx",
   speedTrail: "Abilities\\Spells\\Undead\\Cripple\\CrippleTarget.mdx",
