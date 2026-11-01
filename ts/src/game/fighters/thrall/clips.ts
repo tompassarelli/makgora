@@ -76,6 +76,8 @@ export const THRALL_CLIPS = { idle: THRALL_FALLBACK, walk: { index: 15, seconds:
   upSpecialAir: { index: 100, seconds: f32(0.667), aligned: true },
   downSpecial: { index: 101, seconds: f32(0.833), aligned: true },
   downSpecialAir: { index: 102, seconds: f32(0.833), aligned: true },
+  upSpecialFollowUp: { index: 114, seconds: f32(0.033), aligned: true },
+  upSpecialFollowUpAir: { index: 115, seconds: f32(0.033), aligned: true },
 } as const satisfies HeroClipTable;
 export const THRALL_DAMAGE_CLIPS: readonly HeroClip[] = [
   { index: 103, seconds: f32(0.4), aligned: true },

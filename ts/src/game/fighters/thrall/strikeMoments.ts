@@ -22,5 +22,6 @@ export const thrallStrikeMoments = {
   20: { clip: 32, seconds: f32(0.050), end: f32(0.450) },
   100: { clip: 95, seconds: f32(0.783), end: f32(0.967) },
   101: { clip: 97, seconds: f32(0.200), end: f32(0.733) },
+  102: { clip: 99, seconds: f32(0.017), end: f32(0.667) },
   103: { clip: 101, seconds: f32(0.267), end: f32(0.833) },
 };

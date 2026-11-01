@@ -50,6 +50,7 @@ import { SHURIKEN_CHARGE_CUES } from "./shurikenCues";
 import { slotCues } from "./slotCues";
 import { BANISH_SWIRL_MODEL } from "../fighters/kaelthas/look";
 import { WYRM_RIDE, WYRM_SUMMON_FRAMES } from "../fighters/lich-king/specials";
+import { RISING_THUNDER_CUES } from "../fighters/thrall/cues";
 
 
 export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";
@@ -293,7 +294,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   [Character.thrall]: {
     neutral: { spell: "Chain Lightning", startup: STORM, active: cue("Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx", "hand", 0.5) },
     side: { spell: "Feral Spirit", startup: BEAST, active: cue("units\\orc\\SpiritWolf\\SpiritWolf.mdx", "ahead", 0.5) },
-    up: { spell: "Far Sight", startup: STORM, active: cue("Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdx", "body", 0.5) },
+    up: RISING_THUNDER_CUES,
     down: { spell: "Doomhammer Slam", startup: STORM, active: cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.8)) },
   },
   [Character.sylvanas]: {
@@ -489,6 +490,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
     down: { followUps: [0, 1, 2, 3].map(() => branch("Keg Toss", BREW, cue("Abilities\\Spells\\Other\\StrongDrink\\BrewmasterTarget.mdx", "ahead", f32(0.6)))) },
   },
   [Character.tinker]: { side: { recall: "slot" } },
+  [Character.thrall]: { up: { followUps: ["none"] } },
   [Character.blademaster]: {
     neutral: { followUps: QUICKDRAW_DRAW_CUES },
     side: { recall: branch("Image Swap", cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "body", 1.0), cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageMissile.mdx", "body", 1.0)) },

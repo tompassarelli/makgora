@@ -12,6 +12,7 @@ import { LEDGE_ROLL_FRAMES } from "../../ts/src/game/sim/ledge";
 import { GROUND_ROLL_FRAMES } from "../../ts/src/game/sim/conditions";
 import { STOCK_MODEL_SCALES } from "../../ts/src/game/presentation/modelScale";
 import { HAMMER_SLIDE, LOW_SHOULDER, STANDING_SHOULDER, THRALL_HAMMER_SWINGS, smash, swingGrip, swingHead, tilt, type HammerSwing } from "../../ts/src/game/fighters/thrall/moves";
+import { RISING_THUNDER, RISING_THUNDER_APEX, RISING_THUNDER_CAST, RISING_THUNDER_STRUCK, RISING_THUNDER_SWING } from "../../ts/src/game/fighters/thrall/risingThunder";
 import { seconds } from "./asset-info";
 import { highestGrip, ledgeGripOffset } from "./ledge-grip";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
@@ -69,6 +70,7 @@ const SWINGS: Partial<Record<HeroPose, HammerSwing>> = {
  getUpAttack: tilt(LOW_SHOULDER, 22.0, 24.0, 8, [-12.0, -6.0, 186.0, 192.0]),
  ledgeAttack: tilt(LOW_SHOULDER, 24.0, 24.0, 8, [-4.0, -8.0, -12.0, -16.0]),
  downSpecial: smash(STANDING_SHOULDER, 18.0, 28.0, 15, [100.0, 30.0, -50.0, -78.0]),
+ upSpecial: RISING_THUNDER_SWING,
 };
 const unit = (angle: number): Point => [Math.cos(angle * Math.PI / 180), 0, Math.sin(angle * Math.PI / 180)];
 const inModel = ([x, z]: readonly [number, number], y = GRIP_Y): Point => [x / SCALE, y, z / SCALE];
@@ -87,6 +89,33 @@ function swingBeats(pose: HeroPose, swing: HammerSwing, total: number): Beat[] {
  };
  const kick = pose === "backAir" ? [5, 7, 8, 9].map((frame, index): Beat => ({ frame, g: index === 0 ? KICK_COIL : KICK, hand: STAND_GRIP, direction: STAND_UP, slide })) : [];
  return [...kick, beat(wind.frame, wind.angle, windBody), ...swing.beats.map(b => beat(b.frame, b.angle, body)), beat(follow.frame, follow.angle, body), ...hold.map(h => beat(h.frame, h.angle, body))];
+}
+const RISE_CROUCH: Gesture = {chest:30,waist:-8,head:-14,lean:6,front:-62,back:-52,kneeFront:112,kneeBack:102};
+const RISE_CAST: Gesture = {chest:22,head:-20,front:-42,back:-30,kneeFront:74,kneeBack:62};
+const RISE_LAUNCH: Gesture = {chest:-6,head:-22,front:8,back:-16,kneeFront:12,kneeBack:30};
+const RISE_DRIVE: Gesture = {chest:-12,head:-26,front:-28,back:12,kneeFront:62,kneeBack:18};
+const RISE_APEX: Gesture = {chest:-18,head:-32,front:-50,back:14,kneeFront:92,kneeBack:16};
+const RISE_FALL: Gesture = {chest:40,head:16,front:22,back:22,kneeFront:30,kneeBack:30};
+const PALM_DOWN: Point = inModel([14.0, 40.0], OFF_Y), HIP_HAND: Point = inModel([4.0, 48.0], OFF_Y);
+function risingBeat(frame: number, angle: number, g: Gesture, offHand: Point): Beat {
+ return { frame: frame - 1, g, hand: inModel(swingGrip(RISING_THUNDER_SWING, angle)), direction: unit(angle), offHand, slide: HAMMER_SLIDE[RISING_THUNDER_SWING.grip] };
+}
+function risingThunderBeats(total: number): Beat[] {
+ const [launch, ...rise] = RISING_THUNDER_SWING.beats, apex = rise.pop()!;
+ return [
+  risingBeat(3, -70, {...RISE_CROUCH}, inModel([20.0, 52.0], OFF_Y)),
+  risingBeat(RISING_THUNDER_CAST, -20, RISE_CAST, PALM_DOWN),
+  risingBeat(launch!.frame, launch!.angle, RISE_LAUNCH, PALM_DOWN),
+  ...rise.map((beat, index) => risingBeat(beat.frame, beat.angle, index === 0 ? RISE_LAUNCH : RISE_DRIVE, HIP_HAND)),
+  risingBeat(apex.frame - 2, 84, RISE_APEX, HIP_HAND),
+  risingBeat(apex.frame, apex.angle, RISE_APEX, HIP_HAND),
+  risingBeat(RISING_THUNDER_APEX.last + 2, 92, RISE_APEX, HIP_HAND),
+  risingBeat(total - 6, 40, {...RISE_FALL, chest:20}, HIP_HAND),
+  risingBeat(total + 1, -10, RISE_FALL, HIP_HAND),
+ ];
+}
+function struckBeats(total: number): Beat[] {
+ return [risingBeat(1, 92, RISE_APEX, HIP_HAND), risingBeat(Math.max(2, total - 2), 60, RISE_DRIVE, HIP_HAND), risingBeat(total + 1, 20, {...RISE_FALL, chest:10}, HIP_HAND)];
 }
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
@@ -113,8 +142,10 @@ for(const [pose,defaultFrames,defaultContact,gesture] of extra) { const throwCod
 for(const pose of ["rollForward","techForward","getUpRollForward","ledgeRoll","rollBackward","techBackward","getUpRollBackward"] as const)actions.push({pose,frames:pose.startsWith("tech")?TECH_ROLL_FRAMES:pose.startsWith("getUp")?DOWN_ROLL_FRAMES:pose==="ledgeRoll"?LEDGE_ROLL_FRAMES:GROUND_ROLL_FRAMES,contact:10,gesture:{...brace,front:-75,back:-75,kneeFront:120,kneeBack:120},roll:pose.endsWith("Backward")?-1:1});
 for(const [pose,key,gesture]of [["neutralSpecial","neutral",{...cast,arm:-30,leftArm:-150,head:-25}],["sideSpecial","side",{...forward,arm:-30,leftArm:-95,chest:26}],["upSpecial","up",{...overhead,front:-55,back:35,lean:-15}],["downSpecial","down",overhead]] as const){
  const move=hero.specials?.[key]; ensure(move,`${pose}: missing special`);
- for(const air of [false,true]) { const form = air ? move.air ?? move.ground : move.ground; const contact = Math.min(...[...(form.regions?.map(r=>r.firstFrame)??[]),...(form.motion?.map(r=>r.first)??[]),...(form.projectiles?.map(r=>r.spawnFrame)??[]),...(form.guard?[form.guard.first]:[]),form.endFrame]); const swing=SWINGS[pose]; actions.push({pose:(air?`${pose}Air`:pose) as HeroPose,frames:form.endFrame,contact:Math.max(3,contact),gesture,air,beats:swing?swingBeats(pose,swing,form.endFrame):undefined,slide:swing?HAMMER_SLIDE[swing.grip]:undefined}); }
+ for(const air of [false,true]) { const form = air ? move.air ?? move.ground : move.ground; const contact = Math.min(...[...(form.regions?.map(r=>r.firstFrame)??[]),...(form.motion?.map(r=>r.first)??[]),...(form.projectiles?.map(r=>r.spawnFrame)??[]),...(form.guard?[form.guard.first]:[]),form.endFrame]); const swing=SWINGS[pose]; const beats=pose==="upSpecial"?risingThunderBeats(form.endFrame):swing?swingBeats(pose,swing,form.endFrame):undefined; actions.push({pose:(air?`${pose}Air`:pose) as HeroPose,frames:form.endFrame,contact:Math.max(3,contact),gesture,air,beats,slide:swing?HAMMER_SLIDE[swing.grip]:undefined}); }
 }
+ensure(hero.specials?.up.ground===RISING_THUNDER,"Thrall's up special is Rising Thunder");
+for(const air of [false,true])actions.push({pose:(air?"upSpecialFollowUpAir":"upSpecialFollowUp") as HeroPose,frames:RISING_THUNDER_STRUCK.endFrame,contact:1,gesture:RISE_APEX,air:true,beats:struckBeats(RISING_THUNDER_STRUCK.endFrame),slide:0});
 function rotated(q: ArrayLike<number>, y:number,z=0){const a=y*Math.PI/360,b=z*Math.PI/360;const u=[-Math.sin(a)*Math.sin(b),Math.sin(a)*Math.cos(b),Math.cos(a)*Math.sin(b),Math.cos(a)*Math.cos(b)];const [x=0,v=0,w=0,t=1]=Array.from(q);const [i=0,j=0,k=0,l=1]=u;return new Float32Array([l*x+i*t+j*w-k*v,l*v-i*w+j*t+k*x,l*w+i*v-j*x+k*t,l*t-i*x-j*v-k*w]);}
 type Phase = { frame: number; amount: number };
 function multiply(a:ArrayLike<number>, b:ArrayLike<number>) {
@@ -179,7 +210,7 @@ for(let height=0;height<3;height++)for(let strength=0;strength<3;strength++){con
 if(inPlace){ensure(replaced.every(pose=>actions.some(action=>action.pose===pose)),`unknown pose in ${replaced.join(" ")}`);actions.splice(0,actions.length,...actions.filter(action=>replaced.includes(action.pose)));}
 const swordIn=(["Bones","Helpers"] as const).find(kind=>source[kind].some(n=>n.Name==="Bone_Sword"))!,hammerTranslation=`.${swordIn}.${source[swordIn].findIndex(n=>n.Name==="Bone_Sword")}.Translation`;
 function placeSequence(name:string,action:Action){
- const existing=inPlace?model.Sequences.findIndex(sequence=>sequence.Name===name):-1;ensure(!inPlace||existing>=0,`${name}: shipped sequence missing`);
+ const existing=inPlace?model.Sequences.findIndex(sequence=>sequence.Name===name):-1;
  const index=existing>=0?existing:model.Sequences.length,start=existing>=0?model.Sequences[index]!.Interval[0]!:cursor,end=start+Math.round(action.frames*1000/60);
  if(existing>=0){const shipped=model.Sequences[index]!.Interval[1]!,next=Math.min(...model.Sequences.map(sequence=>sequence.Interval[0]!).filter(first=>first>start));ensure(end<next,`${name}: no room before the next sequence`);
   tracks(model,track=>{if(!onGlobalClock(track))track.Keys=track.Keys.filter(key=>key.Frame<start||key.Frame>Math.max(end,shipped));});model.Sequences[index]!.Interval=new Uint32Array([start,end]);}
@@ -220,7 +251,7 @@ function plantRoot(index:number,start:number,end:number,action:Action,phases:rea
  const beforeKeys=center.Translation.Keys.filter(k=>k.Frame<start||(inPlace&&k.Frame>end));
  const drawn=new DrawnModel(generateMDX(model),1);
  const translations:mdx.AnimKeyframe[]=[];
- for(const {frame}of phases){const posed=drawn.posed(index,frame/60,1);const lowest=Math.min(...footNodes.map(n=>posed.nodes[n*2+1]!))-FOOT_REST;const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:(action.pose==="ledgeHang"?hangRoot(drawn,index,frame/60,old?.Vector):undefined)??new Float32Array([old?.Vector[0]??0,old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air||action.pose.startsWith("upSpecial")?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
+ for(const {frame}of phases){const posed=drawn.posed(index,frame/60,1);const lowest=Math.min(...footNodes.map(n=>posed.nodes[n*2+1]!))-FOOT_REST;const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:(action.pose==="ledgeHang"?hangRoot(drawn,index,frame/60,old?.Vector):undefined)??new Float32Array([old?.Vector[0]??0,old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air||(action.pose.startsWith("upSpecial")&&frame>=RISING_THUNDER_CAST)?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
  center.Translation.Keys=[...beforeKeys,...translations].sort((a,b)=>a.Frame-b.Frame);
 }
 function bindAction(ordinal:number,name:string,index:number,start:number,end:number,action:Action){
@@ -249,7 +280,7 @@ if(!inPlace)for(const [ordinal,action]of actions.entries())if(/^victim(Pummel|Th
 const clipSeconds=(index:number)=>seconds((source.Sequences[index]!.Interval[1]-source.Sequences[index]!.Interval[0])/1000);
 async function writeClipTable(){
 const clipTable=join(project,"ts/src/game/fighters/thrall/clips.ts");
-if(inPlace){let table=await Bun.file(clipTable).text();for(const binding of bindings){const line=new RegExp(`^  ${binding.trim().split(":")[0]}: .*,$`,"m");ensure(line.test(table),`${binding}: no binding to replace`);table=table.replace(line,()=>binding);}await Bun.write(clipTable,table);}
+if(inPlace){let table=await Bun.file(clipTable).text();for(const binding of bindings){const line=new RegExp(`^  ${binding.trim().split(":")[0]}: .*,$`,"m");table=line.test(table)?table.replace(line,()=>binding):table.replace("} as const satisfies HeroClipTable;",()=>`${binding}\n} as const satisfies HeroClipTable;`);}await Bun.write(clipTable,table);}
 else await Bun.write(clipTable,[
  "// Generated by tools/animations/thrall-clips.ts from johnwar's Warchief Thrall Dismounted.",'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
  'export const THRALL_MODEL_FILE = '+JSON.stringify(THRALL_MODEL_FILE)+';',
@@ -272,7 +303,7 @@ function headErrors(bytes:ArrayBuffer){
  return rows;
 }
 async function writeSheets(finalDrawn:DrawnModel){
-for(const pose of ["jab","jab2","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","dashAttack","forwardSmash","upSmash","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","grab","throwForward","throwBack","throwUp","throwDown","getUpAttack","ledgeAttack"] as HeroPose[]){const i=actions.findIndex(a=>a.pose===pose);if(i<0)continue;const action=actions[i]!,sequence=records[i]!.index;const shown=action.beats?[0,...action.beats.map(b=>b.frame),action.frames]:[0,Math.max(1,action.contact-3),action.contact,action.contact+4,action.frames];const panels:PoseFrame[]=[1,-1].flatMap(facing=>shown.map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:sequence,seconds:Math.min(action.frames,frame)/60})));await Bun.write(join(output,`${pose}.png`),sheet(`Thrall ${pose}`,finalDrawn,panels,Math.min(8,shown.length)).png);}
+for(const pose of ["jab","jab2","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","dashAttack","forwardSmash","upSmash","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","neutralSpecial","sideSpecial","upSpecial","upSpecialFollowUpAir","downSpecial","grab","throwForward","throwBack","throwUp","throwDown","getUpAttack","ledgeAttack"] as HeroPose[]){const i=actions.findIndex(a=>a.pose===pose);if(i<0)continue;const action=actions[i]!,sequence=records[i]!.index;const shown=action.beats?[0,...action.beats.map(b=>b.frame),action.frames]:[0,Math.max(1,action.contact-3),action.contact,action.contact+4,action.frames];const panels:PoseFrame[]=[1,-1].flatMap(facing=>shown.map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:sequence,seconds:Math.min(action.frames,frame)/60})));await Bun.write(join(output,`${pose}.png`),sheet(`Thrall ${pose}`,finalDrawn,panels,Math.min(8,shown.length)).png);}
 }
 async function generate(){
  for(const [ordinal,action]of [...actions,...damageActions].entries())bakeAction(ordinal,action);

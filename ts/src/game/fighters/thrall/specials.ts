@@ -1,10 +1,9 @@
-import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../../sim/codes";
-import { HERO_REFERENCE_HEIGHT, heroRegion, type MoveRegion } from "../../sim/heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, frames } from "../../sim/specials/schema";
+import { heroRegion, type MoveRegion } from "../../sim/heroMoves";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../../sim/specials/schema";
 import { capsule, thrallHit } from "./moves";
+import { RISING_THUNDER } from "./risingThunder";
 
-const h = (multiple: number) => f32(HERO_REFERENCE_HEIGHT * multiple);
 const CHAIN_ORIGIN_X = 42.0;
 const CHAIN_ORIGIN_Z = 70.0;
 const CHAIN_RANGE = 520.0;
@@ -24,10 +23,6 @@ const wolf = (spawnFrame: number, air: boolean): SpecialProjectile => ({
   model: "units\\orc\\SpiritWolf\\SpiritWolf.mdx",
 });
 const wolves = (air: boolean): AuthoredSpecial => ({ endFrame: 44, cooldownFrames: 90, projectiles: [wolf(16, air), wolf(24, air)], landingLag: air ? 20 : undefined });
-const sight = (height: number): AuthoredSpecial => ({
-  endFrame: 40, facesStick: true, oncePerAirtime: true, helpless: true,
-  motion: [{ ...frames(1, 8), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(9, 32), velocityX: 0.0, velocityZ: f32(h(height) / 24.0), driftSpeed: f32(h(f32(1.5)) / 24.0) }],
-});
 const DOOMHAMMER_SLAM: AuthoredSpecial = {
     endFrame: 50, cooldownFrames: 90, groundOnly: true,
     regions: [heroRegion(18, 21, capsule(0.0, 12.0, 119.0, 12.0, 16.0), thrallHit(11.263999938964844, 75, 69.0199966430664, 36.0)), heroRegion(18, 21, capsule(0.0, 12.0, -119.0, 12.0, 16.0), thrallHit(11.263999938964844, 75, 69.0199966430664, 36.0, true))],
@@ -36,6 +31,6 @@ const DOOMHAMMER_SLAM: AuthoredSpecial = {
 export const THRALL_SPECIALS: FighterSpecials = {
   neutral: { name: "Chain Lightning", description: "Call down a crackling bolt of lightning at where the nearest foe in front of him stood when he began; it does not follow them, so jump or shield it and punish the slow cast.", ground: CHAIN_LIGHTNING },
   side: { name: "Feral Spirit", description: "Send two spirit wolves running low, one after the other.", ground: wolves(false), air: wolves(true) },
-  up: { name: "Far Sight", description: "Let the spirits guide a rising leap; steer toward the ledge, then fall helpless.", ground: sight(f32(3.1)) },
+  up: { name: "Rising Thunder", description: "Erupt the earth under his palm and ride it skyward, sweeping the crackling Doomhammer up from level to straight overhead: the rise strikes again and again and the top launches. A hit leaves him free to swing again; a miss leaves him falling helpless.", ground: RISING_THUNDER },
   down: { name: "Doomhammer Slam", description: "Slam the ground on both sides to launch nearby foes; a jump clears it.", ground: DOOMHAMMER_SLAM, air: { ...DOOMHAMMER_SLAM, groundOnly: false, landingLag: 20 } },
 };

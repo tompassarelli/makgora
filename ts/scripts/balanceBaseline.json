@@ -23229,6 +23229,117 @@
    "authored.specials.side.air.projectiles.1.effect.launchZ": 0.8191520571708679,
    "authored.specials.side.air.landingLag": 20,
    "authored.specials.up.ground.endFrame": 40,
+   "authored.specials.up.ground.landingLag": 30,
+   "authored.specials.up.ground.regions.0.firstFrame": 4,
+   "authored.specials.up.ground.regions.0.lastFrame": 5,
+   "authored.specials.up.ground.regions.0.hit.effect.damage": 3,
+   "authored.specials.up.ground.regions.0.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.0.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.0.hit.effect.launchX": 0,
+   "authored.specials.up.ground.regions.0.hit.effect.launchZ": 1,
+   "authored.specials.up.ground.regions.1.firstFrame": 6,
+   "authored.specials.up.ground.regions.1.lastFrame": 8,
+   "authored.specials.up.ground.regions.1.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.1.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.1.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.1.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.1.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.2.firstFrame": 6,
+   "authored.specials.up.ground.regions.2.lastFrame": 8,
+   "authored.specials.up.ground.regions.2.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.2.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.2.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.2.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.2.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.3.firstFrame": 9,
+   "authored.specials.up.ground.regions.3.lastFrame": 11,
+   "authored.specials.up.ground.regions.3.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.3.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.3.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.3.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.3.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.4.firstFrame": 9,
+   "authored.specials.up.ground.regions.4.lastFrame": 11,
+   "authored.specials.up.ground.regions.4.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.4.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.4.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.4.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.4.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.5.firstFrame": 12,
+   "authored.specials.up.ground.regions.5.lastFrame": 14,
+   "authored.specials.up.ground.regions.5.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.5.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.5.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.5.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.5.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.6.firstFrame": 12,
+   "authored.specials.up.ground.regions.6.lastFrame": 14,
+   "authored.specials.up.ground.regions.6.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.6.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.6.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.6.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.6.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.7.firstFrame": 15,
+   "authored.specials.up.ground.regions.7.lastFrame": 17,
+   "authored.specials.up.ground.regions.7.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.7.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.7.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.7.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.7.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.8.firstFrame": 15,
+   "authored.specials.up.ground.regions.8.lastFrame": 17,
+   "authored.specials.up.ground.regions.8.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.8.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.8.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.8.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.8.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.9.firstFrame": 18,
+   "authored.specials.up.ground.regions.9.lastFrame": 20,
+   "authored.specials.up.ground.regions.9.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.9.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.9.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.9.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.9.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.10.firstFrame": 18,
+   "authored.specials.up.ground.regions.10.lastFrame": 20,
+   "authored.specials.up.ground.regions.10.hit.effect.damage": 1.5,
+   "authored.specials.up.ground.regions.10.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.10.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.10.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.10.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.11.firstFrame": 23,
+   "authored.specials.up.ground.regions.11.lastFrame": 25,
+   "authored.specials.up.ground.regions.11.hit.effect.damage": 8,
+   "authored.specials.up.ground.regions.11.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.11.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.11.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.11.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.regions.12.firstFrame": 23,
+   "authored.specials.up.ground.regions.12.lastFrame": 25,
+   "authored.specials.up.ground.regions.12.hit.effect.damage": 8,
+   "authored.specials.up.ground.regions.12.hit.effect.growth": 100,
+   "authored.specials.up.ground.regions.12.hit.effect.base": 0,
+   "authored.specials.up.ground.regions.12.hit.effect.launchX": 0.08715574443340302,
+   "authored.specials.up.ground.regions.12.hit.effect.launchZ": 0.9961947202682495,
+   "authored.specials.up.ground.projectiles.0.effect.damage": 0,
+   "authored.specials.up.ground.projectiles.0.effect.growth": 0,
+   "authored.specials.up.ground.projectiles.0.effect.base": 0,
+   "authored.specials.up.ground.projectiles.0.effect.launchX": 0,
+   "authored.specials.up.ground.projectiles.0.effect.launchZ": 1,
+   "authored.specials.up.ground.projectiles.1.effect.damage": 0,
+   "authored.specials.up.ground.projectiles.1.effect.growth": 0,
+   "authored.specials.up.ground.projectiles.1.effect.base": 0,
+   "authored.specials.up.ground.projectiles.1.effect.launchX": 0,
+   "authored.specials.up.ground.projectiles.1.effect.launchZ": 1,
+   "authored.specials.up.ground.projectiles.2.effect.damage": 0,
+   "authored.specials.up.ground.projectiles.2.effect.growth": 0,
+   "authored.specials.up.ground.projectiles.2.effect.base": 0,
+   "authored.specials.up.ground.projectiles.2.effect.launchX": 0,
+   "authored.specials.up.ground.projectiles.2.effect.launchZ": 1,
+   "authored.specials.up.ground.hurt.0.firstFrame": 6,
+   "authored.specials.up.ground.hurt.0.lastFrame": 25,
+   "authored.specials.up.ground.followUps.0.special.endFrame": 2,
+   "authored.specials.up.ground.followUps.0.special.landingLag": 4,
    "authored.specials.down.ground.endFrame": 50,
    "authored.specials.down.ground.cooldownFrames": 90,
    "authored.specials.down.ground.regions.0.firstFrame": 17,
@@ -23931,6 +24042,54 @@
    },
    "special.side.air.projectiles.1": {
     "advantage": -17
+   },
+   "special.up.ground.regions.0": {
+    "advantage": -32
+   },
+   "special.up.ground.regions.1": {
+    "advantage": -31
+   },
+   "special.up.ground.regions.2": {
+    "advantage": -31
+   },
+   "special.up.ground.regions.3": {
+    "advantage": -28
+   },
+   "special.up.ground.regions.4": {
+    "advantage": -28
+   },
+   "special.up.ground.regions.5": {
+    "advantage": -25
+   },
+   "special.up.ground.regions.6": {
+    "advantage": -25
+   },
+   "special.up.ground.regions.7": {
+    "advantage": -22
+   },
+   "special.up.ground.regions.8": {
+    "advantage": -22
+   },
+   "special.up.ground.regions.9": {
+    "advantage": -19
+   },
+   "special.up.ground.regions.10": {
+    "advantage": -19
+   },
+   "special.up.ground.regions.11": {
+    "advantage": -11
+   },
+   "special.up.ground.regions.12": {
+    "advantage": -11
+   },
+   "special.up.ground.projectiles.0": {
+    "advantage": -33
+   },
+   "special.up.ground.projectiles.1": {
+    "advantage": -15
+   },
+   "special.up.ground.projectiles.2": {
+    "advantage": -15
    },
    "special.down.ground.regions.0": {
     "advantage": -26,

@@ -1096,7 +1096,7 @@ One rule for every fighter's four specials
 | Shadow Hunter | up: Loa Vault (recovery) |
 | Pit Lord | side: Ruin Charge (rush); up: Abyssal Leap (recovery) |
 | Beastmaster | up in the air: Summon Hawk's lift (recovery; the ground form summons and stops) |
-| Lich King, Thrall, Jaina, Sylvanas, Chen, Peon, Kael'thas | up: their recovery (Frost Wyrm, Far Sight, Blink, Banshee Flight, Storm Rise, Worksite Launch, Phoenix) |
+| Lich King, Thrall, Jaina, Sylvanas, Chen, Peon, Kael'thas | up: their recovery (Frost Wyrm, Rising Thunder, Blink, Banshee Flight, Storm Rise, Worksite Launch, Phoenix) |
 | Cairne | side: Bloodhoof Gore (rush); up: Spirit Lift (recovery) |
 | Tinker | up: Rocket Boots (recovery); side in the air: the Laser stops him dead in the air too, Tom's per-move decision of 19 Oct |
 | Mrgl & Grgl | side: Belly Slide (rush); up: Tidal Surf (recovery) |
@@ -2744,7 +2744,7 @@ Expert field.
 | Mannoroth | Abyssal Leap | 13 | 0 | 43 | 367 / 395 | guided | 54 | read down air (offstage launch, KO at 40%), reaction aerial | 191/256 |
 | Rexxar | Summon Hawk | 10 | 0 | 56 | 383 / 618 | guided | 50 | read down air (offstage launch, KO at 40%), reaction aerial | 222/256 |
 | Arthas | Frost Wyrm | 10 | 0 | 18 | 410 / 331 | guided | 79 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 238/256 |
-| Thrall | Far Sight | 9 | 0 | 19 | 505 / 471 | guided | 73 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 244/256 |
+| Thrall | Rising Thunder | 7 | 0 | 33 | 527 / 346 | guided | 82 | read down air (offstage launch, KO at 40%), reaction aerial | 247/256 |
 | Jaina Proudmoore | Blink | 14 | 5 | 422 (teleport) | 421 / 425 | aimed (8-way, 13 frames) | 32 | read forward air (offstage launch, KO at 40%), reaction aerial | 236/256 |
 | Sylvanas Windrunner | Banshee Flight | 8 | 0 | 29 | 395 / 802 | guided | 65 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 241/256 |
 | Cairne Bloodhoof | Spirit Lift | 11 | 0 | 22 | 363 / 367 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 233/256 |

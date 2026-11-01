@@ -11,7 +11,7 @@ provisional Smashcraft values, not copied hitboxes or animation.
 [Wowpedia's Thrall](https://wowpedia.fandom.com/wiki/Thrall) and
 [Doomhammer](https://wowpedia.fandom.com/wiki/Doomhammer) establish the warrior,
 shaman and hammer. The [Far Seer](https://liquipedia.net/warcraft/Far_Seer)
-supplies Chain Lightning, Feral Spirit, Far Sight and Earthquake (his ultimate); Blizzard's
+supplies Chain Lightning, Feral Spirit and Earthquake (his ultimate), and its earth and lightning shape Rising Thunder; Blizzard's
 [Far Seer unit page](https://classic.battle.net/war3/orc/units/farseer.shtml)
 is the original ability reference. Only these ability identities and numerical
 facts are reused; no outside implementation, prose or animation is copied.
@@ -91,13 +91,13 @@ striking the floor.
 | --- | --- | --- |
 | Neutral: Chain Lightning | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) / [Tinker's laser](https://liquipedia.net/warcraft/Tinker) | Warcraft's own white Chain Lightning arc, cast like the Tinker laser but slower and longer: the beam fires from the hammer on frames26–31 and reaches 520 units along the line to where the nearest foe stood when the cast began, never re-aimed (Tom, 17 Oct: so it covers a tech, a ledge or a slow foe), 9 damage electric, 40° launch, end58, cost10. Tom (17 Oct) found the old travelling bolt too strong (12.3 damage at 17 units a frame) and asked for an actual lightning effect. The long wind-up is the counterplay: jump or shield once the cast starts; a whiffed cast is punishable. Air landing lag18. |
 | Side: Feral Spirit | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) / [Duck Hunt's dog](https://www.ssbwiki.com/Duck_Hunt_(SSBU)) | Two spectral wolves leave at frames16 and24, run low for 28 frames, each 4 damage/55°, cost18, end44, cooldown90. The second wolf makes a delayed jump or shield decision; each can hit only once. Summons can be blocked or parried but do not reflect. Air wolves descend and air landing lag20 applies. |
-| Up: Far Sight | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) / [Duck Jump](https://www.ssbwiki.com/Duck_Jump) | Spirit sight points a safe way upward: after8 frames, rise2.25H with up to1.5H steering over24 frames, end40, cost12, no hitbox or armor. At low mana rise1.4H free. Both forms meet the shared recovery-distance band. Uses the aerial jump and ends helpless; the broad body can be intercepted. This movement is an original adaptation of a vision spell. |
+| Up: Rising Thunder | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) earth and lightning / [Ryu's Shoryuken](https://www.ssbwiki.com/Shoryuken) and [Fox's Shine](https://www.ssbwiki.com/Reflector_(Fox)) | Tom's design (1 Nov 2026, paraphrased): an electric-hammer rising uppercut that replaces Far Sight. He crouches (frames 1–4), slams his left palm down under him and an earth eruption launches him (frames 5–6: 3 damage, 90°, set knockback 80, so a grounded foe leaves the floor into the hammer), then rises 4.0H over frames 7–23 with up to 1.5H steering while his right arm sweeps the Doomhammer from straight ahead to straight overhead; his left hand stays down at his side. Five rising hits along that arc and his body (frames 7, 10, 13, 16, 19, three frames each, 1.5 damage, 85°, set knockback 30, carry) hold the foe at his rising speed; they use the electric element without electric hitlag, because the extra victim hitlag frame let the foe fall a frame behind the rise on every hit. The apex (frames 24–26, held in place) is a lightning burst around the raised hammer, 58-unit radius: 8 damage, electric, 85°, fixed set knockback 60, the same launch at every percent (Tom, 1 Nov: Shine-style, so the follow-up is guaranteed). All seven connect on a standing foe for 18.5. **On hit** he is not helpless: two frames after the apex hold he hops 12 units a frame and is free at frame 45 of the cast (hitlag included) with 24 frames of advantage on Rifleman and Mountain King and 20 on Thrall, at 0% and 150% alike, so down air, forward air and a fast-fall into up air each strike inside the foe's hitstun. **On a whiff** he falls helpless and lands with a special-fall landing lag of 30 frames, set on this move (Tom, 1 Nov), and landing during the cast also costs 30; that cost pays for the reward on hit. Measured route: rise 527, reach 346, inside the vertical recovery band (400–560, 320–600). No loop: it is once per airtime, so Up B, aerial, Up B cannot repeat in the air; after he lands from an aerial follow-up the foe has had at least 4 free frames before a second cast becomes active (down, forward and up air at 0, 40 and 80%), and the aerials scale with percent. Uses the aerial jump. |
 | Down: Doomhammer Slam | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) / [Donkey Kong's Hand Slap](https://www.ssbwiki.com/Hand_Slap) | A low spell pulse hits both sides at frames18–21, 11 damage/75°, end50, cost20, cooldown90. Ground only, 135-unit reach; jump clears it. No extra shield damage, armor or repeating hold. |
 | Ultimate: Elemental Fury | [Far Seer's Earthquake](https://liquipedia.net/warcraft/Far_Seer) / [Pikachu's Volt Tackle](https://www.ssbwiki.com/Volt_Tackle) | Designed ultimate, matching today's hero template: a storm-assisted Earthquake that sends a broad final lightning wave. The current roster stores ultimate names/descriptions; its activation system is not yet implemented. |
 
 The computer holds midrange with lightning and wolves, approaches with down
 tilt or grab, uses Doomhammer Slam against grounded proximity, juggles with up tilt
-and up air, and saves Far Sight for return to the ledge. Every special is
+and up air, and saves Rising Thunder for return to the ledge. Every special is
 listed in the gameplan and counted by the existing eight-seed coverage.
 
 ## Presentation
@@ -110,8 +110,7 @@ for the change on 28 October 2026). The map imports the model as
 authors every Smashcraft clip on its full biped and keeps its 31 stock
 sequences. Stock spirit wolves, Far Seer lightning and earthquake effects,
 and shared Warcraft impact sounds stay.
-Far Sight has no stock target model, so its rising spirit cue uses the
-base-game Shaman's Purge glow around the body.
+Rising Thunder layers stock Classic effects: a Purge glow gathers under him in the crouch, War Stomp's earth eruption bursts under his palm at the launch, a Far Seer lightning orb rides the hammer head along its swing with the shared lightning trail behind his rise, and at the apex a Monsoon bolt strikes the raised Doomhammer inside a Thunder Clap ring.
 Author deliberate preparation/contact/recovery poses, both facing directions,
 the shared recovery actions, paired grabs and nine pain poses. All extracted
 and authored Warcraft model data remains in the private build-input store.

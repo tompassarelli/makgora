@@ -29,7 +29,7 @@ const along = (pivot: HammerPivot, angle: number, distance: number): readonly [n
 export const swingGrip = (swing: HammerSwing, angle: number) => along(swing.pivot, angle, swing.hand);
 export const swingHead = (swing: HammerSwing, angle: number) => along(swing.pivot, angle, swing.hand + HEAD_FROM_HAND[swing.grip]);
 
-const wholeCapsule = (swing: HammerSwing, angle: number): StrikeCapsule => {
+export const wholeCapsule = (swing: HammerSwing, angle: number): StrikeCapsule => {
   const [x1, z1] = along(swing.pivot, angle, swing.hand + HEAD_FROM_HAND[swing.grip] * 0.5);
   const [x2, z2] = swingHead(swing, angle);
   return capsule(x1, z1, x2, z2, swing.radius);
@@ -57,7 +57,7 @@ export const THRALL_HAMMER_SWINGS = {
   downAir: smash(STANDING_SHOULDER, 40.0, 28.0, 14, [-76.0, -82.0, -86.0, -88.0]),
 } as const satisfies Record<string, HammerSwing>;
 
-const swingRegions = (swing: HammerSwing, effect: (beat: HammerBeat) => Readonly<HitEffect>, grounded?: Readonly<HitEffect>, window = 1): MoveRegion[] =>
+export const swingRegions = (swing: HammerSwing, effect: (beat: HammerBeat) => Readonly<HitEffect>, grounded?: Readonly<HitEffect>, window = 1): MoveRegion[] =>
   swing.beats.map((beat) => heroRegion(beat.frame, beat.frame, wholeCapsule(swing, beat.angle), effect(beat), grounded, window));
 const sameHit = (effect: Readonly<HitEffect>) => () => effect;
 
@@ -72,7 +72,7 @@ const body = hurtCapsule(Character.thrall);
 const TORSO = hurtPart(body.x1, body.z1, body.x2, body.z2, body.radius);
 const ARM_RADIUS = 12.0;
 const reach = (pivot: HammerPivot, x: number, z: number): readonly HurtPart[] => [TORSO, hurtPart(pivot.x, pivot.z, x, z, ARM_RADIUS)];
-const swingReach = (swing: HammerSwing, first: number, last: number) => {
+export const swingReach = (swing: HammerSwing, first: number, last: number) => {
   const [x, z] = swingGrip(swing, swing.beats[idiv(swing.beats.length, 2)]?.angle ?? 0.0);
   return heroHurtPose(first, last, reach(swing.pivot, x, z));
 };
