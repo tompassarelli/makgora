@@ -22,12 +22,11 @@ import { runProcess } from "./hostProcess";
 import { headlessRender } from "./wisp/headlessRender";
 import { SMASHCRAFT_JOURNEYS } from "./wisp/journeys";
 import { storeStageCard } from "./wisp/buildInputs";
-import { CARD, HERO_CAMERAS, RENDERED_STAGES, type ThumbnailManifest, silhouetteSource, stageInputHash, stageNamed, thumbnailFile } from "./stageThumbnailSpec";
+import { CARD, HERO_CAMERAS, RENDERED_STAGES, type ThumbnailManifest, stageInputHash, stageNamed, thumbnailFile } from "./stageThumbnailSpec";
 import { platformLayer } from "wisp/scripts/platform/layer";
 
 const TS = resolve(import.meta.dir, "..");
 const MANIFEST_FILE = join(TS, "stage-thumbnails.json");
-const SILHOUETTE_FILE = join(TS, "src/generated/stages/stageSilhouettes.ts");
 const FRAME = 80;
 
 class ThumbnailFailure extends Schema.TaggedError<ThumbnailFailure, { readonly brand: unique symbol }>()("ThumbnailFailure", { problem: Schema.String }) {
@@ -104,7 +103,6 @@ const composePicture = (stage: StageTile, render: string, cards: string) => Effe
 const program = Effect.gen(function*() {
   const only = stageName === undefined ? undefined : stageNamed(stageName);
   if (stageName !== undefined && only === undefined) return yield* new ThumbnailFailure({ problem: `no selectable stage is called ${JSON.stringify(stageName)}` });
-  yield* attempt("write the silhouettes", () => Bun.write(SILHOUETTE_FILE, silhouetteSource()));
   const stages = only === undefined ? RENDERED_STAGES : RENDERED_STAGES.filter((stage) => stage === only);
   const previous: ThumbnailManifest = only === undefined ? { stages: [] } : yield* attempt("read the manifest", () => Bun.file(MANIFEST_FILE).json());
   mkdirSync(work, { recursive: true });

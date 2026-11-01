@@ -555,7 +555,7 @@ export function renderUi(s: ShellState): void {
   presentMatchPanels(s, game, ui, showMatch, local, localKeys);
   markLoreClear(game);
   presentMessages(s, game, ui, showMatch, paused, selecting, local, localFighter);
-  ui.stage.update(game);
+  ui.stage.update(game, s.stageLoad?.carded === true);
   hideWarcraftChat();
   ui.chat.update(FRAME_SECONDS, shellChatBox(s));
 }

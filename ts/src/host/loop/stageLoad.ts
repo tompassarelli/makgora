@@ -4,7 +4,7 @@
 import type { ParticipantSlot } from "../../game/input/participants";
 import { canRequestStart, requestStart, resolveStageChoice } from "../../game/lobby/lobbyState";
 import { stageInfo } from "../../game/menu/stageCatalog";
-import { STAGE_READY_PREFIX, StageLoadStep, beginStageLoad, stageReported, tickStageLoad } from "../../game/session/stageLoad";
+import { STAGE_READY_PREFIX, StageLoadStep, beginStageLoad, stageCardDue, stageReported, tickStageLoad } from "../../game/session/stageLoad";
 import { startMatch } from "./matchStart";
 import type { ShellState } from "./state";
 import { views } from "./ui";
@@ -19,8 +19,6 @@ export function requestStageLoad(s: ShellState, slot: ParticipantSlot): boolean 
   if (s.stageLoad !== undefined || !canRequestStart(s.game, slot)) return false;
   resolveStageChoice(s.game, (s.menuFrames ?? 0) + s.game.matchSeed);
   s.stageLoad = beginStageLoad(s.game, slot);
-  const { name, texture } = stageInfo(s.game.stageChoice);
-  views(s).match.showLoading(name, texture);
   drawStage(s);
   return true;
 }
@@ -48,6 +46,11 @@ export function serviceStageLoad(s: ShellState): void {
   const step = tickStageLoad(load);
   if (step === StageLoadStep.report) sendSync(STAGE_READY_PREFIX, `${load.stage}`);
   else if (step === StageLoadStep.start) finishStageLoad(s);
+  else if (stageCardDue(load)) {
+    const { name, texture } = stageInfo(load.stage);
+    views(s).stage.update(s.game, true);
+    views(s).match.showLoading(name, texture);
+  }
 }
 
 

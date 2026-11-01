@@ -23,8 +23,8 @@ import { confirmedOrbCues, createOrbCueObservation, observeOrbCues } from "../pr
 import { orbPoint, orbWarned } from "../sim/orbs";
 import { RENDERED_FIGHTERS } from "../roster/kits";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
-import { createBackdrop, createText, fitToWindow, gameUi, sizeText, styleMenuPanel } from "../ui/frames";
-import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "../ui/hudLayout";
+import { createBackdrop, createText, createWindowBackdrop, fitToWindow, gameUi, sizeText, styleMenuPanel } from "../ui/frames";
+import { MENU_FONT, MENU_STYLE } from "../ui/hudLayout";
 import { hideEffect, type WorldOrigin } from "./effects";
 import { SoundBank, SoundKind } from "./soundBank";
 import { resultFighterPlacement } from "../presentation/arenaCamera";
@@ -396,11 +396,10 @@ export class MatchPresentation {
   showLoading(name: string, texture: string): void {
     const parent = gameUi();
     const frames = (this.loadingFrames ??= {
-      cover: createBackdrop("StageLoadingCover", parent, 0),
+      cover: createWindowBackdrop("StageLoadingCover", MENU_STYLE.panelTexture, 0),
       art: createBackdrop("StageLoadingArt", parent, 0),
       name: createText("StageLoadingName", parent, 0),
     });
-    setFrameTexture(frames.cover, PANEL_TEXTURE, 0, true);
     fitToWindow(frames.cover);
     setFrameLevel(frames.cover, 8);
     setFrameTexture(frames.art, texture, 0, true);

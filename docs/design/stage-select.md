@@ -37,29 +37,36 @@ What they do:
 What Smashcraft takes: one picture per stage framed the same way on every
 card (Ultimate), the selected stage large beside the grid (Ultimate, Rivals),
 and a drawn outline of the stage's layout (Rivals), so a player reads the
-platforms before picking.
+platforms before picking; the outline is not drawn now (below).
 
 ## The card
 
-Every card has the same three parts (smashcraft:ts/src/game/ui/stageCard.ts):
+Every card has the same two parts (smashcraft:ts/src/game/ui/stageCard.ts):
 
-1. **Picture**, a square at the card's left, full height: Warcraft's own
-   campaign loading art for the stage's zone, or for a stage with none, a
-   render of the stage from its hero camera (below).
-2. **Panel**, coal (`TeamColor20`) filling the rest of the card, holding the
-   **layout silhouette**: every surface of the stage at rest, in snow
-   (`TeamColor21`, alpha 230), the main deck thick and platforms thin at their
-   true spacing, centred in a box 84% of the panel's width and half as tall.
-   The silhouette is generated from the stage's surfaces into
-   smashcraft:ts/src/generated/stages/stageSilhouettes.ts.
-3. **Name banner** on grid tiles: a coal strip (alpha 210) along the bottom
+1. **Picture**, a square: Warcraft's own campaign loading art for the stage's
+   zone, or for a stage with none, a render of the stage from its hero camera
+   (below). A grid tile stretches it over its whole 0.094 x 0.059 box; the
+   preview draws it at its true shape, as large as its box allows and centred,
+   with the box's own panel on either side and no coal behind it. The window
+   cannot crop a texture without a SIMPLEFRAME (wisp:docs/ui.md), which Warcraft
+   draws beneath every other frame, so the preview shows the whole square.
+2. **Name banner** on grid tiles: a coal strip (alpha 210) along the bottom
    22% of the card with the stage's name in the menu font. The large preview
-   leaves it out: its name and description sit below it.
+   leaves it out: its name and description sit above and below it.
 
 Sizes, in Warcraft's UI units: grid tiles keep the 0.094 x 0.059 shape at the
 largest size the stage list fits (about 0.107 x 0.067 since 2026-11-02), the
-preview fills its box's width at 0.2 high (picture 0.2 square), the loading
-screen's picture 0.18 square. Random Stage keeps its icon tile.
+preview's picture takes the height its box leaves between its heading and its
+description (about 0.23 square), the loading screen's picture 0.18 square.
+Random Stage keeps its icon tile. The layout silhouette that once filled the
+preview's right side was removed on 2026-11-02 (Tom asked for the preview to
+fill its box; the native window drew the coal panel behind it grey).
+
+The loading card appears only when a start takes longer than a second
+(`STAGE_CARD_DELAY_FRAMES`, 60 frames); a local start finishes in about half a
+second and shows none. When it appears it hides stage select first and draws
+on its own opaque window backdrop, so the select screen and the card are never
+on screen together.
 
 ## Picture sources
 
@@ -155,7 +162,7 @@ Freshness is per stage, so stage changes in different lanes never touch the
 same lines. After changing one stage, run
 `bun scripts/stageThumbnails.ts --stage NAME` (from ts/, through the capacity
 helper; NAME is the catalog name, such as `--stage "Gryphon Aerie"`): it
-rewrites the silhouettes, re-renders that stage's picture if it has one,
+re-renders that stage's picture if it has one,
 stores it and rewrites only that stage's row of ts/stage-thumbnails.json;
 commit both files with the stage change. Without `--stage` it redraws every
 stage (about a minute). smashcraft:ts/test/stage-thumbnails.test.ts fails,
@@ -164,5 +171,4 @@ has neither zone art nor a recorded render, when a rendered stage's own inputs
 (its scenery, its placed pieces with their mood colours, terrain, decks, scenery models and surfaces,
 hero camera and the card format; stage-assets files are named by their
 contents' hash, so their names stand for their bytes) hash differently from
-its recorded hash, or when its silhouette differs from what its surfaces draw
-now.
+its recorded hash.

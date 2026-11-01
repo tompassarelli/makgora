@@ -46,6 +46,7 @@
     "test/y-capture.test.ts",
     "test/y-strong.test.ts",
     "test/pause-screen.test.ts",
+    "test/stage-load-card.test.ts",
     "test/dash-feet.test.ts",
     "test/illidan-gait.test.ts",
     "test/menu-journey.test.ts",

@@ -1,50 +1,43 @@
-
-
-
 import { f32 } from "wisp/src/sim/f32";
-import { at } from "wisp/src/runtime/lookup";
 import { RANDOM_STAGE, stageInfo } from "../menu/stageCatalog";
-import { STAGE_SILHOUETTES, SILHOUETTE_PIECES } from "../../generated/stages/stageSilhouettes";
 import { createBackdrop, createText, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
 import { Frame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
-import { formatInt } from "wisp/game/text";
 
 export const STAGE_CARD_COAL = "ReplaceableTextures\\TeamColor\\TeamColor20.blp";
-export const STAGE_CARD_SNOW = "ReplaceableTextures\\TeamColor\\TeamColor21.blp";
 export const STAGE_CHIP_TEXTURE = "war3mapImported\\StageChip.tga";
+
+export interface PictureBox {
+  readonly left: number;
+  readonly top: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+/** A stage picture is a square: a banner card stretches it over its whole box, a preview draws it at its true shape, as large as the box allows and centred. */
+export function stagePictureBox(left: number, top: number, width: number, height: number, banner: boolean): PictureBox {
+  if (banner) return { left, top, width, height };
+  const side = Math.min(width, height);
+  return { left: f32(left + f32(width - side) / 2), top: f32(top - f32(height - side) / 2), width: side, height: side };
+}
 
 export class StageCard {
   private readonly panel: Frame;
   private readonly picture: Frame;
-  private readonly pieces: Frame[] = [];
   private readonly name: Frame | undefined;
-  private readonly boxLeft: number;
-  private readonly boxTop: number;
-  private readonly boxWidth: number;
 
-  constructor(parent: Frame, id: string, left: number, top: number, width: number, height: number, private readonly banner: boolean) {
+  constructor(parent: Frame, id: string, left: number, top: number, width: number, height: number, banner: boolean) {
+    const box = stagePictureBox(left, top, width, height, banner);
     const panel = createBackdrop(`${id}Panel`, parent, 0);
     this.panel = panel;
     setFrameTexture(panel, STAGE_CARD_COAL, 0, true);
-    placeTopLeft(panel, left, top);
-    setFrameSize(panel, width, height);
+    placeTopLeft(panel, box.left, box.top);
+    setFrameSize(panel, box.width, box.height);
     setFrameEnabled(panel, false);
     this.picture = createBackdrop(`${id}Picture`, parent, 0);
-    placeTopLeft(this.picture, left, top);
-    setFrameSize(this.picture, banner ? width : height, height);
+    placeTopLeft(this.picture, box.left, box.top);
+    setFrameSize(this.picture, box.width, box.height);
     setFrameEnabled(this.picture, false);
-    const side = width - height;
-    this.boxWidth = f32(side * f32(0.84));
-    this.boxLeft = f32(left + height + side * f32(0.08));
-    this.boxTop = f32(top - height * f32(0.14));
-    for (let index = 0; index < SILHOUETTE_PIECES; index++) {
-      const piece = createBackdrop(`${id}Piece${formatInt(index)}`, parent, index);
-      setFrameTexture(piece, STAGE_CARD_SNOW, 0, true);
-      setFrameAlpha(piece, 230);
-      setFrameEnabled(piece, false);
-      this.pieces.push(piece);
-    }
     if (banner) {
       const strip = createBackdrop(`${id}Banner`, parent, 0);
       setFrameTexture(strip, STAGE_CARD_COAL, 0, true);
@@ -67,14 +60,5 @@ export class StageCard {
     setFrameTexture(this.picture, stage.texture, 0, true);
     setFrameVisible(this.panel, choice !== RANDOM_STAGE);
     if (this.name !== undefined) setFrameText(this.name, stage.name);
-    const pieces = this.banner ? [] : STAGE_SILHOUETTES[choice] ?? [];
-    for (let index = 0; index < SILHOUETTE_PIECES; index++) {
-      const frame = at(this.pieces, index);
-      const piece = pieces[index];
-      setFrameVisible(frame, piece !== undefined);
-      if (piece === undefined) continue;
-      placeTopLeft(frame, f32(this.boxLeft + piece[0] * this.boxWidth), f32(this.boxTop - piece[1] * this.boxWidth));
-      setFrameSize(frame, f32(piece[2] * this.boxWidth), f32(piece[3] * this.boxWidth));
-    }
   }
 }

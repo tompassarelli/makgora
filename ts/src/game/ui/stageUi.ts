@@ -45,7 +45,10 @@ type StageButton = { kind: "stage"; choice: StageChoice } | { kind: "hazards" } 
 export const HAZARDS_BUTTON = STAGE_BAR.hazards;
 const PANEL_PAD = f32(0.012);
 const PREVIEW_HEADING = f32(0.03);
-const PREVIEW_HEIGHT = f32(0.2);
+const PREVIEW_ABOUT_HEIGHT = f32(0.05);
+const PREVIEW_GAP = f32(0.01);
+/** The preview's picture takes the box's height left under its heading and above its description. */
+export const PREVIEW_HEIGHT = f32(STAGE_PREVIEW_BOX.height - f32(PANEL_PAD + PREVIEW_HEADING + f32(0.006) + PREVIEW_GAP + PREVIEW_ABOUT_HEIGHT + PANEL_PAD));
 
 type StageBarItem = "back" | "hazards" | "orbs" | "pool" | "start";
 const BAR_TARGETS: Readonly<Record<StageBarItem, StageButton>> = { back: { kind: "back" }, hazards: { kind: "hazards" }, orbs: { kind: "orbs" }, pool: { kind: "poolOpen" }, start: { kind: "start" } };
@@ -98,6 +101,7 @@ export class StagePanel {
   private poolOpen = false;
   private readonly drag = stageDrag();
   private lastPhase: Phase | undefined;
+  private lastCovered = false;
   private lastChoice: number | undefined;
 
   constructor(
@@ -119,7 +123,7 @@ export class StagePanel {
     this.previewName = stageText(root, "MeleeStagePreviewName", heading.x, heading.y, heading.width, heading.height, f32(0.016), "");
     const card = inside(STAGE_PREVIEW_BOX, f32(f32(PANEL_PAD + PREVIEW_HEADING) + f32(0.006)), PREVIEW_HEIGHT);
     this.preview = new StageCard(root, "MeleeStagePreview", card.x, card.y, card.width, card.height, false);
-    const about = inside(STAGE_PREVIEW_BOX, f32(f32(STAGE_PREVIEW_BOX.y - f32(card.y - card.height)) + f32(0.01)), f32(0.06));
+    const about = inside(STAGE_PREVIEW_BOX, f32(f32(STAGE_PREVIEW_BOX.y - f32(card.y - card.height)) + PREVIEW_GAP), PREVIEW_ABOUT_HEIGHT);
     this.previewDescription = stageText(root, "MeleeStageDescription", about.x, about.y, about.width, about.height, f32(0.0095), "");
     setMenuText(barText(root, "MeleeStageGridTitle", STAGE_LIST_HEADING, BAR_SMALL_TEXT, TextAlignment.left), `${BAR_COLOURS.dim}CHOOSE A STAGE|r`);
     for (const stage of STAGE_CHOICES) {
@@ -242,14 +246,16 @@ export class StagePanel {
     litControl(control, on);
   }
 
-  update(game: Readonly<MatchState>): void {
-    const enabled = game.phase === Phase.stageMenu && humanActive(game, playerSlot(localPlayer()));
-    if (this.lastPhase !== game.phase) {
+  /** Draws the screen unless `covered`: a loading card has taken the window, which the stage list and its backdrop must not show through. */
+  update(game: Readonly<MatchState>, covered: boolean): void {
+    const enabled = game.phase === Phase.stageMenu && !covered && humanActive(game, playerSlot(localPlayer()));
+    if (this.lastPhase !== game.phase || this.lastCovered !== covered) {
       setFrameVisible(this.root, enabled);
       setFrameVisible(this.backdrop, enabled);
       setFrameVisible(this.band, enabled);
       if (enabled) this.focusStart();
       this.lastPhase = game.phase;
+      this.lastCovered = covered;
     }
     if (!enabled) {
       clearStageDrag(this.drag);
