@@ -15,4 +15,8 @@ export function toggleChatHistory(s: ShellState): void {
   if (eventPlayer() === localPlayer()) s.chatHistoryOpen = s.chatHistoryOpen !== true;
 }
 
-export const shellChatBox = (s: Readonly<ShellState>): ChatBox | ChatSlot | undefined => chatBox(s.game.phase, s.chatLineSinceMatch !== false || s.chatHistoryOpen === true);
+/** Where the chat shows; none while a Controls panel covers the screen, which draws beneath the chat. */
+export function shellChatBox(s: Readonly<ShellState>): ChatBox | ChatSlot | undefined {
+  for (const panel of views(s).settings) if (panel.covers()) return undefined;
+  return chatBox(s.game.phase, s.chatLineSinceMatch !== false || s.chatHistoryOpen === true);
+}

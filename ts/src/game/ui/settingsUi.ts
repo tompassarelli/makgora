@@ -104,6 +104,7 @@ export class SettingsPanel {
   private readonly keyboardButton: Frame;
   private readonly bindButton: { readonly frames: readonly Frame[]; readonly label: Frame };
   private open = false;
+  private rootShown = false;
   private nameShown = false;
   private lastSignature = "";
   private readonly local: boolean;
@@ -272,18 +273,28 @@ export class SettingsPanel {
     return this.open;
   }
 
+  /** Whether the Controls panel is up on this client's screen, open or previewed while the controls load. */
+  covers(): boolean {
+    return this.rootShown;
+  }
+
+  private showRoot(visible: boolean): void {
+    this.rootShown = visible;
+    setFrameVisible(this.root, visible);
+  }
+
 
   preview(): void {
     if (this.open || this.settings.ready) return;
     const preview = previewStartingBindings(this.settings);
     if (preview === undefined) return;
-    setFrameVisible(this.root, true);
+    this.showRoot(true);
     this.renderHeader(preview);
     this.renderKeys(preview);
   }
 
   endPreview(): void {
-    if (!this.open) setFrameVisible(this.root, false);
+    if (!this.open) this.showRoot(false);
   }
 
   show(): void {
@@ -300,7 +311,7 @@ export class SettingsPanel {
     endNaming(this.settings);
     this.settings.picking = false;
     this.showNameBox(false);
-    setFrameVisible(this.root, false);
+    this.showRoot(false);
     this.actions.closeSettings(this.participantId);
   }
 
@@ -312,7 +323,7 @@ export class SettingsPanel {
     const signature = `${settings.keyboard ? "k" : "-"}${settings.layout}${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.fromProfile ? "p" : "-"}${settings.picking ? "s" : "-"}${settings.naming ? "n" : "-"}${formatInt(settings.slot)}${settings.customs.map(custom => custom.name).join("|")}${capture === undefined ? "-" : formatInt(capture.action * 2 + capture.slot)}`;
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
-    setFrameVisible(this.root, true);
+    this.showRoot(true);
     this.renderHeader(settings);
     this.renderKeys(settings);
   }
