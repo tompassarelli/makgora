@@ -50,7 +50,7 @@ type ControlAssignment =
   | { readonly kind: "flag"; readonly field: FlagField; readonly value: boolean }
   | { readonly kind: "number"; readonly field: NumberField; readonly value: number };
 
-type MenuOperation = "character" | "stage" | "hazards" | "stocks" | "time";
+type MenuOperation = "character" | "stage" | "hazards" | "orbs" | "stocks" | "time";
 type MenuRequest = "stage-select" | "start" | "rematch";
 
 export type TapeOperation =
@@ -166,6 +166,7 @@ function decodeLine(line: number, text: string): Decoded<TapeOperation> | undefi
     case "character":
     case "stage":
     case "hazards":
+    case "orbs":
     case "stocks":
     case "time":
       return pair ? { ok: true, value: { kind: operation, line, slot: first, value: second } } : fail(`${operation} takes SLOT VALUE`);

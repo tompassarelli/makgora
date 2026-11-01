@@ -173,7 +173,7 @@ function formatControls(controls: Controls, attacks: AttackBuffer): string {
 function menuLines(script: MatchScript): string[] {
   return [
     `character 0 ${script.characters[0]}`, `character 1 ${script.characters[1]}`, `stocks 0 ${script.stocks}`, `time 0 ${script.minutes}`, "stage-select 0",
-    ...(script.stage > 1 ? [`test-stage ${script.stage}`] : [`stage 0 ${script.stage}`]), ...(script.hazardsOff === true ? ["hazards 0 0"] : []), "start 0", ...(script.placement === undefined ? [] : [script.placement]),
+    ...(script.stage > 1 ? [`test-stage ${script.stage}`] : [`stage 0 ${script.stage}`]), ...(script.hazardsOff === true ? ["hazards 0 0"] : []), ...(script.orbPickups === undefined ? [] : ["orbs 0 1"]), "start 0", ...(script.placement === undefined ? [] : [script.placement]),
     ...(script.meter === undefined ? [] : [`test-meter 0 ${script.meter}`, `test-meter 1 ${script.meter}`]),
   ];
 }
