@@ -824,11 +824,16 @@ export class SelectionPanel {
   }
 }
 
-function readPointer(): { readonly pointed: boolean; readonly x: number; readonly y: number } {
+const POINTER = { pointed: false, x: 0.0, y: 0.0 };
+
+// Lua: one shared record, because the panel updates on every match frame and a fresh table each frame is garbage.
+function readPointer(): Readonly<typeof POINTER> {
   const width = toReal(screenWidth());
   const height = toReal(screenHeight());
-  if (width <= 0 || height <= 0) return { pointed: false, x: 0.0, y: 0.0 };
-  return { pointed: true, x: pointerX(toReal(inputPointerX()), width, height), y: pointerY(toReal(inputPointerY()), height) };
+  POINTER.pointed = width > 0 && height > 0;
+  POINTER.x = POINTER.pointed ? pointerX(toReal(inputPointerX()), width, height) : 0.0;
+  POINTER.y = POINTER.pointed ? pointerY(toReal(inputPointerY()), height) : 0.0;
+  return POINTER;
 }
 
 const BAR_FOCUS: Readonly<Partial<Record<MenuFocus["kind"], BarItem>>> = { mainMenu: "back", mode: "mode", teamBattle: "teams", rules: "rules", guide: "guide", gear: "gear" };
