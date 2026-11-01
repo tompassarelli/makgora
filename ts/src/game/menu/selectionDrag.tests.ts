@@ -1,7 +1,7 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
-import { bullseyeLeft, bullseyeSize, bullseyeTop, GAME_MENU_WAKE_UPDATES, gameMenuWake, carriedChipLeft, carriedChipSize, carriedChipTop, CARRIED_CHIP_OFFSET, HAND_STATES, handLeft, handSize, handTop, menuCursor } from "./selectionDrag";
+import { bullseyeLeft, bullseyeSize, bullseyeTop, GAME_MENU_WAKE_UPDATES, gameMenuWake, carriedChipLeft, carriedChipTop, chipBox, CARRIED_CHIP_OFFSET, HAND_STATES, handLeft, handSize, handTop, menuCursor, readyChipSize } from "./selectionDrag";
 import { rosterGrid } from "./selectionGrid";
 
 // The chip texture's disc is 232 of its 256 texels.
@@ -120,7 +120,7 @@ test("A carried chip hangs left of the pinch point with its right rim between th
   for (let count = 1; count <= 60; count++) {
     const grid = rosterGrid(count);
     const size = handSize(grid);
-    const chip = carriedChipSize(grid);
+    const chip = readyChipSize(grid);
     const x = f32(0.4);
     const y = f32(0.3);
     assertTrue(Math.abs(carriedChipLeft(x, chip) + chip / 2 - (x + chip * CARRIED_CHIP_OFFSET.x)) < f32(0.00001));
@@ -128,5 +128,20 @@ test("A carried chip hangs left of the pinch point with its right rim between th
     assertTrue(carriedChipLeft(x, chip) + chip * (f32(0.5) - DISC_RADIUS) < x);
     assertTrue(Math.abs(carriedChipTop(y, chip) - chip / 2 - y) < chip * f32(0.15));
     assertTrue(chip < size * HAND_ART_COLUMNS / HAND_TEXELS);
+  }
+});
+
+test("A chip is drawn at one size parked on its card, carried by the hand and placed on a tile [k2 property]", () => {
+  for (let count = 1; count <= 60; count++) {
+    const grid = rosterGrid(count);
+    for (let slot = 0; slot < 4; slot++) {
+      const hand = { x: f32(0.4), y: f32(0.3) };
+      const parked = chipBox(grid, slot, "parked", 0, hand).size;
+      const carried = chipBox(grid, slot, "carried", 0, hand).size;
+      const placed = chipBox(grid, slot, "placed", 0, hand).size;
+      assertEquals(carried, readyChipSize(grid));
+      assertEquals(placed, carried);
+      assertEquals(parked, carried);
+    }
   }
 });

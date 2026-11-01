@@ -7,7 +7,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, type Client, focus, loadClients, type Region } from "wisp/scripts/warcraft/desktop";
-import { HAND_STATES, type HandState, carriedChipLeft, carriedChipSize, carriedChipTop, handLeft, handSize, handTop } from "../../src/game/menu/selectionDrag";
+import { HAND_STATES, type HandState, carriedChipLeft, carriedChipTop, readyChipSize, handLeft, handSize, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
 import { handBadgeBox } from "../../src/game/ui/selectionHandFrames";
@@ -88,7 +88,7 @@ export const measureHandsGate = (clientsFile: string, directory: string) => Effe
   const reference = yield* capture(first.client, first.region).pipe(Effect.mapError(fail("hands gate capture")));
   const grid = rosterGrid(ROSTER_TILES);
   const extent = handSize(grid);
-  const chip = carriedChipSize(grid);
+  const chip = readyChipSize(grid);
   const tile = cellRect(grid, HOVER_TILE);
   const hover = { x: (tile.left + tile.right) / 2, y: (tile.top + tile.bottom) / 2 };
   const move = (person: Participant, at: { x: number; y: number }) => {
@@ -109,7 +109,7 @@ export const measureHandsGate = (clientsFile: string, directory: string) => Effe
         const carried = carrying && owner.slot === 0;
         const left = handLeft(at.x, at.state, extent);
         const top = handTop(at.y, at.state, extent);
-        const box = handBadgeBox(left, top, extent);
+        const box = handBadgeBox(left, top, extent, chip);
         const badge = { left: box.left - COVER_PAD, top: box.top + COVER_PAD, width: box.width + 2 * COVER_PAD, height: box.height + 2 * COVER_PAD };
         const handBox = { left: left - COVER_PAD, top: top + COVER_PAD, width: extent + 2 * COVER_PAD, height: extent + 2 * COVER_PAD };
         const hand = texturePixels(frame, textures[at.state], left, top, extent, extent, badge);

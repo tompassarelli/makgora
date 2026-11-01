@@ -293,10 +293,12 @@ tips, which open to the left. While a chip is carried its centre hangs 0.4 of th
 level with it (`CARRIED_CHIP_OFFSET`), and the chip
 frame is drawn beneath the hand (`SELECT_LEVELS.carriedChip`, `carriedChipLeft`,
 `carriedChipTop`), so the thumb and index tips cover its right rim the way Melee's
-hand holds its token (Tom compared the two, 2026-10-30). The carried chip is
-0.71 of the hand's frame (`CARRIED_CHIP_HAND_SHARE`): in Melee's reference the
-token's disc is 51 px across a glove 62 px wide, 0.82, and the chip texture's disc
-is 232 of its 256 texels while the gauntlet is 202 of the hand's 256. The hand frames hang from the game UI at frame level
+hand holds its token (Tom compared the two, 2026-10-30). A chip keeps one size in every
+state (Tom asked for this on 2026-11-02, after seeing it grow when picked up): parked
+on its card, carried and placed on a tile it is drawn at `readyChipSize` of the
+grid, built by one function (`chipBox`) so the three states cannot differ. The
+hand's P1-P4 label keeps the chip's lettering size, so it matches the chip's own
+lettering. The hand frames hang from the game UI at frame level
 200, above every
 selection panel. Scaling is nearest-neighbour only.
 The selection asset build is described in smashcraft:docs/build-inputs.md.

@@ -202,11 +202,6 @@ export const GAME_MENU_WAKE_UPDATES = 30;
 
 export const gameMenuWake = (updatesLeft: number, warcraftMenuOpen: boolean): number => warcraftMenuOpen ? 0 : Math.max(0, updatesLeft - 1);
 
-// Melee holds its token at the pinch with the fingers over its lower part: the token's visible disc is about 0.82 of the glove's width (51 px against 62 in Tom's reference), and the chip texture's disc is 232 of its 256 texels while the gauntlet is 202 of the hand's 256.
-export const CARRIED_CHIP_HAND_SHARE = f32(0.71);
-
-export const carriedChipSize = (grid: RosterGrid): number => f32(handSize(grid) * CARRIED_CHIP_HAND_SHARE);
-
 // The pinch opens to the left, so a carried chip hangs to the left of the pinch point with its right rim between thumb and index tips, drawn under the hand so the tips cover that rim; the offset is in chip sizes.
 export const CARRIED_CHIP_OFFSET = { x: f32(-0.4), y: f32(0.0) };
 
@@ -216,6 +211,16 @@ export const carriedChipTop = (y: number, size: number): number => y + size * f3
 
 // A chip not yet on a fighter parks centred on this point of its player card.
 export const parkedChipCentre = (slot: number): { readonly x: number; readonly y: number } => ({ x: cardRight(slot, f32(0.126)), y: cardDown(f32(0.105)) });
+
+export interface ChipBox { readonly left: number; readonly top: number; readonly size: number }
+
+// A chip is one size in every state: parked on its card, carried by the hand, and placed on a tile.
+export function chipBox(grid: RosterGrid, slot: number, state: "parked" | "carried" | "placed", tile: number, hand: { readonly x: number; readonly y: number }): ChipBox {
+  const size = readyChipSize(grid);
+  if (state === "carried") return { left: carriedChipLeft(hand.x, size), top: carriedChipTop(hand.y, size), size };
+  if (state === "placed") return { left: chipX(grid, slot, tile), top: chipY(grid, slot, tile), size };
+  return { left: parkedChipLeft(slot, size), top: parkedChipTop(size), size };
+}
 
 export const parkedChipLeft = (slot: number, size: number): number => parkedChipCentre(slot).x - size * f32(0.5);
 

@@ -14,14 +14,7 @@ import {
   cardRight,
   cardSize,
   cardX,
-  readyChipSize,
-  carriedChipLeft,
-  carriedChipSize,
-  carriedChipTop,
-  parkedChipLeft,
-  parkedChipTop,
-  chipX,
-  chipY,
+  chipBox,
 } from "../menu/selectionDrag";
 import type { RosterGrid } from "../menu/selectionGrid";
 import { CARD_HEIGHT, CARD_TOP, CARD_WIDTH } from "../core/selectScreenLayout";
@@ -227,14 +220,10 @@ export function presentCardChip(frames: CardFrames, drag: Readonly<SelectionDrag
   const carried = local || remote !== undefined;
   const hand = remote !== undefined && !local ? remote : { x, y };
   const chipChoice = tileOfCharacter(choice ?? DEFAULT_FIGHTER);
-  const size = carried ? carriedChipSize(grid) : readyChipSize(grid);
-  setFrameSize(frames.chip, size, size);
+  const box = chipBox(grid, slot, carried ? "carried" : ready ? "placed" : "parked", chipChoice, hand);
+  setFrameSize(frames.chip, box.size, box.size);
   setFrameLevel(frames.chip, carried ? SELECT_LEVELS.carriedChip : SELECT_LEVELS.cardChip);
-  placeTopLeft(
-    frames.chip,
-    carried ? carriedChipLeft(hand.x, size) : ready ? chipX(grid, slot, chipChoice) : parkedChipLeft(slot, size),
-    carried ? carriedChipTop(hand.y, size) : ready ? chipY(grid, slot, chipChoice) : parkedChipTop(size),
-  );
+  placeTopLeft(frames.chip, box.left, box.top);
   return local;
 }
 

@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import { CARRIED_CHIP_HAND_SHARE, HAND_STATES, type HandState, handLeft, handSize, handTop } from "../menu/selectionDrag";
+import { HAND_STATES, type HandState, handLeft, handSize, handTop, readyChipSize } from "../menu/selectionDrag";
 import { HAND_TEXELS } from "../core/handArt";
 import type { RosterGrid } from "../menu/selectionGrid";
 import { SELECT_LEVELS } from "./selectLevels";
@@ -33,10 +33,10 @@ const UI_HEIGHT = f32(0.6);
 
 const TEXTURE_NAMES: Readonly<Record<HandState, string>> = { point: "Point", fan: "Fan", pinch: "Pinch" };
 
-export function handBadgeBox(left: number, top: number, size: number): { readonly left: number; readonly top: number; readonly width: number; readonly height: number } {
+export function handBadgeBox(left: number, top: number, size: number, chip: number): { readonly left: number; readonly top: number; readonly width: number; readonly height: number } {
   const unit = f32(size / HAND_TEXELS);
-  const width = f32(f32(size * CARRIED_CHIP_HAND_SHARE) * LABEL_CHIP_WIDTH);
-  const height = f32(f32(size * CARRIED_CHIP_HAND_SHARE) * LABEL_CHIP_HEIGHT);
+  const width = f32(chip * LABEL_CHIP_WIDTH);
+  const height = f32(chip * LABEL_CHIP_HEIGHT);
   return { left: f32(left + f32(LABEL_CENTRE_X * unit) - width / 2), top: f32(top - f32(LABEL_CENTRE_Y * unit) + height / 2), width, height };
 }
 
@@ -50,7 +50,7 @@ function createLayer(parent: Frame, grid: RosterGrid, tag: string, suffix: strin
     setFrameVisible(frame, false);
     return frame;
   };
-  const { width, height } = handBadgeBox(0.0, 0.0, size);
+  const { width, height } = handBadgeBox(0.0, 0.0, size, readyChipSize(grid));
   const badge = art(parent, `MeleeHandBadge${tag}${suffix}_${formatInt(slot)}`, `war3mapImported\\SelectionHandLabelP${formatInt(slot + 1)}.tga`, 0.0, 0.0, width, height);
   setFrameLevel(badge, SELECT_LEVELS.handBadge);
   setFrameVisible(badge, false);
@@ -61,7 +61,7 @@ export function createHandFrames(grid: RosterGrid, suffix: string, slot: number)
   return { inside: createLayer(gameUi(), grid, "", suffix, slot), edge: createLayer(consoleUi(), grid, "Edge", suffix, slot) };
 }
 
-function presentLayer(layer: HandLayer, hand: DrawnHand | undefined, left: number, top: number, size: number): void {
+function presentLayer(layer: HandLayer, hand: DrawnHand | undefined, left: number, top: number, size: number, chip: number): void {
   for (const state of HAND_STATES) setFrameVisible(layer.states[state], hand?.pose.state === state);
   setFrameVisible(layer.badge, hand !== undefined);
   if (hand === undefined) return;
@@ -70,7 +70,7 @@ function presentLayer(layer: HandLayer, hand: DrawnHand | undefined, left: numbe
     setFrameColor(layer.badge, frameColor(255, imod(idiv(hand.colour, 65536), 256), imod(idiv(hand.colour, 256), 256), imod(hand.colour, 256)));
   }
   placeTopLeft(layer.states[hand.pose.state], left, top);
-  const badge = handBadgeBox(left, top, size);
+  const badge = handBadgeBox(left, top, size, chip);
   placeTopLeft(layer.badge, badge.left, badge.top);
 }
 
@@ -79,8 +79,9 @@ export function presentHand(frames: HandFrames, hand: DrawnHand | undefined, gri
   const left = hand === undefined ? 0.0 : handLeft(hand.pose.x, hand.pose.state, size);
   const top = hand === undefined ? 0.0 : handTop(hand.pose.y, hand.pose.state, size);
   const crossing = hand !== undefined && handCrossesEdge(left, top, size);
-  presentLayer(frames.inside, crossing ? undefined : hand, left, top, size);
-  presentLayer(frames.edge, crossing ? hand : undefined, left, top, size);
+  const chip = readyChipSize(grid);
+  presentLayer(frames.inside, crossing ? undefined : hand, left, top, size, chip);
+  presentLayer(frames.edge, crossing ? hand : undefined, left, top, size, chip);
 }
 
 function destroyLayer(layer: HandLayer): void {

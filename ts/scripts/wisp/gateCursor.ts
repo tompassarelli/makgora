@@ -8,7 +8,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, focus, loadClients } from "wisp/scripts/warcraft/desktop";
-import { carriedChipLeft, carriedChipSize, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, handSize, HAND_STATES, type HandState, handLeft, handTop } from "../../src/game/menu/selectionDrag";
+import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, handSize, HAND_STATES, type HandState, handLeft, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
@@ -38,10 +38,10 @@ const EDGE_SPOT = { x: 0.005, y: 0.3 };
 const AFTER_DROP_RISE = 0.01;
 const margined = (left: number, top: number, width: number, height: number): UiRect => ({ left: left - COVER_MARGIN, top: top + COVER_MARGIN, width: width + 2 * COVER_MARGIN, height: height + 2 * COVER_MARGIN });
 
-const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, state: HandState, size: number) => {
+const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, state: HandState, size: number, chip: number) => {
   const left = handLeft(x, state, size);
   const top = handTop(y, state, size);
-  const badge = handBadgeBox(left, top, size);
+  const badge = handBadgeBox(left, top, size, chip);
   return texturePixels(frame, texture, left, top, size, size, margined(badge.left, badge.top, badge.width, badge.height));
 };
 
@@ -72,7 +72,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     return movePointer(client, { x: region.x + point.x, y: region.y + point.y }, "cursor gate pointer");
   };
   const drawnHand = (pixels: Frame, x: number, y: number) => {
-    const drawn = HAND_STATES.map(state => ({ state, hand: cursorPixels(pixels, texture[state], x, y, state, handExtent) }));
+    const drawn = HAND_STATES.map(state => ({ state, hand: cursorPixels(pixels, texture[state], x, y, state, handExtent, readyChipSize(grid)) }));
     const best = drawn.reduce((nearest, next) => (next.hand?.error ?? Infinity) < (nearest.hand?.error ?? Infinity) ? next : nearest);
     return { state: best.state, pinched: best.state === "pinch", hand: best.hand };
   };
@@ -92,7 +92,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     const error = hand?.error;
     const size = readyChipSize(grid);
     const pointerCover = margined(handLeft(x, state, handExtent), handTop(y, state, handExtent), handExtent, handExtent);
-    const carriedSize = carriedChipSize(grid);
+    const carriedSize = size;
     const chipError = phase === "carrying" ? textureError(pixels, texture.chip, carriedChipLeft(x, carriedSize), carriedChipTop(y, carriedSize), carriedSize, carriedSize, pointerCover)
       : phase === "after-drop" ? textureError(pixels, texture.chip, chipX(grid, 0, 0), chipY(grid, 0, 0), size, size, pointerCover)
       : phase === "before-pick" ? textureError(pixels, texture.chip, parkedChipLeft(0, size), parkedChipTop(size), size, size, pointerCover) : undefined;
@@ -112,7 +112,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   const pin = { x: parkedChipLeft(0, readyChipSize(grid)) + readyChipSize(grid) / 2, y: parkedChipCentre(0).y };
   const control = yield* sample("positive-control", CLEAR_SPOT.x, CLEAR_SPOT.y);
   const controlFrame = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate control")));
-  const negativeControlError = cursorPixels(controlFrame, texture.point, 0.4, 0.56, "point", handExtent)?.error;
+  const negativeControlError = cursorPixels(controlFrame, texture.point, 0.4, 0.56, "point", handExtent, readyChipSize(grid))?.error;
   if (!control.visible || negativeControlError === undefined || negativeControlError <= 24) return yield* new AcceptFailure({ operation: "cursor gate calibration", problem: `positive error=${control.error}; negative error=${negativeControlError}` });
   yield* sample("before-pick", CLEAR_SPOT.x, CLEAR_SPOT.y);
   if (edgeRoom(frame, handLeft(EDGE_SPOT.x, "point", handExtent))) yield* sample("edge", EDGE_SPOT.x, EDGE_SPOT.y);
