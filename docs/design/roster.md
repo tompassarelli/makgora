@@ -1336,6 +1336,8 @@ Tom asked on 2026-11-01 to show this fighter to players as Ragnaros. Only the di
 
 **Identity:** a caster who leaves brief fire zones that scar the ground and dives through the floor back to the newest scar. Flame trails are visually clear and mechanically bounded. The floating model still follows normal jumps and gravity.
 
+**Gait:** his walk, run and dash play the stock Walk at most 2.5x, half the shared 5x ground-clip cap, because the Walk bobs his body 22.6 units twice a loop and at 5x that was 10 bobs a second (453 units of vertical travel a second, the most on the roster, whose runs have a median of 229); at 2.5x it is 5 bobs and 226 units a second. Tom asked for it after a playtest on 2026-11-01, when his run bobbed too much. He floats, so the slower clip leaves no feet to slide (docs/fighter-motion.md).
+
 ### Normals
 
 | Input and move | F/A/R and landing | Damage | Reach and launch | Behavior |

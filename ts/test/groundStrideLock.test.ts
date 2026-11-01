@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { min } from "../src/game/core/numbers";
 import { DRAWN_STRIDES } from "../src/game/presentation/drawnStrideInfo";
-import { groundLocomotionClip, groundLocomotionRate, GROUND_LOCOMOTION_RATE_CAP } from "../src/game/presentation/fighterLocomotion";
+import { groundLocomotionClip, groundLocomotionRate, groundLocomotionRateCap } from "../src/game/presentation/fighterLocomotion";
 import { IllidanLocomotion } from "../src/game/presentation/illidanMotion";
 import { lookCharacter, SELECTABLE_CHARACTERS } from "../src/game/roster/kits";
 import { Character } from "../src/game/sim/codes";
@@ -34,7 +34,7 @@ test("each grounded fighter's walk, run and dash play the clip its stride was me
     for (const gait of GAITS) {
       const { clip, stride, rate, feet, body, slides } = measure(character, gait);
       expect(clip?.index, `${character} ${gait.gait}: clip against measured stride`).toBe(stride?.clip);
-      expect(rate).toBeLessThanOrEqual(GROUND_LOCOMOTION_RATE_CAP);
+      expect(rate).toBeLessThanOrEqual(groundLocomotionRateCap(character));
       expect(slides, `${character} ${gait.gait} ${gait.motion}: feet ${feet.toFixed(1)} against body ${body.toFixed(1)}`).toBe(false);
     }
   }

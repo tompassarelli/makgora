@@ -1,0 +1,5 @@
+# Firelord runs right for 80 frames, then left for 80, so his run's body bob shows in both facings (2026-11-01 bob cap).
+#! chat -dev quick hero firelord
+250 a stick 1 0
+330 a stick -1 0
+410 a stick 0 0

@@ -14,7 +14,7 @@ import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { drawnStrideOf } from "../../ts/scripts/wisp/drawnMotion";
 import { sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackPhase, type Character } from "../../ts/src/game/sim/codes";
-import { GROUND_LOCOMOTION_RATE_CAP } from "../../ts/src/game/presentation/fighterLocomotion";
+import { groundLocomotionRateCap } from "../../ts/src/game/presentation/fighterLocomotion";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
@@ -164,9 +164,9 @@ for (const [i, sequence] of source.Sequences.entries()) for (const fraction of [
 const duration = frames / 60, drawn = new DrawnModel(bytes, scale);
 const stride = drawnStrideOf(drawn, index, duration), drawnRate = runSpeed / stride;
 const ankleZ = (frame: number, l: Leg) => drawn.posed(index, frame / 60, 1).nodes[l.ankle * 2 + 1] ?? 0;
-const bodyOverFeet = Math.max(1, drawnRate / GROUND_LOCOMOTION_RATE_CAP);
-console.log(`RUN_CLIP ${fighter.name}: ${frames} frames, ${cadence.toFixed(2)} cycles/s at ${runSpeed.toFixed(0)} u/s, step ${step.toFixed(1)}, drawn stride ${stride.toFixed(1)} u/s, run rate ${drawnRate.toFixed(2)}x (cap ${GROUND_LOCOMOTION_RATE_CAP}), body/feet ${bodyOverFeet.toFixed(2)}, ankle z ${ankleZ(0, leg).toFixed(1)}`);
-if (!process.env.RUN_DEBUG) ensure(drawnRate <= GROUND_LOCOMOTION_RATE_CAP, `${fighter.name}: run rate ${drawnRate.toFixed(2)} past the cap`);
+const bodyOverFeet = Math.max(1, drawnRate / groundLocomotionRateCap(character));
+console.log(`RUN_CLIP ${fighter.name}: ${frames} frames, ${cadence.toFixed(2)} cycles/s at ${runSpeed.toFixed(0)} u/s, step ${step.toFixed(1)}, drawn stride ${stride.toFixed(1)} u/s, run rate ${drawnRate.toFixed(2)}x (cap ${groundLocomotionRateCap(character)}), body/feet ${bodyOverFeet.toFixed(2)}, ankle z ${ankleZ(0, leg).toFixed(1)}`);
+if (!process.env.RUN_DEBUG) ensure(drawnRate <= groundLocomotionRateCap(character), `${fighter.name}: run rate ${drawnRate.toFixed(2)} past the cap`);
 
 mkdirSync(dirname(join(output, fighter.source)), { recursive: true });
 await Bun.write(join(output, fighter.source), bytes); chmodSync(join(output, fighter.source), 0o644);
