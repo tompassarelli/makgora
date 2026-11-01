@@ -63,7 +63,7 @@ const FOUR_FIGHTER_STOCKS = 99;
 
 export type StandaloneStart = "match" | "select" | "results";
 
-const offersPrompt = (start: StandaloneStart, savedFiles: string | undefined): boolean => start !== "select" || savedFiles !== undefined;
+const offersPrompt = (start: StandaloneStart, savedFiles: string | undefined, tutorialOffer: boolean): boolean => tutorialOffer && (start !== "select" || savedFiles !== undefined);
 
 const clientOptions = (savedFiles: string | undefined) => savedFiles === undefined ? { keepCalls: 0 } : { keepCalls: 0, files: () => customMapData(savedFiles) };
 
@@ -103,10 +103,12 @@ export interface StandaloneSessionOptions {
   readonly start?: StandaloneStart;
   readonly chosen?: string;
   readonly savedFiles?: string;
+  /** Whether a first-time player is offered the tutorial on character select; `--no-tutorial-offer` turns it off so a live window opens on the menu with nothing in front. */
+  readonly tutorialOffer?: boolean;
 }
 
 export async function createStandaloneSession(options: StandaloneSessionOptions = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string; replayed(): number }> {
-  const { script, presentation, fourFighters = false, stage = 0, rollback = 0, start = "match", chosen, savedFiles } = options;
+  const { script, presentation, fourFighters = false, stage = 0, rollback = 0, start = "match", chosen, savedFiles, tutorialOffer = true } = options;
   const scripted = script?.startsWith(SELECTION_SCRIPT) === true;
   const selection = scripted || start === "select";
   const driven = script !== undefined && !scripted;
@@ -126,7 +128,7 @@ export async function createStandaloneSession(options: StandaloneSessionOptions 
     const { tutorialOffers }: { tutorialOffers: { enabled: boolean } } = await import("../../src/game/ui/tutorialMenu");
     const offersBefore = tutorialOffers.enabled;
     restoreTutorialOffers = () => { tutorialOffers.enabled = offersBefore; };
-    tutorialOffers.enabled = offersPrompt(start, savedFiles);
+    tutorialOffers.enabled = offersPrompt(start, savedFiles, tutorialOffer);
     const { drawnFrame }: { drawnFrame(state: State): { readonly frame: number } } = await import("../../src/host/loop/drawnFrame");
     const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import("./botMatch");
     const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import("../../src/host/loop/menus");
@@ -245,7 +247,7 @@ export const smashcraftStandalone = (render: StandaloneGame["render"]): Standalo
   net: { mapHash: smashcraftMapHash, create: createNetStandalone },
 });
 
-const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only"]);
+const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only", "--no-tutorial-offer"]);
 const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests", "--storage", "--stage"]);
 
 export function standaloneArguments(args: readonly string[], window: "chrome" | "native" = "native") {
@@ -283,7 +285,7 @@ export function standaloneArguments(args: readonly string[], window: "chrome" | 
   const stageName = texts.get("--stage");
   if (stageName !== undefined && !fourFighters) throw new Error("--stage picks the --four-fighters match's stage; add --four-fighters");
   const stage = stageName === undefined ? undefined : stageNamed(stageName);
-  return { ...(fourFighters ? { fourFighters } : {}), ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }), ...(storage === undefined ? {} : { storage }), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
+  return { ...(fourFighters ? { fourFighters } : {}), ...(flags.has("--no-tutorial-offer") ? { noTutorialOffer: true } : {}), ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }), ...(storage === undefined ? {} : { storage }), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
 }
 
 function digestsOf(texts: ReadonlyMap<string, string>, window: "chrome" | "native"): { readonly digests?: string } {
@@ -320,7 +322,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const counted = standaloneEmulatedCallsArgument(windowed.rest);
   if (typeof counted === "string") return yield* new UsageFailure({ problem: counted });
   const options = yield* Effect.try({ try: () => standaloneArguments(counted.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
-  const { playerAssets, start, chosen, digests, storage, stage, rollback, fourFighters, ...run } = options;
+  const { playerAssets, start, chosen, digests, storage, stage, rollback, fourFighters, noTutorialOffer, ...run } = options;
   const match = { ...(fourFighters === true ? { fourFighters } : {}), ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }) };
   const game = smashcraftStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
   const query = new URLSearchParams();
@@ -328,6 +330,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   if (options.start !== undefined) query.set("start", options.start);
   if (!options.headless) query.set("save", "1");
   if (chosen !== undefined) query.set("chosen", chosen);
+  if (noTutorialOffer === true) query.set("noTutorialOffer", "1");
   if (options.presentation !== undefined) query.set("presentation", options.presentation);
   if (options.fourFighters === true) query.set("fourFighters", "1");
   if (options.stage !== undefined) query.set("stage", String(options.stage));
@@ -336,7 +339,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const compiled = !import.meta.path.endsWith(".ts");
   if (compiled) process.env.SMASHCRAFT_NATIVE_QUERY = query.toString();
   const nativeModule = query.size === 0 || compiled ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
-  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...match, ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) }) }, {
+  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...match, ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }), ...(noTutorialOffer === true ? { tutorialOffer: false } : {}) }) }, {
     ...run,
     reforged: storage === undefined ? {} : { storage },
     ...(playerAssets === undefined ? {} : { gpuLease: false }),
