@@ -149,7 +149,9 @@ const BANSHEE_FORM: MoveCues = {
 const DREADLORD_BITE_CUES: MoveCues = { spell: "Healing bite", startup: VAMPIRIC, active: cue("Abilities\\Weapons\\Blood\\BloodImpact.mdx", "ahead", 1.0) };
 const VOODOO = cue("Abilities\\Spells\\Orc\\TrollBerserk\\TrollBeserkerTarget.mdx", "hand", f32(0.7));
 const FEL = cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.7));
-const FINGER_GLOW = cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(1.3));
+const MANA_SHIELD_FLARE = timed(cue("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", "hand", f32(0.4)), "birth", 0.0);
+const MANA_SHIELD_CAST: MoveCues = { spell: "Mana Shield", startup: MANA_SHIELD_FLARE, active: MANA_SHIELD_FLARE };
+const FINGER_GLOW =cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(1.3));
 const HOWL_INHALE: Cue = { ...FEL, scale: f32(0.25), scaleEnd: f32(1.2), scaleFrames: HOWL_FIRST - 1, color: [160, 20, 10], sound: "HowlOfTerror", anchorFrames: Array.from({ length: HOWL_FIRST }, () => ({ x: 38.0, z: 118.0 })) };
 const HOWL_ROAR: Cue = { ...cue("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdx", "feet", f32(HOWL_REACH / f32(440.0))), color: [255, 60, 30] };
 const MURGUL = cue("Abilities\\Weapons\\MurgulMagicMissile\\MurgulMagicMissile.mdx", "hand", f32(0.6));
@@ -319,7 +321,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Multi-Shot", startup: cue("Abilities\\Spells\\Other\\FrostArrows\\NagaColdArrowMissile.mdl", "hand", f32(0.6)), active: cue("Abilities\\Spells\\Other\\FrostArrows\\NagaColdArrowMissile.mdl", "hand", f32(0.6)) },
     side: { spell: "Tidal Serpent", startup: cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "hand", f32(0.4)), active: cue("Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdl", "hand", f32(0.6)) },
     up: { spell: "Tidal Surge", startup: cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", f32(0.6)), active: timed(cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", 1.0), "birth", 0.0) },
-    down: { spell: "Mana Shield", startup: cue("Abilities\\Spells\\Human\\ManaShield\\ManaShieldCaster.mdl", "body", f32(0.8)), active: cue("Abilities\\Spells\\Human\\ManaShield\\ManaShieldCaster.mdl", "body", f32(0.8)) },
+    down: MANA_SHIELD_CAST,
   },
   [Character.blademaster]: {
     neutral: QUICKDRAW_STANCE_CUES,

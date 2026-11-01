@@ -13,6 +13,7 @@ import { createFighter, type Fighter } from "../../sim/fighter";
 import { fighterAt } from "../../sim/roster";
 import { ULTIMATE_METER_FRAMES } from "../../sim/meter";
 import { MANA_SHIELD_FRAMES_PER_PERCENT } from "../../sim/manaShield";
+import { ManaShieldChange, manaShieldChange } from "../../presentation/manaShieldLook";
 
 type Press = "shield" | "serpent" | "jab" | "none";
 type Script = (tick: number) => readonly [Press, Press];
@@ -122,6 +123,18 @@ test("Mana Shield turns on, takes half of each hit from her ultimate meter, brea
   assertTrue(broke);
   assertTrue(staggered);
   assertEquals(d.vashj.status.manaShield, false);
+});
+
+test("Mana Shield's look reads her toggles as on and off and a meter-dry hit as a break [k3 measure docs/design/lady-vashj.md]", () => {
+  const d = duel(60.0, SHIELD_CHARGE);
+  const changes: ManaShieldChange[] = [];
+  for (let tick = 1; tick <= SHIELD_END; tick++) {
+    const was = d.vashj.status.manaShield;
+    step(d, shieldScript(tick));
+    const change = manaShieldChange(was, d.vashj);
+    if (change !== ManaShieldChange.none) changes.push(change);
+  }
+  assertEquals(changes.join(","), [ManaShieldChange.on, ManaShieldChange.broken, ManaShieldChange.on, ManaShieldChange.off].join(","));
 });
 
 test("Tidal Serpent drains 108 frames of the foe's ultimate meter, turns back with no other foe, and gives her nothing on the catch [k3 measure docs/design/lady-vashj.md]", () => {

@@ -47,6 +47,7 @@ const THROWS: Readonly<Partial<Record<HeroPose, readonly [GrabAction, number, nu
   throwUp: [GrabAction.throwUp, 11, 30], throwDown: [GrabAction.throwDown, 15, 32],
 };
 const SPECIALS: Readonly<Record<"neutral" | "side" | "up" | "down", readonly [number, number]>> = { neutral: [18, 40], side: [16, 46], up: [12, 40], down: [6, 12] };
+const SPELL_SEQUENCE = 5, SPELL_RELEASE = 0.5;
 
 
 type Hero = HeroDefinition | undefined;
@@ -192,9 +193,7 @@ for (const [pose, key] of [["neutralSpecial", "neutral"], ["sideSpecial", "side"
       { air, reach: [...[Math.round(c / 2), c - 2].flatMap(f => reachAll([f], "upperR", [-50, -25, 100]).concat(reachAll([f], "upperL", [-50, 25, 100]))), ...reachAll([c], "upperR", [100, -15, 68]), ...reachAll([c], "upperL", [100, 15, 68]), ...reachAll([c + 6], "upperR", [105, -15, 55]), ...reachAll([c + 6], "upperL", [105, 15, 55])] }); }
   if (key === "up") add(name, t, c, [[0, { ...rest, lean: 30, chest: 20, uncoil: 0.2, curl: 30 }], [c - 3, { lean: 40, chest: 25, uncoil: 0.1, curl: 36, tail: 6 }], [c, { tz: 20, lean: -10, chest: -20, head: -30, snakes: -40, uncoil: 1, tail: -88, curl: 0 }], [Math.min(t - 2, c + 7), { tz: 24, lean: -12, chest: -22, head: -30, snakes: -40, uncoil: 1, tail: -86, curlYaw: 15 }], [t, { lean: 30, chest: 40, head: 20, uncoil: 1, tail: -70 }]],
     { air: true, reach: reachAll([c, Math.min(t - 2, c + 7)], "upperR", [15, -30, 200]).concat(reachAll([c, Math.min(t - 2, c + 7)], "upperL", [15, 30, 200])) });
-  if (key === "down") { const cast: Gesture = { ...rest, lean: -6, chest: -14, head: -18, snakes: -40, uncoil: 0.5, curl: 26, curlYaw: 20 }, hold = Math.min(t - 1, c + 4), spread = (f: number) => [...reachAll([f], "upperR", [40, -35, 130]), ...reachAll([f], "upperL", [-45, 35, 135]), ...reachAll([f], "bow", [60, 25, 95]), ...reachAll([f], "draw", [-55, -25, 90])];
-    add(name, t, c, [[0, rest], [Math.max(1, c - 3), { ...rest, lean: 14, chest: 18, head: -10, uncoil: 0.3, curl: 20, curlYaw: 10 }], [c, cast], [hold, cast], [t, rest]],
-      { air, reach: [...reachAll([Math.max(1, c - 3)], "upperR", [30, -5, 105]), ...reachAll([Math.max(1, c - 3)], "upperL", [30, 5, 105]), ...spread(c), ...spread(hold)] }); }
+  if (key === "down") add(name, t, c, [[0, rest], [c, rest], [t, rest]], { air, donor: { sequence: SPELL_SEQUENCE, release: SPELL_RELEASE } });
 }
 add("ultimate", 70, 20, [[0, {}], [8, { lean: 10, chest: 15, head: 15, snakes: 20, uncoil: 0.6, curl: 20, curlYaw: 20 }], [20, { tz: 12, lean: -8, chest: -14, head: -10, snakes: -75, uncoil: 0.9, tail: 30, curl: 14, whip: 20 }], [60, { tz: 12, lean: -6, chest: -12, head: -12, snakes: -80, uncoil: 0.9, tail: 32, curl: 16, whip: 24 }], [70, {}]],
   { reach: [...reachAll([20, 60], "upperR", [40, -60, 165]), ...reachAll([20, 60], "upperL", [40, 60, 165]), ...reachAll([20, 60], "draw", [30, -45, 95])] });

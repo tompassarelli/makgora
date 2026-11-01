@@ -32,6 +32,7 @@ import { ChatPanel } from "wisp/src/ui/chatPanel";
 import { CHAT_STYLE } from "../../game/ui/nativeChat";
 import { HitAreaPresentation } from "../../game/render/hitAreaPresentation";
 import { SeaSplashPresentation } from "../../game/render/seaSplashPresentation";
+import { ManaShieldPresentation } from "../../game/render/manaShieldPresentation";
 import { TerrorPresentation } from "../../game/render/terrorPresentation";
 import { EscapeMeter } from "../../game/ui/escapeMeter";
 import { OffscreenBubble } from "../../game/ui/offscreenBubble";
@@ -92,6 +93,7 @@ interface FighterRenderers {
   readonly hitAreas: HitAreaPresentation | undefined;
   readonly terror: TerrorPresentation;
   readonly seaSplash: SeaSplashPresentation;
+  readonly manaShield: ManaShieldPresentation;
 }
 
 export interface UiObjects {
@@ -221,6 +223,7 @@ function endFighterRenderers(renderers: FighterRenderers | undefined): void {
   renderers?.hitAreas?.destroy();
   renderers?.terror.destroy();
   renderers?.seaSplash.destroy();
+  renderers?.manaShield.destroy();
 }
 
 
@@ -261,6 +264,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
     terror: new TerrorPresentation(s.origin),
     seaSplash: new SeaSplashPresentation(s.origin),
+    manaShield: new ManaShieldPresentation(s.origin),
   };
   return pool?.admitted() === true;
 }
@@ -393,6 +397,7 @@ function rebindFighterRenderers(renderers: FighterRenderers): void {
   if (renderers.hitAreas !== undefined) bindPrototype(renderers.hitAreas, HitAreaPresentation.prototype);
   bindPrototype(renderers.terror, TerrorPresentation.prototype);
   bindPrototype(renderers.seaSplash, SeaSplashPresentation.prototype);
+  bindPrototype(renderers.manaShield, ManaShieldPresentation.prototype);
 }
 
 export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (choice: number, clicker: Player) => void): void {

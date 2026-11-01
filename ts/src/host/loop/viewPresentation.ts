@@ -89,6 +89,7 @@ function presentSlotBody(s: ShellState, ui: UiObjects, slot: ParticipantSlot, ga
     renderers.agency.present(live, live === undefined ? "act" : mark);
     renderers.terror.present(live, roared, s.session.paused);
     renderers.seaSplash.present(live, drawn, s.session.paused);
+    renderers.manaShield.present(live, s.session.paused);
   }
 }
 

@@ -170,7 +170,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.ladyVashj]: {
     weapon: Weapon.blunt, strong: "CrushingWaveDamage",
-    specials: [s("FrostArrowLaunch", "FrostArrowHit"), s("CrushingWave", "CrushingWaveDamage"), s("CrushingWave", "CrushingWaveDamage"), s("ManaShieldCastSound", "FrostArmor")],
+    specials: [s("FrostArrowLaunch", "FrostArrowHit"), s("CrushingWave", "CrushingWaveDamage"), s("CrushingWave", "CrushingWaveDamage"), s(undefined, "FrostArmor")],
     ultimate: s("Curse", "StoneFormMorphAlternate"),
   },
   [Character.archimonde]: {
