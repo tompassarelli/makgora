@@ -4,6 +4,12 @@ import { rulesPillParts } from "../session/messages";
 import { MATCH_MODES, Phase, chooseMatchMode, createMatchState, matchMode, setItemsOn, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./lobbyState";
 import { RULE_PRESETS, applyRulePreset } from "./rulePresets";
 
+type Rule = number | boolean;
+const assertRules = (actual: readonly Rule[], expected: readonly Rule[]): void => {
+  assertEquals(actual.length, expected.length);
+  actual.forEach((value, index) => assertEquals(value, expected[index]));
+};
+
 test("Reset default gives a fresh lobby's rules back, and Tourney, Party and Endless set only the rules they name [k2 property]", () => {
   const fresh = createMatchState();
   const game = createMatchState();
@@ -13,14 +19,14 @@ test("Reset default gives a fresh lobby's rules back, and Tourney, Party and End
   toggleItemKind(game, 0, ItemKind.heavy);
   setUltimatesOn(game, 0, false);
   applyRulePreset(game, 0, "standard");
-  assertEquals([game.stockCount, game.timeLimitMinutes, game.items.on, game.items.enabledMask, game.ultimatesOff, game.endless, game.automaticRematch],
+  assertRules([game.stockCount, game.timeLimitMinutes, game.items.on, game.items.enabledMask, game.ultimatesOff, game.endless, game.automaticRematch],
     [fresh.stockCount, fresh.timeLimitMinutes, fresh.items.on, fresh.items.enabledMask, fresh.ultimatesOff, fresh.endless, fresh.automaticRematch]);
   assertEquals(game.items.enabledMask, ALL_ITEMS_MASK);
   applyRulePreset(game, 0, "tourney");
-  assertEquals([game.stockCount, game.timeLimitMinutes, game.items.on, game.ultimatesOff, game.endless], [4, 8, false, true, false]);
+  assertRules([game.stockCount, game.timeLimitMinutes, game.items.on, game.ultimatesOff, game.endless], [4, 8, false, true, false]);
   setStocks(game, 0, 2);
   applyRulePreset(game, 0, "party");
-  assertEquals([game.stockCount, game.timeLimitMinutes, game.items.on, game.ultimatesOff], [2, 8, true, false]);
+  assertRules([game.stockCount, game.timeLimitMinutes, game.items.on, game.ultimatesOff], [2, 8, true, false]);
   applyRulePreset(game, 0, "endless");
   assertTrue(game.endless);
   assertEquals(RULE_PRESETS.endless.stocks, undefined);

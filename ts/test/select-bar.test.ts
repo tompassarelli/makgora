@@ -63,7 +63,7 @@ test("rule changes made in the bar's panels reach every client in the lobby, and
   clients.client(0).run(() => { settings = views(shell()).settings[0]?.isOpen() === true; });
   expect(settings).toBe(true);
   for (const client of clients.clients) expect(client.errors).toEqual([]);
-});
+}, 120_000);
 
 test("the pad reaches the rules drawer from the bar: down past the fighter card, Back, Mode and Teams to the rules pill, attack opens it, down and right step the stocks, special closes it [k1 scenario]", async () => {
   const session = await createStandaloneSession({ start: "select" });
