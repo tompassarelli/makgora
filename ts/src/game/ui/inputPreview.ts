@@ -22,6 +22,7 @@ interface RowFrames {
   readonly lit: Frame;
   readonly label: Frame;
   readonly key: Frame;
+  keyText: string;
   shownKey: string;
   held: boolean | undefined;
 }
@@ -68,7 +69,7 @@ export class InputPreview {
       setFrameVisible(lit, false);
       const label = this.text(`InputPreviewLabel${formatInt(index)}`, 896);
       setFrameText(label, `${LABEL_COLOUR}${placed.row.label}|r`);
-      return { lit, label, key: this.text(`InputPreviewKey${formatInt(index)}`, 896), shownKey: "", held: undefined };
+      return { lit, label, key: this.text(`InputPreviewKey${formatInt(index)}`, 896), keyText: "", shownKey: "", held: undefined };
     });
   }
 
@@ -135,6 +136,7 @@ export class InputPreview {
       sizeText(frames.label, size, column.tab, PREVIEW_ROW_HEIGHT);
       placeTopLeft(frames.key, f32(x + column.tab), y);
       sizeText(frames.key, size, f32(column.width - column.tab), PREVIEW_ROW_HEIGHT);
+      frames.keyText = previewKeyText(settings.bindings, placed.row);
       frames.shownKey = "";
       frames.held = undefined;
     });
@@ -169,17 +171,17 @@ export class InputPreview {
       this.shownRevision = settings.revision;
       this.fit(settings);
     }
-    PREVIEW_ROWS.forEach((placed, index) => {
-      const frames = this.rows[index];
-      if (frames === undefined) return;
+    for (let index = 0; index < PREVIEW_ROWS.length; index++) {
+      const placed = PREVIEW_ROWS[index], frames = this.rows[index];
+      if (placed === undefined || frames === undefined) continue;
       const held = previewRowHeld(settings.bindings, placed.row, down);
-      const key = previewKeyText(settings.bindings, placed.row);
-      if (held === frames.held && key === frames.shownKey) return;
+      const key = frames.keyText;
+      if (held === frames.held && key === frames.shownKey) continue;
       frames.held = held;
       frames.shownKey = key;
       setFrameVisible(frames.lit, held);
       setFrameText(frames.label, `${held ? LIT_COLOUR : LABEL_COLOUR}${placed.row.label}|r`);
       setFrameText(frames.key, `${held ? LIT_COLOUR : KEY_COLOUR}${key}|r`);
-    });
+    }
   }
 }
