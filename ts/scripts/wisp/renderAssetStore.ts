@@ -1,9 +1,9 @@
 import { mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { homedir } from "node:os";
+import { availableParallelism, homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
-import { Effect, ManagedRuntime, Schema } from "effect";
+import { Effect, ManagedRuntime, Schema, Semaphore } from "effect";
 import { ChildProcess } from "effect/process";
 import { INPUTS_STORE, type Manifest, assetsView, readManifest } from "./buildInputs";
 import { ProcessFailure, runProcess } from "../hostProcess";
@@ -16,6 +16,13 @@ const PRIVATE = join(homedir(), ".local/share/smashcraft-render-assets");
 const NOT_IN_STORAGE = "open asset failed: 2";
 const ABSENT_SUFFIX = ".absent";
 const EXTRACT_TIMEOUT = "60 seconds";
+
+const ROOT_MOD = "war3.w3mod";
+
+const absentMarker = (output: string, stored: string) => {
+  const mod = stored.slice(0, stored.lastIndexOf(":"));
+  return mod === ROOT_MOD ? `${output}${ABSENT_SUFFIX}` : `${output}.${mod.replaceAll(/[:/\\]/g, "-")}${ABSENT_SUFFIX}`;
+};
 
 
 class RenderAssetFailure extends Schema.TaggedError<RenderAssetFailure, { readonly brand: unique symbol }>()("RenderAssetFailure", { problem: Schema.String }) {
@@ -85,6 +92,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
   const used = new Map<string, { readonly sha256: string; readonly bytes: number }>();
   let stockInfo: StockBuild | undefined;
   let temporaries = 0;
+  const extractions = Semaphore.makeUnsafe(availableParallelism());
   const temporary = (target: string) => `${target}.${process.pid}.${++temporaries}.tmp`;
 
   const stockCache = Effect.runSync(Effect.cached(storageOf.pipe(Effect.flatMap(readStockBuild), Effect.flatMap((build) => attempt("open the stock cache", () => {
@@ -117,7 +125,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
   const succeeds = (program: string, args: readonly string[]) => {
     const output = args.at(-1);
     if (output === undefined) return Effect.succeed(false);
-    const temp = temporary(output), absent = `${output}${ABSENT_SUFFIX}`;
+    const temp = temporary(output), absent = absentMarker(output, args.at(-2) ?? "");
     const extract = runProcess(ChildProcess.make(program, [...args.slice(0, -1), temp], { stdin: "ignore" })).pipe(
       Effect.timeoutOrElse({ duration: EXTRACT_TIMEOUT, orElse: () => Effect.fail(new ProcessFailure({ command: program, problem: `no result within ${EXTRACT_TIMEOUT}` })) }),
       Effect.flatMap(() => read(temp)),
@@ -126,7 +134,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
         : options.strict === true ? Effect.fail(new RenderAssetFailure({ problem: `extract ${args.at(-2) ?? output}: ${failure.problem}` })) : Effect.succeed(false)),
       Effect.ensuring(Effect.sync(() => rmSync(temp, { force: true }))),
       Effect.flatMap((moved) => moved ? Effect.succeed(true) : read(output).pipe(Effect.map((bytes) => bytes !== undefined))));
-    return attempt(`read ${absent}`, () => Bun.file(absent).exists()).pipe(Effect.flatMap((known) => known ? Effect.succeed(false) : extract));
+    return attempt(`read ${absent}`, () => Bun.file(absent).exists()).pipe(Effect.flatMap((known) => known ? Effect.succeed(false) : extractions.withPermits(1)(extract)));
   };
 
   const stockClassic = (path: string) => Effect.gen(function*() {
