@@ -136,6 +136,10 @@ export class FighterPoolPresentation {
       this.hide();
       return;
     }
+    if (fighterModelReplaced(fighter)) {
+      this.hide();
+      return;
+    }
     const changed = this.visible !== index;
     if (changed) {
       const previous = this.visible;
@@ -231,7 +235,6 @@ export class FighterPoolPresentation {
       alpha = body.alpha;
     }
     if (transformation.cues?.vanishes === true && isIntangible(fighter)) alpha = 0;
-    if (fighterModelReplaced(fighter)) alpha = 0;
     if (changed || this.red !== red || this.green !== green || this.blue !== blue) {
       setEffectColor(model, red, green, blue);
       this.red = red;

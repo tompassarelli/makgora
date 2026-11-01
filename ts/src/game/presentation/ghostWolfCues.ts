@@ -4,7 +4,7 @@ import { GHOST_WOLF_MODEL } from "../fighters/thrall/wolves";
 import { STOCK_WOLF_STRIDE } from "./projectileArt";
 import type { Cue, CueState, MoveCues } from "./specialCues";
 
-const WOLF_SCALE = f32(0.85);
+const WOLF_SCALE = f32(0.65);
 const POUNCE_FRAMES = GHOST_GLIDE.last - GHOST_LEAP.first + 1;
 const POUNCE_SECONDS = f32(0.867);
 
