@@ -275,16 +275,17 @@ test("a one-set save from before layouts loads as the active layout's keys, and 
   assertEquals(slots(settings, Action.attack), "N —", "Box is untouched by Load profile");
 });
 
-test("a one-set save still on the old WASD defaults opens on WASD with Strong on 9 and C-up on 0, while an edited one stays Custom [k2 property]", () => {
+test("a one-set save still on the old WASD defaults opens on WASD with C-up on Y, while an edited one stays Custom [k2 property]", () => {
   const stock = persistedSettings({ encoded: encodeBindings({ keys: previousDefaultKeys("wasd") }) });
   assertEquals(stock.layout, "wasd", "an old stock save opens on its layout");
-  assertEquals(slots(stock, Action.strong), "9 Y", "Strong moved");
-  assertEquals(slots(stock, Action.cUp), "0 —", "C-up moved");
+  assertEquals(slots(stock, Action.strong), "9 —", "Strong moved");
+  assertEquals(slots(stock, Action.cUp), "Y —", "C-up moved");
   const edited = { keys: previousDefaultKeys("wasd") };
   edited.keys[slotIndex(Action.attack, 0)] = code("B");
   const own = persistedSettings({ encoded: encodeBindings(edited) });
   assertEquals(own.layout, "custom", "edited keys land on Custom");
-  assertEquals(slots(own, Action.strong), "Y —", "edited Strong stays");
+  assertEquals(slots(own, Action.strong), "9 Y", "edited Strong stays");
+  assertEquals(slots(own, Action.cUp), "H —", "edited C-up stays");
 });
 
 test("each layout shows the same keys however the screen reaches it: opening on a save from before the layout defaults moved, then clicking layouts and Load profile in any order [k2 property]", () => {

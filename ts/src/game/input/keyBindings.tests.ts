@@ -8,11 +8,11 @@ const code = (character: string) => character.charCodeAt(0);
 const encodeSlots = (save: { layouts: LayoutBindings; active: BindingPreset }) => encodeLayouts(layoutSave(save.layouts, save.active));
 const slots = (preset: BindingPreset, action: Action) => `${keyLabel(keyFor(presetBindings(preset), action, 0))} ${keyLabel(keyFor(presetBindings(preset), action, 1))}`;
 
-test("every preset binds U special, I short hop, O grab, H C-up, J C-left, K C-down, L C-right and P Walk, and Strong to 9 alone (0 on Custom) [k2 property]", () => {
+test("every preset binds U special, I short hop, O grab, Y C-up, J C-left, K C-down, L C-right and P Walk, and Strong to 9 alone (0 on Custom) [k2 property]", () => {
   for (const preset of BINDING_PRESETS) {
     assertEquals(slots(preset, Action.cLeft), "J —", `${preset} C-left`);
     assertEquals(slots(preset, Action.cRight), "L —", `${preset} C-right`);
-    assertEquals(slots(preset, Action.cUp), "H —", `${preset} C-up`);
+    assertEquals(slots(preset, Action.cUp), "Y —", `${preset} C-up`);
     assertEquals(slots(preset, Action.cDown), "K —", `${preset} C-down`);
     assertEquals(slots(preset, Action.special), "U —", `${preset} special`);
     assertEquals(slots(preset, Action.shortHop), "I —", `${preset} short hop`);
@@ -54,6 +54,23 @@ test("a saved layout still on the C-up 0 (- on Custom), C-down P and Walk K defa
   edited[slotIndex(Action.attack, 0)] = code("B");
   const kept = decodeLayouts(encodeSlots({ ...stock, layouts: { ...stock.layouts, custom: { keys: edited } } }));
   assertEquals(kept?.layouts.custom.keys.join(","), edited.join(","), "edited Custom stays");
+});
+
+test("a saved layout still on the stock keys with C-up on H moves C-up to Y on load, and one with its own C-up key stays as saved [k2 property]", () => {
+  const stockWithH = (preset: BindingPreset) => {
+    const keys = presetBindings(preset).keys.slice();
+    keys[slotIndex(Action.cUp, 0)] = code("H");
+    return { keys };
+  };
+  const stock = { layouts: { wasd: stockWithH("wasd"), standard: stockWithH("standard"), custom: stockWithH("custom") }, active: "wasd" as BindingPreset };
+  const upgraded = decodeLayouts(encodeSlots(stock));
+  for (const preset of BINDING_PRESETS) assertEquals(slots(preset, Action.cUp), "Y —", `${preset} stock C-up`);
+  for (const preset of BINDING_PRESETS) assertEquals(upgraded?.layouts[preset].keys.join(","), presetBindings(preset).keys.join(","), `${preset} upgraded`);
+  const own = stockWithH("custom");
+  own.keys[slotIndex(Action.cUp, 0)] = code("G");
+  const kept = decodeLayouts(encodeSlots({ ...stock, layouts: { ...stock.layouts, custom: own } }));
+  assertEquals(kept?.layouts.custom.keys.join(","), own.keys.join(","), "a rebound Custom C-up stays");
+  assertEquals(kept?.layouts.wasd.keys.join(","), presetBindings("wasd").keys.join(","), "stock WASD still upgrades");
 });
 
 test("no preset binds one key to two actions, and each survives a save and load unchanged [k2 property]", () => {
@@ -130,6 +147,7 @@ test("a saved layout with Z bound first to jump, or X or G bound first, keeps it
 
 test("a saved Custom layout still on the old defaults (Z/9 jump, G second on Shield R) moves to the new Custom, and an edited one keeps its first-slot Z [k2 property]", () => {
   const oldCustom = presetBindings("custom").keys.slice();
+  oldCustom[slotIndex(Action.cUp, 0)] = code("H");
   oldCustom[slotIndex(Action.jump, 0)] = code("Z");
   oldCustom[slotIndex(Action.jump, 1)] = code("9");
   oldCustom[slotIndex(Action.rightTrigger, 1)] = code("G");
@@ -143,6 +161,8 @@ test("a saved Custom layout still on the old defaults (Z/9 jump, G second on Shi
 
 test("a saved WASD layout still on the earlier defaults (Space and 8 on Jump) moves to the new one, and an edited one stays [k2 property]", () => {
   const earlier = presetBindings("wasd").keys.slice();
+  earlier[slotIndex(Action.cUp, 0)] = code("H");
+  earlier[slotIndex(Action.strong, 1)] = code("Y");
   earlier[slotIndex(Action.moveUp, 0)] = code("W");
   earlier[slotIndex(Action.moveUp, 1)] = 0;
   earlier[slotIndex(Action.jump, 0)] = 32;

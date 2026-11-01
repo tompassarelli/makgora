@@ -11,7 +11,7 @@ export const PLAYER_COMMANDS: readonly string[] = [
   "-save: save your current controls and delay as your profile for next time.",
   "-load: load your saved profile (the Controls screen's Load profile does the same).",
   "F1: open the Controls screen at fighter select. F9: help (Controls, How to play, Commands).",
-  "Y: start from fighter or stage select (in a match Y is Strong by default). Esc or Backspace (Start on a controller): pause. H: hide or show the new-player hints in a match. -clip: save the last ten seconds of a match for a bug report.",
+  "Y: start from fighter or stage select (in a match Y is C-up by default). Esc or Backspace (Start on a controller): pause. H: hide or show the new-player hints in a match. -clip: save the last ten seconds of a match for a bug report.",
 ];
 
 export const CONTROLS_TITLE = "Controls";

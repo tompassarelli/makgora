@@ -29,7 +29,7 @@ export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { wasd: "WA
 export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
   wasd: "Recommended if you're new. W is up, 8 jumps",
   standard: "Leverless controller style",
-  custom: "Box with 9 jump, 8 shield and - C-up",
+  custom: "Box with 9 jump, 8 shield and 0 Strong",
 };
 
 const EMPTY = 0;
@@ -96,7 +96,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.rightTrigger, code(custom ? "8" : "7"));
   bind(Action.cLeft, code("J"));
   bind(Action.cRight, code("L"));
-  bind(Action.cUp, code("H"));
+  bind(Action.cUp, START_KEY);
   bind(Action.cDown, code("K"));
   bind(Action.modX, code("P"));
   bind(Action.lightShield, code(wasd ? "E" : "A"));
@@ -132,9 +132,11 @@ type KeyChange = readonly [action: Action, first: number, second?: number];
 
 const previousCStickKeys = (preset: BindingPreset): readonly KeyChange[] => [[Action.cUp, preset === "custom" ? MINUS : code("0")], [Action.cDown, code("P")], [Action.modX, code("K")]];
 
+const PREVIOUS_C_UP: KeyChange = [Action.cUp, code("H")];
+
 const withKeys = (preset: BindingPreset, changes: readonly KeyChange[]): number[] => {
   const keys = presetBindings(preset).keys.slice();
-  for (const [action, first, second = EMPTY] of changes) {
+  for (const [action, first, second = EMPTY] of [PREVIOUS_C_UP, ...changes]) {
     keys[slotIndex(action, 0)] = first;
     keys[slotIndex(action, 1)] = second;
   }
@@ -157,8 +159,8 @@ const EARLIER_CUSTOM_JUMP: readonly KeyChange[] = [[Action.jump, code("Z"), code
 const earlierStockKeys = (preset: StockPreset, changes: readonly KeyChange[]): number[] => withKeys(preset, preset === "wasd" ? [...changes, ...EARLIER_WASD_JUMP] : changes);
 
 function earlierDefaults(preset: BindingPreset): number[][] {
-  if (preset === "custom") return [withKeys(preset, previousCStickKeys(preset)), withKeys(preset, EARLIER_CUSTOM_JUMP)];
-  const earlier = [withKeys(preset, previousCStickKeys(preset)), previousDefaultKeys(preset), ...EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes))];
+  if (preset === "custom") return [withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), withKeys(preset, EARLIER_CUSTOM_JUMP)];
+  const earlier = [withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), previousDefaultKeys(preset), ...EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes))];
   return preset === "wasd" ? [...earlier, earlierStockKeys(preset, PREVIOUS_STOCK_CHANGES)] : earlier;
 }
 
