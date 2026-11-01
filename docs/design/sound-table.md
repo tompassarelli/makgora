@@ -150,7 +150,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Get-up attack, Neutral air, Forward air, Back air, Up air, Down air, Ledge attack, Dash attack | BattleNetWooshStereo1 | MetalMediumBashFlesh | MetalHeavyBashFlesh + LightningBolt | MetalMediumBashMetal |  |
 | Neutral special: Chain Lightning | HeroFarSeerAttack1 | LightningBolt | LightningBolt + LightningBolt | MetalMediumBashMetal |  |
 | Side special: Ghost Wolf | FeralSpiritTarget | MetalMediumChopFlesh | MetalMediumChopFlesh + LightningBolt | MetalMediumBashMetal |  |
-| Up special: Far Sight | RevealMap | MetalMediumBashFlesh | MetalMediumBashFlesh + LightningBolt | MetalMediumBashMetal |  |
+| Up special: Rising Thunder | ThunderClap | LightningBolt | LightningBolt + LightningBolt | MetalMediumBashMetal |  |
 | Down special: Feral Spirit | FeralSpiritTarget | MetalMediumChopFlesh | MetalMediumChopFlesh + LightningBolt | MetalMediumBashMetal |  |
 
 ## Jaina
