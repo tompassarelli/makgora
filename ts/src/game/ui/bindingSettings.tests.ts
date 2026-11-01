@@ -54,13 +54,13 @@ const unbound = (settings: Readonly<BindingSettings>) => unboundActions(settings
 
 test("a rebind swaps with the action holding the key, Delete and the x clear a slot, reserved keys stay refused and Reset to layout restores the preset [k2 property]", () => {
   const settings = customSettings();
-  assertEquals(slots(settings, Action.modX), "K —", "Custom Mod X");
+  assertEquals(slots(settings, Action.modX), "P —", "Custom Mod X");
   assertEquals(slots(settings, Action.strong), "0 —", "Custom Strong");
 
   beginBindingCapture(settings, Action.modX, 0);
   assertEquals(captureBinding(settings, code("0")), true);
   assertEquals(slots(settings, Action.modX), "0 —", "Mod X after the swap");
-  assertEquals(slots(settings, Action.strong), "K —", "Strong after the swap");
+  assertEquals(slots(settings, Action.strong), "P —", "Strong after the swap");
   assertEquals(settings.message, `Swapped with ${ACTION_LABELS[Action.strong]}.`);
   assertEquals(settings.capture, undefined);
 
@@ -71,7 +71,7 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   assertEquals(settings.message, `${ACTION_LABELS[Action.modX]} is now unbound.`);
   assertEquals(settings.capture, undefined);
 
-  clearKey(settings, code("K"));
+  clearKey(settings, code("P"));
   assertEquals(slots(settings, Action.strong), "— —", "Strong after its x");
   assertEquals(settings.message, `${ACTION_LABELS[Action.strong]} is now unbound.`);
   assertEquals(unbound(settings), `${Action.modX},${Action.strong}`);
