@@ -16,7 +16,7 @@ const FALL_SPEED = 16.0;
 
 interface Source {
   readonly character: Character;
-  readonly press: (side: number) => Partial<Controls>;
+  readonly press: (this: void, side: number) => Partial<Controls>;
 }
 
 const sideSpecial = (side: number): Partial<Controls> => ({ specialPressed: true, specialX: -side, direction: -side });
