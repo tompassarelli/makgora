@@ -1,6 +1,7 @@
 import type { SessionWinsFrames } from "./sessionWinsFrames";
 import { f32 } from "wisp/src/sim/f32";
 import { type RosterTile, cardDown, cardRight, cardSize } from "../menu/selectionDrag";
+import type { RosterGrid } from "../menu/selectionGrid";
 import { NATIVE_TEXT_BASE } from "./hudLayout";
 import { PLAYABLE_CHARACTERS, fighterName, DEFAULT_FIGHTER } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
@@ -32,7 +33,14 @@ export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
   [Character.grom]: "Grom",
   [Character.malfurion]: "Malfurion",
   [Character.ladyVashj]: "Vashj",
+  [Character.murloc]: "Mrgl&Grgl",
 };
+
+export const TILE_NAME_INSET = f32(0.008);
+export const TILE_NAME_SIZE = f32(0.0078);
+
+/** Room for a name on one line of a roster tile, in font sizes. */
+export const tileNameEms = (grid: Readonly<RosterGrid>): number => f32(f32(f32(grid.cellWidth) - f32(2 * f32(TILE_NAME_INSET * f32(grid.scale)))) / TILE_NAME_SIZE);
 
 export function art(parent: Frame, name: string, texture: string, x: number, y: number, width: number, height: number): Frame {
   const frame = createBackdrop(name, parent, 0);

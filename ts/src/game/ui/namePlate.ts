@@ -5,7 +5,7 @@ import { cardRight, cardDown, cardSize } from "../menu/selectionDrag";
 import { MENU_STYLE, NATIVE_TEXT_BASE } from "./hudLayout";
 import { placeTopLeft } from "./frames";
 
-/** Room for the name on a selection card, in font sizes of Friz Quadrata: Anub'arak (5.9) fits on one line and Mrgl & Grgl (6.5) wraps, in Tom's native screenshots (2026-11-01). */
+/** Room for the name on a selection card, in font sizes of Friz Quadrata: Anub'arak (5.9) fits on one line and Mrgl & Grgl (6.5) wraps at the card's font, in Tom's native screenshots (2026-11-01). */
 export const NAME_PLATE_EMS = f32(6.2);
 export const NAME_SHRINK_STEP = f32(0.05);
 export const NAME_STEPS = 6;

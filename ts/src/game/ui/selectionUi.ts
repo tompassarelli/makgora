@@ -64,7 +64,7 @@ import { anyOpen, overAny } from "./menuHover";
 import { CommunityMenu } from "./communityMenu";
 import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffer, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offerTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
-import { ROSTER_TILES, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
+import { ROSTER_TILES, TILE_NAME_INSET, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type DelayFrames, type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules, presentDelayControls, rulesKey } from "./selectionRules";
 import { panelButton } from "./infoPanel";
@@ -84,8 +84,6 @@ type SelectionButton = { kind: "tile"; tile: number } | CardButton | CpuButton |
 type ClickOf<K extends SelectionButton["kind"]> = Extract<SelectionButton, { kind: K }>;
 
 const DELAY_TEXT_SIZE = f32(0.0095);
-const TILE_NAME_INSET = f32(0.008);
-const TILE_NAME_SIZE = f32(0.0078);
 const CPU_DEFAULTS: CpuDefaults = { opponent: CPU_OPPONENT_CHOICE_DEFAULT, tier: CPU_TIER_DEFAULT };
 
 

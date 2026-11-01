@@ -236,7 +236,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Phoenix | PhoenixMissileLaunch | Fireball | Fireball + Fireball | WoodMediumBashMetal |  |
 | Down special: Banish | BanishCaster | BanishCaster | BanishCaster + Fireball | WoodMediumBashMetal |  |
 
-## Mrgl&Grgl
+## Mrgl & Grgl
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |

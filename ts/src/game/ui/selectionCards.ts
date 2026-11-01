@@ -79,7 +79,7 @@ export interface CardFrames {
   readonly team: Frame;
   readonly teamLabel: Frame;
   readonly portrait: Frame;
-  readonly render: Frame;
+  readonly renders: readonly Frame[];
   readonly costume: Frame;
   readonly dots: readonly Frame[];
   readonly name: Frame;
@@ -106,10 +106,11 @@ export function createCard(root: Frame, suffix: string, slot: number, add: (fram
   add(team, { kind: "team", slot });
   const teamLabel = label(root, `MeleeTeam${name}`, teamArea.x, cardDown(f32(0.008)), teamArea.width, cardSize(f32(0.019)), TAG_SIZE);
   const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), cardRight(slot, f32(0.029)), cardDown(f32(0.03)), cardSize(f32(0.102)), cardSize(f32(0.102)));
-  const render = createFrameByType("SPRITE", `MeleeRender${name}`, root, "", 0);
-  placeTopLeft(render, cardRight(slot, f32(0.029)), cardDown(f32(0.03)));
-  setFrameSize(render, cardSize(f32(0.102)), cardSize(f32(0.102)));
-  setFrameVisible(render, false);
+  const renders = ["", "Partner"].map((role) => {
+    const render = createFrameByType("SPRITE", `MeleeRender${role}${name}`, root, "", 0);
+    setFrameVisible(render, false);
+    return render;
+  });
   const dotArea = costumeDotsBox(slot);
   const dotSize = cardSize(COSTUME_DOT);
   const dots = Array.from({ length: MAX_COSTUMES }, (_, index) => {
@@ -134,7 +135,7 @@ export function createCard(root: Frame, suffix: string, slot: number, add: (fram
   setMenuText(settingsLabel, "Opponent settings");
   add(settings, { kind: "cpuSettings", slot });
   const summary = label(root, `MeleeCpuSummary${name}`, cardRight(slot, f32(0.004)), cardDown(f32(0.136)), cardSize(f32(0.152)), cardSize(f32(0.031)), BAR_TEXT);
-  return { card, tag, mode, team, teamLabel, portrait, render, costume, dots, name: name_, status, wins, chip, summary, settings, settingsLabel };
+  return { card, tag, mode, team, teamLabel, portrait, renders, costume, dots, name: name_, status, wins, chip, summary, settings, settingsLabel };
 }
 
 export function presentCardTeam(frames: CardFrames, game: Readonly<MatchState>, slot: ParticipantSlot, participantId: number, menuFocus: MenuFocus | undefined, active: boolean, human: boolean, teamsShown: boolean, palette: number): void {
@@ -170,7 +171,7 @@ export function presentCardStatus(frames: CardFrames, game: Readonly<MatchState>
     setMenuText(frames.name, fitted.text);
     placeName(frames.name, slot, fitted);
   }
-  presentLiveFighter(frames.render, frames.portrait, shown, choice, game.costumeChoices[slot] ?? 0, now);
+  presentLiveFighter(frames.renders, costumePortraitBox(slot), frames.portrait, shown, choice, game.costumeChoices[slot] ?? 0, now);
 }
 
 const COSTUME_DOT = f32(0.011);

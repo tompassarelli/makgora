@@ -4,7 +4,8 @@ import { fighterKey, fighterSlug, PLAYABLE_CHARACTERS } from "../roster/kits";
 import { Character } from "../sim/codes";
 import { hudTitle } from "./duoTitle";
 import { RANDOM_FIGHTER } from "../lobby/lobbyState";
-import { GRID_FIGHTERS, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, nameText, tileLabel, tileOfCharacter } from "./selectionFrames";
+import { FRIZ_QUADRATA_WIDTHS, textWidth } from "wisp/src/ui/chatLog";
+import { GRID_FIGHTERS, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, nameText, tileLabel, tileNameEms, tileOfCharacter } from "./selectionFrames";
 
 const FACTION_ORDER = [
   "thrall", "grom-hellscream", "cairne-bloodhoof", "beastmaster", "blademaster", "shadow-hunter", "peon",
@@ -65,4 +66,15 @@ test("Every fighter with a surname or epithet reads as its first name on the sel
     assertEquals(hudTitle(character, false), name.toUpperCase());
     if (character !== Character.ladyVashj) assertEquals(tileLabel(tileOfCharacter(character)), name);
   }
+});
+
+test("Mrgl & Grgl reads with spaces on the select card and the match HUD plate; the roster tile keeps Mrgl&Grgl only because the spaced name is wider than the tile's one line [k1 scenario]", () => {
+  assertEquals(nameText(Character.murloc), "Mrgl & Grgl");
+  assertEquals(hudTitle(Character.murloc, false), "MRGL & GRGL");
+  assertEquals(hudTitle(Character.murloc, true), "Mrgl & Grgl");
+  const room = tileNameEms(rosterGrid(ROSTER_TILES));
+  assertTrue(textWidth("Mrgl & Grgl", FRIZ_QUADRATA_WIDTHS) > room);
+  const tile = tileLabel(tileOfCharacter(Character.murloc));
+  assertEquals(tile, "Mrgl&Grgl");
+  assertTrue(textWidth(tile, FRIZ_QUADRATA_WIDTHS) <= room);
 });

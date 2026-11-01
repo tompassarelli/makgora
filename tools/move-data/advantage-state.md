@@ -65,9 +65,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne) 
 | Kael'thas | light | yes | **no** | yes | yes | yes | back throw at 0%: tech in place dash, dash attack; tech in up smash, side special, dash grab, back throw; tech away uncovered; missed tech dash, dash attack; trap up smash, side special, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kael'thas | medium | yes | **no** | yes | yes | yes | back throw at 0%: tech in place dash grab, back throw, dash grab, back throw; tech in side special, forward smash; tech away uncovered; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Kael'thas | heavy | yes | yes | yes | yes | yes | back throw at 0%: tech in place dash grab, back throw, dash grab, up throw, forward smash; tech in side special, forward smash; tech away dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash grab, up throw, forward smash; trap dash grab, back throw, dash grab, up throw, forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Mrgl&Grgl | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in up smash, short hop +4, back air, dash, dash attack; tech away dash, dash attack; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Mrgl&Grgl | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, up air, up tilt; tech in forward smash; tech away dash, dash attack; missed tech short hop, forward air; trap short hop, up air, up tilt covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Mrgl&Grgl | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Mrgl & Grgl | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in up smash, short hop +4, back air, dash, dash attack; tech away dash, dash attack; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Mrgl & Grgl | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, up air, up tilt; tech in forward smash; tech away dash, dash attack; missed tech short hop, forward air; trap short hop, up air, up tilt covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Mrgl & Grgl | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Grom | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down special; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Grom | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down special, dash, dash attack; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; missed tech short hop, down special, dash, dash attack; trap short hop, down special, dash, dash attack covers tech in place, tech away, missed tech | up throw at 60% → up air against 4/5 DI |
 | Grom | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down special; tech away short hop, down special; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
@@ -339,18 +339,18 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Kael'thas | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kael'thas | heavy | up throw | 1/1 in short hop, neutral air, out dash, dash attack | 1/1 in forward tilt, out short hop, forward air | 1/1 KD in up smash, out side special | 1/1 in dash, dash attack, out short hop, forward air |
 | Kael'thas | heavy | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
-| Mrgl&Grgl | light | forward throw | 0/0 | 1/0 | 1/0 | 0/0 KD |
-| Mrgl&Grgl | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Mrgl&Grgl | light | up throw | 1/1 in short hop, up air, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air |
-| Mrgl&Grgl | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Mrgl&Grgl | medium | forward throw | 0/0 | 1/0 | 1/1 | 0/0 KD |
-| Mrgl&Grgl | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Mrgl&Grgl | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in forward smash, out dash, dash attack |
-| Mrgl&Grgl | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Mrgl&Grgl | heavy | forward throw | 0/0 | 1/1 | 1/1 | 0/0 KD |
-| Mrgl&Grgl | heavy | back throw | 1/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Mrgl&Grgl | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out down smash | 2/1 in up smash, out forward smash |
-| Mrgl&Grgl | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Mrgl & Grgl | light | forward throw | 0/0 | 1/0 | 1/0 | 0/0 KD |
+| Mrgl & Grgl | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Mrgl & Grgl | light | up throw | 1/1 in short hop, up air, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out short hop, forward air |
+| Mrgl & Grgl | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Mrgl & Grgl | medium | forward throw | 0/0 | 1/0 | 1/1 | 0/0 KD |
+| Mrgl & Grgl | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Mrgl & Grgl | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in forward smash, out dash, dash attack |
+| Mrgl & Grgl | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Mrgl & Grgl | heavy | forward throw | 0/0 | 1/1 | 1/1 | 0/0 KD |
+| Mrgl & Grgl | heavy | back throw | 1/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Mrgl & Grgl | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out down smash | 2/1 in up smash, out forward smash |
+| Mrgl & Grgl | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom | light | forward throw | 1/1 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom | light | up throw | 1/1 in short hop, back air, out down smash | 1/1 in forward tilt, out down smash | 1/1 in forward smash, out down special | 1/1 in dash, dash attack, out down special |

@@ -438,22 +438,22 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Kael'thas | down | 30 | 15 | 32 | 17 | 18 | 8.3, 0 | 82.4 at 80°, tumble, knockdown at +22 |
 | Kael'thas | down | 60 | 15 | 32 | 17 | 18 | 8.3, 0 | 82.4 at 80°, tumble, knockdown at +22 |
 | Kael'thas | down | 90 | 15 | 32 | 17 | 18 | 8.3, 0 | 82.4 at 80°, tumble, knockdown at +22 |
-| Mrgl&Grgl | forward | 0 | 6 | 27 | 21 | 12 | 8.3, 0 | 69.4 at 40° |
-| Mrgl&Grgl | forward | 30 | 9 | 30 | 21 | 12 | 8.3, 0 | 76.3 at 40° |
-| Mrgl&Grgl | forward | 60 | 12 | 33 | 21 | 12 | 8.3, 0 | 83.2 at 40°, tumble, knockdown at +15 |
-| Mrgl&Grgl | forward | 90 | 15 | 36 | 21 | 12 | 8.3, 0 | 90.1 at 40°, tumble, knockdown at +17 |
-| Mrgl&Grgl | back | 0 | 7 | 30 | 23 | 14 | -8.3, 0 | 77.3 at 140° |
-| Mrgl&Grgl | back | 30 | 10 | 33 | 23 | 14 | -8.3, 0 | 84.2 at 140°, tumble, knockdown at +16 |
-| Mrgl&Grgl | back | 60 | 13 | 36 | 23 | 14 | -8.3, 0 | 91.1 at 140°, tumble, knockdown at +17 |
-| Mrgl&Grgl | back | 90 | 16 | 39 | 23 | 14 | -8.3, 0 | 98.1 at 140°, tumble, knockdown at +18 |
-| Mrgl&Grgl | up | 0 | 9 | 24 | 15 | 12 | 8.3, 10.8 | 60.8 at 90° |
-| Mrgl&Grgl | up | 30 | 12 | 27 | 15 | 12 | 8.3, 10.8 | 69.1 at 90° |
-| Mrgl&Grgl | up | 60 | 15 | 30 | 15 | 12 | 8.3, 10.8 | 77.5 at 90° |
-| Mrgl&Grgl | up | 90 | 19 | 34 | 15 | 12 | 8.3, 10.8 | 85.8 at 90°, tumble, knockdown at +30 |
-| Mrgl&Grgl | down | 0 | 9 | 32 | 23 | 16 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Mrgl&Grgl | down | 30 | 9 | 32 | 23 | 16 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Mrgl&Grgl | down | 60 | 9 | 32 | 23 | 16 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Mrgl&Grgl | down | 90 | 9 | 32 | 23 | 16 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Mrgl & Grgl | forward | 0 | 6 | 27 | 21 | 12 | 8.3, 0 | 69.4 at 40° |
+| Mrgl & Grgl | forward | 30 | 9 | 30 | 21 | 12 | 8.3, 0 | 76.3 at 40° |
+| Mrgl & Grgl | forward | 60 | 12 | 33 | 21 | 12 | 8.3, 0 | 83.2 at 40°, tumble, knockdown at +15 |
+| Mrgl & Grgl | forward | 90 | 15 | 36 | 21 | 12 | 8.3, 0 | 90.1 at 40°, tumble, knockdown at +17 |
+| Mrgl & Grgl | back | 0 | 7 | 30 | 23 | 14 | -8.3, 0 | 77.3 at 140° |
+| Mrgl & Grgl | back | 30 | 10 | 33 | 23 | 14 | -8.3, 0 | 84.2 at 140°, tumble, knockdown at +16 |
+| Mrgl & Grgl | back | 60 | 13 | 36 | 23 | 14 | -8.3, 0 | 91.1 at 140°, tumble, knockdown at +17 |
+| Mrgl & Grgl | back | 90 | 16 | 39 | 23 | 14 | -8.3, 0 | 98.1 at 140°, tumble, knockdown at +18 |
+| Mrgl & Grgl | up | 0 | 9 | 24 | 15 | 12 | 8.3, 10.8 | 60.8 at 90° |
+| Mrgl & Grgl | up | 30 | 12 | 27 | 15 | 12 | 8.3, 10.8 | 69.1 at 90° |
+| Mrgl & Grgl | up | 60 | 15 | 30 | 15 | 12 | 8.3, 10.8 | 77.5 at 90° |
+| Mrgl & Grgl | up | 90 | 19 | 34 | 15 | 12 | 8.3, 10.8 | 85.8 at 90°, tumble, knockdown at +30 |
+| Mrgl & Grgl | down | 0 | 9 | 32 | 23 | 16 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Mrgl & Grgl | down | 30 | 9 | 32 | 23 | 16 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Mrgl & Grgl | down | 60 | 9 | 32 | 23 | 16 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Mrgl & Grgl | down | 90 | 9 | 32 | 23 | 16 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Grom | forward | 0 | 10 | 31 | 21 | 14 | 8.3, 0 | 79.4 at 40° |
 | Grom | forward | 30 | 15 | 36 | 21 | 14 | 8.3, 0 | 91.5 at 40°, tumble, knockdown at +17 |
 | Grom | forward | 60 | 20 | 41 | 21 | 14 | 8.3, 0 | 103.6 at 40°, tumble, knockdown at +19 |

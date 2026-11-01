@@ -384,26 +384,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Kael'thas | ledge-get-up | 43: Kaelthas ledgeClimb | 114.3 | 20.7 | up; 108.5/8.9 |
 | Kael'thas | ledge-roll | 71: Kaelthas ledgeRoll | 173.0 | 78.2 | forward; 138.3/102.3 |
 | Kael'thas | ledge-attack | 44: Kaelthas ledgeAttack | 68.1 | 11.1 | both; 55.2/19.3 |
-| Mrgl&Grgl | walk | 1: Walk | 126.4 | 32.7 | forward; 117.8/124.4 |
-| Mrgl&Grgl | dash | 1: Walk | 125.9 | 31.3 | forward; 112.8/123.7 |
-| Mrgl&Grgl | run | 1: Walk | 110.4 | 34.5 | forward; 109.3/93.9 |
-| Mrgl&Grgl | turn | 32: Murloc stop | 67.8 | 15.4 | back; 49.8/43.8 |
-| Mrgl&Grgl | brake | 32: Murloc stop | 67.8 | 15.4 | in place; 43.8/49.8 |
-| Mrgl&Grgl | jump-squat | 33: Murloc jumpSquat | 36.8 | 13.0 | down; 22.0/33.3 |
-| Mrgl&Grgl | roll-forward | 66: Murloc rollForward | 167.4 | 71.9 | forward; 71.6/157.4 |
-| Mrgl&Grgl | roll-back | 70: Murloc rollBackward | 166.3 | 71.1 | back; 157.3/71.6 |
-| Mrgl&Grgl | spot-dodge | 47: Murloc spotDodge | 77.2 | 23.0 | in place; 46.2/59.5 |
-| Mrgl&Grgl | air-dodge | 28: Murloc airDodge | 65.4 | 13.9 | in place; 45.5/55.4 |
-| Mrgl&Grgl | tech | 48: Murloc tech | 75.3 | 31.5 | in place; 24.5/47.5 |
-| Mrgl&Grgl | tech-forward | 67: Murloc techForward | 167.5 | 71.5 | forward; 71.5/157.5 |
-| Mrgl&Grgl | tech-back | 71: Murloc techBackward | 167.5 | 71.4 | back; 157.5/71.6 |
-| Mrgl&Grgl | get-up | 45: Murloc getUp | 111.1 | 44.9 | up; 73.6/77.5 |
-| Mrgl&Grgl | get-up-forward | 68: Murloc getUpRollForward | 147.7 | 60.7 | forward; 123.7/94.2 |
-| Mrgl&Grgl | get-up-back | 72: Murloc getUpRollBackward | 128.4 | 60.6 | back; 98.8/121.6 |
-| Mrgl&Grgl | get-up-attack | 46: Murloc getUpAttack | 134.6 | 49.8 | both; 133.3/39.7 |
-| Mrgl&Grgl | ledge-get-up | 41: Murloc ledgeClimb | 107.1 | 26.3 | up; 76.0/89.8 |
-| Mrgl&Grgl | ledge-roll | 69: Murloc ledgeRoll | 167.3 | 71.7 | forward; 71.6/157.2 |
-| Mrgl&Grgl | ledge-attack | 42: Murloc ledgeAttack | 77.2 | 15.7 | both; 22.0/75.7 |
+| Mrgl & Grgl | walk | 1: Walk | 126.4 | 32.7 | forward; 117.8/124.4 |
+| Mrgl & Grgl | dash | 1: Walk | 125.9 | 31.3 | forward; 112.8/123.7 |
+| Mrgl & Grgl | run | 1: Walk | 110.4 | 34.5 | forward; 109.3/93.9 |
+| Mrgl & Grgl | turn | 32: Murloc stop | 67.8 | 15.4 | back; 49.8/43.8 |
+| Mrgl & Grgl | brake | 32: Murloc stop | 67.8 | 15.4 | in place; 43.8/49.8 |
+| Mrgl & Grgl | jump-squat | 33: Murloc jumpSquat | 36.8 | 13.0 | down; 22.0/33.3 |
+| Mrgl & Grgl | roll-forward | 66: Murloc rollForward | 167.4 | 71.9 | forward; 71.6/157.4 |
+| Mrgl & Grgl | roll-back | 70: Murloc rollBackward | 166.3 | 71.1 | back; 157.3/71.6 |
+| Mrgl & Grgl | spot-dodge | 47: Murloc spotDodge | 77.2 | 23.0 | in place; 46.2/59.5 |
+| Mrgl & Grgl | air-dodge | 28: Murloc airDodge | 65.4 | 13.9 | in place; 45.5/55.4 |
+| Mrgl & Grgl | tech | 48: Murloc tech | 75.3 | 31.5 | in place; 24.5/47.5 |
+| Mrgl & Grgl | tech-forward | 67: Murloc techForward | 167.5 | 71.5 | forward; 71.5/157.5 |
+| Mrgl & Grgl | tech-back | 71: Murloc techBackward | 167.5 | 71.4 | back; 157.5/71.6 |
+| Mrgl & Grgl | get-up | 45: Murloc getUp | 111.1 | 44.9 | up; 73.6/77.5 |
+| Mrgl & Grgl | get-up-forward | 68: Murloc getUpRollForward | 147.7 | 60.7 | forward; 123.7/94.2 |
+| Mrgl & Grgl | get-up-back | 72: Murloc getUpRollBackward | 128.4 | 60.6 | back; 98.8/121.6 |
+| Mrgl & Grgl | get-up-attack | 46: Murloc getUpAttack | 134.6 | 49.8 | both; 133.3/39.7 |
+| Mrgl & Grgl | ledge-get-up | 41: Murloc ledgeClimb | 107.1 | 26.3 | up; 76.0/89.8 |
+| Mrgl & Grgl | ledge-roll | 69: Murloc ledgeRoll | 167.3 | 71.7 | forward; 71.6/157.2 |
+| Mrgl & Grgl | ledge-attack | 42: Murloc ledgeAttack | 77.2 | 15.7 | both; 22.0/75.7 |
 | Grom | walk | 5: Walk | 121.9 | 50.4 | forward; 118.7/111.2 |
 | Grom | dash | 5: Walk | 121.9 | 49.0 | forward; 118.7/109.6 |
 | Grom | run | 5: Walk | 135.2 | 46.2 | forward; 134.4/132.1 |

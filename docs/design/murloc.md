@@ -298,7 +298,7 @@ One rule prevents each loop the pair could build. `bun wisp interactions --attac
 
 ## Presentation
 
-The selection name is "Mrgl&Grgl" (one word, so the card's name plate holds it on one line at the normal font; Tom asked on 2026-11-01) and the HUD plate reads "Mrgl&Grgl" with
+The name reads "Mrgl & Grgl" with spaces on the player card, the HUD plate and results (Tom asked on 2026-11-01, after a playtest, for the spaced form wherever it fits). The card holds it on one line at 95% of its font (6.5 font sizes against the plate's 6.2). The roster tile alone keeps the compact "Mrgl&Grgl": its one line holds 6.48 font sizes on the current 32-tile grid, under the spaced name's 6.5. In the native window the player card draws both bodies live, Mrgl on the left and Grgl on the right at his match scale, as the match draws them (smashcraft:ts/src/game/ui/liveCard.ts). The HUD plate shows the name with
 the pair's one percent and no separate Grgl readout (the pip went with the
 shared percent on 2026-10-30; its text also overlapped the name). The camera frames Grgl as any active fighter,
 and a separated Grgl near a blast zone gets the off-screen indicator at

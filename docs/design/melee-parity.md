@@ -651,7 +651,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `kael'thas-sunstrider-walk` | 1.248 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `kael'thas-sunstrider-traction` | 0.055 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### Mrgl&Grgl
+### Mrgl & Grgl
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|

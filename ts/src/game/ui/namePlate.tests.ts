@@ -17,14 +17,16 @@ test("Every roster name fits the card's name plate at its fitted font, on at mos
   }
 });
 
-test("Mrgl&Grgl is one word that fits the plate at the card's normal font, and names that fit are left alone [k2 property]", () => {
-  assertEquals(fighterName(Character.murloc), "Mrgl&Grgl");
-  for (const name of ["Mrgl&Grgl", "Anub'arak"]) {
-    const fitted = fitName(name);
-    assertEquals(fitted.text, name);
-    assertEquals(fitted.shrink, 1.0);
-    assertEquals(fitted.lines, 1);
-  }
+test("Mrgl & Grgl keeps one line on the plate at 95% of the card's font, and names that fit are left alone [k2 property]", () => {
+  assertEquals(fighterName(Character.murloc), "Mrgl & Grgl");
+  const duo = fitName("Mrgl & Grgl");
+  assertEquals(duo.text, "Mrgl & Grgl");
+  assertEquals(duo.lines, 1);
+  assertEquals(duo.shrink, shrinkAt(1));
+  const fitted = fitName("Anub'arak");
+  assertEquals(fitted.text, "Anub'arak");
+  assertEquals(fitted.shrink, 1.0);
+  assertEquals(fitted.lines, 1);
 });
 
 test("A name wider than the plate shrinks, then takes a second line, and never loses a word [k2 property]", () => {
