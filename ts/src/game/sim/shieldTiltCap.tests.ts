@@ -1,3 +1,4 @@
+import "../roster/kits";
 import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Character } from "./codes";
