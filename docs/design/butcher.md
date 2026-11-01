@@ -235,7 +235,13 @@ puts him at 42.2% (5,337 wins), so his damage factor goes from 1.0 to 1.05,
 about 8 points at 0.6% of damage a point by the retune rule; Rot, Dismember's
 drain and the pummel stay unscaled. The patches barely touch the computer's
 play, since Rot is under 1% of the moves it starts, so the trail does not move
-the field read.
+the field read. After the change the same 31 pairs on c0eea8761d (balance run
+41256822659, 12,648 matches) put him at 46.9% (5,936 wins), inside the band;
+the 5% bought 4.7 points, fewer than the rule's 8, so a later retune should
+use about 1% of damage a point. His worst pairs are Pit Lord 12%, Shadow Hunter
+26%, Dreadlord and Cairne 35% and Warden 92%, Firelord 82%.
+The spam probe on the same commit (Stitches' Charge alone, 99% of its damage,
+1,488 matches against Expert) won 10.6%, under the 45% limit.
 
 Path draft for Tom to correct (#358):
 
