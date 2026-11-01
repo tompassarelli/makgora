@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: ["main"]
-    paths: ["ts/scripts/player*.ts", "ts/scripts/wisp/**", "ts/src/**", "tools/player/**", ".github/workflows/player.yml", "map-version", "ts/wisp.lock", "ts/vendor/**"]
+    paths: ["ts/scripts/player*.ts", "ts/scripts/wisp/**", "ts/src/**", "tools/player/**", ".github/workflows/player.yml", "ts/wisp.lock", "ts/vendor/**"]
 
 permissions:
   contents: read
@@ -35,6 +35,9 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.13
@@ -80,7 +83,8 @@ jobs:
         run: |
           cd "$RUNNER_TEMP/package/smashcraft-play-${{ matrix.name }}"
           ext=""; [ "${{ matrix.name }}" = windows ] && ext=.exe; PATH=/usr/bin:/bin:/c/Windows/System32 "./smashcraft-play$ext" --version | tee "$RUNNER_TEMP/version.txt"
-          grep -q "$GITHUB_SHA" "$RUNNER_TEMP/version.txt"
+          expected=$(cd "$GITHUB_WORKSPACE/ts" && bun scripts/playerBuild.ts --name-only --commit "$GITHUB_SHA")
+          [ "$(tr -d '\r' < "$RUNNER_TEMP/version.txt")" = "$expected" ]
       - uses: actions/upload-artifact@v4
         with:
           name: smashcraft-play-${{ matrix.name }}

@@ -1,25 +1,16 @@
-import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
+import { playerReadme } from "./playerArguments";
+import { projectRoot } from "./wisp/projectRoot";
+import { playName } from "./wisp/currentPlaytest";
 
 const EXE = process.platform === "win32" ? ".exe" : "";
 const WISP_WINDOW = join(import.meta.dir, "../node_modules/wisp/host/window");
 const ENTRYPOINTS = [join(import.meta.dir, "player.ts"), join(import.meta.dir, "wisp/nativeGame.ts"), join(WISP_WINDOW, "simWorker.ts")];
-
-const README = (version: string) => `Mak'gora ${version}
-
-Run smashcraft-play${EXE} with the .w3x map you downloaded:
-
-  smashcraft-play${EXE} Makgora.w3x                         play offline against the computer
-  smashcraft-play${EXE} Makgora.w3x --host --relay REGION   host an online match through the relay
-  smashcraft-play${EXE} Makgora.w3x --join CODE             join a match by its code
-
-The art comes from your own Warcraft III: Reforged install (add --storage DIR if it is not found) and the map you give it.
-Controllers work through SDL3. Nothing else needs installing.
-`;
 
 function option(args: readonly string[], name: string): string {
   const at = args.indexOf(`--${name}`);
@@ -29,10 +20,12 @@ function option(args: readonly string[], name: string): string {
 }
 
 const build = (args: readonly string[]) => Effect.gen(function*() {
-  const out = resolve(option(args, "out")), library = resolve(option(args, "library")), tools = resolve(option(args, "tools")), commit = option(args, "commit");
+  const commit = option(args, "commit");
   if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error("playerBuild needs --commit with a full commit hash");
+  const version = yield* playName(commit, projectRoot);
+  if (args.includes("--name-only")) return console.log(version);
+  const out = resolve(option(args, "out")), library = resolve(option(args, "library")), tools = resolve(option(args, "tools"));
   if (!existsSync(library)) throw new Error(`no window library at ${library}`);
-  const version = readFileSync(join(import.meta.dir, "../../map-version"), "utf8").trim();
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
   yield* runProcess(ChildProcess.make("bun", ["build", "--compile", "--external", "pnpapi", "--entry-naming", "[name].[ext]", "--define", `PLAYER_COMMIT=${JSON.stringify(commit)}`, "--define", `PLAYER_VERSION=${JSON.stringify(version)}`, ...ENTRYPOINTS, "--outfile", join(out, `smashcraft-play${EXE}`)], { stdout: "pipe", stderr: "pipe" }));
@@ -42,7 +35,7 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
     chmodSync(join(out, tool), 0o755);
   }
   copyFileSync(join(import.meta.dir, "../node_modules/wisp/src/natives/warcraft.d.ts"), join(out, "warcraft.d.ts"));
-  writeFileSync(join(out, "README.txt"), README(version));
+  writeFileSync(join(out, "README.txt"), playerReadme(version, EXE));
   console.log(`player package: ${out}`);
 });
 

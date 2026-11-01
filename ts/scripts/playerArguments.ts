@@ -18,3 +18,18 @@ export function playerMap(args: readonly string[], folders: readonly string[]): 
 
 /** The play command's own arguments for the native window over the player's own art. */
 export const playerArguments = (map: string, rest: readonly string[]) => ["--standalone", "--window", "native", "--player-assets-only", "--map", map, ...rest];
+
+/** What `--version` prints: the build name the build stamped in (the name play-current gives the same commit), else the product name alone for a source run. */
+export const playerVersion = (stamped: string | undefined) => stamped ?? `${PRODUCT} dev`;
+
+export const playerReadme = (name: string, exe: string) => `${name}
+
+Run smashcraft-play${exe} with the .w3x map you downloaded:
+
+  smashcraft-play${exe} Makgora.w3x                         play offline against the computer
+  smashcraft-play${exe} Makgora.w3x --host --relay REGION   host an online match through the relay
+  smashcraft-play${exe} Makgora.w3x --join CODE             join a match by its code
+
+The art comes from your own Warcraft III: Reforged install (add --storage DIR if it is not found) and the map you give it.
+Controllers work through SDL3. Nothing else needs installing.
+`;
