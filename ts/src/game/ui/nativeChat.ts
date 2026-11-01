@@ -33,9 +33,8 @@ const CHAT_PAD = f32(0.008);
 const CHAT_HEADING = { x: f32(CHAT_SLOT.left + CHAT_PAD), y: f32(f32(CHAT_SLOT.bottom + CHAT_SLOT.height) - f32(0.006)), width: f32(CHAT_SLOT.width - f32(2 * CHAT_PAD)), height: f32(0.016) } as const;
 
 /** The select screens' chat lines, inside the chat box under its heading. */
-export const CHARACTER_SELECT_CHAT_BOX: ChatBox = { left: CHAT_HEADING.x, bottom: f32(CHAT_SLOT.bottom + CHAT_PAD), width: CHAT_HEADING.width, rows: 13 };
+export const SELECT_CHAT_BOX: ChatBox = { left: CHAT_HEADING.x, bottom: f32(CHAT_SLOT.bottom + CHAT_PAD), width: CHAT_HEADING.width, rows: 13 };
 
-export const STAGE_SELECT_CHAT_BOX: ChatBox = { left: f32(0.02), bottom: f32(0.22), width: f32(0.3), rows: 8 };
 export const MATCH_CHAT_BOX: ChatBox = { left: f32(0.02), bottom: f32(0.152), width: f32(0.3), rows: 4 };
 
 /** The chat box at the bottom left of the select screens, drawn even before anyone has written. */
@@ -45,7 +44,6 @@ export function createChatBox(parent: Frame, name: string): void {
 }
 
 export function chatBox(phase: Phase): ChatBox {
-  if (phase === Phase.characterMenu) return CHARACTER_SELECT_CHAT_BOX;
-  if (phase === Phase.stageMenu) return STAGE_SELECT_CHAT_BOX;
+  if (phase === Phase.characterMenu || phase === Phase.stageMenu) return SELECT_CHAT_BOX;
   return MATCH_CHAT_BOX;
 }

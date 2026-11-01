@@ -10,13 +10,17 @@ import { bindPrototype } from "../../platform/rebind";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type MatchState, Phase, humanActive } from "../lobby/lobbyState";
 import { pixelX, pixelY, pointerX, pointerY } from "../menu/pointer";
-import { type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTop, updateStageDrag } from "../menu/stageSelection";
+import { STAGE_LIST_HEADING, STAGE_TILE, type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTop, updateStageDrag } from "../menu/stageSelection";
 import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stageInfo } from "../menu/stageCatalog";
 import { orbsSetting, hazardsSetting, rulesSummary } from "../session/messages";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { STAGE_CHIP_TEXTURE, StageCard } from "./stageCard";
-import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, STAGE_START_BUTTON, stageStartContains } from "./selectionLayout";
+import { STAGE_START_BUTTON, stageStartContains } from "./selectionLayout";
+import { BAR_KEYS, BAR_STRIP_TEXTURE, STAGE_BAR, barTexture } from "../core/selectBarLayout";
+import { BAR_STRIP, type ScreenBox, STAGE_LIST_BOX, STAGE_PREVIEW_BOX } from "../core/selectScreenLayout";
+import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, labelControl, litControl } from "./barFrames";
+import { art } from "./selectionFrames";
 import { destroyEvents, Events } from "wisp/game/events";
 import { createFrame, createFrameByType, destroyFrame, Frame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { MouseButton, mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, setPointer } from "wisp/game/input";
@@ -38,10 +42,20 @@ export interface StageActions {
 
 type StageButton = { kind: "stage"; choice: StageChoice } | { kind: "hazards" } | { kind: "orbs" } | { kind: "start" } | { kind: "back" } | { kind: "poolOpen" } | { kind: "poolClose" } | { kind: "poolMode" } | { kind: "poolStage"; choice: number };
 
-export const BACK_BUTTON = { x: f32(0.265), y: HEADER_BUTTON_TOP, width: f32(0.17), height: HEADER_BUTTON_HEIGHT } as const;
-export const HAZARDS_BUTTON = { x: f32(0.445), y: HEADER_BUTTON_TOP, width: f32(0.17), height: HEADER_BUTTON_HEIGHT } as const;
-export const ORBS_BUTTON = { x: f32(0.625), y: HEADER_BUTTON_TOP, width: f32(0.13), height: HEADER_BUTTON_HEIGHT } as const;
-export const STAGE_POOL_BUTTON = { x: f32(0.49), y: f32(0.518), width: f32(0.298), height: f32(0.027) } as const;
+export const HAZARDS_BUTTON = STAGE_BAR.hazards;
+const PANEL_PAD = f32(0.012);
+const PREVIEW_HEADING = f32(0.03);
+const PREVIEW_HEIGHT = f32(0.2);
+
+type StageBarItem = "back" | "hazards" | "orbs" | "pool" | "start";
+const BAR_TARGETS: Readonly<Record<StageBarItem, StageButton>> = { back: { kind: "back" }, hazards: { kind: "hazards" }, orbs: { kind: "orbs" }, pool: { kind: "poolOpen" }, start: { kind: "start" } };
+const BAR_ITEMS: readonly StageBarItem[] = ["back", "hazards", "orbs", "pool", "start"];
+
+const inside = (b: ScreenBox, top: number, height: number): ScreenBox => ({ x: f32(b.x + PANEL_PAD), y: f32(b.y - top), width: f32(b.width - f32(2 * PANEL_PAD)), height });
+
+function framedBox(parent: Frame, name: string, b: ScreenBox): void {
+  art(parent, name, barTexture("Panel", b), b.x, b.y, b.width, b.height);
+}
 
 
 function stageText(parent: Frame, name: string, x: number, y: number, width: number, height: number, fontSize: number, text: string): Frame {
@@ -70,11 +84,9 @@ export class StagePanel {
   private readonly preview: StageCard;
   private readonly previewName: Frame;
   private readonly previewDescription: Frame;
-  private readonly ruleLabel: Frame;
+  private readonly rules: BarControl;
   private readonly chip: Frame;
-  private readonly hazardsToggle: Frame;
-  private readonly orbsToggle: Frame;
-  private readonly startButton: Frame;
+  private readonly bar: Readonly<Record<StageBarItem, BarControl>>;
   private readonly clicks: ButtonClicks<StageButton>;
   private readonly tileNames: Frame[] = [];
   private readonly sync: Events;
@@ -86,9 +98,6 @@ export class StagePanel {
   private readonly drag = stageDrag();
   private lastPhase: Phase | undefined;
   private lastChoice: number | undefined;
-  private lastRules: string | undefined;
-  private lastHazards: boolean | undefined;
-  private lastOrbs: boolean | undefined;
 
   constructor(
     private actions: StageActions,
@@ -101,23 +110,26 @@ export class StagePanel {
     this.backdrop = createWindowBackdrop("MeleeStageBackdrop", MENU_STYLE.panelTexture, 800);
     const root = createFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
     this.root = root;
-    stageText(root, "MeleeStageTitle", f32(0.055), f32(0.558), f32(0.2), f32(0.032), MENU_STYLE.titleSize, `${MENU_STYLE.gold}STAGE SELECT|r`);
-    this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.265), f32(0.558), f32(0.49), f32(0.032), MENU_STYLE.headerSize, "");
-    this.preview = new StageCard(root, "MeleeStagePreview", f32(0.045), f32(0.19), f32(0.19), f32(0.13), false);
-    this.previewName = stageText(root, "MeleeStagePreviewName", f32(0.245), f32(0.19), f32(0.235), f32(0.03), f32(0.018), "");
-    this.previewDescription = stageText(root, "MeleeStageDescription", f32(0.245), f32(0.155), f32(0.235), f32(0.06), f32(0.0095), "");
-    stageText(root, "MeleeStageGridTitle", f32(0.49), f32(0.483), f32(0.298), f32(0.022), MENU_STYLE.headerSize, `${MENU_STYLE.gold}CHOOSE A STAGE|r`);
+    art(root, "MeleeStageStrip", BAR_STRIP_TEXTURE, BAR_STRIP.x, BAR_STRIP.y, BAR_STRIP.width, BAR_STRIP.height);
+    framedBox(root, "MeleeStagePreviewBox", STAGE_PREVIEW_BOX);
+    framedBox(root, "MeleeStageListBox", STAGE_LIST_BOX);
+    const heading = inside(STAGE_PREVIEW_BOX, PANEL_PAD, PREVIEW_HEADING);
+    this.previewName = stageText(root, "MeleeStagePreviewName", heading.x, heading.y, heading.width, heading.height, f32(0.016), "");
+    const card = inside(STAGE_PREVIEW_BOX, f32(f32(PANEL_PAD + PREVIEW_HEADING) + f32(0.006)), PREVIEW_HEIGHT);
+    this.preview = new StageCard(root, "MeleeStagePreview", card.x, card.y, card.width, card.height, false);
+    const about = inside(STAGE_PREVIEW_BOX, f32(f32(STAGE_PREVIEW_BOX.y - f32(card.y - card.height)) + f32(0.01)), f32(0.06));
+    this.previewDescription = stageText(root, "MeleeStageDescription", about.x, about.y, about.width, about.height, f32(0.0095), "");
+    setMenuText(barText(root, "MeleeStageGridTitle", STAGE_LIST_HEADING, BAR_SMALL_TEXT, TextAlignment.left), `${BAR_COLOURS.dim}CHOOSE A STAGE|r`);
     for (const stage of STAGE_CHOICES) {
       const choice = stage.id;
       const button = createFrameByType("BUTTON", `MeleeStageTileButton${formatInt(choice)}`, root, "", 0);
       placeTopLeft(button, stageTileLeft(choice), stageTileTop(choice));
-      setFrameSize(button, f32(0.094), f32(0.059));
+      setFrameSize(button, STAGE_TILE.width, STAGE_TILE.height);
       this.clicks.add(button, { kind: "stage", choice });
-      new StageCard(root, `MeleeStageTile${formatInt(choice)}`, stageTileLeft(choice), stageTileTop(choice), f32(0.094), f32(0.059), true).show(choice);
+      new StageCard(root, `MeleeStageTile${formatInt(choice)}`, stageTileLeft(choice), stageTileTop(choice), STAGE_TILE.width, STAGE_TILE.height, true).show(choice);
       this.tileNames[choice] = namedFrame(`MeleeStageTile${formatInt(choice)}Name`, 0);
       setMenuText(this.tileNames[choice], stage.name);
     }
-    dialogButton(root, STAGE_POOL_BUTTON.x, STAGE_POOL_BUTTON.y, STAGE_POOL_BUTTON.width, STAGE_POOL_BUTTON.height, "Stage pool", { kind: "poolOpen" });
     this.poolRoot = createFrameByType("FRAME", "MeleeStagePoolRoot", root, "", 0);
     setFrameLevel(this.poolRoot, SELECT_LEVELS.stagePool);
     const poolBackdrop = createBackdrop("MeleeStagePoolBackdrop", this.poolRoot, 0);
@@ -138,14 +150,8 @@ export class StagePanel {
     setFrameTexture(this.chip, STAGE_CHIP_TEXTURE, 0, true);
     setFrameSize(this.chip, f32(0.04), f32(0.04));
     setFrameEnabled(this.chip, false);
-    const help = journal
-      ? "Click a stage or move the stick.\nAny player can choose.\nA / Click: choose · Start: start · Click BACK: back"
-      : "Click a stage or use movement controls.\nAny player can choose.\nY: start · Click BACK TO FIGHTERS: back";
-    stageText(root, "MeleeStageHelp", f32(0.49), f32(0.148), f32(0.298), f32(0.03), f32(0.008), help);
-    this.startButton = dialogButton(root, STAGE_START_BUTTON.x, STAGE_START_BUTTON.y, STAGE_START_BUTTON.width, STAGE_START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH", { kind: "start" });
-    dialogButton(root, BACK_BUTTON.x, BACK_BUTTON.y, BACK_BUTTON.width, BACK_BUTTON.height, journal ? "BACK" : "BACK TO FIGHTERS", { kind: "back" });
-    this.hazardsToggle = dialogButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "", { kind: "hazards" });
-    this.orbsToggle = dialogButton(root, ORBS_BUTTON.x, ORBS_BUTTON.y, ORBS_BUTTON.width, ORBS_BUTTON.height, "", { kind: "orbs" });
+    this.bar = this.createBar(root, journal);
+    this.rules = barControl(root, "MeleeStageRules", STAGE_BAR.rules, "Frame", BAR_TEXT, false);
     this.sync = createSyncTrigger("ui.stage.drop", "stage-drop", PARTICIPANT_SLOTS, (sender, data) => {
       const choice = parseInt(data);
       if (formatInt(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
@@ -172,13 +178,31 @@ export class StagePanel {
     destroyFrame(this.backdrop);
   }
 
+  private createBar(root: Frame, journal: boolean): Readonly<Record<StageBarItem, BarControl>> {
+    const control = (item: StageBarItem, rest: "Frame" | "Primary", size: number, text: string): BarControl => {
+      const made = barControl(root, `MeleeStageBar${item}`, STAGE_BAR[item], rest, size, true, item === "start" ? TextAlignment.left : TextAlignment.center);
+      labelControl(made, text);
+      if (made.button !== undefined) this.clicks.add(made.button, BAR_TARGETS[item], undefined, "native", STAGE_BAR[item]);
+      return made;
+    };
+    const bar = {
+      back: control("back", "Frame", BAR_TEXT, `${BAR_COLOURS.cream}<  BACK|r`),
+      hazards: control("hazards", "Frame", BAR_TEXT, ""),
+      orbs: control("orbs", "Frame", BAR_SMALL_TEXT, ""),
+      pool: control("pool", "Frame", BAR_TEXT, `${BAR_COLOURS.cream}Stage pool|r`),
+      start: control("start", "Primary", BAR_TEXT, `${BAR_COLOURS.cream}START|r`),
+    };
+    labelControl(barControl(root, "MeleeStageStartKey", BAR_KEYS.start, "Key", BAR_SMALL_TEXT, false), `${BAR_COLOURS.gold}${journal ? "A" : "Y"}|r`);
+    return bar;
+  }
+
   private hover(button: StageButton | undefined): void {
-    if (button?.kind !== "start") highlightText(this.startButton, false);
+    for (const item of BAR_ITEMS) if (item !== "hazards" && item !== "orbs") litControl(this.bar[item], BAR_TARGETS[item].kind === button?.kind);
     this.highlightStage(button?.kind === "stage" ? button.choice : undefined);
   }
 
   private focusStart(): void {
-    highlightText(this.startButton, true);
+    litControl(this.bar.start, true);
     const width = toReal(screenWidth());
     const height = toReal(screenHeight());
     if (width <= 0 || height <= 0) return;
@@ -209,6 +233,11 @@ export class StagePanel {
   }
 
 
+  private showToggle(control: BarControl, text: string, on: boolean): void {
+    labelControl(control, `${on ? BAR_COLOURS.gold : BAR_COLOURS.cream}${text}|r`);
+    litControl(control, on);
+  }
+
   update(game: Readonly<MatchState>): void {
     const enabled = game.phase === Phase.stageMenu && humanActive(game, playerSlot(localPlayer()));
     if (this.lastPhase !== game.phase) {
@@ -230,19 +259,9 @@ export class StagePanel {
       setMenuText(this.previewDescription, stage.description);
       this.lastChoice = game.stageChoice;
     }
-    if (this.lastHazards !== game.hazards) {
-      setMenuText(this.hazardsToggle, hazardsSetting(game.hazards));
-      this.lastHazards = game.hazards;
-    }
-    if (this.lastOrbs !== game.orbs.on) {
-      setMenuText(this.orbsToggle, orbsSetting(game.orbs.on));
-      this.lastOrbs = game.orbs.on;
-    }
-    const rules = rulesSummary(game);
-    if (this.lastRules !== rules) {
-      setMenuText(this.ruleLabel, `${MENU_STYLE.gold}${rules}|r`);
-      this.lastRules = rules;
-    }
+    this.showToggle(this.bar.hazards, hazardsSetting(game.hazards), game.hazards);
+    this.showToggle(this.bar.orbs, orbsSetting(game.orbs.on), game.orbs.on);
+    labelControl(this.rules, `${BAR_COLOURS.gold}${rulesSummary(game)}|r`);
     setFrameVisible(this.poolRoot, this.poolOpen);
     setFrameVisible(this.chip, !this.poolOpen);
     if (this.poolOpen) {
@@ -263,8 +282,8 @@ export class StagePanel {
       return;
     }
     fitToWindow(this.backdrop);
-    let x = stageTileLeft(game.stageChoice) + f32(0.047);
-    let y = f32(stageTileTop(game.stageChoice) - f32(0.0295));
+    let x = f32(stageTileLeft(game.stageChoice) + f32(STAGE_TILE.width / 2));
+    let y = f32(stageTileTop(game.stageChoice) - f32(STAGE_TILE.height / 2));
     const width = toReal(screenWidth());
     const height = toReal(screenHeight());
     if (width > 0 && height > 0) {

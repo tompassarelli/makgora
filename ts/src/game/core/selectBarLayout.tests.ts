@@ -2,8 +2,9 @@ import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/te
 import { f32 } from "wisp/src/sim/f32";
 import { RULE_BUTTONS, type RuleName, rulePanel } from "../ui/ruleButtons";
 import {
-  BAR_ORDER, BAR_PANELS, BAR_STRIP, type BarArtStyle, type BarBox, type BarPanel, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, GUIDE_ROWS, MODE_ROWS, SELECT_BAR, TRAINING_ROWS, barArt, barArtName, barBoxContains,
+  BAR_ORDER, BAR_PANELS, type BarArtStyle, type BarBox, type BarPanel, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, GUIDE_ROWS, MODE_ROWS, SELECT_BAR, TRAINING_ROWS, barArt, barArtName, barBoxContains,
 } from "./selectBarLayout";
+import { BAR_STRIP } from "./selectScreenLayout";
 
 const right = (b: BarBox): number => f32(b.x + b.width);
 const bottom = (b: BarBox): number => f32(b.y - b.height);

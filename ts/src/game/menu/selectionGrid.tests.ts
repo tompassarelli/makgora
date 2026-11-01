@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { assertTrue, test } from "wisp/src/runtime/testing";
-import { BAR_STRIP, SELECT_BAR } from "../core/selectBarLayout";
-import { CARD_HEIGHT, CARD_TOP, CARD_WIDTH, CHAT_SLOT, SELECT_EDGE_LEFT, SELECT_EDGE_RIGHT } from "../core/selectScreenLayout";
+import { SELECT_BAR } from "../core/selectBarLayout";
+import { BAR_STRIP, CARD_HEIGHT, CARD_TOP, CARD_WIDTH, CHAT_SLOT, SELECT_EDGE_LEFT, SELECT_EDGE_RIGHT } from "../core/selectScreenLayout";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { cardX } from "./selectionDrag";
 import { cellRect, rosterGrid } from "./selectionGrid";

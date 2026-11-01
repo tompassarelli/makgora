@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import { CHAT_SLOT, SELECT_EDGE_LEFT, SELECT_EDGE_RIGHT } from "./selectScreenLayout";
+import { BAR_HEIGHT, BAR_STRIP, BAR_TOP, CHAT_SLOT, SELECT_EDGE_LEFT, SELECT_EDGE_RIGHT, STAGE_PREVIEW_BOX } from "./selectScreenLayout";
 
 export interface BarBox {
   readonly x: number;
@@ -17,8 +17,6 @@ const bottom = (b: BarBox): number => f32(b.y - b.height);
 
 export const BAR_LEFT = SELECT_EDGE_LEFT;
 export const BAR_RIGHT = SELECT_EDGE_RIGHT;
-export const BAR_TOP = f32(0.594);
-export const BAR_HEIGHT = f32(0.03);
 const GAP = f32(0.006);
 const CLUSTER_GAP = f32(0.012);
 const ATTACHED_GAP = f32(0.002);
@@ -40,8 +38,9 @@ export const SELECT_BAR = { back: BACK, mode: MODE, teams: TEAMS, rules: RULES, 
 export type BarItem = keyof typeof SELECT_BAR;
 export const BAR_ORDER: readonly BarItem[] = ["back", "mode", "teams", "rules", "guide", "gear", "start"];
 
-/** The dark band the bar sits on, across the whole 4:3 area. */
-export const BAR_STRIP = box(0, f32(0.6), f32(0.8), f32(f32(f32(0.6) - f32(BAR_TOP - BAR_HEIGHT)) + f32(0.008)));
+/** Stage select's bar on the same boxes: Back, the Hazards and Orbs toggles, the rules pill, the stage pool across the Guide and gear boxes, and Start. */
+export const STAGE_BAR = { back: BACK, hazards: MODE, orbs: TEAMS, rules: RULES, pool: barItem(GUIDE.x, f32(right(GEAR) - GUIDE.x)), start: START } as const;
+
 
 const KEY_WIDTH = f32(0.022);
 const KEY_HEIGHT = f32(0.018);
@@ -207,7 +206,7 @@ export interface BarArt {
 
 const both = (b: BarBox): BarArt[] => [{ style: "Frame", width: b.width, height: b.height }, { style: "Lit", width: b.width, height: b.height }];
 
-/** Every framed image the bar, its panels and the chat box draw, for the art build, the map's imports and the preload. */
+/** Every framed image the select screens' bars, their panels, the chat box and stage select's two boxes draw, for the art build, the map's imports and the preload. */
 export function barArt(): readonly BarArt[] {
   const art: BarArt[] = [
     ...[BACK, MODE, TEAMS, RULES, GUIDE, GEAR].flatMap(b => both(b)),
@@ -216,6 +215,8 @@ export function barArt(): readonly BarArt[] {
     { style: "Key", width: KEY_WIDTH, height: KEY_HEIGHT },
     ...Object.values(BAR_PANELS).map((p): BarArt => ({ style: "Panel", width: p.width, height: p.height })),
     { style: "Panel", width: CHAT_SLOT.width, height: CHAT_SLOT.height },
+    { style: "Panel", width: STAGE_PREVIEW_BOX.width, height: STAGE_PREVIEW_BOX.height },
+    ...both(STAGE_BAR.pool),
     ...both(DRAWER_ROWS.reset), ...both(DRAWER_ROWS.presets[0]), ...both(DRAWER_ROWS.stocks.less), ...both(DRAWER_ROWS.ultimates),
     ...both(TRAINING_ROWS.behaviour.value), ...both(DRAWER_ROWS.stocks.value),
     ...both(MODE_ROWS.modes[0]), ...both(MODE_ROWS.teamToggle), ...both(GUIDE_ROWS.controls), ...both(GEAR_ROWS.autoDelay),

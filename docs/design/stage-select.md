@@ -56,9 +56,10 @@ Every card has the same three parts (smashcraft:ts/src/game/ui/stageCard.ts):
    22% of the card with the stage's name in the menu font. The large preview
    leaves it out: its name and description sit below it.
 
-Sizes, in Warcraft's UI units: grid tiles 0.094 x 0.059 (picture 0.059
-square), the preview 0.372 x 0.25 (picture 0.25 square), the loading screen's
-picture 0.18 square. Random Stage keeps its icon tile.
+Sizes, in Warcraft's UI units: grid tiles keep the 0.094 x 0.059 shape at the
+largest size the stage list fits (about 0.107 x 0.067 since 2026-11-02), the
+preview fills its box's width at 0.2 high (picture 0.2 square), the loading
+screen's picture 0.18 square. Random Stage keeps its icon tile.
 
 ## Picture sources
 
@@ -130,14 +131,23 @@ Each picture is stored in the build-input store
 bytes, SHA-256 and the hash of its own stage's inputs, and the map build
 imports each card by that hash.
 
-## Header
+## Frame
 
-Stage select keeps its own header row of dialog buttons (Start Match, Back,
-Hazards, Orbs; `STAGE_START_BUTTON` and `BACK_BUTTON` in
-smashcraft:ts/src/game/ui/selectionLayout.ts and stageUi.ts). Fighter select's
-one-row bar ([fighter-portraits.md](fighter-portraits.md), "Select screen top
-bar") does not reach it yet; giving stage select the same bar art is a
-follow-up, not part of the 2026-11-01 change.
+Stage select uses fighter select's frame ([fighter-portraits.md](fighter-portraits.md),
+"Select screen frame"), so switching between the two screens moves nothing at
+the top or bottom (Tom asked on 2026-11-02, from a wireframe, for stage select
+to match the new fighter select). Its bar sits on the same band and the same
+boxes (`STAGE_BAR` in smashcraft:ts/src/game/core/selectBarLayout.ts): `<  BACK`
+where Back is, Hazards and Orbs as an attached pair where Mode and Teams are,
+lit gold while on, the rules line in the rules pill, Stage pool across the
+Guide and gear boxes, and `START` with its key (Y, or A on a journal pad).
+Below it the body holds two equal framed boxes side by side
+(`STAGE_PREVIEW_BOX` and `STAGE_LIST_BOX` in
+smashcraft:ts/src/game/core/selectScreenLayout.ts): the chosen stage's name,
+preview card and description at the left, and the stage list at the right,
+headed Choose a stage, its tiles in three columns at the largest size that
+fits. The bottom row is fighter select's own chat slot and four cards, which
+stay up through stage select for reference and take no clicks there.
 
 ## Staying current
 

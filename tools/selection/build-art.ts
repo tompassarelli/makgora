@@ -16,7 +16,8 @@ import { findExtractor, reforgedStorage } from '../../ts/scripts/wisp/renderAsse
 import { gameCursorArt } from './gameCursorArt';
 import { RACES } from '../../ts/src/game/roster/races';
 import { RACE_COLOURS } from '../../ts/src/game/ui/raceFrame';
-import { BAR_STRIP, type BarArtStyle, barArt, barArtName } from '../../ts/src/game/core/selectBarLayout';
+import { type BarArtStyle, barArt, barArtName } from '../../ts/src/game/core/selectBarLayout';
+import { BAR_STRIP } from '../../ts/src/game/core/selectScreenLayout';
 
 const project = resolve(import.meta.dir, '../..');
 const source = join(project, 'tools/selection/art');

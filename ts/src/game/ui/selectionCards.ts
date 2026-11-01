@@ -7,7 +7,7 @@ import { boxContains } from "./selectionLayout";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/participants";
-import { type MatchState, canChooseComputer, canCycleSlotMode, costumeFor, fighterActive, humanFighterActive, humanPresent } from "../lobby/lobbyState";
+import { type MatchState, Phase, canChooseComputer, canCycleSlotMode, costumeFor, fighterActive, humanActive, humanFighterActive, humanPresent } from "../lobby/lobbyState";
 import {
   type SelectionDrag,
   cardDown,
@@ -89,7 +89,8 @@ export interface CardFrames {
   readonly settingsLabel: Frame;
 }
 
-export function createCard(root: Frame, suffix: string, slot: number, add: (frame: Frame, target: CardButton) => Frame): CardFrames {
+/** A fighter card on the bottom row; its chip, which travels over the roster grid, belongs to `grid` so it hides with the grid on stage select. */
+export function createCard(root: Frame, grid: Frame, suffix: string, slot: number, add: (frame: Frame, target: CardButton) => Frame): CardFrames {
   const x = cardX(slot);
   const name = `${suffix}_${formatInt(slot)}`;
   const card = art(root, `MeleeCard${name}`, selectionCardTexture("Gray"), x, CARD_TOP, CARD_WIDTH, CARD_HEIGHT);
@@ -122,7 +123,7 @@ export function createCard(root: Frame, suffix: string, slot: number, add: (fram
   const name_ = label(root, `MeleeName${name}`, cardRight(slot, f32(0.008)), cardDown(f32(0.173)), cardSize(f32(0.144)), cardSize(f32(0.019)), cardSize(f32(0.011)));
   const wins = createSessionWinsFrames(root, name, cardRight(slot, f32(0.054)), BOTTOM_BAR_TOP, BAR_TEXT);
   const status = label(root, `MeleeStatus${name}`, cardRight(slot, f32(0.014)), BOTTOM_BAR_TOP, cardSize(f32(0.132)), BAR_HEIGHT, BAR_TEXT);
-  const chip = art(root, `MeleeChip${name}`, selectionChipTexture(slot, true), cardRight(slot, f32(0.06)), cardDown(f32(0.075)), cardSize(f32(0.06)), cardSize(f32(0.06)));
+  const chip = art(grid, `MeleeChip${name}`, selectionChipTexture(slot, true), cardRight(slot, f32(0.06)), cardDown(f32(0.075)), cardSize(f32(0.06)), cardSize(f32(0.06)));
   setFrameLevel(chip, SELECT_LEVELS.cardChip);
   const box = cpuSettingsBox(slot);
   const settings = createFrame("ScriptDialogButton", root, 0, 0);
@@ -236,3 +237,10 @@ export function presentCardChip(frames: CardFrames, drag: Readonly<SelectionDrag
   );
   return local;
 }
+
+/** The chat box and the cards stay up from character select through stage select, so the two screens share one bottom row. */
+export const cardRowShown = (game: Readonly<MatchState>, participantId: number, choosing: boolean): boolean =>
+  choosing || (game.phase === Phase.stageMenu && humanActive(game, participantId));
+
+/** A panel acts on its own player's clicks, and only on character select: on stage select its cards are shown for reference. */
+export const acceptsClick = (game: Readonly<MatchState> | undefined, clicker: number, owner: number): boolean => clicker === owner && game?.phase === Phase.characterMenu;

@@ -1,15 +1,10 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { TextBox } from "./hudLayout";
 import { Character } from "../sim/codes";
+import { STAGE_BAR } from "../core/selectBarLayout";
 
-export const HEADER_BUTTON_TOP = f32(0.588);
-export const HEADER_BUTTON_HEIGHT = f32(0.023);
-export const SELECT_LEFT = f32(0.055);
-export const SELECT_RIGHT = f32(0.786);
-export const SELECT_GAP = f32(0.006);
-
-/** Stage select's Start Match button, under the header's left edge. */
-export const STAGE_START_BUTTON = { x: SELECT_LEFT, y: HEADER_BUTTON_TOP, width: f32(0.145), height: HEADER_BUTTON_HEIGHT } as const;
+/** Stage select's Start button, at the right end of its bar like character select's. */
+export const STAGE_START_BUTTON = STAGE_BAR.start;
 
 export const boxContains = (box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number }, x: number, y: number): boolean =>
   x >= box.x && x <= f32(box.x + box.width) && y <= box.y && y >= f32(box.y - box.height);

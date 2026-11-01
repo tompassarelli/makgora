@@ -400,7 +400,10 @@ height, as tall as the cards), then the four cards one small gap apart ending
 at the right edge. The chat component draws in that slot; until Wisp's window
 chat lands the slot shows a framed box headed Chat with the chat lines inside
 it. A larger grid also gives every tile name room, so Mrgl & Grgl's tile reads
-with spaces like its card.
+with spaces like its card. Stage select uses the same frame: the same bar
+band and boxes, its preview and stage list as two equal boxes in the body,
+and this bottom row, which stays up from fighter select through stage select
+([stage-select.md](stage-select.md), "Frame").
 
 ## Classic tile colour floor
 

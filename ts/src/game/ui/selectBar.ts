@@ -6,9 +6,10 @@ import { ItemKind, itemBit } from "../sim/codes";
 import { SELECT_LEVELS } from "./selectLevels";
 import type { SelectText } from "./selectionActions";
 import {
-  BAR_CHECK_TEXTURE, BAR_CHEVRON_TEXTURE, BAR_CHEVRON_UP_TEXTURE, BAR_GEAR_TEXTURE, BAR_KEYS, BAR_ORDER, BAR_PANELS, BAR_STRIP, BAR_STRIP_TEXTURE, BAR_CHEVRONS, type BarBox, type BarItem, type BarPanel,
+  BAR_CHECK_TEXTURE, BAR_CHEVRON_TEXTURE, BAR_CHEVRON_UP_TEXTURE, BAR_GEAR_TEXTURE, BAR_KEYS, BAR_ORDER, BAR_PANELS, BAR_STRIP_TEXTURE, BAR_CHEVRONS, type BarBox, type BarItem, type BarPanel,
   GEAR_ICON, GEAR_ROWS, GUIDE_KEY, GUIDE_ROWS, MODE_ROWS, SELECT_BAR, barBoxContains, barTexture, panelHeading,
 } from "../core/selectBarLayout";
+import { BAR_STRIP } from "../core/selectScreenLayout";
 import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, clickArea, enableControl, labelControl, litControl, showControl, styleControl } from "./barFrames";
 import { type DelayFrames, type RuleButton, type RuleFrames, createDelayControls, createRulesDrawer, presentDelayControls, presentRules, rulesKey } from "./selectionRules";
 import { createBackdrop, placeTopLeft, setMenuText } from "./frames";

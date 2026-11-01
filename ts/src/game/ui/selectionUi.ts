@@ -3,7 +3,8 @@ import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lob
 import { RULE_BUTTONS, rulePanel } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp } from "./ruleHelp";
 import { type BarButton, type BarTarget, SelectBar } from "./selectBar";
-import { type BarItem, BAR_HEIGHT, barBoxContains, helpAnchor } from "../core/selectBarLayout";
+import { type BarItem, barBoxContains, helpAnchor } from "../core/selectBarLayout";
+import { BAR_HEIGHT } from "../core/selectScreenLayout";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";
@@ -61,7 +62,7 @@ import { CommunityMenu } from "./communityMenu";
 import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffer, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offerTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { ROSTER_TILES, TILE_NAME_INSET, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
-import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
+import { type CardButton, type CardFrames, type MenuFocus, acceptsClick, cardPalette, cardRowShown, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, applyRuleButton } from "./selectionRules";
 import type { LobbyNet, SelectText, SelectionActions } from "./selectionActions";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
@@ -69,7 +70,7 @@ import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus,
 import { destroyEvents, Events } from "wisp/game/events";
 import { createFrameByType, destroyFrame, Frame, FramePoint, screenHeight, screenWidth, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { MouseButton, mouseDown, showCursor } from "wisp/game/input";
-import { localPlayer, Player, player as playerOf } from "wisp/game/players";
+import { localPlayer, Player, player as playerOf, playerSlot } from "wisp/game/players";
 import { sendSync } from "wisp/game/sync";
 import { formatInt, toReal } from "wisp/game/text";
 
@@ -99,6 +100,7 @@ export class SelectionPanel {
   private shownTilePalette: number | undefined;
   private readonly tileButtons: Frame[] = [];
   private readonly root: Frame;
+  private readonly row: Frame;
   private readonly backdrop: Frame;
   private readonly cards: readonly CardFrames[];
   private readonly clicks: ButtonClicks<SelectionButton>;
@@ -169,6 +171,8 @@ export class SelectionPanel {
     this.backdrop = createWindowBackdrop(`MeleeSelectBackdrop${suffix}`, MENU_STYLE.panelTexture, 400 + participantId);
     const root = createFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
     this.root = root;
+    const row = createFrameByType("FRAME", `MeleeSelectRow${suffix}`, gameUi(), "", 0);
+    this.row = row;
     const grid = this.roster.grid;
     const scale = f32(grid.scale);
     for (let choice = 0; choice < grid.count; choice++) {
@@ -190,8 +194,8 @@ export class SelectionPanel {
       setFrameSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
       this.tileButtons.push(this.clicks.add(button, { kind: "tile", tile: choice }, undefined, "native"));
     }
-    this.cards = PARTICIPANT_SLOTS.map(slot => createCard(root, suffix, slot, (frame, target) => this.clicks.add(frame, target, undefined, "native")));
-    createChatBox(root, `MeleeChat${suffix}`);
+    this.cards = PARTICIPANT_SLOTS.map(slot => createCard(row, root, suffix, slot, (frame, target) => this.clicks.add(frame, target, undefined, "native")));
+    createChatBox(row, `MeleeChat${suffix}`);
     this.bullseye = art(gameUi(), `MeleeBullseye${suffix}`, "war3mapImported\\SelectionBullseye.tga", 0.0, 0.0, bullseyeSize(grid), bullseyeSize(grid));
     setFrameLevel(this.bullseye, SELECT_LEVELS.hand);
     setFrameVisible(this.bullseye, false);
@@ -265,6 +269,7 @@ export class SelectionPanel {
       createSyncTrigger(`ui.selection.${suffix}.tutorialOffer`, TUTORIAL_OFFER, owner, () => this.acceptTutorialOffer()),
     ];
     setFrameVisible(root, false);
+    setFrameVisible(row, false);
     setFrameVisible(this.backdrop, false);
   }
 
@@ -303,11 +308,12 @@ export class SelectionPanel {
     for (const frames of this.hands) destroyHandFrames(frames);
     if (this.cpu.root !== undefined) destroyFrame(this.cpu.root);
     destroyFrame(this.root);
+    destroyFrame(this.row);
     destroyFrame(this.backdrop);
   }
 
   private click(button: SelectionButton, clicker: Player): void {
-    if (clicker !== playerOf(this.participantId)) return;
+    if (!acceptsClick(this.game, playerSlot(clicker), this.participantId)) return;
     if (this.cpuSlot !== undefined && !isCpuPanelClick(button)) return;
     if (button.kind === "tile") this.clickTile(button.tile);
     else if (isCardClick(button)) this.clickCard(button);
@@ -691,6 +697,7 @@ export class SelectionPanel {
     this.community.show(visible);
     setFrameVisible(this.cpu.root, cpuOpen);
     setFrameVisible(this.root, visible);
+    setFrameVisible(this.row, cardRowShown(game, participantId, visible));
     fitToWindow(this.backdrop);
     setFrameVisible(this.backdrop, visible || (loading && game.phase === Phase.characterMenu && humanActive(game, participantId)));
     for (const frame of this.movesFrames) setFrameVisible(frame, visible && this.movesOpen);
@@ -708,6 +715,7 @@ export class SelectionPanel {
     if (cpuOpen && this.cpuSlot !== undefined) {
       this.showHand(pointed, undefined, x, y, true);
       setFrameVisible(this.root, false);
+      setFrameVisible(this.row, false);
       clearSelectionDrag(drag);
       showCpuSettings(this.cpu, game, this.participantId, this.cpuSlot, this.cpuFocus, this.menuPrompt.text, CPU_DEFAULTS);
       return true;
@@ -715,6 +723,7 @@ export class SelectionPanel {
     if (this.movesOpen) {
       this.showHand(pointed, undefined, x, y, true);
       setFrameVisible(this.root, false);
+      setFrameVisible(this.row, false);
       clearSelectionDrag(drag);
       this.showMoves();
       return true;
