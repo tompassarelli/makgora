@@ -71,6 +71,7 @@ import { clearTextMessages, createFrameByType, Frame, FramePoint, originFrame, O
 import { CameraField, panCameraTo, setCameraBounds, setCameraField, setCameraPosition } from "wisp/game/view";
 import { setBodyAnimation, setBodyAnimationIndex, setBodyTimeScale, showBody } from "wisp/game/bodies";
 import { formatReal, toReal } from "wisp/game/text";
+import { fighterModelReplaced } from "../../game/presentation/fighterForm";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -276,8 +277,9 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
     showBody(body.unit, false);
   }
   const { pooled } = participant;
-  if (hidden !== undefined && cloaked) hidden.unitShown = !pooled && !fighter.status.out && !inCannonBarrel(fighter);
-  else showBody(body.unit, !pooled && !fighter.status.out && !inCannonBarrel(fighter));
+  const unitShown = !pooled && !fighter.status.out && !inCannonBarrel(fighter) && !fighterModelReplaced(fighter);
+  if (hidden !== undefined && cloaked) hidden.unitShown = unitShown;
+  else showBody(body.unit, unitShown);
   if (body.renderedSelection !== pose.selectionSerial) {
     if (!pooled) {
 
