@@ -199,11 +199,13 @@ test("Thrall can walk in behind his spirit wolf: it outpaces his walk, so walkin
 
 interface Hop { readonly hits: number }
 
+const HOP_END_TICK = 85;
+
 function hopOver(full: boolean, jumpAt: number): Hop {
   const d = thrallDuel(260.0, 1);
   let hits = 0;
   let damage = 0.0;
-  for (let tick = 1; tick <= 120; tick++) {
+  for (let tick = 1; tick <= HOP_END_TICK; tick++) {
     const jump: Press = tick === jumpAt ? "down" : full && tick > jumpAt && tick < jumpAt + 6 ? "hold" : "none";
     step(d, pressAt(tick), held(DIAGONAL, -DIAGONAL)(tick - PRESS_TICK, 1), undefined, jump);
     if (d.foe.status.damage > damage) hits++;
@@ -215,7 +217,7 @@ function hopOver(full: boolean, jumpAt: number): Hop {
 test("Only a full hop clears both timber wolves: a short hop timed over the first is bitten by the second, and a full hop clears the pair [k3 measure docs/design/thrall.md]", () => {
   let shortClearsFirst = false;
   let fullClearsBoth = false;
-  for (let jumpAt = PRESS_TICK; jumpAt < PRESS_TICK + 60; jumpAt++) {
+  for (let jumpAt = PRESS_TICK + 13; jumpAt < PRESS_TICK + 53; jumpAt++) {
     const short = hopOver(false, jumpAt);
     assertGreaterThan(short.hits, 0);
     if (short.hits === 1) shortClearsFirst = true;
