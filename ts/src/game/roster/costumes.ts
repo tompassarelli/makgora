@@ -1,6 +1,7 @@
 export type { CostumeTint } from "../presentation/model/costume";
 import { type Costume, DEFAULT_COSTUMES, DEFAULT_COSTUME, MAX_COSTUMES, PARTNER_COSTUME } from "../presentation/model/costume";
 import { heroLook } from "./looks";
+import { costumeSystem } from "./costumeSwitch";
 import { DuoRole } from "../sim/codes";
 import type { PartnerLook } from "../presentation/model/look";
 import { costumeBody } from "../../generated/costumes/costumeBodies";
@@ -20,7 +21,7 @@ export function costumeOf(character: number, index: number): Costume {
 }
 
 export function costumeIndex(character: number, index: number): number {
-  return index >= 0 && index < MAX_COSTUMES && index < authoredCostumes(character).length ? index : 0;
+  return costumeSystem.enabled && index >= 0 && index < MAX_COSTUMES && index < authoredCostumes(character).length ? index : 0;
 }
 
 export function partnerLook(character: number, role: DuoRole): PartnerLook | undefined {
