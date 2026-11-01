@@ -248,7 +248,7 @@ export const smashcraftStandalone = (render: StandaloneGame["render"]): Standalo
 const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only"]);
 const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests", "--storage", "--stage"]);
 
-export function standaloneArguments(args: readonly string[], window: "chrome" | "native" = "chrome") {
+export function standaloneArguments(args: readonly string[], window: "chrome" | "native" = "native") {
   let frames: number | undefined, rollback: number | undefined;
   let presentation: MapBuild["presentation"] | undefined;
   const flags = new Set<string>(), texts = new Map<string, string>();
@@ -288,7 +288,7 @@ export function standaloneArguments(args: readonly string[], window: "chrome" | 
 
 function digestsOf(texts: ReadonlyMap<string, string>, window: "chrome" | "native"): { readonly digests?: string } {
   const digests = texts.get("--digests");
-  if (digests !== undefined && window !== "native") throw new Error("--digests is written by the native window; add --window native");
+  if (digests !== undefined && window !== "native") throw new Error("--digests is written by the native window; drop --window chrome");
   return digests === undefined ? {} : { digests };
 }
 
@@ -342,7 +342,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
     ...(playerAssets === undefined ? {} : { gpuLease: false }),
     ...(counted.emulatedCalls === undefined ? {} : { emulatedCalls: counted.emulatedCalls }),
     ...(net.net === undefined ? {} : { net: net.net }),
-    ...(windowed.window === undefined ? {} : { window: windowed.window }),
+    window: windowed.window,
     ...(windowed.window === "native" ? { nativeGame: { module: nativeModule, export: "SMASHCRAFT_NATIVE_GAME" } } : {}),
   });
 });

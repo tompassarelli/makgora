@@ -69,16 +69,16 @@
   install proceeds and status.json reads `installed-unverified` with the gate
   failures).
 
-- Standalone play: `bun wisp play --standalone` opens the Wisp browser player
-  with a full three-stock Illidan against Wren Expert Rifleman. `--script FILE`
+- Standalone play: `bun wisp play --standalone` opens Wisp's native window
+  (`--window chrome` opens the Wisp browser player instead, the fallback for
+  captures, the four-fighter measurement and net-accept) with a full three-stock Illidan against Wren Expert Rifleman. `--script FILE`
   runs the native driver's exact pad inputs; `--headless --frames N --out DIR`
-  saves frame checksums and captures (`--capture-frames N,N` picks their frames).
+  saves frame checksums, and with `--window chrome` captures (`--capture-frames N,N` picks their frames).
   `--presentation native|pool-confirmed|pool-predicted` selects fighter presentation;
   live play defaults to `pool-predicted`, scripts to `native`.
-  `--four-fighters --frames 7200 --out DIR` is wisp#48's 60 FPS measurement
+  `--window chrome --four-fighters --frames 7200 --out DIR` is wisp#48's 60 FPS measurement
   (one game copy, four fighters; smashcraft:docs/play.md).
-  `--window native` opens Wisp's Rust window instead of Chrome (`chrome` is the
-  default) and draws the stage, sky and fighters; it steps Smashcraft's default
+  The native window draws the stage, sky and fighters; it steps Smashcraft's default
   session, so it refuses `--presentation` and `--four-fighters`; `--host` and `--join`
   work in it as in Chrome; with `--map MAP.w3x --player-assets-only` its worker thread reads
   the map's imports and the Warcraft install as Chrome does; `--start select|results` opens it at character select or in a one-stock match that ends quickly, for the victory screen. A live window keeps Smashcraft's first-run files (whether the Tutorial prompt was answered) in `~/.local/state/smashcraft/native-files`, and a headless `--start select` run keeps the prompt off so captures stay the same; the window has no pointer, so at the prompt the attack key starts the tutorial, the special key or Esc is Not now, and left and right pick the lesson. A script whose first line is `#! select cpu` stays in the menus with a one-stock Wren Expert in slot 2, and its `STEP start` and `STEP back` lines press the Start key and Esc; `ts/test/native/pads/music-journey.pad` walks title, character select, stage select, a match, results, a rematch, results and character select with `--start select --chosen demonHunter`, and `ts/test/musicJourney.test.ts` asserts one music track on each of those screens. The command finds the window
@@ -87,7 +87,7 @@
   Linux, which links the Wayland, X11 and Vulkan libraries into the library, so no dev shell or
   `LD_LIBRARY_PATH` is needed) (wisp:docs/native-window-plan.md, "Where a consumer gets the library").
   Private map and Warcraft assets stay in the existing local asset store.
-- `--emulated-calls FILE` (either window) writes the headless client's emulated-native call counts to FILE as JSON when the run ends: one count per Warcraft native name, a native never called absent. A migrated game API family reads zero (wisp:docs/game-api-plan.md, "The measurement that proves it"). Native window run: `bun wisp play --standalone --window native --start select --script PAD --headless --frames N --emulated-calls FILE`.
+- `--emulated-calls FILE` (either window) writes the headless client's emulated-native call counts to FILE as JSON when the run ends: one count per Warcraft native name, a native never called absent. A migrated game API family reads zero (wisp:docs/game-api-plan.md, "The measurement that proves it"). Native window run: `bun wisp play --standalone --start select --script PAD --headless --frames N --emulated-calls FILE`.
 - Host and join: `bun wisp play --standalone --host [--port N]` prints a join
   code and its direct addresses; the other player runs
   `bun wisp play --standalone --join CODE` (or `ADDRESS:PORT`). Both meet at

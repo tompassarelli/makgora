@@ -10,7 +10,7 @@ test("player assets need a map and a map needs player assets [k2 property]", () 
 
 test("a headless native window run needs frames but no output folder, and a Chrome run keeps needing both [k2 property]", () => {
   expect(standaloneArguments(["--headless", "--frames", "600"], "native")).toMatchObject({ headless: true, frames: 600 });
-  expect(() => standaloneArguments(["--headless", "--frames", "600"])).toThrow("--headless needs --frames N and --out DIR");
+  expect(() => standaloneArguments(["--headless", "--frames", "600"], "chrome")).toThrow("--headless needs --frames N and --out DIR");
   expect(() => standaloneArguments(["--headless"], "native")).toThrow("--headless needs --frames N");
 });
 
@@ -22,7 +22,7 @@ test("--start names where the native window opens [k2 property]", () => {
 
 test("--digests names the file the native window writes its frame digests to, and only the native window writes it [k2 property]", () => {
   expect(standaloneArguments(["--digests", "digests.txt"], "native").digests).toBe("digests.txt");
-  expect(() => standaloneArguments(["--digests", "digests.txt"])).toThrow("add --window native");
+  expect(() => standaloneArguments(["--digests", "digests.txt"], "chrome")).toThrow("drop --window chrome");
 });
 
 test("--storage names the Warcraft III: Reforged folder Wisp looks at first [k2 property]", () => {

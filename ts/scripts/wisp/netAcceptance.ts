@@ -159,7 +159,7 @@ export const runFourFighters = (options: { readonly frames: number; readonly see
     const side = (name: string, role: readonly string[]) => Effect.gen(function*() {
       const out = join(directory, name);
       mkdirSync(out, { recursive: true });
-      const run = yield* captureProcess("play --standalone", pad, [process.execPath, "scripts/wisp.ts", "play", "--standalone", ...role, "--script", pad, "--frames", `${options.frames}`, "--out", out]);
+      const run = yield* captureProcess("play --standalone", pad, [process.execPath, "scripts/wisp.ts", "play", "--standalone", "--window", "chrome", ...role, "--script", pad, "--frames", `${options.frames}`, "--out", out]);
       writeFileSync(join(directory, `${name}.log`), `${run.stdout}\n${run.stderr}`);
       const measured = /^net: slot \d+, round trip (\d+(?:\.\d+)?) ms, turn delay .*$/m.exec(run.stderr);
       if (measured === null || measured[1] === undefined) return yield* new NetAcceptFailure({ problem: `${name}: no measured round trip at requested ${rttMs} ms` });

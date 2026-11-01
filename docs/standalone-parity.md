@@ -34,7 +34,7 @@ the box that fixes it or the reason it stays. It blocks the player build
   (smashcraft:docs/graphics-settings.md, "What Smashcraft reads on screen").
 - **Fighter presentation profile.** Live standalone play defaults to
   `pool-predicted`, scripted runs to `native`; live Warcraft play also defaults
-  to `pool-predicted`. Check: `bun wisp play --standalone --headless --script
+  to `pool-predicted`. Check: `bun wisp play --standalone --window chrome --headless --script
   test/native/pads/cpu-expert.pad --frames 1070 --out DIR --presentation native`
   against `--presentation pool-predicted` (smashcraft:docs/play.md). Box:
   smashcraft#806 compares both profiles frame for frame with the native
@@ -128,7 +128,7 @@ the box that fixes it or the reason it stays. It blocks the player build
   Warcraft build's frame is the map callback under Warcraft's frame cap
   (`maxfps`, smashcraft:docs/graphics-settings.md) and its renderer. The window
   also needs a gpu capacity lease and Chrome. Check: `bun wisp play
-  --standalone --four-fighters --frames 7200 --out DIR` prints the frame-time
+  --standalone --window chrome --four-fighters --frames 7200 --out DIR` prints the frame-time
   p95 against the 16.7 ms target and keeps every frame in `DIR/standalone.json`;
   `bun wisp net-accept --four-fighters --out DIR` requires both windows'
   `presentedMs.p95` at most 16.7 ms at each round trip; the Warcraft side is

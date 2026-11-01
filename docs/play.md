@@ -5,13 +5,14 @@ Put it
 in the Warcraft III Maps folder and open it from Custom Games. The GitHub
 repositories contain code only; maps are distributed on Hive Workshop.
 
-`bun wisp play --standalone` opens Smashcraft in the Wisp browser player,
+`bun wisp play --standalone` opens Smashcraft in Wisp's native window, and
+`--window chrome` in the Wisp browser player,
 with Illidan against a Wren Expert Rifleman over the normal three stocks and
 seven-minute clock. Keyboard controls and the browser's gamepad controls enter
 the playable map's keyboard sampling. The browser draws the map's models,
 camera, effects and HUD from the headless client and plays its sound cues.
 
-`bun wisp play --standalone --script test/native/pads/cpu-expert.pad --headless
+`bun wisp play --standalone --window chrome --script test/native/pads/cpu-expert.pad --headless
 --frames 1070 --out build/standalone-cpu --capture-frames 200,600,1000` runs
 the existing native pad driver and saves each frame's checksum plus captures.
 `cpu-expert.pad` is the original `cpu-level-9.pad`: commit `c0424f66` renamed
@@ -55,7 +56,7 @@ send DIR "$(cat PAD)"`, `resume 1100`, then `reset` once both clients pause at
 frame 1100, which writes each client's `smashcraft-replay-N.txt` manifest and
 parts to copy into the recording's `a` and `b` folders.
 
-`bun wisp play --standalone --four-fighters --frames 7200 --out DIR` is
+`bun wisp play --standalone --window chrome --four-fighters --frames 7200 --out DIR` is
 wisp#48's frame-rate measurement. It runs one game copy, as live play does:
 Illidan on the bot beat's keys against computer Blademaster, Illidan and Warden,
 99 stocks and a two-minute clock, so four fighters stay on stage. It prints
