@@ -4,7 +4,6 @@ import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, GroundAction } from "./codes";
 import { attackActive, attackStartup, inGrabContext } from "./conditions";
 import { type Fighter, createFighter } from "./fighter";
-import { PIVOT_FRAMES } from "./groundMovement";
 import { type Controls, type Roster } from "./roster";
 import { controls } from "./testWorld";
 import { duelPair, queueDuelAttack, stepDuel } from "./testDuel";
@@ -14,6 +13,8 @@ const FAR = 300.0;
 const DASH_FRAMES = 6;
 const RUN_FRAMES = 30;
 const BEYOND_DASH_REACH = 128.0;
+const PIVOT_FRAMES_TOM_CHOSE = [1, 2];
+const FIRST_FRAME_AFTER_PIVOT = 3;
 
 type Moment = "turnaround" | number;
 
@@ -72,8 +73,7 @@ function catchesBeyondDashReach(moment: Moment): boolean {
 }
 
 test("Pivot grab: a grab on the dash-back turnaround frame or on either pivot frame after it faces the new way, slides on with the dash's momentum and catches with the pivot box, beyond the dash grab's reach [k3 measure docs/design/grabs.md]", () => {
-  const moments: Moment[] = ["turnaround"];
-  for (let frame = 1; frame <= PIVOT_FRAMES; frame++) moments.push(frame);
+  const moments: Moment[] = ["turnaround", ...PIVOT_FRAMES_TOM_CHOSE];
   for (const moment of moments) {
     const run = pivotGrab(moment);
     assertEquals(run.f.attack.style, AttackStyle.grab, `grab at ${moment}`);
@@ -87,7 +87,7 @@ test("Pivot grab: a grab on the dash-back turnaround frame or on either pivot fr
 });
 
 test("Pivot grab: the pivot lasts two frames, so a grab on the frame after them is the standing grab and keeps none of the dash [k3 measure docs/design/grabs.md]", () => {
-  const run = pivotGrab(PIVOT_FRAMES + 1);
+  const run = pivotGrab(FIRST_FRAME_AFTER_PIVOT);
   assertEquals(run.f.attack.style, AttackStyle.grab);
   assertFalse(run.f.attack.pivotGrab);
   assertFalse(run.f.attack.dashGrab);
@@ -95,7 +95,7 @@ test("Pivot grab: the pivot lasts two frames, so a grab on the frame after them 
 });
 
 test("Pivot grab: a dash back flicked on either pivot frame still dash-dances, dashing the other way at once [k1 scenario]", () => {
-  for (let frame = 1; frame <= PIVOT_FRAMES; frame++) {
+  for (const frame of PIVOT_FRAMES_TOM_CHOSE) {
     const run = dashing(DASH_FRAMES);
     stepDuel(run.world, back);
     for (let neutral = 1; neutral < frame; neutral++) stepDuel(run.world, controls());
