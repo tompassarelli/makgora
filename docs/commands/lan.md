@@ -3,7 +3,7 @@
 South's battlenet-accounts skill names the signed-in pairs and how each one
 runs; never touch Tom’s install.
 
-- Offline LAN pool, the default for native testing (see "Native testing and
+- Offline LAN pool, the default for native parity, desync, net and release-acceptance testing, not for look captures (docs/commands/native.md "Look captures") (see "Native testing and
   UI"), on live build 3.0.0.24268 only (the private LAN plugin refuses other
   builds): `bun wisp lan setup --from INSTALL [--pairs N]` creates throwaway
   clients with no account from one updated install (a clone's

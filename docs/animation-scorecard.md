@@ -163,7 +163,7 @@ context and write its requested JSONL. `bun wisp anim judge record
 PRIVATE_DIR/scores-*.jsonl` validates and stores numerical judgements in
 `tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the judge framing, the key-frame poses `prepare` rendered and, for a move that travels, each key frame's forward travel, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the judgement, or for a borderline or old clip the per-line median of the first three, whose identity matches the clip the scorecard samples now, so a re-authored move or a changed framing drops the old clip's scores, and a judgement recorded before identities existed no longer counts (#95, #96). Reference pixels stay outside Git.
 
-For the native Classic read of a take on gex45, queue the committed take with
+Take the look of a take in the Wisp window (docs/commands/native.md, "Look captures"). For a Warcraft Classic read of a take on gex45 (release acceptance, or a difference only Warcraft shows), queue the committed take with
 `bun wisp anim capture enqueue --lane LANE --fighter SLUG --move MOVE` and wait
 with `bun wisp anim capture wait ID` instead of building a map and starting a pool.
 The result holds one sheet for the clip and a judge folder for

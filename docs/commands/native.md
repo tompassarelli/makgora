@@ -1,5 +1,34 @@
 # Native
 
+## Look captures
+
+Look, animation and VFX captures for iteration and for Tom's review are taken in
+the Wisp native window, the window Tom plays in, not in Warcraft III clients (a
+LAN-pair queue for them took most of a 12 hour Lava Raze effects lane on
+2026-11-01, when Tom directed that the Wisp window is the default). From `ts/`
+on gex45:
+
+```sh
+bun scripts/windowStrip.ts PAD.pad --out ~/.local/state/smashcraft/shots/NAME/NAME-low.jpg \
+  --after 580 --count 1000 --row 8,20,24,32,40,56 --row 140,152,158,164
+```
+
+It starts a private desktop, runs `play --standalone --window native --script PAD`
+in it under `machine-capacity run --class gpu` (no pair, no Warcraft client),
+saves `--count` window frames from the `--after`th drawn scene
+(`WISP_WINDOW_CAPTURE*`, wisp:docs/native-window-plan.md "Capture") and montages
+each `--row` of frame numbers (counted from the first saved frame) into one
+strip row of `--tile` (default 480x270) tiles. `--keep-frames` keeps the PNGs
+beside the strip. Pick rows by viewing a contact sheet of the kept frames first.
+Write the pad with `#! chat -dev quick stage S pair A / B` and `VIEW` presses as
+in `ts/test/native/pads/`; set the look with `WISP_PLAYER` graphics settings
+(`Low` or `Remastered`) for a strip per setting. The frames show Wisp's
+renderer: use Warcraft clients, below, for a difference only Warcraft shows.
+
+Use the Warcraft Classic pool for what only Warcraft shows: online desync and
+net checks, `accept` checks, and the Classic acceptance pass before Tom cuts a
+release candidate. The capture queue and `native-capture` below are those paths.
+
 Native startup verifies private-window focus, observed
 pointer motion and a harmless Scroll Lock key in the map-written
 `smashcraft-input-preflight.txt`. The probe has a twelve-second deadline
@@ -193,7 +222,7 @@ Frame acceptance follows the root AGENTS.md budget.
 
 Never touch Tom’s install; run clone-a only through its
 launch.sh, which yields to Tom’s game. The offline LAN pool is the default for pad parity,
-captures, `accept` checks and desync hunts.
+`accept` checks, desync hunts and release acceptance; look captures take the Wisp window ("Look captures" above).
 
 Wisp gives every verdict that is a number from the map's code (wisp#75 M5):
 rules, meters, items, hazards, recovery, match flow,
@@ -278,7 +307,7 @@ assigns the actor's fighter or a computer to a team through the lobby rules.
 
 ## Shared capture queue
 
-Animation lanes on gex45 get native Classic frames of their take from one
+Animation lanes on gex45 get Warcraft Classic frames of their take from one
 shared queue instead of building a map and starting a pool of their own (#614).
 From the lane's `ts/`, with the take committed:
 

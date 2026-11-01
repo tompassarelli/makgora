@@ -17,7 +17,7 @@ loses Battle.net, with the evidence the watch saw.
 
 ## Which clients
 
-Native testing defaults to Wisp's offline LAN pool: `bun wisp lan pool
+Native testing for parity, desync, net and release acceptance defaults to Wisp's offline LAN pool (look, animation and VFX captures take the Wisp window, docs/commands/native.md "Look captures"): `bun wisp lan pool
 --pairs N` runs it and `bun wisp lan fresh MAP.w3x --pair K` starts a match
 (wisp:docs/lan.md). The
 pool's throwaway clients have no account and no internet, each in its own

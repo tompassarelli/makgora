@@ -511,7 +511,7 @@ Nordrassil, Blackrock and Hellfire keep their depth-pass look. Rules 17 and
 
 ### Art checklist
 
-Every stage passes these, judged from one batch of native captures at both
+Every stage passes these, judged from one batch of Wisp window captures at both
 camera extremes (smashcraft:ts/scripts/wisp/stageCompositionChecks.ts):
 `bun tools/stage/search.ts STAGE SPEC.json` ([stage help](../commands/stage.md))
 checks the render-free rules on every fog, tint, position, scale and light
