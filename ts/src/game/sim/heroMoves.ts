@@ -124,11 +124,10 @@ export interface FighterMoves {
 }
 
 
-/** A kit's partner body: the weight multiplier of the reference weight, the multiplier of the damage and knockback it takes, and the partner's version of its moves. */
+/** A kit's partner body: the weight multiplier of the reference weight, and the multiplier of the damage and knockback it takes. The partner shares the leader's moves, hit regions and hurt capsules. */
 export interface PartnerBody {
   readonly weight: number;
   readonly taken: number;
-  readonly moves: (base: FighterMoves) => FighterMoves;
 }
 
 

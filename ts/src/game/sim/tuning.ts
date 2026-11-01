@@ -482,6 +482,6 @@ export function authoredTuning(character: Character, partner = false): FighterTu
     shieldBreak: AUTHORED_SHIELD_BREAK_TIMING,
   };
   const body = partner ? hero?.partner : undefined;
-  if (body === undefined || tuning.moves === undefined) return tuning;
-  return { ...tuning, moves: body.moves(tuning.moves), physics: { ...tuning.physics, weight: f32(REFERENCE_WEIGHT * body.weight) } };
+  if (body === undefined) return tuning;
+  return { ...tuning, physics: { ...tuning.physics, weight: f32(REFERENCE_WEIGHT * body.weight) } };
 }

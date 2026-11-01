@@ -17,5 +17,5 @@ export const murlocLook: HeroLook = {
   portrait: "ReplaceableTextures\\CommandButtons\\BTNMurloc.blp",
   clips: MURLOC_CLIPS, damageClips: MURLOC_DAMAGE_CLIPS, fallback: MURLOC_FALLBACK, defeat: "death",
   costumes: [{ name: "Teal", skin: MRGL_SKIN }, ...DEFAULT_COSTUMES.slice(1).map(costume => ({ ...costume, skin: MRGL_SKIN }))],
-  partner: { skin: GRGL_SKIN, scale: f32(0.9) },
+  partner: { skin: GRGL_SKIN, scale: f32(1.0) },
 };
