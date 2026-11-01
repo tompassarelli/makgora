@@ -2,6 +2,7 @@ import { CLASSIC_CHARACTERS, classicRoute } from "../classic/routes";
 import { type StagePool, createStagePool, copyStagePool, nextPoolStage, consumePoolStage, togglePoolMode, togglePoolStage } from "../menu/stagePool";
 import { PLAYABLE_CHARACTERS, isMatchCharacter, nextCharacterIn, DEFAULT_FIGHTER } from "../roster/kits";
 import { type CostumeTint, costumeIndex, costumeOf, costumesFor } from "../roster/costumes";
+import { costumeSystem } from "../roster/costumeSwitch";
 import { RANDOM_STAGE, selectableStageChoice } from "../menu/stageCatalog";
 import { floorMod } from "wisp/src/sim/intMath";
 import { type MatchCamera, createMatchCamera, copyMatchCamera } from "../sim/matchCamera";
@@ -438,7 +439,7 @@ export function costumeTintFor(game: Readonly<MatchState>, slot: ParticipantSlot
 }
 
 export function cycleCostume(game: MatchState, actor: number, slot: number, direction: number): void {
-  if (game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !fighterActive(game, slot) || cpuFighterRandom(game, slot)
+  if (!costumeSystem.enabled || game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !fighterActive(game, slot) || cpuFighterRandom(game, slot)
     || !humanPresent(game, actor) || !(actor === slot && humanFighterActive(game, slot) || canChooseComputer(game, actor, slot))) return;
   const count = costumesFor(game.characterChoices[slot]).length;
   game.costumeChoices[slot] = floorMod(costumeFor(game, slot) + direction, count);

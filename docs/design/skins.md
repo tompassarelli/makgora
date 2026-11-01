@@ -1,5 +1,11 @@
 # Costumes (skins)
 
+## Hidden until ready
+
+The costume system is off (2026-11-02): Tom asked on 2026-11-02 to hide it until it is ready. One switch, `costumeSystem.enabled` in `ts/src/game/roster/costumeSwitch.ts`, defaults to false. With it off, the select cards create no dots and no portrait hotspot, Jump on a focused fighter and a click on the card portrait do nothing, `cycleCostume` refuses, and `costumeIndex` reads every choice as index 0, so every slot, portrait, body, HUD plate and KO plays its fighter's default costume (Grom keeps Fel as his default, so nothing else a player sees changes). The model, costumes, portraits and the rest of this page are kept; the costume tests set the switch on (`src/game/roster/costumes.tests.ts`, `ts/test/costume-switch.test.ts`). The native fighter-select checks 726-fel-select and 726-fel-match, and `-dev costume` and `-dev quick ... in COSTUME` with a non-default costume, need the switch on to show a non-default costume.
+
+Open to-do: when the system is turned back on, its indicator must be plain dots in the player's colour, the current one bright and the others dimmed, not the player chip texture that reads "P1" (Tom, 2026-11-02).
+
 A costume is presentation only: a fighter's colour treatment. It never touches frame data, hit regions, the sim or rollback state. The one synced fact is the player's choice, `MatchState.costumeChoices[slot]`, an index into that fighter's costume list.
 
 ## Model
