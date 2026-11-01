@@ -387,7 +387,7 @@ export function cueScenes(move: CueMove): { readonly scenes: RenderScene[]; read
         renderers.cues.present(f, true, false);
         renderers.shots.present(f, true, false);
         renderers.specials.presentConfirmedAnimated(tick, f, 0);
-        renderers.specials.presentStatic(specialState, f, 0);
+        renderers.specials.presentStatic(specialState, f, 0, world);
         renderers.specials.presentSummons(summonState, f, 0);
         renderers.frost.present(f, 0);
         renderers.placed.presentConfirmed(tick, f, 0);

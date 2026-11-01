@@ -25,6 +25,8 @@ import type { Fighter } from "../sim/fighter";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP } from "../sim/specials";
 import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkOnce, placeEffect } from "./effects";
 import { beamSegment } from "../sim/specials/heroContact";
+import { chainBoltSegment } from "../presentation/chainBolt";
+import type { Roster } from "../sim/roster";
 import { runningHeroSpecial } from "../sim/specials/runningMove";
 import { emptyCapsule } from "../sim/geometry/contactGeometry";
 import { specialAreaRegion } from "../presentation/disjointCues";
@@ -291,7 +293,7 @@ export class SpecialEffects {
   }
 
 
-  presentStatic(state: Readonly<SpecialEffectState>, fighter: Readonly<Fighter> | undefined, slot: number): void {
+  presentStatic(state: Readonly<SpecialEffectState>, fighter: Readonly<Fighter> | undefined, slot: number, world: Roster): void {
     const effects = this.slots[slot];
     if (effects === undefined) return;
     if (fighter === undefined) {
@@ -310,7 +312,7 @@ export class SpecialEffects {
     this.fighterZ[slot] = fighter.motion.z;
     this.tether.present(fighter, slot, this.fighterX, this.fighterZ);
     this.presentSiphon(effects, fighter);
-    this.presentLaser(effects, fighter);
+    this.presentLaser(effects, fighter, world);
     this.presentGrip(effects, fighter);
     this.applyStatic(effects.aura, slot, AURA, projectSpecialEffect(state, fighter, slot, STATIC_AURA, this.pose));
     this.applyStatic(effects.wingTrail, slot, WING_TRAIL, projectSpecialEffect(state, fighter, slot, STATIC_WING_TRAIL, this.pose));
@@ -330,14 +332,14 @@ export class SpecialEffects {
     slot.laserShown = false;
   }
 
-  private presentLaser(effects: SpecialSlot, fighter: Readonly<Fighter>): void {
+  private presentLaser(effects: SpecialSlot, fighter: Readonly<Fighter>, world: Roster): void {
     const beam = runningHeroSpecial(fighter)?.beam;
     const region = specialAreaRegion(fighter, 0);
     if (beam === undefined || fighter.status.out || region.strike === undefined) {
       this.presentTrail(effects, fighter);
       return;
     }
-    const line = beamSegment(this.beamLine, fighter, beam, region.strike.radius);
+    const line = beam.chain === true ? chainBoltSegment(this.beamLine, fighter, world, beam, region.strike.radius) : beamSegment(this.beamLine, fighter, beam, region.strike.radius);
     const { x, z } = this.origin;
     const shown = beam.chain === true ? effects.chain : effects.laser;
     setBeamColor(beam.chain === true ? effects.laser : effects.chain, 1.0, 1.0, 1.0, 0.0);

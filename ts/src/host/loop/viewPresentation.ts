@@ -67,7 +67,7 @@ export function presentSlot(s: ShellState, ui: UiObjects, slot: ParticipantSlot,
   const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
   const live = playing ? fighter : undefined;
   presentSlotBody(s, ui, slot, game, fighter, live, runtime, drawn, matchFrame, roared, mark);
-  ui.special.presentStatic(runtime.specials, live, slot);
+  ui.special.presentStatic(runtime.specials, live, slot, world);
   ui.special.presentSummons(runtime.summons, live, slot);
   presentSlotLayers(ui, slot, live);
   presentSlotOverlays(s, ui, slot, fighter, live, playing, runtime);

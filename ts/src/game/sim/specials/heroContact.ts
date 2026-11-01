@@ -17,7 +17,7 @@ import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import { squareRoot } from "../warcraftMath";
 import { runningHeroSpecial, projectileAnchor } from "./runningMove";
 
-const BEAM_TARGET_HEIGHT = 45.0;
+export const BEAM_TARGET_HEIGHT = 45.0;
 
 const beamFoe = { x: 0.0, z: 0.0 };
 
