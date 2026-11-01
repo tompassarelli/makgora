@@ -10,9 +10,11 @@ import { copyFighterState } from "../../../generated/state/fighterState";
 import { Character, ProjectileKind, SpecialAction } from "../../sim/codes";
 import { createFighter, type Fighter, mutablePlacedObject, placedObject } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
+import { PLACED_THROW_FRAMES } from "../../sim/placedWalk";
 import { fighterAt, setRosterMask } from "../../sim/roster";
+import { CompanionMode } from "../../sim/specials/schema";
 import { type Duel, duel } from "./testDuel";
-import { FIREBALL_SPEED, LAVA_SPAWN, LAVA_SPAWN_HALF, SPAWN_CAST_FRAME, SPAWN_FIRST_SHOT, SPAWN_LIFE, SPAWN_SPLIT_HITS } from "./lavaSpawn";
+import { FIREBALL_LIFE, FIREBALL_SPEED, LAVA_SPAWN, LAVA_SPAWN_HALF, SPAWN_CAST_FRAME, SPAWN_FIRST_SHOT, SPAWN_LIFE, SPAWN_SPLIT_HITS } from "./lavaSpawn";
 
 const FAR_AWAY = 3000.0;
 const IN_RANGE = 350.0;
@@ -187,4 +189,42 @@ test("A rollback replays the spawn across its split to the same canonical state,
     assertEquals(replayed, expected, `saved ${saveAt} frames after the cast`);
     assertEquals(before !== expected, true, "the split changed the state");
   }
+});
+
+test("With no foe on the stage the spawn never enters its throwing state, in all 720 frames of its life [k3 measure docs/design/roster.md]", () => {
+  const d = summoned(IN_RANGE);
+  assertEquals(spawn(d, 0).life > 0, true, "the spawn is out");
+  d.state.match.practice = true;
+  d.state.match.humanFighterMask = 1;
+  d.foe.status.stocks = 0;
+  d.foe.status.out = true;
+  let frames = 0;
+  while (spawn(d, 0).life > 0 && frames++ < SPAWN_LIFE) {
+    assertEquals(spawn(d, 0).mode === CompanionMode.throwing, false, `standing at frame ${frames}`);
+    assertEquals(fireballs(d.caster).length, 0, `nothing thrown at frame ${frames}`);
+    step(d);
+  }
+  assertEquals(frames > SPAWN_LIFE - SPAWN_CAST_FRAME - 2, true, `the spawn lived out its ${frames} frames`);
+  assertEquals(spawn(d, 0).life, 0, "and expired");
+});
+
+test("The spawn is in its throwing state for 8 frames from each fireball it throws, and in no other frame [k3 measure docs/design/roster.md]", () => {
+  const d = summoned(IN_RANGE);
+  const foeX = d.foe.motion.x;
+  let throwing = 0;
+  let runs = 0;
+  let previous = false;
+  for (let frame = 0; frame < 400; frame++) {
+    step(d);
+    pinFoe(d, foeX);
+    const now = spawn(d, 0).mode === CompanionMode.throwing;
+    if (now) throwing++;
+    if (now && !previous) {
+      runs++;
+      assertEquals(fireballs(d.caster).some((shot) => shot.life > FIREBALL_LIFE - PLACED_THROW_FRAMES), true, "a fireball just left");
+    }
+    previous = now;
+  }
+  assertEquals(throwing, runs * PLACED_THROW_FRAMES, "each throw lasts 8 frames");
+  assertEquals(runs >= 3, true, `threw ${runs} times in 400 frames`);
 });

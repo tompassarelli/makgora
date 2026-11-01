@@ -10,6 +10,8 @@ import { canHit } from "./teams";
 
 const STILL: readonly SpecialMotion[] = [];
 
+export const PLACED_THROW_FRAMES = 8;
+
 export function untouchable(placed: Readonly<Pick<PlacedObject, "mode">>): boolean {
   return placed.mode === CompanionMode.vanished || placed.mode === CompanionMode.burrowed || placed.mode === CompanionMode.rising;
 }
@@ -111,11 +113,16 @@ export function walkPlaced(world: Roster, ownerSlot: number, placed: PlacedObjec
     }
     return;
   }
-  if (placed.mode !== CompanionMode.follow || owner.status.out) return;
+  if (placed.mode === CompanionMode.throwing && ++placed.modeFrame >= PLACED_THROW_FRAMES) {
+    placed.mode = CompanionMode.follow;
+    placed.modeFrame = 0;
+  }
+  if (placed.mode !== CompanionMode.follow && placed.mode !== CompanionMode.throwing || owner.status.out) return;
   if (diving(owner) || stranded(owner, placed, walk)) {
     goUnder(placed);
     return;
   }
+  if (placed.mode === CompanionMode.throwing) return;
   const foeX = nearestFoeX(world, ownerSlot, placed.x);
   walkTo(placed, goal(owner, placed, walk, spread, foeX), walk, radius, stage, matchFrame, foeX);
 }

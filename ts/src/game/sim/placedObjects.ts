@@ -212,7 +212,7 @@ function towardNearestFoe(world: Roster, ownerSlot: number, placed: Resting<Plac
 
 const AIM_HEIGHT = 45.0;
 
-function fireAimed(world: Roster, owner: Fighter, ownerSlot: number, placed: PlacedObject, shot: Readonly<SpecialProjectile>, speed: number): void {
+function fireAimed(world: Roster, owner: Fighter, ownerSlot: number, placed: PlacedObject, shot: Readonly<SpecialProjectile>, speed: number): boolean {
   let nearest = -1.0;
   let aimX = 0.0;
   let aimZ = 0.0;
@@ -228,12 +228,13 @@ function fireAimed(world: Roster, owner: Fighter, ownerSlot: number, placed: Pla
     aimX = dx;
     aimZ = dz;
   }
-  if (nearest < 0.0) return;
+  if (nearest < 0.0) return false;
   if (aimX !== 0.0) placed.direction = aimX < 0.0 ? -1 : 1;
   const length = nearest > 0.0 ? squareRootFloat32(nearest) : 1.0;
   const velocity = nearest > 0.0 ? { velocityX: f32(f32(aimX / length) * speed), velocityZ: f32(f32(aimZ / length) * speed) } : { velocityX: f32(placed.direction * speed), velocityZ: 0.0 };
   const x = f32(placed.x + f32(placed.direction * shot.offsetX));
   spawnHeroProjectileAt(owner, shot, x, f32(placed.z + shot.offsetZ), 1, false, owner.attack.serial + 1, undefined, velocity);
+  return true;
 }
 
 export function advancePlacedObjects(world: Roster, stage: number, matchFrame: number): void {
@@ -286,7 +287,10 @@ export function advancePlacedObjects(world: Roster, stage: number, matchFrame: n
       const shot = spec.finalShot !== undefined && placed.age === last ? spec.finalShot : spec.shot;
       if (fires && shot !== undefined && (channeled || ownedProjectiles(owner) < HERO_PROJECTILE_CAP)) {
         if (spec.aimedSpeed !== undefined) {
-          fireAimed(world, owner, ownerSlot, placed, shot, spec.aimedSpeed);
+          if (fireAimed(world, owner, ownerSlot, placed, shot, spec.aimedSpeed) && spec.walks !== undefined) {
+            placed.mode = CompanionMode.throwing;
+            placed.modeFrame = 0;
+          }
           continue;
         }
         if (spec.aimed === true) placed.direction = towardNearestFoe(world, ownerSlot, placed);

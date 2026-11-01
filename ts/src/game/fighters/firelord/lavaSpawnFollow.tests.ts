@@ -155,7 +155,7 @@ test("Left on another floor than his, the spawn sinks after a short delay and re
   for (let frame = 1; frame < SPAWN_WALK.strandedFrames; frame++) {
     step(d, "none");
     stand(d.caster, middle, above.z, above.index);
-    assertEquals(spawn(d).mode, CompanionMode.follow, `still waiting at frame ${frame}`);
+    assertEquals(spawn(d).mode === CompanionMode.follow || spawn(d).mode === CompanionMode.throwing, true, `still waiting at frame ${frame}`);
   }
   step(d, "none");
   assertEquals(spawn(d).mode, CompanionMode.burrowed, "sinks once stranded");

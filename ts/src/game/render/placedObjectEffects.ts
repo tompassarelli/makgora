@@ -248,7 +248,10 @@ export class PlacedObjectEffects {
     let attackStart = -1;
     let pitch = 0.0;
     let speed = 1.0;
-    if (partner !== undefined && mode === CompanionMode.lunge) {
+    if (mode === CompanionMode.throwing) {
+      attackStart = placed.age - placed.modeFrame;
+      speed = 4.0;
+    } else if (partner !== undefined && mode === CompanionMode.lunge) {
       if (partner.behavior === "sentry") {
         for (const fire of partner.volleyFrames ?? []) {
           if (placed.modeFrame >= fire - 4 && placed.modeFrame < fire + 4) {
@@ -263,7 +266,7 @@ export class PlacedObjectEffects {
         if (placed.modeFrame <= partner.lungeStartup) pitch = f32(-0.25);
         else if (placed.modeFrame <= partner.lungeStartup + partner.lungeActive) pitch = partner.behavior === "flying" ? f32(0.7) : f32(0.15);
       }
-    } else if (mode === CompanionMode.follow && placed.spec?.aura !== true) {
+    } else if (mode === CompanionMode.follow && placed.spec?.aura !== true && placed.spec?.walks === undefined) {
       for (const fire of placed.spec?.fireAges ?? []) {
         if (placed.age >= fire && placed.age < fire + 8) {
           attackStart = fire;
