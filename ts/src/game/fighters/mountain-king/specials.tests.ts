@@ -490,3 +490,24 @@ test("The computer's Hammerfall dive from the top of Thunder Leap always comes d
   assertGreaterThan(picked, 20);
   assertGreaterThan(held, 0);
 });
+
+const FROZEN_THRONE = 2;
+const LATE_DIVE_X = 292.0;
+
+function guardedStick(stage: number, kingX: number): Controls {
+  const leap = startLeap(UP, FOE_AWAY, kingX);
+  leap.state.match.stageChoice = stage;
+  advance(leap, UP, () => REST, FIRE_STEP_FRAME);
+  const input = neutralControls();
+  input.direction = 1;
+  input.verticalDirection = -1;
+  holdAutoFollowUpOnDeck(leap.king, stage, leap.tick, input);
+  return input;
+}
+
+test("The computer's Hammerfall guard judges the dive from where the leap's last rising step leaves him: from x 292 on the Frozen Throne the down-right dive misses the deck and is held back, while from x 100 it lands and goes ahead [k1 scenario]", () => {
+  const late = guardedStick(FROZEN_THRONE, LATE_DIVE_X);
+  assertEquals([late.direction, late.verticalDirection].join(","), "0,1", "the dive off the edge is held in the leap's zone");
+  const near = guardedStick(FROZEN_THRONE, 100.0);
+  assertEquals([near.direction, near.verticalDirection].join(","), "1,-1", "the dive onto the deck stays");
+});

@@ -234,7 +234,10 @@ export function deckUnder(stage: number, matchFrame: number, x: number, z: numbe
 
 
 export function scriptedPathLands(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>, facing: number, stage: number, matchFrame: number): boolean {
-  let { x, z } = f.motion;
+  let x = f32(f.motion.x + f.motion.vx);
+  let z = f32(f.motion.z + f.motion.vz);
+  const pending = deckUnder(stage, matchFrame, x, f.motion.z);
+  if (pending !== undefined && z <= pending) return true;
   let elapsed = 0;
   for (const segment of move.motion ?? []) {
     for (let frame = segment.first; frame <= segment.last; frame++) {
