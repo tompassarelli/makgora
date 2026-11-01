@@ -65,8 +65,11 @@ export function padNetGame(script: string): NetGame {
   return { create: (link, slot, humans) => createNetStandalone(link, slot, humans, { script }) };
 }
 
-/** sha256 over every map source file, path and content in path order: two players with different sources get different hashes. */
+declare const PLAYER_COMMIT: string | undefined;
+
+/** sha256 over every map source file, path and content in path order, or over the commit a packaged player was built from: two players with different sources get different hashes. */
 export async function smashcraftMapHash(): Promise<string> {
+  if (typeof PLAYER_COMMIT === "string") return new Bun.CryptoHasher("sha256").update(PLAYER_COMMIT).digest("hex");
   const root = join(import.meta.dir, "../../src");
   const paths = [...new Bun.Glob("**/*").scanSync({ cwd: root })].sort();
   const hash = new Bun.CryptoHasher("sha256");
