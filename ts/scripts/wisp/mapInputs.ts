@@ -18,6 +18,7 @@ import * as impactModels from "../../src/game/assets/impactAssetInfo";
 import { IMPORTED_MUSIC } from "../../src/game/assets/importedMusicInfo";
 import { IMPORTED_VOICES } from "../../src/game/assets/importedVoiceInfo";
 import { IMPORTED_MODEL_FILES } from "../../src/game/assets/importedModelInfo";
+import { shippedLayerProblem } from "./modelLayerReferences";
 import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount, modelSoundLabel } from "../../src/generated/assets/modelSoundInfo";
 import * as shieldModels from "../../src/generated/assets/shieldAssetInfo";
 import * as ankhModels from "../../src/generated/assets/ankhAssetInfo";
@@ -337,6 +338,8 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
   const selected = editionImports(entries, edition);
   const problem = importProblem(selected);
   if (problem !== undefined) return yield* new MapBuildFailure({ operation: "check imports", path: assets, cause: problem });
+  const layers = shippedLayerProblem(selected.map(({ entry, source }) => ({ entry, bytes: () => readFileSync(source) })));
+  if (layers !== undefined) return yield* new MapBuildFailure({ operation: "check model layers", path: assets, cause: layers });
   return selected;
 });
 

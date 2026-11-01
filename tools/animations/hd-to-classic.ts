@@ -11,6 +11,7 @@ const lift = Number(option('--lift') ?? 0);
 const QUALITY = 85;
 const WEIGHT_FLOOR = 64;
 const MAX_BONES = 3;
+const NO_TEXTURE_ANIMATION = -1;
 
 function decodeDds(bytes: Uint8Array): Rgba {
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -78,7 +79,7 @@ for (const material of model.Materials) {
     const first = material.Layers[0]!;
     const filter = material.Layers.length > 0 && (first.FilterMode ?? 0) === 0 ? 0 : first.FilterMode ?? 0;
     delete material.Shader;
-    material.Layers = [{ FilterMode: filter, Shading: first.Shading ?? 0, TextureID: textureIndex(diffuseOf(material)), CoordId: 0, ...(first.Alpha !== undefined ? { Alpha: first.Alpha } : {}) }];
+    material.Layers = [{ FilterMode: filter, Shading: first.Shading ?? 0, TextureID: textureIndex(diffuseOf(material)), TVertexAnimId: NO_TEXTURE_ANIMATION, CoordId: 0, ...(first.Alpha !== undefined ? { Alpha: first.Alpha } : {}) }];
 }
 model.Textures = outputTextures;
 model.Version = 800;
