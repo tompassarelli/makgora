@@ -1,4 +1,4 @@
-import { chmodSync, closeSync, constants, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, rmSync, symlinkSync } from "node:fs";
+import { chmodSync, closeSync, constants, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
 import { Effect } from "effect";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
@@ -10,7 +10,7 @@ import { ASSET_FAMILIES, FETCH_HINT, type Family, INPUTS_STORE, type Manifest, t
 import { reforgedStorage } from "./renderAssetStore";
 import { STEP_TOOLS, type StepName, stepCode } from "./fighterArtCode";
 import { cachedSteps, sha256, stepKeys } from "./fighterArtPlan";
-import { withLock } from "./fileLock";
+import { tryLock } from "./fileLock";
 import { SHARED_SHARD, shardFiles } from "./inputShards";
 import { MODEL_FACTS_DIRECTORY, modelFactsFile, writeGenerated } from "./modelFactsTable";
 import { projectRoot } from "./project";
@@ -141,13 +141,39 @@ export interface FighterPlan { readonly fighter: Fighter; readonly keys: readonl
 
 const stepStored = (index: number, key: string) => existsSync(join(DERIVED_STORE, STEPS[index]!.name, key));
 
-const LOCK_HOLDER = "SMASHCRAFT_DERIVE_LOCK_HOLDER";
+const ancestors = (): ReadonlySet<number> => {
+  const pids = new Set<number>();
+  for (let pid = process.ppid; pid > 1 && !pids.has(pid);) {
+    pids.add(pid);
+    pid = Number(/^PPid:\s+(\d+)/m.exec(readFileSync(`/proc/${pid}/status`, "utf8"))?.[1] ?? 0);
+  }
+  return pids;
+};
 
-const withLocks = <A, E, R>(locks: readonly { readonly path: string; readonly waiting: string }[], effect: Effect.Effect<A, E, R>): Effect.Effect<A, E, R> =>
-  [...locks].sort((a, b) => a.path.localeCompare(b.path)).reduceRight<Effect.Effect<A, E, R>>((inner, lock) => withLock(lock.path, lock.waiting, inner), effect);
+const holder = (path: string) => Number(readFileSync(path, "utf8").trim() || 0);
+
+const holdLock = (lock: { readonly path: string; readonly waiting: string }, mine: ReadonlySet<number>) => Effect.acquireRelease(
+  Effect.gen(function*() {
+    let announced = false;
+    while (true) {
+      const fd = tryLock(lock.path);
+      if (fd !== undefined) return (writeFileSync(lock.path, `${process.pid}\n`), fd);
+      if (mine.has(holder(lock.path))) return undefined;
+      if (!announced) console.log(lock.waiting);
+      announced = true;
+      yield* Effect.sleep("250 millis");
+    }
+  }),
+  (fd) => Effect.sync(() => fd === undefined || closeSync(fd)),
+);
+
+const withLocks = <A, E, R>(locks: readonly { readonly path: string; readonly waiting: string }[], effect: Effect.Effect<A, E, R>) => Effect.scoped(Effect.gen(function*() {
+  const mine = ancestors();
+  for (const lock of [...locks].sort((a, b) => a.path.localeCompare(b.path))) yield* holdLock(lock, mine);
+  return yield* effect;
+}));
 
 export const withStepLocks = <A, E, R>(plans: readonly FighterPlan[], rebuild: boolean, use: (plans: readonly FighterPlan[]) => Effect.Effect<A, E, R>) => {
-  if (process.env[LOCK_HOLDER] !== undefined) return use(plans);
   const locks = plans.flatMap(({ fighter, keys, cached }) => keys.slice(cached).map((key, offset) => {
     const step = STEPS[cached + offset]!.name;
     return { path: join(DERIVED_STORE, ".locks", `${step}-${key}`), waiting: `waiting for another derive running ${fighter.name} ${step} (input hash ${key.slice(0, 12)})` };
@@ -156,7 +182,6 @@ export const withStepLocks = <A, E, R>(plans: readonly FighterPlan[], rebuild: b
     const fresh = plans.map((plan) => ({ ...plan, cached: cachedSteps(plan.keys, stepStored, rebuild) }));
     for (const [index, plan] of fresh.entries()) for (let step = plans[index]!.cached; step < plan.cached; step++)
       console.log(`${plan.fighter.name} ${STEPS[step]!.name}: cache hit on input hash ${plan.keys[step]!.slice(0, 12)}, stored by another derive`);
-    process.env[LOCK_HOLDER] = String(process.pid);
     return use(fresh);
   }));
 };
