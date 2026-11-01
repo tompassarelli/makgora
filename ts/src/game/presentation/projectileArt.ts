@@ -16,6 +16,7 @@ import { FLAME_STRIKE_BURST } from "../fighters/kaelthas/specials";
 import { PILLAR_COLUMN_STRETCH, FINGER_COLUMN_WIDTH } from "../fighters/archimonde/specials";
 import { ELUNE_SHIMMER } from "../fighters/tyrande/specials";
 import { HOOK_MODEL } from "../fighters/butcher/specials";
+import { DIRE_WOLF_MODEL, SPIRIT_WOLF_MODEL, TIMBER_WOLF_MODEL } from "../fighters/thrall/wolves";
 import { SPECIAL_SLOTS, type SpecialSlot } from "./slotCues";
 import type { Fuse } from "./discLook";
 
@@ -132,7 +133,13 @@ export function allProjectileModels(): readonly string[] {
   return models;
 }
 
-export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale: number; readonly birth?: CueBirth | undefined; readonly color?: readonly [number, number, number] | undefined } | undefined } = {
+// The stock wolves' Walk sequence covers 260 units a second at scale 1 (its MDX move speed).
+export const STOCK_WOLF_STRIDE = 260.0;
+
+export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale: number; readonly birth?: CueBirth | undefined; readonly color?: readonly [number, number, number] | undefined; readonly alpha?: number | undefined; readonly stride?: number | undefined } | undefined } = {
+  [SPIRIT_WOLF_MODEL]: { scale: f32(0.62), color: [255, 255, 235], alpha: 150, stride: STOCK_WOLF_STRIDE },
+  [TIMBER_WOLF_MODEL]: { scale: f32(0.62), stride: STOCK_WOLF_STRIDE },
+  [DIRE_WOLF_MODEL]: { scale: f32(0.7), stride: STOCK_WOLF_STRIDE },
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { scale: f32(0.16) },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { scale: f32(1.2) },
   "Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx": { scale: 1.5 },

@@ -27,6 +27,7 @@ import { hookLatchesLedge } from "./specials/ledgeTether";
 import { SHIELD_PROJECTILE_DAMAGE_MULTIPLIER, SHIELD_PROJECTILE_SPEED_MULTIPLIER, grantParry, shieldCircleIntersects } from "./shield";
 import { at } from "wisp/src/runtime/lookup";
 import { creditSpawnHit } from "./specials/spawnSplit";
+import { finishRunnerStep, startRunnerStep } from "./projectileRun";
 import { solidSurfaceAt, solidSurfaceCount, surfaceCount, surfaceLeft, surfaceLine, surfacePass, surfaceRight, surfaceZ } from "./stage";
 
 export const BLASTER_PROJECTILE_SPEED = 36.0;
@@ -350,8 +351,10 @@ function homeProjectile(world: Roster, ownerSlot: number, projectile: Projectile
 
 const heroFlight = emptyCapsule();
 const heroTarget = emptyCapsule();
-function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Projectile, hit: { reflector: boolean; shield: boolean }): number | undefined {
+function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Projectile, hit: { reflector: boolean; shield: boolean }, stage: number | undefined, matchFrame: number): number | undefined {
   const spec = projectile.spec;
+  const runs = spec?.runs !== undefined && stage !== undefined;
+  const standing = runs && spec !== undefined && stage !== undefined && startRunnerStep(projectile, spec, stage, matchFrame);
 
   if (spec?.returns !== undefined && projectile.damageMultiplier === 1.0 && spec.life - projectile.life >= spec.returns.age && !returnToOwner(fighterAt(world, ownerSlot), projectile, spec.returns.speed)) return undefined;
   if (steerBounce(world, ownerSlot, projectile)) return undefined;
@@ -361,6 +364,7 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
   if (spec?.gravity !== undefined) projectile.velocityZ = f32(projectile.velocityZ - spec.gravity);
   projectile.x = f32(oldX + projectile.velocityX);
   projectile.z = f32(oldZ + projectile.velocityZ);
+  if (runs && spec !== undefined && stage !== undefined) finishRunnerStep(projectile, spec, stage, matchFrame, oldZ, standing);
   projectile.life--;
   if (projectile.poolWait > 0) {
     projectile.poolWait--;
@@ -489,12 +493,12 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
       selected.shield = false;
       const fromX = projectile.x;
       const fromZ = projectile.z;
-      const nearest = projectile.kind === ProjectileKind.hero ? flyHeroProjectile(world, ownerSlot, projectile, selected) : flyProjectile(world, ownerSlot, projectile, selected);
+      const nearest = projectile.kind === ProjectileKind.hero ? flyHeroProjectile(world, ownerSlot, projectile, selected, stage, matchFrame) : flyProjectile(world, ownerSlot, projectile, selected);
       if (nearest === undefined && stage !== undefined && hookLatchesLedge(world, ownerSlot, projectile, fromX, fromZ, stage)) {
         projectile.life = 0;
         continue;
       }
-      if (nearest === undefined && stage !== undefined && (projectile.kind === ProjectileKind.hero)
+      if (nearest === undefined && stage !== undefined && projectile.kind === ProjectileKind.hero && projectile.spec?.runs === undefined
         && projectileMeetsStage(stage, matchFrame, fromX, fromZ, projectile.x, projectile.z)) {
         const burst = projectile.spec?.burstsOnStage === true ? projectile.spec.burstInto : undefined;
         projectile.life = burst?.life ?? 0;
@@ -509,6 +513,7 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
       }
       const pool = projectile.kind === ProjectileKind.hero ? projectile.spec?.pool : undefined;
       const burn = projectile.kind === ProjectileKind.hero ? projectile.spec?.burn : undefined;
+      const bites = projectile.kind === ProjectileKind.hero ? projectile.spec?.bites : undefined;
       if (nearest !== undefined && pool !== undefined) {
 
         applyProjectileHit(world, ownerSlot, nearest, projectile, selected.shield);
@@ -517,6 +522,12 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
       } else if (nearest !== undefined && burn !== undefined) {
         applyProjectileHit(world, ownerSlot, nearest, projectile, selected.shield);
         projectile.poolWait = burn.every - 1;
+      } else if (nearest !== undefined && bites !== undefined) {
+        applyProjectileHit(world, ownerSlot, nearest, projectile, selected.shield);
+        projectile.poolHits++;
+        projectile.poolWait = bites.every;
+        projectile.velocityX = 0.0;
+        if (projectile.poolHits >= bites.count) projectile.life = min(projectile.life, bites.every);
       } else if (nearest !== undefined) {
         if (latchesOn(world, ownerSlot, nearest, projectile, selected.shield)) {
           projectile.life = 0;

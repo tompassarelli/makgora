@@ -90,6 +90,7 @@ export class ProjectilePresentation {
   private readonly specs: (Fighter["projectiles"][number]["spec"])[] = [];
   private readonly lives: number[] = [];
   private readonly reseek: boolean[] = [];
+  private readonly gaitSequences: (string | undefined)[] = [];
   private readonly birthLife: number[] = [];
   private readonly lingering: number[] = [];
   private readonly risen: (Risen | undefined)[] = [];
@@ -300,6 +301,14 @@ export class ProjectilePresentation {
     this.lineShown[index] = false;
   }
 
+  private presentGait(slot: number, model: Effect, pose: Readonly<ReturnType<typeof projectedProjectile>>, scale: number, stride: number | undefined, paused: boolean): void {
+    if (this.gaitSequences[slot] !== pose.animationSequence && pose.animationSequence !== undefined) {
+      setEffectAnimation(model, pose.animationSequence);
+      this.gaitSequences[slot] = pose.animationSequence;
+    }
+    if (pose.gait !== undefined && stride !== undefined) setEffectTimeScale(model, paused ? 0.0 : f32(pose.gait / f32(stride * scale)));
+  }
+
   present(fighter: Readonly<Fighter> | undefined, playing: boolean, paused: boolean): void {
     this.presentAimedShot(fighter, playing);
     this.eyeBeam.present(fighter, playing);
@@ -343,6 +352,7 @@ export class ProjectilePresentation {
         }
         this.serials[slot] = projectile.serial;
         this.specs[slot] = projectile.spec;
+        this.gaitSequences[slot] = pose.animationSequence;
       } else if (this.reseek[slot] === true && !paused && projectile !== undefined && projectile.life < (this.birthLife[slot] ?? projectile.life)) {
         // Warcraft discards an animation seek in the callback selecting its sequence (#58 native rulers).
         const elapsed = f32(((this.birthLife[slot] ?? projectile.life) - projectile.life) / 60.0);
@@ -356,8 +366,9 @@ export class ProjectilePresentation {
       setEffectScale(model, pose.modelScale * (cue?.scale ?? 1.0));
       tintProjectile(model, cue);
       if (draw?.width !== undefined || draw?.height !== undefined) setEffectMatrixScale(model, draw.width ?? 1.0, 1.0, draw.height ?? 1.0);
-      setEffectAlpha(model, 255);
+      setEffectAlpha(model, cue?.alpha ?? 255);
       setEffectTimeScale(model, paused ? 0.0 : 1.0);
+      if (projectile?.spec?.runs !== undefined) this.presentGait(slot, model, pose, pose.modelScale * (cue?.scale ?? 1.0), cue?.stride, paused);
       if (draw?.seconds !== undefined) {
         setEffectTime(model, draw.seconds);
         setEffectTimeScale(model, 0.0);

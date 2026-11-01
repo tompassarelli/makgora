@@ -38,7 +38,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.pitLord]: "aerial Rain of Fire; lands into the grounded cast",
   [Character.beastmaster]: "downward quill volley; commands a deployed Quilbeast",
   [Character.lichKing]: "Harvest Soul channel while falling, a hold move (a tap ends it); raises the Ghoul at a full meter",
-  [Character.thrall]: "falling two-sided Doomhammer Slam",
+  [Character.thrall]: "Feral Spirit: the wolf pounces ahead, falls and runs on along the floor",
   [Character.jaina]: "downward water bolt; recall works while falling",
   [Character.sylvanas]: "Life Drain grab while falling",
   [Character.cairne]: "War Stomp: Endurance armor while falling, two-sided stomp, 26 landing frames",

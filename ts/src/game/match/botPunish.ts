@@ -28,6 +28,8 @@ import { gameplanOf } from "./botGameplan";
 import { aheadX, aheadZ, moveReachAhead, moveReaches } from "./botMoves";
 import { botChance } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
+import type { BotStrategy } from "./botStrategy";
+import { pressMotionPunish } from "./botMotionCast";
 
 
 export const PunishKind = { none: 0, endLag: 1, grab: 2, special: 3, landing: 4, shieldDrop: 5, dodge: 6, status: 7, knockdown: 8, ledge: 9 } as const;
@@ -228,7 +230,7 @@ function swing(f: Readonly<Fighter>, style: AttackStyle, moves: Fighter["tuning"
   return characterAttackActiveFrames(f.character, style, moves);
 }
 
-export function choosePunish(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, matchFrame: number, frame: number, skill: CpuSkill, input: Controls, commands: AttackBuffer, observationAge = 0, burned?: AttackStyle): boolean {
+export function choosePunish(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, matchFrame: number, frame: number, skill: CpuSkill, input: Controls, commands: AttackBuffer, observationAge = 0, burned?: AttackStyle, strategy?: BotStrategy): boolean {
   if (skill.punishTenths <= 0 || !f.motion.grounded) return false;
   const shielding = f.shield.raised;
   if (shielding ? !canShieldGrab(f) : !canAttack(f)) return false;
@@ -281,6 +283,7 @@ export function choosePunish(f: Readonly<Fighter>, target: Readonly<Fighter>, st
     }
     return true;
   }
+  if (strategy !== undefined && !shielding && pressMotionPunish(strategy, f, target, believed, frame, input)) return true;
   if (!runFits || !safeAt(stage, f32(f.motion.x + dx), 0.0)) return false;
   input.walking = false;
   input.direction = toward;

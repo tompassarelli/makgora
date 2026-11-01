@@ -3,6 +3,7 @@ import { callVariant } from "../duoPartner";
 import type { Fighter } from "../fighter";
 import type { Roster } from "../roster";
 import type { AuthoredSpecial } from "./schema";
+import { motionVariant } from "../stickHistory";
 
 export function readyEmpowered(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number): void {
   const empowers = move.empowers;
@@ -26,6 +27,8 @@ export function castVariant(world: Roster | undefined, f: Readonly<Fighter>, mov
   const paired = move.pairedVariant;
   const called = callVariant(world, f, move);
   if (called !== undefined) return called;
+  const moved = motionVariant(f, move);
+  if (moved !== undefined) return moved;
   return paired !== undefined && world !== undefined && pairedWithin(world, f, paired.within, paired.heldWithin) ? paired.variant : empoweredVariant(f, move);
 }
 

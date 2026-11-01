@@ -26,6 +26,7 @@ import type { FighterGameplan, GameplanMove } from "../sim/gameplan";
 import { type CpuSkill, FULL_SKILL } from "./cpuSkill";
 import { type AttackDecision, familiarOption, moveValueMultiplier } from "./botMoveValue";
 import type { BotStrategy } from "./botStrategy";
+import { pressMotionCast } from "./botMotionCast";
 
 const GROUND_MOVES = [
   AttackStyle.jab, AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown, AttackStyle.upTilt,
@@ -299,11 +300,12 @@ export function smashChargeGoal(f: Readonly<Fighter>): number {
   return choice === 0 ? 0 : choice === 1 ? 10 : choice === 2 ? 25 : 45;
 }
 
-function perform(f: Readonly<Fighter>, target: Readonly<Fighter>, option: number, frame: number, input: Controls, commands: AttackBuffer, observationAge: number, stage: number, matchFrame: number): void {
+function perform(f: Readonly<Fighter>, target: Readonly<Fighter>, option: number, frame: number, input: Controls, commands: AttackBuffer, observationAge: number, stage: number, matchFrame: number, strategy?: BotStrategy): void {
   const dx = aheadX(f, target, 0, undefined, observationAge, stage, matchFrame);
   const facing = f.facing < 0 ? -1 : 1;
   const toward = dx === 0 ? facing : dx > 0 ? 1 : -1;
   if (option >= NEUTRAL_SPECIAL) {
+    if (strategy !== undefined && pressMotionCast(strategy, f, target, at(HERO_SLOTS, option - NEUTRAL_SPECIAL), frame, observationAge, input)) return;
     input.specialPressed = true;
     input.specialX = option === SIDE_SPECIAL ? toward : 0;
     input.specialZ = option === UP_SPECIAL ? 1 : option === DOWN_SPECIAL ? -1 : 0;
@@ -457,7 +459,7 @@ export function chooseAttack(f: Readonly<Fighter>, target: Readonly<Fighter>, st
 
   if (skill.basicMoves === undefined && canAttack(f) && gap <= MISPLAY_GAP && botChance(frame, f.attack.serial * 11 + f.character + 5, skill.misplay, 100)) {
     const moves = f.motion.grounded ? GROUND_MOVES : AERIALS;
-    perform(f, target, at(moves, botChoice(frame, f.attack.serial * 3 + f.character, moves.length)), frame, input, commands, observationAge, stage, matchFrame);
+    perform(f, target, at(moves, botChoice(frame, f.attack.serial * 3 + f.character, moves.length)), frame, input, commands, observationAge, stage, matchFrame, decision?.strategy);
     return true;
   }
   if (canAttack(f)) count = addCloseSpecials(f, target, stage, count, observationAge);
@@ -488,6 +490,6 @@ export function chooseAttack(f: Readonly<Fighter>, target: Readonly<Fighter>, st
     decision.strategy.lastOption = option;
     rememberStart(decision.strategy, option, frame);
   }
-  perform(f, target, option, frame, input, commands, observationAge, stage, matchFrame);
+  perform(f, target, option, frame, input, commands, observationAge, stage, matchFrame, decision?.strategy);
   return true;
 }

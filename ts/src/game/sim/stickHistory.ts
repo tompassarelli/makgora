@@ -1,6 +1,6 @@
 import { idiv, imod } from "wisp/src/sim/intMath";
 import type { Fighter } from "./fighter";
-import type { FighterSpecials, SpecialKit } from "./specials/schema";
+import type { AuthoredSpecial, FighterSpecials, SpecialKit } from "./specials/schema";
 import { OLDEST_WEIGHT, type StickMotion, motionCompleted, zoneCode } from "./stickMotion";
 
 export function recordStick(f: Fighter, sectorX: number, sectorZ: number): void {
@@ -13,7 +13,14 @@ export function stickMoved(f: Readonly<Fighter>, motion: Readonly<StickMotion>):
   return motionCompleted(f.stick.recent, f.stick.older, f.facing < 0 ? -1 : 1, motion);
 }
 
-const kitReadsMotion = (kit: Readonly<SpecialKit>): boolean => kit.selectedByMotion !== undefined || kit.ground.aimByMotion !== undefined || kit.air?.aimByMotion !== undefined;
+const moveReadsMotion = (move: Readonly<AuthoredSpecial> | undefined): boolean => move?.aimByMotion !== undefined || move?.variantByMotion !== undefined;
+
+const kitReadsMotion = (kit: Readonly<SpecialKit>): boolean => kit.selectedByMotion !== undefined || moveReadsMotion(kit.ground) || moveReadsMotion(kit.air);
+
+export function motionVariant(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>): number | undefined {
+  for (const pick of move.variantByMotion ?? []) if (stickMoved(f, pick.motion)) return pick.variant;
+  return undefined;
+}
 
 export function readsStickMotion(specials: Readonly<FighterSpecials>): boolean {
   return kitReadsMotion(specials.neutral) || kitReadsMotion(specials.side) || kitReadsMotion(specials.up) || kitReadsMotion(specials.down);

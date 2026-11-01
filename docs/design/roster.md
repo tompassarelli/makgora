@@ -2111,7 +2111,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Pit Lord | Wide cleaver swings and armoured charge move | Third-contact cleave bonus |
 | Beastmaster | Commanded bear, Quilbeast and hawk positions | Timed Pack Hunt bonus |
 | Lich King | Frostmourne reach, Death Grip, the Howling Gale windbreak and the Harvest Soul channel | Souls banked from ordinary hits and soul forms (a channelled, visible soul meter returned 1 Nov) |
-| Thrall | Mounted hammer reach, lightning and wolves | Counted Windfury |
+| Thrall | Hammer reach, lightning, three motion-picked Feral Spirit wolves and a Ghost Wolf dash | Counted Windfury |
 | Jaina | Staff strikes, Blizzard placement and Water Elemental | Faster hidden meter regeneration |
 | Sylvanas | Bow-and-dagger actions, Silence and chosen escape | Banked Black Quiver damage |
 | Cairne | Large visible body, halberd swings and guard read | Timed Endurance speed and stock heal bank |

@@ -41,7 +41,7 @@ export function startableForm(f: Readonly<Fighter>, specials: Readonly<FighterSp
 }
 
 
-function projectileMeets(spec: Readonly<SpecialProjectile>, target: Readonly<Fighter>, localX: number, localZ: number, facing: number): boolean {
+export function projectileMeets(spec: Readonly<SpecialProjectile>, target: Readonly<Fighter>, localX: number, localZ: number, facing: number): boolean {
   const body = hurtCapsule(target.character);
   const reach = f32(spec.radius + body.radius);
   const speed = Math.abs(spec.velocityX);
@@ -192,7 +192,7 @@ export function confirmOnly(f: Readonly<Fighter>, slot: SpecialSlot): boolean {
 }
 
 
-function recovering(t: Readonly<Fighter>): boolean {
+export function recovering(t: Readonly<Fighter>): boolean {
   if (t.status.out || t.shield.raised || t.launch.hitstun > 0 || t.launch.hitlag > 0) return false;
   if (heroStatusBlocksActions(t) || t.landing.lag > 0 || t.special.lockFrames > 0 || t.shield.releaseLag > 0) return true;
   const { style } = t.attack;

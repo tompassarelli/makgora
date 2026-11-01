@@ -48,6 +48,7 @@ import { QUICKDRAW_DRAW_CUES, QUICKDRAW_STANCE_CUES } from "./quickdrawCues";
 import { SHADOW_STEP_CUES } from "./shadowStepCues";
 import { SHURIKEN_CHARGE_CUES } from "./shurikenCues";
 import { slotCues } from "./slotCues";
+import { ghostWolfCueState } from "./ghostWolfCues";
 import { BANISH_SWIRL_MODEL } from "../fighters/kaelthas/look";
 import { WYRM_RIDE, WYRM_SUMMON_FRAMES } from "../fighters/lich-king/specials";
 import { RISING_THUNDER_CUES } from "../fighters/thrall/cues";
@@ -293,9 +294,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.thrall]: {
     neutral: { spell: "Chain Lightning", startup: STORM, active: cue("Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx", "hand", 0.5) },
-    side: { spell: "Feral Spirit", startup: BEAST, active: cue("units\\orc\\SpiritWolf\\SpiritWolf.mdx", "ahead", 0.5) },
+    side: { spell: "Ghost Wolf", startup: BEAST, active: BEAST },
     up: RISING_THUNDER_CUES,
-    down: { spell: "Doomhammer Slam", startup: STORM, active: cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.8)) },
+    down: { spell: "Feral Spirit", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdx", "ahead", f32(0.6)) },
   },
   [Character.sylvanas]: {
     neutral: { spell: "Black Arrow", startup: { ...SHADOW, scale: f32(0.25), scaleEnd: f32(0.45), scaleFrames: BLACK_ARROW_SHOT - 1, anchorFrames: Array.from({ length: BLACK_ARROW_FRAMES }, () => ({ x: 44.0, z: 60.0 })) }, active: { ...cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.18)), anchorFrames: Array.from({ length: BLACK_ARROW_FRAMES }, () => ({ x: 44.0, z: 60.0 })) } },
@@ -596,6 +597,7 @@ function characterCueState(fighter: Readonly<Fighter>, action: number, frame: nu
     return frame <= PHOENIX_STARTUP_FRAMES ? { cues: KAEL_PHOENIX_CHARGE, phase: "startup" } : NONE;
   }
   if (fighter.character === Character.sylvanas && action === SpecialAction.heroUltimate) return sylvanasCueState(fighter, frame);
+  if (fighter.character === Character.thrall && action === SpecialAction.heroSide) return ghostWolfCueState(frame);
   return undefined;
 }
 

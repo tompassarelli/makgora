@@ -111,7 +111,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.thrall]: {
     weapon: Weapon.hammer, strong: "LightningBolt",
-    specials: [s("HeroFarSeerAttack1", "LightningBolt"), s("FeralSpiritTarget", "MetalMediumChopFlesh"), s("ThunderClap", "LightningBolt"), s("RockHeavyBashFlesh", "MetalHeavyBashFlesh")],
+    specials: [s("HeroFarSeerAttack1", "LightningBolt"), s("FeralSpiritTarget", "MetalMediumChopFlesh"), s("ThunderClap", "LightningBolt"), s("FeralSpiritTarget", "MetalMediumChopFlesh")],
   },
   [Character.jaina]: {
     weapon: Weapon.blunt, strong: "FrostBoltHit",

@@ -78,6 +78,11 @@ export interface BotStrategy {
   burnCount: number;
   burnGap: number;
   blockFrame: number;
+  motionSlot: number;
+  motionVariant: number;
+  motionStep: number;
+  motionSide: number;
+  motionFrame: number;
 
   readonly recentOptions: number[];
 }
@@ -87,10 +92,10 @@ const NO_HABITS: readonly number[] = [];
 const noRecentOptions = (): number[] => Array.from({ length: 2 * VARIETY_STARTS }, () => -1);
 
 export function createBotStrategy(): BotStrategy {
-  return { history: NO_HABITS, observedFrame: -1, opponent: -1, lastChoice: HabitChoice.none, lastContext: 0, lastSerial: -1, events: 0, readActive: false, readChoice: HabitChoice.none, readContext: 0, readExpectedFrame: 0, readExpires: 0, readConfidence: 0, readActed: false, readActionFrame: -1, readActionSerial: -1, readActionStyle: -1, readActionFacing: 0, lastOption: -1, burnHurt: false, burnStyle: -1, burnCharacter: -1, burnFrame: -1, burnCount: 0, burnGap: 0, blockFrame: -1, recentOptions: noRecentOptions() };
+  return { history: NO_HABITS, observedFrame: -1, opponent: -1, lastChoice: HabitChoice.none, lastContext: 0, lastSerial: -1, events: 0, readActive: false, readChoice: HabitChoice.none, readContext: 0, readExpectedFrame: 0, readExpires: 0, readConfidence: 0, readActed: false, readActionFrame: -1, readActionSerial: -1, readActionStyle: -1, readActionFacing: 0, lastOption: -1, burnHurt: false, burnStyle: -1, burnCharacter: -1, burnFrame: -1, burnCount: 0, burnGap: 0, blockFrame: -1, motionSlot: -1, motionVariant: 0, motionStep: 0, motionSide: 0, motionFrame: -1, recentOptions: noRecentOptions() };
 }
 
-export type SavedBotStrategy = Pick<BotStrategy, "observedFrame" | "opponent" | "lastChoice" | "lastContext" | "lastSerial" | "events" | "lastOption" | "recentOptions" | "burnHurt" | "burnStyle" | "burnCharacter" | "burnFrame" | "burnCount" | "burnGap" | "blockFrame"> & {
+export type SavedBotStrategy = Pick<BotStrategy, "observedFrame" | "opponent" | "lastChoice" | "lastContext" | "lastSerial" | "events" | "lastOption" | "recentOptions" | "burnHurt" | "burnStyle" | "burnCharacter" | "burnFrame" | "burnCount" | "burnGap" | "blockFrame" | "motionSlot" | "motionVariant" | "motionStep" | "motionSide" | "motionFrame"> & {
   readonly history: readonly SavedBotHabit[];
   readonly read: SavedBotRead | undefined;
 };
@@ -113,7 +118,7 @@ export function savedBotStrategy(state: Readonly<BotStrategy>): SavedBotStrategy
     actionStyle: state.readActionStyle,
     actionFacing: state.readActionFacing,
   } : undefined;
-  return { history, observedFrame: state.observedFrame, opponent: state.opponent, lastChoice: state.lastChoice, lastContext: state.lastContext, lastSerial: state.lastSerial, events: state.events, read, lastOption: state.lastOption, burnHurt: state.burnHurt, burnStyle: state.burnStyle, burnCharacter: state.burnCharacter, burnFrame: state.burnFrame, burnCount: state.burnCount, burnGap: state.burnGap, blockFrame: state.blockFrame, recentOptions: [...state.recentOptions] };
+  return { history, observedFrame: state.observedFrame, opponent: state.opponent, lastChoice: state.lastChoice, lastContext: state.lastContext, lastSerial: state.lastSerial, events: state.events, read, lastOption: state.lastOption, burnHurt: state.burnHurt, burnStyle: state.burnStyle, burnCharacter: state.burnCharacter, burnFrame: state.burnFrame, burnCount: state.burnCount, burnGap: state.burnGap, blockFrame: state.blockFrame, motionSlot: state.motionSlot, motionVariant: state.motionVariant, motionStep: state.motionStep, motionSide: state.motionSide, motionFrame: state.motionFrame, recentOptions: [...state.recentOptions] };
 }
 
 export function restoredBotStrategy(saved: Readonly<SavedBotStrategy>): BotStrategy {
@@ -135,6 +140,11 @@ export function restoredBotStrategy(saved: Readonly<SavedBotStrategy>): BotStrat
   state.burnCount = saved.burnCount;
   state.burnGap = saved.burnGap;
   state.blockFrame = saved.blockFrame;
+  state.motionSlot = saved.motionSlot;
+  state.motionVariant = saved.motionVariant;
+  state.motionStep = saved.motionStep;
+  state.motionSide = saved.motionSide;
+  state.motionFrame = saved.motionFrame;
   for (let index = 0; index < state.recentOptions.length; index++) state.recentOptions[index] = at(saved.recentOptions, index);
   if (saved.read !== undefined) {
     state.readActive = true;
@@ -168,6 +178,11 @@ export function copyBotStrategy(target: BotStrategy, source: Readonly<BotStrateg
   target.burnCount = source.burnCount;
   target.burnGap = source.burnGap;
   target.blockFrame = source.blockFrame;
+  target.motionSlot = source.motionSlot;
+  target.motionVariant = source.motionVariant;
+  target.motionStep = source.motionStep;
+  target.motionSide = source.motionSide;
+  target.motionFrame = source.motionFrame;
   const recent = source.recentOptions;
   const into = target.recentOptions;
   for (let index = 0; index < recent.length; index++) into[index] = recent[index] ?? 0;
@@ -195,6 +210,7 @@ export function sameBotStrategy(a: Readonly<BotStrategy>, b: Readonly<BotStrateg
   return sameHistory(a.history, b.history) && a.observedFrame === b.observedFrame && a.opponent === b.opponent && a.lastChoice === b.lastChoice
     && a.lastContext === b.lastContext && a.lastSerial === b.lastSerial && a.events === b.events && a.lastOption === b.lastOption
     && a.burnHurt === b.burnHurt && a.burnStyle === b.burnStyle && a.burnCharacter === b.burnCharacter && a.burnFrame === b.burnFrame && a.burnCount === b.burnCount && a.burnGap === b.burnGap && a.blockFrame === b.blockFrame
+    && a.motionSlot === b.motionSlot && a.motionVariant === b.motionVariant && a.motionStep === b.motionStep && a.motionSide === b.motionSide && a.motionFrame === b.motionFrame
     && a.readActive === b.readActive && a.readChoice === b.readChoice && a.readContext === b.readContext && a.readExpectedFrame === b.readExpectedFrame
     && a.readExpires === b.readExpires && a.readConfidence === b.readConfidence && a.readActed === b.readActed && a.readActionFrame === b.readActionFrame
     && a.readActionSerial === b.readActionSerial && a.readActionStyle === b.readActionStyle && a.readActionFacing === b.readActionFacing;
@@ -211,6 +227,7 @@ export function botStrategyValues(state: Readonly<BotStrategy>): number[] {
     state.readActive ? state.readActionFrame : -1, state.readActive ? state.readActionSerial : -1, state.readActive ? state.readActionStyle : -1, state.readActive ? state.readActionFacing : 0, floorDiv(state.history.length, HABIT_FIELDS)];
   for (const value of state.recentOptions) values.push(value);
   for (const value of state.history) values.push(value);
+  if (state.motionSlot >= 0) values.push(state.motionSlot, state.motionVariant, state.motionStep, state.motionSide, state.motionFrame);
   return values;
 }
 

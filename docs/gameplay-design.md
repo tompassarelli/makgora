@@ -1098,6 +1098,7 @@ One rule for every fighter's four specials
 | Beastmaster | up in the air: Summon Hawk's lift (recovery; the ground form summons and stops) |
 | Lich King, Thrall, Jaina, Sylvanas, Chen, Peon, Kael'thas | up: their recovery (Frost Wyrm, Rising Thunder, Blink, Banshee Flight, Storm Rise, Worksite Launch, Phoenix) |
 | Cairne | side: Bloodhoof Gore (rush); up: Spirit Lift (recovery) |
+| Thrall | side: Ghost Wolf (rush and sideways recovery) |
 | Tinker | up: Rocket Boots (recovery); side in the air: the Laser stops him dead in the air too, Tom's per-move decision of 19 Oct |
 | Mrgl & Grgl | side: Belly Slide (rush); up: Tidal Surf (recovery) |
 | Grom | side: Gorehowl Rush (rush); up: Blood Leap (recovery) |

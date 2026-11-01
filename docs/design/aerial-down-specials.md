@@ -29,7 +29,7 @@ cancelling.
 | Pit Lord | aerial Rain of Fire; lands into the grounded cast | S1 W25 L31/E31 | S1 W25 L15/E60 | S1 W25 L3/E60 | S1 W25 L—/E60 |
 | Rexxar | downward quill volley; commands a deployed Quilbeast | S1 W18 L27/E27 | S1 W18 L15/E32 | S1 W18 L3/E32 | S1 W18 L—/E32 |
 | Lich King | Harvest Soul channel while falling, a hold move (a tap ends it); raises the Ghoul at a full meter | S1 W— L27/E15 | S1 W— L15/E15 | S1 W— L3/E3 | S1 W— L—/E15 |
-| Thrall | falling two-sided Doomhammer Slam | S1 W18 L27/E27 | S1 W18 L15/E50 | S1 W18 L3/E50 | S1 W18 L—/E50 |
+| Thrall | Feral Spirit: the wolf pounces ahead, falls and runs on along the floor | S1 W18 L27/E27 | S1 W18 L15/E44 | S1 W18 L3/E44 | S1 W18 L—/E44 |
 | Jaina Proudmoore | downward water bolt; recall works while falling | S1 W27 L27/E52 | S1 W27 L15/E52 | S1 W27 L3/E52 | S1 W27 L—/E52 |
 | Sylvanas Windrunner | Life Drain grab while falling | S1 W16 L27/E52 | S1 W16 L15/E52 | S1 W16 L3/E52 | S1 W16 L—/E52 |
 | Cairne Bloodhoof | War Stomp: Endurance armor while falling, two-sided stomp, 26 landing frames | S1 W1 L31/E31 | S1 W1 L15/E15 | S1 W1 L3/E3 | S1 W1 L—/E62 |

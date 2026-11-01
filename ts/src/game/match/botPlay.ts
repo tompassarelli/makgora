@@ -26,6 +26,7 @@ import { chooseDefense } from "./botDefense";
 import { burnedMove, keepClearOfBurn, punishBlockedBurn } from "./botBurn";
 import { choosePunish } from "./botPunish";
 import { chooseLedgeTrap } from "./botLedgeTrap";
+import { continueMotionCast } from "./botMotionCast";
 import { chooseRecoveryInput } from "./botRecovery";
 import { guardOffstage, waitAtLip } from "./botEdgeGuard";
 import { escapeCorner, pokeGoal, pressCorner, pressEdgeCancel, steerEdgeCancel } from "./botCorner";
@@ -396,6 +397,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
     input.mashPressed = floorMod(frame, skill.grabMashFrames) === 0;
     return;
   }
+  if (continueMotionCast(runtime.botStrategies[slot], fighter, frame, input)) return;
   if (skill.basicMoves === undefined && target !== undefined && pressDuoCall(world, fighter, target, stage, skill, frame, input, commands)) return;
   if (skill.basicMoves === undefined && target !== undefined && (steerHeroBranches(fighter, target, skill, input) || pressHeroFollowUp(fighter, target, stage, stageFrame, input))) return;
   if (skill.basicMoves === undefined && target !== undefined && !game.training && guardOffstage(fighter, target, stage, skill, slot, frame, observationAge, input, commands)) return;
@@ -411,7 +413,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
   if (skill.basicMoves === undefined && punishBlockedBurn(runtime.botStrategies[slot], burned, fighter, target, frame, input, commands)) return;
   if (chooseDefense(fighter, target, stage, input, skill, observationAge)) return;
   // An opponent that can't act yet is punished before any pause or idle stretch.
-  if (skill.basicMoves === undefined && choosePunish(fighter, target, stage, stageFrame, frame, skill, input, commands, observationAge, burned)) {
+  if (skill.basicMoves === undefined && choosePunish(fighter, target, stage, stageFrame, frame, skill, input, commands, observationAge, burned, runtime.botStrategies[slot])) {
 
     runtime.botAttackDelays[slot] = f32(f32(skill.attackPause + botChoice(frame, fighter.attack.serial, skill.attackSpread)) * TICK);
     return;

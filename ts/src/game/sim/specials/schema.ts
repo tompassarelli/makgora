@@ -116,6 +116,11 @@ export interface MotionAim {
   readonly aimZ: number;
 }
 
+export interface MotionVariant {
+  readonly motion: StickMotion;
+  readonly variant: number;
+}
+
 export interface AimByMotion {
   readonly motions: readonly MotionAim[];
   readonly otherwise: { readonly aimX: number; readonly aimZ: number };
@@ -207,6 +212,13 @@ export interface SpecialProjectile {
   /** Leaves `reach` out along its move's eight-way aim from `offsetZ` above its owner's feet and flies `speed` that way, straight ahead with no aim. It is part of the move's body: it skips the hero projectile cap and ends when the move is interrupted. */
   readonly breath?: { readonly speed: number; readonly reach: number } | undefined;
   readonly gust?: ProjectileGust | undefined;
+  readonly runs?: ProjectileRun | undefined;
+  readonly bites?: { readonly every: number; readonly count: number } | undefined;
+}
+
+export interface ProjectileRun {
+  readonly gravity: number;
+  readonly maxFall: number;
 }
 
 interface ArmorWindow extends FrameWindow { readonly shell?: boolean | undefined; readonly chillsStriker?: boolean | undefined; readonly perStack?: number | undefined }
@@ -367,6 +379,7 @@ export interface AuthoredSpecial extends CastWindows {
   readonly aimFrames?: number | undefined;
   /** Picks the aim on the press from the stick's recent motion, the first listed motion the stick history completed within its window, else `otherwise`; the stick after the press does not steer it. Aims are facing-relative in x. */
   readonly aimByMotion?: AimByMotion | undefined;
+  readonly variantByMotion?: readonly MotionVariant[] | undefined;
   readonly facesStick?: boolean | undefined;
   readonly hurt?: readonly HurtPose[] | undefined;
 

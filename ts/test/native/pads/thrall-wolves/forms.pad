@@ -1,0 +1,32 @@
+# Thrall's wolves (2026-11-01): a (Thrall) casts the spirit wolf with plain down into b's raised shield and walks in behind it, then the timber pair with down and forward, the dire wolf with a quarter-circle forward, a ground Ghost Wolf, and an air Ghost Wolf off a full hop.
+#! chat -dev quick stage 2 pair thrall / peon
+120 a stick 0 -1
+121 a tap X 1
+124 a stick 0 0
+150 b shield 1
+170 a stick 0.6 0
+290 a stick 0 0
+290 b shield 0
+340 a stick -1 0
+352 a stick 0 0
+356 a stick 1 0
+357 a stick 0 0
+380 a stick 0.7 -0.7
+381 a tap X 1
+384 a stick 0 0
+470 a stick 0 -1
+472 a stick 0.7 -0.7
+474 a stick 1 0
+474 a tap X 1
+477 a stick 0 0
+560 a stick 1 0
+561 a tap X 1
+564 a stick 0 0
+660 a stick -1 0
+661 a stick 0 0
+680 a tap B 8
+692 a stick -1 0
+692 a tap X 1
+695 a stick 0 0
+780 a press VIEW
+830 a release VIEW
