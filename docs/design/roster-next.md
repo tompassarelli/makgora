@@ -132,6 +132,31 @@ Credits: Footman16, AndrewOverload519 (Female Human Mage) and kangyun (staff).
 The page's own terms line is "So if you decide to use this resource please give
 credits." The icons and the portrait model are not imported.
 
+#### Malfurion Wild Pack (read 1 November 2026)
+
+Tom asked on 1 November 2026 to move Malfurion to this pack and rebuild him
+around shapeshifting. The live page sits behind a Cloudflare check that the
+automation browser does not pass, so this was read from the Wayback Machine's
+copy captured 18 September 2026.
+
+- **Malfurion Wild Pack**, https://www.hiveworkshop.com/threads/malfurion-wild-pack.373194/
+  - Author: vindorei, the only name on the page. Filed under Reforged HD
+    Models, state Pending (not reviewed by staff). Created 16 July 2026,
+    updated 17 July 2026, 66.74 MB, eight resources.
+  - Models: `MalfurionMoonkin.mdx` (21,950 polygons), `MalfurionCatForm.mdx`
+    (12,588), `MalfurionBearForm2.mdx` (18,384), `MalfurionLunarwingForm.mdx`
+    (9,595), each with a `_Portrait` model. There is no Night Elf (humanoid)
+    Malfurion in the pack; reply #6 asks the author to add one.
+  - Format: Reforged HD only. Classic needs the hd-to-classic conversion
+    Onyxia's dragon used (diffuse texture only).
+  - Conditions: the description is preview images only. The page states no
+    usage terms, no credit requirement and no edit ban.
+  - Provenance: the page names no source models. The author's Winter Fury
+    Malfurion page (349062) credits other modellers and a stag "ported" with
+    a patron's permission, so whether these forms contain World of Warcraft
+    files, which the clean-room rule forbids, cannot be read from the page.
+  - Not imported yet: the terms and provenance go to Tom first.
+
 ### H1 intake (29 October 2026)
 
 Both models were downloaded through a plain headful Chrome on gex45's private
