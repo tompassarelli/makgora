@@ -41228,12 +41228,12 @@
    "authored.specials.neutral.ground.endFrame": 57,
    "authored.specials.neutral.ground.hurt.0.firstFrame": 8,
    "authored.specials.neutral.ground.hurt.0.lastFrame": 30,
-   "authored.specials.neutral.ground.placement.shot.effect.damage": 4,
+   "authored.specials.neutral.ground.placement.shot.effect.damage": 5,
    "authored.specials.neutral.ground.placement.shot.effect.growth": 70,
    "authored.specials.neutral.ground.placement.shot.effect.base": 16,
    "authored.specials.neutral.ground.placement.shot.effect.launchX": 0.7660444378852844,
    "authored.specials.neutral.ground.placement.shot.effect.launchZ": 0.6427876353263855,
-   "authored.specials.neutral.ground.placement.splits.half.shot.effect.damage": 4,
+   "authored.specials.neutral.ground.placement.splits.half.shot.effect.damage": 5,
    "authored.specials.neutral.ground.placement.splits.half.shot.effect.growth": 70,
    "authored.specials.neutral.ground.placement.splits.half.shot.effect.base": 16,
    "authored.specials.neutral.ground.placement.splits.half.shot.effect.launchX": 0.7660444378852844,
@@ -41677,10 +41677,12 @@
     "killPercent": 244
    },
    "special.neutral.ground.placement.shot": {
-    "advantage": -54
+    "advantage": -53,
+    "killPercent": 283
    },
    "special.neutral.ground.placement.splits.half.shot": {
-    "advantage": -54
+    "advantage": -53,
+    "killPercent": 283
    },
    "special.side.ground.motion.1.resurface.at": {
     "advantage": -33

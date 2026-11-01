@@ -1,14 +1,14 @@
-# Firelord's Lava Spawn goes under with Submerge: he summons it, razes one step ahead, walks left past the spawn, then dives on 400 and comes up at the crater on 412 with the spawn rising beside him.
+# Firelord's Lava Spawn goes under with Submerge: he summons it, razes one step ahead, walks right past the crater toward the foe, then dives on 400 and comes up at the crater on 412 with the spawn rising beside him.
 #! chat -dev quick hero firelord hit-areas
 250 a tap X 2
 312 a stick 0 -1
 316 a tap X 2
 320 a stick 0 0
 350 a capture
-352 a stick -1 0
-385 a stick 0 0
+352 a stick 1 0
+368 a stick 0 0
 396 a capture
-400 a stick -1 0
+400 a stick 1 0
 400 a tap X 2
 402 a stick 0 0
 403 a capture

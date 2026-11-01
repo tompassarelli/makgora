@@ -1,16 +1,16 @@
-# Firelord's Lava Spawn follows him across the stage: summoned on 250, he walks right from 310 and back left from 420, and the spawn walks after him on its floor, staying on his foe's side.
+# Firelord's Lava Spawn follows him across the stage: summoned on 250, he walks right toward the foe from 310 and back left from 420, and the spawn walks after him on its floor, staying on his foe's side.
 #! chat -dev quick hero firelord hit-areas
 250 a tap X 2
 310 a stick 1 0
 320 a capture
+345 a stick 0 0
 345 a capture
 370 a capture
 395 a capture
-415 a stick 0 0
 420 a stick -1 0
 440 a capture
+470 a stick 0 0
 470 a capture
 500 a capture
 530 a capture
-560 a stick 0 0
 580 a capture

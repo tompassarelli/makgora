@@ -11,13 +11,13 @@ const h = (multiple: number): number => f32(HERO_REFERENCE_HEIGHT * f32(multiple
 export const SPAWN_LIFE = 720;
 export const SPAWN_SPLIT_HITS = 5;
 export const SPAWN_FIRST_SHOT = 45;
-export const SPAWN_SHOT_EVERY = 75;
+export const SPAWN_SHOT_EVERY = 65;
 export const SPAWN_DURABILITY = 10.0;
 export const SPAWN_CAST_FRAME = 30;
 export const SPAWN_END_FRAME = 57;
 export const SPAWN_APART = h(f32(0.35));
 export const FIREBALL_SPEED = h(f32(0.09));
-export const FIREBALL_DAMAGE = 4.0;
+export const FIREBALL_DAMAGE = 5.0;
 export const FIREBALL_LIFE = 50;
 
 export const SPAWN_WALK: PlacementWalk = {
