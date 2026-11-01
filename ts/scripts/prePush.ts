@@ -21,6 +21,7 @@ import { derivedStepCode } from "./wisp/fighterArtCode";
 import { changedFighters } from "./wisp/fighterArtChanges";
 import { LOCOMOTION_RECORD, LOCOMOTION_TRAILER } from "./locomotionRecord";
 import { type Finished, killChildren, runGroup } from "./processGroups";
+import { PIN_HOST } from "./wisp/inputsPublish";
 
 const root = join(import.meta.dir, "../..");
 const ZERO = /^0+$/;
@@ -64,6 +65,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const cueModels = touchesCueInputs(paths, cues);
   const strikeMoments = touchesCueInputs(paths, strikes);
   const mapInputs = paths.some((path) => MAP_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
+  const pins = paths.some((path) => path.startsWith("build-inputs/"));
   const suites = paths.some((path) => SUITE_INPUTS.includes(path));
   const effectKit = paths.some((path) => EFFECT_KIT_INPUTS.test(path));
   const fighterArt = changedFighters(paths, derivedStepCode());
@@ -82,6 +84,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
       { name: "Autoland suite covers the farm suite", directory: "ts", args: ["scripts/suiteParity.ts"], fix: "give Autoland's suite every farm-test job and input, since safe-push hands a lane to Autoland without its own farm run (smashcraft:docs/ci.md, \"Autoland\").", hosted: true },
     ] : []),
     ...(mapInputs ? [{ name: "private map-build inputs", directory: "ts", args: ["scripts/wisp.ts", "map", "build", "--profile", "playable", "--edition", "classic", "--inputs-only"], fix: "regenerate and store the missing inputs before landing (smashcraft:docs/build-inputs.md).", hosted: false, privateStore: true }] : []),
+    ...(pins ? [{ name: `pinned build inputs stored on ${PIN_HOST}`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "publish", PIN_HOST], fix: `${PIN_HOST} builds and lands from its own store and cannot fetch from this host, so a pin lands only once its entry is there: make ${PIN_HOST} reachable over ssh and push again, and produce again any entry this host lacks (smashcraft:docs/build-inputs.md, "Hosts").`, hosted: false, privateStore: true }] : []),
     ...(models ? [
       { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
       { name: "stored portraits match their models", directory: "ts", args: ["test", "test/portraitSources.test.ts"], fix: "re-render the listed fighters with bun scripts/fighterPortraits.ts PRIVATE_OUTPUT --only NAME and store the result as fighter-renders (smashcraft:docs/design/fighter-portraits.md).", hosted: false, privateStore: true },

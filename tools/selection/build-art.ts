@@ -2,7 +2,8 @@
 
 
 
-import { mkdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { PLAYER_COLORS } from '../../ts/src/game/ui/slotColors';
 import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_MARGIN, HAND_TEXELS } from '../../ts/src/game/core/handArt';
@@ -14,6 +15,7 @@ import { BunRuntime, BunServices } from '../../ts/node_modules/@effect/platform-
 import { ProcessFailure, runProcess } from '../../ts/scripts/hostProcess';
 import { findExtractor, reforgedStorage } from '../../ts/scripts/wisp/renderAssetStore';
 import { gameCursorArt } from './gameCursorArt';
+import { clearArt, writeFontConfig } from './pinnedFonts';
 import { RACES } from '../../ts/src/game/roster/races';
 import { RACE_COLOURS } from '../../ts/src/game/ui/raceFrame';
 import { type BarArtStyle, barArt, barArtName } from '../../ts/src/game/core/selectBarLayout';
@@ -24,7 +26,10 @@ const source = join(project, 'tools/selection/art');
 const index = process.argv.indexOf('--out');
 const output = index < 0 ? join(project, 'build/selection-assets') : resolve(process.argv[index + 1]!);
 const ioFailure = (cause: unknown) => new ProcessFailure({ command: 'selection art', problem: String(cause) });
-const run = (command: readonly [string, ...string[]]) => runProcess(ChildProcess.make(command[0], command.slice(1)));
+const scratch = mkdtempSync(join(tmpdir(), 'selection-art-'));
+const fonts = join(scratch, 'fonts.conf');
+// Text renders through fontconfig, so every child sees only the flake's pinned fonts; host fonts made the family differ by host.
+const run = (command: readonly [string, ...string[]]) => runProcess(ChildProcess.make(command[0], command.slice(1), { env: { FONTCONFIG_FILE: fonts }, extendEnv: true }));
 
 const hex = (rgb: number) => `#${rgb.toString(16).padStart(6, '0')}`;
 
@@ -60,7 +65,9 @@ const render = (name: string, svg: string, replacements: { readonly [placeholder
 });
 
 BunRuntime.runMain(Effect.gen(function*() {
-  yield* Effect.try({ try: () => mkdirSync(output, { recursive: true }), catch: ioFailure });
+  yield* Effect.try({ try: () => clearArt(output), catch: ioFailure });
+  const fontStore = yield* run(['nix', 'build', '--no-link', '--print-out-paths', `${project}#selection-fonts`]);
+  yield* Effect.try({ try: () => writeFontConfig(fonts, fontStore, join(scratch, 'cache')), catch: ioFailure });
   for (const [fighter, label] of [['Rifleman', 'RIFLEMAN'], ['DemonHunter', 'ILLIDAN']] as const) {
     yield* render(`${fighter}Name`, 'FighterName.svg', { FIGHTER_NAME: label }, true);
   }
@@ -114,4 +121,4 @@ BunRuntime.runMain(Effect.gen(function*() {
   yield* Effect.try({ try: () => rmSync(randomIcon), catch: ioFailure });
   const files = yield* Effect.try({ try: () => [...new Bun.Glob('*.tga').scanSync(output)].sort().map((file) => join(output, file)), catch: ioFailure });
   console.log(yield* run(['magick', 'identify', ...files]));
-}).pipe(Effect.provide(BunServices.layer)));
+}).pipe(Effect.ensuring(Effect.sync(() => rmSync(scratch, { recursive: true, force: true }))), Effect.provide(BunServices.layer)));

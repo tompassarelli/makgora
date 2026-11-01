@@ -19,6 +19,7 @@ import { measureStrikeMoments, staleStrikeFighters } from "../strikeMoments";
 import { heroModelSource } from "../../heroModelSource";
 import { FAMILIES, FAMILY_NAMES, type Family, INPUTS_STORE, MANIFEST, checkoutInputs, isSharded, readManifest, readPins, storeFamily, storeShards, unstoredPins, writePin, writeShardPins } from "../buildInputs";
 import { fetchEntry } from "../inputsFetch";
+import { isThisHost, pinnedEntries, publishPins, sshRemote } from "../inputsPublish";
 
 const isFamily = (name: string): name is Family => name in FAMILIES;
 
@@ -115,6 +116,16 @@ const fetch = (hosts: readonly string[]) => Effect.gen(function*() {
   console.log(`fetched ${missing.length} entries, each verified by its hash`);
 });
 
+const publish = (hosts: readonly string[]) => Effect.gen(function*() {
+  const [host] = hosts;
+  if (host === undefined || hosts.length !== 1 || host.startsWith("-")) return yield* new UsageFailure({ problem: "inputs publish takes HOST, the ssh host to copy every pinned entry it lacks to" });
+  if (isThisHost(host)) return console.log(`this is ${host}, whose own store the private map-build inputs check verifies`);
+  const published = yield* publishPins(sshRemote(host), pinnedEntries(yield* readManifest()));
+  if (published.length === 0) return console.log(`${host} stores every entry ${MANIFEST} pins`);
+  for (const { family, hash } of published) console.log(`published ${family} ${hash} to ${host}`);
+  console.log(`published ${published.length} entries to ${host}, each verified by its hash there`);
+});
+
 export const inputs: Command = (args) => Effect.gen(function*() {
   const [verb, ...rest] = args;
   const [family, source, ...flags] = rest;
@@ -123,6 +134,7 @@ export const inputs: Command = (args) => Effect.gen(function*() {
   if (verb === "derive") return yield* derive(rest);
   if (verb === "prune") return yield* prune(rest);
   if (verb === "fetch") return yield* fetch(rest);
+  if (verb === "publish") return yield* publish(rest);
   if (verb === "check" && rest.length === 0) {
     const paths = yield* checkoutInputs();
     console.log(`every family in ${MANIFEST} is stored and unchanged\n--assets ${paths.assets}`);
@@ -135,5 +147,5 @@ export const inputs: Command = (args) => Effect.gen(function*() {
     if (name === "base" || name === "container" || name === "assets" || name === "summon") return console.log(paths[name]);
     return yield* new UsageFailure({ problem: "inputs path takes base, container, assets or summon" });
   }
-  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH [--fighter SHARD]... [--all] | derive [--fighter NAME]... [--rebuild | --check] | fetch HOST... | prune [--scratch NAME]... | check | path [base|container|assets|summon]" });
+  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH [--fighter SHARD]... [--all] | derive [--fighter NAME]... [--rebuild | --check] | fetch HOST... | publish HOST | prune [--scratch NAME]... | check | path [base|container|assets|summon]" });
 });

@@ -54,9 +54,14 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   rehashes the copy, seals it and publishes it by one rename like `inputs add`
   (smashcraft:ts/scripts/wisp/inputsFetch.ts). A copy that hashes otherwise is
   refused. `map build`, `inputs check` and `inputs derive` name this command when
-  a pinned entry is missing. Adding pushes nowhere: the publishing host need not
-  reach every builder or know which hosts build, and the host that lacks an entry
-  learns it at its next build. The store is licensed art: it moves only between
+  a pinned entry is missing. gex45 builds and lands from its own store and cannot
+  reach the other hosts, so a landing that changes any pin runs
+  `bun wisp inputs publish gex45` before it lands (smashcraft:ts/scripts/wisp/inputsPublish.ts):
+  every pinned entry gex45 lacks is copied from this store over ssh with rsync into a
+  staging folder beside gex45's store, hard-linking files that match its 20 newest
+  entries of the family, rehashed there, sealed and renamed into place; a pin whose
+  entry neither host stores, or a gex45 that cannot be reached, refuses the landing.
+  On gex45 itself the private map-build inputs check already reads the store. The store is licensed art: it moves only between
   your own hosts over ssh, never through Git or a public service.
 - **Play.** `bun wisp play` builds main from main's manifest. Builders of a
   revision share the lock ~/.local/share/smashcraft-build-inputs/locks/play-REVISION.lock
@@ -168,7 +173,9 @@ come from his three 1024x1024 JPEGs on a flat dark grey background; `bun tools/s
 JPEGs>` keys the background to transparency (outline kept), aligns the cuffs and
 writes the three PNGs on one canvas. The normal `bun tools/selection/build-art.ts`
 point-scales them into `SelectionHandPoint.tga`, `SelectionHandFan.tga` and
-`SelectionHandPinch.tga`, each a 256x256 canvas, and renders the four 128x96 `SelectionHandLabelP1-4.tga` player labels from `SelectionHandLabel.svg` in white, which the label frame tints to its hand's card colour; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Store the generated
+`SelectionHandPinch.tga`, each a 256x256 canvas, and renders the four 128x96 `SelectionHandLabelP1-4.tga` player labels from `SelectionHandLabel.svg` in white, which the label frame tints to its hand's card colour; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Text renders through fontconfig with only the flake's pinned DejaVu fonts
+(`nix build .#selection-fonts`), never the host's, and the output folder is
+cleared first, so the family hashes the same on every host. Store the generated
 `selection-assets` family and commit its hash with the source change.
 
 ### Warcraft's own cursor

@@ -7,6 +7,7 @@
       pkgs = import nixpkgs { inherit system; };
       addonPin = pkgs.lib.trim (builtins.readFile ./tools/animations/mdl-exporter4.pin);
     in {
+      packages.${system}.selection-fonts = pkgs.dejavu_fonts;
       devShells.${system}.default = pkgs.mkShell {
         packages = [ pkgs.blender ];
         shellHook = ''
