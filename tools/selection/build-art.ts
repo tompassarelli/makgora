@@ -17,7 +17,7 @@ import { gameCursorArt } from './gameCursorArt';
 import { RACES } from '../../ts/src/game/roster/races';
 import { RACE_COLOURS } from '../../ts/src/game/ui/raceFrame';
 import { type BarArtStyle, barArt, barArtName } from '../../ts/src/game/core/selectBarLayout';
-import { BAR_STRIP } from '../../ts/src/game/core/selectScreenLayout';
+import { BAR_LINE, BAR_STRIP } from '../../ts/src/game/core/selectScreenLayout';
 
 const project = resolve(import.meta.dir, '../..');
 const source = join(project, 'tools/selection/art');
@@ -98,8 +98,8 @@ BunRuntime.runMain(Effect.gen(function*() {
       INNER_COLOR: style.inner, INNER_OPACITY: String(style.innerOpacity), WIDTH: String(width), HEIGHT: String(height),
     }, false);
   }
-  const stripHeight = Math.round(BAR_STRIP.height * BAR_PIXELS);
-  yield* render('SelectBarStrip', 'SelectBarStrip.svg', { LINE_Y: String(stripHeight - 3), WIDTH: String(Math.round(BAR_STRIP.width * BAR_PIXELS)), HEIGHT: String(stripHeight) }, false);
+  yield* render('SelectBarBand', 'SelectBarBand.svg', { WIDTH: String(Math.round(BAR_STRIP.width * BAR_PIXELS)), HEIGHT: String(Math.round(BAR_STRIP.height * BAR_PIXELS)) }, false);
+  yield* render('SelectBarLine', 'SelectBarLine.svg', { WIDTH: String(Math.round(BAR_LINE.width * BAR_PIXELS)), HEIGHT: String(Math.round(BAR_LINE.height * BAR_PIXELS)) }, false);
   for (const name of ['SelectBarChevron', 'SelectBarGear', 'SelectBarCheck']) yield* run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
   yield* run(['magick', join(output, 'SelectBarChevron.tga'), '-flip', '-depth', '8', `TGA:${join(output, 'SelectBarChevronUp.tga')}`]);
   for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionBullseye', 'SelectionThreeBridges']) {

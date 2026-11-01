@@ -13,12 +13,12 @@ import { pixelX, pixelY, pointerX, pointerY } from "../menu/pointer";
 import { STAGE_LIST_HEADING, STAGE_TILE, type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTop, updateStageDrag } from "../menu/stageSelection";
 import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stageInfo } from "../menu/stageCatalog";
 import { orbsSetting, hazardsSetting, rulesSummary } from "../session/messages";
-import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
+import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, createWindowBand, fitBandToWindow, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { STAGE_CHIP_TEXTURE, StageCard } from "./stageCard";
 import { STAGE_START_BUTTON, stageStartContains } from "./selectionLayout";
-import { BAR_KEYS, BAR_STRIP_TEXTURE, STAGE_BAR, barTexture } from "../core/selectBarLayout";
-import { BAR_STRIP, type ScreenBox, STAGE_LIST_BOX, STAGE_PREVIEW_BOX } from "../core/selectScreenLayout";
+import { BAR_BAND_TEXTURE, BAR_KEYS, BAR_LINE_TEXTURE, STAGE_BAR, barTexture } from "../core/selectBarLayout";
+import { BAR_LINE, BAR_STRIP, type ScreenBox, STAGE_LIST_BOX, STAGE_PREVIEW_BOX } from "../core/selectScreenLayout";
 import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, labelControl, litControl } from "./barFrames";
 import { art } from "./selectionFrames";
 import { destroyEvents, Events } from "wisp/game/events";
@@ -81,6 +81,7 @@ function stageButton(parent: Frame, x: number, y: number, width: number, height:
 export class StagePanel {
   private readonly root: Frame;
   private readonly backdrop: Frame;
+  private readonly band: Frame;
   private readonly preview: StageCard;
   private readonly previewName: Frame;
   private readonly previewDescription: Frame;
@@ -108,9 +109,10 @@ export class StagePanel {
     const dialogButton = (parent: Frame, x: number, y: number, width: number, height: number, text: string, target: StageButton) =>
       this.clicks.add(stageButton(parent, x, y, width, height, text), target, undefined, "native");
     this.backdrop = createWindowBackdrop("MeleeStageBackdrop", MENU_STYLE.panelTexture, 800);
+    this.band = createWindowBand("MeleeStageBand", BAR_BAND_TEXTURE, 801, BAR_STRIP);
     const root = createFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
     this.root = root;
-    art(root, "MeleeStageStrip", BAR_STRIP_TEXTURE, BAR_STRIP.x, BAR_STRIP.y, BAR_STRIP.width, BAR_STRIP.height);
+    art(root, "MeleeStageLine", BAR_LINE_TEXTURE, BAR_LINE.x, BAR_LINE.y, BAR_LINE.width, BAR_LINE.height);
     framedBox(root, "MeleeStagePreviewBox", STAGE_PREVIEW_BOX);
     framedBox(root, "MeleeStageListBox", STAGE_LIST_BOX);
     const heading = inside(STAGE_PREVIEW_BOX, PANEL_PAD, PREVIEW_HEADING);
@@ -158,6 +160,7 @@ export class StagePanel {
     });
     setFrameVisible(root, false);
     setFrameVisible(this.backdrop, false);
+    setFrameVisible(this.band, false);
   }
 
   bindActions(actions: StageActions): void {
@@ -176,6 +179,7 @@ export class StagePanel {
     destroyEvents(this.sync);
     destroyFrame(this.root);
     destroyFrame(this.backdrop);
+    destroyFrame(this.band);
   }
 
   private createBar(root: Frame, journal: boolean): Readonly<Record<StageBarItem, BarControl>> {
@@ -243,6 +247,7 @@ export class StagePanel {
     if (this.lastPhase !== game.phase) {
       setFrameVisible(this.root, enabled);
       setFrameVisible(this.backdrop, enabled);
+      setFrameVisible(this.band, enabled);
       if (enabled) this.focusStart();
       this.lastPhase = game.phase;
     }
@@ -282,6 +287,7 @@ export class StagePanel {
       return;
     }
     fitToWindow(this.backdrop);
+    fitBandToWindow(this.band, BAR_STRIP);
     let x = f32(stageTileLeft(game.stageChoice) + f32(STAGE_TILE.width / 2));
     let y = f32(stageTileTop(game.stageChoice) - f32(STAGE_TILE.height / 2));
     const width = toReal(screenWidth());

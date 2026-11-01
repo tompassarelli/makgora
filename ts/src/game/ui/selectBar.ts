@@ -6,15 +6,18 @@ import { ItemKind, itemBit } from "../sim/codes";
 import { SELECT_LEVELS } from "./selectLevels";
 import type { SelectText } from "./selectionActions";
 import {
-  BAR_CHECK_TEXTURE, BAR_CHEVRON_TEXTURE, BAR_CHEVRON_UP_TEXTURE, BAR_GEAR_TEXTURE, BAR_KEYS, BAR_ORDER, BAR_PANELS, BAR_STRIP_TEXTURE, BAR_CHEVRONS, type BarBox, type BarItem, type BarPanel,
+  BAR_CHECK_TEXTURE, BAR_CHEVRON_TEXTURE, BAR_CHEVRON_UP_TEXTURE, BAR_GEAR_TEXTURE, BAR_KEYS, BAR_ORDER, BAR_PANELS, BAR_BAND_TEXTURE, BAR_LINE_TEXTURE, BAR_CHEVRONS, type BarBox, type BarItem, type BarPanel,
   GEAR_ICON, GEAR_ROWS, GUIDE_KEY, GUIDE_ROWS, MODE_ROWS, SELECT_BAR, barBoxContains, barTexture, panelHeading,
 } from "../core/selectBarLayout";
-import { BAR_STRIP } from "../core/selectScreenLayout";
+import { BAR_LINE, BAR_STRIP } from "../core/selectScreenLayout";
 import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, clickArea, enableControl, labelControl, litControl, showControl, styleControl } from "./barFrames";
 import { type DelayFrames, type RuleButton, type RuleFrames, createDelayControls, createRulesDrawer, presentDelayControls, presentRules, rulesKey } from "./selectionRules";
-import { createBackdrop, placeTopLeft, setMenuText } from "./frames";
+import { createBackdrop, createWindowBand, fitBandToWindow, placeTopLeft, setMenuText } from "./frames";
 import { art } from "./selectionFrames";
 import { createFrameByType, destroyFrame, Frame, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
+
+/** The bar shows with fighter select, and hides under the opponent settings and the move list, which hide the rest of the screen. */
+export const barShown = (visible: boolean, cpuOpen: boolean, movesOpen: boolean): boolean => visible && !cpuOpen && !movesOpen;
 
 export type BarButton = { kind: "barPanel"; panel: BarPanel } | { kind: "barClose" };
 export type BarTarget = BarButton | RuleButton | { kind: "start" } | { kind: "settings" } | { kind: "moves" } | { kind: "tutorialOpen" } | { kind: "creditsOpen" } | { kind: "communityOpen" };
@@ -199,6 +202,8 @@ export class SelectBar {
   private padActive = false;
   private shownKey: string | undefined;
   private shownChevron: BarPanel | undefined;
+  private readonly band: Frame;
+  private bandShown = false;
 
   constructor(parent: Frame, suffix: string, private text: SelectText, add: AddBarTarget) {
     const name = (part: string) => `MeleeBar${part}${suffix}`;
@@ -208,7 +213,9 @@ export class SelectBar {
     setFrameVisible(this.scrim, false);
     this.root = createFrameByType("FRAME", name("Root"), parent, "", 0);
     setFrameLevel(this.root, SELECT_LEVELS.bar);
-    art(this.root, name("Strip"), BAR_STRIP_TEXTURE, BAR_STRIP.x, BAR_STRIP.y, BAR_STRIP.width, BAR_STRIP.height);
+    this.band = createWindowBand(name("Band"), BAR_BAND_TEXTURE, 0, BAR_STRIP);
+    setFrameVisible(this.band, false);
+    art(this.root, name("Line"), BAR_LINE_TEXTURE, BAR_LINE.x, BAR_LINE.y, BAR_LINE.width, BAR_LINE.height);
     this.items = createItems(this.root, name, add);
     art(this.root, name("GearIcon"), BAR_GEAR_TEXTURE, GEAR_ICON.x, GEAR_ICON.y, GEAR_ICON.width, GEAR_ICON.height);
     this.chevrons = (["mode", "rules", "guide"] as const).map(panel => {
@@ -222,6 +229,14 @@ export class SelectBar {
     this.guide = createGuide(this.panels.guide, name, add);
     this.delay = createDelayControls(this.panels.gear, suffix, (frame, target) => add(frame, target, undefined));
     this.gear = createGear(this.panels.gear, name);
+  }
+
+  /** Shows the bar's band across the whole window, refitted when the window changes size. */
+  showBand(shown: boolean): void {
+    if (shown) fitBandToWindow(this.band, BAR_STRIP);
+    if (shown === this.bandShown) return;
+    this.bandShown = shown;
+    setFrameVisible(this.band, shown);
   }
 
   bindText(text: SelectText): void {
@@ -428,6 +443,7 @@ export class SelectBar {
   destroy(): void {
     for (const which of ["mode", "rules", "guide", "gear"] as const) destroyFrame(this.panels[which]);
     destroyFrame(this.root);
+    destroyFrame(this.band);
     destroyFrame(this.scrim);
   }
 }

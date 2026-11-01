@@ -230,10 +230,11 @@ export function barArt(): readonly BarArt[] {
   });
 }
 
-/** The bar's art that is not a framed box: the band, the arrows, the gear and the check mark. */
-export const BAR_ICONS = ["SelectBarStrip", "SelectBarChevron", "SelectBarChevronUp", "SelectBarGear", "SelectBarCheck"] as const;
+/** The bar's art that is not a framed box: the band, its gold line, the arrows, the gear and the check mark. */
+export const BAR_ICONS = ["SelectBarBand", "SelectBarLine", "SelectBarChevron", "SelectBarChevronUp", "SelectBarGear", "SelectBarCheck"] as const;
 const icon = (name: (typeof BAR_ICONS)[number]): string => `war3mapImported\\${name}.tga`;
-export const BAR_STRIP_TEXTURE = icon("SelectBarStrip");
+export const BAR_BAND_TEXTURE = icon("SelectBarBand");
+export const BAR_LINE_TEXTURE = icon("SelectBarLine");
 export const BAR_CHEVRON_TEXTURE = icon("SelectBarChevron");
 export const BAR_CHEVRON_UP_TEXTURE = icon("SelectBarChevronUp");
 export const BAR_GEAR_TEXTURE = icon("SelectBarGear");

@@ -18,8 +18,11 @@ const BODY_GAP = f32(0.008);
 
 export const BAR_TOP = f32(0.594);
 export const BAR_HEIGHT = f32(0.03);
-/** The dark band the top bar sits on, across the whole 4:3 area. */
+/** The dark band the top bar sits on; the 4:3 part of it, which the band stretches past to both window edges. */
 export const BAR_STRIP = box(0, f32(0.6), f32(0.8), f32(f32(f32(0.6) - f32(BAR_TOP - BAR_HEIGHT)) + f32(0.008)));
+const BAR_LINE_HEIGHT = f32(f32(3) / f32(1800));
+/** The gold line along the band's bottom edge, across the 4:3 area only. */
+export const BAR_LINE = box(0, f32(f32(BAR_STRIP.y - BAR_STRIP.height) + BAR_LINE_HEIGHT), f32(0.8), BAR_LINE_HEIGHT);
 
 export const CARD_SCALE = f32(0.86);
 export const CARD_WIDTH = f32(f32(0.16) * CARD_SCALE);

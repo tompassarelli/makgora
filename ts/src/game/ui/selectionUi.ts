@@ -2,7 +2,7 @@ import { SELECT_LEVELS } from "./selectLevels";
 import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
 import { RULE_BUTTONS, rulePanel } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp } from "./ruleHelp";
-import { type BarButton, type BarTarget, SelectBar } from "./selectBar";
+import { type BarButton, type BarTarget, SelectBar, barShown } from "./selectBar";
 import { type BarItem, barBoxContains, helpAnchor } from "../core/selectBarLayout";
 import { BAR_HEIGHT } from "../core/selectScreenLayout";
 import { f32 } from "wisp/src/sim/f32";
@@ -697,6 +697,7 @@ export class SelectionPanel {
     this.community.show(visible);
     setFrameVisible(this.cpu.root, cpuOpen);
     setFrameVisible(this.root, visible);
+    this.bar.showBand(barShown(visible, cpuOpen, this.movesOpen));
     setFrameVisible(this.row, cardRowShown(game, participantId, visible));
     fitToWindow(this.backdrop);
     setFrameVisible(this.backdrop, visible || (loading && game.phase === Phase.characterMenu && humanActive(game, participantId)));

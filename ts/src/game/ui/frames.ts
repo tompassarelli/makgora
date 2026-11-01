@@ -72,6 +72,27 @@ export function createWindowBackdrop(name: string, texture: string, context: num
   return frame;
 }
 
+/** A band of `band.height` from `band.y` down, stretched across the whole window at any aspect, under the game UI. */
+export function createWindowBand(name: string, texture: string, context: number, band: { readonly y: number; readonly height: number }): Frame {
+  const frame = createBackdrop(name, consoleUi(), context);
+  setFrameTexture(frame, texture, 0, false);
+  fitBandToWindow(frame, band);
+  return frame;
+}
+
+const windowWidth = (pixelWidth: number, pixelHeight: number): number =>
+  f32(Math.max(f32(0.8), (pixelHeight <= 0 ? f32(4.0 / 3.0) : toReal(pixelWidth) / toReal(pixelHeight)) * f32(0.6)) + f32(0.02));
+
+export function fitBandToWindow(frame: Frame, band: { readonly y: number; readonly height: number }): void {
+  const pixelWidth = screenWidth();
+  const pixelHeight = screenHeight();
+  const key = pixelWidth * 65536 + pixelHeight;
+  if (fittedSize.get(frame) === key) return;
+  fittedSize.set(frame, key);
+  setFrameSize(frame, windowWidth(pixelWidth, pixelHeight), band.height);
+  setFrameAbsPoint(frame, FramePoint.top, f32(0.4), band.y);
+}
+
 export function fitToWindow(frame: Frame): void {
   const pixelWidth = screenWidth();
   const pixelHeight = screenHeight();

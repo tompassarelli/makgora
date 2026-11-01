@@ -324,9 +324,13 @@ the hidden pose, and a hand is drawn only for a human still present.
 
 ## Select screen top bar
 
-Fighter select's controls sit in one row on a dark band across the top of the
-4:3 area (smashcraft:ts/src/game/ui/selectBar.ts, geometry, shared with the art
-builder, in `ts/src/game/core/selectBarLayout.ts`). Until 2026-11-01 they were about 17 gold-bevelled dialog
+Fighter select's controls sit in one row inside the 4:3 area on a dark band
+across the top of the window (smashcraft:ts/src/game/ui/selectBar.ts, geometry,
+shared with the art builder, in `ts/src/game/core/selectBarLayout.ts`). The band
+stretches past the 4:3 area to both window edges at any aspect, hung off the
+console UI like the window backdrop because Warcraft draws no game-UI child
+outside 4:3; its gold bottom line stays across the 4:3 area only (Tom asked on
+2026-11-02 for the band to run edge to edge with the line and buttons kept). Until 2026-11-01 they were about 17 gold-bevelled dialog
 buttons of equal weight over four rows, a quarter of the screen; Tom asked for
 one row of a few clusters with the rarely used settings one click deeper
 (progressive disclosure), after a mockup he had made. Left to right:
