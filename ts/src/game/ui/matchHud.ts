@@ -8,7 +8,7 @@ import { hudTitle } from "./duoTitle";
 import { DEFAULT_FIGHTER } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
 import {
-  DOOM_MARK_TEXTURE, NAME_FONT, PING_FONT, STOCK_FADE_FRAMES, STOCK_ICONS_SHOWN, type NumberJolt, type PanelLayout, type PlateBox, boxLeft, boxTop, damageOutlineText, damageText, numberJolt,
+  DOOM_MARK_TEXTURE, NAME_FONT, PING_FONT, STOCK_FADE_FRAMES, STOCK_ICONS_SHOWN, type NumberJolt, type PanelLayout, type PlateBox, type PlateRow, plateRow, boxLeft, boxTop, damageOutlineText, damageText, numberJolt,
   panelLayout, percentOutlineText, percentText, pingBars, plateLeft, stepJolt, stockFadeAlpha,
 } from "./plateLayout";
 import { RACES, type Race, fighterRace } from "../roster/races";
@@ -149,7 +149,7 @@ export class FighterHud {
   private shownPing: number | undefined;
 
   private left = 0.0;
-  private panel: PanelLayout = panelLayout(0, 1);
+  private panel: PanelLayout = panelLayout(0, plateRow(1));
   private readonly jolt: NumberJolt = numberJolt();
   private readonly damageOutline: readonly Frame[];
   private readonly percentOutline: readonly Frame[];
@@ -195,7 +195,7 @@ export class FighterHud {
     for (const frame of [...this.stocks, this.stockCount]) setFrameLevel(frame, HUD_LEVEL + 1);
     attachOutline(this.damageOutline, this.damage, OUTLINE_PX, TextAlignment.middle, TextAlignment.right);
     attachOutline(this.percentOutline, this.percent, OUTLINE_PX, TextAlignment.bottom, TextAlignment.left);
-    this.layout(slot, count);
+    this.layout(slot, plateRow(count));
     this.update(false, DEFAULT_FIGHTER, slot, 0.0, 0);
   }
 
@@ -211,9 +211,9 @@ export class FighterHud {
   }
 
 
-  layout(position: number, count: number, hints = false): void {
-    const left = plateLeft(position, count, hints);
-    const panel = panelLayout(position, count);
+  layout(position: number, row: PlateRow): void {
+    const left = plateLeft(position, row);
+    const panel = panelLayout(position, row);
     this.left = left;
     this.panel = panel;
     const inner = panel.mirrored ? TextAlignment.right : TextAlignment.left;

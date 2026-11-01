@@ -1143,15 +1143,32 @@ four specials on the ground and in the air.
   button never ends it; Start, Esc or Backspace resumes. The stick pans and the
   C-stick zooms a camera that is local to the pausing client and restored on resume, so
   it adds nothing to synced state.
-- **New-player mode** (owner, 30 Oct): on for a fresh profile. In a match a
-  compact strip sits at the bottom centre between the player panels (p1 [strip]
-  p2 for two players, p1 p2 [strip] p3 p4 for four) and lists the local
-  player's own move, jump, attack, special, shield, grab, Strong, Mod X, Mod Y and pause
-  keys as bound (pad buttons for a controller), ending with "H: hide". With it
-  off the panels return to their even spacing with no gap. It shows only in
-  matches. H, the Controls screen's "New-player hints" button and the pause
-  screen's line toggle it, and the setting is saved with the profile (`encodeLayouts`,
-  save version KN, which an older KM save loads as on). Esc pauses and resumes
+- **In-game keyboard preview** (owner, 30 Oct; reworked 2 Nov from the owner's
+  HUD sketch): the bottom row splits the player plates around a centre input
+  preview, p1 [preview] p2, p1 p2 [preview] p3 and p1 p2 [preview] p3 p4, with
+  the plates right of it mirrored; in Team Battle each team keeps its plates on
+  one side, the split falling on the team boundary nearest the middle
+  (`plateOrder`). The preview is a CONTROLS panel after the owner's sketch (2 Nov):
+  two columns in the owner's rows, labels and order listing every bindable
+  action with the local player's own key in brackets, [-] when unbound: Up,
+  Down, Left, Right, then Mod-X (Walk), then A (Atk), B (Spc), X (Jmp)
+  and Y (Jmp, short hop) on the left; C-Up to C-Right, then Mod-Y (Tilt),
+  then Shield (both trigger keys, [Q]/[7]), Lightshield, Strong (Smash) and
+  Grab on the right; each row lit while one of its keys is held. Its
+  text shrinks until every label and key fits its column, the columns taking
+  width in proportion to their text (`keyboardPreview.ts`); a pad
+  player sees the pad's buttons in the same slot, which a drawn pad diagram can
+  later replace. Everything stays inside the plate band and the 4:3 area. With
+  the preview off the plates close up evenly spaced and centred. It shows only
+  in matches. The Controls screen's "Show keyboard in game" button and H toggle
+  it, and it is saved with the controls (`encodeLayouts`, save version KO). A
+  new player starts with it on; a save from before it (KN, KM or KL) loads with
+  it off, so existing players keep today's HUD.
+- **Match chat**: the chat box sits at the bottom left above p1, in the same
+  place in every arrangement. A match starts with it hidden, even if lines from
+  the select screens are still recent; it appears when a new line arrives and
+  fades on the panel's own recent and fade timing, and Tab opens the history as
+  before (`chatBox`, smashcraft:ts/src/host/loop/matchChat.ts). Esc pauses and resumes
   like Backspace and Start; it is a keyboard event on the pause trigger, not the
   end-cinematic event, and it does not open Warcraft's F10 menu, which the pause
   screen names for leaving the game.

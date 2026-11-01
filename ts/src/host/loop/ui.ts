@@ -38,7 +38,7 @@ import { EscapeMeter } from "../../game/ui/escapeMeter";
 import { OffscreenBubble } from "../../game/ui/offscreenBubble";
 import { FighterMarker } from "../../game/ui/fighterMarker";
 import { MeterBar } from "../../game/ui/meterBar";
-import { meterPlacement } from "../../game/ui/plateLayout";
+import { meterPlacement, plateOrder, plateRow } from "../../game/ui/plateLayout";
 import { ButtonClicks, gameUi } from "../../game/ui/frames";
 import { ResultsBanner } from "../../game/ui/resultsBanner";
 import type { SelectText, SelectionActions } from "../../game/ui/selectionActions";
@@ -66,7 +66,7 @@ import { type FighterDraw, createFighterDraw } from "../../game/presentation/fig
 import { ClassicPresentation } from "../../game/render/classicPresentation";
 import { PauseMenu } from "../../game/ui/pauseMenu";
 import { PauseScreen } from "../../game/ui/pauseScreen";
-import { HintStrip } from "../../game/ui/hintStrip";
+import { InputPreview } from "../../game/ui/inputPreview";
 import { duoRole } from "../../game/sim/fighter";
 import { Player, player as playerOf, playerControl, PlayerControl, playerSlotState, PlayerSlotState } from "wisp/game/players";
 import type { Frame } from "wisp/game/frames";
@@ -107,7 +107,7 @@ export interface UiObjects {
   orbs: OrbPresentation;
   readonly clock: MatchClock;
   readonly training: TrainingReadout;
-  hints: HintStrip;
+  preview: InputPreview;
   readonly huds: Slots<FighterHud>;
   readonly bubbles: Slots<OffscreenBubble>;
   markers: Slots<FighterMarker>;
@@ -178,7 +178,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     orbs: new OrbPresentation(s.origin),
     clock: new MatchClock(),
     training: new TrainingReadout(),
-    hints: new HintStrip(),
+    preview: new InputPreview(),
     huds: each(slot => new FighterHud(slot, 4)),
     bubbles: each(slot => new OffscreenBubble(slot)),
     markers: each(slot => new FighterMarker(slot)),
@@ -282,14 +282,16 @@ export function endFighter(s: ShellState, slot: ParticipantSlot): void {
 }
 
 
-export function layoutHuds(s: ShellState, hints: boolean): void {
+export function layoutHuds(s: ShellState, preview: boolean): void {
   const ui = views(s);
-  const active = PARTICIPANT_SLOTS.filter(slot => isActive(s.world, slot));
-  active.forEach((slot, position) => {
-    ui.huds[slot].layout(position, active.length, hints);
-    ui.meterBars[slot].hud.place(meterPlacement(position, active.length, hints));
+  const order = plateOrder(PARTICIPANT_SLOTS.filter(slot => isActive(s.world, slot)), s.game.teamBattle, slot => s.game.teamChoices[slot] ?? 0);
+  const row = plateRow(order.slots.length, preview, order.split);
+  order.slots.forEach((slot, position) => {
+    if (!isParticipantSlot(slot)) return;
+    ui.huds[slot].layout(position, row);
+    ui.meterBars[slot].hud.place(meterPlacement(position, row));
   });
-  ui.hints.place(active.length, hints);
+  ui.preview.place(row);
 }
 
 
@@ -319,9 +321,9 @@ function rebindScreens(ui: UiObjects, selectPause: (choice: number, clicker: Pla
   else for (const slot of PARTICIPANT_SLOTS) bindPrototype(ui.markers[slot], FighterMarker.prototype);
   bindPrototype(ui.clock, MatchClock.prototype);
   bindPrototype(ui.training, TrainingReadout.prototype);
-  const retainedHints: { readonly hints?: HintStrip } = ui;
-  if (retainedHints.hints === undefined) ui.hints = new HintStrip();
-  else bindPrototype(ui.hints, HintStrip.prototype);
+  const retainedPreview: { readonly preview?: InputPreview } = ui;
+  if (retainedPreview.preview === undefined) ui.preview = new InputPreview();
+  else bindPrototype(ui.preview, InputPreview.prototype);
   const retainedChat: { readonly chat?: ChatPanel } = ui;
   if (retainedChat.chat === undefined) ui.chat = new ChatPanel(CHAT_STYLE);
   else bindPrototype(ui.chat, ChatPanel.prototype);

@@ -53,12 +53,14 @@ test("on stage select the chat lines use character select's chat box, under the 
   }
 });
 
-test("in a match the chat panel sits above the fighter plates and the netplay warning, and results, pause and menus use the match box [k1 scenario]", () => {
+test("in a match the chat panel sits above the fighter plates and the netplay warning, and results, pause and menus use the match box, hidden until a line arrives after the match starts [k1 scenario]", () => {
   assertTrue(extent(MATCH_CHAT_BOX, 1).bottom >= PLATE_TOP);
   assertTrue(extent(MATCH_CHAT_BOX, 1).bottom >= NET_INDICATOR_TOP);
   assertEquals(chatBox(Phase.characterMenu), SELECT_CHAT_BOX);
   assertEquals(chatBox(Phase.match), MATCH_CHAT_BOX);
   assertEquals(chatBox(Phase.result), MATCH_CHAT_BOX);
+  assertEquals(chatBox(Phase.match, false), undefined);
+  assertEquals(chatBox(Phase.characterMenu, false), SELECT_CHAT_BOX);
 });
 
 test("the chat panel leaves out commands, whose lines never show in it [k2 property]", () => {

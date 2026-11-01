@@ -85,6 +85,7 @@ BunRuntime.runMain(Effect.gen(function*() {
     const fills = Object.fromEntries([1, 2, 3, 4].map(bar => [`BAR${bar}`, bar <= bars ? '#dbe8f2' : '#262a31']));
     yield* render(`PingSignal${bars}`, 'PingSignal.svg', fills, false);
   }
+  for (const name of ['PreviewRowLit', 'PreviewRule']) yield* run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
   yield* run(['magick', '-background', 'none', join(source, 'StockShadow.svg'), '-depth', '8', `TGA:${join(output, 'StockShadow.tga')}`]);
   yield* gameCursorArt(source, output, run);
   yield* render('SelectionCardGray', 'SelectionCard.svg', { CARD_COLOR: '#30353b', CARD_EDGE: '#555d65', CARD_METAL: '#687078' }, false);

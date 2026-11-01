@@ -3,7 +3,6 @@ import { servicePauseCameraControls, pauseHudHidden } from "./pauseCamera";
 
 
 
-
 import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../../game/input/participants";
 import { clearPulse } from "../../game/input/directionalInput";
 import { ownConfirmedState } from "./confirmedState";
@@ -31,8 +30,9 @@ import { callbackMatchTick } from "./frame";
 import { clearAllInputs, clearParticipantInputs, currentHumanMask } from "./inputs";
 import { INPUT_PREFIX, journalEpoch, publishMenu, serviceJournalEnd } from "./journal";
 import * as journalPause from "./journalPause";
-import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEY_HINTS_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, MAIN_MENU, Key, registerKey, syncKeyEvents } from "./keyEvents";
-import { onHintsKeyDown } from "./hints";
+import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEY_PREVIEW_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, MAIN_MENU, Key, registerKey, syncKeyEvents } from "./keyEvents";
+import { onPreviewKeyDown } from "./keyboardPreview";
+import { receiveChat, toggleChatHistory } from "./matchChat";
 import { onKeyboardPause, onPauseKeyDown } from "./keyboardPause";
 import { onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
 import { onDevCommand } from "./developerCommands";
@@ -316,9 +316,9 @@ function createTriggers(s: ShellState): void {
   registerKey(s, pauseDown, Key.backspace, true);
   registerKey(s, pauseDown, Key.escape, true);
   onEvents(pauseDown, trampoline(KEY_PAUSE_DOWN));
-  const hintsDown = createEvents();
-  registerKey(s, hintsDown, Key.h, true);
-  onEvents(hintsDown, trampoline(KEY_HINTS_DOWN));
+  const previewDown = createEvents();
+  registerKey(s, previewDown, Key.h, true);
+  onEvents(previewDown, trampoline(KEY_PREVIEW_DOWN));
   syncTrigger(s, KEYBOARD_PAUSE_PREFIX, KEYBOARD_PAUSE, true);
   syncTrigger(s, MAIN_MENU_PREFIX, MAIN_MENU, true);
   syncKeyEvents(s);
@@ -452,7 +452,7 @@ export function installShell(): void {
   on(KEY_START_DOWN, withShell(onStartKeyDown));
   on(KEY_START_UP, withShell(onStartKeyUp));
   on(KEY_PAUSE_DOWN, withShell(onPauseKeyDown));
-  on(KEY_HINTS_DOWN, withShell(onHintsKeyDown));
+  on(KEY_PREVIEW_DOWN, withShell(onPreviewKeyDown));
   on(KEYBOARD_PAUSE, withShell(onKeyboardPause));
   on(MAIN_MENU, withShell(onMainMenu));
   on(INPUT, withShell(receiveInput));
@@ -462,8 +462,8 @@ export function installShell(): void {
   on(CHAT_CLOSED, withShell(journalPause.chatClosedEvent));
   on(EDITBOX_ENTER, withShell(journalPause.chatEntered));
   on(DEV_COMMAND, withShell(onDevCommand));
-  on(CHAT_RECEIVED, withShell(s => views(s).chat.receive()));
-  on(CHAT_HISTORY, withShell(s => views(s).chat.toggleHistory()));
+  on(CHAT_RECEIVED, withShell(receiveChat));
+  on(CHAT_HISTORY, withShell(toggleChatHistory));
   on(CONTROLS_COMMAND, withShell(controlsCommand));
   on(HELP_EVENT, helpCommand);
   on(PLAYER_LEFT, withShell(playerLeft));

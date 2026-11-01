@@ -43,7 +43,8 @@ export function createChatBox(parent: Frame, name: string): void {
   setMenuText(barText(parent, `${name}Heading`, CHAT_HEADING, BAR_SMALL_TEXT, TextAlignment.left), `${BAR_COLOURS.dim}Chat|r`);
 }
 
-export function chatBox(phase: Phase): ChatBox {
+/** Where the chat shows; a match starts with it hidden, so lines from the select screens stay out of the fight until someone writes again or opens the history. */
+export function chatBox(phase: Phase, matchLines = true): ChatBox | undefined {
   if (phase === Phase.characterMenu || phase === Phase.stageMenu) return SELECT_CHAT_BOX;
-  return MATCH_CHAT_BOX;
+  return matchLines ? MATCH_CHAT_BOX : undefined;
 }

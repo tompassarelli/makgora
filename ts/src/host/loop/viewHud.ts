@@ -1,3 +1,4 @@
+import { keyDown } from "../../game/input/playerKeys";
 import { chargeMeterFill } from "../../game/presentation/chargeMeter";
 import { DEFAULT_FIGHTER } from "../../game/roster/kits";
 import { leadsDuo } from "../../game/sim/duoStatus";
@@ -13,7 +14,7 @@ import type { ParticipantSlot } from "../../game/input/participants";
 import type { KeyBindings } from "../../game/input/keyBindings";
 import { loreClears } from "../../game/classic/loreClears";
 import { type UiObjects, layoutHuds, menuControlHit } from "./ui";
-import { localDevice, localHints } from "./hints";
+import { localDevice, localPreview } from "./keyboardPreview";
 import { type ShellState, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { warcraftMenuOpen } from "./warcraftMenu";
 import { probeWaiting } from "./responseProbe";
@@ -32,9 +33,10 @@ export function presentMatchPanels(s: ShellState, game: MatchState, ui: UiObject
   ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), game.remainingFrames);
   ui.match.presentCountdown(game, showMatch);
   ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer, localKeys);
-  const hints = localHints(s);
-  if (ui.hints.laidFor !== hints) layoutHuds(s, hints);
-  ui.hints.update(showMatch && hints && game.phase === Phase.match && local !== undefined, s.participants[local ?? 0].bindings, localDevice(s));
+  const preview = localPreview(s);
+  if (ui.preview.laidFor !== preview) layoutHuds(s, preview);
+  const keys = s.participants[local ?? 0].keys;
+  ui.preview.update(showMatch && preview && game.phase === Phase.match && local !== undefined, s.participants[local ?? 0].bindings, localDevice(s), key => keyDown(keys, key));
   ui.classic?.updateCard(game);
 }
 

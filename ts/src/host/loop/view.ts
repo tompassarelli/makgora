@@ -38,7 +38,7 @@ import { FIGHTER_PHASE_ALPHA, hideEffect } from "../../game/render/effects";
 import { createLavaRims, destroyLavaRims } from "./lavaRims";
 import type { FighterPose } from "../../game/presentation/fighterPose";
 import { FRAME_SECONDS } from "../../game/presentation/frameClock";
-import { chatBox } from "../../game/ui/nativeChat";
+import { shellChatBox } from "./matchChat";
 import { hideWarcraftChat } from "../../game/ui/warcraftChat";
 import { CANNON_MODEL, CANNON_MODEL_BASE, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, WIND_STREAK_COUNT, WIND_STREAK_MODEL, lavaLook, windStreak } from "../../game/presentation/stageHazards";
 import { escapeMeterView, readEscapeMeter } from "../../game/presentation/escapeMeter";
@@ -54,7 +54,7 @@ import { CANNON_Z, cannonOn, cannonX, hasTide, hasWind, inCannonBarrel } from ".
 import { localParticipantSlot, traceParticipant } from "./diagnostics";
 import { colorFighterBody, paintFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
 import { concealFighter, concealFighters } from "./fighterCloak";
-import { localDevice, localHints } from "./hints";
+import { localDevice, localPreview } from "./keyboardPreview";
 import { type ShellState, type StatusFrames, activeRollback, localSlot } from "./state";
 import { presentedMatch } from "./presentedMatch";
 import { EMPTY_PAUSE_VIEW, pauseScreenUp, pauseView } from "./pauseView";
@@ -557,5 +557,5 @@ export function renderUi(s: ShellState): void {
   presentMessages(s, game, ui, showMatch, paused, selecting, local, localFighter);
   ui.stage.update(game);
   hideWarcraftChat();
-  ui.chat.update(FRAME_SECONDS, chatBox(game.phase));
+  ui.chat.update(FRAME_SECONDS, shellChatBox(s));
 }

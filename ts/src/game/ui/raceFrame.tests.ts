@@ -3,7 +3,7 @@ import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { Character } from "../sim/codes";
 import { RENDERED_FIGHTERS } from "../roster/kits";
 import { RACES, fighterRace } from "../roster/races";
-import { CAP_HEIGHT, DAMAGE_FONT, NAME_FONT, STOCK_SHOWN_PX, type PlateBox, panelLayout, pingBars, stockFadeAlpha, STOCK_FADE_FRAMES } from "./plateLayout";
+import { CAP_HEIGHT, DAMAGE_FONT, NAME_FONT, STOCK_SHOWN_PX, type PlateBox, panelLayout, plateRow, pingBars, stockFadeAlpha, STOCK_FADE_FRAMES } from "./plateLayout";
 import { RACE_FRAME_PX, partScale, raceFrameParts } from "./raceFrame";
 import { pixelsForUnits } from "./portraitFrames";
 
@@ -61,7 +61,7 @@ test("both plates mirror each other: the frame keeps its texture's size, the sto
   assertTrue(STOCK_SHOWN_PX >= capitals(NAME_FONT));
   assertTrue(capitals(NAME_FONT) >= capitals(DAMAGE_FONT) / 4);
   for (const [position, count] of [[0, 1], [0, 2], [1, 2], [0, 4], [3, 4]] as const) {
-    const panel = panelLayout(position, count);
+    const panel = panelLayout(position, plateRow(count));
     const where = `${count} players, position ${position}`;
     assertEquals(panel.frame.width, RACE_FRAME_PX.width, `${where} frame width`);
     assertEquals(panel.frame.height, RACE_FRAME_PX.height, `${where} frame height`);
@@ -81,7 +81,7 @@ test("both plates mirror each other: the frame keeps its texture's size, the sto
       assertTrue(bar.y < bottom(panel.namePlate) && bottom(bar) > panel.namePlate.y);
     }
   }
-  const leftPanel = panelLayout(0, 2), rightPanel = panelLayout(1, 2);
+  const leftPanel = panelLayout(0, plateRow(2)), rightPanel = panelLayout(1, plateRow(2));
   assertEquals(leftPanel.frame.x, 544 - right(rightPanel.frame), "frames mirror");
   leftPanel.stocks.forEach((stock, index) => assertEquals(stock.x, 544 - right(rightPanel.stocks[index] ?? stock), `stock ${index} mirrors`));
 });

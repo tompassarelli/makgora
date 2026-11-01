@@ -1,5 +1,4 @@
 import { Action } from "../input/actions";
-import { type KeyBindings, keyFor, keyLabel, keyNames } from "../input/keyBindings";
 import { PAD_LAYOUTS, type PadControl } from "../input/padLayouts";
 
 export type HintDevice = "keyboard" | "pad";
@@ -21,37 +20,18 @@ function padButtons(action: Action): string {
   return names.length === 0 ? "—" : names.join("/");
 }
 
-function keyboardMove(bindings: Readonly<KeyBindings>): string {
-  const keys = [Action.moveUp, Action.moveLeft, Action.moveDown, Action.moveRight].map(action => keyLabel(keyFor(bindings, action, 0) ?? keyFor(bindings, action, 1)));
-  return keys.join(" ");
-}
-
-export function hintRows(device: HintDevice, bindings: Readonly<KeyBindings>, hideKeyFree: boolean): HintRow[] {
-  if (device === "pad") {
-    return [
-      { keys: "Left stick", label: "move" },
-      { keys: padButtons(Action.jump), label: "jump" },
-      { keys: padButtons(Action.attack), label: "attack" },
-      { keys: padButtons(Action.special), label: "special" },
-      { keys: padButtons(Action.leftTrigger), label: "shield" },
-      { keys: padButtons(Action.grab), label: "grab" },
-      { keys: padButtons(Action.strong), label: "Strong" },
-      { keys: "R stick tilt", label: "Mod X + Y" },
-      { keys: "Start", label: "pause" },
-      ...(hideKeyFree ? [{ keys: "H", label: "hide" }] : []),
-    ];
-  }
+/** A pad player's preview: the pad's buttons for each action, until a drawn pad diagram takes the slot. */
+export function padHintRows(hideKeyFree: boolean): HintRow[] {
   return [
-    { keys: keyboardMove(bindings), label: "move" },
-    { keys: keyNames(bindings, Action.jump), label: "jump" },
-    { keys: keyNames(bindings, Action.attack), label: "attack" },
-    { keys: keyNames(bindings, Action.special), label: "special" },
-    { keys: keyNames(bindings, Action.leftTrigger), label: "shield" },
-    { keys: keyNames(bindings, Action.grab), label: "grab" },
-    { keys: keyNames(bindings, Action.strong), label: "Strong" },
-    { keys: keyNames(bindings, Action.modX), label: "Mod X" },
-    { keys: keyNames(bindings, Action.modY), label: "Mod Y" },
-    { keys: "Esc", label: "pause" },
+    { keys: "Left stick", label: "move" },
+    { keys: padButtons(Action.jump), label: "jump" },
+    { keys: padButtons(Action.attack), label: "attack" },
+    { keys: padButtons(Action.special), label: "special" },
+    { keys: padButtons(Action.leftTrigger), label: "shield" },
+    { keys: padButtons(Action.grab), label: "grab" },
+    { keys: padButtons(Action.strong), label: "Strong" },
+    { keys: "R stick tilt", label: "Mod X + Y" },
+    { keys: "Start", label: "pause" },
     ...(hideKeyFree ? [{ keys: "H", label: "hide" }] : []),
   ];
 }

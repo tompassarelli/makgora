@@ -290,6 +290,8 @@ export interface ShellState {
   pauseKeysHeld?: number[];
   chatOpen?: () => boolean;
   chatFrame?: Frame | false;
+  chatLineSinceMatch?: boolean;
+  chatHistoryOpen?: boolean;
   menuPublication?: { phase: MenuPhase; ticks: number };
   readonly pad: NativePadCapture | undefined;
 

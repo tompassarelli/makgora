@@ -81,7 +81,7 @@ L + R + A + START over RESET MATCH: hold two shield buttons (shield, light shiel
 second trigger) and Attack, then press Start (Esc or Backspace), or click the plate,
 to return to fighter selection. On a keyboard the plate names the keys you bound
 to those actions. Start, Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
-the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). H on the pause screen is reserved for the new-player hints toggle; G hides the HUD for a clean screenshot.
+the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). H on the pause screen is reserved for the Show keyboard in game toggle; G hides the HUD for a clean screenshot.
 
 At fighter selection, up/down (W/S on WASD, Space/E on Box) moves focus
 between fighter cards and CPU Opponent settings. Left/right changes the focused
@@ -112,11 +112,13 @@ bring back your saved ones. Y binds to any action and stays Start on fighter and
 remain reserved for Warcraft shortcuts. Pressing a reserved key during a rebind
 is refused and the screen names what it is reserved for.
 
-New-player hints are on until you turn them off. In a match a small strip at the bottom centre,
-between the player panels, lists your own keys (your controller's buttons on a pad) for move, jump,
-attack, special, shield, grab, Strong, Mod X, Mod Y and Esc to pause. Press H in a match, click "New-player
-hints" on the Controls screen or on the pause screen to hide it, and the choice is saved with your
-profile. If you bind H to an action, the strip drops its "H: hide" line and the buttons still work. Ctrl+T starts a developer input trace.
+Show keyboard in game is on for a new player and off for anyone who saved controls before it
+existed. In a match a small CONTROLS panel sits in the bottom row between the player panels and lists
+every action with the key you bound to it in brackets ([-] when unbound): movement, Mod-X (Walk), then
+A (Atk), B (Spc), X (Jmp) and Y (Jmp, the short hop) on the left; the C-stick, Mod-Y (Tilt), then
+Shield (both trigger keys), Lightshield, Strong (Smash) and Grab on the right. A row lights while you hold its key (your controller's buttons on a pad). Press H in a match or click "Show keyboard in
+game" on the Controls screen to hide or show it, and the choice is saved with your controls. If you
+bind H to an action, H stops toggling it and the button still works. Ctrl+T starts a developer input trace.
 
 Help: type -help (or -commands) in chat for every player command, one line
 each, or press F9 for the quest log's Controls (your current layout and how to

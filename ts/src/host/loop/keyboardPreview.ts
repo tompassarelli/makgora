@@ -1,4 +1,4 @@
-import { hintsKeyFree, toggleNewPlayerHints } from "../../game/ui/bindingSettings";
+import { previewKeyFree, toggleKeyboardPreview } from "../../game/ui/bindingSettings";
 import { PAD_PRESENT_KEY } from "../../game/input/padCapture";
 import type { HintDevice } from "../../game/ui/hintLines";
 import { osKeyDown } from "../../platform/osKeys";
@@ -11,26 +11,28 @@ import { views } from "./ui";
 import { windowFocused } from "wisp/game/input";
 import { eventPlayer, playerSlot } from "wisp/game/players";
 
-export function localHints(s: Readonly<ShellState>): boolean {
+// Capture maps play pads inside the map, so -dev hints shows the preview in a chosen look, or hides it, instead of reading the player's setting and controller.
+export function localPreview(s: Readonly<ShellState>): boolean {
   const local = localParticipantSlot(s);
-  return local !== undefined && s.participants[local].bindings.hints;
+  const look = s.dev.hintsLook;
+  return local !== undefined && (look === undefined ? s.participants[local].bindings.keyboard : look !== "off");
 }
 
-// Capture maps play pads inside the map, so -dev hints chooses the look there instead of reading the connected controller.
 export function localDevice(s: Readonly<ShellState>): HintDevice {
-  return s.dev.hintsLook ?? (windowFocused() && osKeyDown(PAD_PRESENT_KEY) ? "pad" : "keyboard");
+  const look = s.dev.hintsLook;
+  return look === "keyboard" || look === "pad" ? look : windowFocused() && osKeyDown(PAD_PRESENT_KEY) ? "pad" : "keyboard";
 }
 
-export function localHintsKey(s: Readonly<ShellState>): boolean {
+export function localPreviewKey(s: Readonly<ShellState>): boolean {
   const local = localParticipantSlot(s);
-  return local !== undefined && hintsKeyFree(s.participants[local].bindings);
+  return local !== undefined && previewKeyFree(s.participants[local].bindings);
 }
 
-export function onHintsKeyDown(s: ShellState): void {
+export function onPreviewKeyDown(s: ShellState): void {
   const slot = playerSlot(eventPlayer());
   if (!isParticipantSlot(slot) || slot !== localSlot() || s.game.phase !== Phase.match || !humanActive(s.game, slot)) return;
   if (s.chatOpen?.() ?? warcraftChatOpen(s.chatFrame)) return;
   const settings = s.participants[slot].bindings;
-  if (!hintsKeyFree(settings) || views(s).settings[slot].isOpen()) return;
-  toggleNewPlayerHints(settings);
+  if (!previewKeyFree(settings) || views(s).settings[slot].isOpen()) return;
+  toggleKeyboardPreview(settings);
 }

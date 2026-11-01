@@ -100,9 +100,35 @@ const RIGHT_PANEL: PanelLayout = {
   pingNumber: flip(PING_NUMBER),
 };
 
-export const panelMirrored = (position: number, count: number): boolean => count > 1 && 2 * position >= count;
+/** The bottom row: how many plates, how many of them sit left of the input preview (the rest face them, mirrored), and whether the preview is shown between them. */
+export interface PlateRow {
+  readonly count: number;
+  readonly split: number;
+  readonly preview: boolean;
+}
 
-export const panelLayout = (position: number, count: number): PanelLayout => panelMirrored(position, count) ? RIGHT_PANEL : LEFT_PANEL;
+const evenSplit = (count: number): number => count - idiv(count, 2);
+
+export const plateRow = (count: number, preview = false, split = evenSplit(count)): PlateRow => ({ count, split: Math.max(0, Math.min(count, split)), preview });
+
+export const panelMirrored = (position: number, row: PlateRow): boolean => row.count > 1 && position >= row.split;
+
+export const panelLayout = (position: number, row: PlateRow): PanelLayout => panelMirrored(position, row) ? RIGHT_PANEL : LEFT_PANEL;
+
+/** The fighters in plate order and the row's split: in Team Battle each team keeps its plates together and the split falls on the team boundary nearest the middle, so with two teams one sits left of the preview and the other right. */
+export function plateOrder(active: readonly number[], teamBattle: boolean, teamOf: (slot: number) => number): { readonly slots: readonly number[]; readonly split: number } {
+  const count = active.length;
+  if (!teamBattle) return { slots: active, split: evenSplit(count) };
+  const slots = active.slice().sort((first, second) => teamOf(first) !== teamOf(second) ? teamOf(first) - teamOf(second) : first - second);
+  let split = evenSplit(count);
+  let best = count + 1;
+  for (let at = 1; at < count; at++) {
+    const boundary = teamOf(slots[at - 1] ?? 0) !== teamOf(slots[at] ?? 0);
+    const distance = Math.abs(2 * at - count);
+    if (boundary && distance < best) { best = distance; split = at; }
+  }
+  return { slots, split };
+}
 
 
 /** Rivals-style signal bars: 4 under 60 ms, 3 under 100, 2 under 150, 1 above; 0 hides the readout (no measurement). */
@@ -125,27 +151,21 @@ export const stockFadeAlpha = (framesSinceLoss: number): number =>
 
 const ROW_LEFT = f32(0.02);
 const ROW_WIDTH = f32(0.76);
-const HINTS_ROW_LEFT = f32(0.005);
-const HINTS_ROW_WIDTH = f32(0.79);
-export const HINT_STRIP_CELL = f32(0.12);
+const PREVIEW_ROW_LEFT = f32(0.005);
+const PREVIEW_ROW_WIDTH = f32(0.79);
+export const PREVIEW_CELL = f32(0.12);
 
-const leftGroup = (count: number): number => count - idiv(count, 2);
+const rowLeft = (row: PlateRow): number => row.preview ? PREVIEW_ROW_LEFT : ROW_LEFT;
 
-function rowLeft(hints: boolean): number {
-  return hints ? HINTS_ROW_LEFT : ROW_LEFT;
+const cellWidth = (row: PlateRow): number => row.preview ? (PREVIEW_ROW_WIDTH - PREVIEW_CELL) / row.count : ROW_WIDTH / row.count;
+
+// The preview's cell sits between the left-facing panels and the mirrored ones: p1 [keys] p2, p1 p2 [keys] p3, p1 p2 [keys] p3 p4.
+export function plateLeft(position: number, row: PlateRow): number {
+  const gap = row.preview && position >= row.split ? PREVIEW_CELL : 0.0;
+  return rowLeft(row) + cellWidth(row) * (position + 0.5) + gap - unitsForPixels(PLATE_WIDTH_PX) / 2;
 }
 
-function cellWidth(count: number, hints: boolean): number {
-  return hints ? (HINTS_ROW_WIDTH - HINT_STRIP_CELL) / count : ROW_WIDTH / count;
-}
-
-// The strip's cell sits between the left-facing panels and the mirrored ones: p1 [keys] p2, p1 p2 [keys] p3 p4.
-export function plateLeft(position: number, count: number, hints = false): number {
-  const gap = hints && position >= leftGroup(count) ? HINT_STRIP_CELL : 0.0;
-  return rowLeft(hints) + cellWidth(count, hints) * (position + 0.5) + gap - unitsForPixels(PLATE_WIDTH_PX) / 2;
-}
-
-export const hintStripLeft = (count: number): number => HINTS_ROW_LEFT + cellWidth(count, true) * leftGroup(count);
+export const previewCellLeft = (row: PlateRow): number => PREVIEW_ROW_LEFT + cellWidth(row) * row.split;
 
 
 export const boxLeft = (left: number, box: PlateBox): number => left + unitsForPixels(box.x);
@@ -160,8 +180,8 @@ export interface PlateRect {
 
 const plateRect = (left: number, box: PlateBox): PlateRect => ({ left: boxLeft(left, box), centerY: boxTop(box) - unitsForPixels(box.height) / 2, width: unitsForPixels(box.width), height: unitsForPixels(box.height) });
 
-export function meterPlacement(position: number, count: number, hints = false): PlateRect {
-  return plateRect(plateLeft(position, count, hints), panelLayout(position, count).ultimateBar);
+export function meterPlacement(position: number, row: PlateRow): PlateRect {
+  return plateRect(plateLeft(position, row), panelLayout(position, row).ultimateBar);
 }
 
 

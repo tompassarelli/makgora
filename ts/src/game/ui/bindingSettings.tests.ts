@@ -25,7 +25,7 @@ import {
   pickBindingPreset,
   resetToLayout,
   saveBindingSettings,
-  toggleNewPlayerHints,
+  toggleKeyboardPreview,
 } from "./bindingSettings";
 import { PLAYER_FILE_CAPACITY } from "../core/gameFiles";
 import { keyboardCaps } from "./keyboardLayout";
@@ -344,7 +344,7 @@ test("three Custom slots each keep their own keys and name through a save, and t
   const longest = createBindingSettings(0, { load: () => undefined, readLocal: () => undefined, save: () => undefined });
   longest.ready = true;
   for (const custom of longest.customs) custom.name = "W".repeat(SLOT_NAME_LIMIT);
-  const full = encodeLayouts({ layouts: longest.layouts, active: "custom", customs: longest.customs, slot: CUSTOM_SLOT_COUNT - 1, hints: true });
+  const full = encodeLayouts({ layouts: longest.layouts, active: "custom", customs: longest.customs, slot: CUSTOM_SLOT_COUNT - 1, keyboard: true });
   assertEquals(full.length <= PLAYER_FILE_CAPACITY, true, `${full.length} characters fit ${PLAYER_FILE_CAPACITY}`);
   assertEquals(decodeLayouts(full)?.customs.map(custom => custom.name).join(","), longest.customs.map(custom => custom.name).join(","), "longest names round-trip");
 });
@@ -415,24 +415,27 @@ test("Delete profile empties the selected Custom slot to the stock Custom keys w
   assertEquals(reloaded?.customs[0]?.name, "Keep");
 });
 
-test("a fresh profile has new-player hints on, turning them off is saved with the profile and a load brings it back off, and an older save without the setting loads with hints on [k2 property]", () => {
+test("a brand-new player has Show keyboard in game on, turning it off is saved with their controls and a load brings it back off, and a save from before the setting loads with it off [k2 property]", () => {
   const saved: string[] = [];
   const empty: BindingLoadResult = { kind: "empty" };
   const settings = createBindingSettings(0, { load: (_owner, complete) => complete(saved.length === 0 ? empty : { kind: "loaded", encoded: saved[saved.length - 1] ?? "" }), readLocal: () => empty, save: (_owner, encoded) => { saved.push(encoded); } });
   initializeBindingSettings(settings);
-  assertEquals(settings.hints, true, "fresh profile");
-  toggleNewPlayerHints(settings);
-  assertEquals(settings.hints, false, "turned off");
+  assertEquals(settings.keyboard, true, "fresh profile");
+  toggleKeyboardPreview(settings);
+  assertEquals(settings.keyboard, false, "turned off");
   assertEquals(saved.length, 1, "saved at once");
-  assertEquals(decodeLayouts(saved[0] ?? "")?.hints, false, "saved as off");
+  assertEquals(decodeLayouts(saved[0] ?? "")?.keyboard, false, "saved as off");
 
   const again = createBindingSettings(0, { load: (_owner, complete) => complete({ kind: "loaded", encoded: saved[0] ?? "" }), readLocal: () => empty, save: () => undefined });
   initializeBindingSettings(again);
-  assertEquals(again.hints, false, "off after a load");
-  toggleNewPlayerHints(again);
-  assertEquals(again.hints, true, "on again");
+  assertEquals(again.keyboard, false, "off after a load");
+  toggleKeyboardPreview(again);
+  assertEquals(again.keyboard, true, "on again");
 
   const current = encodeLayouts(layoutSave(presetLayouts(), "wasd", false));
+  const withHints = "KN" + current.slice(2, 4) + "1" + current.slice(5);
+  assertEquals(decodeLayouts(withHints)?.keyboard, false, "a save from the new-player hints days, hints on");
   const older = "KM" + current.slice(2, 4) + current.slice(5);
-  assertEquals(decodeLayouts(older)?.hints, true, "a save from before the setting");
+  assertEquals(decodeLayouts(older)?.keyboard, false, "a save from before either setting");
+  assertEquals(decodeLayouts(encodeLayouts(layoutSave(presetLayouts(), "wasd", true)))?.keyboard, true, "on survives a save and load");
 });

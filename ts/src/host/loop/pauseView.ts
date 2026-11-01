@@ -6,7 +6,7 @@ import { timedMatch } from "../../game/lobby/lobbyState";
 import { clockMain, clockSeconds } from "../../game/ui/clockReadout";
 import type { PauseView } from "../../game/ui/pauseScreen";
 import { osKeyDown } from "../../platform/osKeys";
-import { localHints, localHintsKey } from "./hints";
+import { localPreview, localPreviewKey } from "./keyboardPreview";
 import type { ShellState } from "./state";
 import { windowFocused } from "wisp/game/input";
 
@@ -28,8 +28,8 @@ export function pauseView(s: Readonly<ShellState>, bindings: Readonly<KeyBinding
     chord: chordLabels(bindings),
     camera: pad ? PAD_CAMERA : keyboardCamera(bindings),
     pauseKey: "Esc",
-    hints: localHints(s),
-    hintsKey: localHintsKey(s),
+    keyboard: localPreview(s),
+    keyboardKey: localPreviewKey(s),
   };
 }
 

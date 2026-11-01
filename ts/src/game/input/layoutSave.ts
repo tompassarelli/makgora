@@ -18,12 +18,13 @@ export interface LayoutSave {
   readonly active: BindingPreset;
   readonly customs: readonly CustomSlot[];
   readonly slot: number;
-  readonly hints: boolean;
+  readonly keyboard: boolean;
 }
 
 const LAYOUT_SAVE = "KL";
 const SLOTS_SAVE = "KM";
 const HINTS_SAVE = "KN";
+const KEYBOARD_SAVE = "KO";
 
 export function slotName(typed: string): string {
   let name = "";
@@ -43,15 +44,16 @@ export function presetLayouts(): LayoutBindings {
   return { wasd: presetBindings("wasd"), standard: presetBindings("standard"), custom: presetBindings("custom") };
 }
 
-export function layoutSave(layouts: LayoutBindings, active: BindingPreset, hints = true): LayoutSave {
+/** A brand-new player sees the keyboard preview; a save from before the setting existed loads with it off. */
+export function layoutSave(layouts: LayoutBindings, active: BindingPreset, keyboard = true): LayoutSave {
   const customs: CustomSlot[] = [];
   for (let slot = 0; slot < CUSTOM_SLOT_COUNT; slot++) customs.push({ bindings: slot === 0 ? layouts.custom : presetBindings("custom"), name: "" });
-  return { layouts, active, customs, slot: 0, hints };
+  return { layouts, active, customs, slot: 0, keyboard };
 }
 
-export function encodeLayouts({ layouts, active, customs, slot, hints }: LayoutSave): string {
+export function encodeLayouts({ layouts, active, customs, slot, keyboard }: LayoutSave): string {
   const custom = customs.map(({ bindings, name }) => encodeBindings(bindings) + String(name.length).padStart(2, "0") + name).join("");
-  return HINTS_SAVE + BINDING_PRESETS.indexOf(active) + slot + (hints ? 1 : 0) + encodeBindings(layouts.wasd) + encodeBindings(layouts.standard) + custom;
+  return KEYBOARD_SAVE + BINDING_PRESETS.indexOf(active) + slot + (keyboard ? 1 : 0) + encodeBindings(layouts.wasd) + encodeBindings(layouts.standard) + custom;
 }
 
 interface Cursor {
@@ -89,16 +91,16 @@ function decodeOneCustom(saved: string, active: BindingPreset): LayoutSave | und
     if (bindings === undefined) return undefined;
     layouts[preset] = bindings;
   }
-  return cursor.at === saved.length ? layoutSave(layouts, active) : undefined;
+  return cursor.at === saved.length ? layoutSave(layouts, active, false) : undefined;
 }
 
-function decodeCustomSlots(saved: string, active: BindingPreset, withHints: boolean): LayoutSave | undefined {
+function decodeCustomSlots(saved: string, active: BindingPreset, withFlag: boolean, withKeyboard: boolean): LayoutSave | undefined {
   const slot = DIGITS.indexOf(saved.charAt(3));
   if (slot < 0 || slot >= CUSTOM_SLOT_COUNT) return undefined;
-  const hintsDigit = withHints ? saved.charAt(4) : "1";
-  if (hintsDigit !== "0" && hintsDigit !== "1") return undefined;
+  const flagDigit = withFlag ? saved.charAt(4) : "0";
+  if (flagDigit !== "0" && flagDigit !== "1") return undefined;
   const layouts = presetLayouts();
-  const cursor = { saved, at: withHints ? 5 : 4 };
+  const cursor = { saved, at: withFlag ? 5 : 4 };
   for (const preset of ["wasd", "standard"] as const) {
     const bindings = readBindings(cursor, preset);
     if (bindings === undefined) return undefined;
@@ -114,7 +116,7 @@ function decodeCustomSlots(saved: string, active: BindingPreset, withHints: bool
   const chosen = customs[slot];
   if (chosen === undefined || cursor.at !== saved.length) return undefined;
   layouts.custom = chosen.bindings;
-  return { layouts, active, customs, slot, hints: hintsDigit === "1" };
+  return { layouts, active, customs, slot, keyboard: withKeyboard && flagDigit === "1" };
 }
 
 export function decodeLayouts(saved: string): LayoutSave | undefined {
@@ -122,6 +124,7 @@ export function decodeLayouts(saved: string): LayoutSave | undefined {
   const active = BINDING_PRESETS[DIGITS.indexOf(saved.charAt(2))];
   if (active === undefined) return undefined;
   if (version === LAYOUT_SAVE) return decodeOneCustom(saved, active);
-  if (version === SLOTS_SAVE) return decodeCustomSlots(saved, active, false);
-  return version === HINTS_SAVE ? decodeCustomSlots(saved, active, true) : undefined;
+  if (version === SLOTS_SAVE) return decodeCustomSlots(saved, active, false, false);
+  if (version === HINTS_SAVE) return decodeCustomSlots(saved, active, true, false);
+  return version === KEYBOARD_SAVE ? decodeCustomSlots(saved, active, true, true) : undefined;
 }

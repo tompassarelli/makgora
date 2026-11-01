@@ -58,6 +58,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
   for (const strategy of s.runtime.botStrategies) clearBotStrategy(strategy);
   makePreview(s);
   s.chatFrame ??= findWarcraftChat();
+  s.chatLineSinceMatch = false;
   initializeMatchFighters(s.game, s.world);
 
 

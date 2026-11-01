@@ -9,7 +9,8 @@ import { trainingReadout } from "../session/messages";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
 import { fighterAt } from "../sim/roster";
 import { Phase, requestStageSelect, selectCharacter } from "../lobby/lobbyState";
-import { DAMAGE_DARK_FROM, SHAKE_FRAMES, type PlateBox, boxLeft, boxTop, damageColour, damageText, meterPlacement, numberJolt, panelLayout, percentText, plateLeft, stepJolt, HINT_STRIP_CELL, hintStripLeft } from "./plateLayout";
+import { DAMAGE_DARK_FROM, PLATE_TOP, SHAKE_FRAMES, type PlateBox, type PlateRow, boxLeft, boxTop, damageColour, damageText, meterPlacement, numberJolt, panelLayout, panelMirrored, percentText, plateLeft, plateOrder, plateRow, previewCellLeft, stepJolt, PREVIEW_CELL } from "./plateLayout";
+import { PREVIEW_PANEL } from "./keyboardPreview";
 import { unitsForPixels } from "./portraitFrames";
 
 const channels = (colour: number): readonly number[] => [imod(idiv(colour, 65536), 256), imod(idiv(colour, 256), 256), imod(colour, 256)];
@@ -81,12 +82,12 @@ const overlaps = (a: ReturnType<typeof span>, b: ReturnType<typeof span>) => a.l
 test("the ultimate bar is a long thin strip under the damage number, clear of the name, stocks and doom, on both sides of the screen for two to four players [k3 measure docs/design/mana.md]", () => {
   for (let count = 1; count <= 4; count++) {
     for (let position = 0; position < count; position++) {
-      const ultimateBar = meterPlacement(position, count);
+      const ultimateBar = meterPlacement(position, plateRow(count));
       const where = `${count} players, position ${position}`;
       assertEquals(ultimateBar.width >= 8 * ultimateBar.height, true, `${where}: ultimate bar is long and thin`);
       const bar = span(ultimateBar.left, ultimateBar.centerY, ultimateBar.width, ultimateBar.height);
-      const left = plateLeft(position, count);
-      const panel = panelLayout(position, count);
+      const left = plateLeft(position, plateRow(count));
+      const panel = panelLayout(position, plateRow(count));
       for (const other of [panel.name, panel.doom, panel.stockCount, ...panel.stocks]) assertEquals(!overlaps(bar, boxSpan(left, other)), true, `${where}: no overlap with name, stocks or doom`);
       const damage = boxSpan(left, panel.damage);
       assertEquals(bar.top <= damage.bottom + unitsForPixels(4), true, `${where}: bar is under the damage number`);
@@ -97,18 +98,54 @@ test("the ultimate bar is a long thin strip under the damage number, clear of th
 const SCREEN_WIDTH = f32(0.8);
 const PLATE_WIDTH = unitsForPixels(544);
 
-test("with hints on the strip sits between the player panels, centred for two and four players, clear of every panel and inside the screen, and with hints off the panels keep their even spacing [k2 property]", () => {
-  for (const count of [2, 3, 4]) {
-    const strip = { left: hintStripLeft(count), right: hintStripLeft(count) + HINT_STRIP_CELL };
-    for (let position = 0; position < count; position++) {
-      const left = plateLeft(position, count, true);
-      assertEquals(left >= 0 && left + PLATE_WIDTH <= SCREEN_WIDTH, true, `${count} players, panel ${position} inside the screen`);
-      const clear = position < count - idiv(count, 2) ? left + PLATE_WIDTH <= strip.left + unitsForPixels(8) : left >= strip.right - unitsForPixels(8);
-      assertEquals(clear, true, `${count} players, panel ${position} clear of the strip`);
+const DAMAGE_DIGITS_PX = 192;
+const SCREEN_LEFT = 0.0;
+
+function plateParts(left: number, row: PlateRow, position: number): ReturnType<typeof span>[] {
+  const panel = panelLayout(position, row);
+  const digits: PlateBox = { ...panel.damage, x: panel.damage.x + panel.damage.width - DAMAGE_DIGITS_PX, width: DAMAGE_DIGITS_PX };
+  return [panel.frame, panel.namePlate, panel.percent, digits, panel.pingSignal, panel.pingNumber, ...panel.stockShadows].map(box => boxSpan(left, box));
+}
+
+const ARRANGEMENTS: readonly { readonly name: string; readonly active: readonly number[]; readonly teams?: readonly number[]; readonly slots: string; readonly split: number }[] = [
+  { name: "1 player", active: [0], slots: "0", split: 1 },
+  { name: "2-player free-for-all", active: [0, 1], slots: "0,1", split: 1 },
+  { name: "3-player free-for-all", active: [0, 1, 2], slots: "0,1,2", split: 2 },
+  { name: "4-player free-for-all", active: [0, 1, 2, 3], slots: "0,1,2,3", split: 2 },
+  { name: "2v2 Team Battle", active: [0, 1, 2, 3], teams: [0, 1, 0, 1], slots: "0,2,1,3", split: 2 },
+  { name: "1v1 Team Battle", active: [0, 2], teams: [1, 0, 0, 1], slots: "2,0", split: 1 },
+  { name: "1v2 Team Battle", active: [0, 1, 2], teams: [1, 0, 0, 0], slots: "1,2,0", split: 2 },
+  { name: "1v3 Team Battle", active: [0, 1, 2, 3], teams: [1, 0, 0, 0], slots: "1,2,3,0", split: 3 },
+  { name: "three-team battle", active: [0, 1, 2, 3], teams: [2, 0, 1, 1], slots: "1,2,3,0", split: 1 },
+];
+
+test("the bottom row puts p1 | preview | p2, p1 p2 | preview | p3 and p1 p2 | preview | p3 p4, keeps each Team Battle team on its own side of the preview, mirrors the plates right of it, never overlaps a plate with another or the preview, stays inside the 4:3 screen and the HUD band, and with the preview off closes up evenly spaced and centred [k2 property]", () => {
+  for (const arrangement of ARRANGEMENTS) {
+    const teams = arrangement.teams;
+    const order = plateOrder(arrangement.active, teams !== undefined, slot => teams?.[slot] ?? 0);
+    assertEquals(order.slots.join(","), arrangement.slots, `${arrangement.name}: plate order`);
+    assertEquals(order.split, arrangement.split, `${arrangement.name}: plates left of the preview`);
+    const count = order.slots.length;
+    for (const preview of [true, false]) {
+      const row = plateRow(count, preview, order.split);
+      const where = `${arrangement.name}, preview ${preview ? "on" : "off"}`;
+      const lefts = order.slots.map((_slot, position) => plateLeft(position, row));
+      const parts = lefts.map((left, position) => plateParts(left, row, position));
+      const panelLeft = previewCellLeft(row) + (PREVIEW_CELL - PREVIEW_PANEL.width) / 2;
+      const panel = span(panelLeft, f32(0.012) + PREVIEW_PANEL.height / 2, PREVIEW_PANEL.width, PREVIEW_PANEL.height);
+      parts.forEach((plate, position) => {
+        assertEquals(panelMirrored(position, row), count > 1 && position >= order.split, `${where}: plate ${position} faces the middle`);
+        for (const part of plate) {
+          assertEquals(part.left >= SCREEN_LEFT && part.right <= SCREEN_WIDTH && part.top <= PLATE_TOP + f32(0.000001), true, `${where}: plate ${position} inside the screen and the HUD band`);
+          if (preview) assertEquals(position < order.split ? part.right <= panel.left : part.left >= panel.right, true, `${where}: plate ${position} on its side of the preview`);
+          for (let other = position + 1; other < parts.length; other++) for (const theirs of parts[other] ?? []) assertEquals(!overlaps(part, theirs), true, `${where}: plates ${position} and ${other} apart`);
+        }
+      });
+      if (preview) assertEquals(panel.left >= SCREEN_LEFT && panel.right <= SCREEN_WIDTH && panel.top <= PLATE_TOP + f32(0.000001), true, `${where}: preview inside the screen and the band`);
+      if (preview) continue;
+      for (let position = 2; position < count; position++) assertEquals(Math.abs((lefts[position] ?? 0) - (lefts[position - 1] ?? 0) - ((lefts[1] ?? 0) - (lefts[0] ?? 0))) < f32(0.0001), true, `${where}: even spacing`);
+      const middle = ((lefts[0] ?? 0) + (lefts[count - 1] ?? 0) + unitsForPixels(544)) / 2;
+      assertEquals(Math.abs(middle - SCREEN_WIDTH / 2) < f32(0.001), true, `${where}: centred`);
     }
-    if (count !== 3) assertEquals(Math.abs((strip.left + strip.right) / 2 - SCREEN_WIDTH / 2) < f32(0.001), true, `${count} players: strip centred`);
-    const steps = [];
-    for (let position = 1; position < count; position++) steps.push(plateLeft(position, count) - plateLeft(position - 1, count));
-    for (const step of steps) assertEquals(Math.abs(step - (steps[0] ?? 0)) < f32(0.0001), true, `${count} players: even spacing with hints off`);
   }
 });

@@ -204,7 +204,7 @@ function lookReceipt(s: ShellState, message: string): string | undefined {
 
 function hintsReceipt(s: ShellState, message: string): string | undefined {
   const look = message.slice("-dev hints ".length);
-  if (look !== "keyboard" && look !== "pad") return undefined;
+  if (look !== "keyboard" && look !== "pad" && look !== "off") return undefined;
   s.dev.hintsLook = look;
   return `dev: hints ${look}`;
 }
