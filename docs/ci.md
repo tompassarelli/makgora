@@ -295,8 +295,11 @@ Everything runs from source: no private build inputs, no `.w3x` build.
 Runner placement comes from the reviewed `ts/runner-routing.json` file and one
 script, `ts/scripts/runnerRoute.ts`, which the workflow revision's own plan or
 `route` job runs. Trusted premerge jobs (Autoland's reports and farm-test's check groups
-except perf) take the self-hosted `farm-big` runners by default and fall back to
-`ubuntu-latest` when the farm is full. The background class (Balance and Background sweeps) is set to `ubuntu-latest`
+except perf) are set to `ubuntu-latest` since 2026-11-01: on gex45 the farm's landing jobs took 0.5 to 2.9 of its 20
+cores beside always-on Warcraft clients while leased agent builds waited a median 462 s and up to an hour, hosted
+Linux minutes cost nothing on this public repository, and hosted shards ran 1.45 to 1.5 times faster (#468). The cost
+is the account's cap of 40 hosted jobs at once, which Autoland shares with Wisp. Set `premerge` back to `farm-big` to
+send these jobs to the farm first, with `ubuntu-latest` when the farm is full. The background class (Balance and Background sweeps) is set to `ubuntu-latest`
 since 2026-11-01: those jobs need no GPU, client or private input, Balance sizes its shard count to the hosted slots
 Autoland and Farm test leave free, and on gex45 they had filled the farm while leased agent builds queued 18 to 23 deep.
 CI's post-landing checks gate nothing and run on `ubuntu-latest` since 2026-11-01: on the farm the old development-loop job hit its 20-minute timeout in 12 of 13 runs (mean 1223 s) and filtered-checks took 1224 s on average, against 483 s and 263 s on hosted runners. Both are now CI's farm job, the Farm test groups that run their steps (2026-11-01): parity tapes in parity-0 to parity-3; parity numeric and the stack-trace profile in lua; the parity corpus and the compiler benchmark in corpus; the type-check benchmark in types; cpuCoverage in computer-0 and computer-1; the clean room in clean-room; effect-kit in static; and the playable-bot-four budget and commit metrics in smoke (perf off main). With `full=1` each group's input key covers all its checks, so a main run skips every group whose files match a pass from a landing gate or an earlier main run, and a group is no longer one 20-minute job cut off mid-run.
