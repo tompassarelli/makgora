@@ -7,6 +7,9 @@ import type { FrameDefinition, FrameNode } from "wisp/scripts/wisp/frames";
 import { writeFrames } from "wisp/scripts/wisp/frames";
 import { CPU_SETTINGS_DONE, CPU_SETTINGS_PANEL, CPU_SETTINGS_PREVIEW, CPU_SETTINGS_PROMPT, CPU_SETTINGS_ROWS } from "../../src/game/ui/cpuSettingsLayout";
 import { MENU_FONT, PANEL_TEXTURE } from "../../src/game/ui/hudLayout";
+import { RACES, type Race } from "../../src/game/roster/races";
+import { RACE_FRAME_PX, raceFrameName, raceFrameParts } from "../../src/game/ui/raceFrame";
+import { unitsForPixels } from "../../src/game/ui/portraitFrames";
 
 const PANEL = CPU_SETTINGS_PANEL;
 const BUTTON_HEIGHT = 0.027;
@@ -43,8 +46,20 @@ export const OPPONENT_SETTINGS: FrameDefinition = {
   ],
 };
 
+const raceFrame = (race: Race): FrameDefinition => ({
+  name: raceFrameName(race),
+  type: "SIMPLEFRAME",
+  width: unitsForPixels(RACE_FRAME_PX.width),
+  height: unitsForPixels(RACE_FRAME_PX.height),
+  textures: raceFrameParts(race).map(part => ({
+    key: part.key, layer: part.layer, ...(part.file === undefined ? {} : { file: part.file }), texCoord: [...part.texCoord] as [number, number, number, number], alphaMode: "BLEND",
+    width: unitsForPixels(part.width), height: unitsForPixels(part.height), anchor: { point: "TOPLEFT", x: unitsForPixels(part.x), y: -unitsForPixels(part.y) },
+  })),
+});
+
 export const UI_FRAMES: readonly { readonly definition: FrameDefinition; readonly bindings: string }[] = [
   { definition: OPPONENT_SETTINGS, bindings: "src/game/ui/opponentSettingsFrames.ts" },
+  ...RACES.map(race => ({ definition: raceFrame(race), bindings: `src/game/ui/raceFrame${race}Frames.ts` })),
 ];
 
 

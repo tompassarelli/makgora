@@ -59,7 +59,7 @@ test("the percent blends white at 0, yellow near 50, red at 100 and dark red fro
 
 test("a fighter at 150% that takes no hit keeps its percent at rest on every frame, a hit shakes it, and it returns to rest after the shake [k1 scenario]", () => {
   const jolt = numberJolt();
-  stepJolt(jolt, true, 150.0);
+  stepJolt(jolt, false, 150.0);
   for (let frame = 0; frame < 30; frame++) {
     stepJolt(jolt, true, 150.0);
     assertEquals(jolt.dx, 0.0, `no hit, frame ${frame} dx`);

@@ -12,8 +12,10 @@ import { Effect } from '../../ts/node_modules/effect/dist/index.js';
 import { ChildProcess } from '../../ts/node_modules/effect/dist/process/index.js';
 import { BunRuntime, BunServices } from '../../ts/node_modules/@effect/platform-bun/dist/index.js';
 import { ProcessFailure, runProcess } from '../../ts/scripts/hostProcess';
-import { findExtractor, stockStorage } from '../../ts/scripts/wisp/renderAssetStore';
+import { findExtractor, reforgedStorage } from '../../ts/scripts/wisp/renderAssetStore';
 import { gameCursorArt } from './gameCursorArt';
+import { RACES } from '../../ts/src/game/roster/races';
+import { RACE_COLOURS } from '../../ts/src/game/ui/raceFrame';
 
 const project = resolve(import.meta.dir, '../..');
 const source = join(project, 'tools/selection/art');
@@ -50,13 +52,23 @@ BunRuntime.runMain(Effect.gen(function*() {
     yield* render(`SelectionHandLabelP${slot + 1}`, 'SelectionHandLabel.svg', { LABEL_COLOR: hex(color.rgb), LABEL_TEXT: `P${slot + 1}` }, true);
     yield* render(`SelectionChipCPUP${slot + 1}`, 'SelectionChip.svg', { CHIP_COLOR: '#626977', CHIP_LABEL: `P${slot + 1}` }, true);
     yield* render(`SelectionCard${color.name}`, 'SelectionCard.svg', { CARD_COLOR: hex(mix(color.rgb, 0x000000, 0.4)), CARD_EDGE: hex(mix(color.rgb, 0xffffff, 0.35)), CARD_METAL: '#bbc6cf' }, false);
-    yield* render(`HudPlate${slot}`, 'HudPlate.svg', { PLAYER_COLOR: hex(color.rgb) }, true);
     yield* render(`MarkerArrow${slot}`, 'MarkerArrow.svg', { ARROW_COLOR: hex(color.rgb) }, false);
-    yield* run(['magick', join(output, `HudPlate${slot}.tga`), '-flop', '-depth', '8', `TGA:${join(output, `HudPlateMirror${slot}.tga`)}`]);
   }
   for (const [pose, art] of [['Point', 'point'], ['Fan', 'fan'], ['Pinch', 'pinch']] as const) {
     yield* run(['magick', join(source, `wc3-hand-${art}.png`), '-filter', 'point', '-resize', `${HAND_ART_COLUMNS}x${HAND_ART_ROWS}!`, '-background', 'none', '-gravity', 'northwest', '-splice', `${HAND_MARGIN}x${HAND_MARGIN}`, '-extent', `${HAND_TEXELS}x${HAND_TEXELS}`, '-depth', '8', `TGA:${join(output, `SelectionHand${pose}.tga`)}`]);
   }
+  for (const race of RACES) {
+    const colours = RACE_COLOURS[race];
+    yield* render(`RaceBacking${race}`, 'RaceBacking.svg', { BACKING_LIGHT: hex(colours.light), BACKING_MID: hex(colours.mid), BACKING_DARK: hex(colours.dark) }, false);
+    yield* render(`NamePlate${race}`, 'NamePlate.svg', { RACE_TINT: hex(colours.tint) }, false);
+    yield* run(['magick', join(output, `NamePlate${race}.tga`), '-flop', '-depth', '8', `TGA:${join(output, `NamePlateMirror${race}.tga`)}`]);
+  }
+  for (let bars = 1; bars <= 4; bars++) {
+    const fills = Object.fromEntries([1, 2, 3, 4].map(bar => [`BAR${bar}`, bar <= bars ? '#dbe8f2' : '#262a31']));
+    yield* render(`PingSignal${bars}`, 'PingSignal.svg', fills, false);
+  }
+  for (const name of ['StockStrip', 'StockRing']) yield* run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
+  yield* run(['magick', join(output, 'StockStrip.tga'), '-flop', '-depth', '8', `TGA:${join(output, 'StockStripMirror.tga')}`]);
   yield* gameCursorArt(source, output, run);
   yield* render('SelectionCardGray', 'SelectionCard.svg', { CARD_COLOR: '#30353b', CARD_EDGE: '#555d65', CARD_METAL: '#687078' }, false);
   for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionBullseye', 'SelectionThreeBridges']) {
@@ -65,7 +77,7 @@ BunRuntime.runMain(Effect.gen(function*() {
   const extractor = findExtractor();
   if (extractor === undefined || extractor === null) return yield* Effect.fail(ioFailure('SelectionRandom needs CASC_EXTRACTOR (smashcraft-tools extract-animation-assets builds it)'));
   const randomIcon = join(output, 'BTNSelectHeroOn.dds');
-  yield* run([extractor, stockStorage(), 'war3.w3mod:replaceabletextures/commandbuttons/btnselectheroon.dds', randomIcon]);
+  yield* run([extractor, process.env.WC3_STORAGE ?? reforgedStorage(), 'war3.w3mod:replaceabletextures/commandbuttons/btnselectheroon.dds', randomIcon]);
   // The stock 64 px icon bevels its outer 4 px; the tile keeps only the "?" inside it, inset on the backdrop behind every fighter tile.
   yield* run(['magick', ...TILE_BACKGROUND, '(', randomIcon, '-crop', '55x56+5+4', '+repage', '-resize', `${RANDOM_ICON_PX}x${RANDOM_ICON_PX}`, '(', '+clone', '-channel', 'RGB', '-separate', '-evaluate-sequence', 'max', '+channel', '-level', '0,20%', ')', '-alpha', 'off', '-compose', 'CopyOpacity', '-composite', ')', '-compose', 'over', '-gravity', 'center', '-composite', '-alpha', 'off', '-depth', '8', `TGA:${join(output, 'SelectionRandom.tga')}`]);
   yield* Effect.try({ try: () => rmSync(randomIcon), catch: ioFailure });

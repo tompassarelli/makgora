@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="316" height="42" viewBox="0 0 316 42">
+ <defs><linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff2a0"/><stop offset=".4" stop-color="#e2b23a"/><stop offset="1" stop-color="#8a5a10"/></linearGradient></defs>
+ <path d="M17 2.5H313.5L299 39.5H2.5Z" fill="#07080b" fill-opacity=".85" stroke="url(#gold)" stroke-width="3"/>
+ <path d="M20 6H308.5L296.5 36H8" fill="none" stroke="RACE_TINT" stroke-width="1.6" stroke-opacity=".9"/>
+</svg>

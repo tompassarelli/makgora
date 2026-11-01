@@ -11,12 +11,8 @@ export const MENU_FONT = "Fonts\\FRIZQT__.TTF";
 export const NET_INDICATOR_TOP = f32(0.145);
 /** The dark tooltip backing behind every menu panel, readout and meter. */
 export const PANEL_TEXTURE = "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp";
-/** Each slot colour's HUD plate, then the same plates mirrored for the right-hand side. */
-export const HUD_PLATE_TEXTURES = ["war3mapImported\\HudPlate0.tga", "war3mapImported\\HudPlate1.tga", "war3mapImported\\HudPlate2.tga", "war3mapImported\\HudPlate3.tga"] as const;
-export const HUD_PLATE_MIRROR_TEXTURES = ["war3mapImported\\HudPlateMirror0.tga", "war3mapImported\\HudPlateMirror1.tga", "war3mapImported\\HudPlateMirror2.tga", "war3mapImported\\HudPlateMirror3.tga"] as const;
 /** The arrow over a fighter in each slot colour. */
 export const MARKER_ARROW_TEXTURES = ["war3mapImported\\MarkerArrow0.tga", "war3mapImported\\MarkerArrow1.tga", "war3mapImported\\MarkerArrow2.tga", "war3mapImported\\MarkerArrow3.tga"] as const;
-export const hudPlateTexture = (color: number, mirrored: boolean): string => at(mirrored ? HUD_PLATE_MIRROR_TEXTURES : HUD_PLATE_TEXTURES, color);
 export const markerArrowTexture = (color: number): string => at(MARKER_ARROW_TEXTURES, color);
 export const MENU_STYLE = {
   font: MENU_FONT,

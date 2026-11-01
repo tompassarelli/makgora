@@ -2,10 +2,11 @@ import { f32 } from "wisp/src/sim/f32";
 import { toInt } from "wisp/src/sim/binary32";
 import { idiv, imod } from "wisp/src/sim/intMath";
 import { unitsForPixels } from "./portraitFrames";
+import { RACE_FRAME_PX } from "./raceFrame";
 
 
 export const PLATE_WIDTH_PX = 544;
-export const PLATE_HEIGHT_PX = 236;
+export const PLATE_HEIGHT_PX = 334;
 
 const PLATE_BOTTOM = f32(0.012);
 export const PLATE_TOP = PLATE_BOTTOM + unitsForPixels(PLATE_HEIGHT_PX);
@@ -19,60 +20,110 @@ export interface PlateBox {
 
 export const STOCK_ICON_PX = 64;
 export const STOCK_ICONS_SHOWN = 5;
-const STOCK_SHOWN_PX = 38;
-const STOCK_STEP_PX = 44;
+export const STOCK_SHOWN_PX = 40;
+const STOCK_RING_PX = 46;
+const STOCK_STEP_PX = 52;
+export const STOCK_FADE_FRAMES = 10;
+
+export const NAME_FONT = f32(0.0105);
+export const DAMAGE_FONT = f32(0.036);
+export const CAP_HEIGHT = f32(0.7);
+export const PING_FONT = f32(0.0062);
+export const PING_BARS = 4;
+export const PING_SIGNAL_TEXTURE_PX = { width: 68, height: 50 } as const;
 
 export interface PanelLayout {
   readonly mirrored: boolean;
-  readonly bust: PlateBox;
+  readonly frame: PlateBox;
   readonly damage: PlateBox;
   readonly percent: PlateBox;
   readonly doom: PlateBox;
+  readonly namePlate: PlateBox;
   readonly name: PlateBox;
   readonly ultimateBar: PlateBox;
+  readonly stockStrip: PlateBox;
+  readonly stockRings: readonly PlateBox[];
   readonly stocks: readonly PlateBox[];
   readonly stockCount: PlateBox;
+  readonly pingSignal: PlateBox;
+  readonly pingNumber: PlateBox;
 }
 
-const BUST: PlateBox = { x: -12, y: -96, width: 256, height: 256 };
+const PING_COLUMN_PX = 68;
+const FRAME: PlateBox = { x: PING_COLUMN_PX, y: 0, width: RACE_FRAME_PX.width, height: RACE_FRAME_PX.height };
 // Warcraft wraps oversized frame text onto a hidden second line; reserve enough width for damage digits.
-const DAMAGE: PlateBox = { x: 150, y: -4, width: 284, height: 124 };
-const PERCENT: PlateBox = { x: 436, y: 34, width: 60, height: 70 };
-const DOOM: PlateBox = { x: 444, y: -8, width: 44, height: 44 };
-const NAME: PlateBox = { x: 244, y: 148, width: 228, height: 30 };
-const ULTIMATE_BAR: PlateBox = { x: 260, y: 123, width: 262, height: 10 };
-const STOCK_LEFT_PX = 246;
-const STOCK_TOP_PX = 186;
+const DAMAGE: PlateBox = { x: 198, y: 96, width: 284, height: 124 };
+const PERCENT: PlateBox = { x: 484, y: 134, width: 60, height: 70 };
+const DOOM: PlateBox = { x: 492, y: 88, width: 44, height: 44 };
+const ULTIMATE_BAR: PlateBox = { x: 226, y: 222, width: 286, height: 10 };
+const NAME_PLATE: PlateBox = { x: 208, y: 236, width: 316, height: 42 };
+const NAME: PlateBox = { x: 234, y: 236, width: 264, height: 42 };
+const STOCK_STRIP: PlateBox = { x: 218, y: 282, width: 286, height: 52 };
+const STOCK_LEFT_PX = 236;
+const STOCK_TOP_PX = 285;
+const PING_SIGNAL_WIDTH_PX = 24;
+const PING_SIGNAL: PlateBox = { x: 0, y: 249, width: PING_SIGNAL_WIDTH_PX, height: (PING_SIGNAL_WIDTH_PX * PING_SIGNAL_TEXTURE_PX.height) / PING_SIGNAL_TEXTURE_PX.width };
+const PING_NUMBER: PlateBox = { x: 26, y: 244, width: 42, height: 24 };
 
 const flip = (box: PlateBox): PlateBox => ({ ...box, x: PLATE_WIDTH_PX - box.x - box.width });
 
-function stockBox(index: number): PlateBox {
-  return { x: STOCK_LEFT_PX + index * STOCK_STEP_PX, y: STOCK_TOP_PX, width: STOCK_SHOWN_PX, height: STOCK_SHOWN_PX };
-}
+const stockRing = (index: number): PlateBox => ({ x: STOCK_LEFT_PX + index * STOCK_STEP_PX, y: STOCK_TOP_PX, width: STOCK_RING_PX, height: STOCK_RING_PX });
+const stockIcon = (index: number): PlateBox => {
+  const inset = (STOCK_RING_PX - STOCK_SHOWN_PX) / 2;
+  return { x: STOCK_LEFT_PX + index * STOCK_STEP_PX + inset, y: STOCK_TOP_PX + inset, width: STOCK_SHOWN_PX, height: STOCK_SHOWN_PX };
+};
 
-const STOCKS: readonly PlateBox[] = [0, 1, 2, 3, 4].map(index => stockBox(index));
-const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_PX, width: 120, height: STOCK_SHOWN_PX };
+const ICON_INDEXES = [0, 1, 2, 3, 4];
+const STOCK_RINGS: readonly PlateBox[] = ICON_INDEXES.map(index => stockRing(index));
+const STOCKS: readonly PlateBox[] = ICON_INDEXES.map(index => stockIcon(index));
+const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_PX, width: 120, height: STOCK_RING_PX };
 
-const LEFT_PANEL: PanelLayout = { mirrored: false, bust: BUST, damage: DAMAGE, percent: PERCENT, doom: DOOM, name: NAME, ultimateBar: ULTIMATE_BAR, stocks: STOCKS, stockCount: STOCK_COUNT };
+const LEFT_PANEL: PanelLayout = {
+  mirrored: false, frame: FRAME, damage: DAMAGE, percent: PERCENT, doom: DOOM, namePlate: NAME_PLATE, name: NAME, ultimateBar: ULTIMATE_BAR,
+  stockStrip: STOCK_STRIP, stockRings: STOCK_RINGS, stocks: STOCKS, stockCount: STOCK_COUNT, pingSignal: PING_SIGNAL, pingNumber: PING_NUMBER,
+};
 
-const MIRRORED_PERCENT_X = 236;
+const MIRRORED_PERCENT_X = 216;
 const GROUP_LEFT = MIRRORED_PERCENT_X - PERCENT.x + DAMAGE.x;
 
 const RIGHT_PANEL: PanelLayout = {
   mirrored: true,
-  bust: flip(BUST),
+  frame: flip(FRAME),
   damage: { ...DAMAGE, x: GROUP_LEFT },
   percent: { ...PERCENT, x: MIRRORED_PERCENT_X },
   doom: { ...DOOM, x: MIRRORED_PERCENT_X + DOOM.x - PERCENT.x },
+  namePlate: flip(NAME_PLATE),
   name: flip(NAME),
   ultimateBar: flip(ULTIMATE_BAR),
+  stockStrip: flip(STOCK_STRIP),
+  stockRings: STOCK_RINGS.map(box => flip(box)),
   stocks: STOCKS.map(box => flip(box)),
   stockCount: flip(STOCK_COUNT),
+  pingSignal: flip(PING_SIGNAL),
+  pingNumber: flip(PING_NUMBER),
 };
 
 export const panelMirrored = (position: number, count: number): boolean => count > 1 && 2 * position >= count;
 
 export const panelLayout = (position: number, count: number): PanelLayout => panelMirrored(position, count) ? RIGHT_PANEL : LEFT_PANEL;
+
+
+/** Rivals-style signal bars: 4 under 60 ms, 3 under 100, 2 under 150, 1 above; 0 hides the readout (no measurement). */
+export const PING_THRESHOLDS_MS = [60, 100, 150] as const;
+
+export function pingBars(roundTripMs: number): number {
+  if (roundTripMs < 0) return 0;
+  let bars = PING_BARS;
+  for (const limit of PING_THRESHOLDS_MS) {
+    if (roundTripMs < limit) return bars;
+    bars--;
+  }
+  return bars;
+}
+
+/** A lost stock's icon alpha, frame by frame after the loss: full, then gone after STOCK_FADE_FRAMES. */
+export const stockFadeAlpha = (framesSinceLoss: number): number =>
+  framesSinceLoss <= 0 ? 255 : framesSinceLoss >= STOCK_FADE_FRAMES ? 0 : idiv(255 * (STOCK_FADE_FRAMES - framesSinceLoss), STOCK_FADE_FRAMES);
 
 
 const ROW_LEFT = f32(0.02);
