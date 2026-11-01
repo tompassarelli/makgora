@@ -75,17 +75,29 @@ exterior, the Plaguelands' ziggurats, temples and farmsteads are gone.
 
 ## Hellfire: a portal across fractured ground
 
-The Demon Gate remains on the left third, at x -1450, y 6500 and scale
-1.25. Its existing glow supplies the ambient motion. Two low rock shelves
-frame the underside at y 2600 and 3700. Two smaller detached fragments
-rise farther back on the right, at y 5400 and 6200, progressing from scale
-1.5 to 0.75. This makes a directional broken landscape rather than a pair
-of looming rocks above the deck. The near fire trap is removed: its broad
-particle plume competed with the portal and the moving platforms. The gate
-itself already carries the stage's magical activity. Beneath the deck
-(stage art rule 16), a near ridge of red Outland spires and boulders rises at
-y 1,450–1,700, an Outland rock arch stands in the valley, and a lighter ridge
-of rubble and boulders at y 2,600–3,000 leads back to the spire field.
+The Demon Gate, the Dark Portal of the stage, stands at the horizontal centre
+behind the deck, at x 0, y 7000, z -913 and scale 2.75, facing the camera, so
+its green opening reads between the fighters in Classic and in Reforged. Its
+base stands on the floor model (bottom at z -1300), as high as the ground rule
+allows, so the far camera shows its opening above the deck. Reforged draws
+the Outland rocks and spires 1.5 to 2 times the Classic size (the Reforged
+spire is 404 by 401 by 465 units, the Classic one 242 by 311 by 458; the
+Reforged gate 525 by 568 by 662), so a clearing was cut in front of the gate
+sized from the Reforged extents, kept in `REFORGED_BOUNDS` of
+smashcraft:ts/scripts/stageViewRules.ts: no piece in front of the gate
+overlaps its screen box at the near or far camera extreme. The mid spires at
+y 4400 to 4700 stand outside x ±2500, the three large spires that stood
+beside the gate at y 6600 to 6900 now stand behind it at y 7900 to 8100, and
+the two ridge boulders in front of it at y 2800 and 3000 are low rubble
+(matrix height 0.375 and 0.25). Tom saw the portal covered by Reforged rocks
+in a 2026-11-01 playtest and asked for it centred and cleared, with the map
+staying in all graphics modes. Two low rock shelves frame the underside at y
+2600 and 3700. The near fire trap is removed: its broad particle plume
+competed with the portal and the moving platforms. The gate itself already
+carries the stage's magical activity. Beneath the deck (stage art rule 16),
+a near ridge of red Outland spires and boulders rises at y 1,450–1,700, an
+Outland rock arch stands in the valley, and a lighter ridge of rubble and
+boulders at y 2,600–3,000 leads back to the spire field.
 
 ## Composition constraints
 

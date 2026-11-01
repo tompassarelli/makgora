@@ -3,7 +3,7 @@ import type { DeckPalette } from "../../ts/src/game/assets/stagePalette";
 import { hiddenBelow, moodColor, type SceneryPiece, type StageScenery } from "../../ts/src/game/presentation/stageScenery";
 import { deckProblems, fogProblems, groundProblems, intensityProblems, landmarkProblems, lightProblems, mirrorProblems } from "../../ts/src/game/presentation/stageRules";
 import { MODEL_FACTS } from "../../ts/scripts/wisp/modelFacts";
-import { behindProblems, floatingProblems, worldProblems } from "../../ts/scripts/stageViewRules";
+import { behindProblems, clearingProblems, floatingProblems, worldProblems } from "../../ts/scripts/stageViewRules";
 
 type Rgb = readonly [number, number, number];
 type Fog = NonNullable<StageScenery["fog"]>;
@@ -105,6 +105,7 @@ export function candidateProblems(stage: Stage, { scenery, light }: Candidate): 
     ...landmarkProblems(stage.name, scenery.pieces, model => MODEL_FACTS[model]?.bounds),
     ...groundProblems(stage.name, scenery.pieces, model => MODEL_FACTS[model]?.bounds, hiddenBelow(stage.id)),
     ...behindProblems(stage.id, stage.name, scenery),
+    ...clearingProblems(stage.id, stage.name, scenery.pieces),
     ...lightProblems(stage.name, light),
     ...intensityProblems(stage.name, stage.id, light),
   ];

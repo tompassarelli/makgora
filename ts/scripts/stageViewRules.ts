@@ -1,6 +1,7 @@
 import { modelReach } from "wisp/scripts/wisp/models";
 import { boxSeen } from "wisp/scripts/wisp/visibility";
-import { arenaFarZ, PLAYABLE_BOUNDS, WORLD_BOUNDS, extremeCamera } from "../src/game/presentation/arenaCamera";
+import { arenaFarZ, PLAYABLE_BOUNDS, WORLD_BOUNDS, cameraRay, extremeCamera } from "../src/game/presentation/arenaCamera";
+import { isStructure } from "../src/game/presentation/stageRules";
 import { hiddenBelow, type SceneryPiece, type StageScenery } from "../src/game/presentation/stageScenery";
 import { MAIN_DECK_BODY_SURFACES, solidSurfaceAt } from "../src/game/sim/stage";
 import { stageBounds } from "../src/game/sim/stageBounds";
@@ -103,6 +104,45 @@ export function floatingProblems(stage: number, name: string, pieces: readonly S
         return !placed.some((other) => other !== piece && other.front <= piece.front && x >= other.left && x <= other.right && piece.bottom >= other.bottom && piece.bottom <= other.top);
       });
       if (shown.length > 0) problems.push(`${name} ${extreme}: ${piece.model} base at z ${Math.round(piece.bottom)}`);
+    }
+  }
+  return problems;
+}
+
+// Vertex bounds of the Reforged (_hd.w3mod, build 3.0.1.24371) models of Hellfire, which draw 1.5 to 2 times the Classic size; Classic facts under-size them.
+export const REFORGED_BOUNDS: Readonly<Record<string, Box>> = {
+  "buildings\\demon\\DemonGate\\DemonGate.mdx": { min: [-242.0, -275.0, -141.0], max: [283.0, 293.0, 521.0] },
+  "Doodads\\Outland\\Rocks\\Outland_Rock\\Outland_Rock5.mdx": { min: [-64.0, -78.0, -5.0], max: [68.0, 67.0, 113.0] },
+  "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx": { min: [-204.0, -206.0, -2.0], max: [200.0, 195.0, 463.0] },
+  "Doodads\\Outland\\Structures\\Outland_RockArch\\Outland_RockArch.mdx": { min: [-130.0, -456.0, -308.0], max: [107.0, 472.0, 394.0] },
+};
+
+function screenBox(camera: Parameters<typeof cameraRay>[0], piece: SceneryPiece, box: Box): { readonly left: number; readonly right: number; readonly top: number; readonly bottom: number } {
+  const [mx, my, mz] = piece.matrixScale ?? [1, 1, 1];
+  const turn = (piece.yaw * Math.PI) / 180;
+  const columns: number[] = [], rows: number[] = [];
+  for (const x of [box.min[0] * mx, box.max[0] * mx]) for (const y of [box.min[1] * my, box.max[1] * my]) for (const z of [box.min[2] * mz, box.max[2] * mz]) {
+    const ray = cameraRay(camera, (x * Math.cos(turn) - y * Math.sin(turn)) * piece.scale + piece.x, (x * Math.sin(turn) + y * Math.cos(turn)) * piece.scale + piece.y, z * piece.scale + piece.z);
+    columns.push(0.5 + ray.across / (2 * camera.tangent * MATCH_CAMERA_ASPECT));
+    rows.push(0.5 - ray.up / (2 * camera.tangent));
+  }
+  return { left: Math.min(...columns), right: Math.max(...columns), top: Math.min(...rows), bottom: Math.max(...rows) };
+}
+
+export function clearingProblems(stage: number, name: string, pieces: readonly SceneryPiece[]): readonly string[] {
+  const landmark = pieces.find(piece => isStructure(piece.model));
+  const own = landmark === undefined ? undefined : REFORGED_BOUNDS[landmark.model];
+  if (landmark === undefined || own === undefined) return [];
+  const problems: string[] = [];
+  for (const extreme of ["near", "far"] as const) {
+    const camera = createMatchCamera();
+    extremeCamera(camera, stage, MATCH_CAMERA_ASPECT, extreme);
+    const shown = screenBox(camera, landmark, own);
+    for (const piece of pieces) {
+      const box = REFORGED_BOUNDS[piece.model] ?? MODEL_FACTS[piece.model]?.bounds;
+      if (piece === landmark || box === undefined || piece.y >= landmark.y) continue;
+      const covers = screenBox(camera, piece, box);
+      if (Math.min(shown.right, covers.right) > Math.max(shown.left, covers.left) && Math.min(shown.bottom, covers.bottom) > Math.max(shown.top, covers.top)) problems.push(`${name} ${extreme}: ${piece.model} at x ${piece.x}, y ${piece.y} covers the landmark ${landmark.model} in Reforged`);
     }
   }
   return problems;

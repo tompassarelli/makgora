@@ -30,7 +30,9 @@
   stage's near and far views once, rejects every candidate that breaks a
   render-free rule (fog start ≥ 5000, deck body ≥ 50 darker than its top and
   top ≥ 40 from the fog, pieces inside x ±4096, nothing floating, no mirror
-  twins, scenery behind the fight, a light that keeps its fighter rules),
+  twins, scenery behind the fight, a landmark with Reforged bounds in `REFORGED_BOUNDS`
+  (smashcraft:ts/scripts/stageViewRules.ts) left uncovered by any piece in front of it at
+  the near and far cameras, a light that keeps its fighter rules),
   renders the rest in one warm Wisp call per mode and client, and ranks them by worst empty-backdrop
   share. It writes `DIR/STAGE-search.txt`: the table and the top one or two
   finalists as scenery and light source, numbers written as `f32(...)` where
