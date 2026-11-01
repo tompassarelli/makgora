@@ -1,9 +1,5 @@
 # Smashcraft
 
-<p align="center">
-  <img src="docs/assets/smashcraft-banner.jpg" alt="Smashcraft" width="100%">
-</p>
-
 Smashcraft is an in-development platform fighter for Warcraft III, inspired by
 Super Smash Bros. Melee. Warcraft heroes fight on floating stages with jumps,
 air dodges, shields, hitstun, knockback and stocks, over rollback netcode.
