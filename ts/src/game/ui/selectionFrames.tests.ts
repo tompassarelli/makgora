@@ -68,13 +68,12 @@ test("Every fighter with a surname or epithet reads as its first name on the sel
   }
 });
 
-test("Mrgl & Grgl reads with spaces on the select card and the match HUD plate; the roster tile keeps Mrgl&Grgl only because the spaced name is wider than the tile's one line [k1 scenario]", () => {
+test("Mrgl & Grgl reads with spaces on the select card, the match HUD plate and the roster tile, whose one line fits it [k1 scenario]", () => {
   assertEquals(nameText(Character.murloc), "Mrgl & Grgl");
   assertEquals(hudTitle(Character.murloc, false), "MRGL & GRGL");
   assertEquals(hudTitle(Character.murloc, true), "Mrgl & Grgl");
   const room = tileNameEms(rosterGrid(ROSTER_TILES));
-  assertTrue(textWidth("Mrgl & Grgl", FRIZ_QUADRATA_WIDTHS) > room);
   const tile = tileLabel(tileOfCharacter(Character.murloc));
-  assertEquals(tile, "Mrgl&Grgl");
+  assertEquals(tile, "Mrgl & Grgl");
   assertTrue(textWidth(tile, FRIZ_QUADRATA_WIDTHS) <= room);
 });

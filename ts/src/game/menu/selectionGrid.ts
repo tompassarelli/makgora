@@ -1,5 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
+import { BAR_STRIP } from "../core/selectBarLayout";
+import { CARD_TOP, SELECT_EDGE_LEFT, SELECT_EDGE_RIGHT } from "../core/selectScreenLayout";
 
 
 
@@ -12,11 +14,11 @@ export type RosterTile = number;
 const CELL_WIDTH = f32(0.112);
 const CELL_HEIGHT = f32(0.132);
 
-const REGION_X = f32(0.25);
-const REGION_WIDTH = f32(0.55);
-
-const REGION_BOTTOM = f32(0.205);
-const REGION_HEIGHT = f32(0.278);
+const REGION_GAP = f32(0.008);
+const REGION_X = SELECT_EDGE_LEFT;
+const REGION_WIDTH = f32(SELECT_EDGE_RIGHT - SELECT_EDGE_LEFT);
+const REGION_BOTTOM = f32(CARD_TOP + REGION_GAP);
+const REGION_HEIGHT = f32(f32(f32(BAR_STRIP.y - BAR_STRIP.height) - REGION_GAP) - REGION_BOTTOM);
 
 export interface RosterGrid {
   readonly count: number;

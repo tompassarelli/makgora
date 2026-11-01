@@ -10,9 +10,6 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/pa
 import { type MatchState, canChooseComputer, canCycleSlotMode, costumeFor, fighterActive, humanFighterActive, humanPresent } from "../lobby/lobbyState";
 import {
   type SelectionDrag,
-  CARD_HEIGHT,
-  CARD_TOP,
-  CARD_WIDTH,
   cardDown,
   cardRight,
   cardSize,
@@ -27,6 +24,7 @@ import {
   chipY,
 } from "../menu/selectionDrag";
 import type { RosterGrid } from "../menu/selectionGrid";
+import { CARD_HEIGHT, CARD_TOP, CARD_WIDTH } from "../core/selectScreenLayout";
 import { Character } from "../sim/codes";
 import { cardPortrait } from "./portraitFrames";
 import { TEAM_NAMES } from "../sim/teams";

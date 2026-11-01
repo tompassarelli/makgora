@@ -5,6 +5,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
+import { CARD_LEFT, CARD_PITCH, CARD_SCALE, CARD_TOP, CARD_WIDTH } from "../core/selectScreenLayout";
 import { PARTICIPANT_CAPACITY, participantActive } from "../input/participants";
 import { type RosterGrid, type RosterTile, cellRect, nearestTile, tileAt } from "./selectionGrid";
 
@@ -66,12 +67,6 @@ export function chipY(grid: RosterGrid, slot: number, choice: number): number {
 
 export const readyChipSize = (grid: RosterGrid): number => grid.cellWidth * f32(0.52);
 
-export const CARD_SCALE = f32(0.86);
-export const CARD_WIDTH = f32(f32(0.16) * CARD_SCALE);
-export const CARD_HEIGHT = f32(f32(0.22) * CARD_SCALE);
-export const CARD_TOP = f32(0.198);
-const CARD_LEFT = f32(0.046);
-const CARD_PITCH = f32(0.19);
 
 export function cardX(slot: number): number {
   return f32(CARD_LEFT + f32(slot * CARD_PITCH));

@@ -1,4 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
+import { CHAT_SLOT, SELECT_EDGE_LEFT, SELECT_EDGE_RIGHT } from "./selectScreenLayout";
 
 export interface BarBox {
   readonly x: number;
@@ -14,8 +15,8 @@ const box = (x: number, y: number, width: number, height: number): BarBox => ({ 
 const right = (b: BarBox): number => f32(b.x + b.width);
 const bottom = (b: BarBox): number => f32(b.y - b.height);
 
-export const BAR_LEFT = f32(0.02);
-export const BAR_RIGHT = f32(0.78);
+export const BAR_LEFT = SELECT_EDGE_LEFT;
+export const BAR_RIGHT = SELECT_EDGE_RIGHT;
 export const BAR_TOP = f32(0.594);
 export const BAR_HEIGHT = f32(0.03);
 const GAP = f32(0.006);
@@ -206,7 +207,7 @@ export interface BarArt {
 
 const both = (b: BarBox): BarArt[] => [{ style: "Frame", width: b.width, height: b.height }, { style: "Lit", width: b.width, height: b.height }];
 
-/** Every framed image the bar and its panels draw, for the art build, the map's imports and the preload. */
+/** Every framed image the bar, its panels and the chat box draw, for the art build, the map's imports and the preload. */
 export function barArt(): readonly BarArt[] {
   const art: BarArt[] = [
     ...[BACK, MODE, TEAMS, RULES, GUIDE, GEAR].flatMap(b => both(b)),
@@ -214,6 +215,7 @@ export function barArt(): readonly BarArt[] {
     { style: "Primary", width: START.width, height: START.height },
     { style: "Key", width: KEY_WIDTH, height: KEY_HEIGHT },
     ...Object.values(BAR_PANELS).map((p): BarArt => ({ style: "Panel", width: p.width, height: p.height })),
+    { style: "Panel", width: CHAT_SLOT.width, height: CHAT_SLOT.height },
     ...both(DRAWER_ROWS.reset), ...both(DRAWER_ROWS.presets[0]), ...both(DRAWER_ROWS.stocks.less), ...both(DRAWER_ROWS.ultimates),
     ...both(TRAINING_ROWS.behaviour.value), ...both(DRAWER_ROWS.stocks.value),
     ...both(MODE_ROWS.modes[0]), ...both(MODE_ROWS.teamToggle), ...both(GUIDE_ROWS.controls), ...both(GEAR_ROWS.autoDelay),

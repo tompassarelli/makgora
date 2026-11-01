@@ -5,6 +5,8 @@ import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
 import { NET_INDICATOR_TOP } from "./hudLayout";
 import { PLATE_TOP } from "./plateLayout";
+import { CHAT_SLOT } from "../core/selectScreenLayout";
+import { cardX } from "../menu/selectionDrag";
 import { CHAT_STYLE, MATCH_CHAT_BOX, STAGE_SELECT_CHAT_BOX, CHARACTER_SELECT_CHAT_BOX, chatBox } from "./nativeChat";
 import type { ChatBox } from "wisp/src/ui/chatPanel";
 
@@ -29,7 +31,7 @@ test("the chat panel stays inside the 4:3 screen area on every screen, recent or
   }
 });
 
-test("on character select the chat panel clears every roster tile and the fighter cards, in the recent and history views [k1 scenario]", () => {
+test("on character select the chat lines sit inside the chat box left of the fighter cards and clear every roster tile, in the recent and history views [k1 scenario]", () => {
   for (const count of [PLAYABLE_CHARACTERS.length, PLAYABLE_CHARACTERS.length + 4]) {
     const grid = rosterGrid(count);
     for (let tile = 0; tile < count; tile++) {
@@ -40,7 +42,10 @@ test("on character select the chat panel clears every roster tile and the fighte
       }
     }
   }
-  assertTrue(extent(CHARACTER_SELECT_CHAT_BOX, 1).bottom >= CARD_STRIP_TOP);
+  const recent = extent(CHARACTER_SELECT_CHAT_BOX, CHARACTER_SELECT_CHAT_BOX.rows);
+  assertTrue(recent.left >= CHAT_SLOT.left && recent.right <= f32(CHAT_SLOT.left + CHAT_SLOT.width));
+  assertTrue(recent.bottom >= CHAT_SLOT.bottom && recent.top <= f32(f32(CHAT_SLOT.bottom + CHAT_SLOT.height) - f32(0.02)));
+  assertTrue(extent(CHARACTER_SELECT_CHAT_BOX, CHAT_STYLE.historyRows).right <= cardX(0));
 });
 
 test("on stage select the chat panel sits left of the stage tiles and above the stage preview, in the recent and history views [k1 scenario]", () => {

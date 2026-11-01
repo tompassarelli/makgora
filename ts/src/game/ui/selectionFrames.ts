@@ -33,7 +33,6 @@ export const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
   [Character.grom]: "Grom",
   [Character.malfurion]: "Malfurion",
   [Character.ladyVashj]: "Vashj",
-  [Character.murloc]: "Mrgl&Grgl",
 };
 
 export const TILE_NAME_INSET = f32(0.008);

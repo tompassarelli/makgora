@@ -384,6 +384,24 @@ because the ui layer may not read session or Classic state itself.
 Follow-up: a Moves button on each player card, so the move list opens for that
 fighter without the Guide.
 
+## Select screen frame
+
+Under the bar the screen is one centred frame inside the 4:3 area, so 4:3,
+3:2 and 16:9 windows show the same arrangement with backdrop beside it
+(smashcraft:ts/src/game/core/selectScreenLayout.ts). The bar and the bottom
+row both span the same edges, 0.02 to 0.78. The roster grid fills the band
+between the bar and the bottom row, centred on the screen's middle; until
+2026-11-02 it sat right of centre beside an empty left column and below a gap
+under the bar, and the four player cards were spread across the bottom. Tom
+asked (2026-11-02, from a wireframe) for everything centred, the cards packed
+together and chat as a box at the bottom left with the cards right after it.
+The bottom row is now the chat slot, `CHAT_SLOT` (left, bottom, width and
+height, as tall as the cards), then the four cards one small gap apart ending
+at the right edge. The chat component draws in that slot; until Wisp's window
+chat lands the slot shows a framed box headed Chat with the chat lines inside
+it. A larger grid also gives every tile name room, so Mrgl & Grgl's tile reads
+with spaces like its card.
+
 ## Classic tile colour floor
 
 Provenance: Tom's 0.0.192 character-select finding #563 item 22, measured
