@@ -168,24 +168,32 @@ function standOn(d: Duel, stage: number, surface: number, x: number, facing: num
   setWorldMotionValue(d.pitLord.motion.meleeVelocityZ, 0.0);
 }
 
-function impactHeights(d: Duel, stage: number): number[] {
-  const gaps: number[] = [];
+interface Landing { readonly burst: number; readonly streak: number }
+
+function landings(d: Duel, stage: number): Landing[] {
+  const found: Landing[] = [];
   const seen = new Set<number>();
+  const before: ({ readonly modelOffsetZ: number } | undefined)[] = [];
   const standingZ = d.pitLord.motion.z;
   step(d, "press");
   for (let frame = 1; frame < RAIN_END + 20 && d.pitLord.special.action === SpecialAction.heroDown; frame++) {
     step(d, frame < RAIN_CHANNEL.first + 8 ? "hold" : "none");
     d.pitLord.projectiles.forEach((p, index) => {
-      if (p.life <= 0 || p.spec?.model?.includes(FIRE_BURST) !== true || seen.has(index * 1000 + p.life)) return;
-      seen.add(index * 1000 + p.life);
-      const floor = floorBelow(stage, d.tick, p.x, standingZ);
-      gaps.push(floor === undefined ? Number.NaN : f32(p.z - floor));
+      const burst = p.life > 0 && p.spec?.model?.includes(FIRE_BURST) === true;
+      if (burst && !seen.has(index * 1000 + p.life) && p.spec !== undefined) {
+        seen.add(index * 1000 + p.life);
+        const floor = floorBelow(stage, d.tick, p.x, standingZ);
+        const meteor = before[index]; if (meteor === undefined) throw new Error(`no meteor before burst at slot ${index} tick ${d.tick}: ${before.map((b, i) => `${i}:${b === undefined ? "-" : "m"}`).join(",")} lives ${d.pitLord.projectiles.map(q => `${q.life}`).join(",")}`);
+        const streakEnd = f32(f32(p.z - p.spec.offsetZ) + (meteor?.modelOffsetZ ?? Number.NaN));
+        found.push({ burst: floor === undefined ? Number.NaN : f32(p.z - floor), streak: floor === undefined ? Number.NaN : f32(streakEnd - floor) });
+      }
+      if (p.life > 0 && p.spec?.model?.includes("FireBallMissile") === true) before[index] = { modelOffsetZ: p.spec.modelOffsetZ ?? 0.0 };
     });
   }
-  return gaps;
+  return found;
 }
 
-test("Rain of Fire's impact burst and burning patch sit on the floor the meteors land on, on the main deck and on a platform, facing either way [k1 scenario]", () => {
+test("Rain of Fire's meteors end on the floor they hit and each impact burst starts there, on the main deck and on a platform, facing either way [k1 scenario]", () => {
   const platform = { left: surfaceLeft(1, 1, 0), right: surfaceRight(1, 1, 0) };
   const scenes: readonly (readonly [string, number, number, number, number])[] = [
     ["main deck right", 0, 0, 0.0, 1],
@@ -198,9 +206,9 @@ test("Rain of Fire's impact burst and burning patch sit on the floor the meteors
   for (const [name, stage, surface, x, facing] of scenes) {
     const d = duel(-IN_RAIN * facing, Character.peon);
     standOn(d, stage, surface, x, facing);
-    const gaps = impactHeights(d, stage);
+    const gaps = landings(d, stage);
     if (gaps.length === 0) off.push(`${name}: no meteor burst`);
-    for (const gap of gaps) if (!(Math.abs(gap) < f32(0.001))) off.push(`${name}: ${gap}`);
+    for (const gap of gaps) for (const [what, off1] of [["burst", gap.burst], ["streak end", gap.streak]] as const) if (!(Math.abs(off1) < f32(0.001))) off.push(`${name}: ${what} ${off1}`);
   }
   assertEquals(off.join("; "), "", "bursts off the floor");
 });

@@ -50,7 +50,7 @@ export const RAIN_LANDINGS = [f32(1.7), f32(2.6), f32(2.15)] as const;
 const meteor = (wave: number, landing: number): SpecialProjectile => ({
   spawnFrame: RAIN_CHANNEL.first + wave, offsetX: f32(h(landing) - f32(METEOR_DRIFT * METEOR_FALL)), offsetZ: f32(METEOR_CLEARANCE + f32(METEOR_SINK * METEOR_FALL)),
   velocityX: METEOR_DRIFT, velocityZ: -METEOR_SINK, life: METEOR_FALL, activeFrom: METEOR_FALL - 4, radius: h(f32(0.3)), modelRadius: h(f32(0.1)),
-  effect: METEOR_HIT, reflectable: false, limit: 1, dropsToFloor: true, cancelOnInterrupt: true, expiresInto: IMPACT,
+  effect: METEOR_HIT, reflectable: false, limit: 1, dropsToFloor: true, cancelOnInterrupt: true, expiresInto: IMPACT, modelOffsetZ: f32(-METEOR_CLEARANCE),
   model: "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx",
 });
 const SCORCH = "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx";
