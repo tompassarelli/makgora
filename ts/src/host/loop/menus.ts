@@ -10,12 +10,13 @@ import { pressKey } from "../../game/input/playerKeys";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import {
   DEFAULT_RESULT_PICK, Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
-  setTeamBattle, setFriendlyFire, cycleTeam, cycleCostume, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, cycleMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
+  setTeamBattle, setFriendlyFire, cycleTeam, cycleCostume, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, chooseMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setOrbsOn, setStocks, setTimeLimit, updateConnectedHumans,
   type MatchState, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
 } from "../../game/lobby/lobbyState";
 import { resetMomentRecorder } from "../../game/replay/moment";
+import { applyRulePreset } from "../../game/lobby/rulePresets";
 import { resetPacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { clearObservedActions } from "../../game/match/step";
 import { clearAttackBuffer } from "../../game/input/attackBuffer";
@@ -319,8 +320,11 @@ export function panelActions(): PanelActions {
       toggleItemKind: (participant, kind) => withSlot(participant, (s, slot) => {
         if (controlsAvailable(s, slot)) toggleItemKind(s.game, slot, kind);
       }),
-      cycleMatchMode: participant => withSlot(participant, (s, slot) => {
-        if (controlsAvailable(s, slot)) cycleMatchMode(s.game, slot);
+      chooseMatchMode: (participant, mode) => withSlot(participant, (s, slot) => {
+        if (controlsAvailable(s, slot)) chooseMatchMode(s.game, slot, mode);
+      }),
+      applyRulePreset: (participant, preset) => withSlot(participant, (s, slot) => {
+        if (controlsAvailable(s, slot)) applyRulePreset(s.game, slot, preset);
       }),
       stepClassicTier: (participant, direction) => withSlot(participant, (s, slot) => {
         if (!controlsAvailable(s, slot)) return;

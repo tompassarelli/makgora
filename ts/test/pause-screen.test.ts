@@ -10,7 +10,7 @@ import { pauseMatchPresentation } from "../src/host/loop/view";
 import { declineTutorial, passStartControls } from "../scripts/wisp/startControls";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
-import { MAIN_MENU_BOX, TUTORIAL_BOX } from "../src/game/ui/selectionLayout";
+import { GUIDE_ROWS, SELECT_BAR } from "../src/game/ui/selectBarLayout";
 import { resetPlateBox, windowEdges } from "../src/game/ui/pauseScreen";
 import { f32 } from "wisp/src/sim/f32";
 
@@ -66,7 +66,9 @@ function pausedMatch(humans: readonly number[] = HUMANS) {
   clients.start();
   passStartControls(clients);
   clients.frames(10);
-  expect(clients.click(0, ...centre(TUTORIAL_BOX))).toBe(true);
+  expect(clients.click(0, ...centre(SELECT_BAR.guide))).toBe(true);
+  clients.frames(2);
+  expect(clients.click(0, ...centre(GUIDE_ROWS.tutorial))).toBe(true);
   clients.frames(3);
   expect(clients.click(0, ...centre(START_TUTORIAL))).toBe(true);
   until("the tutorial match", () => humans.every(slot => seen(slot).phase === Phase.match));
@@ -181,7 +183,7 @@ test("the title screen opens from fighter selection by the Main menu button, Esc
   declineTutorial(clients);
   clients.frames(10);
   expect(titles()).toEqual([false, false]);
-  expect(clients.click(0, ...centre(MAIN_MENU_BOX))).toBe(true);
+  expect(clients.click(0, ...centre(SELECT_BAR.back))).toBe(true);
   clients.frames(5);
   expect(titles()).toEqual([true, true]);
   tap(ATTACK);
@@ -190,7 +192,6 @@ test("the title screen opens from fighter selection by the Main menu button, Esc
   expect(titles()).toEqual([true, true]);
   tap(ATTACK);
   expect(titles()).toEqual([false, false]);
-  tap(DOWN);
   tap(DOWN);
   tap(ATTACK);
   expect(titles()).toEqual([true, true]);

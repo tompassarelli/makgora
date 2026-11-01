@@ -31,14 +31,17 @@ read the preview. Random chooses an opponent each match and keeps your
 difficulty; countdown and results show who you face. Choices stay through
 fighter or stage changes, New Match and automatic rematches.
 
-At fighter selection, any player can change Stocks, Time, Endless and
-Automatic rematch. No time limit removes the clock. Endless also removes
+At fighter selection, the rules pill in the middle of the top bar shows the
+rules; click it (or move the menu focus to it and press Attack) to open the
+rules drawer, where any player can change Stocks, Time, Ultimates, Items,
+Endless and Automatic rematch, pick a preset (Tourney, Party, Endless) or Reset
+default. No time limit removes the clock. Endless also removes
 the stock limit; pause and press the reset combination (L, R, A and Start) to leave. Automatic rematch keeps
 the same fighters, stage and rules, with a visible five-second countdown
 after the result. A player can stop it with a menu control, then choose the
 next match. It starts off.
 
-Training (top of the rules) turns the match into practice against computer
+Training (the mode list at the top left) turns the match into practice against computer
 partners: no clock and no lost stocks. Choose what the partner does (Stand,
 Shield, Crouch, Jump, Attack or Fight), which way it drifts when hit, how it
 techs, its damage, whether hit areas show (bodies green, attacks red) and the
@@ -78,7 +81,7 @@ L + R + A + START over RESET MATCH: hold two shield buttons (shield, light shiel
 second trigger) and Attack, then press Start (Esc or Backspace), or click the plate,
 to return to fighter selection. On a keyboard the plate names the keys you bound
 to those actions. Start, Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
-the Main menu button, Esc, or by moving the menu focus down to Main menu and pressing Attack (the pad's A). H on the pause screen is reserved for the new-player hints toggle; G hides the HUD for a clean screenshot.
+the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). H on the pause screen is reserved for the new-player hints toggle; G hides the HUD for a clean screenshot.
 
 At fighter selection, up/down (W/S on WASD, Space/E on Box) moves focus
 between fighter cards and CPU Opponent settings. Left/right changes the focused
@@ -180,7 +183,7 @@ Specials use U with a direction; every fighter's specials and
 ultimate are listed by name in the [move list](move-list.md). Strong + U
 with a direction is the same ordinary special (press U with the direction or before it, since Strong and a direction alone smash). Each fighter has one ultimate meter, filled only by the orb that appears above centre stage every 30 s (0:30, 1:00, 1:30 and so on): touch it with your body or hit it with a normal attack, but not from a special, an ultimate or an air dodge, which pass through it. Each orb gives half a meter, so two make an ultimate. At a full ultimate meter,
 N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate, Strong held or not (below a full ultimate meter it is the plain special); the
-Ultimates rule at fighter selection turns them off.
+Ultimates rule in the rules drawer at fighter selection turns them off.
 
 Use Warcraft's ordinary Quit Mission to leave and recreate a custom game.
 The map's Ctrl+R restart path is unreliable, and F5 has previously hung the

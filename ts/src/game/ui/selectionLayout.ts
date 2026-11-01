@@ -8,35 +8,20 @@ export const SELECT_LEFT = f32(0.055);
 export const SELECT_RIGHT = f32(0.786);
 export const SELECT_GAP = f32(0.006);
 
-const headerBox = (x: number, width: number) => ({ x, y: HEADER_BUTTON_TOP, width, height: HEADER_BUTTON_HEIGHT }) as const;
-const after = (box: { readonly x: number; readonly width: number }): number => f32(f32(box.x + box.width) + SELECT_GAP);
-
-export const START_BUTTON = headerBox(SELECT_LEFT, f32(0.145));
-
-export const SETTINGS_BOX = headerBox(after(START_BUTTON), f32(0.105));
-
-export const MOVES_BOX = headerBox(after(SETTINGS_BOX), f32(0.08));
-
-export const MAIN_MENU_BOX = headerBox(after(MOVES_BOX), f32(0.08));
-
-const PANEL_BUTTON_WIDTH = f32(0.095);
-
-export const TUTORIAL_BOX = headerBox(after(MAIN_MENU_BOX), PANEL_BUTTON_WIDTH);
-
-export const CREDITS_BOX = headerBox(after(TUTORIAL_BOX), PANEL_BUTTON_WIDTH);
-
-export const COMMUNITY_BOX = headerBox(f32(SELECT_RIGHT - PANEL_BUTTON_WIDTH), PANEL_BUTTON_WIDTH);
+/** Stage select's Start Match button, under the header's left edge. */
+export const STAGE_START_BUTTON = { x: SELECT_LEFT, y: HEADER_BUTTON_TOP, width: f32(0.145), height: HEADER_BUTTON_HEIGHT } as const;
 
 export const boxContains = (box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number }, x: number, y: number): boolean =>
   x >= box.x && x <= f32(box.x + box.width) && y <= box.y && y >= f32(box.y - box.height);
 
-export const startButtonContains = (x: number, y: number): boolean => boxContains(START_BUTTON, x, y);
+export const stageStartContains = (x: number, y: number): boolean => boxContains(STAGE_START_BUTTON, x, y);
 
 export function selectionTitleBox(_aspect: number): TextBox {
   return { left: f32(0.055), top: f32(0.536), width: f32(0.285), height: f32(0.023) };
 }
 
 
+export const MOVES_HEADER_TOP = f32(0.538);
 export const MOVES_TITLE_BOX: TextBox = { left: f32(0.12), top: f32(0.44), width: f32(0.56), height: f32(0.03) };
 export const MOVES_BODY_BOX: TextBox = { left: f32(0.12), top: f32(0.4), width: f32(0.56), height: f32(0.3) };
 export const MOVES_BUTTON_TOP = f32(0.075);

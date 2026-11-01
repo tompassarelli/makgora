@@ -131,7 +131,8 @@ export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>, lo
   });
   const shown = `${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${formatInt(delay)}`;
   const delayText = !online ? `Input delay: ${shown} frames|r` : net.manual === AUTO_DELAY ? `Input delay: Auto (${shown}|r)` : `Input delay: ${shown}|r (Auto ${formatInt(autoMatchDelay(net, game))})`;
-  return { delayText, echoes, hostControl: isHost(game, local) };
+  const delayBadge = `${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${formatInt(delay)}F|r`;
+  return { delayText, delayBadge, echoes, hostControl: isHost(game, local) };
 }
 
 export function slowMachineLine(net: Readonly<NetDelay>, game: Readonly<MatchState>): string {

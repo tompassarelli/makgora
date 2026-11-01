@@ -1,7 +1,7 @@
 # Training (#120)
 
-Training is a match rule chosen at fighter selection beside Stocks, Time,
-Endless and Automatic rematch. A training match has no clock and no lost
+Training is a mode chosen at fighter selection from the top bar's mode list,
+beside Versus, Classic and Lore Battles. A training match has no clock and no lost
 stocks; every computer fighter is a training partner that does what the
 player set (stand, shield, crouch, jump, attack or fight) and escapes hits and
 techs the way the player set. The match reports what the player's last move
@@ -119,7 +119,7 @@ the checksum only while a tutorial runs. Leaving a finished tutorial (pause, the
 Escape) turns Training off, so fighter selection comes back in Versus; leaving
 one partway keeps Training and the lesson for a player alone, and turns both off
 when other players are in the lobby, so their next match is Versus rather than
-the tutorial again (#676). With Training on, the Tutorial button
+the tutorial again (#676). The Guide's How to Play (Tutorial) row
 opens the menu where any lesson can be chosen and replayed. The same menu
 opens by itself on fighter selection for a player whose client has never
 started a match or answered it (`SmashcraftTutorial.pld`;

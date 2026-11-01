@@ -1,70 +1,48 @@
 import { f32 } from "wisp/src/sim/f32";
 import { cardDown, cardRight, cardSize } from "../menu/selectionDrag";
-import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, SELECT_GAP, SELECT_LEFT, SELECT_RIGHT } from "./selectionLayout";
+import { type BarBox, type BarPanel, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, MODE_ROWS, SELECT_BAR, TRAINING_ROWS } from "./selectBarLayout";
 
+export type RuleBox = BarBox;
 
-export interface RuleBox {
-  readonly x: number;
-  readonly y: number;
-  readonly width: number;
-  readonly height: number;
-}
-
-const STEP_WIDTH = f32(0.03);
-export const RULE_HEIGHT = HEADER_BUTTON_HEIGHT;
-const ROW_STEP = f32(RULE_HEIGHT + f32(0.002));
-export const RULE_ROWS = [f32(HEADER_BUTTON_TOP - ROW_STEP), f32(HEADER_BUTTON_TOP - f32(2 * ROW_STEP)), f32(HEADER_BUTTON_TOP - f32(3 * ROW_STEP))] as const;
-const [ROW_1, ROW_2, ROW_3] = RULE_ROWS;
-const LEFT_WIDTH = f32(0.29);
-const HALF_LEFT = f32(f32(LEFT_WIDTH - SELECT_GAP) / 2);
-const LEFT_SECOND = f32(f32(SELECT_LEFT + HALF_LEFT) + SELECT_GAP);
-const RIGHT_LEFT = f32(0.38);
-const COLUMN_WIDTH = f32(f32(f32(SELECT_RIGHT - RIGHT_LEFT) - SELECT_GAP) / 2);
-const RIGHT_SECOND = f32(SELECT_RIGHT - COLUMN_WIDTH);
-const ITEMS_WIDTH = f32(0.08);
-const stepBox = (x: number, y: number): RuleBox => ({ x, y, width: STEP_WIDTH, height: RULE_HEIGHT });
-const stepEnd = (column: number, y: number): RuleBox => stepBox(f32(f32(column + COLUMN_WIDTH) - STEP_WIDTH), y);
-const toggleBox = (x: number, y: number): RuleBox => ({ x, y, width: COLUMN_WIDTH, height: RULE_HEIGHT });
-const leftBox = (x: number, y: number, width: number): RuleBox => ({ x, y, width, height: RULE_HEIGHT });
-
+/** Every rule control by name, and the bar panel it lives in (undefined: on the bar itself). */
 export const RULE_BUTTONS = {
-  teamBattle: leftBox(SELECT_LEFT, ROW_3, HALF_LEFT),
-  friendlyFire: leftBox(LEFT_SECOND, ROW_3, HALF_LEFT),
-  fewerStocks: stepBox(RIGHT_LEFT, ROW_1),
-  moreStocks: stepEnd(RIGHT_LEFT, ROW_1),
-  lessTime: stepBox(RIGHT_SECOND, ROW_1),
-  moreTime: stepEnd(RIGHT_SECOND, ROW_1),
-  endless: toggleBox(RIGHT_LEFT, ROW_2),
-  automaticRematch: toggleBox(RIGHT_SECOND, ROW_2),
-  items: { x: RIGHT_LEFT, y: ROW_3, width: ITEMS_WIDTH, height: RULE_HEIGHT },
-  itemSpeed: leftBox(SELECT_LEFT, ROW_1, HALF_LEFT),
-  itemHeavy: leftBox(LEFT_SECOND, ROW_1, HALF_LEFT),
-  training: leftBox(SELECT_LEFT, ROW_2, LEFT_WIDTH),
-  inputDelay: toggleBox(RIGHT_SECOND, ROW_3),
-  ultimates: { x: f32(f32(RIGHT_LEFT + ITEMS_WIDTH) + SELECT_GAP), y: ROW_3, width: f32(f32(COLUMN_WIDTH - ITEMS_WIDTH) - SELECT_GAP), height: RULE_HEIGHT },
-  lessBehaviour: stepBox(RIGHT_LEFT, ROW_1),
-  moreBehaviour: stepEnd(RIGHT_LEFT, ROW_1),
-  lessEscape: stepBox(RIGHT_SECOND, ROW_1),
-  moreEscape: stepEnd(RIGHT_SECOND, ROW_1),
-  lessTech: stepBox(RIGHT_LEFT, ROW_2),
-  moreTech: stepEnd(RIGHT_LEFT, ROW_2),
-  lessDamage: stepBox(RIGHT_SECOND, ROW_2),
-  moreDamage: stepEnd(RIGHT_SECOND, ROW_2),
-  hitAreas: toggleBox(RIGHT_LEFT, ROW_3),
-  speed: leftBox(SELECT_LEFT, ROW_3, LEFT_WIDTH),
-  easierClassic: stepBox(RIGHT_LEFT, ROW_1),
-  harderClassic: stepEnd(RIGHT_SECOND, ROW_1),
+  teamBattle: SELECT_BAR.teams,
+  friendlyFire: MODE_ROWS.friendlyToggle,
+  fewerStocks: DRAWER_ROWS.stocks.less,
+  moreStocks: DRAWER_ROWS.stocks.more,
+  lessTime: DRAWER_ROWS.time.less,
+  moreTime: DRAWER_ROWS.time.more,
+  endless: DRAWER_ROWS.endless,
+  automaticRematch: DRAWER_ROWS.automaticRematch,
+  items: DRAWER_ROWS.items,
+  ultimates: DRAWER_ROWS.ultimates,
+  itemSpeed: DRAWER_ROWS.itemSpeed,
+  itemHeavy: DRAWER_ROWS.itemHeavy,
+  training: SELECT_BAR.mode,
+  inputDelay: GEAR_ROWS.delay,
+  lessBehaviour: TRAINING_ROWS.behaviour.less,
+  moreBehaviour: TRAINING_ROWS.behaviour.more,
+  lessEscape: TRAINING_ROWS.escape.less,
+  moreEscape: TRAINING_ROWS.escape.more,
+  lessTech: TRAINING_ROWS.tech.less,
+  moreTech: TRAINING_ROWS.tech.more,
+  lessDamage: TRAINING_ROWS.damage.less,
+  moreDamage: TRAINING_ROWS.damage.more,
+  hitAreas: TRAINING_ROWS.hitAreas,
+  speed: TRAINING_ROWS.speed,
+  easierClassic: CLASSIC_ROWS.tier.less,
+  harderClassic: CLASSIC_ROWS.tier.more,
 } as const;
 
-export const CLASSIC_ROUTE_BOX: RuleBox = { x: RIGHT_LEFT, y: ROW_2, width: f32(SELECT_RIGHT - RIGHT_LEFT), height: RULE_HEIGHT };
+export type RuleName = keyof typeof RULE_BUTTONS;
 
-const { inputDelay } = RULE_BUTTONS;
+const ON_BAR: readonly RuleName[] = ["teamBattle", "training"];
+const IN_MODE: readonly RuleName[] = ["friendlyFire"];
+const IN_GEAR: readonly RuleName[] = ["inputDelay"];
 
-export const DELAY_CONTROLS = {
-  less: stepBox(inputDelay.x, ROW_3),
-  more: stepEnd(inputDelay.x, ROW_3),
-  auto: { x: f32(f32(inputDelay.x + STEP_WIDTH) + SELECT_GAP), y: ROW_3, width: f32(inputDelay.width - f32(2 * f32(STEP_WIDTH + SELECT_GAP))), height: RULE_HEIGHT },
-} as const;
+/** The panel that must be open to click a rule, or undefined for a rule on the bar. */
+export const rulePanel = (name: RuleName): BarPanel | undefined =>
+  ON_BAR.includes(name) ? undefined : IN_MODE.includes(name) ? "mode" : IN_GEAR.includes(name) ? "gear" : "rules";
 
 
 export type TrainingSetting = "behaviour" | "escape" | "tech" | "damage";

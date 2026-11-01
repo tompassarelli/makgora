@@ -1,8 +1,10 @@
 import { SELECT_LEVELS } from "./selectLevels";
 import { slotColor } from "./slotColors";
 import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
-import { RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
-import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
+import { RULE_BUTTONS, rulePanel } from "./ruleButtons";
+import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp } from "./ruleHelp";
+import { type BarButton, type BarTarget, SelectBar } from "./selectBar";
+import { type BarItem, BAR_HEIGHT, barBoxContains, helpAnchor } from "./selectBarLayout";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";
@@ -47,16 +49,11 @@ import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { type HandFrames, createHandFrames, destroyHandFrames, presentHand } from "./selectionHandFrames";
 import { type HandPose, HIDDEN_HAND, SelectionHands } from "./selectionHands";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
-import { MOVES_BODY_BOX, MOVES_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, SETTINGS_BOX, START_BUTTON, boxContains, selectionTitleBox } from "./selectionLayout";
+import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_HEADER_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, nextSelectableCharacter, DEFAULT_FIGHTER } from "../roster/kits";
-import {
-  MOVES_HEADER, movesPage, itemsSetting, ultimatesSetting, itemKindSetting, automaticRematchSetting, selectionModeLabel, endlessSetting, hitAreasSetting, partnerBehaviourSetting, partnerDamageSetting,
-  partnerEscapeSetting, partnerTechSetting, stockSetting, timeSetting, trainingSpeedSetting,
-} from "../session/messages";
-import { classicRouteSummary, classicTierSetting } from "../classic/classicText";
-import { loreBattle, loreBattleSetting, loreBattleSummary } from "../classic/loreBattles";
-import { type LoreClears, loreClears } from "../classic/loreClears";
-import { Character, ItemKind, itemBit } from "../sim/codes";
+import { MOVES_HEADER, movesPage } from "../session/messages";
+import { loreClears } from "../classic/loreClears";
+import { Character } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { CreditsMenu } from "./creditsMenu";
 import { MainMenuButton } from "./mainMenuButton";
@@ -66,8 +63,7 @@ import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffe
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { ROSTER_TILES, TILE_NAME_INSET, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, cardPalette, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
-import { type DelayFrames, type RuleButton, type RuleFrames, applyRuleButton, createClassicRules, createDelayControls, createMatchRules, presentDelayControls, rulesKey } from "./selectionRules";
-import { panelButton } from "./infoPanel";
+import { type RuleButton, applyRuleButton } from "./selectionRules";
 import type { LobbyNet, SelectionActions } from "./selectionActions";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
 import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus, createCpuSettings, showCpuSettings } from "./selectionCpuSettings";
@@ -79,64 +75,12 @@ import { sendSync } from "wisp/game/sync";
 import { formatInt, toReal } from "wisp/game/text";
 
 
-type SelectionButton = { kind: "tile"; tile: number } | CardButton | CpuButton | { kind: "start" } | { kind: "settings" } | RuleButton
-  | { kind: "moves" } | { kind: "movesBack" } | { kind: "movesStep"; direction: -1 | 1 } | TutorialButton;
+type SelectionButton = { kind: "tile"; tile: number } | CardButton | CpuButton | { kind: "start" } | { kind: "settings" } | RuleButton | BarButton
+  | { kind: "moves" } | { kind: "movesBack" } | { kind: "movesStep"; direction: -1 | 1 } | TutorialButton | { kind: "creditsOpen" } | { kind: "communityOpen" };
 type ClickOf<K extends SelectionButton["kind"]> = Extract<SelectionButton, { kind: K }>;
 
-const DELAY_TEXT_SIZE = f32(0.0095);
 const CPU_DEFAULTS: CpuDefaults = { opponent: CPU_OPPONENT_CHOICE_DEFAULT, tier: CPU_TIER_DEFAULT };
 
-
-function presentMatchRules(rules: RuleFrames, game: Readonly<MatchState>): void {
-  const { stockCount, timeLimitMinutes, endless, automaticRematch, training, items, classic, lore } = game;
-  setMenuText(rules.stockValue, `${MENU_STYLE.gold}${stockSetting(stockCount)}|r`);
-  setMenuText(rules.timeValue, `${MENU_STYLE.gold}${timeSetting(timeLimitMinutes)}|r`);
-  setMenuText(rules.teamToggle, `Team Battle: ${game.teamBattle ? "On" : "Off"}`);
-  setMenuText(rules.friendlyFireToggle, `Friendly Fire: ${game.friendlyFire ? "On" : "Off"}`);
-  setMenuText(rules.endlessToggle, endlessSetting(endless));
-  setMenuText(rules.rematchToggle, automaticRematchSetting(automaticRematch));
-  for (const step of rules.steps) setFrameEnabled(step, !endless);
-  setMenuText(rules.itemsToggle, itemsSetting(items.on));
-  setMenuText(rules.ultimatesToggle, ultimatesSetting(!game.ultimatesOff));
-  for (let index = 0; index < rules.itemToggles.length; index++) {
-    const frame = rules.itemToggles[index];
-    if (frame === undefined) continue;
-    const kind = index === 0 ? ItemKind.speed : ItemKind.heavy;
-    setMenuText(frame, itemKindSetting(kind, (items.enabledMask & itemBit(kind)) !== 0));
-    setFrameVisible(frame, items.on && !training && !classic && !lore);
-  }
-}
-
-function presentModeRules(rules: RuleFrames, game: Readonly<MatchState>, clears: LoreClears, fighter: number, tutorial: TutorialMenuFrames): void {
-  const { trainer, classicTier, lore, loreBattle: battle } = game;
-  setMenuText(rules.trainingToggle, `${MENU_STYLE.gold}${selectionModeLabel(game)}|r`);
-  const chosen = loreBattle(battle);
-  setMenuText(rules.classicTierValue, lore ? loreBattleSetting(battle, chosen !== undefined && clears.has(chosen.id)) : classicTierSetting(classicTier));
-  setMenuText(rules.classicRoute, lore ? loreBattleSummary(battle, clears.count()) : classicRouteSummary(fighter));
-  showTutorialLesson(tutorial, trainer.lesson);
-  setMenuText(rules.hitAreasToggle, hitAreasSetting(trainer.showHitAreas));
-  setMenuText(rules.speedToggle, trainingSpeedSetting(trainer.speed));
-  const [behaviour, escape, tech, damage] = rules.partnerValues;
-  if (behaviour !== undefined) setMenuText(behaviour, partnerBehaviourSetting(trainer.behaviour));
-  if (escape !== undefined) setMenuText(escape, partnerEscapeSetting(trainer.escape));
-  if (tech !== undefined) setMenuText(tech, partnerTechSetting(trainer.tech));
-  if (damage !== undefined) setMenuText(damage, partnerDamageSetting(trainer.damage));
-}
-
-function presentRuleVisibility(rules: RuleFrames, game: Readonly<MatchState>): void {
-  const { training, items, classic, lore } = game;
-  for (const frame of rules.matchRuleFrames) setFrameVisible(frame, !training && !classic && !lore);
-  for (const frame of rules.itemToggles) setFrameVisible(frame, items.on && !training && !classic && !lore);
-  setFrameVisible(rules.friendlyFireToggle, game.teamBattle && !training && !classic && !lore);
-  for (const frame of rules.trainingFrames) setFrameVisible(frame, training);
-  for (const frame of rules.classicFrames) setFrameVisible(frame, classic || lore);
-}
-
-function presentRules(rules: RuleFrames, game: Readonly<MatchState>, clears: LoreClears, fighter: number, tutorial: TutorialMenuFrames): void {
-  presentMatchRules(rules, game);
-  presentModeRules(rules, game, clears, fighter, tutorial);
-  presentRuleVisibility(rules, game);
-}
 
 export interface MenuControlHit {
   over(x: number, y: number): boolean;
@@ -149,9 +93,6 @@ export class SelectionPanel {
   private readonly tileButtons: Frame[] = [];
   private readonly root: Frame;
   private readonly backdrop: Frame;
-  private readonly confirm: Frame;
-  private readonly settingsLabel: Frame;
-  private readonly movesLabel: Frame;
   private readonly cards: readonly CardFrames[];
   private readonly clicks: ButtonClicks<SelectionButton>;
   private readonly syncTriggers: readonly Events[];
@@ -181,13 +122,11 @@ export class SelectionPanel {
   private readonly movesFrames: readonly Frame[];
   private readonly movesTitle: Frame;
   private readonly movesBody: Frame;
-  private readonly delay: DelayFrames;
-  private net: LobbyNet = { delayText: "", hostControl: false, echoes: PARTICIPANT_SLOTS.map(() => "") };
+  private net: LobbyNet = { delayText: "", delayBadge: "", hostControl: false, echoes: PARTICIPANT_SLOTS.map(() => "") };
 
   private readonly modeLabel: Frame;
-  private readonly rules: RuleFrames;
-
-  private shownRules: string | undefined;
+  private readonly bar: SelectBar;
+  private shownLesson = -2;
   private readonly help: Frame;
   private readonly helpText: Frame;
   private shownHelp: string | undefined;
@@ -249,14 +188,7 @@ export class SelectionPanel {
     setFrameVisible(this.bullseye, false);
     this.hands = [0, 1, 2, 3].map(slot => createHandFrames(grid, suffix, slot)) as Slots<HandFrames>;
     this.handChannel = new SelectionHands(participantId);
-    const headerButton = (box: typeof START_BUTTON, text: string, target: SelectionButton) => {
-      const frame = panelButton(root, box.x, box.y, box.width, box.height, "");
-      setMenuText(frame, text);
-      return this.clicks.add(frame, target, undefined, "native", box);
-    };
-    this.confirm = headerButton(START_BUTTON, "", { kind: "start" });
-    this.settingsLabel = headerButton(SETTINGS_BOX, "Controls (F1)", { kind: "settings" });
-    this.movesLabel = headerButton(MOVES_BOX, "Moves", { kind: "moves" });
+    this.bar = new SelectBar(root, suffix, (frame, target: BarTarget, box) => this.clicks.add(frame, target, undefined, "native", box));
     const page = (frame: Frame, x: number, y: number, width: number, height: number) => {
       placeTopLeft(frame, x, y);
       setFrameSize(frame, width, height);
@@ -276,8 +208,8 @@ export class SelectionPanel {
       return this.clicks.add(frame, target, undefined, "native", { x, y: MOVES_BUTTON_TOP, width, height: MOVES_BUTTON_HEIGHT });
     };
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
-    sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), RULE_HEIGHT);
-    placeTopLeft(this.modeLabel, headerLeft, RULE_ROWS[1]);
+    sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), BAR_HEIGHT);
+    placeTopLeft(this.modeLabel, headerLeft, MOVES_HEADER_TOP);
     setFrameTextAlignment(this.modeLabel, TextAlignment.middle, TextAlignment.left);
     setFrameEnabled(this.modeLabel, false);
     setMenuText(this.modeLabel, `${MENU_STYLE.gold}${MOVES_HEADER}|r`);
@@ -289,18 +221,20 @@ export class SelectionPanel {
     ];
 
     this.cpu = createCpuSettings(participantId, (frame, target, text, box) => this.clicks.add(frame, target, text, "native", box));
-    const ruleClick = (frame: Frame, target: RuleButton) => this.clicks.add(frame, target, undefined, "native");
-    const matchRules = createMatchRules(root, suffix, ruleClick);
-    this.delay = createDelayControls(root, ruleClick, DELAY_TEXT_SIZE);
-    presentDelayControls(this.delay, false);
-    this.tutorial = createTutorialMenu(gameUi(), root, suffix, (frame, target, box) => this.clicks.add(frame, target,
+    this.tutorial = createTutorialMenu(gameUi(), suffix, (frame, target, box) => this.clicks.add(frame, target,
       target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? NOT_NOW_LABEL : target.direction < 0 ? "−" : "+", "native", box));
-    this.credits = new CreditsMenu(gameUi(), root, suffix, version, participantId);
-    this.community = new CommunityMenu(gameUi(), root, suffix, participantId);
-    this.mainMenu = new MainMenuButton(root, suffix, participantId);
-    this.credits.onOpen = () => this.community.close();
-    this.community.onOpen = () => this.credits.close();
-    this.rules = createClassicRules(root, suffix, ruleClick, matchRules);
+    const opener = (control: { readonly button: Frame | undefined }): Frame => control.button ?? root;
+    this.credits = new CreditsMenu(gameUi(), opener(this.bar.gear.credits), suffix, version, participantId);
+    this.community = new CommunityMenu(gameUi(), opener(this.bar.gear.community), suffix, participantId);
+    this.mainMenu = new MainMenuButton(opener(this.bar.items.back), suffix, participantId);
+    this.credits.onOpen = () => {
+      this.community.close();
+      this.bar.close();
+    };
+    this.community.onOpen = () => {
+      this.credits.close();
+      this.bar.close();
+    };
     this.help = createBackdrop(`MeleeRuleHelp${suffix}`, root, 0);
     setFrameTexture(this.help, PANEL_TEXTURE, 0, true);
     setFrameSize(this.help, RULE_HELP_WIDTH, RULE_HELP_HEIGHT);
@@ -353,6 +287,7 @@ export class SelectionPanel {
     this.credits.destroy();
     this.community.destroy();
     this.mainMenu.destroy();
+    this.bar.destroy();
     destroyFrame(this.bullseye);
     for (const frames of this.hands) destroyHandFrames(frames);
     if (this.cpu.root !== undefined) destroyFrame(this.cpu.root);
@@ -368,7 +303,18 @@ export class SelectionPanel {
     else if (button.kind === "start" || button.kind === "settings" || button.kind === "moves" || button.kind === "movesBack" || button.kind === "movesStep") this.clickDialog(button);
     else if (button.kind === "cpuSettings" || button.kind === "cpuStep" || button.kind === "cpuClose") this.clickCpu(button);
     else if (button.kind === "tutorialOpen" || button.kind === "tutorialStep" || button.kind === "tutorialStart" || button.kind === "tutorialClose") this.clickTutorial(button);
-    else applyRuleButton(this.actions, this.participantId, button);
+    else if (button.kind === "barPanel" || button.kind === "barClose" || button.kind === "creditsOpen" || button.kind === "communityOpen") this.clickBar(button);
+    else {
+      if (button.kind === "matchMode") this.bar.close();
+      applyRuleButton(this.actions, this.participantId, button);
+    }
+  }
+
+  private clickBar(button: ClickOf<"barPanel" | "barClose" | "creditsOpen" | "communityOpen">): void {
+    if (button.kind === "barPanel") this.bar.toggle(button.panel, false);
+    else if (button.kind === "barClose") this.bar.close();
+    else if (button.kind === "creditsOpen") this.credits.open();
+    else this.community.open();
   }
 
   private clickTile(tile: number): void {
@@ -384,6 +330,7 @@ export class SelectionPanel {
   }
 
   private clickDialog(button: ClickOf<"start" | "settings" | "moves" | "movesBack" | "movesStep">): void {
+    if (button.kind !== "movesStep") this.bar.close();
     if (button.kind === "start") this.actions.start(this.participantId);
     else if (button.kind === "settings") this.actions.openSettings(this.participantId);
     else if (button.kind === "moves") this.openMoves();
@@ -398,6 +345,7 @@ export class SelectionPanel {
   }
 
   private clickTutorial(button: ClickOf<"tutorialOpen" | "tutorialStep" | "tutorialStart" | "tutorialClose">): void {
+    if (button.kind === "tutorialOpen") this.bar.close();
     this.tutorialOpen = pressTutorialButton(button, this.actions, this.participantId, () => {
       if (this.ownsLocalClient()) this.markSeen();
     });
@@ -405,9 +353,7 @@ export class SelectionPanel {
 
 
   private pointedDialog(game: Readonly<MatchState>, x: number, y: number): SelectionButton | undefined {
-    if (boxContains(START_BUTTON, x, y)) return { kind: "start" };
-    if (boxContains(MOVES_BOX, x, y)) return { kind: "moves" };
-    if (boxContains(SETTINGS_BOX, x, y)) return { kind: "settings" };
+    if (this.bar.opened() !== undefined || this.bar.covers(x, y)) return undefined;
     if (this.drag.hover !== undefined) return { kind: "tile", tile: this.drag.hover };
     for (const slot of PARTICIPANT_SLOTS) {
       const card = pointedCard(game, slot, x, y);
@@ -425,9 +371,6 @@ export class SelectionPanel {
       if (card !== undefined) highlightText(card.tag, button?.kind === "mode" && button.slot === slot);
       if (card !== undefined) highlightText(card.settingsLabel, button?.kind === "cpuSettings" && button.slot === slot);
     }
-    highlightText(this.confirm, button?.kind === "start");
-    setMenuText(this.settingsLabel, button?.kind === "settings" ? "> Controls (F1) <" : "Controls (F1)");
-    highlightText(this.movesLabel, button?.kind === "moves");
     if (updateDrag) this.drag.hover = tile;
     for (let index = 0; index < this.tiles.length; index++) {
       const name = this.tiles[index]?.[2];
@@ -488,6 +431,11 @@ export class SelectionPanel {
       return true;
     }
     if (this.tutorialOpen) return this.answerTutorial(tutorialKeyButton(action));
+    if (this.bar.opened() !== undefined) {
+      const target = this.bar.padAction(action, game, this.net.hostControl, tutorialAvailable(game));
+      if (target !== undefined) this.click(target, playerOf(this.participantId));
+      return true;
+    }
     const focus = menuFocusList(game, this.participantId);
     if (focus.length === 0) return false;
     let index = focus.findIndex(item => item.kind === this.menuFocus?.kind && item.slot === this.menuFocus.slot);
@@ -498,7 +446,8 @@ export class SelectionPanel {
     }
     const target = focus[index];
     if (target === undefined) return false;
-    if (target.kind === "teamBattle" || target.kind === "friendlyFire" || target.kind === "team") return this.toggleFocus(target, action);
+    if (target.kind === "teamBattle" || target.kind === "team") return this.toggleFocus(target, action);
+    if (target.kind === "mode" || target.kind === "rules" || target.kind === "guide" || target.kind === "gear") return this.openFocus(target.kind, action);
     if (target.kind === "mainMenu" || target.kind === "settings") return this.pressMenuButton(target, action);
     return this.chooseFocus(game, target, action);
   }
@@ -518,10 +467,15 @@ export class SelectionPanel {
     return attack || action === Action.moveLeft || action === Action.moveRight;
   }
 
+  private openFocus(panel: "mode" | "rules" | "guide" | "gear", action: Action): boolean {
+    if (action !== Action.attack) return action === Action.moveLeft || action === Action.moveRight;
+    this.bar.toggle(panel, true);
+    return true;
+  }
+
   private toggleFocus(target: MenuFocus, action: Action): boolean {
     if (action !== Action.attack && action !== Action.moveLeft && action !== Action.moveRight) return false;
     if (target.kind === "teamBattle") this.actions.toggleTeamBattle(this.participantId);
-    else if (target.kind === "friendlyFire") this.actions.toggleFriendlyFire(this.participantId);
     else this.actions.changeTeam(this.participantId, target.slot, action === Action.moveLeft ? -1 : 1);
     return true;
   }
@@ -578,7 +532,7 @@ export class SelectionPanel {
   // The menu pointer: every Smashcraft menu with a pointer draws this hand, and a panel over the select screen keeps it local, off the shared hands and off stage select's bullseye.
   private showHand(pointed: boolean, carried: number | undefined, x: number, y: number, panel: boolean, restOpen = panel): void {
     const drawn = pointed && this.menuCursorAllowed;
-    const over = overAny(x, y, [this.clicks, this.credits, this.community, this.mainMenu, this.controlHit]);
+    const over = overAny(x, y, [this.clicks, this.credits, this.community, this.bar, this.controlHit]);
     const hover = menuHover(drawn, over, this.drag.hover !== undefined);
     const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, hover, restOpen, this.game?.phase === Phase.stageMenu && !panel, this.warcraftMenuOpen);
     this.localPanel = panel;
@@ -662,8 +616,11 @@ export class SelectionPanel {
 
   showDelay(net: LobbyNet): void {
     this.net = net;
-    setMenuText(this.delay.line, net.delayText);
-    presentDelayControls(this.delay, net.hostControl);
+  }
+
+  /** Closes an open bar panel; whether one was open, so Esc closes it before leaving the screen. */
+  closeBar(): boolean {
+    return this.choosing() !== undefined && this.bar.close();
   }
 
   update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, warcraftMenuOpen: boolean, sessionWins: Readonly<Slots<number>>, now: number, controlHit: MenuControlHit): void {
@@ -671,7 +628,10 @@ export class SelectionPanel {
     this.game = game;
     this.now = now;
     this.settingsOpen = loading || settingsOpen;
-    if (this.choosing() === undefined) this.cpuSlot = undefined;
+    if (this.choosing() === undefined) {
+      this.cpuSlot = undefined;
+      this.bar.close();
+    }
     if (!this.ownsLocalClient()) return;
     this.menuCursorAllowed = menuCursorAllowed;
     this.trackGameMenu(warcraftMenuOpen);
@@ -688,12 +648,13 @@ export class SelectionPanel {
     if (this.showDialog(game, visible, cpuOpen, pointed, x, y)) return;
     this.showTiles(game);
     if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;
-    if (pointed) this.dragChips(game, x, y);
+    const barOpen = this.bar.opened() !== undefined;
+    if (barOpen) clearSelectionDrag(drag);
+    else if (pointed) this.dragChips(game, x, y);
     const carried = this.showCards(game, sessionWins, x, y);
     const infoOpen = anyOpen(this.tutorialOpen, this.credits.opened(), this.community.opened());
     this.showHand(pointed, infoOpen ? undefined : carried, x, y, infoOpen);
-    setMenuText(this.confirm, this.confirmText(game));
-    this.showRules(game);
+    this.showBar(game, pointed && (barOpen || drag.dragging === undefined) ? { x, y } : undefined);
     this.showHelp(game, x, y);
     this.clicks.refreshHover();
     this.highlight(this.hovered ?? (pointed ? this.pointedDialog(game, x, y) : undefined), false);
@@ -709,7 +670,6 @@ export class SelectionPanel {
     setFrameVisible(this.tutorial.root, visible && this.tutorialOpen && !cpuOpen && !this.movesOpen);
     this.credits.show(visible);
     this.community.show(visible);
-    setFrameVisible(this.tutorial.open, tutorialAvailable(game));
     setFrameVisible(this.cpu.root, cpuOpen);
     setFrameVisible(this.root, visible);
     fitToWindow(this.backdrop);
@@ -775,7 +735,6 @@ export class SelectionPanel {
 
   private showCards(game: Readonly<MatchState>, sessionWins: Readonly<Slots<number>>, x: number, y: number): number | undefined {
     const { participantId, menuFocus } = this;
-    this.mainMenu.focus(menuFocus?.kind === "mainMenu");
     const remoteChips = this.handChannel.carriedChips(game, this.now);
     let carried: number | undefined;
     for (const slot of PARTICIPANT_SLOTS) {
@@ -798,14 +757,16 @@ export class SelectionPanel {
   }
 
   private showHelp(game: Readonly<MatchState>, x: number, y: number): void {
-    const name = this.drag.dragging === undefined ? hoveredRule(visibleRuleGroups(game), x, y) : undefined;
+    const name = this.drag.dragging === undefined ? hoveredRule(game, this.bar.opened(), x, y) : undefined;
     const text = name === undefined ? "" : ruleHelp(name, game);
     if (text === this.shownHelp) return;
     this.shownHelp = text;
     setFrameVisible(this.help, name !== undefined);
     if (name === undefined) return;
+    const panel = rulePanel(name);
     const box = RULE_BUTTONS[name];
-    placeTopLeft(this.help, Math.min(box.x, f32(f32(0.8) - RULE_HELP_WIDTH - f32(0.01))), f32(box.y - box.height - f32(0.003)));
+    const anchor = panel === undefined ? { x: box.x, y: f32(f32(box.y - box.height) - f32(0.012)) } : helpAnchor(panel);
+    placeTopLeft(this.help, Math.min(anchor.x, f32(f32(0.8) - RULE_HELP_WIDTH - f32(0.01))), anchor.y);
     setMenuText(this.helpText, text);
   }
 
@@ -832,21 +793,25 @@ export class SelectionPanel {
     setMenuText(this.movesBody, lines.join("\n\n"));
   }
 
-  private showRules(game: Readonly<MatchState>): void {
-    const clears = loreClears();
-    const fighter = characterFor(game, this.participantId) ?? DEFAULT_FIGHTER;
-    const rules = rulesKey(game, clears, fighter);
-    if (rules === this.shownRules) return;
-    this.shownRules = rules;
-    presentRules(this.rules, game, clears, fighter, this.tutorial);
+  private showBar(game: Readonly<MatchState>, pointer: { readonly x: number; readonly y: number } | undefined): void {
+    if (game.trainer.lesson !== this.shownLesson) {
+      this.shownLesson = game.trainer.lesson;
+      showTutorialLesson(this.tutorial, game.trainer.lesson);
+    }
+    const { net } = this;
+    this.bar.present({
+      game, clears: loreClears(), fighter: characterFor(game, this.participantId) ?? DEFAULT_FIGHTER, delayText: net.delayText, delayBadge: net.delayBadge, hostControl: net.hostControl,
+      pointer, focus: barFocus(this.menuFocus), start: startState(game, this.controls), tutorial: tutorialAvailable(game),
+    });
   }
+}
 
-  private confirmText(game: Readonly<MatchState>): string {
-    const journal = this.controls === "journal";
-    if (hasUnassignedHuman(game)) return "Choose CPU or Empty";
-    if (!validTeams(game)) return "Choose at least two teams";
-    if (allCharactersReady(game)) return journal ? "Start / Click" : "Start (Y) / Click";
-    if (fighterMask(game) === 0) return "Add a fighter";
-    return journal ? "Select [A] / Click" : "Place your chip / Click";
-  }
+const BAR_FOCUS: Readonly<Partial<Record<MenuFocus["kind"], BarItem>>> = { mainMenu: "back", mode: "mode", teamBattle: "teams", rules: "rules", guide: "guide", gear: "gear" };
+const barFocus = (focus: MenuFocus | undefined): BarItem | undefined => focus === undefined ? undefined : BAR_FOCUS[focus.kind];
+
+function startState(game: Readonly<MatchState>, controls: MenuControls) {
+  const journal = controls === "journal";
+  const ready = !hasUnassignedHuman(game) && validTeams(game) && allCharactersReady(game);
+  const text = hasUnassignedHuman(game) ? "Choose CPU or Empty" : !validTeams(game) ? "Choose two teams" : fighterMask(game) === 0 ? "Add a fighter" : journal ? "Select [A]" : "Place your chip";
+  return { ready, text, key: journal ? undefined : "Y" };
 }

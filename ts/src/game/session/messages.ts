@@ -2,7 +2,7 @@
 import { Advantage, type TrainingState } from "../match/trainingState";
 import { PARTICIPANT_SLOTS, participantActive } from "../input/participants";
 import { floorDiv } from "wisp/src/sim/intMath";
-import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, computerActive, fighterActive, holdingStart, humanFighterActive, humanPresent, practiceSelected } from "../lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, type MatchMode, Phase, type MatchState, matchMode, computerActive, fighterActive, holdingStart, humanFighterActive, humanPresent, practiceSelected } from "../lobby/lobbyState";
 import { DownState, ItemKind, LedgeState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { SPECIAL_INPUTS, fighterKit, normalName, specialName } from "../sim/moveNames";
@@ -10,7 +10,7 @@ import { fighterName } from "../roster/kits";
 import { classicResultHelp, classicResultMessage, tierName } from "../classic/classicText";
 import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, cpuProfileLabel } from "../match/cpuProfiles";
 import { TEAM_NAMES } from "../sim/teams";
-import { loreBattle, loreResultHelp, loreResultMessage } from "../classic/loreBattles";
+import { LORE_BATTLES, loreBattle, loreResultHelp, loreResultMessage } from "../classic/loreBattles";
 
 
 export type StartControl = "Start" | "Y";
@@ -86,7 +86,16 @@ export function rulesSummary(game: Readonly<MatchState>): string {
   return game.automaticRematch ? `${matchRules}  ·  Automatic rematch` : matchRules;
 }
 
-const pauseControl = (start: StartControl) => (start === "Start" ? "Start" : "Esc");
+/** The select bar's rules pill: the live rules, short enough for one line. */
+export function rulesPillParts(game: Readonly<MatchState>): readonly string[] {
+  if (game.classic) return ["Classic", tierName(game.classicTier)];
+  if (game.lore) return ["Lore Battle", `${game.loreBattle + 1}/${LORE_BATTLES.length}`];
+  if (game.training) return ["Training", partnerBehaviourSetting(game.trainer.behaviour)];
+  const rules = game.endless ? ["Endless"] : [stockSetting(game.stockCount), game.timeLimitMinutes === 0 ? "No timer" : timeSetting(game.timeLimitMinutes)];
+  return [...rules, ...(game.ultimatesOff ? [] : ["Ultimates"]), ...(game.items.on ? ["Items"] : [])];
+}
+
+const pauseControl =(start: StartControl) => (start === "Start" ? "Start" : "Esc");
 const PLAYING_HELP_START = "Start: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; touch or hit the orb at centre stage to fill it).\nShield then Left/Right: roll; Down: dodge.";
 const PLAYING_HELP_BACKSPACE = "Esc: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; touch or hit the orb at centre stage to fill it).\nShield then Left/Right: roll; Down: dodge.";
 export const pausedMessage = (start: StartControl) => `Paused — press ${pauseControl(start)} to resume.`;
@@ -126,9 +135,8 @@ export function trainingReadout(state: Readonly<TrainingState>): string {
 }
 
 
-export function selectionModeLabel(game: Readonly<MatchState>): string {
-  return game.lore ? "LORE BATTLES" : game.classic ? "CLASSIC" : game.training ? "TRAINING" : "VERSUS";
-}
+export const MODE_LABELS: Readonly<Record<MatchMode, string>> = { versus: "VERSUS", training: "TRAINING", classic: "CLASSIC", lore: "LORE BATTLES" };
+export const selectionModeLabel = (game: Readonly<MatchState>): string => MODE_LABELS[matchMode(game)];
 export const MOVES_HEADER = "MOVES";
 
 

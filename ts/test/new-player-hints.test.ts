@@ -8,7 +8,7 @@ import { views } from "../src/host/loop/ui";
 import { passStartControls } from "../scripts/wisp/startControls";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
-import { TUTORIAL_BOX } from "../src/game/ui/selectionLayout";
+import { GUIDE_ROWS, SELECT_BAR } from "../src/game/ui/selectBarLayout";
 import { f32 } from "wisp/src/sim/f32";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
@@ -46,7 +46,9 @@ test("a fresh profile shows the new-player strip in a match, H hides it for that
   clients.start();
   passStartControls(clients);
   clients.frames(10);
-  expect(clients.click(0, ...centre(TUTORIAL_BOX))).toBe(true);
+  expect(clients.click(0, ...centre(SELECT_BAR.guide))).toBe(true);
+  clients.frames(2);
+  expect(clients.click(0, ...centre(GUIDE_ROWS.tutorial))).toBe(true);
   clients.frames(3);
   expect(clients.click(0, ...centre(START_TUTORIAL))).toBe(true);
   until("the tutorial match", () => HUMANS.every(slot => seen(slot).phase === Phase.match));

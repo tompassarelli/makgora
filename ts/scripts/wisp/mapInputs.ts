@@ -43,6 +43,7 @@ import { stageCardPath } from "./buildInputs";
 import { buildProject, projectRoot as PROJECT } from "./project";
 import { UI_FRAMES } from "./uiFrames";
 import { RACES } from "../../src/game/roster/races";
+import { barArtNames } from "../../src/game/ui/selectBarLayout";
 import { checkCueModels } from "./headlessRender";
 import { mapCueModels } from "./cueModels";
 import { removeGeosets, teamGlowGeosets } from "../groundPlanes";
@@ -90,8 +91,8 @@ const SELECTION_TEXTURES = [
   "SelectionChipP1", "SelectionChipP2", "SelectionChipP3", "SelectionChipP4", "SelectionChipCPUP1", "SelectionChipCPUP2", "SelectionChipCPUP3", "SelectionChipCPUP4",
   "SelectionHandPoint", "SelectionHandFan", "SelectionHandPinch", "SelectionHandLabelP1", "SelectionHandLabelP2", "SelectionHandLabelP3", "SelectionHandLabelP4", "SelectionBullseye",
   ...RACES.flatMap(race => [`RaceBacking${race}`, `NamePlate${race}`, `NamePlateMirror${race}`]), "StockStrip", "StockStripMirror", "StockRing", "PingSignal1", "PingSignal2", "PingSignal3", "PingSignal4",
-  "MarkerArrow0", "MarkerArrow1", "MarkerArrow2", "MarkerArrow3",
-] as const;
+  "MarkerArrow0", "MarkerArrow1", "MarkerArrow2", "MarkerArrow3", ...barArtNames(),
+];
 
 
 const SummonEvidence = Schema.Struct({

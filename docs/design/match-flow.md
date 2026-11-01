@@ -1,7 +1,7 @@
 # Match rules and another match
 
-Smashcraft puts Stocks, Time, Endless and Automatic rematch beside the fighter
-roster. Every player sees the same choices and any present player can change
+Smashcraft puts Stocks, Time, Endless and Automatic rematch in the rules
+drawer above the fighter roster (the top bar's rules pill shows them). Every player sees the same choices and any present player can change
 them before continuing to stages. The defaults are 3 stocks, 7:00, Endless off
 and Automatic rematch off. These are a short competitive match with room for a
 comeback; automatic play is an explicit session choice.
