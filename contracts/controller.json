@@ -175,7 +175,7 @@
     }
   ],
   "savedBindings": {
-    "version": "KC",
+    "version": "KD",
     "slots": {
       "K1": 28,
       "K2": 30,
@@ -188,7 +188,8 @@
       "K9": 36,
       "KA": 36,
       "KB": 36,
-      "KC": 38
+      "KC": 38,
+      "KD": 38
     },
     "keyDigits": 3,
     "empty": 0,

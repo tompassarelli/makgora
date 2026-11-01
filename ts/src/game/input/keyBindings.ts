@@ -251,10 +251,12 @@ export function unboundActions(bindings: Readonly<KeyBindings>): Action[] {
 
 
 
-const CURRENT_SAVE = "KC";
+const CURRENT_SAVE = "KD";
 const FIRST_SAVE_WITH_START = "KB";
+const FIRST_SAVE_WITH_MOD_Y_KEPT = "KC";
+const FIRST_SAVE_WITH_C_UP_ON_Y = "KD";
 const SLOTS_BEFORE_MOD_Y = (Action.strong + 1) * 2;
-const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: SLOTS_BEFORE_MOD_Y - 2, K5: SLOTS_BEFORE_MOD_Y - 2, K6: SLOTS_BEFORE_MOD_Y, K7: SLOTS_BEFORE_MOD_Y, K8: SLOTS_BEFORE_MOD_Y, K9: SLOTS_BEFORE_MOD_Y, KA: SLOTS_BEFORE_MOD_Y, KB: SLOTS_BEFORE_MOD_Y, [CURRENT_SAVE]: KEY_SLOT_COUNT };
+const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: SLOTS_BEFORE_MOD_Y - 2, K5: SLOTS_BEFORE_MOD_Y - 2, K6: SLOTS_BEFORE_MOD_Y, K7: SLOTS_BEFORE_MOD_Y, K8: SLOTS_BEFORE_MOD_Y, K9: SLOTS_BEFORE_MOD_Y, KA: SLOTS_BEFORE_MOD_Y, KB: SLOTS_BEFORE_MOD_Y, KC: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
 const DIGITS = "0123456789";
 const SAVED_KEY_DIGITS = 3;
 
@@ -288,7 +290,15 @@ function upgradeToCurrentKeys(bindings: KeyBindings, version: string): void {
     if (version !== "KA") upgradeToPreviousKeys(bindings, version);
     replacePreviousPreset(bindings);
   }
-  bindModYDefault(bindings);
+  if (version < FIRST_SAVE_WITH_MOD_Y_KEPT) bindModYDefault(bindings);
+  if (version < FIRST_SAVE_WITH_C_UP_ON_Y) moveCUpToStart(bindings);
+}
+
+function moveCUpToStart(bindings: KeyBindings): void {
+  if (bindings.keys.includes(START_KEY)) return;
+  for (const slot of [0, 1] as const) {
+    if (keyFor(bindings, Action.cUp, slot) === code("H")) rebind(bindings, Action.cUp, slot, START_KEY);
+  }
 }
 
 function bindModYDefault(bindings: KeyBindings): void {

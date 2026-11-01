@@ -265,3 +265,37 @@ test("a saved layout from before Mod Y, with the old Walk on SPACE, the old Mod 
   layouts.wasd = { keys: saved };
   check(decodeLayouts(encodeSlots({ layouts, active: "wasd" }))?.layouts.wasd, "layout save");
 });
+
+const asEarlierSave = (saved: string) => saved.replaceAll("KD", "KC");
+
+const editedWithCUpOnH = (preset: BindingPreset, edit: (keys: number[]) => void) => {
+  const keys = presetBindings(preset).keys.slice();
+  keys[slotIndex(Action.cUp, 0)] = code("H");
+  edit(keys);
+  return { keys };
+};
+
+test("any saved layout from before the C-up on Y upgrade moves a C-up on H to Y, unless Y is bound to another action [k2 property]", () => {
+  const edited = (preset: BindingPreset) => editedWithCUpOnH(preset, (keys) => {
+    keys[slotIndex(Action.attack, 0)] = code("B");
+    keys[slotIndex(Action.grab, 0)] = code("G");
+  });
+  const yTaken = editedWithCUpOnH("custom", (keys) => {
+    keys[slotIndex(Action.grab, 0)] = code("Y");
+  });
+  const layouts = { wasd: edited("wasd"), standard: edited("standard"), custom: yTaken };
+  const loaded = decodeLayouts(asEarlierSave(encodeSlots({ layouts, active: "wasd" })));
+  assertEquals(keyFor(loaded?.layouts.wasd ?? { keys: [] }, Action.cUp, 0), code("Y"), "edited WASD C-up");
+  assertEquals(keyFor(loaded?.layouts.standard ?? { keys: [] }, Action.cUp, 0), code("Y"), "edited Box C-up");
+  assertEquals(loaded?.layouts.wasd.keys[slotIndex(Action.attack, 0)], code("B"), "other edits stay");
+  assertEquals(loaded?.layouts.custom.keys.join(","), yTaken.keys.join(","), "Y bound elsewhere keeps H");
+});
+
+test("a layout saved after the C-up on Y upgrade keeps a deliberate C-up on H [k2 property]", () => {
+  const deliberate = editedWithCUpOnH("wasd", (keys) => {
+    keys[slotIndex(Action.attack, 0)] = code("B");
+  });
+  const layouts = { wasd: deliberate, standard: presetBindings("standard"), custom: presetBindings("custom") };
+  const loaded = decodeLayouts(encodeSlots({ layouts, active: "wasd" }));
+  assertEquals(loaded?.layouts.wasd.keys.join(","), deliberate.keys.join(","), "H stays");
+});
