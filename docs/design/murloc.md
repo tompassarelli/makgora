@@ -405,6 +405,8 @@ One tuning round (f6dce7477f): damage x1.2 on forward, up and down tilt, dash at
 
 The round landed on main as 2988ca4979, seven commits after the toss rework (5317f8dc81). The full-roster run 41048924811 measured 5317f8dc81, before the round, so its Mrgl & Grgl 27.2% is the untuned pair: it matches the first reading (dash attack 26% of damage, Chen Stormstout 3%, Pit Lord 10%) and not the round's. The toss rework did not move the rate. The computer duo still fits the new orders: a toss now lands Grgl in copy, which `pressToss` accepts and `pressOrder` leaves alone unless a pincer calls Hold. The same 30 pairs on main with both the round and the toss rework (e8785f9a25, run 41069783385): 49% over 12,240 matches (6,054 wins, 6,186 losses); the top damage share is dash attack at 23%, so no numbers changed. Matchups outside 30%-70%: Chen Stormstout 15%, Sylvanas 83%, Warden 80%.
 
+After the linked surf (5a39f8963f, 2026-11-01): all 31 Mrgl & Grgl pairs, 408 matches a pair, Wren Expert (balance run 41264905997): 50.5% over 12,648 matches (6,392 wins, 6,256 losses), inside the 45-55% band, so no numbers changed with it. Up special is 8% of the moves he starts; the top damage share is dash attack at 23%, under the 40% limit. Matchups outside 30%-70%: Warden 82%, Sylvanas 72%, Peon 71% and Dreadlord 70%; Chen Stormstout moved from 15% to 68% since the last reading.
+
 ## Signature strong/weak move (#389)
 
 Neutral air, split by timing: strong hit clean, frames 5-6, 8%; weak hit late, frames 7-10, 5.6%. A flailing spin strongest at its first slap; the rest is a scrappy weak wall.
