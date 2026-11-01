@@ -5,7 +5,7 @@ import { ARCHIMONDE_MOVES } from "./moves";
 import { ARCHIMONDE_SPECIALS } from "./specials";
 
 export const ARCHIMONDE_HERO: HeroDefinition = {
-  character: Character.archimonde, name: "Archimonde", displayName: "Archimonde the Defiler",
+  character: Character.archimonde, name: "Archimonde", displayName: "Archimonde",
   purpose: "Superheavy zone-control punisher: marked ground and huge claw strikes",
   weakness: "The largest target and the shortest recovery of the heavies",
   complete: true,

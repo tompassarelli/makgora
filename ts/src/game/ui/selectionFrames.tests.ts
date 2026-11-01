@@ -48,3 +48,21 @@ test("A select card, a roster tile and the match HUD plate show Ragnaros and Gaz
   assertEquals(fighterKey(Character.firelord), "Firelord");
   assertEquals(fighterKey(Character.tinker), "Goblin Tinker");
 });
+
+test("The match HUD plate shows every fighter's name exactly as its select card does, in capitals [k2 property]", () => {
+  for (const character of PLAYABLE_CHARACTERS) assertEquals(hudTitle(character, false), nameText(character).toUpperCase(), fighterSlug(character));
+});
+
+const FIRST_NAMES: readonly (readonly [Character, string])[] = [
+  [Character.tyrande, "Tyrande"], [Character.archimonde, "Archimonde"], [Character.mountainKing, "Muradin"], [Character.warden, "Maiev"], [Character.chen, "Chen"],
+  [Character.jaina, "Jaina"], [Character.cairne, "Cairne"], [Character.grom, "Grom"], [Character.kaelthas, "Kael'thas"], [Character.malfurion, "Malfurion"],
+  [Character.sylvanas, "Sylvanas"], [Character.ladyVashj, "Lady Vashj"],
+];
+
+test("Every fighter with a surname or epithet reads as its first name on the select card, the roster tile and the match HUD plate; Lady Vashj keeps her title on the card and plate [k1 scenario]", () => {
+  for (const [character, name] of FIRST_NAMES) {
+    assertEquals(nameText(character), name);
+    assertEquals(hudTitle(character, false), name.toUpperCase());
+    if (character !== Character.ladyVashj) assertEquals(tileLabel(tileOfCharacter(character)), name);
+  }
+});

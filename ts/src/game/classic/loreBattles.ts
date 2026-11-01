@@ -84,7 +84,7 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
   battle({
     id: "thunder-brew", title: "The Brewmaster's Thunder Brew", player: C.chen, against: [C.peon], tier: "beginner", stage: 13,
     win: koWithinClock, minutes: 2, playerStocks: 2, opponentStocks: 2, opponentDamage: 40,
-    speaker: "Chen Stormstout", intro: "Someone drank my thunder brew. Now someone gets a lesson!",
+    speaker: "Chen", intro: "Someone drank my thunder brew. Now someone gets a lesson!",
   }),
   battle({
     id: "culling", title: "The Culling of Stratholme", player: C.uther, against: [C.dreadlord], tier: "beginner", stage: 6,
@@ -92,7 +92,7 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
   }),
   battle({
     id: "frostmourne", title: "Frostmourne", player: C.lichKing, against: [C.mountainKing], tier: "beginner", stage: 2,
-    win: ko, minutes: 3, playerStocks: 2, opponentStocks: 2, speaker: "Muradin Bronzebeard", intro: "Leave it be, Arthas. Forget this business and lead your men home.",
+    win: ko, minutes: 3, playerStocks: 2, opponentStocks: 2, speaker: "Muradin", intro: "Leave it be, Arthas. Forget this business and lead your men home.",
   }),
   battle({
     id: "dalaran", title: "The Siege of Dalaran", player: C.lich, against: [C.kaelthas], tier: "intermediate", stage: 4,
@@ -110,16 +110,16 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
   battle({
     id: "silvermoon", title: "The Gates of Silvermoon", player: C.sylvanas, against: [C.lichKing], tier: "intermediate", stage: 4,
     win: survive, minutes: 2, playerStocks: 2, opponentStocks: 3, playerDamage: 30,
-    speaker: "Sylvanas Windrunner", intro: "You'll not pass the gates of Silvermoon while I still draw breath!",
+    speaker: "Sylvanas", intro: "You'll not pass the gates of Silvermoon while I still draw breath!",
   }),
   battle({
     id: "hyjal-alliance", title: "Mount Hyjal: Jaina's Stand", player: C.jaina, against: [C.lich, C.dreadlord], tier: "advanced", stage: 10,
-    win: survive, minutes: 2, playerStocks: 3, opponentStocks: 2, speaker: "Jaina Proudmoore", intro: "Rage Winterchill marches on our base. Hold until the Horde is ready!",
+    win: survive, minutes: 2, playerStocks: 3, opponentStocks: 2, speaker: "Jaina", intro: "Rage Winterchill marches on our base. Hold until the Horde is ready!",
   }),
   battle({
     id: "hyjal-horde", title: "Mount Hyjal: The Horde Holds", player: C.cairne, against: [C.pitLord], tier: "advanced", stage: 10,
     win: survive, minutes: 2, playerStocks: 2, opponentStocks: 3, playerDamage: 40,
-    speaker: "Cairne Bloodhoof", intro: "Azgalor's fire reaches the totems. Stand fast, my brothers. The Earthmother watches!",
+    speaker: "Cairne", intro: "Azgalor's fire reaches the totems. Stand fast, my brothers. The Earthmother watches!",
   }),
   battle({
     id: "skull", title: "The Skull of Gul'dan", player: C.demonHunter, against: [C.dreadlord], tier: "advanced", stage: 14,
@@ -127,7 +127,7 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
   }),
   battle({
     id: "maiev", title: "The Hunt for Illidan", player: C.warden, against: [C.demonHunter], tier: "advanced", stage: 7,
-    win: koWithinClock, minutes: 3, playerStocks: 2, opponentStocks: 2, speaker: "Maiev Shadowsong", intro: "You will not escape me this time, Illidan.",
+    win: koWithinClock, minutes: 3, playerStocks: 2, opponentStocks: 2, speaker: "Maiev", intro: "You will not escape me this time, Illidan.",
   }),
   bossBattle("archimonde", "The Battle of Mount Hyjal", C.warden, BossKind.archimonde, 3, 5, 2,
     "The World Tree is mine. Your feeble races will burn with this world!"),
@@ -146,7 +146,7 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
   battle({
     id: "grom-mannoroth", title: "Grom's Last Stand", player: C.grom, against: [C.pitLord], tier: "expert", stage: 3,
     win: koWithinClock, minutes: 3, playerStocks: 1, opponentStocks: 2, playerDamage: 40,
-    speaker: "Grom Hellscream", intro: "Mannoroth, you chained the Warsong with your blood. Gorehowl will cut us free!",
+    speaker: "Grom", intro: "Mannoroth, you chained the Warsong with your blood. Gorehowl will cut us free!",
   }),
   bossBattle("hyjal-malfurion", "Mount Hyjal: The Horn of Cenarius", C.malfurion, BossKind.archimonde, 4, 5, 2,
     "Blow your horn, druid. When I reach Nordrassil, the last refuge of your people will burn."),

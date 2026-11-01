@@ -11,7 +11,7 @@ import { WARDEN_WEAPON_REGIONS } from "./weaponRegions";
 export const WARDEN_HERO: HeroDefinition = {
   character: Character.warden,
   name: "Warden",
-  displayName: "Maiev Shadowsong",
+  displayName: "Maiev",
   purpose: "Precision mobility and edge pressure",
   weakness: "Light body and punishable teleport endpoints",
   complete: true,

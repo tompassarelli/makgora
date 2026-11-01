@@ -385,7 +385,7 @@
         }
       ]
     },
-    "Muradin Bronzebeard": {
+    "Muradin": {
       "openingsPerKill": 4.5,
       "multiHitOpeningsPerKill": 2.5,
       "openingsWithReads": 5.25,
@@ -517,7 +517,7 @@
         }
       ]
     },
-    "Maiev Shadowsong": {
+    "Maiev": {
       "openingsPerKill": 11.5,
       "multiHitOpeningsPerKill": 5.25,
       "openingsWithReads": 12.5,
@@ -1591,7 +1591,7 @@
         }
       ]
     },
-    "Jaina Proudmoore": {
+    "Jaina": {
       "openingsPerKill": 6,
       "multiHitOpeningsPerKill": 5.5,
       "openingsWithReads": 6.75,
@@ -1705,7 +1705,7 @@
         }
       ]
     },
-    "Sylvanas Windrunner": {
+    "Sylvanas": {
       "openingsPerKill": 7.75,
       "multiHitOpeningsPerKill": 5.25,
       "openingsWithReads": 9.25,
@@ -1825,7 +1825,7 @@
         }
       ]
     },
-    "Cairne Bloodhoof": {
+    "Cairne": {
       "openingsPerKill": 5.25,
       "multiHitOpeningsPerKill": 2.75,
       "openingsWithReads": 5.5,
@@ -1933,7 +1933,7 @@
         }
       ]
     },
-    "Chen Stormstout": {
+    "Chen": {
       "openingsPerKill": 2.75,
       "multiHitOpeningsPerKill": 2.25,
       "openingsWithReads": 4,
@@ -2299,7 +2299,7 @@
         }
       ]
     },
-    "Kael'thas Sunstrider": {
+    "Kael'thas": {
       "openingsPerKill": 7,
       "multiHitOpeningsPerKill": 6.75,
       "openingsWithReads": 7.25,
@@ -2563,7 +2563,7 @@
         }
       ]
     },
-    "Grom Hellscream": {
+    "Grom": {
       "openingsPerKill": 9.25,
       "multiHitOpeningsPerKill": 3.5,
       "openingsWithReads": 10,
@@ -2683,7 +2683,7 @@
         }
       ]
     },
-    "Malfurion Stormrage": {
+    "Malfurion": {
       "openingsPerKill": 3.75,
       "multiHitOpeningsPerKill": 3.75,
       "openingsWithReads": 4.75,
@@ -3163,7 +3163,7 @@
         }
       ]
     },
-    "Archimonde the Defiler": {
+    "Archimonde": {
       "openingsPerKill": 7.25,
       "multiHitOpeningsPerKill": 2,
       "openingsWithReads": 7.75,

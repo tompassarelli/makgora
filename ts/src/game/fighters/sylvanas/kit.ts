@@ -7,7 +7,7 @@ import { fitMoves, fitSpecials } from "../../sim/weaponRegions";
 import { SYLVANAS_WEAPON_REGIONS } from "./weaponRegions";
 
 export const SYLVANAS_HERO: HeroDefinition = {
-  character: Character.sylvanas, name: "Sylvanas Windrunner",
+  character: Character.sylvanas, name: "Sylvanas Windrunner", displayName: "Sylvanas",
   purpose: "Dark arrows and punishable curses", weakness: "Short melee reach and exposed casts",
   complete: true,
   moves: fitMoves(SYLVANAS_MOVES, SYLVANAS_WEAPON_REGIONS), specials: fitSpecials(SYLVANAS_SPECIALS, SYLVANAS_WEAPON_REGIONS), gameplan: SYLVANAS_GAMEPLAN,

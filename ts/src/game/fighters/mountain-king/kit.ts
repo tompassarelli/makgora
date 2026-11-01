@@ -11,7 +11,7 @@ import { MOUNTAIN_KING_WEAPON_REGIONS } from "./weaponRegions";
 export const MOUNTAIN_KING_HERO: HeroDefinition = {
   character: Character.mountainKing,
   name: "Mountain King",
-  displayName: "Muradin Bronzebeard",
+  displayName: "Muradin",
   purpose: "Compact heavy with hammer and axe",
   weakness: "Slow approach and limited air drift",
   complete: true,

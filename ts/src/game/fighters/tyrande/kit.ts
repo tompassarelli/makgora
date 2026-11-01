@@ -5,7 +5,7 @@ import { TYRANDE_MOVES } from "./moves";
 import { TYRANDE_SPECIALS } from "./specials";
 
 export const TYRANDE_HERO: HeroDefinition = {
-  character: Character.tyrande, name: "Tyrande", displayName: "Tyrande Whisperwind",
+  character: Character.tyrande, name: "Tyrande", displayName: "Tyrande",
   purpose: "Aerial rushdown archer: quick arrows hold a foe in shield while she closes",
   weakness: "A light body that dies early, and arrows too weak to win from range",
   complete: true,

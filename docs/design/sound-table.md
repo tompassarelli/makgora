@@ -32,7 +32,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Rising Whirlwind | HeroBladeMasterAttack1 | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 | Down special: Wind Walk | WindWalk | CriticalStrike | CriticalStrike + CriticalStrike | MetalMediumSliceMetal |  |
 
-## Muradin Bronzebeard
+## Muradin
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -44,7 +44,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Thunder Leap | HeroMountainKingAttack1 | RockHeavyBashFlesh | RockHeavyBashFlesh + StormBolt | MetalMediumBashMetal |  |
 | Down special: Thunder Clap | Taunt | ThunderClap | ThunderClap + StormBolt | MetalMediumBashMetal |  |
 
-## Maiev Shadowsong
+## Maiev
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -153,7 +153,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Far Sight | RevealMap | MetalMediumBashFlesh | MetalMediumBashFlesh + LightningBolt | MetalMediumBashMetal |  |
 | Down special: Doomhammer Slam | RockHeavyBashFlesh | MetalHeavyBashFlesh | MetalHeavyBashFlesh + LightningBolt | MetalMediumBashMetal |  |
 
-## Jaina Proudmoore
+## Jaina
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -165,7 +165,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Blink | BlinkCaster | BlinkTarget | BlinkTarget + FrostBoltHit | WoodMediumBashMetal |  |
 | Down special: Summon Water Elemental | WaterElementalBirth | WaterElementalMissile | WaterElementalMissile + FrostBoltHit | WoodMediumBashMetal |  |
 
-## Sylvanas Windrunner
+## Sylvanas
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -177,7 +177,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Banshee Flight | BansheeMissileLaunch | BansheeMissileHit | BansheeMissileHit + BlackArrowHit | WoodMediumBashMetal |  |
 | Down special: Life Drain | BansheeMissileLaunch | BansheeMissileHit | BansheeMissileHit + BlackArrowHit | WoodMediumBashMetal |  |
 
-## Cairne Bloodhoof
+## Cairne
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -188,7 +188,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Spirit Lift | AncestralSpirit | WoodMediumBashFlesh | WoodMediumBashFlesh + Pulverize | RockHeavyBashMetal |  |
 | Down special: War Stomp | HeroTaurenChieftainAttack2 | Pulverize | Pulverize + Pulverize | RockHeavyBashMetal |  |
 
-## Chen Stormstout
+## Chen
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -224,7 +224,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Rocket Boots | ClusterRocketsLaunch | MetalMediumBashFlesh | MetalMediumBashFlesh + ClusterRocketsImpact | MetalMediumBashMetal |  |
 | Down special: Pocket Factory | PocketFactoryBirth | GoblinSapperExplode | GoblinSapperExplode + ClusterRocketsImpact | MetalMediumBashMetal |  |
 
-## Kael'thas Sunstrider
+## Kael'thas
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -236,7 +236,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Phoenix | PhoenixMissileLaunch | Fireball | Fireball + Fireball | WoodMediumBashMetal |  |
 | Down special: Banish | BanishCaster | BanishCaster | BanishCaster + Fireball | WoodMediumBashMetal |  |
 
-## Mrgl & Grgl
+## Mrgl&Grgl
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -248,7 +248,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Tidal Surf | CrushingWave | WaterElementalMissile | WaterElementalMissile + CrushingWaveDamage | MetalLightChopMetal | MurlocYesAttack1 / MurlocYesAttack2 / MurlocYesAttack3 |
 | Down special: Mrglglgl! | BigWaterStep | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | MetalLightChopMetal | MurlocYes1 / MurlocWhat1 |
 
-## Grom Hellscream
+## Grom
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -260,7 +260,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Blood Leap |  | MetalMediumChopFlesh | MetalMediumChopFlesh + CriticalStrike | MetalMediumChopMetal |  |
 | Down special: Mannoroth's Bane |  | MetalHeavyChopFlesh | MetalHeavyChopFlesh + CriticalStrike | MetalMediumChopMetal |  |
 
-## Malfurion Stormrage
+## Malfurion
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -308,7 +308,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Tidal Surge | CrushingWave | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | WoodMediumBashMetal |  |
 | Down special: Mana Shield | ManaShieldCastSound | FrostArmor | FrostArmor + CrushingWaveDamage | WoodMediumBashMetal |  |
 
-## Archimonde the Defiler
+## Archimonde
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -320,7 +320,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Fel Ascent | FireballLaunch | Fireball | Fireball + MetalHeavyBashFlesh | MetalLightChopMetal |  |
 | Down special: Bash | ThunderClap | RockHeavyBashFlesh | RockHeavyBashFlesh + MetalHeavyBashFlesh | MetalLightChopMetal |  |
 
-## Tyrande Whisperwind
+## Tyrande
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
