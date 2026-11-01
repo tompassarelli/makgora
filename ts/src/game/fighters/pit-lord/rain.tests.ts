@@ -199,8 +199,8 @@ test("Rain of Fire's impact burst and burning patch sit on the floor the meteors
     const d = duel(-IN_RAIN * facing, Character.peon);
     standOn(d, stage, surface, x, facing);
     const gaps = impactHeights(d, stage);
-    assertGreaterThan(gaps.length, 0, `${name}: the meteors burst`);
-    for (const gap of gaps) if (!(Math.abs(gap) < 0.001)) off.push(`${name}: ${gap}`);
+    if (gaps.length === 0) off.push(`${name}: no meteor burst`);
+    for (const gap of gaps) if (!(Math.abs(gap) < f32(0.001))) off.push(`${name}: ${gap}`);
   }
   assertEquals(off.join("; "), "", "bursts off the floor");
 });
