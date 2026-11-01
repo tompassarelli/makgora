@@ -23,7 +23,7 @@ test("Reset default gives a fresh lobby's rules back, and Tourney, Party and End
     [fresh.stockCount, fresh.timeLimitMinutes, fresh.items.on, fresh.items.enabledMask, fresh.ultimatesOff, fresh.endless, fresh.automaticRematch]);
   assertEquals(game.items.enabledMask, ALL_ITEMS_MASK);
   applyRulePreset(game, 0, "tourney");
-  assertRules([game.stockCount, game.timeLimitMinutes, game.items.on, game.ultimatesOff, game.endless], [4, 8, false, true, false]);
+  assertRules([game.stockCount, game.timeLimitMinutes, game.items.on, game.ultimatesOff, game.endless], [4, 8, false, false, false]);
   setStocks(game, 0, 2);
   applyRulePreset(game, 0, "party");
   assertRules([game.stockCount, game.timeLimitMinutes, game.items.on, game.ultimatesOff], [2, 8, true, false]);

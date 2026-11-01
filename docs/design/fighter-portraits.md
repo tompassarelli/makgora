@@ -360,7 +360,8 @@ one row of a few clusters with the rarely used settings one click deeper
    chip, Add a fighter, Choose CPU or Empty, Choose two teams).
 
 The presets set only the rules they name (smashcraft:ts/src/game/lobby/rulePresets.ts):
-Tourney is 4 stocks, 8:00, ultimates off, items off and endless off; Party is
+Tourney is 4 stocks, 8:00, ultimates on, items off and endless off (it had
+ultimates off until 2026-11-02, when Tourney was changed to keep them on); Party is
 items on with every item kind, ultimates on and endless off; Endless is endless
 play with ultimates on; Reset default is a fresh lobby's 3 stocks, 7:00, items
 off with every kind, ultimates on, endless off and automatic rematch off.

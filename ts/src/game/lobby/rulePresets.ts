@@ -16,7 +16,7 @@ export interface PresetRules {
 /** Each preset sets only the rules it names; `standard` is a fresh lobby's rules, the drawer's Reset default. */
 export const RULE_PRESETS: Readonly<Record<RulePreset, PresetRules>> = {
   standard: { stocks: 3, minutes: 7, items: false, everyItem: true, ultimates: true, endless: false, automaticRematch: false },
-  tourney: { stocks: 4, minutes: 8, items: false, ultimates: false, endless: false },
+  tourney: { stocks: 4, minutes: 8, items: false, ultimates: true, endless: false },
   party: { items: true, everyItem: true, ultimates: true, endless: false },
   endless: { endless: true, ultimates: true },
 };
