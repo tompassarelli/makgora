@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { playerArguments, playerMap, playerReadme, playerVersion } from "../scripts/playerArguments";
-import { playName } from "../scripts/wisp/currentPlaytest";
+import { playName } from "../scripts/wisp/buildName";
 
 test("the player takes the map from its first .w3x argument and keeps the other flags [k2 property]", () => {
   expect(playerMap(["Makgora.w3x", "--host", "--relay", "eu"], [])).toEqual({ map: "Makgora.w3x", rest: ["--host", "--relay", "eu"] });

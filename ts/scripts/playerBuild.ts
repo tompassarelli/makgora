@@ -6,7 +6,7 @@ import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
 import { playerReadme } from "./playerArguments";
 import { projectRoot } from "./wisp/projectRoot";
-import { playName } from "./wisp/currentPlaytest";
+import { playName } from "./wisp/buildName";
 
 const EXE = process.platform === "win32" ? ".exe" : "";
 const WISP_WINDOW = join(import.meta.dir, "../node_modules/wisp/host/window");

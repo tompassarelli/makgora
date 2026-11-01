@@ -14,9 +14,10 @@ import { runProcess } from "../hostProcess";
 import { FETCH_HINT, buildOnce } from "./buildInputs";
 import { capacityHelper } from "../heavyCapacity";
 import { withLock } from "./fileLock";
-import { type Edition, installName, playableBuildArgs } from "./greenBuilds";
+import { type BuildNameProblem } from "./buildName";
+import * as buildNameOf from "./buildName";
+import { type Edition, playableBuildArgs } from "./greenBuilds";
 import { MAP_FOLDER } from "./mapLibrary";
-import { GAME_TITLE } from "../../src/game/ui/title";
 import { projectRoot } from "./project";
 
 const inputsRoot = join(homedir(), ".local/share/smashcraft-build-inputs");
@@ -41,47 +42,13 @@ const capture = (cwd: string, [program = "", ...args]: readonly string[]) =>
 const tryPlay = <A>(run: () => A) => Effect.try({ try: run, catch: playProblem });
 
 
-export const RELEASE_TAG_PATTERN = "v[0-9]*.[0-9]*";
+const named = <A>(naming: Effect.Effect<A, BuildNameProblem>) => naming.pipe(Effect.mapError((failure) => playProblem(new Error(failure.problem))));
 
-export function releaseTarget(described: string | undefined): string | undefined {
-  const match = /^v(\d+)\.(\d+)(\.\d+)?(-\d+-g[0-9a-f]+)?$/.exec(described?.trim() ?? "");
-  if (match === null) return undefined;
-  if (match[4] === undefined) return `${match[1]}.${match[2]}${match[3] ?? ""}`;
-  return `${match[1]}.${Number(match[2]) + 1}`;
-}
+export const playTarget = (revision: string, repo = projectRoot) => named(buildNameOf.playTarget(revision, repo));
 
-export function buildName(tags: readonly string[], target: string, build: number): string {
-  if (tags.includes(`v${target}`)) return `${GAME_TITLE} ${target}`;
-  const candidates = tags.flatMap((tag) => {
-    const [version, number = ""] = tag.slice(1).split("-rc.");
-    return tag.startsWith("v") && version === target && /^\d+$/.test(number) ? [Number(number)] : [];
-  });
-  if (candidates.length > 0) return `${GAME_TITLE} ${target} RC-${Math.max(...candidates)}`;
-  return installName(target, build);
-}
+export const devBuild = (revision: string, repo = projectRoot) => named(buildNameOf.devBuild(revision, repo));
 
-const tagsAt = (revision: string, repo: string) =>
-  capture(repo, ["git", "tag", "--points-at", revision]).pipe(Effect.map((text) => (text ?? "").split("\n").map((tag) => tag.trim()).filter((tag) => tag !== "")));
-
-/** The release `revision` builds toward: its own vX.Y tag (vX.Y.Z on tags before 0.2), else the minor after the newest one it descends from. */
-export const playTarget = (revision: string, repo = projectRoot) => Effect.gen(function*() {
-  const target = releaseTarget(yield* capture(repo, ["git", "describe", "--tags", "--match", RELEASE_TAG_PATTERN, "--exclude", "v*-*", revision]));
-  if (target === undefined) return yield* playProblem(new Error(`no vX.Y release tag is reachable from ${revision.slice(0, 12)}`));
-  return target;
-}).pipe(Effect.provide(BunServices.layer));
-
-/** The first-parent commits `revision` is past the newest release tag it descends from: the number a dev build carries, which only grows along main. */
-export const devBuild = (revision: string, repo = projectRoot) => Effect.gen(function*() {
-  const tag = (yield* capture(repo, ["git", "describe", "--tags", "--abbrev=0", "--match", RELEASE_TAG_PATTERN, "--exclude", "v*-*", revision]))?.trim();
-  const count = tag === undefined ? undefined : (yield* capture(repo, ["git", "rev-list", "--first-parent", "--count", `${tag}..${revision}`]))?.trim();
-  if (count === undefined || !/^\d+$/.test(count)) return yield* playProblem(new Error(`can't count first-parent commits past the newest release tag for ${revision.slice(0, 12)}`));
-  return Number(count);
-}).pipe(Effect.provide(BunServices.layer));
-
-export const playName = (revision: string, repo = projectRoot) => Effect.gen(function*() {
-  const target = yield* playTarget(revision, repo);
-  return buildName(yield* tagsAt(revision, repo), target, yield* devBuild(revision, repo));
-}).pipe(Effect.provide(BunServices.layer));
+export const playName = (revision: string, repo = projectRoot) => named(buildNameOf.playName(revision, repo));
 
 
 const mainCheckoutOf = Effect.gen(function*() {
