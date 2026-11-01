@@ -1,12 +1,13 @@
 import type { StandaloneGame, StandaloneInput, StandaloneSession } from "wisp/scripts/wisp/standalone";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import type { MapEntry } from "wisp/src/headless/client";
 import { createKeyFeed } from "wisp/src/headless/keyInput";
 import { createPointerFeed } from "wisp/src/headless/pointer";
 import { Effect } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { RenderFailure } from "wisp/scripts/wisp/headlessRender";
-import { installHeadless, readNativeDeclarations } from "wisp/scripts/wisp/headless";
+import { installHeadless } from "wisp/scripts/wisp/headless";
+import { nativeDeclarations } from "./nativeDeclarations";
 import { customMapData } from "wisp/scripts/wisp/headlessInput";
 import { describeDigestDifference, digestDifference, frameDigest } from "../../src/game/replay/frameDigest";
 import { Action } from "../../src/game/input/actions";
@@ -65,9 +66,6 @@ export type StandaloneStart = "match" | "select" | "results";
 const offersPrompt = (start: StandaloneStart, savedFiles: string | undefined): boolean => start !== "select" || savedFiles !== undefined;
 
 const clientOptions = (savedFiles: string | undefined) => savedFiles === undefined ? { keepCalls: 0 } : { keepCalls: 0, files: () => customMapData(savedFiles) };
-
-// a compiled player holds no Wisp source tree, so the build ships the declarations beside the executable
-const nativeDeclarations = () => import.meta.path.endsWith(".ts") ? readNativeDeclarations() : readNativeDeclarations(join(dirname(process.execPath), "warcraft.d.ts"));
 
 const OPPONENT_SLOT = 1;
 

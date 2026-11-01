@@ -8,6 +8,7 @@ import { PARTICIPANT_CAPACITY } from "../../src/game/input/participants";
 import { Phase } from "../../src/game/lobby/lobbyState";
 import { type InputSchedule, acceptedInput, remoteAccepted } from "../../src/game/netcode/inputSchedule";
 import { installHeadless } from "wisp/scripts/wisp/headless";
+import { nativeDeclarations } from "./nativeDeclarations";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { PREDICTED_HEADLESS } from "./headless";
@@ -84,7 +85,7 @@ const PHASE_NAMES = new Map<number, string>(Object.entries(Phase).map(([name, va
 
 /** One player of a hosted or joined match: both humans meet at fighter selection, and each presses its window's input or its pad script. */
 export async function createNetStandalone(link: LockstepLink, slot: number, humans: number, options: { readonly script?: string } = {}): Promise<StandaloneNetSession> {
-  const runtime = installHeadless(PREDICTED_HEADLESS);
+  const runtime = installHeadless(PREDICTED_HEADLESS, nativeDeclarations());
   try {
     const platform = join(import.meta.dir, "../../src/platform");
     interface State { readonly game: { readonly phase: number; readonly humanFighterMask: number; readonly computerMask: number } }
