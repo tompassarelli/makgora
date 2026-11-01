@@ -103,7 +103,7 @@ export function specialToEnd(world: Roster, owner: Fighter, second: Readonly<Con
 }
 
 /** Queues the attack command the input layer would send for `style` on the next stepDuel frame. */
-export function queueDuelAttack(world: Roster, style: number, facing: -1 | 1, slot = 0): void {
+export function queueDuelAttack(world: Roster, style: number, facing: -1 | 0 | 1, slot = 0): void {
   const match = duelMatches.get(world);
   if (match === undefined) throw new Error("queueDuelAttack needs a world that has been stepped with stepDuel");
   const buffer = match.controls.commands[slot];

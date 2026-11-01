@@ -4,7 +4,7 @@ import { canHit } from "./teams";
 
 import { f32 } from "wisp/src/sim/f32";
 import { AttackPhase, AttackStyle, Character, DASH_GRAB_REQUEST, GroundAction } from "./codes";
-import { groundOptionOpen, groundState } from "./groundMovement";
+import { grabPivots, groundOptionOpen, groundState } from "./groundMovement";
 import { GroundOption, GroundState, groundOptionAllowed } from "./stickZones";
 import { attackPhase, attackStartup, attackActive, canStartAttackStyle, inEarlyAscent, inGrabContext, isIntangible, jabChainStep } from "./conditions";
 import { finishDamageContacts, openDamageContacts } from "./contacts";
@@ -166,7 +166,7 @@ export function beginFighterAttack(world: Roster, slot: number, style: AttackSty
   const groundAttack = (action <= DASH_GRAB_REQUEST && action !== AttackStyle.shot) || action === AttackStyle.demonHunterDashAttack || action === AttackStyle.dashAttack || isJab(action);
   const aerial = isAerialAttack(action);
   if (((groundAttack && grounded) || action === AttackStyle.shot || (aerial && !grounded)) && canStartAttackStyle(fighter, action)) {
-    const pivot = action === AttackStyle.grab && fighter.ground.action === GroundAction.turnRun;
+    const pivot = (action === AttackStyle.grab || action === DASH_GRAB_REQUEST) && grabPivots(fighter);
     const smashFromDash = grounded && fighter.ground.action === GroundAction.dash && isGroundSmash(action);
     const tiltFromMotion = grounded && cStick && groundOption(action) === GroundOption.tilt && !groundOptionOpen(fighter, GroundOption.tilt);
     beginAttack(fighter, pivot ? DASH_GRAB_REQUEST : action, mayCharge, strongUp);

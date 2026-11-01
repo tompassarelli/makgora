@@ -21,6 +21,7 @@ statements. Retrieved 2026-10-06.
 | Melee | Ledgedash: earliest release | frame 9 of the hang; 0 to 15 grounded actionable intangible frames by character (Fox and Pichu 15, Peach 0) | [SmashWiki Ledgedash](https://www.ssbwiki.com/Ledgedash) |
 | Melee | Wavedash landing lag | 10 frames without attacking; jump squat 3 to 6 by character. The page gives no input-window frame counts | [SmashWiki Wavedash](https://www.ssbwiki.com/Wavedash), [Jump](https://www.ssbwiki.com/Jump) |
 | Melee | Input buffering | none in general; a few actions buffer 2 to 3 frames | [SmashWiki Buffer](https://www.ssbwiki.com/Buffering) |
+| Melee | Pivot (dash-dance turnaround) and pivot grab | 1 | [SmashWiki Pivot](https://www.ssbwiki.com/Pivot), [Pivot grab](https://www.ssbwiki.com/Pivot_grab) |
 | Project M | 1-frame changes counted as real execution relief (backdash tolerance, short-hop last-squat-frame fix, DACUS 2 frames) | 1 to 2 | [Critpoints](https://critpoints.net/2015/11/02/execution-in-pm-vs-melee/) |
 | Ultimate | Tech | 11 (Smash 4: 8) | [SmashWiki Tech](https://www.ssbwiki.com/Tech) |
 | Ultimate | Hit buffer | 9 (Brawl and Smash 4: 10) | [SmashWiki Buffer](https://www.ssbwiki.com/Buffer) |
@@ -108,6 +109,7 @@ developer statements on buffer lengths. Add them with their source when found.
 | Roll, spot dodge, air dodge intangibility | 4 to 19; 2 to 15; 4 to 29 | [physics.md](../physics.md) |
 | Dash to run command; run brake opposite-input window | 12 or 16; through 14 | [physics.md](../physics.md) |
 | Late dash guard grab | 3 | smashcraft:ts/src/game/sim/step.ts |
+| Pivot after a dash back or run turn: standing frames that keep the slide and give the pivot grab | 2 (Melee 1; Tom 2026-11-01, an easier window; parity row `pivot-window`) | smashcraft:ts/src/game/sim/groundMovement.ts `PIVOT_FRAMES`, [Pivots](../gameplay-design.md#pivots) |
 | Shield release lag; minimum shield hold | 11; 8 | [physics.md](../physics.md) |
 | L-cancel; wavedash input timing | none; not a defined window | [gameplay design decisions](../gameplay-design.md) |
 

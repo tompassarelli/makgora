@@ -23,13 +23,32 @@ standing grab informs the direction change, not the extra reach.
 | --- | ---: | ---: | ---: | ---: |
 | Standing and out of shield | 96 | 20 / 70 | 50 | 3 |
 | Dash | 120 | 20 / 70 | 50 | 3 |
-| Pivot during run turn | 144 | 20 / 70 | 50 | 3 |
+| Pivot (run turn, dash-back turnaround, either pivot frame) | 144 | 20 / 70 | 50 | 3 |
 
 The regions touch authored body capsules, face forward and reject a target
 whose feet exceed the listed reach. Startup and whiff duration retain each
 fighter's authored timing; dash and pivot add three startup and eleven
 total frames. The larger box does not extend throws or the early-ascent
 catch window. A stock loss resets the grab variant; rollback stores it.
+
+A pivot grab comes from three places: Turn-run (a run turned), the turnaround
+frame of a dash back (the dash dance's first frame the other way), and either
+of the two pivot frames that follow a dash back released to neutral
+(smashcraft:docs/gameplay-design.md, Pivots). It faces the new direction and
+keeps the ground speed it had, sliding under the grab's ordinary traction, so a
+pivot grab out of a dash travels like a dash grab, the other way. A grab on the
+frame after the two pivot frames is the standing grab from what the pivot left:
+about a standstill. A standing grab from a standstill and a grab in a forward
+dash are unchanged. Melee's pivot grab is the standing grab, with standing
+boxes and animation, on the one dash-dance turnaround frame and never out of a
+run ([SmashWiki Pivot grab](https://www.ssbwiki.com/Pivot_grab)); Smashcraft
+keeps the 1.5 times reach #337 chose, the dash grab's timing and a two-frame
+window (parity rows `pivot-grab` and `pivot-window`). Tom's playtest on
+2026-11-01 found a grab on the pivot frame gave a still standing grab with no
+reach bonus, because only Turn-run gave the pivot grab; he asked for the
+Melee-style sliding pivot grab out of a dash with the pivot box, and for the
+pivot to last two frames as an easier window. Tests:
+smashcraft:ts/src/game/sim/pivotGrab.tests.ts.
 
 A grab pressed while holding shield stays buffered through hitlag and
 shield stun and starts on the first free frame, without shield release.

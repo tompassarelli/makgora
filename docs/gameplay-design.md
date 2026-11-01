@@ -53,6 +53,26 @@ threshold on all three samples for small stick variation. This is an authored
 tolerance policy, not exact UCF emulation. It uses independently described
 behavior and numerical facts; no external implementation was copied.
 
+### Pivots
+
+A dash back released to neutral within its first two frames, or a run turn
+released early in its turn (`pivotWindow` in `advanceGroundMovement`), is a pivot: the fighter faces the new direction and
+stands for two frames (`PIVOT_FRAMES`, smashcraft:ts/src/game/sim/groundMovement.ts)
+with the ground speed it had, sliding. Melee's pivot is one frame
+([SmashWiki Pivot](https://www.ssbwiki.com/Pivot)); Tom chose two on
+2026-11-01 as an easier execution window (parity row `pivot-window`). On both
+frames the fighter is standing and actionable and keeps the slide: jab, tilts,
+smashes and jump start there, and grab gives the pivot grab with its 144 reach
+(smashcraft:docs/design/grabs.md). A dash flicked on either frame still dash-dances,
+dashing that way at once. On the third frame the pivot ends: the slide drops to
+at most twice the fighter's traction, backward, and a grab there is the standing
+grab. A grab on the dash back's turnaround frame itself, before the release,
+is the pivot grab too. Shield and crouch pressed on the first pivot frame are
+still read before the pivot starts, so the shield stops as out of a dash and
+crouch is refused; from the second frame both act as from standing.
+smashcraft:ts/src/game/sim/pivotGrab.tests.ts checks the grab frames and the
+dash dance.
+
 ## Ground states and the stick map
 
 Tom, 9 Oct 2026 (#390): copy Melee's ground states and its analog stick map,
@@ -136,10 +156,11 @@ tilt gives, since it sat unusually far from the body; the cap is
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Stand | neutral | yes | yes | – | yes | yes | yes | yes | dash, smash turn | – |
 | Walk slow/middle/fast | walk zone; re-enters Dash when the stick then flicks past 0.8 within the window | yes | yes | – | yes | yes | yes | yes | dash | – |
-| Initial dash | dash zone from stand, walk or crouch, or a dash back | no: A gives the dash attack (frames 1–20) | up smash on every frame (Smashcraft, #489, as in Ultimate); forward and down smash on frames 1–3 only; the slide brakes as if the stick were released | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
+| Initial dash | dash zone from stand, walk or crouch, or a dash back | no: A gives the dash attack (frames 1–20) | up smash on every frame (Smashcraft, #489, as in Ultimate); forward and down smash on frames 1–3 only; the slide brakes as if the stick were released | frames 1–20 | dash grab; pivot grab on a dash back's turnaround frame | yes | yes (relaxed) | no | dash back (the dash dance) | – |
 | Run | dash held forward to its run frame | no: A gives the dash attack | up smash only (Smashcraft, #489); forward and down: A gives the dash attack | yes | dash grab | yes | yes (relaxed) | no | no | turn-run at x ≤ −0.375 |
 | Run brake | run with \|x\| < 0.625 | no | no | no | no | no | yes (relaxed) | yes: crouch from run goes through here | no | turn-run within its command window |
 | Turn-run | run or run brake turned | no | no | no | pivot grab (Smashcraft, #337) | no | yes (relaxed) | no | no | – |
+| Pivot (2 frames) | a dash back or run turn released to neutral ([Pivots](#pivots)) | yes, keeping the slide | yes, keeping the slide | – | pivot grab | yes (from frame 2) | yes | yes (from frame 2) | dash back (the dash dance) | – |
 | Crouch | crouch zone from stand, walk or run brake | yes | yes | – | yes | yes | yes | holds | dash | – |
 
 `groundOptionAllowed` holds this table and `groundGatedStyle`

@@ -21,6 +21,8 @@ const TURN_RUN_ZERO_VELOCITY_THRESHOLD = melee(0.009999999776482582);
 /** only the Dash-to-Guard branch uses this early/late split. */
 export const DASH_GUARD_EARLY_FRAMES = 20;
 
+export const PIVOT_FRAMES = 2;
+
 /** the stick crosses this sideways to count as a fresh flick. */
 const STICK_SMASH_DEADZONE_X = 0.25;
 
@@ -67,6 +69,12 @@ export function groundState(f: Readonly<Fighter>): GroundState {
     case GroundAction.turnRun: return GroundState.turnRun;
     default: return f.ground.dashFrame > 0 ? GroundState.dash : f.motion.vx !== 0 ? GroundState.walk : GroundState.stand;
   }
+}
+
+export function grabPivots(f: Readonly<Fighter>): boolean {
+  const { ground } = f;
+  return ground.action === GroundAction.turnRun || ground.pivotGraceFrames > 0
+    || (ground.action === GroundAction.dash && ground.pivotEligible && ground.actionFrame === 1);
 }
 
 export function groundOptionOpen(f: Readonly<Fighter>, option: GroundOption): boolean {
@@ -255,7 +263,7 @@ export function advanceGroundMovement(f: Fighter, direction: number, walking: bo
     clearDash(f);
     ground.turnRunEntryFacing = entryFacing;
     ground.dashDirection = dashDirection;
-    ground.pivotGraceFrames = 3;
+    ground.pivotGraceFrames = PIVOT_FRAMES;
     ground.pivotDashFrame = dashFrame;
     ground.pivotDashActionFrame = dashActionFrame;
     return false;

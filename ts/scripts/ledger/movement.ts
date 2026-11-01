@@ -12,7 +12,7 @@ import {
 } from "../../src/game/sim/conditions";
 import { AIR_DODGE_LANDING_LAG, EMPTY_LANDING_LAG } from "../../src/game/sim/down";
 import { createFighter } from "../../src/game/sim/fighter";
-import { groundState, restingTraction } from "../../src/game/sim/groundMovement";
+import { PIVOT_FRAMES, groundState, restingTraction } from "../../src/game/sim/groundMovement";
 import { AIR_DODGE_ANIMATION_FRAMES, AIR_DODGE_DECAY } from "../../src/game/sim/jumpsAndDodges";
 import { LEDGE_HANG_DAMAGED_PERCENT, LEDGE_INTANGIBLE_DECAY, ledgeIntangibleFrames, ledgeSnap, snapToLedge } from "../../src/game/sim/ledge";
 import { attackLandingLag, uncancelledLandingLag } from "../../src/game/sim/moves";
@@ -250,6 +250,19 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     melee: { value: "side special only", source: wiki("Dash") }, ours: () => specialsOutOf(GroundState.dash),
     anchor: { file: "ts/src/game/sim/specials.ts", symbol: "startFighterSpecial" },
     status: { kind: "deviation", reason: "our smash turn is the dash back, so the flick-then-B turnaround special starts in Dash, and a grounded special stops horizontal movement, so a dash carries no speed into it (docs/gameplay-design.md, Special momentum)", decided: "2026-10-26", issue: 490 },
+  },
+  {
+    id: "pivot-window", family: "movement", name: "Pivot frames after a dash back released to neutral",
+    melee: { value: 1, source: wiki("Pivot") }, ours: () => PIVOT_FRAMES,
+    anchor: { file: `${SIM}/groundMovement.ts`, symbol: "PIVOT_FRAMES" },
+    status: { kind: "deviation", reason: "an easier execution window: both frames stand, keep the dash's slide and take every standing option, and a dash flicked on either still dash-dances (docs/gameplay-design.md, Pivots)", decided: "2026-11-01" },
+  },
+  {
+    id: "pivot-grab", family: "movement", name: "Grab on a dash-back turnaround or pivot frame",
+    melee: { value: "the standing grab, with standing boxes, on the one dash-dance turnaround frame; never out of a run", source: wiki("Pivot_grab") },
+    ours: () => "the pivot grab: reach 144 (1.5 times standing), three more startup and eleven more total frames, keeping the slide; also out of a run turn",
+    anchor: { file: `${SIM}/groundMovement.ts`, symbol: "grabPivots" },
+    status: { kind: "deviation", reason: "#337's longer pivot reach, given wherever a fighter pivots, so a grab on the turnaround slides on like a dash grab the other way (docs/design/grabs.md)", decided: "2026-11-01", issue: 337 },
   },
   {
     id: "special-out-of-run", family: "movement", name: "Specials out of Run, probed headless",
