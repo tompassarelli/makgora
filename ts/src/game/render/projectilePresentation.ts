@@ -96,6 +96,7 @@ export class ProjectilePresentation {
   private readonly risen: (Risen | undefined)[] = [];
   private readonly risenAge: number[] = [];
   private parked: ParkedFlags | undefined;
+  private idle = false;
   private readonly aimedShot: Beam[] = [];
   private readonly lineShown: boolean[] = [];
   private readonly eyeBeam: EyeBeamLine;
@@ -186,6 +187,7 @@ export class ProjectilePresentation {
       this.hide(model, parked, index);
     }
     for (let index = 0; index < this.assigned.length; index++) this.assigned[index] = -1;
+    this.idle = false;
   }
 
   drawnModel(index: number): Effect | undefined {
@@ -314,8 +316,15 @@ export class ProjectilePresentation {
     this.eyeBeam.present(fighter, playing);
     const parked = (this.parked ??= []);
     const taken = this.taken;
-    for (let index = 0; index < this.models.length; index++) taken[index] = false;
+    const idle = this.idle === true;
+    if (!idle) for (let index = 0; index < this.models.length; index++) taken[index] = false;
+    const shown = fighter !== undefined && playing && !fighter.status.out ? fighter : undefined;
+    let used = false;
     for (let index = 0; index < PROJECTILE_CAPACITY; index++) {
+      if (shown === undefined || (shown.projectiles[index]?.life ?? 0) <= 0) {
+        this.assigned[index] = -1;
+        continue;
+      }
       if (this.aimedShot.length > 0 && fighter?.projectiles[index]?.spec === FIGHTER_ULTIMATES[Character.rifleman]?.projectiles?.[0]) {
         this.assigned[index] = -1;
         continue;
@@ -330,6 +339,7 @@ export class ProjectilePresentation {
       this.assigned[index] = slot;
       const model = this.models[slot];
       if (model === undefined) continue;
+      used = true;
       taken[slot] = true;
       this.lingering[slot] = 0;
       parked[slot] = false;
@@ -462,6 +472,8 @@ export class ProjectilePresentation {
       }
       if (draw?.discOnly === true && boundaries.length > 0) taken[slot] = false;
     }
+    if (idle && !used) return;
+    let still = true;
     for (let index = 0; index < this.models.length; index++) {
       const model = this.models[index];
       const remaining = this.lingering[index] ?? 0;
@@ -477,7 +489,9 @@ export class ProjectilePresentation {
       }
       this.visible[index] = taken[index] === true;
       if (model !== undefined && taken[index] !== true) this.hide(model, parked, index);
+      if (taken[index] === true || (this.lingering[index] ?? 0) > 0 || (model !== undefined && parked[index] !== true)) still = false;
     }
+    this.idle = still;
   }
 
   setPaused(paused: boolean): void {
