@@ -13,16 +13,21 @@ bun scripts/windowStrip.ts PAD.pad --out ~/.local/state/smashcraft/shots/NAME/NA
   --after 580 --count 1000 --row 8,20,24,32,40,56 --row 140,152,158,164
 ```
 
-It starts a private desktop, runs `play --standalone --window native --script PAD`
-in it under `machine-capacity run --class gpu` (no pair, no Warcraft client),
+It starts a private desktop and runs `play --standalone --window native --script PAD`
+in it under `machine-capacity run --class gpu` (no pair, no Warcraft client; Wisp
+refuses a window without that lease, which admits two at a time, so a busy host
+queues the run for up to 40 minutes inside the desktop),
 saves `--count` window frames from the `--after`th drawn scene
 (`WISP_WINDOW_CAPTURE*`, wisp:docs/native-window-plan.md "Capture") and montages
 each `--row` of frame numbers (counted from the first saved frame) into one
 strip row of `--tile` (default 480x270) tiles. `--keep-frames` keeps the PNGs
 beside the strip. Pick rows by viewing a contact sheet of the kept frames first.
-Write the pad with `#! chat -dev quick stage S pair A / B` and `VIEW` presses as
-in `ts/test/native/pads/`; set the look with `WISP_PLAYER` graphics settings
-(`Low` or `Remastered`) for a strip per setting. The frames show Wisp's
+Write the pad with `#! chat -dev quick stage S pair A / B` as in
+`ts/test/native/pads/window-strip.pad` (`--after 100 --count 60 --row 0,15,30,45,59`),
+end it right after the last wanted frame because the window closes at the pad's
+end or at the 10 minute limit, and set the look per run with
+`$XDG_CONFIG_HOME/wisp/players/OWNER.graphics.json` as `scripts/perf-window.ts` does
+(`--owner` names the player). The frames show Wisp's
 renderer: use Warcraft clients, below, for a difference only Warcraft shows.
 
 Use the Warcraft Classic pool for what only Warcraft shows: online desync and

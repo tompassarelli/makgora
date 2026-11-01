@@ -3,11 +3,13 @@ import { dirname, join, resolve } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
+import { pollUntil } from "./hostPoll";
 import { runProcess } from "./hostProcess";
 
 const USAGE = "usage: bun scripts/windowStrip.ts PAD.pad --out STRIP.jpg --row N,N,... [--row N,N,...]... [--after N] [--count N] [--owner NAME] [--tile WxH] [--resolution WxH] [--keep-frames]";
 const project = resolve(import.meta.dir, "..");
 const RUN_SECONDS = 600;
+const QUEUE_SECONDS = 2400;
 
 class WindowStripFailure extends Schema.TaggedError<WindowStripFailure, { readonly brand: unique symbol }>()("WindowStripFailure", { problem: Schema.String }) {
   override get message(): string {
@@ -53,15 +55,19 @@ const main = Effect.gen(function*() {
   rmSync(frames, { recursive: true, force: true });
   mkdirSync(frames, { recursive: true });
   const play = [process.execPath, "scripts/wisp.ts", "play", "--standalone", "--window", "native", "--script", pad];
-  const command = [process.execPath, helper, "run", "--class", "gpu", "--owner", owner, "--timeout-seconds", String(RUN_SECONDS + 60), "--", "bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS), "--", ...play];
-  yield* runProcess(ChildProcess.make(command[0] ?? "", command.slice(1), {
+  const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + QUEUE_SECONDS), "--", process.execPath, helper, "run", "--class", "gpu", "--owner", owner, "--timeout-seconds", String(RUN_SECONDS), "--", ...play];
+  let runProblem = "";
+  const wanted = rows.flat();
+  const lastFrame = join(frames, frameName(Math.max(...wanted)));
+  const lastSaved = pollUntil(Effect.sync(() => existsSync(lastFrame) ? true : undefined), { every: "1 second", within: `${RUN_SECONDS + QUEUE_SECONDS} seconds`, orElse: () => Effect.succeed(false) }).pipe(Effect.andThen(Effect.sleep("2 seconds")));
+  const run = runProcess(ChildProcess.make(command[0] ?? "", command.slice(1), {
     cwd: project,
     env: { WISP_PLAYER: owner, WISP_WINDOW_CAPTURE: join(frames, "f.png"), WISP_WINDOW_CAPTURE_AFTER: String(after), WISP_WINDOW_CAPTURE_FRAMES: String(count) },
     extendEnv: true,
-  })).pipe(Effect.mapError((cause) => new WindowStripFailure({ problem: `the native window run failed: ${cause.message}` })));
-  const wanted = rows.flat();
+  })).pipe(Effect.catchTag("ProcessFailure", (cause) => Effect.sync(() => { runProblem = cause.message; })));
+  yield* Effect.raceFirst(run, lastSaved);
   const missing = wanted.filter((frame) => !existsSync(join(frames, frameName(frame))));
-  if (missing.length > 0) return yield* new WindowStripFailure({ problem: `the window saved no frames ${missing.join(",")} in ${frames}; the pad ended before them or --after is past the scene` });
+  if (missing.length > 0) return yield* new WindowStripFailure({ problem: `the window saved no frames ${missing.join(",")} in ${frames}; the pad ended before them or --after is past the scene${runProblem === "" ? "" : `; the run failed: ${runProblem}`}` });
   const rowFiles: string[] = [];
   for (const [index, row] of rows.entries()) {
     const file = join(frames, `row-${index}.jpg`);

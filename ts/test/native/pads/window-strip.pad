@@ -1,0 +1,6 @@
+# Example pad for bun scripts/windowStrip.ts (docs/commands/native.md, "Look captures"): Illidan taps B twice against a Wren Expert computer on the default stage, and the pad ends after the last wanted frame so the window closes. Use --after 100 --count 60 --row 0,15,30,45,59.
+#! chat -dev quick cpu wren expert hero Illidan
+200 a tap B 8
+260 a tap B 8
+330 a press VIEW
+340 a release VIEW
