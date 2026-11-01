@@ -111,7 +111,7 @@ test("Every wolf runs with its feet on the floor at its own speed, facing either
       const run = runOf(script, facing, 60);
       assertTrue(run.grounded);
       assertGreaterThan(run.speeds.length, 5);
-      for (const measured of run.speeds) assertNear(measured, speed, 0.01);
+      for (const measured of run.speeds) assertNear(measured, speed, f32(0.01));
     }
   }
 });
@@ -185,7 +185,7 @@ test("Thrall can walk in behind his spirit wolf: it outpaces his walk, so walkin
     let alive = 0;
     let passed = false;
     for (let tick = 0; tick < 200; tick++) {
-      step(d, "none", d.caster.special.action === SpecialAction.none ? { x: f32(0.6 * facing), z: 0 } : NEUTRAL);
+      step(d, "none", d.caster.special.action === SpecialAction.none ? { x: f32(f32(0.6) * facing), z: 0 } : NEUTRAL);
       const wolf = wolves(d.caster)[0];
       if (wolf === undefined) continue;
       alive++;
