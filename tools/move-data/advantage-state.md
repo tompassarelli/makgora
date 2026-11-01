@@ -56,9 +56,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne) 
 | Chen | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special, up tilt, forward smash; tech in forward smash; tech away full hop, up air, forward smash; missed tech side special, up tilt, side special, side special, short hop, forward air, dash, dash attack; trap side special, up tilt, forward smash covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Chen | medium | yes | yes | yes | **no** | yes | down throw at 0%: tech in place side special, up tilt, side special, forward smash; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech side special, up tilt, side special, forward smash; trap side special, up tilt, side special, forward smash covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Chen | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, up air, forward smash; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Peon | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down special; tech in up smash, down special; tech away full hop, side special, up smash, up smash, short hop, down special; missed tech short hop, down special; trap full hop, side special, up smash, up smash, short hop, down special covers tech in place, tech away, missed tech | up throw at 0% → up air against 4/5 DI |
-| Peon | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down special; tech in full hop, side special, up smash, up smash, forward smash; tech away dash, dash attack; missed tech short hop, down special; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 60% → up air against 4/5 DI |
-| Peon | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down special; tech in forward smash; tech away short hop, side special, up smash, down special; missed tech short hop, down special; trap short hop, down special covers tech in place, tech in, missed tech | up throw at 0% → up air against 5/5 DI |
+| Peon | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down special; tech in up smash, down special; tech away dash, dash attack; missed tech short hop, down special; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up air against 4/5 DI |
+| Peon | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down special; tech in dash, dash attack; tech away dash, dash attack; missed tech short hop, down special; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 60% → up air against 4/5 DI |
+| Peon | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down special; tech in forward smash; tech away full hop, forward air; missed tech short hop, down special; trap short hop, down special covers tech in place, tech in, missed tech | up throw at 0% → up air against 5/5 DI |
 | Gazlowe | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away dash, dash attack; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
 | Gazlowe | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Gazlowe | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash, dash attack; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
@@ -275,7 +275,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Sylvanas | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Sylvanas | medium | up throw | 1/1 in forward smash, out down smash | 1/1 in dash, dash attack, out down smash | 1/1 in forward smash, out down smash | 1/1 in forward smash, out down smash |
 | Sylvanas | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Sylvanas | heavy | forward throw | 1/1 | 1/0 | 0/0 KD | 0/0 KD |
+| Sylvanas | heavy | forward throw | 1/1 | 1/1 | 0/0 KD | 0/0 KD |
 | Sylvanas | heavy | back throw | 1/0 | 1/0 | 0/0 KD | 0/0 KD |
 | Sylvanas | heavy | up throw | 1/1 | 1/1 in short hop, back air, out forward smash | 2/1 KD | 1/1 |
 | Sylvanas | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -305,15 +305,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Chen | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Peon | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Peon | light | up throw | 1/1 in down special, out side special | 1/1 in up smash, out side special | 1/4 in up smash, out side special KO | 1/1 in up smash, out short hop, forward air |
+| Peon | light | up throw | 1/1 in down special, out side special | 1/1 in up smash, out side special | 1/4 in up smash, out dash, dash attack KO | 1/1 in up smash, out short hop, forward air |
 | Peon | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Peon | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Peon | medium | up throw | 1/1 in down special, out dash, dash attack | 1/1 in down special, out side special | 1/1 in down special, out side special | 1/2 in down special, out dash, dash attack KO |
+| Peon | medium | up throw | 1/1 in down special, out dash, dash attack | 1/1 in down special, out side special | 1/1 in down special, out dash, dash attack | 1/2 in down special, out dash, dash attack KO |
 | Peon | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Peon | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Peon | heavy | up throw | 1/1 in down special, out short hop, down special | 1/1 in down special, out side special | 2/1 in up smash, out side special | 1/1 in up smash, out short hop, down special |
+| Peon | heavy | up throw | 1/1 in down special, out short hop, down special | 1/1 in down special, out short hop, down special | 1/1 in up smash, out short hop, down special | 1/1 in up smash, out short hop, down special |
 | Peon | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Gazlowe | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Gazlowe | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
