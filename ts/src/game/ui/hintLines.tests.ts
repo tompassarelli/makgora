@@ -6,7 +6,7 @@ import { hintRows } from "./hintLines";
 const lines = (device: "keyboard" | "pad", bindings = presetBindings("wasd"), hideKeyFree = true) => hintRows(device, bindings, hideKeyFree).map(row => `${row.keys} ${row.label}`);
 
 test("the keyboard strip names the keys actually bound for move, jump, attack, special, shield, grab, Strong, Mod X, Mod Y, pause and hide, and a rebound attack key shows the new key [k2 property]", () => {
-  assertEquals(lines("keyboard").join("|"), "W A S D move|8 jump|N attack|U special|Q shield|O grab|9 Strong|K Mod X|; Mod Y|Esc pause|H hide");
+  assertEquals(lines("keyboard").join("|"), "W A S D move|8 jump|N attack|U special|Q shield|O grab|9 Strong|P Mod X|; Mod Y|Esc pause|H hide");
   const rebound = presetBindings("wasd");
   rebind(rebound, Action.attack, 0, "B".charCodeAt(0));
   assertEquals(lines("keyboard", rebound)[2], "B attack");
