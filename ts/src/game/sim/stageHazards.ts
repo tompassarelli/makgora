@@ -151,7 +151,7 @@ const CANNON_SWING_SPEED = 5.0;
 const CANNON_SWING_FRAMES = 192;
 
 /** Where a held fighter sits: below Blackrock's underside (its lowest edge is z -300) with the whole barrel clear of it. */
-export const CANNON_Z = -500.0;
+export const CANNON_Z = -390.0;
 
 /** The barrel only rocks as it travels; the shot ignores it. */
 const CANNON_ROCK = f32(0.12);

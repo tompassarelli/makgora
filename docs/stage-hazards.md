@@ -29,7 +29,7 @@ Randall and rising platforms; their exact retail movement is not asserted.
 The cannon is a recovery launcher (reworked 2026-10-31 at Tom's request; it
 once fired along the barrel's lean, which could send a fighter away from the
 stage). A barrel travels back and forth under Blackrock's underside, x ±480
-at z −500 (the underside's lowest edge is z −300, so the whole barrel sits
+at z −390 (the underside's lowest edge is z −300, so the whole barrel sits
 clear of it), 5 world units per frame, a 384-frame lap, rocking a little as
 it goes; the rock is only drawn and the shot ignores it. A fighter whose
 position comes within 120 units of the barrel's centre is caught, the first

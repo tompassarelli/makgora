@@ -37,7 +37,8 @@ function step(world: ReturnType<typeof duelPair>["world"], input: Readonly<Contr
 test("Blackrock's cannon: a fighter touching the barrel is caught below the underside and fired straight up on Attack [k1 scenario]", () => {
   const { world, f } = caught();
   assertTrue(f.cannon.held !== undefined);
-  assertTrue(f.motion.z < -300.0 - 100.0);
+  assertEquals(f.motion.z, CANNON_Z);
+  assertTrue(f.motion.z + 75.0 < -300.0);
   step(world, ATTACK);
   let x = Number.NaN;
   let peak = f.motion.z;
