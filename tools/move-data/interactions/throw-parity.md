@@ -582,54 +582,54 @@ Release position does not enter the frame advantage, but it decides whether the 
 | Stitches | down | 30 | 7 | 32 | 25 | 20 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Stitches | down | 60 | 7 | 32 | 25 | 20 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Stitches | down | 90 | 7 | 32 | 25 | 20 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Akama (WIP) | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 76.2 at 35° |
-| Akama (WIP) | forward | 30 | 12 | 35 | 23 | 14 | 8.3, 0 | 88.8 at 35°, tumble, knockdown at +15 |
-| Akama (WIP) | forward | 60 | 17 | 40 | 23 | 14 | 8.3, 0 | 101.4 at 35°, tumble, knockdown at +17 |
-| Akama (WIP) | forward | 90 | 22 | 45 | 23 | 14 | 8.3, 0 | 114 at 35°, tumble, knockdown at +19 |
-| Akama (WIP) | back | 0 | 6 | 30 | 24 | 17 | -8.3, 0 | 77.4 at 140° |
-| Akama (WIP) | back | 30 | 13 | 37 | 24 | 17 | -8.3, 0 | 94.1 at 140°, tumble, knockdown at +17 |
-| Akama (WIP) | back | 60 | 20 | 44 | 24 | 17 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +21 |
-| Akama (WIP) | back | 90 | 26 | 50 | 24 | 17 | -8.3, 0 | 127.3 at 140°, tumble, knockdown at +25 |
-| Akama (WIP) | up | 0 | 12 | 24 | 12 | 15 | 8.3, 10.8 | 60.7 at 90° |
-| Akama (WIP) | up | 30 | 17 | 29 | 12 | 15 | 8.3, 10.8 | 73.9 at 90° |
-| Akama (WIP) | up | 60 | 22 | 34 | 12 | 15 | 8.3, 10.8 | 87.1 at 90°, tumble, knockdown at +30 |
-| Akama (WIP) | up | 90 | 28 | 40 | 12 | 15 | 8.3, 10.8 | 100.4 at 90°, tumble, knockdown at +37 |
-| Akama (WIP) | down | 0 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Akama (WIP) | down | 30 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Akama (WIP) | down | 60 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Akama (WIP) | down | 90 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Ragnaros (WIP) | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 76.2 at 35° |
-| Ragnaros (WIP) | forward | 30 | 12 | 35 | 23 | 14 | 8.3, 0 | 88.8 at 35°, tumble, knockdown at +15 |
-| Ragnaros (WIP) | forward | 60 | 17 | 40 | 23 | 14 | 8.3, 0 | 101.4 at 35°, tumble, knockdown at +17 |
-| Ragnaros (WIP) | forward | 90 | 22 | 45 | 23 | 14 | 8.3, 0 | 114 at 35°, tumble, knockdown at +19 |
-| Ragnaros (WIP) | back | 0 | 6 | 30 | 24 | 17 | -8.3, 0 | 77.4 at 140° |
-| Ragnaros (WIP) | back | 30 | 13 | 37 | 24 | 17 | -8.3, 0 | 94.1 at 140°, tumble, knockdown at +17 |
-| Ragnaros (WIP) | back | 60 | 20 | 44 | 24 | 17 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +21 |
-| Ragnaros (WIP) | back | 90 | 26 | 50 | 24 | 17 | -8.3, 0 | 127.3 at 140°, tumble, knockdown at +25 |
-| Ragnaros (WIP) | up | 0 | 12 | 24 | 12 | 15 | 8.3, 10.8 | 60.7 at 90° |
-| Ragnaros (WIP) | up | 30 | 17 | 29 | 12 | 15 | 8.3, 10.8 | 73.9 at 90° |
-| Ragnaros (WIP) | up | 60 | 22 | 34 | 12 | 15 | 8.3, 10.8 | 87.1 at 90°, tumble, knockdown at +30 |
-| Ragnaros (WIP) | up | 90 | 28 | 40 | 12 | 15 | 8.3, 10.8 | 100.4 at 90°, tumble, knockdown at +37 |
-| Ragnaros (WIP) | down | 0 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Ragnaros (WIP) | down | 30 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Ragnaros (WIP) | down | 60 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Ragnaros (WIP) | down | 90 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Alchemist (WIP) | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 76.2 at 35° |
-| Alchemist (WIP) | forward | 30 | 12 | 35 | 23 | 14 | 8.3, 0 | 88.8 at 35°, tumble, knockdown at +15 |
-| Alchemist (WIP) | forward | 60 | 17 | 40 | 23 | 14 | 8.3, 0 | 101.4 at 35°, tumble, knockdown at +17 |
-| Alchemist (WIP) | forward | 90 | 22 | 45 | 23 | 14 | 8.3, 0 | 114 at 35°, tumble, knockdown at +19 |
-| Alchemist (WIP) | back | 0 | 6 | 30 | 24 | 17 | -8.3, 0 | 77.4 at 140° |
-| Alchemist (WIP) | back | 30 | 13 | 37 | 24 | 17 | -8.3, 0 | 94.1 at 140°, tumble, knockdown at +17 |
-| Alchemist (WIP) | back | 60 | 20 | 44 | 24 | 17 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +21 |
-| Alchemist (WIP) | back | 90 | 26 | 50 | 24 | 17 | -8.3, 0 | 127.3 at 140°, tumble, knockdown at +25 |
-| Alchemist (WIP) | up | 0 | 12 | 24 | 12 | 15 | 8.3, 10.8 | 60.7 at 90° |
-| Alchemist (WIP) | up | 30 | 17 | 29 | 12 | 15 | 8.3, 10.8 | 73.9 at 90° |
-| Alchemist (WIP) | up | 60 | 22 | 34 | 12 | 15 | 8.3, 10.8 | 87.1 at 90°, tumble, knockdown at +30 |
-| Alchemist (WIP) | up | 90 | 28 | 40 | 12 | 15 | 8.3, 10.8 | 100.4 at 90°, tumble, knockdown at +37 |
-| Alchemist (WIP) | down | 0 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Alchemist (WIP) | down | 30 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Alchemist (WIP) | down | 60 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
-| Alchemist (WIP) | down | 90 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Akama | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 76.2 at 35° |
+| Akama | forward | 30 | 12 | 35 | 23 | 14 | 8.3, 0 | 88.8 at 35°, tumble, knockdown at +15 |
+| Akama | forward | 60 | 17 | 40 | 23 | 14 | 8.3, 0 | 101.4 at 35°, tumble, knockdown at +17 |
+| Akama | forward | 90 | 22 | 45 | 23 | 14 | 8.3, 0 | 114 at 35°, tumble, knockdown at +19 |
+| Akama | back | 0 | 6 | 30 | 24 | 17 | -8.3, 0 | 77.4 at 140° |
+| Akama | back | 30 | 13 | 37 | 24 | 17 | -8.3, 0 | 94.1 at 140°, tumble, knockdown at +17 |
+| Akama | back | 60 | 20 | 44 | 24 | 17 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +21 |
+| Akama | back | 90 | 26 | 50 | 24 | 17 | -8.3, 0 | 127.3 at 140°, tumble, knockdown at +25 |
+| Akama | up | 0 | 12 | 24 | 12 | 15 | 8.3, 10.8 | 60.7 at 90° |
+| Akama | up | 30 | 17 | 29 | 12 | 15 | 8.3, 10.8 | 73.9 at 90° |
+| Akama | up | 60 | 22 | 34 | 12 | 15 | 8.3, 10.8 | 87.1 at 90°, tumble, knockdown at +30 |
+| Akama | up | 90 | 28 | 40 | 12 | 15 | 8.3, 10.8 | 100.4 at 90°, tumble, knockdown at +37 |
+| Akama | down | 0 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Akama | down | 30 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Akama | down | 60 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Akama | down | 90 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Ragnaros | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 76.2 at 35° |
+| Ragnaros | forward | 30 | 12 | 35 | 23 | 14 | 8.3, 0 | 88.8 at 35°, tumble, knockdown at +15 |
+| Ragnaros | forward | 60 | 17 | 40 | 23 | 14 | 8.3, 0 | 101.4 at 35°, tumble, knockdown at +17 |
+| Ragnaros | forward | 90 | 22 | 45 | 23 | 14 | 8.3, 0 | 114 at 35°, tumble, knockdown at +19 |
+| Ragnaros | back | 0 | 6 | 30 | 24 | 17 | -8.3, 0 | 77.4 at 140° |
+| Ragnaros | back | 30 | 13 | 37 | 24 | 17 | -8.3, 0 | 94.1 at 140°, tumble, knockdown at +17 |
+| Ragnaros | back | 60 | 20 | 44 | 24 | 17 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +21 |
+| Ragnaros | back | 90 | 26 | 50 | 24 | 17 | -8.3, 0 | 127.3 at 140°, tumble, knockdown at +25 |
+| Ragnaros | up | 0 | 12 | 24 | 12 | 15 | 8.3, 10.8 | 60.7 at 90° |
+| Ragnaros | up | 30 | 17 | 29 | 12 | 15 | 8.3, 10.8 | 73.9 at 90° |
+| Ragnaros | up | 60 | 22 | 34 | 12 | 15 | 8.3, 10.8 | 87.1 at 90°, tumble, knockdown at +30 |
+| Ragnaros | up | 90 | 28 | 40 | 12 | 15 | 8.3, 10.8 | 100.4 at 90°, tumble, knockdown at +37 |
+| Ragnaros | down | 0 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Ragnaros | down | 30 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Ragnaros | down | 60 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Ragnaros | down | 90 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Alchemist | forward | 0 | 7 | 30 | 23 | 14 | 8.3, 0 | 76.2 at 35° |
+| Alchemist | forward | 30 | 12 | 35 | 23 | 14 | 8.3, 0 | 88.8 at 35°, tumble, knockdown at +15 |
+| Alchemist | forward | 60 | 17 | 40 | 23 | 14 | 8.3, 0 | 101.4 at 35°, tumble, knockdown at +17 |
+| Alchemist | forward | 90 | 22 | 45 | 23 | 14 | 8.3, 0 | 114 at 35°, tumble, knockdown at +19 |
+| Alchemist | back | 0 | 6 | 30 | 24 | 17 | -8.3, 0 | 77.4 at 140° |
+| Alchemist | back | 30 | 13 | 37 | 24 | 17 | -8.3, 0 | 94.1 at 140°, tumble, knockdown at +17 |
+| Alchemist | back | 60 | 20 | 44 | 24 | 17 | -8.3, 0 | 110.7 at 140°, tumble, knockdown at +21 |
+| Alchemist | back | 90 | 26 | 50 | 24 | 17 | -8.3, 0 | 127.3 at 140°, tumble, knockdown at +25 |
+| Alchemist | up | 0 | 12 | 24 | 12 | 15 | 8.3, 10.8 | 60.7 at 90° |
+| Alchemist | up | 30 | 17 | 29 | 12 | 15 | 8.3, 10.8 | 73.9 at 90° |
+| Alchemist | up | 60 | 22 | 34 | 12 | 15 | 8.3, 10.8 | 87.1 at 90°, tumble, knockdown at +30 |
+| Alchemist | up | 90 | 28 | 40 | 12 | 15 | 8.3, 10.8 | 100.4 at 90°, tumble, knockdown at +37 |
+| Alchemist | down | 0 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Alchemist | down | 30 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Alchemist | down | 60 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
+| Alchemist | down | 90 | 7 | 32 | 25 | 18 | 8.3, 0 | 82.4 at 70°, tumble, knockdown at +21 |
 | Onyxia | forward | 0 | 6 | 27 | 21 | 12 | 8.3, 0 | 67.8 at 35° |
 | Onyxia | forward | 30 | 10 | 31 | 21 | 12 | 8.3, 0 | 77.9 at 35° |
 | Onyxia | forward | 60 | 14 | 35 | 21 | 12 | 8.3, 0 | 88 at 35°, tumble, knockdown at +15 |

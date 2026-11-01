@@ -5,7 +5,7 @@ stock clips, playing one shared, plain moveset until his own kit is designed
 and built. Tom asked for Akama, Ragnaros and Goblin Alchemist as stand-ins
 (2026-10-29), with their real kits to follow.
 
-The select tile and the match HUD showed each stand-in's name with a "(WIP)"
+The select tile and the match HUD showed each stand-in's name with a work-in-progress
 suffix until Tom asked for it to go (2026-11-02); a stand-in now shows his plain
 name everywhere, and the stand-in kit itself is unchanged.
 

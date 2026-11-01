@@ -2788,9 +2788,9 @@ Expert field.
 | Archimonde the Defiler | Fel Ascent | 10 | 0 | 24 | 342 / 252 | guided | 48 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 231/256 |
 | Tyrande Whisperwind | Moonlight Leap | 6 | 0 | 18 | 289 / 267 | guided | 47 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 228/256 |
 | Stitches | Hook Swing | -1 | 0 | 17 | 232 / 155 | guided | 6 | read down air (offstage launch, KO at 40%), projectile | 207/256 |
-| Akama (WIP) | Shadow Step | 13 | 14 | 33 | 329 / 333 | aimed (8-way, 12 frames) | 6 | read down air (offstage launch, KO at 40%) | 238/256 |
-| Ragnaros (WIP) | Lava Surf | 6 | 0 | 18 | 435 / 288 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 242/256 |
-| Alchemist (WIP) | Rising Strike | 10 | 0 | 29 | 426 / 411 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 221/256 |
+| Akama | Shadow Step | 13 | 14 | 33 | 329 / 333 | aimed (8-way, 12 frames) | 6 | read down air (offstage launch, KO at 40%) | 238/256 |
+| Ragnaros | Lava Surf | 6 | 0 | 18 | 435 / 288 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 242/256 |
+| Alchemist | Rising Strike | 10 | 0 | 29 | 426 / 411 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 221/256 |
 | Onyxia | Shadow Ascent | 8 | 0 | 18 | 285 / 280 | guided | 44 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 224/256 |
 
 `GAME_TESTS=edgeGuard bun test test/game.test.ts` checks Rifleman's recorded

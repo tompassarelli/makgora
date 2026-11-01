@@ -40,9 +40,9 @@ test("Every playable fighter owns exactly one select grid tile, and each tile ma
 });
 
 test("A select card, a roster tile and the match HUD plate show Ragnaros and Gazlowe, never the internal Firelord and Goblin Tinker keys [k1 scenario]", () => {
-  assertEquals(nameText(Character.firelord), "Ragnaros (WIP)");
-  assertEquals(hudTitle(Character.firelord, false), "RAGNAROS (WIP)");
-  assertEquals(tileLabel(tileOfCharacter(Character.firelord)), "Ragnaros (WIP)");
+  assertEquals(nameText(Character.firelord), "Ragnaros");
+  assertEquals(hudTitle(Character.firelord, false), "RAGNAROS");
+  assertEquals(tileLabel(tileOfCharacter(Character.firelord)), "Ragnaros");
   assertEquals(nameText(Character.tinker), "Gazlowe");
   assertEquals(hudTitle(Character.tinker, false), "GAZLOWE");
   assertEquals(tileLabel(tileOfCharacter(Character.tinker)), "Gazlowe");
