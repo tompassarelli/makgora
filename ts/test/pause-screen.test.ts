@@ -1,15 +1,17 @@
 import { expect, test } from "bun:test";
 import { install, startBuild } from "../src/platform/main";
-import { Phase } from "../src/game/lobby/lobbyState";
+import { Phase, setParticipants } from "../src/game/lobby/lobbyState";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { Key } from "../src/host/loop/keyEvents";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
+import { panelActions } from "../src/host/loop/menus";
 import { shell } from "../src/host/loop/state";
 import { pauseMatchPresentation } from "../src/host/loop/view";
 import { declineTutorial, passStartControls } from "../scripts/wisp/startControls";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 import { MAIN_MENU_BOX, TUTORIAL_BOX } from "../src/game/ui/selectionLayout";
+import { resetPlateBox, windowEdges } from "../src/game/ui/pauseScreen";
 import { f32 } from "wisp/src/sim/f32";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
@@ -33,8 +35,8 @@ interface Seen {
   readonly checksum: string;
 }
 
-function pausedMatch() {
-  const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, HUMANS);
+function pausedMatch(humans: readonly number[] = HUMANS) {
+  const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, humans);
   const seen = (slot: number): Seen => {
     let result: Seen | undefined;
     clients.client(slot).run(() => {
@@ -67,7 +69,7 @@ function pausedMatch() {
   expect(clients.click(0, ...centre(TUTORIAL_BOX))).toBe(true);
   clients.frames(3);
   expect(clients.click(0, ...centre(START_TUTORIAL))).toBe(true);
-  until("the tutorial match", () => HUMANS.every(slot => seen(slot).phase === Phase.match));
+  until("the tutorial match", () => humans.every(slot => seen(slot).phase === Phase.match));
   clients.frames(30);
   return { clients, seen, until, tap, hold };
 }
@@ -115,6 +117,50 @@ test("L+R+A with Backspace resets a paused match to fighter selection [k1 scenar
   hold([SHIELD, LIGHT_SHIELD, ATTACK], () => tap(Key.backspace));
   until("fighter selection", () => HUMANS.every(slot => seen(slot).phase === Phase.characterMenu));
   for (const client of clients.clients) expect(client.errors).toEqual([]);
+}, 120_000);
+
+for (const humans of [[0], HUMANS]) {
+  test(`a click on the reset plate resets a paused match to fighter selection with ${humans.length} human${humans.length === 1 ? "" : "s"} [k1 scenario]`, () => {
+    const { clients, seen, until, tap } = pausedMatch(humans);
+    tap(Key.escape);
+    until("the pause", () => humans.every(slot => seen(slot).paused));
+    clients.frames(5);
+    const [left, top, width, height] = resetPlateBox(windowEdges(1024, 768));
+    expect(clients.click(0, f32(left + width / 2), f32(top - height / 2))).toBe(true);
+    until("fighter selection", () => humans.every(slot => seen(slot).phase === Phase.characterMenu));
+    for (const client of clients.clients) expect(client.errors).toEqual([]);
+  }, 120_000);
+}
+
+test("a click on the reset plate resets a paused practice match with no opponent to fighter selection [k1 scenario]", () => {
+  const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, [0]);
+  const state = () => {
+    let result = { phase: -1, paused: false, practice: false };
+    clients.client(0).run(() => { const s = shell(); result = { phase: s.game.phase, paused: s.session.paused, practice: s.game.practice }; });
+    return result;
+  };
+  const until = (what: string, done: () => boolean) => {
+    for (let frame = 0; frame < 600 && !done(); frame++) clients.frames(1);
+    expect(done(), what).toBe(true);
+  };
+  clients.start();
+  passStartControls(clients);
+  clients.frames(10);
+  clients.everywhere(() => { const g = shell().game; g.training = false; setParticipants(g, 1, 0); g.characterReadiness[0] = true; g.phase = Phase.stageMenu; });
+  clients.frames(5);
+  clients.press(0, Key.y);
+  until("the match", () => state().phase === Phase.match);
+  expect(state().practice).toBe(true);
+  clients.frames(30);
+  clients.press(0, Key.escape);
+  until("the pause", () => state().paused);
+  clients.frames(5);
+  const [left, top, width, height] = resetPlateBox(windowEdges(1024, 768));
+  expect(clients.click(0, f32(left + width / 2), f32(top - height / 2))).toBe(true);
+  until("fighter selection", () => state().phase === Phase.characterMenu);
+  clients.frames(120);
+  expect(state().phase).toBe(Phase.characterMenu);
+  expect(clients.client(0).errors).toEqual([]);
 }, 120_000);
 
 test("the title screen opens from fighter selection by the Main menu button, Esc and the menu focus (down to it, then Attack), on every client, and Attack closes it [k1 scenario]", () => {
