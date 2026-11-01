@@ -4,7 +4,7 @@ import type { Race } from "../roster/races";
 /** Edge length of a Classic race console tile (UI\Console\<Race>\<Race>UITile0N), the art the portrait frame is cut from. */
 export const CONSOLE_TILE_PX = 512;
 
-/** The portrait arch of the stock console, in tile 01 and tile 02 laid side by side; every race's console puts it at the same place. */
+/** The portrait arch of the stock console, in tile 01 and tile 02 laid side by side; every race's console puts it at the same place, its opening centred on texel 506. */
 export const CONSOLE_ARCH = { left: 400, top: 186, width: 212, height: 272 } as const;
 
 /** The frame is drawn at its texels' own size on a 1920-tall display, never stretched past it. */
@@ -16,7 +16,7 @@ export type FrameLayer = "BACKGROUND" | "BORDER" | "ARTWORK";
 
 /** One texture of the frame: where it sits in the frame (pixels at 1920 tall) and which texels it shows as [left, right, top, bottom]. */
 export interface FramePart {
-  readonly key: "backing" | "portrait" | "archLeft" | "archRight";
+  readonly key: "backing" | "portrait" | "archLeft" | "archMiddle" | "archRight";
   readonly layer: FrameLayer;
   readonly file?: string;
   readonly texels: number;
@@ -28,6 +28,8 @@ export interface FramePart {
 }
 
 const ARCH_SPLIT = CONSOLE_TILE_PX - CONSOLE_ARCH.left;
+const ARCH_RIGHT_PX = CONSOLE_ARCH.width - ARCH_SPLIT;
+const ARCH_MIDDLE_PX = CONSOLE_ARCH.width - 2 * ARCH_RIGHT_PX;
 const tileU = (texel: number): number => f32(texel / CONSOLE_TILE_PX);
 const ARCH_V_TOP = tileU(CONSOLE_ARCH.top);
 const ARCH_V_BOTTOM = tileU(CONSOLE_ARCH.top + CONSOLE_ARCH.height);
@@ -46,15 +48,16 @@ export function raceFrameParts(race: Race): readonly FramePart[] {
   return [
     { key: "backing", layer: "BACKGROUND", file: raceBacking(race), texels: RACE_BACKING_PX, texCoord: OPENING_CROP, ...OPENING },
     { key: "portrait", layer: "BORDER", texels: BUST_TEXTURE_PX, texCoord: OPENING_CROP, ...OPENING },
-    { key: "archLeft", layer: "ARTWORK", file: consoleTile(race, 1), texels: CONSOLE_TILE_PX, texCoord: [tileU(CONSOLE_ARCH.left), 1.0, ARCH_V_TOP, ARCH_V_BOTTOM], x: 0, y: 0, width: ARCH_SPLIT, height: CONSOLE_ARCH.height },
-    { key: "archRight", layer: "ARTWORK", file: consoleTile(race, 2), texels: CONSOLE_TILE_PX, texCoord: [0.0, tileU(CONSOLE_ARCH.width - ARCH_SPLIT), ARCH_V_TOP, ARCH_V_BOTTOM], x: ARCH_SPLIT, y: 0, width: CONSOLE_ARCH.width - ARCH_SPLIT, height: CONSOLE_ARCH.height },
+    { key: "archLeft", layer: "ARTWORK", file: consoleTile(race, 2), texels: CONSOLE_TILE_PX, texCoord: [tileU(ARCH_RIGHT_PX), 0.0, ARCH_V_TOP, ARCH_V_BOTTOM], x: 0, y: 0, width: ARCH_RIGHT_PX, height: CONSOLE_ARCH.height },
+    { key: "archMiddle", layer: "ARTWORK", file: consoleTile(race, 1), texels: CONSOLE_TILE_PX, texCoord: [tileU(CONSOLE_TILE_PX - ARCH_MIDDLE_PX), 1.0, ARCH_V_TOP, ARCH_V_BOTTOM], x: ARCH_RIGHT_PX, y: 0, width: ARCH_MIDDLE_PX, height: CONSOLE_ARCH.height },
+    { key: "archRight", layer: "ARTWORK", file: consoleTile(race, 2), texels: CONSOLE_TILE_PX, texCoord: [0.0, tileU(ARCH_RIGHT_PX), ARCH_V_TOP, ARCH_V_BOTTOM], x: ARCH_SPLIT, y: 0, width: ARCH_RIGHT_PX, height: CONSOLE_ARCH.height },
   ];
 }
 
 /** Drawn pixels per texel along each axis on a 1920-tall display: at most 1 means never stretched, equal means not distorted. */
 export function partScale(part: FramePart): { readonly x: number; readonly y: number } {
   const [left, right, top, bottom] = part.texCoord;
-  return { x: part.width / ((right - left) * part.texels), y: part.height / ((bottom - top) * part.texels) };
+  return { x: part.width / (Math.abs(right - left) * part.texels), y: part.height / ((bottom - top) * part.texels) };
 }
 
 export const raceFrameName = (race: Race): string => `SmashcraftRaceFrame${race}`;
@@ -68,7 +71,5 @@ export const RACE_COLOURS: { readonly [R in Race]: { readonly tint: number; read
 };
 
 export const namePlateTexture = (race: Race, mirrored: boolean): string => `war3mapImported\\NamePlate${mirrored ? "Mirror" : ""}${race}.tga`;
-export const STOCK_STRIP_TEXTURE = "war3mapImported\\StockStrip.tga";
-export const STOCK_STRIP_MIRROR_TEXTURE = "war3mapImported\\StockStripMirror.tga";
-export const STOCK_RING_TEXTURE = "war3mapImported\\StockRing.tga";
+export const STOCK_SHADOW_TEXTURE = "war3mapImported\\StockShadow.tga";
 export const pingSignalTexture = (bars: number): string => `war3mapImported\\PingSignal${bars}.tga`;

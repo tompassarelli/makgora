@@ -90,7 +90,7 @@ const SELECTION_TEXTURES = [
   "SelectionCardGray", "SelectionAction", "SelectionRandom", "StageBackdrop", "StageChip",
   "SelectionChipP1", "SelectionChipP2", "SelectionChipP3", "SelectionChipP4", "SelectionChipCPUP1", "SelectionChipCPUP2", "SelectionChipCPUP3", "SelectionChipCPUP4",
   "SelectionHandPoint", "SelectionHandFan", "SelectionHandPinch", "SelectionHandLabelP1", "SelectionHandLabelP2", "SelectionHandLabelP3", "SelectionHandLabelP4", "SelectionBullseye",
-  ...RACES.flatMap(race => [`RaceBacking${race}`, `NamePlate${race}`, `NamePlateMirror${race}`]), "StockStrip", "StockStripMirror", "StockRing", "PingSignal1", "PingSignal2", "PingSignal3", "PingSignal4",
+  ...RACES.flatMap(race => [`RaceBacking${race}`, `NamePlate${race}`, `NamePlateMirror${race}`]), "StockShadow", "PingSignal1", "PingSignal2", "PingSignal3", "PingSignal4",
   "MarkerArrow0", "MarkerArrow1", "MarkerArrow2", "MarkerArrow3", ...barArtNames(),
 ];
 

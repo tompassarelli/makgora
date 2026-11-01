@@ -7,6 +7,7 @@ export interface SmashcraftRaceFrameNightElfFrames {
   readonly backing: Frame;
   readonly portrait: Frame;
   readonly archLeft: Frame;
+  readonly archMiddle: Frame;
   readonly archRight: Frame;
 }
 
@@ -19,6 +20,7 @@ export function createSmashcraftRaceFrameNightElf(parent: Frame, context: number
     backing: namedFrame("SmashcraftRaceFrameNightElfBacking", context),
     portrait: namedFrame("SmashcraftRaceFrameNightElfPortrait", context),
     archLeft: namedFrame("SmashcraftRaceFrameNightElfArchLeft", context),
+    archMiddle: namedFrame("SmashcraftRaceFrameNightElfArchMiddle", context),
     archRight: namedFrame("SmashcraftRaceFrameNightElfArchRight", context),
   };
   return frames;

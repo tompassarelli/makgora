@@ -21,7 +21,7 @@ export interface PlateBox {
 export const STOCK_ICON_PX = 64;
 export const STOCK_ICONS_SHOWN = 5;
 export const STOCK_SHOWN_PX = 40;
-const STOCK_RING_PX = 46;
+const STOCK_SHADOW_PX = 46;
 const STOCK_STEP_PX = 52;
 export const STOCK_FADE_FRAMES = 10;
 
@@ -41,8 +41,7 @@ export interface PanelLayout {
   readonly namePlate: PlateBox;
   readonly name: PlateBox;
   readonly ultimateBar: PlateBox;
-  readonly stockStrip: PlateBox;
-  readonly stockRings: readonly PlateBox[];
+  readonly stockShadows: readonly PlateBox[];
   readonly stocks: readonly PlateBox[];
   readonly stockCount: PlateBox;
   readonly pingSignal: PlateBox;
@@ -58,7 +57,6 @@ const DOOM: PlateBox = { x: 492, y: 88, width: 44, height: 44 };
 const ULTIMATE_BAR: PlateBox = { x: 226, y: 222, width: 286, height: 10 };
 const NAME_PLATE: PlateBox = { x: 208, y: 236, width: 316, height: 42 };
 const NAME: PlateBox = { x: 234, y: 236, width: 264, height: 42 };
-const STOCK_STRIP: PlateBox = { x: 218, y: 282, width: 286, height: 52 };
 const STOCK_LEFT_PX = 236;
 const STOCK_TOP_PX = 285;
 const PING_SIGNAL_WIDTH_PX = 24;
@@ -67,20 +65,20 @@ const PING_NUMBER: PlateBox = { x: 26, y: 244, width: 42, height: 24 };
 
 const flip = (box: PlateBox): PlateBox => ({ ...box, x: PLATE_WIDTH_PX - box.x - box.width });
 
-const stockRing = (index: number): PlateBox => ({ x: STOCK_LEFT_PX + index * STOCK_STEP_PX, y: STOCK_TOP_PX, width: STOCK_RING_PX, height: STOCK_RING_PX });
+const stockShadow = (index: number): PlateBox => ({ x: STOCK_LEFT_PX + index * STOCK_STEP_PX, y: STOCK_TOP_PX, width: STOCK_SHADOW_PX, height: STOCK_SHADOW_PX });
 const stockIcon = (index: number): PlateBox => {
-  const inset = (STOCK_RING_PX - STOCK_SHOWN_PX) / 2;
+  const inset = (STOCK_SHADOW_PX - STOCK_SHOWN_PX) / 2;
   return { x: STOCK_LEFT_PX + index * STOCK_STEP_PX + inset, y: STOCK_TOP_PX + inset, width: STOCK_SHOWN_PX, height: STOCK_SHOWN_PX };
 };
 
 const ICON_INDEXES = [0, 1, 2, 3, 4];
-const STOCK_RINGS: readonly PlateBox[] = ICON_INDEXES.map(index => stockRing(index));
+const STOCK_SHADOWS: readonly PlateBox[] = ICON_INDEXES.map(index => stockShadow(index));
 const STOCKS: readonly PlateBox[] = ICON_INDEXES.map(index => stockIcon(index));
-const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_PX, width: 120, height: STOCK_RING_PX };
+const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_PX, width: 120, height: STOCK_SHADOW_PX };
 
 const LEFT_PANEL: PanelLayout = {
   mirrored: false, frame: FRAME, damage: DAMAGE, percent: PERCENT, doom: DOOM, namePlate: NAME_PLATE, name: NAME, ultimateBar: ULTIMATE_BAR,
-  stockStrip: STOCK_STRIP, stockRings: STOCK_RINGS, stocks: STOCKS, stockCount: STOCK_COUNT, pingSignal: PING_SIGNAL, pingNumber: PING_NUMBER,
+  stockShadows: STOCK_SHADOWS, stocks: STOCKS, stockCount: STOCK_COUNT, pingSignal: PING_SIGNAL, pingNumber: PING_NUMBER,
 };
 
 const MIRRORED_PERCENT_X = 216;
@@ -95,8 +93,7 @@ const RIGHT_PANEL: PanelLayout = {
   namePlate: flip(NAME_PLATE),
   name: flip(NAME),
   ultimateBar: flip(ULTIMATE_BAR),
-  stockStrip: flip(STOCK_STRIP),
-  stockRings: STOCK_RINGS.map(box => flip(box)),
+  stockShadows: STOCK_SHADOWS.map(box => flip(box)),
   stocks: STOCKS.map(box => flip(box)),
   stockCount: flip(STOCK_COUNT),
   pingSignal: flip(PING_SIGNAL),

@@ -7,6 +7,7 @@ export interface SmashcraftRaceFrameOrcFrames {
   readonly backing: Frame;
   readonly portrait: Frame;
   readonly archLeft: Frame;
+  readonly archMiddle: Frame;
   readonly archRight: Frame;
 }
 
@@ -19,6 +20,7 @@ export function createSmashcraftRaceFrameOrc(parent: Frame, context: number): Sm
     backing: namedFrame("SmashcraftRaceFrameOrcBacking", context),
     portrait: namedFrame("SmashcraftRaceFrameOrcPortrait", context),
     archLeft: namedFrame("SmashcraftRaceFrameOrcArchLeft", context),
+    archMiddle: namedFrame("SmashcraftRaceFrameOrcArchMiddle", context),
     archRight: namedFrame("SmashcraftRaceFrameOrcArchRight", context),
   };
   return frames;

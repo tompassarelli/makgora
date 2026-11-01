@@ -12,7 +12,7 @@ import {
   panelLayout, percentOutlineText, percentText, pingBars, plateLeft, stepJolt, stockFadeAlpha,
 } from "./plateLayout";
 import { RACES, type Race, fighterRace } from "../roster/races";
-import { STOCK_RING_TEXTURE, STOCK_STRIP_MIRROR_TEXTURE, STOCK_STRIP_TEXTURE, namePlateTexture, pingSignalTexture } from "./raceFrame";
+import { STOCK_SHADOW_TEXTURE, namePlateTexture, pingSignalTexture } from "./raceFrame";
 import { type RaceFrameFrames, createRaceFrame } from "./raceFrameFrames";
 import { attachOutline, createOutline, createTemplateOutline, destroyOutline, setOutlineText, showOutline } from "./textOutline";
 import { unitsForPixels } from "./portraitFrames";
@@ -117,11 +117,10 @@ const PING_COLOUR = "|cff9fb4c2";
 export class FighterHud {
   private readonly raceFrames: readonly RaceFrameFrames[];
   private readonly namePlate: Frame;
-  private readonly stockStrip: Frame;
   private readonly damage: Frame;
   private readonly percent: Frame;
   private readonly name: Frame;
-  private readonly stockRings: readonly Frame[];
+  private readonly stockShadows: readonly Frame[];
   private readonly stocks: readonly Frame[];
   private readonly pingSignal: Frame;
   private readonly pingNumber: Frame;
@@ -162,7 +161,6 @@ export class FighterHud {
     const parent = gameUi();
     this.raceFrames = RACES.map((race, index) => createRaceFrame(race, 1600 + slot * 8 + index));
     this.namePlate = createBackdrop(`FighterHUDNamePlate${suffix}`, parent, context);
-    this.stockStrip = createBackdrop(`FighterHUDStockStrip${suffix}`, parent, context + 1);
     this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", parent, context + 2, HUD_LEVEL, 1.0);
     this.percentOutline = createOutline(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN, MENU_FONT, f32(0.016), HUD_LEVEL);
     this.damage = createFrame("SmashcraftDamage", parent, 0, context + 2);
@@ -171,15 +169,15 @@ export class FighterHud {
     setFrameTextAlignment(this.percent, TextAlignment.bottom, TextAlignment.left);
     this.name = createText(`FighterHUDName${suffix}`, parent, context + 3);
     setFrameFont(this.name, MENU_FONT, NAME_FONT, 1);
-    const rings: Frame[] = [];
+    const shadows: Frame[] = [];
     const stocks: Frame[] = [];
     for (let index = 0; index < STOCK_ICONS_SHOWN; index++) {
-      const ring = createBackdrop(`FighterHUDStockRing${suffix}_${formatInt(index)}`, parent, context + 5 + index);
-      setFrameTexture(ring, STOCK_RING_TEXTURE, 0, true);
-      rings.push(ring);
+      const shadow = createBackdrop(`FighterHUDStockShadow${suffix}_${formatInt(index)}`, parent, context + 5 + index);
+      setFrameTexture(shadow, STOCK_SHADOW_TEXTURE, 0, true);
+      shadows.push(shadow);
       stocks.push(createBackdrop(`FighterHUDStock${suffix}_${formatInt(index)}`, parent, context + 5 + index));
     }
-    this.stockRings = rings;
+    this.stockShadows = shadows;
     this.stocks = stocks;
     this.stockCount = createText(`FighterHUDStockCount${suffix}`, parent, context + 6 + STOCK_ICONS_SHOWN);
     setFrameFont(this.stockCount, MENU_FONT, NAME_FONT, 1);
@@ -188,8 +186,8 @@ export class FighterHud {
     this.pingSignal = createBackdrop(`FighterHUDPingSignal${suffix}`, parent, context + 9 + STOCK_ICONS_SHOWN);
     this.pingNumber = createText(`FighterHUDPing${suffix}`, parent, context + 10 + STOCK_ICONS_SHOWN);
     setFrameFont(this.pingNumber, MENU_FONT, PING_FONT, 0);
-    this.body = [this.namePlate, this.stockStrip, this.damage, this.percent, this.name];
-    const stockLayer = [...this.stockRings, ...this.stocks, this.stockCount];
+    this.body = [this.namePlate, this.damage, this.percent, this.name];
+    const stockLayer = [...this.stockShadows, ...this.stocks, this.stockCount];
     for (const frame of [...this.body, ...stockLayer, this.doomMark, this.pingSignal, this.pingNumber]) {
       setFrameLevel(frame, HUD_LEVEL);
       setFrameEnabled(frame, false);
@@ -206,7 +204,7 @@ export class FighterHud {
     for (const frame of this.body) destroyFrame(frame);
     destroyOutline(this.damageOutline);
     destroyOutline(this.percentOutline);
-    for (const icon of [...this.stockRings, ...this.stocks, this.pingSignal]) destroyFrame(icon);
+    for (const icon of [...this.stockShadows, ...this.stocks, this.pingSignal]) destroyFrame(icon);
     destroyFrame(this.stockCount);
     destroyFrame(this.doomMark);
     destroyFrame(this.pingNumber);
@@ -221,21 +219,19 @@ export class FighterHud {
     const inner = panel.mirrored ? TextAlignment.right : TextAlignment.left;
     for (const frame of this.raceFrames) placeBox(frame.root, left, panel.frame);
     placeBox(this.namePlate, left, panel.namePlate);
-    placeBox(this.stockStrip, left, panel.stockStrip);
     placeBox(this.damage, left, panel.damage);
     setFrameTextAlignment(this.damage, TextAlignment.middle, TextAlignment.right);
     placeBox(this.percent, left, panel.percent);
     placeBox(this.doomMark, left, panel.doom);
     placeBox(this.name, left, panel.name);
     setFrameTextAlignment(this.name, TextAlignment.middle, inner);
-    placeEach(this.stockRings, left, panel.stockRings);
+    placeEach(this.stockShadows, left, panel.stockShadows);
     placeEach(this.stocks, left, panel.stocks);
     placeBox(this.stockCount, left, panel.stockCount);
     setFrameTextAlignment(this.stockCount, TextAlignment.middle, inner);
     placeBox(this.pingSignal, left, panel.pingSignal);
     placeBox(this.pingNumber, left, panel.pingNumber);
     setFrameTextAlignment(this.pingNumber, TextAlignment.middle, panel.mirrored ? TextAlignment.left : TextAlignment.right);
-    setFrameTexture(this.stockStrip, panel.mirrored ? STOCK_STRIP_MIRROR_TEXTURE : STOCK_STRIP_TEXTURE, 0, true);
     this.shownRace = undefined;
     this.placeNumber(0.0, 0.0);
   }
@@ -332,20 +328,19 @@ export class FighterHud {
       const icons = counted ? 1 : shownStocks;
       for (let index = 0; index < STOCK_ICONS_SHOWN; index++) {
         const on = index < icons || index === this.fadingStock;
-        const icon = this.stocks[index], ring = this.stockRings[index];
+        const icon = this.stocks[index], shadow = this.stockShadows[index];
         if (icon !== undefined) { setFrameVisible(icon, on); setFrameAlpha(icon, 255); }
-        if (ring !== undefined) { setFrameVisible(ring, on); setFrameAlpha(ring, 255); }
+        if (shadow !== undefined) { setFrameVisible(shadow, on); setFrameAlpha(shadow, 255); }
       }
-      setFrameVisible(this.stockStrip, visible && shownStocks > 0);
       setFrameVisible(this.stockCount, counted);
       setFrameText(this.stockCount, `${NAME_COLOUR}x ${formatInt(shownStocks)}|r`);
     }
     if (this.fadingStock < 0) return;
     this.fadeFrame++;
     const alpha = stockFadeAlpha(this.fadeFrame);
-    const icon = this.stocks[this.fadingStock], ring = this.stockRings[this.fadingStock];
+    const icon = this.stocks[this.fadingStock], shadow = this.stockShadows[this.fadingStock];
     if (icon !== undefined) { setFrameAlpha(icon, alpha); setFrameVisible(icon, alpha > 0); }
-    if (ring !== undefined) { setFrameAlpha(ring, alpha); setFrameVisible(ring, alpha > 0); }
+    if (shadow !== undefined) { setFrameAlpha(shadow, alpha); setFrameVisible(shadow, alpha > 0); }
     if (alpha === 0) this.fadingStock = -1;
   }
 

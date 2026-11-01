@@ -22,12 +22,20 @@ Frame "SIMPLEFRAME" "SmashcraftRaceFrameNightElf" {
     }
     Layer "ARTWORK" {
         Texture "SmashcraftRaceFrameNightElfArchLeft" {
-            File "UI\Console\NightElf\NightElfUITile01.blp",
-            TexCoord 0.78125, 1, 0.363281, 0.894531,
+            File "UI\Console\NightElf\NightElfUITile02.blp",
+            TexCoord 0.195313, 0, 0.363281, 0.894531,
             AlphaMode "BLEND",
-            Width 0.035,
+            Width 0.03125,
             Height 0.085,
             Anchor TOPLEFT, 0, 0,
+        }
+        Texture "SmashcraftRaceFrameNightElfArchMiddle" {
+            File "UI\Console\NightElf\NightElfUITile01.blp",
+            TexCoord 0.976563, 1, 0.363281, 0.894531,
+            AlphaMode "BLEND",
+            Width 0.00375,
+            Height 0.085,
+            Anchor TOPLEFT, 0.03125, 0,
         }
         Texture "SmashcraftRaceFrameNightElfArchRight" {
             File "UI\Console\NightElf\NightElfUITile02.blp",

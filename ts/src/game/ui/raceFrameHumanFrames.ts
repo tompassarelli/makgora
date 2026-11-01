@@ -7,6 +7,7 @@ export interface SmashcraftRaceFrameHumanFrames {
   readonly backing: Frame;
   readonly portrait: Frame;
   readonly archLeft: Frame;
+  readonly archMiddle: Frame;
   readonly archRight: Frame;
 }
 
@@ -19,6 +20,7 @@ export function createSmashcraftRaceFrameHuman(parent: Frame, context: number): 
     backing: namedFrame("SmashcraftRaceFrameHumanBacking", context),
     portrait: namedFrame("SmashcraftRaceFrameHumanPortrait", context),
     archLeft: namedFrame("SmashcraftRaceFrameHumanArchLeft", context),
+    archMiddle: namedFrame("SmashcraftRaceFrameHumanArchMiddle", context),
     archRight: namedFrame("SmashcraftRaceFrameHumanArchRight", context),
   };
   return frames;

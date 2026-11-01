@@ -7,6 +7,7 @@ export interface SmashcraftRaceFrameUndeadFrames {
   readonly backing: Frame;
   readonly portrait: Frame;
   readonly archLeft: Frame;
+  readonly archMiddle: Frame;
   readonly archRight: Frame;
 }
 
@@ -19,6 +20,7 @@ export function createSmashcraftRaceFrameUndead(parent: Frame, context: number):
     backing: namedFrame("SmashcraftRaceFrameUndeadBacking", context),
     portrait: namedFrame("SmashcraftRaceFrameUndeadPortrait", context),
     archLeft: namedFrame("SmashcraftRaceFrameUndeadArchLeft", context),
+    archMiddle: namedFrame("SmashcraftRaceFrameUndeadArchMiddle", context),
     archRight: namedFrame("SmashcraftRaceFrameUndeadArchRight", context),
   };
   return frames;

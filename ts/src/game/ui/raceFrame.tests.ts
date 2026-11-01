@@ -18,28 +18,36 @@ test("each fighter's portrait frame is its race's console art: playable races th
   for (const character of RENDERED_FIGHTERS) assertTrue(RACES.includes(fighterRace(character)));
 });
 
-test("the race frame stands level and is never stretched or squashed: both arch halves share one row of texels, every part draws at most one pixel per texel with equal scale on both axes, on a 1920-tall display [k2 property]", () => {
+test("the race frame stands level, whole and never stretched or squashed: its left side is its right side mirrored so no edge is cut through the console art, every arch part shares one row of texels, and every part draws at most one pixel per texel with equal scale on both axes, on a 1920-tall display [k2 property]", () => {
   for (const race of RACES) {
     const parts = raceFrameParts(race);
     for (const part of parts) {
       const [left, right, top, bottom] = part.texCoord;
-      assertTrue(left >= 0.0 && left < right && right <= 1.0 && top >= 0.0 && top < bottom && bottom <= 1.0);
+      assertTrue(Math.min(left, right) >= 0.0 && Math.max(left, right) <= 1.0 && left !== right && top >= 0.0 && top < bottom && bottom <= 1.0);
       const scale = partScale(part);
       assertTrue(scale.x <= 1.0 && scale.y <= 1.0);
       assertTrue(Math.abs(scale.x - scale.y) < f32(0.001));
       assertTrue(part.x >= 0 && part.y >= 0 && part.x + part.width <= RACE_FRAME_PX.width && part.y + part.height <= RACE_FRAME_PX.height);
     }
-    const halves = parts.filter(part => part.layer === "ARTWORK");
-    const [archLeft, archRight] = halves;
-    assertTrue(archLeft !== undefined && archRight !== undefined);
-    if (archLeft === undefined || archRight === undefined) continue;
-    assertEquals(archLeft.y, archRight.y, `${race} halves share a top`);
-    assertEquals(archLeft.height, archRight.height, `${race} halves share a height`);
-    assertEquals(archLeft.texCoord[2], archRight.texCoord[2], `${race} halves cut from one texel row`);
-    assertEquals(archLeft.texCoord[3], archRight.texCoord[3], `${race} halves end on one texel row`);
-    assertEquals(archLeft.x + archLeft.width, archRight.x, `${race} halves meet`);
-    assertEquals(archLeft.texCoord[1], 1.0, `${race} left half runs to its tile's edge`);
-    assertEquals(archRight.texCoord[0], 0.0, `${race} right half starts at its tile's edge`);
+    const [archLeft, archMiddle, archRight] = parts.filter(part => part.layer === "ARTWORK");
+    assertTrue(archLeft !== undefined && archMiddle !== undefined && archRight !== undefined);
+    if (archLeft === undefined || archMiddle === undefined || archRight === undefined) continue;
+    for (const part of [archLeft, archMiddle]) {
+      assertEquals(part.y, archRight.y, `${race} ${part.key} shares the arch's top`);
+      assertEquals(part.height, archRight.height, `${race} ${part.key} shares the arch's height`);
+      assertEquals(part.texCoord[2], archRight.texCoord[2], `${race} ${part.key} is cut from the arch's top texel row`);
+      assertEquals(part.texCoord[3], archRight.texCoord[3], `${race} ${part.key} ends on the arch's bottom texel row`);
+    }
+    assertEquals(archLeft.file, archRight.file, `${race} left side is drawn from the right side's tile`);
+    assertEquals(archLeft.texCoord[0], archRight.texCoord[1], `${race} left side starts where the right side ends`);
+    assertEquals(archLeft.texCoord[1], archRight.texCoord[0], `${race} left side ends where the right side starts`);
+    assertEquals(archLeft.width, archRight.width, `${race} sides match`);
+    assertEquals(archLeft.x, 0, `${race} left side starts the frame`);
+    assertEquals(archLeft.x + archLeft.width, archMiddle.x, `${race} left side meets the middle`);
+    assertEquals(archMiddle.x + archMiddle.width, archRight.x, `${race} middle meets the right side`);
+    assertEquals(archRight.x + archRight.width, RACE_FRAME_PX.width, `${race} right side ends the frame`);
+    assertEquals(archMiddle.texCoord[1], 1.0, `${race} middle runs to tile 01's edge`);
+    assertEquals(archRight.texCoord[0], 0.0, `${race} right side starts at tile 02's edge`);
   }
 });
 
@@ -48,7 +56,7 @@ const bottom = (box: PlateBox): number => box.y + box.height;
 const apart = (a: PlateBox, b: PlateBox): boolean => right(a) <= b.x || right(b) <= a.x || bottom(a) <= b.y || bottom(b) <= a.y;
 const inside = (inner: PlateBox, outer: PlateBox): boolean => inner.x >= outer.x && inner.y >= outer.y && right(inner) <= right(outer) && bottom(inner) <= bottom(outer);
 
-test("both plates mirror each other: the frame keeps its texture's size, the stocks sit on their dark strip below the frame and clear of it, at least as tall as the name's capitals, and the ping sits beside the frame on the outer side [k2 property]", () => {
+test("both plates mirror each other: the frame keeps its texture's size, the stocks sit below the frame and clear of it with no backing strip, each over its own shadow, at least as tall as the name's capitals, and the ping sits beside the frame on the outer side [k2 property]", () => {
   const capitals = (font: number) => pixelsForUnits(font, 1920) * CAP_HEIGHT;
   assertTrue(STOCK_SHOWN_PX >= capitals(NAME_FONT));
   assertTrue(capitals(NAME_FONT) >= capitals(DAMAGE_FONT) / 4);
@@ -57,12 +65,15 @@ test("both plates mirror each other: the frame keeps its texture's size, the sto
     const where = `${count} players, position ${position}`;
     assertEquals(panel.frame.width, RACE_FRAME_PX.width, `${where} frame width`);
     assertEquals(panel.frame.height, RACE_FRAME_PX.height, `${where} frame height`);
-    assertTrue(panel.stockStrip.y >= bottom(panel.frame));
-    panel.stockRings.forEach((ring, index) => {
-      assertTrue(inside(ring, panel.stockStrip));
-      assertTrue(apart(ring, panel.frame));
-      const next = panel.stockRings[index + 1];
-      if (next !== undefined) assertTrue(apart(ring, next));
+    assertEquals(panel.stockShadows.length, panel.stocks.length, `${where} one shadow per stock`);
+    panel.stocks.forEach((stock, index) => {
+      const shadow = panel.stockShadows[index];
+      assertTrue(shadow !== undefined && inside(stock, shadow));
+      if (shadow === undefined) return;
+      assertTrue(shadow.y >= bottom(panel.frame));
+      assertTrue(apart(shadow, panel.frame));
+      const next = panel.stockShadows[index + 1];
+      if (next !== undefined) assertTrue(apart(shadow, next));
     });
     for (const bar of [panel.pingSignal, panel.pingNumber]) {
       assertTrue(apart(bar, panel.frame));
@@ -72,7 +83,7 @@ test("both plates mirror each other: the frame keeps its texture's size, the sto
   }
   const leftPanel = panelLayout(0, 2), rightPanel = panelLayout(1, 2);
   assertEquals(leftPanel.frame.x, 544 - right(rightPanel.frame), "frames mirror");
-  assertEquals(leftPanel.stockStrip.x, 544 - right(rightPanel.stockStrip), "strips mirror");
+  leftPanel.stocks.forEach((stock, index) => assertEquals(stock.x, 544 - right(rightPanel.stocks[index] ?? stock), `stock ${index} mirrors`));
 });
 
 test("the ping shows 4 bars under 60 ms, 3 under 100, 2 under 150, 1 above and hides with no measurement, and a lost stock fades out over its fade frames [k2 property]", () => {
