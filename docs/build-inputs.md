@@ -105,13 +105,20 @@ code:
    fighter's rules (victory pose, flash clips, Warden's blade timing) into
    ts/src/generated/fighter-art/SLUG.ts, so a lane that changes a fighter's clip
    tables needs no separate `bun run generate`. Each step is stored under
-   store/derived/STEP/KEY/, KEY hashing the fighter's source model and rules
-   file, the step's source files and lockfiles, the earlier step's key and, after
-   the export, the stock build and the hero-models and imported-models pins, so a
-   run redoes only the steps whose inputs changed. Before taking its lease, a
-   derive locks store/derived/.locks/STEP-KEY for every step it must run, so a
-   concurrent derive of the same inputs waits without a lease, logs a cache hit
-   on each step the first stored, and takes a lease only for what is still missing.
+   store/derived/STEP/KEY/ with a digest of what it stored, KEY hashing the
+   fighter's source model and rules file, the step's source files and lockfiles,
+   the digests of the fighter's earlier steps and, after the export, the stock
+   build, the fighter's hero-models shards and the imported-models files its
+   model or rules name. A run redoes only the steps whose inputs changed, and a
+   step that reruns to the same output lets the steps after it reuse theirs. The
+   steps see an imported-models folder holding only those named files, so a
+   step that reads another one fails instead of caching against a file its key
+   does not cover. Before taking its lease, a derive locks
+   store/derived/.locks/STEP-KEY for the first step each fighter must run and
+   writes its pid there; a concurrent derive of the same inputs waits without a
+   lease, logs a cache hit on each step the first stored, and takes a lease only
+   for what is still missing, while the derive's own leased re-run passes the
+   locks its parent holds.
    `--rebuild` ignores stored steps.
    The steps run in a scratch copy of the checkout, and only the derive writes
    their differences back; `--check` writes nothing and fails, listing them, when
