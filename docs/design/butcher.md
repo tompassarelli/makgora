@@ -229,6 +229,14 @@ returned to 1.0 (the authored rows) and his knockback growth factor became 1.04
 He now sits at 42% (5,118 wins, 7,122 losses), inside the 40–60% band. Side
 special is still his top damage share (32%).
 
+The Rot trail box (2026-11-01) asks for 45% to 55%. The field on main
+1f887e7944 (balance run 41254282255, his 31 pairs only, 12,648 of his matches)
+puts him at 42.2% (5,337 wins), so his damage factor goes from 1.0 to 1.05,
+about 8 points at 0.6% of damage a point by the retune rule; Rot, Dismember's
+drain and the pummel stay unscaled. The patches barely touch the computer's
+play, since Rot is under 1% of the moves it starts, so the trail does not move
+the field read.
+
 Path draft for Tom to correct (#358):
 
 ```ceiling-plan
