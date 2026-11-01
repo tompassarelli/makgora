@@ -100,6 +100,15 @@ Smashcraft follows that shape with Warcraft III's built-in assets
   (Stand Channel or Stand Ready where the model has none). It shouts its battle
   cry over a crowd cheer and its race's victory theme. A KO goes to the last
   fighter whose hit landed.
+- **Closing camera.** From the frame of the final KO or the TIME! call the
+  camera never moves toward the knocked-out fighter: it eases from the match's
+  last shot straight into the victory view over 30 frames, each of its
+  position, distance and field of view only closing on that view. Until
+  2026-11-01 the native window first zoomed onto the KO point for 45 frames
+  and back, which in Tom's playtest that day read as a pump fake following the
+  dead fighter toward the blast zone, and he asked for it gone; the results
+  shot no longer snaps its distance in on its first frame either.
+  Mid-match KOs keep the follow camera (docs/melee-camera.md).
 - **Choices.** Rematch and New stage go ahead only when every present player
   picks the same one. Character select goes at once when any player picks it,
   since a split vote ends there anyway (Tom, 20 Oct 2026).

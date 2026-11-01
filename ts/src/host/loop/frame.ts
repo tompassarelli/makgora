@@ -173,7 +173,6 @@ export function applyFrame(s: ShellState, recorded = false): void {
     const participant = s.participants[slot];
     const fighter = fighterAt(world, slot);
     reportChanges(s, slot, participant.before, fighter);
-    if (runtime.frameImpacts[slot].koDirectionX !== 0 || runtime.frameImpacts[slot].koDirectionZ !== 0) s.lastKo = { frame: runtime.simulationFrame, x: fighter.motion.x, z: fighter.motion.z };
     const critical = criticalStrikeDamage(world, slot, runtime.frameImpacts[slot].hit, participant.before.damage);
     if (critical !== undefined) ui.criticals.show(fighter.motion.x, fighter.motion.z, critical);
     if (participant.pooled && !confirmModelSounds(s.sounds, s.sounds.epoch ?? 0, runtime.simulationFrame, slot, fighter, runtime.poses[slot], ui.sounds)) {
@@ -198,8 +197,6 @@ export function applyFrame(s: ShellState, recorded = false): void {
   const cues = ui.match.presentConfirmed(s.game, world);
   if (s.game.phase !== Phase.result) return;
   recordSessionWins(s.sessionWins, s.game);
-  const finalKo = cues.includes(MatchCue.game) && s.lastKo !== undefined && runtime.simulationFrame - s.lastKo.frame <= FINAL_KO_WINDOW_FRAMES ? s.lastKo : undefined;
-  s.koZoom = finalKo === undefined ? undefined : { x: finalKo.x, z: finalKo.z };
   clearMatchEffects(s);
 
   keepMomentEnd(recorder, world, s.game, s.controls, runtime);
@@ -212,8 +209,6 @@ export function applyFrame(s: ShellState, recorded = false): void {
   setStatus(s, resultMessage(s.game), LASTING);
 }
 
-
-const FINAL_KO_WINDOW_FRAMES = 5;
 
 export function presentPredictedHits(s: ShellState, frame: number, world: Readonly<Roster>, runtime: Readonly<PacingAndPresentation>): void {
   // Presentation only: a predicted sound never feeds the simulation, a snapshot or a checksum.

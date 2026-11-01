@@ -21,7 +21,6 @@ import { type MatchState, REMATCH_COUNTDOWN_SECONDS, createMatchState } from "..
 import { matchSpawnX } from "../../game/match/step";
 import { createMatchCamera, type MatchCamera } from "../../game/sim/matchCamera";
 import type { HeldCamera } from "./heldCamera";
-import type { KoZoom } from "./finale";
 import { type FixedDelay, type InputSchedule, PENDING_CAPACITY, inputSchedule } from "../../game/netcode/inputSchedule";
 import { type NetDelay, createNetDelay } from "./netDelay";
 import { InputBatch } from "../../game/netcode/inputBatch";
@@ -344,8 +343,6 @@ export interface ShellState {
   readonly showcase: ShowcasePads;
   showcaseFocus: ParticipantSlot | undefined;
   heldCamera: HeldCamera | undefined;
-  koZoom: KoZoom | undefined;
-  lastKo: { readonly frame: number; readonly x: number; readonly z: number } | undefined;
   showcaseDemo: Character | undefined;
   readonly showcaseMarkers: Effect[];
   readonly capture: CaptureStage;
@@ -460,7 +457,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     produced: createFrameControls(), runtime: createPacingAndPresentation(), sessionWins: createSessionWins(), session: createMatchControls(),
     frameInput: createMatchFrameInput(),
     participants: [participant(0, persistence), participant(1, persistence), participant(2, persistence), participant(3, persistence)],
-    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageLavaRims: [], stageWind: [], stageScenery: undefined, stageDrifters: [], shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, heldCamera: undefined, koZoom: undefined, lastKo: undefined, showcaseDemo: undefined, showcaseMarkers: [], capture: createCaptureStage(), captureBodies: [undefined, undefined, undefined, undefined], ui: undefined,
+    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageLavaRims: [], stageWind: [], stageScenery: undefined, stageDrifters: [], shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, heldCamera: undefined, showcaseDemo: undefined, showcaseMarkers: [], capture: createCaptureStage(), captureBodies: [undefined, undefined, undefined, undefined], ui: undefined,
     sounds: createModelSoundCursor(ORIGINAL_MODEL_SOUNDS),
     dev: { rollback: isShadow(input) ? input.rollback : 6, delay: isShadow(input) ? input.delay : 3, batch: DEFAULT_BATCH, rematchSeconds: REMATCH_COUNTDOWN_SECONDS }, devReceipts: 0, devStep: 1, devSteps: 1,
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),
