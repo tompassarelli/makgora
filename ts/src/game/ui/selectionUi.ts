@@ -26,7 +26,7 @@ import {
   humanActive,
   humanFighterActive,
 } from "../lobby/lobbyState";
-import { pointerX, pointerY } from "../menu/pointer";
+import { readScreenPointer } from "./screenPointer";
 import {
   type Placement,
   type Roster,
@@ -68,7 +68,7 @@ import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfi
 import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus, createCpuSettings, showCpuSettings } from "./selectionCpuSettings";
 import { destroyEvents, Events } from "wisp/game/events";
 import { createFrameByType, destroyFrame, Frame, FramePoint, screenHeight, screenWidth, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
-import { MouseButton, mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, showCursor } from "wisp/game/input";
+import { MouseButton, mouseDown, showCursor } from "wisp/game/input";
 import { localPlayer, Player, player as playerOf } from "wisp/game/players";
 import { sendSync } from "wisp/game/sync";
 import { formatInt, toReal } from "wisp/game/text";
@@ -658,7 +658,7 @@ export class SelectionPanel {
     const cpuOpen = visible && this.cpuSlot !== undefined;
 
     this.showOverlays(game, loading, visible, cpuOpen);
-    const { pointed, x, y } = readPointer();
+    const { pointed, x, y } = readScreenPointer();
     if (this.showDialog(game, visible, cpuOpen, pointed, x, y)) return;
     this.showTiles(game);
     if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;
@@ -822,18 +822,6 @@ export class SelectionPanel {
       pointer, focus: barFocus(this.menuFocus), start: startState(game, this.controls), tutorial: tutorialAvailable(game),
     });
   }
-}
-
-const POINTER = { pointed: false, x: 0.0, y: 0.0 };
-
-// Lua: one shared record, because the panel updates on every match frame and a fresh table each frame is garbage.
-function readPointer(): Readonly<typeof POINTER> {
-  const width = toReal(screenWidth());
-  const height = toReal(screenHeight());
-  POINTER.pointed = width > 0 && height > 0;
-  POINTER.x = POINTER.pointed ? pointerX(toReal(inputPointerX()), width, height) : 0.0;
-  POINTER.y = POINTER.pointed ? pointerY(toReal(inputPointerY()), height) : 0.0;
-  return POINTER;
 }
 
 const BAR_FOCUS: Readonly<Partial<Record<MenuFocus["kind"], BarItem>>> = { mainMenu: "back", mode: "mode", teamBattle: "teams", rules: "rules", guide: "guide", gear: "gear" };
