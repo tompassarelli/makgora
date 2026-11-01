@@ -436,15 +436,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Tyrande Whisperwind | heavy | up throw | 1/1 | 1/1 in short hop, back air, out short hop, neutral air | 1/1 in up smash, out down smash | 1/1 KD in short hop, back air, out short hop, neutral air |
 | Tyrande Whisperwind | heavy | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
 | Stitches | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Stitches | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Stitches | light | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 KD |
+| Stitches | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
+| Stitches | light | up throw | 1/1 | 1/1 KD | 1/1 KD | 1/1 KD |
 | Stitches | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Stitches | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Stitches | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Stitches | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Stitches | medium | up throw | 1/0 | 1/1 | 1/1 KD | 1/1 KD |
 | Stitches | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Stitches | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Stitches | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Stitches | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Stitches | heavy | up throw | 1/1 | 1/1 | 1/1 KD | 1/1 KD |
 | Stitches | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Akama (WIP) | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
