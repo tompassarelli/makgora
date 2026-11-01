@@ -50,10 +50,20 @@ const mark = (model: string, spawnFrame: number, life: number, offsetX: number, 
 export const RISING_THUNDER_ERUPTION_MODEL = "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx";
 export const RISING_THUNDER_APEX_MODEL = "Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx";
 export const RISING_THUNDER_BURST_MODEL = "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx";
+export const RISING_THUNDER_MAGMA_MODEL = "Abilities\\Spells\\Other\\Volcano\\VolcanoDeath.mdx";
+export const RISING_THUNDER_DEBRIS_MODEL = "Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx";
+export const RISING_THUNDER_HEAT_MODEL = "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx";
+export const RISING_THUNDER_CRACK_MODEL = "Doodads\\Dungeon\\Rocks\\Cave_FieryCrator\\Cave_FieryCrator.mdx";
+export const RISING_THUNDER_FLASH_MODEL = "Abilities\\Weapons\\Bolt\\BoltImpact.mdx";
 const marks = (): SpecialProjectile[] => [
   mark(RISING_THUNDER_ERUPTION_MODEL, RISING_THUNDER_CAST, 24, 6.0, 0.0, f32(1.0 / f32(0.9))),
+  mark(RISING_THUNDER_CRACK_MODEL, RISING_THUNDER_CAST, 36, 6.0, 0.0, f32(1.0 / f32(0.6))),
+  mark(RISING_THUNDER_MAGMA_MODEL, RISING_THUNDER_CAST, 30, 6.0, 0.0, f32(1.0 / f32(0.35))),
+  mark(RISING_THUNDER_DEBRIS_MODEL, RISING_THUNDER_CAST, 30, 6.0, 0.0, f32(1.0 / f32(1.2))),
+  mark(RISING_THUNDER_HEAT_MODEL, RISING_THUNDER_CAST, 12, 6.0, 20.0, f32(1.0 / f32(0.8))),
   mark(RISING_THUNDER_APEX_MODEL, RISING_THUNDER_APEX.first, 18, 0.0, 0.0, f32(1.0 / f32(0.8))),
   mark(RISING_THUNDER_BURST_MODEL, RISING_THUNDER_APEX.first, 16, 0.0, 174.0, f32(1.0 / f32(0.55))),
+  mark(RISING_THUNDER_FLASH_MODEL, RISING_THUNDER_APEX.first, 10, 0.0, 174.0, f32(1.0 / f32(4.0))),
 ];
 
 const riseFrames = RISING_THUNDER_RISE.last - RISING_THUNDER_RISE.first + 1;

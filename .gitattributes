@@ -2,7 +2,7 @@
 ts/map-size-baseline.tsv merge=smashcraft-generated
 ts/test/cost-baseline.tsv merge=smashcraft-generated
 # Classic effect record: look rows keyed by model, use rows by their use digest, each row checked on its own.
-ts/scripts/wisp/cue-models.tsv merge=smashcraft-generated
+ts/scripts/wisp/cue-models.tsv merge=smashcraft-generated linguist-generated
 # Append-only judgement log; `anim judge record` skips entries already stored, so order does not matter.
 tools/move-data/anim-score/judge.jsonl merge=union
 # Produced files: regenerate with their producer instead of editing.

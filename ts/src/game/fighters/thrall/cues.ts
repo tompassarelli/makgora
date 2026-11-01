@@ -25,7 +25,8 @@ const HAMMER_HEAD = Array.from({ length: RISING_THUNDER.endFrame }, (_, index) =
   return { x, z };
 });
 
-const PALM_GATHER = { model: "Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdx", anchor: "feet" as const, scale: f32(0.7), sequence: "stand", seconds: f32(0.2), pitch: 0.0, color: [150, 210, 255] as const };
-const HAMMER_CHARGE = { model: "Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx", anchor: "hand" as const, scale: f32(1.3), sequence: "stand", seconds: f32(0.2), pitch: 0.0, anchorFrames: HAMMER_HEAD, sound: "ThunderClap", lingerFrames: 30 };
+const PALM_HEAT = { model: "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx", anchor: "feet" as const, scale: f32(0.9), sequence: "stand", seconds: f32(0.2), pitch: 0.0 };
+export const RISING_THUNDER_ARCS_MODEL = "Abilities\\Spells\\Other\\ForkedLightning\\ForkedLightningTarget.mdx";
+const HAMMER_ARCS = { model: RISING_THUNDER_ARCS_MODEL, anchor: "hand" as const, scale: f32(2.0), anchorFrames: HAMMER_HEAD, sound: "ThunderClap", birth: { eachFrame: true, voices: 24, lingerFrames: 30 } };
 
-export const RISING_THUNDER_CUES = { spell: "Rising Thunder", startup: PALM_GATHER, active: HAMMER_CHARGE, trail: true as const };
+export const RISING_THUNDER_CUES = { spell: "Rising Thunder", startup: PALM_HEAT, active: HAMMER_ARCS, trail: true as const };

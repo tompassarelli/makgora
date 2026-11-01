@@ -5,7 +5,7 @@
 
 
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { ELEMENTS, HIT_CUES, type HitCueSeen, advanceHitCueSeen, elementLook, hitCueSeen } from "../presentation/elementLooks";
+import { CHARGED_VICTIM, ELEMENTS, HIT_CUES, type HitCueSeen, advanceHitCueSeen, elementLook, hitCueSeen } from "../presentation/elementLooks";
 import { fighterModelScale } from "../presentation/fighterScale";
 import type { Fighter } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
@@ -14,6 +14,8 @@ import { playSound, setSoundPosition, setSoundVolume, Sound, soundFromLabel, sto
 
 
 const SHOWN = ELEMENTS.filter((element) => elementLook(element).victim !== undefined);
+const VICTIMS = [...SHOWN.map((element) => ({ model: elementLook(element).victim ?? "", scale: elementLook(element).victimScale })), CHARGED_VICTIM];
+const CHARGED = VICTIMS.length - 1;
 
 export class ElementEffects {
 
@@ -33,7 +35,7 @@ export class ElementEffects {
 
   constructor(private readonly origin: WorldOrigin) {
     this.front = origin.y - 10.0;
-    this.models = PARTICIPANT_SLOTS.flatMap(() => SHOWN.map((element) => createEffect(elementLook(element).victim ?? "", origin.x, origin.y)));
+    this.models = PARTICIPANT_SLOTS.flatMap(() => VICTIMS.map((victim) => createEffect(victim.model, origin.x, origin.y)));
     this.hitCues = PARTICIPANT_SLOTS.flatMap(() => HIT_CUES.map((cue) => createEffect(cue.look.model, origin.x, origin.y)));
     this.clear();
   }
@@ -44,9 +46,9 @@ export class ElementEffects {
 
   hideSlot(slot: number): void {
     const parked = (this.parked ??= []);
-    for (let index = 0; index < SHOWN.length; index++) {
-      const model = this.models[slot * SHOWN.length + index];
-      if (model !== undefined) parkOnce(model, this.origin, parked, slot * SHOWN.length + index);
+    for (let index = 0; index < VICTIMS.length; index++) {
+      const model = this.models[slot * VICTIMS.length + index];
+      if (model !== undefined) parkOnce(model, this.origin, parked, slot * VICTIMS.length + index);
     }
     for (let cue = 0; cue < HIT_CUES.length; cue++) this.hideHitCue(slot * HIT_CUES.length + cue);
   }
@@ -59,11 +61,11 @@ export class ElementEffects {
 
   present(fighter: Readonly<Fighter>, slot: number): void {
     const { launch, visuals } = fighter;
-    const shown = !fighter.status.out && (launch.hitlag > 0 || launch.hitstun > 0) ? SHOWN.indexOf(visuals.hitElement) : -1;
+    const shown = fighter.status.out || (launch.hitlag === 0 && launch.hitstun === 0) ? -1 : visuals.hitElectric ? CHARGED : SHOWN.indexOf(visuals.hitElement);
     const parked = (this.parked ??= []);
     const scale = fighterModelScale(fighter);
-    for (let index = 0; index < SHOWN.length; index++) {
-      const at = slot * SHOWN.length + index;
+    for (let index = 0; index < VICTIMS.length; index++) {
+      const at = slot * VICTIMS.length + index;
       const model = this.models[at];
       if (model === undefined) continue;
       if (index !== shown) {
@@ -73,7 +75,7 @@ export class ElementEffects {
       parked[at] = false;
       if (this.hitSerials[slot] !== visuals.hit) setEffectTime(model, 0.0);
       placeEffect(model, this.origin.x + fighter.motion.x, this.front, this.origin.z + fighter.motion.z + 45.0 * scale);
-      setEffectScale(model, elementLook(visuals.hitElement).victimScale * scale);
+      setEffectScale(model, (VICTIMS[index]?.scale ?? 1.0) * scale);
       setEffectAlpha(model, 255);
     }
     this.hitSerials[slot] = visuals.hit;

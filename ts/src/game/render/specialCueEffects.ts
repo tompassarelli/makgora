@@ -331,7 +331,7 @@ export class SpecialCueEffects {
   private place(fighter: Readonly<Fighter>, cue: Cue, index: number | undefined): boolean {
     const out = this.placed;
     if (index === undefined) {
-      const anchor = CUE_ANCHORS[cue.anchor];
+      const anchor = cue.anchorFrames?.[Math.max(0, fighter.special.frame - 1)] ?? CUE_ANCHORS[cue.anchor];
       out.x = anchor.x * this.scale;
       out.z = anchor.z * this.scale;
       out.scale = cue.scale;

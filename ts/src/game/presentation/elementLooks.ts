@@ -38,6 +38,8 @@ export const ELEMENT_LOOKS: { readonly [element in HitElement]: ElementLook } = 
 };
 
 
+export const CHARGED_VICTIM = { model: "Abilities\\Spells\\Orc\\LightningShield\\LightningShieldTarget.mdx", scale: f32(0.9) } as const;
+
 export const ELEMENTS: readonly HitElement[] = [
   HitElement.normal, HitElement.fire, HitElement.electric, HitElement.slash, HitElement.ice,
   HitElement.dark, HitElement.holy, HitElement.poison, HitElement.arcane,

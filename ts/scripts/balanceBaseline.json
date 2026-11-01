@@ -23335,6 +23335,31 @@
    "authored.specials.up.ground.projectiles.2.effect.base": 0,
    "authored.specials.up.ground.projectiles.2.effect.launchX": 0,
    "authored.specials.up.ground.projectiles.2.effect.launchZ": 1,
+   "authored.specials.up.ground.projectiles.3.effect.damage": 0,
+   "authored.specials.up.ground.projectiles.3.effect.growth": 0,
+   "authored.specials.up.ground.projectiles.3.effect.base": 0,
+   "authored.specials.up.ground.projectiles.3.effect.launchX": 0,
+   "authored.specials.up.ground.projectiles.3.effect.launchZ": 1,
+   "authored.specials.up.ground.projectiles.4.effect.damage": 0,
+   "authored.specials.up.ground.projectiles.4.effect.growth": 0,
+   "authored.specials.up.ground.projectiles.4.effect.base": 0,
+   "authored.specials.up.ground.projectiles.4.effect.launchX": 0,
+   "authored.specials.up.ground.projectiles.4.effect.launchZ": 1,
+   "authored.specials.up.ground.projectiles.5.effect.damage": 0,
+   "authored.specials.up.ground.projectiles.5.effect.growth": 0,
+   "authored.specials.up.ground.projectiles.5.effect.base": 0,
+   "authored.specials.up.ground.projectiles.5.effect.launchX": 0,
+   "authored.specials.up.ground.projectiles.5.effect.launchZ": 1,
+   "authored.specials.up.ground.projectiles.6.effect.damage": 0,
+   "authored.specials.up.ground.projectiles.6.effect.growth": 0,
+   "authored.specials.up.ground.projectiles.6.effect.base": 0,
+   "authored.specials.up.ground.projectiles.6.effect.launchX": 0,
+   "authored.specials.up.ground.projectiles.6.effect.launchZ": 1,
+   "authored.specials.up.ground.projectiles.7.effect.damage": 0,
+   "authored.specials.up.ground.projectiles.7.effect.growth": 0,
+   "authored.specials.up.ground.projectiles.7.effect.base": 0,
+   "authored.specials.up.ground.projectiles.7.effect.launchX": 0,
+   "authored.specials.up.ground.projectiles.7.effect.launchZ": 1,
    "authored.specials.up.ground.hurt.0.firstFrame": 6,
    "authored.specials.up.ground.hurt.0.lastFrame": 25,
    "authored.specials.up.ground.followUps.0.special.endFrame": 2,
@@ -24103,9 +24128,24 @@
     "advantage": -33
    },
    "special.up.ground.projectiles.1": {
-    "advantage": -15
+    "advantage": -33
    },
    "special.up.ground.projectiles.2": {
+    "advantage": -33
+   },
+   "special.up.ground.projectiles.3": {
+    "advantage": -33
+   },
+   "special.up.ground.projectiles.4": {
+    "advantage": -33
+   },
+   "special.up.ground.projectiles.5": {
+    "advantage": -15
+   },
+   "special.up.ground.projectiles.6": {
+    "advantage": -15
+   },
+   "special.up.ground.projectiles.7": {
     "advantage": -15
    },
    "special.down.ground.projectiles.0": {
