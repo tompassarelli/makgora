@@ -87,17 +87,16 @@ const PHASE_NAMES = new Map<number, string>(Object.entries(Phase).map(([name, va
 export async function createNetStandalone(link: LockstepLink, slot: number, humans: number, options: { readonly script?: string } = {}): Promise<StandaloneNetSession> {
   const runtime = installHeadless(PREDICTED_HEADLESS, nativeDeclarations());
   try {
-    const platform = join(import.meta.dir, "../../src/platform");
     interface State { readonly game: { readonly phase: number; readonly humanFighterMask: number; readonly computerMask: number } }
-    const { shell }: { shell(): State & NetcodeShell } = await import(join(platform, "../host/loop/state.ts"));
-    const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import(join(platform, "../host/loop/diagnostics.ts"));
-    const { handMeasuredRtt, measuredDelay }: { handMeasuredRtt(net: object, rttMs: number): number; measuredDelay(window: number, rttMs: number): number } = await import(join(platform, "../host/loop/netDelay.ts"));
-    const { setHumanCount }: { setHumanCount(game: State["game"], count: number): void } = await import(join(import.meta.dir, "../../src/game/lobby/lobbyState.ts"));
-    const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(platform, "main.ts"));
+    const { shell }: { shell(): State & NetcodeShell } = await import("../../src/host/loop/state");
+    const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import("../../src/host/loop/diagnostics");
+    const { handMeasuredRtt, measuredDelay }: { handMeasuredRtt(net: object, rttMs: number): number; measuredDelay(window: number, rttMs: number): number } = await import("../../src/host/loop/netDelay");
+    const { setHumanCount }: { setHumanCount(game: State["game"], count: number): void } = await import("../../src/game/lobby/lobbyState");
+    const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import("../../src/platform/main");
     const build: MapBuild = { ...PLAYABLE_BUILD, devConsole: true };
     const lockstep = runtime.clients({ install: () => main.install(build), start: () => main.startBuild(build) }, [slot], { humans: Array.from({ length: humans }, (_, member) => member), link, keepCalls: 0 });
     const client = lockstep.client(slot);
-    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/developerCommands.ts"));
+    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import("../../src/host/loop/developerCommands");
     const scripted = options.script === undefined ? undefined : padInputs(padEdges(options.script).edges, slot);
     const chat = (options.script ?? "").split("\n").map((line) => line.trim()).filter((line) => line.startsWith("#! chat ")).map((line) => line.substring(8));
     let latest: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
