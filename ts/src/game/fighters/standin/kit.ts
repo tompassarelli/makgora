@@ -20,7 +20,7 @@ export interface StandinIdentity {
 export function standinHero({ character, name, displayName, effects, neutral, side, up, down, gameplan }: StandinIdentity): HeroDefinition {
   const shared = standinSpecials(character, effects);
   return {
-    character, name, displayName: `${displayName ?? name} (WIP)`,
+    character, name, displayName: displayName ?? name,
     purpose: "Work-in-progress stand-in: a plain middleweight moveset until his own kit lands",
     weakness: "No signature tools yet: every move is the shared stand-in's",
     complete: true,

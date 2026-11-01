@@ -831,7 +831,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `butcher-walk` | 1.12 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `butcher-traction` | 0.08 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### Akama (WIP)
+### Akama
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
@@ -851,7 +851,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `akama-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `akama-traction` | 0.06 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### Ragnaros (WIP)
+### Ragnaros
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|
@@ -871,7 +871,7 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Walk speed `firelord-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `firelord-traction` | 0.06 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
-### Alchemist (WIP)
+### Alchemist
 
 | Row | Ours | Melee | Code | Status |
 |---|---|---|---|---|

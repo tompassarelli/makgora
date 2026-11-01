@@ -564,66 +564,66 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Stitches | ledge-get-up | 1: Walk | 155.1 | 42.3 | up; 84.3/58.4 |
 | Stitches | ledge-roll | 1: Walk | 155.5 | 42.4 | forward; 149.4/143.6 |
 | Stitches | ledge-attack | 2: Attack | 371.8 | 93.9 | both; 317.8/325.1 |
-| Akama (WIP) | walk | 2: Walk | 110.5 | 52.0 | forward; 88.7/107.4 |
-| Akama (WIP) | dash | 2: Walk | 109.3 | 50.4 | forward; 87.9/105.6 |
-| Akama (WIP) | run | 2: Walk | 118.4 | 44.6 | forward; 106.5/118.4 |
-| Akama (WIP) | turn | 2: Walk | 54.6 | 23.1 | back; 35.4/39.2 |
-| Akama (WIP) | brake | 2: Walk | 58.1 | 25.0 | in place; 45.5/40.3 |
-| Akama (WIP) | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
-| Akama (WIP) | roll-forward | 2: Walk | 110.5 | 51.9 | forward; 88.7/107.3 |
-| Akama (WIP) | roll-back | 2: Walk | 110.5 | 51.9 | back; 107.3/88.7 |
-| Akama (WIP) | spot-dodge | 9: Stand - Var3 | 111.7 | 19.2 | in place; 28.8/64.7 |
-| Akama (WIP) | air-dodge | 9: Stand - Var3 | 112.1 | 19.2 | in place; 28.9/64.7 |
-| Akama (WIP) | tech | 0: Stand | 10.5 | 1.8 | in place; 8.0/1.0 |
-| Akama (WIP) | tech-forward | 0: Stand | 10.5 | 1.8 | forward; 8.0/1.0 |
-| Akama (WIP) | tech-back | 0: Stand | 10.5 | 1.8 | back; 1.0/8.0 |
-| Akama (WIP) | get-up | 9: Stand - Var3 | 112.1 | 19.2 | up; 98.6/12.5 |
-| Akama (WIP) | get-up-forward | 0: Stand | 10.5 | 1.8 | forward; 8.0/1.0 |
-| Akama (WIP) | get-up-back | 0: Stand | 10.5 | 1.8 | back; 1.0/8.0 |
-| Akama (WIP) | get-up-attack | 6: Attack -1HVar2 | 176.4 | 56.1 | both; 122.9/118.1 |
-| Akama (WIP) | ledge-get-up | 2: Walk | 110.3 | 51.9 | up; 65.3/86.5 |
-| Akama (WIP) | ledge-roll | 2: Walk | 110.5 | 52.0 | forward; 88.7/107.4 |
-| Akama (WIP) | ledge-attack | 5: Attack - 1HVar1 | 271.2 | 75.0 | both; 127.9/191.3 |
-| Ragnaros (WIP) | walk | 2: Walk | 104.6 | 41.1 | forward; 63.4/97.3 |
-| Ragnaros (WIP) | dash | 2: Walk | 104.8 | 33.5 | forward; 56.3/97.2 |
-| Ragnaros (WIP) | run | 2: Walk | 158.6 | 42.6 | forward; 92.9/142.4 |
-| Ragnaros (WIP) | turn | 2: Walk | 29.2 | 13.6 | back; 28.2/27.2 |
-| Ragnaros (WIP) | brake | 2: Walk | 33.6 | 15.2 | in place; 30.6/31.4 |
-| Ragnaros (WIP) | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
-| Ragnaros (WIP) | roll-forward | 2: Walk | 105.6 | 41.2 | forward; 63.6/97.1 |
-| Ragnaros (WIP) | roll-back | 2: Walk | 105.6 | 41.2 | back; 97.1/63.6 |
-| Ragnaros (WIP) | spot-dodge | 8: Stand Ready | 22.6 | 6.3 | in place; 15.6/16.4 |
-| Ragnaros (WIP) | air-dodge | 8: Stand Ready | 22.7 | 6.4 | in place; 15.8/16.4 |
-| Ragnaros (WIP) | tech | 0: Stand | 22.6 | 6.4 | in place; 16.1/16.4 |
-| Ragnaros (WIP) | tech-forward | 0: Stand | 22.6 | 6.4 | forward; 16.0/16.4 |
-| Ragnaros (WIP) | tech-back | 0: Stand | 22.6 | 6.4 | back; 16.4/16.0 |
-| Ragnaros (WIP) | get-up | 8: Stand Ready | 22.7 | 6.3 | up; 22.2/12.3 |
-| Ragnaros (WIP) | get-up-forward | 0: Stand | 22.6 | 6.4 | forward; 16.0/16.4 |
-| Ragnaros (WIP) | get-up-back | 0: Stand | 22.6 | 6.4 | back; 16.4/16.0 |
-| Ragnaros (WIP) | get-up-attack | 4: Attack - 2 | 199.5 | 66.9 | both; 103.5/196.6 |
-| Ragnaros (WIP) | ledge-get-up | 2: Walk | 105.7 | 41.1 | up; 50.9/61.6 |
-| Ragnaros (WIP) | ledge-roll | 2: Walk | 105.6 | 41.2 | forward; 63.6/97.7 |
-| Ragnaros (WIP) | ledge-attack | 3: Attack | 220.7 | 66.1 | both; 129.6/220.5 |
-| Alchemist (WIP) | walk | 4: Walk 1 | 114.4 | 31.2 | forward; 107.5/108.9 |
-| Alchemist (WIP) | dash | 4: Walk 1 | 100.6 | 29.9 | forward; 91.9/93.0 |
-| Alchemist (WIP) | run | 4: Walk 1 | 98.1 | 38.0 | forward; 82.8/57.1 |
-| Alchemist (WIP) | turn | 4: Walk 1 | 58.1 | 20.6 | back; 29.5/54.8 |
-| Alchemist (WIP) | brake | 4: Walk 1 | 66.1 | 22.8 | in place; 60.9/37.5 |
-| Alchemist (WIP) | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
-| Alchemist (WIP) | roll-forward | 4: Walk 1 | 114.4 | 31.1 | forward; 107.0/108.7 |
-| Alchemist (WIP) | roll-back | 4: Walk 1 | 114.4 | 31.1 | back; 108.7/107.0 |
-| Alchemist (WIP) | spot-dodge | 2: Stand 3 | 86.2 | 29.2 | in place; 85.9/31.4 |
-| Alchemist (WIP) | air-dodge | 2: Stand 3 | 86.2 | 29.3 | in place; 85.9/31.4 |
-| Alchemist (WIP) | tech | 0: Stand | 10.8 | 5.3 | in place; 3.7/3.2 |
-| Alchemist (WIP) | tech-forward | 0: Stand | 11.0 | 5.3 | forward; 3.7/3.4 |
-| Alchemist (WIP) | tech-back | 0: Stand | 11.0 | 5.3 | back; 3.4/3.7 |
-| Alchemist (WIP) | get-up | 2: Stand 3 | 86.3 | 29.2 | up; 29.7/56.7 |
-| Alchemist (WIP) | get-up-forward | 0: Stand | 11.0 | 5.3 | forward; 3.7/3.8 |
-| Alchemist (WIP) | get-up-back | 0: Stand | 11.0 | 5.3 | back; 3.8/3.7 |
-| Alchemist (WIP) | get-up-attack | 5: attack one - 2 NEW | 132.2 | 53.0 | both; 94.5/132.2 |
-| Alchemist (WIP) | ledge-get-up | 4: Walk 1 | 112.9 | 31.1 | up; 58.6/52.2 |
-| Alchemist (WIP) | ledge-roll | 4: Walk 1 | 114.2 | 31.2 | forward; 107.3/108.7 |
-| Alchemist (WIP) | ledge-attack | 3: attack one -1 NEW | 140.2 | 38.2 | both; 73.2/135.7 |
+| Akama | walk | 2: Walk | 110.5 | 52.0 | forward; 88.7/107.4 |
+| Akama | dash | 2: Walk | 109.3 | 50.4 | forward; 87.9/105.6 |
+| Akama | run | 2: Walk | 118.4 | 44.6 | forward; 106.5/118.4 |
+| Akama | turn | 2: Walk | 54.6 | 23.1 | back; 35.4/39.2 |
+| Akama | brake | 2: Walk | 58.1 | 25.0 | in place; 45.5/40.3 |
+| Akama | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
+| Akama | roll-forward | 2: Walk | 110.5 | 51.9 | forward; 88.7/107.3 |
+| Akama | roll-back | 2: Walk | 110.5 | 51.9 | back; 107.3/88.7 |
+| Akama | spot-dodge | 9: Stand - Var3 | 111.7 | 19.2 | in place; 28.8/64.7 |
+| Akama | air-dodge | 9: Stand - Var3 | 112.1 | 19.2 | in place; 28.9/64.7 |
+| Akama | tech | 0: Stand | 10.5 | 1.8 | in place; 8.0/1.0 |
+| Akama | tech-forward | 0: Stand | 10.5 | 1.8 | forward; 8.0/1.0 |
+| Akama | tech-back | 0: Stand | 10.5 | 1.8 | back; 1.0/8.0 |
+| Akama | get-up | 9: Stand - Var3 | 112.1 | 19.2 | up; 98.6/12.5 |
+| Akama | get-up-forward | 0: Stand | 10.5 | 1.8 | forward; 8.0/1.0 |
+| Akama | get-up-back | 0: Stand | 10.5 | 1.8 | back; 1.0/8.0 |
+| Akama | get-up-attack | 6: Attack -1HVar2 | 176.4 | 56.1 | both; 122.9/118.1 |
+| Akama | ledge-get-up | 2: Walk | 110.3 | 51.9 | up; 65.3/86.5 |
+| Akama | ledge-roll | 2: Walk | 110.5 | 52.0 | forward; 88.7/107.4 |
+| Akama | ledge-attack | 5: Attack - 1HVar1 | 271.2 | 75.0 | both; 127.9/191.3 |
+| Ragnaros | walk | 2: Walk | 104.6 | 41.1 | forward; 63.4/97.3 |
+| Ragnaros | dash | 2: Walk | 104.8 | 33.5 | forward; 56.3/97.2 |
+| Ragnaros | run | 2: Walk | 158.6 | 42.6 | forward; 92.9/142.4 |
+| Ragnaros | turn | 2: Walk | 29.2 | 13.6 | back; 28.2/27.2 |
+| Ragnaros | brake | 2: Walk | 33.6 | 15.2 | in place; 30.6/31.4 |
+| Ragnaros | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
+| Ragnaros | roll-forward | 2: Walk | 105.6 | 41.2 | forward; 63.6/97.1 |
+| Ragnaros | roll-back | 2: Walk | 105.6 | 41.2 | back; 97.1/63.6 |
+| Ragnaros | spot-dodge | 8: Stand Ready | 22.6 | 6.3 | in place; 15.6/16.4 |
+| Ragnaros | air-dodge | 8: Stand Ready | 22.7 | 6.4 | in place; 15.8/16.4 |
+| Ragnaros | tech | 0: Stand | 22.6 | 6.4 | in place; 16.1/16.4 |
+| Ragnaros | tech-forward | 0: Stand | 22.6 | 6.4 | forward; 16.0/16.4 |
+| Ragnaros | tech-back | 0: Stand | 22.6 | 6.4 | back; 16.4/16.0 |
+| Ragnaros | get-up | 8: Stand Ready | 22.7 | 6.3 | up; 22.2/12.3 |
+| Ragnaros | get-up-forward | 0: Stand | 22.6 | 6.4 | forward; 16.0/16.4 |
+| Ragnaros | get-up-back | 0: Stand | 22.6 | 6.4 | back; 16.4/16.0 |
+| Ragnaros | get-up-attack | 4: Attack - 2 | 199.5 | 66.9 | both; 103.5/196.6 |
+| Ragnaros | ledge-get-up | 2: Walk | 105.7 | 41.1 | up; 50.9/61.6 |
+| Ragnaros | ledge-roll | 2: Walk | 105.6 | 41.2 | forward; 63.6/97.7 |
+| Ragnaros | ledge-attack | 3: Attack | 220.7 | 66.1 | both; 129.6/220.5 |
+| Alchemist | walk | 4: Walk 1 | 114.4 | 31.2 | forward; 107.5/108.9 |
+| Alchemist | dash | 4: Walk 1 | 100.6 | 29.9 | forward; 91.9/93.0 |
+| Alchemist | run | 4: Walk 1 | 98.1 | 38.0 | forward; 82.8/57.1 |
+| Alchemist | turn | 4: Walk 1 | 58.1 | 20.6 | back; 29.5/54.8 |
+| Alchemist | brake | 4: Walk 1 | 66.1 | 22.8 | in place; 60.9/37.5 |
+| Alchemist | jump-squat | 0: Stand | 0.0 | 0.0 | down; 0.0/0.0 |
+| Alchemist | roll-forward | 4: Walk 1 | 114.4 | 31.1 | forward; 107.0/108.7 |
+| Alchemist | roll-back | 4: Walk 1 | 114.4 | 31.1 | back; 108.7/107.0 |
+| Alchemist | spot-dodge | 2: Stand 3 | 86.2 | 29.2 | in place; 85.9/31.4 |
+| Alchemist | air-dodge | 2: Stand 3 | 86.2 | 29.3 | in place; 85.9/31.4 |
+| Alchemist | tech | 0: Stand | 10.8 | 5.3 | in place; 3.7/3.2 |
+| Alchemist | tech-forward | 0: Stand | 11.0 | 5.3 | forward; 3.7/3.4 |
+| Alchemist | tech-back | 0: Stand | 11.0 | 5.3 | back; 3.4/3.7 |
+| Alchemist | get-up | 2: Stand 3 | 86.3 | 29.2 | up; 29.7/56.7 |
+| Alchemist | get-up-forward | 0: Stand | 11.0 | 5.3 | forward; 3.7/3.8 |
+| Alchemist | get-up-back | 0: Stand | 11.0 | 5.3 | back; 3.8/3.7 |
+| Alchemist | get-up-attack | 5: attack one - 2 NEW | 132.2 | 53.0 | both; 94.5/132.2 |
+| Alchemist | ledge-get-up | 4: Walk 1 | 112.9 | 31.1 | up; 58.6/52.2 |
+| Alchemist | ledge-roll | 4: Walk 1 | 114.2 | 31.2 | forward; 107.3/108.7 |
+| Alchemist | ledge-attack | 3: attack one -1 NEW | 140.2 | 38.2 | both; 73.2/135.7 |
 | Onyxia | walk | 6: Walk | 64.1 | 35.7 | forward; 58.2/63.6 |
 | Onyxia | dash | 6: Walk | 61.6 | 34.9 | forward; 58.2/61.3 |
 | Onyxia | run | 6: Walk | 56.9 | 26.6 | forward; 51.9/56.8 |

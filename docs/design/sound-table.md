@@ -344,7 +344,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Hook Swing | AxeMissileLaunch | AxeMissileHit | AxeMissileHit + RelentlessCleave | MetalMediumChopMetal |  |
 | Down special: Rot | Cannibalize | Cannibalize | Cannibalize + RelentlessCleave | MetalMediumChopMetal |  |
 
-## Akama (WIP)
+## Akama
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
@@ -356,12 +356,12 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up special: Shadow Step |  | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 | Down special: Burst |  | MetalMediumSliceFlesh | MetalMediumSliceFlesh + CriticalStrike | MetalMediumSliceMetal |  |
 
-## Ragnaros (WIP)
+## Ragnaros
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
 
-## Alchemist (WIP)
+## Alchemist
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
