@@ -25,9 +25,14 @@ const builds = join(inputsRoot, "play-current");
 const locks = join(inputsRoot, "locks");
 const playProblem = (cause: unknown) => new PlayProblem({ problem: String(cause) });
 
+export const KILLED_HINT = "the build process was killed by a signal";
+
+const killedBySignal = (detail: string) => /\bexited (130|137|143)\b/.test(detail);
+
 export const preparationFailure = (program: string, detail: string) => {
   const hint = detail.split("\n").find((line) => line.includes(FETCH_HINT));
-  return playProblem(new Error(`${program} failed while preparing the current build${hint === undefined ? "" : `: ${hint.trim()}`}`));
+  const reason = hint !== undefined ? `: ${hint.trim()}` : killedBySignal(detail) ? `: ${KILLED_HINT}` : "";
+  return playProblem(new Error(`${program} failed while preparing the current build${reason}`));
 };
 
 const run = (cwd: string, [program = "", ...args]: readonly string[]) =>

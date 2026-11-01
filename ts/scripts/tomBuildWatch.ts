@@ -10,7 +10,7 @@ import { FETCH_HINT } from "./wisp/buildInputs";
 import { type LandingDecision, TOM_EDITION, buildLabel, costPrediction } from "./wisp/greenBuilds";
 import { writePlaytestChecklist } from "./wisp/playtestChecklist";
 import { startWindowLibrary } from "./wisp/windowLibrary";
-import { type BuildStage, currentPlaytest } from "./wisp/currentPlaytest";
+import { type BuildStage, KILLED_HINT, currentPlaytest } from "./wisp/currentPlaytest";
 import { installLatest, library, pendingTidy, tidyLibrary } from "./wisp/mapLibrary";
 import { PLAYTEST_PREFIX, projectRoot, tsDirectory } from "./wisp/project";
 import { clientHold, liveClients } from "./wisp/runningGames";
@@ -136,6 +136,10 @@ const logged = (text: string) => Effect.sync(() => {
 
 export const missingInputs = ({ problem }: PlayProblem) => problem.includes(FETCH_HINT);
 
+export const killed = ({ problem }: PlayProblem) => problem.includes(KILLED_HINT);
+
+const retryable = (problem: PlayProblem) => missingInputs(problem) || killed(problem);
+
 const builtWithInputs = <R>(steps: WatchSteps<R>, sha: string) => Effect.gen(function*() {
   const started = yield* Clock.currentTimeMillis;
   const fetched = yield* steps.fetchInputs.pipe(
@@ -154,9 +158,15 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   if (decision === "wait") return yield* logged(`Waiting on ${sha.slice(0, 7)}: its checks have not finished`);
   yield* append(files.attempts, sha);
   if (decision === "red") return yield* logged(`Skipping ${sha.slice(0, 7)}: its checks failed`);
+  return yield* installed(steps, files, sha, previous).pipe(
+    Effect.onInterrupt(() => forget(files.attempts, sha).pipe(Effect.ignore)),
+  );
+});
+
+const installed = <R>(steps: WatchSteps<R>, files: WatchFiles, sha: string, previous: string | undefined) => Effect.gen(function*() {
   const started = yield* Clock.currentTimeMillis;
   const [built, load] = yield* steps.measured(Effect.all([builtWithInputs(steps, sha), steps.prepareBoot], { concurrency: "unbounded" }).pipe(Effect.map(([built]) => built))).pipe(
-    Effect.tapError((problem) => missingInputs(problem) ? forget(files.attempts, sha) : Effect.void),
+    Effect.tapError((problem) => retryable(problem) ? forget(files.attempts, sha) : Effect.void),
   );
   const booting = yield* Clock.currentTimeMillis;
   const refusal = yield* steps.boot(built);
@@ -168,16 +178,16 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   const held = yield* steps.held;
   if (held !== undefined) console.log(`Installing ${sha.slice(0, 7)} beside the older builds, tidy deferred: ${held}`);
   const copying = yield* Clock.currentTimeMillis;
-  const installed = yield* steps.install(built, held);
+  const copied = yield* steps.install(built, held);
   const finished = yield* Clock.currentTimeMillis;
   const landed = yield* steps.landedAt(sha);
   const onMain = yield* steps.onMain(sha);
   const timing: Timing = { landed, onMain, started, finished, stages: [...built.stages, { name: "boot", millis: booted - booting }, { name: "maps-copy", millis: finished - copying }], load };
-  const line = buildLine(sha, installed, timing);
+  const line = buildLine(sha, copied, timing);
   yield* append(files.log, line);
   yield* steps.windowLibrary(sha);
   yield* steps.budget(sha, timing);
-  yield* steps.notes(installed.version, sha, previous).pipe(
+  yield* steps.notes(copied.version, sha, previous).pipe(
     Effect.tap((path) => Effect.sync(() => console.log(`Playtest checklist ${path}`))),
     Effect.catch(({ problem }) => Effect.sync(() => console.error(`Playtest checklist not written: ${problem}`))),
   );
