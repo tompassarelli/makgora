@@ -1,15 +1,12 @@
 import { f32 } from "wisp/src/sim/f32";
-import type { ChatBox, ChatStyle } from "wisp/src/ui/chatPanel";
+import type { ChatBox, ChatSlot, ChatStyle } from "wisp/src/ui/chatPanel";
 import { FRIZ_QUADRATA_WIDTHS, lighten } from "wisp/src/ui/chatLog";
 import { Phase } from "../lobby/lobbyState";
 import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
 import { slotColor } from "./slotColors";
 import { barTexture } from "../core/selectBarLayout";
 import { CHAT_SLOT } from "../core/selectScreenLayout";
-import { BAR_COLOURS, BAR_SMALL_TEXT, barText } from "./barFrames";
-import { setMenuText } from "./frames";
-import { art } from "./selectionFrames";
-import { type Frame, TextAlignment } from "wisp/game/frames";
+import { BAR_COLOURS, BAR_SMALL_TEXT } from "./barFrames";
 
 export const CHAT_STYLE: ChatStyle = {
   name: "SmashcraftChat",
@@ -27,24 +24,26 @@ export const CHAT_STYLE: ChatStyle = {
   fadeSeconds: f32(3.0),
   colour: slot => lighten(slotColor(slot).rgb, 45),
   ignore: text => text.startsWith("-"),
+  frame: {
+    panelTexture: barTexture("Panel", CHAT_SLOT),
+    title: `${BAR_COLOURS.cream}Chat|r`,
+    titleFontSize: BAR_SMALL_TEXT,
+    titleTexture: "ReplaceableTextures\\TeamColor\\TeamColor03.blp",
+    titleAlpha: 120,
+    barTexture: "ReplaceableTextures\\TeamColor\\TeamColor08.blp",
+    fieldTexture: PANEL_TEXTURE,
+    placeholder: "Type your chat here",
+    placeholderColour: 0x8c95a3,
+  },
 };
 
-const CHAT_PAD = f32(0.008);
-const CHAT_HEADING = { x: f32(CHAT_SLOT.left + CHAT_PAD), y: f32(f32(CHAT_SLOT.bottom + CHAT_SLOT.height) - f32(0.006)), width: f32(CHAT_SLOT.width - f32(2 * CHAT_PAD)), height: f32(0.016) } as const;
-
-/** The select screens' chat lines, inside the chat box under its heading. */
-export const SELECT_CHAT_BOX: ChatBox = { left: CHAT_HEADING.x, bottom: f32(CHAT_SLOT.bottom + CHAT_PAD), width: CHAT_HEADING.width, rows: 13 };
+/** The select screens' framed chat box fills the chat slot at the bottom left, beside the fighter cards, on character and stage select alike. */
+export const SELECT_CHAT_SLOT: ChatSlot = CHAT_SLOT;
 
 export const MATCH_CHAT_BOX: ChatBox = { left: f32(0.02), bottom: f32(0.152), width: f32(0.3), rows: 4 };
 
-/** The chat box at the bottom left of the select screens, drawn even before anyone has written. */
-export function createChatBox(parent: Frame, name: string): void {
-  art(parent, `${name}Panel`, barTexture("Panel", CHAT_SLOT), CHAT_SLOT.left, f32(CHAT_SLOT.bottom + CHAT_SLOT.height), CHAT_SLOT.width, CHAT_SLOT.height);
-  setMenuText(barText(parent, `${name}Heading`, CHAT_HEADING, BAR_SMALL_TEXT, TextAlignment.left), `${BAR_COLOURS.dim}Chat|r`);
-}
-
 /** Where the chat shows; a match starts with it hidden, so lines from the select screens stay out of the fight until someone writes again or opens the history. */
-export function chatBox(phase: Phase, matchLines = true): ChatBox | undefined {
-  if (phase === Phase.characterMenu || phase === Phase.stageMenu) return SELECT_CHAT_BOX;
+export function chatBox(phase: Phase, matchLines = true): ChatBox | ChatSlot | undefined {
+  if (phase === Phase.characterMenu || phase === Phase.stageMenu) return SELECT_CHAT_SLOT;
   return matchLines ? MATCH_CHAT_BOX : undefined;
 }

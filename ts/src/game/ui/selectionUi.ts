@@ -49,7 +49,6 @@ import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { type HandFrames, createHandFrames, destroyHandFrames, presentHand } from "./selectionHandFrames";
 import { type HandPose, HIDDEN_HAND, SelectionHands, handColour } from "./selectionHands";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
-import { createChatBox } from "./nativeChat";
 import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_HEADER_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, nextSelectableCharacter, DEFAULT_FIGHTER } from "../roster/kits";
 import { MOVES_HEADER, movesPage } from "../session/messages";
@@ -195,7 +194,6 @@ export class SelectionPanel {
       this.tileButtons.push(this.clicks.add(button, { kind: "tile", tile: choice }, undefined, "native"));
     }
     this.cards = PARTICIPANT_SLOTS.map(slot => createCard(row, root, suffix, slot, (frame, target) => this.clicks.add(frame, target, undefined, "native")));
-    createChatBox(row, `MeleeChat${suffix}`);
     this.bullseye = art(gameUi(), `MeleeBullseye${suffix}`, "war3mapImported\\SelectionBullseye.tga", 0.0, 0.0, bullseyeSize(grid), bullseyeSize(grid));
     setFrameLevel(this.bullseye, SELECT_LEVELS.hand);
     setFrameVisible(this.bullseye, false);

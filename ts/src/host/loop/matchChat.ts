@@ -1,5 +1,5 @@
 import { CHAT_STYLE, chatBox } from "../../game/ui/nativeChat";
-import type { ChatBox } from "wisp/src/ui/chatPanel";
+import type { ChatBox, ChatSlot } from "wisp/src/ui/chatPanel";
 import { chatText } from "wisp/game/input";
 import { eventPlayer, localPlayer } from "wisp/game/players";
 import type { ShellState } from "./state";
@@ -15,4 +15,4 @@ export function toggleChatHistory(s: ShellState): void {
   if (eventPlayer() === localPlayer()) s.chatHistoryOpen = s.chatHistoryOpen !== true;
 }
 
-export const shellChatBox = (s: Readonly<ShellState>): ChatBox | undefined => chatBox(s.game.phase, s.chatLineSinceMatch !== false || s.chatHistoryOpen === true);
+export const shellChatBox = (s: Readonly<ShellState>): ChatBox | ChatSlot | undefined => chatBox(s.game.phase, s.chatLineSinceMatch !== false || s.chatHistoryOpen === true);

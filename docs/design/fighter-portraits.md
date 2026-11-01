@@ -403,9 +403,11 @@ asked (2026-11-02, from a wireframe) for everything centred, the cards packed
 together and chat as a box at the bottom left with the cards right after it.
 The bottom row is now the chat slot, `CHAT_SLOT` (left, bottom, width and
 height, as tall as the cards), then the four cards one small gap apart ending
-at the right edge. The chat component draws in that slot; until Wisp's window
-chat lands the slot shows a framed box headed Chat with the chat lines inside
-it. A larger grid also gives every tile name room, so Mrgl & Grgl's tile reads
+at the right edge. Wisp's chat panel draws its framed box in that slot on
+character and stage select (wisp:docs/chat.md): the panel art, a Chat title
+bar, the chat lines newest at the bottom beside a scrollbar and, in the native
+window only, the typing line along the bottom; in Warcraft the box only shows
+what players type in the Enter box. A larger grid also gives every tile name room, so Mrgl & Grgl's tile reads
 with spaces like its card. Stage select uses the same frame: the same bar
 band and boxes, its preview and stage list as two equal boxes in the body,
 and this bottom row, which stays up from fighter select through stage select
