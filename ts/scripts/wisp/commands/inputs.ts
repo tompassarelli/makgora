@@ -66,7 +66,7 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
   if (rules.length > 0) console.log(`regenerated ${rules.join(", ")}`);
   const { manifest, assets, plans: planned } = yield* planFighters(names, rebuild);
   const { plans, differing } = yield* withStepLocks(planned, rebuild, (plans) => Effect.gen(function*() {
-    const steps = plans.reduce((sum, plan) => sum + plan.keys.length - plan.cached, 0);
+    const steps = plans.reduce((sum, plan) => sum + plan.steps - plan.cached, 0);
     const admission = deriveAdmission(plans);
     console.log(`${plans.length} fighters: ${steps} steps to run, ${plans.reduce((sum, plan) => sum + plan.cached, 0)} reused`);
     if (admission !== undefined) yield* Effect.promise(() => runAdmitted(admission.class, "smashcraft:inputs-derive", DERIVE_LEASE_SECONDS));

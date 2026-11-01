@@ -9,7 +9,7 @@ import { pruneWhiteTextures } from "../whiteImports";
 import { ASSET_FAMILIES, FETCH_HINT, type Family, INPUTS_STORE, type Manifest, type Pin, assetsView, listFiles, mergeShards, publish, readManifest, removeTree, seal, storeShards, unstoredPins, writeShardPins } from "./buildInputs";
 import { reforgedStorage } from "./renderAssetStore";
 import { STEP_TOOLS, type StepName, stepCode } from "./fighterArtCode";
-import { cachedSteps, sha256, stepKeys } from "./fighterArtPlan";
+import { IMPORTED_FAMILY, type StepKeyInputs, chainSteps, importedReads, sha256, stepKey } from "./fighterArtPlan";
 import { tryLock } from "./fileLock";
 import { SHARED_SHARD, shardFiles } from "./inputShards";
 import { MODEL_FACTS_DIRECTORY, modelFactsFile, writeGenerated } from "./modelFactsTable";
@@ -89,9 +89,19 @@ const copyTree = (from: string, to: string) => {
   for (const path of listFiles(from)) copyFile(join(from, path), join(to, path));
 };
 
-function saveStep(fighter: Fighter, step: Step, key: string, work: Work): void {
+const DIGEST = "digest";
+
+const treeDigest = (root: string) => sha256(...listFiles(root).flatMap((path) => [path, readFileSync(join(root, path))]));
+
+const storedOutput = (index: number, key: string): string | undefined => {
+  const digest = join(DERIVED_STORE, STEPS[index]!.name, key, DIGEST);
+  return existsSync(digest) ? readFileSync(digest, "utf8").trim() : undefined;
+};
+
+function saveStep(fighter: Fighter, step: Step, key: string, work: Work): string {
   const final = join(DERIVED_STORE, step.name, key);
-  if (existsSync(final)) return;
+  if (existsSync(join(final, DIGEST))) return readFileSync(join(final, DIGEST), "utf8").trim();
+  removeTree(final);
   mkdirSync(dirname(final), { recursive: true });
   const staging = mkdtempSync(join(dirname(final), ".add-"));
   copyTree(work[step.output], join(staging, "output"));
@@ -99,8 +109,11 @@ function saveStep(fighter: Fighter, step: Step, key: string, work: Work): void {
     mkdirSync(dirname(join(staging, "checkout", path)), { recursive: true });
     copyFileSync(join(work.checkout, path), join(staging, "checkout", path));
   }
+  const digest = treeDigest(staging);
+  writeFileSync(join(staging, DIGEST), `${digest}\n`);
   seal(staging);
   publish(staging, final);
+  return readFileSync(join(final, DIGEST), "utf8").trim();
 }
 
 function restoreStep(fighter: Fighter, step: Step, key: string, work: Work): void {
@@ -137,9 +150,17 @@ const spawnTool = (label: string, tool: string, args: readonly string[], checkou
 const runTool = (fighter: Fighter, step: Step, work: Work) =>
   spawnTool(`${fighter.name} ${step.name}`, step.tool, step.args(fighter, work), work.checkout, join(work.root, `${step.name}.log`));
 
-export interface FighterPlan { readonly fighter: Fighter; readonly keys: readonly string[]; readonly cached: number; readonly sourceBytes: number }
-
-const stepStored = (index: number, key: string) => existsSync(join(DERIVED_STORE, STEPS[index]!.name, key));
+export interface FighterPlan {
+  readonly fighter: Fighter;
+  readonly inputs: StepKeyInputs;
+  readonly imported: readonly string[];
+  readonly rebuild: boolean;
+  readonly keys: readonly string[];
+  readonly outputs: readonly string[];
+  readonly cached: number;
+  readonly steps: number;
+  readonly sourceBytes: number;
+}
 
 const ancestors = (): ReadonlySet<number> => {
   const pids = new Set<number>();
@@ -174,12 +195,12 @@ const withLocks = <A, E, R>(locks: readonly { readonly path: string; readonly wa
 }));
 
 export const withStepLocks = <A, E, R>(plans: readonly FighterPlan[], rebuild: boolean, use: (plans: readonly FighterPlan[]) => Effect.Effect<A, E, R>) => {
-  const locks = plans.flatMap(({ fighter, keys, cached }) => keys.slice(cached).map((key, offset) => {
-    const step = STEPS[cached + offset]!.name;
+  const locks = plans.filter(({ cached, steps }) => cached < steps).map(({ fighter, keys, cached }) => {
+    const step = STEPS[cached]!.name, key = keys[cached]!;
     return { path: join(DERIVED_STORE, ".locks", `${step}-${key}`), waiting: `waiting for another derive running ${fighter.name} ${step} (input hash ${key.slice(0, 12)})` };
-  }));
+  });
   return withLocks(locks, Effect.suspend(() => {
-    const fresh = plans.map((plan) => ({ ...plan, cached: cachedSteps(plan.keys, stepStored, rebuild) }));
+    const fresh = plans.map((plan) => ({ ...plan, ...chainSteps(plan.inputs, storedOutput, rebuild) }));
     for (const [index, plan] of fresh.entries()) for (let step = plans[index]!.cached; step < plan.cached; step++)
       console.log(`${plan.fighter.name} ${STEPS[step]!.name}: cache hit on input hash ${plan.keys[step]!.slice(0, 12)}, stored by another derive`);
     return use(fresh);
@@ -198,14 +219,15 @@ export const planFighters = (names: readonly string[], rebuild: boolean) => Effe
   const chosen = names.length === 0 ? roster : roster.filter((fighter) => names.some((name) => named(fighter, name)));
   const code = STEPS.map((step) => codeDigest(step.tool));
   const stock = yield* Effect.try({ try: () => readFileSync(join(reforgedStorage(), ".build.info")), catch: (cause) => failure("read stock build info", "Warcraft III: Reforged install", cause) });
-  const shared = sha256(stock, JSON.stringify(manifest["imported-models"]));
+  const importedFiles = yield* Effect.try({ try: () => listFiles(join(assets, IMPORTED_FAMILY)), catch: (cause) => failure("list imported models", join(assets, IMPORTED_FAMILY), cause) });
   const plans = yield* Effect.forEach(chosen, (fighter) => Effect.tryPromise({
     try: async () => {
       const bytes = await Bun.file(join(assets, fighter.source)).bytes(), source = sha256(bytes);
-      const rules = readFileSync(join(projectRoot, RULES, `${fighter.slug}.ts`)), external = sha256(shared, ...heroShards(manifest[HERO_MODELS], fighter));
-      const keys = stepKeys({ steps: STEPS.map((step) => step.name), code, fighter: fighter.name, source, external, rules });
-      const cached = cachedSteps(keys, stepStored, rebuild);
-      return { fighter, keys, cached, sourceBytes: bytes.byteLength } satisfies FighterPlan;
+      const rules = readFileSync(join(projectRoot, RULES, `${fighter.slug}.ts`)), imported = importedReads(importedFiles, fighter.source, bytes, rules);
+      const importedHashes = imported.flatMap((file) => [file, sha256(readFileSync(join(assets, IMPORTED_FAMILY, file)))]);
+      const external = sha256(stock, ...importedHashes, ...heroShards(manifest[HERO_MODELS], fighter));
+      const inputs: StepKeyInputs = { steps: STEPS.map((step) => step.name), code, fighter: fighter.name, source, external, rules };
+      return { fighter, inputs, imported, rebuild, ...chainSteps(inputs, storedOutput, rebuild), steps: STEPS.length, sourceBytes: bytes.byteLength } satisfies FighterPlan;
     },
     catch: (cause) => failure("hash fighter source", join(assets, fighter.source), cause),
   }), { concurrency: 8 });
@@ -213,14 +235,16 @@ export const planFighters = (names: readonly string[], rebuild: boolean) => Effe
 });
 
 const buildFighter = (plan: FighterPlan, manifest: Manifest, assets: string, root: string, checkout: string) => Effect.gen(function*() {
-  const { fighter, keys, cached } = plan;
+  const { fighter, keys, cached } = plan, outputs = [...plan.outputs];
   const directory = join(root, fighter.slug);
   const work: Work = { root: directory, checkout, assets: join(directory, "assets"), pool: join(directory, "pool"), impact: join(directory, "impact") };
   yield* Effect.try({
     try: () => {
       for (const path of [work.assets, work.pool, work.impact]) mkdirSync(path, { recursive: true });
-      for (const family of readdirSync(assets)) if (family !== FAMILY.pool && family !== HERO_MODELS) symlinkSync(join(assets, family), join(work.assets, family));
+      for (const family of readdirSync(assets)) if (family !== FAMILY.pool && family !== HERO_MODELS && family !== IMPORTED_FAMILY) symlinkSync(join(assets, family), join(work.assets, family));
       linkHeroModels(manifest[HERO_MODELS], fighter, assets, join(work.assets, HERO_MODELS));
+      mkdirSync(join(work.assets, IMPORTED_FAMILY));
+      for (const file of plan.imported) symlinkSync(join(assets, IMPORTED_FAMILY, file), join(work.assets, IMPORTED_FAMILY, file));
       symlinkSync(work.pool, join(work.assets, FAMILY.pool));
       for (const [index, step] of STEPS.entries()) if (index < cached) restoreStep(fighter, step, keys[index]!, work);
     },
@@ -228,9 +252,16 @@ const buildFighter = (plan: FighterPlan, manifest: Manifest, assets: string, roo
   });
   for (const [index, step] of STEPS.entries()) {
     if (index < cached) continue;
+    const key = stepKey(plan.inputs, index, outputs), stored = plan.rebuild ? undefined : storedOutput(index, key);
+    if (stored !== undefined) {
+      yield* Effect.try({ try: () => restoreStep(fighter, step, key, work), catch: (cause) => failure(`restore ${step.name}`, DERIVED_STORE, cause) });
+      outputs.push(stored);
+      console.log(`${fighter.name} ${step.name}: earlier outputs unchanged, reused ${key.slice(0, 12)}`);
+      continue;
+    }
     const started = performance.now();
     yield* runTool(fighter, step, work);
-    yield* Effect.try({ try: () => saveStep(fighter, step, keys[index]!, work), catch: (cause) => failure(`store ${step.name}`, DERIVED_STORE, cause) });
+    outputs.push(yield* Effect.try({ try: () => saveStep(fighter, step, key, work), catch: (cause) => failure(`store ${step.name}`, DERIVED_STORE, cause) }));
     console.log(`${fighter.name} ${step.name} ${((performance.now() - started) / 1000).toFixed(1)} s`);
   }
   return work;
