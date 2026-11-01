@@ -23,7 +23,6 @@ import { cardPortrait } from "./portraitFrames";
 import { TEAM_NAMES } from "../sim/teams";
 import { slotColor } from "./slotColors";
 import { costumeIndex, costumesFor } from "../roster/costumes";
-import { costumeSystem } from "../roster/costumeSwitch";
 import { MAX_COSTUMES } from "../presentation/model/costume";
 import { paintCostume } from "./costumeTint";
 import { placeTopLeft, setMenuText } from "./frames";
@@ -106,14 +105,14 @@ export function createCard(root: Frame, grid: Frame, suffix: string, slot: numbe
   });
   const dotArea = costumeDotsBox(slot);
   const dotSize = cardSize(COSTUME_DOT);
-  const dots = Array.from({ length: costumeSystem.enabled ? MAX_COSTUMES : 0 }, (_, index) => {
+  const dots = Array.from({ length: MAX_COSTUMES }, (_, index) => {
     const dot = art(root, `MeleeCostumeDot${name}_${formatInt(index)}`, selectionChipTexture(slot, true), f32(dotArea.x + f32(index * f32(dotSize + cardSize(COSTUME_DOT_GAP)))), dotArea.y, dotSize, dotSize);
     setFrameVisible(dot, false);
     return dot;
   });
   const portraitArea = costumePortraitBox(slot);
   const costume = hotspot(root, portraitArea.x, portraitArea.y, portraitArea.width, portraitArea.height);
-  if (costumeSystem.enabled) add(costume, { kind: "costume", slot });
+  add(costume, { kind: "costume", slot });
   const name_ = label(root, `MeleeName${name}`, cardRight(slot, f32(0.008)), cardDown(f32(0.173)), cardSize(f32(0.144)), cardSize(f32(0.019)), cardSize(f32(0.011)));
   const wins = createSessionWinsFrames(root, name, cardRight(slot, f32(0.054)), BOTTOM_BAR_TOP, BAR_TEXT);
   const status = label(root, `MeleeStatus${name}`, cardRight(slot, f32(0.014)), BOTTOM_BAR_TOP, cardSize(f32(0.132)), BAR_HEIGHT, BAR_TEXT);
@@ -180,14 +179,14 @@ export function costumeDotsBox(slot: number) {
 export function pointedCard(game: Readonly<MatchState>, slot: ParticipantSlot, x: number, y: number): CardButton | undefined {
   const active = fighterActive(game, slot);
   if (game.teamBattle && active && boxContains(teamSettingsBox(slot), x, y)) return { kind: "team", slot };
-  if (costumeSystem.enabled && active && boxContains(costumePortraitBox(slot), x, y)) return { kind: "costume", slot };
+  if (active && boxContains(costumePortraitBox(slot), x, y)) return { kind: "costume", slot };
   if (active && !humanFighterActive(game, slot) && boxContains(cpuSettingsBox(slot), x, y)) return { kind: "cpuSettings", slot };
   if (boxContains(modeBox(slot), x, y)) return { kind: "mode", slot };
   return undefined;
 }
 
 export function presentCardCostume(frames: CardFrames, game: Readonly<MatchState>, slot: ParticipantSlot, participantId: number, shown: boolean, choice: number | undefined): void {
-  const costumes = !costumeSystem.enabled || choice === undefined || choice < 0 ? [] : costumesFor(choice);
+  const costumes = choice === undefined || choice < 0 ? [] : costumesFor(choice);
   const chosen = costumeFor(game, slot);
   const tint = costumes[chosen]?.tint;
   paintCostume(frames.portrait, tint);

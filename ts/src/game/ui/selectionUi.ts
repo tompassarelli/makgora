@@ -51,7 +51,6 @@ import { type HandPose, HIDDEN_HAND, SelectionHands, handColour } from "./select
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
 import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_HEADER_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, nextSelectableCharacter, DEFAULT_FIGHTER } from "../roster/kits";
-import { costumeSystem } from "../roster/costumeSwitch";
 import { MOVES_HEADER, movesPage } from "../session/messages";
 import { Character } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
@@ -506,7 +505,6 @@ export class SelectionPanel {
 
   private chooseFocus(game: Readonly<MatchState>, target: MenuFocus, action: Action): boolean {
     if (action === Action.jump) {
-      if (!costumeSystem.enabled) return false;
       this.actions.changeCostume(this.participantId, target.slot, 1);
       return true;
     }

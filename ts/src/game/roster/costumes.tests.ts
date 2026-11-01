@@ -1,8 +1,7 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { copyMatchState, costumeFor, createMatchState, cycleCostume, selectCharacter } from "../lobby/lobbyState";
 import { Character, DuoRole } from "../sim/codes";
-import { bodyCostume, bodyVariants, costumeClipModel, costumeIndex, costumesFor, partnerLook } from "./costumes";
-import { costumeSystem } from "./costumeSwitch";
+import { bodyCostume, bodyVariants, costumeClipModel, costumesFor, partnerLook } from "./costumes";
 import { f32 } from "wisp/src/sim/f32";
 import { PARTNER_COSTUME } from "../presentation/model/costume";
 import { fighterPortrait, portraitCostumes } from "./looks";
@@ -13,44 +12,25 @@ import { costumeBody } from "../../generated/costumes/costumeBodies";
 import { originalClip } from "../../generated/clips/fighterOriginalClipInfo";
 
 test("cycling costumes wraps, stays with its own card, and resets with a new fighter [k2 property]", () => {
-  costumeSystem.enabled = true;
-  try {
-    const game = createMatchState();
-    game.humanMask = 3;
-    game.humanFighterMask = 3;
-    game.computerMask = 0;
-    selectCharacter(game, 0, Character.grom);
-    selectCharacter(game, 1, Character.grom);
-    cycleCostume(game, 0, 0, 1);
-    cycleCostume(game, 0, 0, 1);
-    assertEquals(costumeFor(game, 0), 2);
-    assertEquals(costumeFor(game, 1), 0);
-    cycleCostume(game, 1, 0, 1);
-    assertEquals(costumeFor(game, 0), 2);
-    for (let step = 0; step < 3; step++) cycleCostume(game, 0, 0, -1);
-    assertEquals(costumeFor(game, 0), costumesFor(Character.grom).length - 1);
-    const copy = createMatchState();
-    copyMatchState(copy, game);
-    assertEquals(copy.costumeChoices[0], game.costumeChoices[0]);
-    selectCharacter(game, 0, Character.rifleman);
-    assertEquals(costumeFor(game, 0), 0);
-  } finally {
-    costumeSystem.enabled = false;
-  }
-});
-
-test("with the costume system off, cycling leaves every slot on its fighter's default costume and a chosen index reads as the default [k2 property]", () => {
   const game = createMatchState();
   game.humanMask = 3;
   game.humanFighterMask = 3;
   game.computerMask = 0;
   selectCharacter(game, 0, Character.grom);
+  selectCharacter(game, 1, Character.grom);
   cycleCostume(game, 0, 0, 1);
-  cycleCostume(game, 0, 0, -1);
-  assertEquals(game.costumeChoices[0], 0);
-  game.costumeChoices[0] = 1;
+  cycleCostume(game, 0, 0, 1);
+  assertEquals(costumeFor(game, 0), 2);
+  assertEquals(costumeFor(game, 1), 0);
+  cycleCostume(game, 1, 0, 1);
+  assertEquals(costumeFor(game, 0), 2);
+  for (let step = 0; step < 3; step++) cycleCostume(game, 0, 0, -1);
+  assertEquals(costumeFor(game, 0), costumesFor(Character.grom).length - 1);
+  const copy = createMatchState();
+  copyMatchState(copy, game);
+  assertEquals(copy.costumeChoices[0], game.costumeChoices[0]);
+  selectCharacter(game, 0, Character.rifleman);
   assertEquals(costumeFor(game, 0), 0);
-  assertEquals(costumeIndex(Character.grom, 2), 0);
 });
 
 test("a skinned costume draws its fighter's timeline clips on its own body at the clips' times, and an unskinned one on the shared body [k2 property]", () => {
