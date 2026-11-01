@@ -1,7 +1,7 @@
 # Mrgl & Grgl
 
 The Mrgl & Grgl are a pair: the leader Mrgl, whom the player drives, and his
-partner Grgl, a smaller murloc who copies Mrgl's inputs five frames late, in
+partner Grgl, a murloc of Mrgl's size who copies Mrgl's inputs five frames late, in
 the manner of Melee's Ice Climbers. Tom asked on 2026-10-30 to rework the
 single Murloc into this duo: fast, multi-hit and annoying up close, light and
 easy to kill, and weak once Grgl is down. Later that day he asked for play deep
@@ -37,7 +37,7 @@ draws the Net. No downloaded art or recordings are needed.
 
 History: until the duo rework (2026-10-30) the down special was the Murloc Plaguebearer's [Disease Cloud](https://wowpedia.fandom.com/wiki/Disease_Cloud), a poison pool drawn with private bog-green copies of the stock Plague Cloud models (`MurlocSwampCloud`, `MurlocSwampMist`, #39); the rework cuts it, its cues and that model family.
 
-Grgl uses a different stock Classic murloc creep model at scale 0.9: the one
+Grgl uses a different stock Classic murloc creep model at Mrgl's scale (1.0; it was 0.9 until 2026-11-01): the one
 among `units\creeps\Murloc*` whose bone names match `Murloc.mdl`, so the
 authored clips 9–89 export onto it unchanged, and whose silhouette or colour
 differs at match zoom. If none matches, the clips are retargeted onto the
@@ -67,14 +67,25 @@ are original:
 | Body | Weight | Run | Air | Width | Height |
 | --- | --- | --- | --- | --- | --- |
 | Mrgl | 0.88 | 1.12 | 1.06 | 0.90 | 0.72 |
-| Grgl | 0.80 | 1.12 | 1.06 | 0.81 | 0.648 |
+| Grgl | 0.80 | 1.12 | 1.06 | 0.90 | 0.72 |
 
 Mrgl dropped from 0.94 to 0.88 with the duo; Grgl's hurt capsules and hit
-regions are Mrgl's ×0.9. Both are among the lightest fighters (Lich 0.85,
+regions are Mrgl's (×0.9 until 2026-11-01, see Size). Both are among the lightest fighters (Lich 0.85,
 Warden 0.88, Shadow Hunter 0.94). Height 0.72 puts Mrgl's hurt capsule's top
 at 77 units against the drawn Stand's 76: the shortest body in the cast
-(Rifleman 87, Peon 89) until Grgl. Shared gravity, jumps and dodge timing stay
+(Rifleman 87, Peon 89). Shared gravity, jumps and dodge timing stay
 the roster's.
+
+### Size
+
+Tom decided on 2026-11-01 that Grgl is the same size as Mrgl: in a playtest the
+duo looked like a mistake because one murloc was visibly smaller. Grgl draws at
+model scale 1.0 (`partner.scale` in `fighters/murloc/look.ts`), his hurt
+capsules and hit regions are Mrgl's with no partner scaling (`fighters/murloc/partner.ts`
+holds only weight, damage taken and damage dealt), and every effect scale
+follows the body through `presentation/fighterScale.ts`. His damage stays ×0.75
+and his weight 0.80; the balance read after the change is in the commit that
+landed it.
 
 ## Voice
 
@@ -189,7 +200,7 @@ readable way. While Mrgl holds a grab, Grgl gets neutral controls and cheers.
 
 | Area | Rule |
 |---|---|
-| Body | Character `murloc` with `fighters/murloc/partner.ts` tuning: hurt capsules and hit regions ×0.9, weight 0.80 (Mrgl 0.88), the same run and air speeds; model scale 0.9 |
+| Body | Character `murloc` with `fighters/murloc/partner.ts` tuning: Mrgl's hurt capsules and hit regions, weight 0.80 (Mrgl 0.88), the same run and air speeds; model scale 1.0, effects drawn at it |
 | Hits | Every Grgl hit deals ×0.75 damage with the same knockback formula. One hit per target per attack, per body |
 | Percent | The pair has one percent. Every hit on either body adds to it, and knockback on whichever body is hit reads it. Grgl takes ×1.02 damage and knockback with his own weight kept ([Ice Climbers (SSBU)](https://www.ssbwiki.com/Ice_Climbers_(SSBU)): the partner sustains 1.02× damage and knockback). Grgl does not faint at any percent (decided 2026-10-30 after a playtest of 0.3-dev.349: with a shared percent the old 70% faint had no meaning) |
 | KO | A blast zone KOs Grgl on his own without costing a stock or changing the pair's percent; he returns on a revive at the pair's percent |
@@ -270,7 +281,7 @@ shared percent on 2026-10-30; its text also overlapped the name). The camera fra
 and a separated Grgl near a blast zone gets the off-screen indicator at
 partner size.
 
-At match end and on the results screen Grgl is posed beside Mrgl at his 0.9
+At match end and on the results screen Grgl is posed beside Mrgl at Mrgl's
 scale and plays the same sequence in step: the model's own `murloc victory`
 for a win, its death sequence for a loss (the pair shares the leader's result,
 Tom 2026-10-30). The results placement counts Grgl as a body, so the camera,

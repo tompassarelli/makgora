@@ -67,7 +67,7 @@ test("Grom's default costume is Fel: costume 0 draws the fel body, KO body and f
   }
 });
 
-test("Murloc's partner look draws Grgl on his own timeline body at 0.9 scale, the leader on the shared one, and the KO pool holds both [k2 property]", () => {
+test("Murloc's partner look draws Grgl on his own timeline body at the leader's scale, the leader on the shared one, and the KO pool holds both [k2 property]", () => {
   const clip = originalClip(Character.murloc, 0);
   const partner = partnerLook(Character.murloc, DuoRole.partner);
   if (clip === undefined || partner === undefined) throw new Error("Murloc needs a timeline clip and a partner look");
@@ -76,7 +76,7 @@ test("Murloc's partner look draws Grgl on his own timeline body at 0.9 scale, th
   assertEquals(costumeClipModel(Character.murloc, PARTNER_COSTUME, clip), body);
   assertEquals(costumeClipModel(Character.murloc, 0, clip), costumeBody(Character.murloc, 0));
   assertTrue(costumeClipModel(Character.murloc, 0, clip) !== body);
-  assertEquals(partner.scale, f32(0.9));
+  assertEquals(partner.scale, f32(1.0));
   assertEquals(partnerLook(Character.murloc, DuoRole.leader), undefined);
   assertEquals(bodyVariants([Character.murloc]).map(variant => variant.costume).join(","), `0,${PARTNER_COSTUME}`);
 });

@@ -7,9 +7,9 @@ import { adaptInput } from "../../match/inputAdapter";
 import { initializeMatchFighters, stepMatch } from "../../match/step";
 import { observeDamageContacts } from "../../sim/contacts";
 import { createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
-import { AttackStyle, Character } from "../../sim/codes";
+import { AttackStyle, Character, LAST_ATTACK_STYLE } from "../../sim/codes";
 import { createFighter } from "../../sim/fighter";
-import { fighterHurtboxes } from "../../sim/hurtboxes";
+import { fighterHurtboxes, type HurtPart } from "../../sim/hurtboxes";
 import { createRoster, fighterAt } from "../../sim/roster";
 import { MURLOC_MOVES } from "./moves";
 
@@ -87,10 +87,30 @@ test("A solo Mrgl's forward tilt deals 0.9 of the authored damage [k3 measure do
   assertEquals(solo[0], f32(TILT_DAMAGE * f32(0.9)));
 });
 
-test("Grgl's stand capsule is 0.9 of Mrgl's height, and the pair weigh 66 and 60 [k3 measure docs/design/murloc.md]", () => {
+const partsKey = (parts: readonly HurtPart[]): string => parts.map(part => [part.x1, part.z1, part.x2, part.z2, part.radius].join(",")).join(";");
+
+function footprint(state: ReplayState, slot: number): string {
+  const fighter = fighterAt(state.world, slot);
+  const moves = fighter.tuning.moves;
+  const boxes = fighterHurtboxes(fighter);
+  const keys: string[] = [partsKey(boxes.stand), partsKey(boxes.crouch ?? [])];
+  for (let style = 0; style <= LAST_ATTACK_STYLE; style++) {
+    for (const pose of boxes.attacks[style] ?? []) keys.push(`${style}:${pose.firstFrame}-${pose.lastFrame}:${partsKey(pose.parts)}`);
+    for (const region of moves?.normals[style]?.regions ?? []) {
+      const { hit } = region;
+      const strike = hit.strike;
+      keys.push(`${style}:${region.firstFrame}-${region.lastFrame}:${[hit.minX, hit.maxX, hit.minZ, hit.maxZ].join(",")}:${strike === undefined ? "" : [strike.x1, strike.z1, strike.x2, strike.z2, strike.radius].join(",")}`);
+    }
+  }
+  const grab = moves?.grabRegion;
+  keys.push(grab === undefined ? "" : [grab.minX, grab.maxX, grab.minZ, grab.maxZ].join(","));
+  return keys.join("|");
+}
+
+test("Grgl's stand capsule height, hurt capsules, hit regions and grab region equal Mrgl's, and the pair weigh 66 and 60 [k3 measure docs/design/murloc.md]", () => {
   const state = seat([Character.murloc, Character.peon], [0.0, 50.0]);
-  const mrgl = standHeight(state, LEADER);
-  assertTrue(Math.abs(standHeight(state, PARTNER) - f32(0.9) * mrgl) < f32(0.001));
+  assertEquals(standHeight(state, PARTNER), standHeight(state, LEADER));
+  assertEquals(footprint(state, PARTNER), footprint(state, LEADER));
   const leader = fighterAt(state.world, LEADER).tuning.physics;
   const partner = fighterAt(state.world, PARTNER).tuning.physics;
   assertEquals(leader.weight, f32(75.0 * f32(0.88)), "Mrgl weighs 0.88");
