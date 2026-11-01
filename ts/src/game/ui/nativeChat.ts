@@ -6,7 +6,6 @@ import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
 import { slotColor } from "./slotColors";
 import { barTexture } from "../core/selectBarLayout";
 import { CHAT_SLOT } from "../core/selectScreenLayout";
-import { BAR_COLOURS, BAR_SMALL_TEXT } from "./barFrames";
 
 export const CHAT_STYLE: ChatStyle = {
   name: "SmashcraftChat",
@@ -26,10 +25,6 @@ export const CHAT_STYLE: ChatStyle = {
   ignore: text => text.startsWith("-"),
   frame: {
     panelTexture: barTexture("Panel", CHAT_SLOT),
-    title: `${BAR_COLOURS.cream}Chat|r`,
-    titleFontSize: BAR_SMALL_TEXT,
-    titleTexture: "ReplaceableTextures\\TeamColor\\TeamColor03.blp",
-    titleAlpha: 120,
     barTexture: "ReplaceableTextures\\TeamColor\\TeamColor08.blp",
     fieldTexture: PANEL_TEXTURE,
     placeholder: "Type your chat here",

@@ -61,3 +61,8 @@ test("the chat panel leaves out commands, whose lines never show in it [k2 prope
   assertTrue(CHAT_STYLE.ignore("-help"));
   assertEquals(CHAT_STYLE.ignore("gg"), false);
 });
+
+test("the select screens' framed chat box has no title bar, so the lines use the space a header would take [k1 scenario]", () => {
+  assertTrue(CHAT_STYLE.frame !== undefined);
+  assertEquals(CHAT_STYLE.frame?.title, undefined);
+});
