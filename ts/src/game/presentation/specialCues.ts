@@ -48,7 +48,7 @@ import { QUICKDRAW_DRAW_CUES, QUICKDRAW_STANCE_CUES } from "./quickdrawCues";
 import { SHADOW_STEP_CUES } from "./shadowStepCues";
 import { SHURIKEN_CHARGE_CUES } from "./shurikenCues";
 import { slotCues } from "./slotCues";
-import { ghostWolfCueState } from "./ghostWolfCues";
+import { GHOST_WOLF_CUES, ghostWolfCueState } from "./ghostWolfCues";
 import { BANISH_SWIRL_MODEL } from "../fighters/kaelthas/look";
 import { WYRM_RIDE, WYRM_SUMMON_FRAMES } from "../fighters/lich-king/specials";
 import { RISING_THUNDER_CUES } from "../fighters/thrall/cues";
@@ -647,7 +647,7 @@ export function fighterMoveCues(character: Character): readonly MoveCues[] {
 
 
 export function fighterCueList(character: Character): readonly Cue[] {
-  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.sylvanas ? [BANSHEE_FORM] : []), ...peonExtraCues(character)].flatMap((cues) => [cues.startup, cues.active]);
+  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.sylvanas ? [BANSHEE_FORM] : []), ...(character === Character.thrall ? GHOST_WOLF_CUES : []), ...peonExtraCues(character)].flatMap((cues) => [cues.startup, cues.active]);
 }
 
 

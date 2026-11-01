@@ -10,7 +10,8 @@ export const DOWN_FORWARD: StickMotion = { window: 1, steps: [{ x: 1, z: -1 }] }
 export const WolfForm = { spirit: 0, timber: 1, dire: 2 } as const;
 export type WolfForm = (typeof WolfForm)[keyof typeof WolfForm];
 
-export const SPIRIT_WOLF_MODEL = "units\\orc\\SpiritWolf\\SpiritWolf.mdx";
+export const GHOST_WOLF_MODEL = "units\\orc\\SpiritWolf\\SpiritWolf.mdx";
+export const SPIRIT_WOLF_MODEL = "units\\creeps\\WhiteWolf\\WhiteWolf.mdx";
 export const TIMBER_WOLF_MODEL = "units\\creeps\\TimberWolf\\TimberWolf.mdx";
 export const DIRE_WOLF_MODEL = "units\\creeps\\DireWolf\\DireWolf.mdx";
 

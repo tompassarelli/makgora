@@ -147,9 +147,12 @@ for the change on 28 October 2026). The map imports the model as
 `war3mapImported\WarchiefThrallDismountedV2.mdx`; smashcraft:tools/animations/thrall-clips.ts
 authors every Smashcraft clip on its full biped and keeps its 31 stock
 sequences. Far Seer lightning and earthquake effects and shared Warcraft impact sounds
-stay. The wolves are stock Warcraft III models only: the Spirit Wolf is the
-stock Feral Spirit wolf (`units\orc\SpiritWolf\SpiritWolf.mdx`) drawn
-translucent and tinted toward white; the Timber Wolves are the stock brown
+stay. The wolves are stock Warcraft III models only. The Spirit Wolf is the stock
+White Wolf (`units\creeps\WhiteWolf\WhiteWolf.mdx`), drawn translucent
+(alpha 140) with a faint cold tint. Tom asked for a white tint of the stock
+Feral Spirit wolf, but that model's texture is dark, and a tint only multiplies,
+so it cannot lighten the wolf to white; the stock White Wolf is the nearest
+stock white wolf, and the translucency gives the ghostly read. the Timber Wolves are the stock brown
 Timber Wolf (`units\creeps\TimberWolf\TimberWolf.mdx`); the Dire Wolf is
 the stock black Dire Wolf (`units\creeps\DireWolf\DireWolf.mdx`). Each plays
 its stock Walk sequence at its ground speed over the sequence's own 260 units a

@@ -137,9 +137,9 @@ export function allProjectileModels(): readonly string[] {
 export const STOCK_WOLF_STRIDE = 260.0;
 
 export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale: number; readonly birth?: CueBirth | undefined; readonly color?: readonly [number, number, number] | undefined; readonly alpha?: number | undefined; readonly stride?: number | undefined } | undefined } = {
-  [SPIRIT_WOLF_MODEL]: { scale: f32(0.62), color: [255, 255, 235], alpha: 150, stride: STOCK_WOLF_STRIDE },
-  [TIMBER_WOLF_MODEL]: { scale: f32(0.62), stride: STOCK_WOLF_STRIDE },
-  [DIRE_WOLF_MODEL]: { scale: f32(0.7), stride: STOCK_WOLF_STRIDE },
+  [SPIRIT_WOLF_MODEL]: { scale: f32(0.9), color: [235, 245, 255], alpha: 140, stride: STOCK_WOLF_STRIDE },
+  [TIMBER_WOLF_MODEL]: { scale: f32(0.55), stride: STOCK_WOLF_STRIDE },
+  [DIRE_WOLF_MODEL]: { scale: f32(0.65), stride: STOCK_WOLF_STRIDE },
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { scale: f32(0.16) },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { scale: f32(1.2) },
   "Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx": { scale: 1.5 },
