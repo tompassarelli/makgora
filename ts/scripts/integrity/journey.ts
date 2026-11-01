@@ -5,7 +5,8 @@
 
 
 import { Context, Effect } from "effect";
-import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
+import { RULE_BUTTONS, type RuleName, rulePanel } from "../../src/game/ui/ruleButtons";
+import { type BarBox, SELECT_BAR } from "../../src/game/core/selectBarLayout";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { Character } from "../../src/game/sim/codes";
 import { fighterKey } from "../../src/game/roster/kits";
@@ -152,7 +153,10 @@ const SELECTION_HELP: Region = { x: 350, y: 1000, width: 1850, height: 400 };
 
 const STAGE_NAME: Region = { x: 420, y: 965, width: 900, height: 110 };
 const SKY_DECK = /Sky Deck/i;
-const REMATCH_SETTING: Region = { x: 390, y: 655, width: 555, height: 90 };
+// The integrity window draws Warcraft's 4:3 area 2400 pixels per UI unit, 320 pixels from its left edge.
+const screenPoint = (box: BarBox) => [Math.round(320 + 2400 * (box.x + box.width / 2)), Math.round(1440 - 2400 * (box.y - box.height / 2))] as const;
+const screenRegion = (box: BarBox): Region => ({ x: Math.round(320 + 2400 * box.x), y: Math.round(1440 - 2400 * box.y), width: Math.round(2400 * box.width), height: Math.round(2400 * box.height) });
+const REMATCH_SETTING = screenRegion(RULE_BUTTONS.automaticRematch);
 const RESULTS = /wins|rematch/i;
 
 
@@ -582,10 +586,12 @@ function ruleSteps(context: SetupSteps) {
   });
 
 
-  const clickRule = Effect.fnUntraced(function*(name: keyof typeof RULE_BUTTONS) {
-    const box = RULE_BUTTONS[name];
+  const clickRule = Effect.fnUntraced(function*(name: RuleName) {
+    const panel = rulePanel(name);
     yield* rig.click(1, 250, 900);
-    yield* rig.click(1, Math.round(320 + 2400 * (box.x + box.width / 2)), Math.round(1440 - 2400 * (box.y - box.height / 2)));
+    if (panel !== undefined) yield* rig.click(1, ...screenPoint(SELECT_BAR[panel]));
+    yield* rig.click(1, ...screenPoint(RULE_BUTTONS[name]));
+    if (panel !== undefined) yield* rig.click(1, ...screenPoint(SELECT_BAR[panel]));
   });
 
 
@@ -605,7 +611,7 @@ function ruleSteps(context: SetupSteps) {
 
   const oneMinute = Effect.gen(function*() {
     if (commands) return yield* command("-dev time 1", { minutes: 1 });
-    const text = yield* rig.waitText(1, /(?:[0-9]+:00|No time limit)/i);
+    const text = yield* rig.waitText(1, /(?:[0-9]+:00|No timer)/i);
     const shown = /([0-9]+):00/.exec(text)?.[1];
     let minutes = shown === undefined ? 0 : Number(shown);
     if (minutes > 10) return yield* failed("read match time", text);
@@ -892,9 +898,15 @@ export function journey(rig: RigShape, options: JourneyOptions) {
       yield* command("-dev auto-rematch on", { "automatic-rematch": 1 });
       yield* devCommand(firstEpoch, "-dev rematch 20", { rematchSeconds: 20 });
     } else if (bot) {
+      const drawer = (client: Slot) => rig.click(client, ...screenPoint(SELECT_BAR.rules));
+      yield* drawer(1);
       const rematch = yield* rig.readText(1, REMATCH_SETTING);
-      if (!/Automatic rematch: On/i.test(rematch)) yield* clickRule("automaticRematch");
-      yield* both(client => rig.waitText(client, /Automatic rematch: On/i, REMATCH_SETTING));
+      if (!/Automatic rematch: On/i.test(rematch)) yield* rig.click(1, ...screenPoint(RULE_BUTTONS.automaticRematch));
+      yield* rig.waitText(1, /Automatic rematch: On/i, REMATCH_SETTING);
+      yield* drawer(1);
+      yield* drawer(0);
+      yield* rig.waitText(0, /Automatic rematch: On/i, REMATCH_SETTING);
+      yield* drawer(0);
     }
 
 

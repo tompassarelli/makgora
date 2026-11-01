@@ -12,7 +12,6 @@ import { type MatchState, humanCount } from "../lobby/lobbyState";
 import { LESSONS, lessonChoiceText } from "../match/tutorial";
 import { MENU_FONT } from "./hudLayout";
 import { type ClickBox, createBackdrop, createText, placeTopLeft, styleMenuPanel } from "./frames";
-import { TUTORIAL_BOX } from "./selectionLayout";
 import type { SelectionActions } from "./selectionActions";
 import { createFrame, Frame, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { sendSync } from "wisp/game/sync";
@@ -27,8 +26,6 @@ export const NOT_NOW_BOX = { x: f32(0.41), y: f32(0.315), width: f32(0.16), heig
 export interface TutorialMenuFrames {
   readonly root: Frame;
   readonly lesson: Frame;
-
-  readonly open: Frame;
 }
 
 function text(parent: Frame, name: string, x: number, y: number, width: number, height: number, size: number): Frame {
@@ -50,7 +47,7 @@ function button(parent: Frame, x: number, y: number, width: number, height: numb
 }
 
 
-export function createTutorialMenu(owner: Frame, rules: Frame, suffix: string, add: (frame: Frame, target: TutorialButton, box: ClickBox) => Frame): TutorialMenuFrames {
+export function createTutorialMenu(owner: Frame, suffix: string, add: (frame: Frame, target: TutorialButton, box: ClickBox) => Frame): TutorialMenuFrames {
   const root = createBackdrop(`MeleeTutorialMenu${suffix}`, owner, 0);
   styleMenuPanel(root, `MeleeTutorialPanel${suffix}`);
   placeTopLeft(root, f32(0.2), f32(0.47));
@@ -65,8 +62,7 @@ export function createTutorialMenu(owner: Frame, rules: Frame, suffix: string, a
   button(root, f32(0.23), f32(0.315), f32(0.16), f32(0.035), "Start tutorial", { kind: "tutorialStart" }, add);
   button(root, NOT_NOW_BOX.x, NOT_NOW_BOX.y, NOT_NOW_BOX.width, NOT_NOW_BOX.height, NOT_NOW_LABEL, { kind: "tutorialClose" }, add);
   setFrameVisible(root, false);
-  const open = button(rules, TUTORIAL_BOX.x, TUTORIAL_BOX.y, TUTORIAL_BOX.width, TUTORIAL_BOX.height, "Tutorial", { kind: "tutorialOpen" }, add);
-  return { root, lesson, open };
+  return { root, lesson };
 }
 
 export function tutorialKeyButton(action: Action): TutorialButton | undefined {

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="WIDTH" height="HEIGHT" viewBox="0 0 WIDTH HEIGHT">
+ <defs><linearGradient id="f" x2="0" y2="1"><stop stop-color="FILL_TOP"/><stop offset="1" stop-color="FILL_BOTTOM"/></linearGradient><linearGradient id="e" x2="0" y2="1"><stop stop-color="EDGE_TOP"/><stop offset="1" stop-color="EDGE_BOTTOM"/></linearGradient></defs>
+ <path d="OUTER_PATH" fill="url(#f)" fill-opacity="FILL_OPACITY" stroke="url(#e)" stroke-width="STROKE"/>
+ <path d="INNER_PATH" fill="none" stroke="INNER_COLOR" stroke-opacity="INNER_OPACITY" stroke-width="1.2"/>
+</svg>

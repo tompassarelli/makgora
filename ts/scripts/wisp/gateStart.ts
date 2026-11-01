@@ -18,7 +18,7 @@ import { JournalMenu } from "./boundary";
 import { currentHelper } from "./currentPlaytest";
 import { reachFighterSelect } from "./gateIntro";
 import { loadStockCursor, locateStockCursor } from "./stockCursor";
-import { START_BUTTON } from "../../src/game/ui/selectionLayout";
+import { STAGE_START_BUTTON } from "../../src/game/ui/selectionLayout";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
@@ -53,7 +53,7 @@ export const measureStartGate = (clientsFile: string, name: string, directory: s
   if (assetClient === undefined) return yield* new AcceptFailure({ operation: "start gate cursor assets", problem: `no selected client ${name}` });
   const cursor = yield* loadStockCursor(assetClient.documents, directory, "start gate cursor assets");
   const locate = (frame: Frame) => locateStockCursor(cursor, frame);
-  const offButton = (observed: { readonly x: number; readonly y: number }) => observed.x < START_BUTTON.x || observed.x > START_BUTTON.x + START_BUTTON.width || observed.y > START_BUTTON.y || observed.y < START_BUTTON.y - START_BUTTON.height;
+  const offButton = (observed: { readonly x: number; readonly y: number }) => observed.x < STAGE_START_BUTTON.x || observed.x > STAGE_START_BUTTON.x + STAGE_START_BUTTON.width || observed.y > STAGE_START_BUTTON.y || observed.y < STAGE_START_BUTTON.y - STAGE_START_BUTTON.height;
   let negativeControl: { readonly file: string; readonly sha256: string } | undefined;
   const positions = [{ x: 0.03, y: 0.30 }, { x: 0.40, y: 0.56 }, { x: 0.75, y: 0.50 }];
   const samples: { readonly trial: number; readonly selected: { readonly x: number; readonly y: number; readonly pixelX: number; readonly pixelY: number }; readonly offButton: boolean; readonly opened: boolean; readonly started: boolean }[] = [];

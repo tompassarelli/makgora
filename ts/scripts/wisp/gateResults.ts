@@ -19,6 +19,7 @@ import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { ROSTER_TILES, tileOfCharacter } from "../../src/game/ui/selectionFrames";
 import { BUTTON_WIDTH, CHOICE_HEIGHT, CHOICE_TOP, choiceLeft } from "../../src/game/ui/resultsBanner";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
+import { SELECT_BAR } from "../../src/game/core/selectBarLayout";
 import { PICKER_DONE } from "../../src/game/ui/settingsUi";
 import { pollUntil } from "../hostPoll";
 import { runProcess } from "../hostProcess";
@@ -106,13 +107,21 @@ export const dismissFirstRunPanels = (d: Driver, client: Client) => Effect.gen(f
 
 const oneStock = (d: Driver, host: Client) => Effect.gen(function*() {
   const { fewerStocks } = RULE_BUTTONS;
+  const { rules } = SELECT_BAR;
   const fewer = yield* d.at(host, fewerStocks.x + fewerStocks.width / 2, fewerStocks.y - fewerStocks.height / 2);
+  const drawer = yield* d.at(host, rules.x + rules.width / 2, rules.y - rules.height / 2);
+  yield* click(host, drawer.x, drawer.y).pipe(Effect.mapError(fail("results gate rules drawer")));
+  yield* Effect.sleep("400 millis");
   let stocks: number | undefined;
   for (let step = 0; step < STOCK_STEPS; step++) {
     const frame = yield* d.shot(host);
     yield* d.save(`stocks-${step}.ppm`, frame);
     stocks = shownStocks((yield* d.words(host, frame, "gold")).map(word => word.text));
-    if (stocks === 1) return stocks;
+    if (stocks === 1) {
+      yield* click(host, drawer.x, drawer.y).pipe(Effect.mapError(fail("results gate rules drawer")));
+      yield* Effect.sleep("400 millis");
+      return stocks;
+    }
     yield* click(host, fewer.x, fewer.y).pipe(Effect.mapError(fail("results gate stocks")));
     yield* Effect.sleep("400 millis");
   }

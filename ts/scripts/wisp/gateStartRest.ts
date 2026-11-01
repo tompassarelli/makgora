@@ -7,7 +7,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, focus, loadClients, type Region } from "wisp/scripts/warcraft/desktop";
-import { START_BUTTON } from "../../src/game/ui/selectionLayout";
+import { STAGE_START_BUTTON } from "../../src/game/ui/selectionLayout";
 import { pollUntil } from "../hostPoll";
 import { runProcess } from "../hostProcess";
 import { pickFighters, stageSelectFrame } from "./gateStart";
@@ -24,15 +24,15 @@ const SAME_SPOT_PIXELS = 3;
 // A fresh private desktop's Xwayland drops the first XTEST motion.
 const POINTER_MOVE_ATTEMPTS = 3;
 
-const startCentre = { x: START_BUTTON.x + START_BUTTON.width / 2, y: START_BUTTON.y - START_BUTTON.height / 2 };
+const startCentre = { x: STAGE_START_BUTTON.x + STAGE_START_BUTTON.width / 2, y: STAGE_START_BUTTON.y - STAGE_START_BUTTON.height / 2 };
 
-const insideStart = (x: number, y: number) => x >= START_BUTTON.x && x <= START_BUTTON.x + START_BUTTON.width && y <= START_BUTTON.y && y >= START_BUTTON.y - START_BUTTON.height;
+const insideStart = (x: number, y: number) => x >= STAGE_START_BUTTON.x && x <= STAGE_START_BUTTON.x + STAGE_START_BUTTON.width && y <= STAGE_START_BUTTON.y && y >= STAGE_START_BUTTON.y - STAGE_START_BUTTON.height;
 
 const ART_MARGIN = 0.004;
 
 const startPixels = (frame: Frame, cursor: StockCursor, x: number, y: number, margin: number, visit: (px: number, py: number, index: number) => void) => {
-  const origin = pixelPoint(frame, START_BUTTON.x - margin, START_BUTTON.y + margin);
-  const end = pixelPoint(frame, START_BUTTON.x + START_BUTTON.width + margin, START_BUTTON.y - START_BUTTON.height - margin);
+  const origin = pixelPoint(frame, STAGE_START_BUTTON.x - margin, STAGE_START_BUTTON.y + margin);
+  const end = pixelPoint(frame, STAGE_START_BUTTON.x + STAGE_START_BUTTON.width + margin, STAGE_START_BUTTON.y - STAGE_START_BUTTON.height - margin);
   const hand = pixelPoint(frame, x + cursor.left, y + cursor.top);
   const handWidth = Math.round(cursor.width * frame.height / 0.6) + 4;
   const handHeight = Math.round(cursor.height * frame.height / 0.6) + 4;
@@ -126,6 +126,6 @@ export const measureStartRestGate = (clientsFile: string, name: string, director
   const steady = (screen: typeof character) => screen.visible === REST_FRAMES && screen.spread <= BLINK_SPREAD;
   const text = `SMASHCRAFT GATE start-rest frames=${REST_FRAMES} character=${character.visible} stage=${stage.visible} characterSpread=${character.spread.toFixed(1)} stageSpread=${stage.spread.toFixed(1)} autoPlaced=${autoPlaced ? 1 : 0} startDx=${dx} startDy=${dy} pass=${steady(character) && steady(stage) && sameSpot ? 1 : 0}`;
   const modified = yield* Clock.currentTimeMillis;
-  yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, cursorError: CURSOR_ERROR, blinkSpread: BLINK_SPREAD, sameSpotPixels: SAME_SPOT_PIXELS, region, startButton: START_BUTTON, cursor: { modelSha256: cursor.modelSha256, textureSha256: cursor.textureSha256 }, entry, placed, character, stage }, null, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "start rest gate evidence", problem: String(cause) }) });
+  yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, cursorError: CURSOR_ERROR, blinkSpread: BLINK_SPREAD, sameSpotPixels: SAME_SPOT_PIXELS, region, startButton: STAGE_START_BUTTON, cursor: { modelSha256: cursor.modelSha256, textureSha256: cursor.textureSha256 }, entry, placed, character, stage }, null, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "start rest gate evidence", problem: String(cause) }) });
   return { name: "start-rest-gate", text, modified } satisfies ReceiptFile;
 }).pipe(Effect.scoped);

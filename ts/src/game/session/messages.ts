@@ -2,15 +2,16 @@
 import { Advantage, type TrainingState } from "../match/trainingState";
 import { PARTICIPANT_SLOTS, participantActive } from "../input/participants";
 import { floorDiv } from "wisp/src/sim/intMath";
-import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, computerActive, fighterActive, holdingStart, humanFighterActive, humanPresent, practiceSelected } from "../lobby/lobbyState";
-import { DownState, ItemKind, LedgeState } from "../sim/codes";
+import { MATCH_TICKS_PER_SECOND, type MatchMode, Phase, type MatchState, matchMode, computerActive, fighterActive, holdingStart, humanFighterActive, humanPresent, practiceSelected } from "../lobby/lobbyState";
+import { DownState, LedgeState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { SPECIAL_INPUTS, fighterKit, normalName, specialName } from "../sim/moveNames";
 import { fighterName } from "../roster/kits";
 import { classicResultHelp, classicResultMessage, tierName } from "../classic/classicText";
 import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, cpuProfileLabel } from "../match/cpuProfiles";
 import { TEAM_NAMES } from "../sim/teams";
-import { loreBattle, loreResultHelp, loreResultMessage } from "../classic/loreBattles";
+import { LORE_BATTLES, loreBattle, loreResultHelp, loreResultMessage } from "../classic/loreBattles";
+import { partnerBehaviourSetting, stockSetting, timeSetting } from "../ui/ruleText";
 
 
 export type StartControl = "Start" | "Y";
@@ -54,27 +55,8 @@ export function resultNotice(game: Readonly<MatchState>, result: string): string
   return notice;
 }
 
-export const stockSetting = (count: number) => (count === 1 ? "1 Stock" : `${count} Stocks`);
-export const timeSetting = (minutes: number) => (minutes === 0 ? "No time limit" : `${minutes}:00`);
-export const endlessSetting = (endless: boolean) => `Endless play: ${endless ? "On" : "Off"}`;
-export const automaticRematchSetting = (automatic: boolean) => `Automatic rematch: ${automatic ? "On" : "Off"}`;
 export const hazardsSetting = (on: boolean) => `Hazards: ${on ? "On" : "Off"}`;
 export const orbsSetting = (on: boolean) => `Orbs: ${on ? "On" : "Off"}`;
-export const itemsSetting = (on: boolean) => `Items: ${on ? "On" : "Off"}`;
-export const ultimatesSetting = (on: boolean) => `Ultimates: ${on ? "On" : "Off"}`;
-export const itemKindSetting = (kind: ItemKind, on: boolean) => `${kind === ItemKind.speed ? "Speed" : "Heavy"} item: ${on ? "On" : "Off"}`;
-
-
-const BEHAVIOUR_NAMES = ["Stand", "Shield", "Crouch", "Jump", "Attack", "Fight"];
-const ESCAPE_NAMES = ["None", "Toward you", "Away", "Random"];
-const TECH_NAMES = ["None", "In place", "Toward you", "Away", "Random"];
-export const partnerBehaviourSetting = (code: number) => `Partner: ${BEHAVIOUR_NAMES[code] ?? ""}`;
-export const partnerEscapeSetting = (code: number) => `Partner drift: ${ESCAPE_NAMES[code] ?? ""}`;
-export const partnerTechSetting = (code: number) => `Partner tech: ${TECH_NAMES[code] ?? ""}`;
-export const partnerDamageSetting = (damage: number) => `Partner damage: ${damage}%`;
-export const hitAreasSetting = (shown: boolean) => `Hit areas: ${shown ? "On" : "Off"}`;
-export const trainingSpeedSetting = (speed: number) => `Game speed: ${speed === 4 ? "Quarter" : speed === 2 ? "Half" : "Full"}`;
-
 
 export function rulesSummary(game: Readonly<MatchState>): string {
   if (game.classic) return `Classic · starts at ${tierName(game.classicTier)}`;
@@ -86,7 +68,16 @@ export function rulesSummary(game: Readonly<MatchState>): string {
   return game.automaticRematch ? `${matchRules}  ·  Automatic rematch` : matchRules;
 }
 
-const pauseControl = (start: StartControl) => (start === "Start" ? "Start" : "Esc");
+/** The select bar's rules pill: the live rules, short enough for one line. */
+export function rulesPillParts(game: Readonly<MatchState>): readonly string[] {
+  if (game.classic) return ["Classic", tierName(game.classicTier)];
+  if (game.lore) return ["Lore Battle", `${game.loreBattle + 1}/${LORE_BATTLES.length}`];
+  if (game.training) return ["Training", partnerBehaviourSetting(game.trainer.behaviour)];
+  const rules = game.endless ? ["Endless"] : [stockSetting(game.stockCount), game.timeLimitMinutes === 0 ? "No timer" : timeSetting(game.timeLimitMinutes)];
+  return [...rules, ...(game.ultimatesOff ? [] : ["Ultimates"]), ...(game.items.on ? ["Items"] : [])];
+}
+
+const pauseControl =(start: StartControl) => (start === "Start" ? "Start" : "Esc");
 const PLAYING_HELP_START = "Start: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; touch or hit the orb at centre stage to fill it).\nShield then Left/Right: roll; Down: dodge.";
 const PLAYING_HELP_BACKSPACE = "Esc: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nStrong + direction: smash.\nAttack + Special (A + X): Ultimate (full meter; touch or hit the orb at centre stage to fill it).\nShield then Left/Right: roll; Down: dodge.";
 export const pausedMessage = (start: StartControl) => `Paused — press ${pauseControl(start)} to resume.`;
@@ -126,9 +117,8 @@ export function trainingReadout(state: Readonly<TrainingState>): string {
 }
 
 
-export function selectionModeLabel(game: Readonly<MatchState>): string {
-  return game.lore ? "LORE BATTLES" : game.classic ? "CLASSIC" : game.training ? "TRAINING" : "VERSUS";
-}
+export const MODE_LABELS: Readonly<Record<MatchMode, string>> = { versus: "VERSUS", training: "TRAINING", classic: "CLASSIC", lore: "LORE BATTLES" };
+export const selectionModeLabel = (game: Readonly<MatchState>): string => MODE_LABELS[matchMode(game)];
 export const MOVES_HEADER = "MOVES";
 
 

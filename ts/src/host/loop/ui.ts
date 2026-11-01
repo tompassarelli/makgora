@@ -41,7 +41,7 @@ import { MeterBar } from "../../game/ui/meterBar";
 import { meterPlacement } from "../../game/ui/plateLayout";
 import { ButtonClicks, gameUi } from "../../game/ui/frames";
 import { ResultsBanner } from "../../game/ui/resultsBanner";
-import type { SelectionActions } from "../../game/ui/selectionActions";
+import type { SelectText, SelectionActions } from "../../game/ui/selectionActions";
 import { type MenuControlHit, SelectionPanel } from "../../game/ui/selectionUi";
 import { type SettingsActions, SettingsPanel } from "../../game/ui/settingsUi";
 import { type StageActions, StagePanel } from "../../game/ui/stageUi";
@@ -140,6 +140,7 @@ export interface PanelActions {
   readonly selection: SelectionActions;
   readonly stage: StageActions;
   readonly settings: SettingsActions;
+  readonly selectText: SelectText;
 }
 
 export function views(s: Readonly<ShellState>): UiObjects {
@@ -184,7 +185,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     escapeMeters: each(slot => new EscapeMeter(slot)),
     meterBars: each(createMeterBars),
     stage: new StagePanel(actions.stage, controls),
-    selections: each(slot => new SelectionPanel(actions.selection, slot, controls, sourceVersion())),
+    selections: each(slot => new SelectionPanel(actions.selection, actions.selectText, slot, controls, sourceVersion())),
     settings: each(slot => new SettingsPanel(s.participants[slot].bindings, actions.settings, slot)),
     combat: combat = new CombatEffects(s.origin),
     criticals: new CriticalStrikeText(s.origin),
@@ -333,8 +334,8 @@ function rebindSlotPanels(s: ShellState, ui: UiObjects, actions: PanelActions, s
   bindPrototype(ui.selections[slot], SelectionPanel.prototype);
   if (!ui.selections[slot].hasCpuSettingsFrames()) {
     ui.selections[slot].destroy();
-    ui.selections[slot] = new SelectionPanel(actions.selection, slot, menuControls(s), sourceVersion());
-  } else ui.selections[slot].bindActions(actions.selection);
+    ui.selections[slot] = new SelectionPanel(actions.selection, actions.selectText, slot, menuControls(s), sourceVersion());
+  } else ui.selections[slot].bindActions(actions.selection, actions.selectText);
   bindPrototype(ui.settings[slot], SettingsPanel.prototype);
   const retainedSettings: { readonly root?: Frame } = ui.settings[slot];
   if (retainedSettings.root === undefined) ui.settings[slot] = new SettingsPanel(s.participants[slot].bindings, actions.settings, slot);

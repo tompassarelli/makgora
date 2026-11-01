@@ -130,6 +130,15 @@ Each picture is stored in the build-input store
 bytes, SHA-256 and the hash of its own stage's inputs, and the map build
 imports each card by that hash.
 
+## Header
+
+Stage select keeps its own header row of dialog buttons (Start Match, Back,
+Hazards, Orbs; `STAGE_START_BUTTON` and `BACK_BUTTON` in
+smashcraft:ts/src/game/ui/selectionLayout.ts and stageUi.ts). Fighter select's
+one-row bar ([fighter-portraits.md](fighter-portraits.md), "Select screen top
+bar") does not reach it yet; giving stage select the same bar art is a
+follow-up, not part of the 2026-11-01 change.
+
 ## Staying current
 
 Freshness is per stage, so stage changes in different lanes never touch the

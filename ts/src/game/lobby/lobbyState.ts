@@ -504,6 +504,15 @@ export function cycleMatchMode(game: MatchState, slot: number): void {
 }
 
 
+export type MatchMode = "versus" | "training" | "classic" | "lore";
+export const MATCH_MODES: readonly MatchMode[] = ["versus", "training", "classic", "lore"];
+export const matchMode = (game: Readonly<MatchState>): MatchMode => game.lore ? "lore" : game.classic ? "classic" : game.training ? "training" : "versus";
+
+export function chooseMatchMode(game: MatchState, slot: number, mode: MatchMode): void {
+  for (let step = 0; step < MATCH_MODES.length && matchMode(game) !== mode; step++) cycleMatchMode(game, slot);
+}
+
+
 export function stepClassicTier(game: MatchState, slot: number, direction: number): void {
   if (settingRules(game, slot) && game.classic) game.classicTier = Math.max(0, Math.min(CPU_TIERS.length - 1, game.classicTier + direction));
 }

@@ -1,11 +1,29 @@
+import type { MatchMode, MatchState } from "../lobby/lobbyState";
+import type { RulePreset } from "../lobby/rulePresets";
 import type { RosterTile } from "../menu/selectionDrag";
 import type { ItemKind } from "../sim/codes";
 import type { TrainingSetting } from "./ruleButtons";
 
 export interface LobbyNet {
   readonly delayText: string;
+  /** The frames of input delay, short, for the gear badge. */
+  readonly delayBadge: string;
   readonly hostControl: boolean;
   readonly echoes: readonly string[];
+}
+
+/** Classic's or a Lore Battle's two drawer lines: the start setting and the route. */
+export interface ClassicLines {
+  readonly setting: string;
+  readonly route: string;
+}
+
+/** The select bar's words that come from match flow and Classic progress, which the host writes. */
+export interface SelectText {
+  modeLabel(game: Readonly<MatchState>): string;
+  modeName(mode: MatchMode): string;
+  rulesPill(game: Readonly<MatchState>): readonly string[];
+  classicLines(game: Readonly<MatchState>, fighter: number): ClassicLines;
 }
 
 export interface SelectionActions {
@@ -27,7 +45,8 @@ export interface SelectionActions {
   toggleItems(participantId: number): void;
   toggleUltimates(participantId: number): void;
   toggleItemKind(participantId: number, kind: ItemKind): void;
-  cycleMatchMode(participantId: number): void;
+  chooseMatchMode(participantId: number, mode: MatchMode): void;
+  applyRulePreset(participantId: number, preset: RulePreset): void;
   stepClassicTier(participantId: number, direction: -1 | 1): void;
   stepTraining(participantId: number, setting: TrainingSetting, direction: -1 | 1): void;
   toggleHitAreas(participantId: number): void;

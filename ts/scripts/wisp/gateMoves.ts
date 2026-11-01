@@ -14,7 +14,8 @@ import { BINDING_PRESETS } from "../../src/game/input/keyBindings";
 import { Character } from "../../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS, fighterName } from "../../src/game/roster/kits";
 import { ROSTER_TILES, tileOfCharacter } from "../../src/game/ui/selectionFrames";
-import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
+import { MATCH_MODES } from "../../src/game/lobby/lobbyState";
+import { MODE_ROWS, SELECT_BAR } from "../../src/game/core/selectBarLayout";
 import { PICKER_DONE, presetButton } from "../../src/game/ui/settingsUi";
 import { HAZARDS_BUTTON } from "../../src/game/ui/stageUi";
 import { pollUntil } from "../hostPoll";
@@ -123,6 +124,17 @@ export interface MovesGateReceipts {
   readonly specials: ReceiptFile;
 }
 
+const chooseTraining = (host: Client, view: Viewport) => Effect.gen(function*() {
+  const { mode } = SELECT_BAR;
+  const training = MODE_ROWS.modes[MATCH_MODES.indexOf("training")] ?? mode;
+  const opener = point(view, mode.x + mode.width / 2, mode.y - mode.height / 2);
+  const choice = point(view, training.x + training.width / 2, training.y - training.height / 2);
+  yield* focus(host);
+  yield* click(host, opener.x, opener.y);
+  yield* Effect.sleep("400 millis");
+  yield* click(host, choice.x, choice.y);
+}).pipe(Effect.mapError(fail("moves gate training")));
+
 const reachFighterSelect = (client: Client, save: (file: string, bytes: Uint8Array) => Effect.Effect<void, AcceptFailure>) => Effect.gen(function*() {
   const viewport = yield* InputInjection.use(input => input.windowRegion(client)).pipe(Effect.mapError(fail("moves gate setup")));
   const done = point(viewport, PICKER_DONE.x + PICKER_DONE.width / 2, PICKER_DONE.y - PICKER_DONE.height / 2);
@@ -214,10 +226,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
     yield* reachFighterSelect(client, save);
   }
   const hostView = yield* input.windowRegion(host).pipe(Effect.mapError(fail("moves gate viewport")));
-  const { training } = RULE_BUTTONS;
-  const toggle = point(hostView, training.x + training.width / 2, training.y - training.height / 2);
-  yield* focus(host).pipe(Effect.mapError(fail("moves gate training")));
-  yield* click(host, toggle.x, toggle.y).pipe(Effect.mapError(fail("moves gate training")));
+  yield* chooseTraining(host, hostView);
 
   const grid = rosterGrid(ROSTER_TILES);
   const verdicts: { readonly fighters: readonly string[]; readonly verdict: SmokeVerdict }[] = [];
