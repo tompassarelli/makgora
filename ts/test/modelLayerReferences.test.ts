@@ -17,7 +17,7 @@ const model = (layers: readonly Record<string, unknown>[], textureAnims: number)
 
 const layer = { FilterMode: 1, Shading: 16, TextureID: 0, CoordId: 0, Alpha: 1 };
 
-test("a model whose layer leaves its texture animation unset is refused, because the writer stores animation 0 and Warcraft reads it on the first draw [k2 bug]", () => {
+test("a model whose layer leaves its texture animation unset is refused, because the writer stores animation 0 and Warcraft reads it on the first draw [k2 property]", () => {
   const bytes = model([layer], 0);
   expect(parseModelMDX(bytes.buffer as ArrayBuffer).Materials[0]?.Layers[0]?.TVertexAnimId).toBe(0);
   expect(layerReferenceProblem(bytes)).toBe("material 0 layer 0 names texture animation 0 of 0");
