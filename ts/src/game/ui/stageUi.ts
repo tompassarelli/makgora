@@ -16,7 +16,7 @@ import { orbsSetting, hazardsSetting, rulesSummary } from "../session/messages";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { STAGE_CHIP_TEXTURE, StageCard } from "./stageCard";
-import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, STAGE_START_BUTTON, stageStartContains } from "./selectionLayout";
+import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, START_BUTTON, startButtonContains } from "./selectionLayout";
 import { destroyEvents, Events } from "wisp/game/events";
 import { createFrame, createFrameByType, destroyFrame, Frame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { MouseButton, mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, setPointer } from "wisp/game/input";
@@ -142,7 +142,7 @@ export class StagePanel {
       ? "Click a stage or move the stick.\nAny player can choose.\nA / Click: choose · Start: start · Click BACK: back"
       : "Click a stage or use movement controls.\nAny player can choose.\nY: start · Click BACK TO FIGHTERS: back";
     stageText(root, "MeleeStageHelp", f32(0.49), f32(0.148), f32(0.298), f32(0.03), f32(0.008), help);
-    this.startButton = dialogButton(root, STAGE_START_BUTTON.x, STAGE_START_BUTTON.y, STAGE_START_BUTTON.width, STAGE_START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH", { kind: "start" });
+    this.startButton = dialogButton(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH", { kind: "start" });
     dialogButton(root, BACK_BUTTON.x, BACK_BUTTON.y, BACK_BUTTON.width, BACK_BUTTON.height, journal ? "BACK" : "BACK TO FIGHTERS", { kind: "back" });
     this.hazardsToggle = dialogButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "", { kind: "hazards" });
     this.orbsToggle = dialogButton(root, ORBS_BUTTON.x, ORBS_BUTTON.y, ORBS_BUTTON.width, ORBS_BUTTON.height, "", { kind: "orbs" });
@@ -182,9 +182,9 @@ export class StagePanel {
     const width = toReal(screenWidth());
     const height = toReal(screenHeight());
     if (width <= 0 || height <= 0) return;
-    if (stageStartContains(pointerX(toReal(inputPointerX()), width, height), pointerY(toReal(inputPointerY()), height))) return;
-    const x = STAGE_START_BUTTON.x + STAGE_START_BUTTON.width / 2;
-    const y = STAGE_START_BUTTON.y - STAGE_START_BUTTON.height / 2;
+    if (startButtonContains(pointerX(toReal(inputPointerX()), width, height), pointerY(toReal(inputPointerY()), height))) return;
+    const x = START_BUTTON.x + START_BUTTON.width / 2;
+    const y = START_BUTTON.y - START_BUTTON.height / 2;
     setPointer(truncate(pixelX(x, width, height)), truncate(pixelY(y, height)));
   }
 

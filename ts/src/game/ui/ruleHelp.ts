@@ -2,10 +2,10 @@ import { f32 } from "wisp/src/sim/f32";
 import { ITEM_INTERVAL_MAX_SECONDS, ITEM_INTERVAL_MIN_SECONDS } from "../match/centreItem";
 import type { MatchState } from "../lobby/lobbyState";
 import { ITEM_BUFF_FRAMES } from "../sim/itemBuffs";
-import { RULE_BUTTONS, type RuleName, rulePanel } from "./ruleButtons";
-import { type BarPanel, barBoxContains } from "./selectBarLayout";
+import { RULE_BUTTONS, type RuleBox } from "./ruleButtons";
 
-const versus = (game: Readonly<MatchState>): boolean => !game.training && !game.classic && !game.lore;
+export type RuleName = keyof typeof RULE_BUTTONS;
+export type RuleGroup = "match" | "items" | "training" | "classic" | "mode" | "teams";
 
 export const RULE_HELP_WIDTH = f32(0.38);
 export const RULE_HELP_HEIGHT = f32(0.046);
@@ -42,26 +42,38 @@ const TRAINING_HELP = {
   speed: "Game speed: slow the whole game to half or quarter speed to study moves.",
 } as const;
 
-const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP, friendlyFire: "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams.", inputDelay: "Input delay: the same for every player. Online, Auto follows the slowest connection; the host (the first player) can set a number with − and +, and click the number to go back to Auto. Against computers it stays at 2 frames." };
+const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP, friendlyFire: "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams.", inputDelay: "Input delay: the same for every player. Online, Auto follows the slowest connection; the host (the first player) can set a number with − and +, and click it to go back to Auto. Against computers it stays at 2 frames." };
 
-const SHOWN_IN: Readonly<Record<string, (game: Readonly<MatchState>) => boolean>> = {
-  ...Object.fromEntries(Object.keys(MATCH_HELP).map(name => [name, versus])),
-  ...Object.fromEntries(Object.keys(ITEM_HELP).map(name => [name, (game: Readonly<MatchState>) => versus(game) && game.items.on])),
-  ...Object.fromEntries(Object.keys(TRAINING_HELP).map(name => [name, (game: Readonly<MatchState>) => game.training])),
-  friendlyFire: (game) => versus(game) && game.teamBattle,
-  easierClassic: (game) => game.classic || game.lore,
-  harderClassic: (game) => game.classic || game.lore,
-};
+const isRule = (name: string): name is RuleName => name in RULE_BUTTONS;
 
-const ruleShown = (name: RuleName, game: Readonly<MatchState>): boolean => SHOWN_IN[name]?.(game) ?? true;
+const RULE_GROUPS: readonly (readonly [RuleGroup, readonly RuleName[]])[] = [
+  ["mode", ["training", "inputDelay"]],
+  ["teams", ["friendlyFire"]],
+  ["match", Object.keys(MATCH_HELP).filter((name) => isRule(name))],
+  ["items", Object.keys(ITEM_HELP).filter((name) => isRule(name))],
+  ["training", Object.keys(TRAINING_HELP).filter((name) => isRule(name))],
+  ["classic", ["easierClassic", "harderClassic"]],
+];
 
-const RULE_NAMES = Object.keys(RULE_BUTTONS).filter((name): name is RuleName => name in RULE_BUTTONS);
 
-/** The rule under the pointer among those drawn: the bar's own while no panel is open, else the open panel's. */
-export function hoveredRule(game: Readonly<MatchState>, open: BarPanel | undefined, x: number, y: number): RuleName | undefined {
-  for (const name of RULE_NAMES) {
-    if (rulePanel(name) !== open || !ruleShown(name, game)) continue;
-    if (barBoxContains(RULE_BUTTONS[name], x, y)) return name;
+export function visibleRuleGroups(game: Readonly<MatchState>): readonly RuleGroup[] {
+  if (game.training) return ["mode", "training"];
+  if (game.classic || game.lore) return ["mode", "classic"];
+  const groups: RuleGroup[] = ["mode", "match"];
+  if (game.items.on) groups.push("items");
+  if (game.teamBattle) groups.push("teams");
+  return groups;
+}
+
+
+const inside = (box: RuleBox, x: number, y: number): boolean =>
+  x >= box.x && x <= f32(box.x + box.width) && y <= box.y && y >= f32(box.y - box.height);
+
+
+export function hoveredRule(groups: readonly RuleGroup[], x: number, y: number): RuleName | undefined {
+  for (const [group, names] of RULE_GROUPS) {
+    if (!groups.includes(group)) continue;
+    for (const name of names) if (inside(RULE_BUTTONS[name], x, y)) return name;
   }
   return undefined;
 }
@@ -72,7 +84,7 @@ function modeHelp(game: Readonly<MatchState>): string {
     : game.classic ? "Classic: a run of fights that ends with a boss."
     : game.training ? "Training: practise on a partner you set up; no stocks or timer."
     : "Versus: fight players and computers with the rules on this screen.";
-  return `Mode: open the list to choose Versus, Training, Classic or Lore Battles. ${current}`;
+  return `Mode: click to switch Versus, Training, Classic, Lore Battles. ${current}`;
 }
 
 

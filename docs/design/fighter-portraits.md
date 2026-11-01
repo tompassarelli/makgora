@@ -311,63 +311,6 @@ over one send interval; the local hand is the mouse's own sample with no delay.
 A client that cannot show a hand (settings open, a dialog, the stage menu) sends
 the hidden pose, and a hand is drawn only for a human still present.
 
-## Select screen top bar
-
-Fighter select's controls sit in one row on a dark band across the top of the
-4:3 area (smashcraft:ts/src/game/ui/selectBar.ts, geometry in
-`selectBarLayout.ts`). Until 2026-11-01 they were about 17 gold-bevelled dialog
-buttons of equal weight over four rows, a quarter of the screen; Tom asked for
-one row of a few clusters with the rarely used settings one click deeper
-(progressive disclosure), after a mockup he had made. Left to right:
-
-1. `< MENU`: the title screen, as the old Main menu button.
-2. The mode (`VERSUS`, `TRAINING`, `CLASSIC` or `LORE BATTLES`) with an arrow,
-   and attached to it the `FFA`/`TEAMS` toggle (Team Battle; Versus only).
-   The mode list holds exactly the four modes the game has, each with one line
-   on what it is and a check on the current one, then Team Battle and, while
-   it is on, Friendly Fire.
-3. The rules pill, centred and the widest item: the live rules in one line
-   (`3 Stocks · 7:00 · Ultimates`, `Items` while items are on, `Endless` in place
-   of stocks and time, `No timer` for no time limit; the other modes show their
-   own line). It opens the rules drawer under it: in Versus the presets, stock
-   count and time steppers, Ultimates, Items, Endless play, Automatic rematch,
-   the Speed and Heavy item toggles while items are on, and Reset default; in
-   Training the partner's behaviour, drift, tech and damage, hit areas and game
-   speed; in Classic and Lore Battles the difficulty or battle and the route.
-4. `Guide` with the `F1` key: Controls & Bindings (the controls and keyboard
-   screen, as F1), Character Move List and How to Play (the tutorial menu).
-5. The gear with the input delay in frames (`2F`): Input delay (the online host
-   also gets − and + and clicks the number for Auto), Community and Credits.
-6. `START` with the `Y` key, the only crimson-and-gold fill on the bar while
-   every fighter is placed; until then it names what is missing (Place your
-   chip, Add a fighter, Choose CPU or Empty, Choose two teams).
-
-The presets set only the rules they name (smashcraft:ts/src/game/lobby/rulePresets.ts):
-Tourney is 4 stocks, 8:00, ultimates off, items off and endless off; Party is
-items on with every item kind, ultimates on and endless off; Endless is endless
-play with ultimates on; Reset default is a fresh lobby's 3 stocks, 7:00, items
-off with every kind, ultimates on, endless off and automatic rematch off.
-
-One panel is open at a time, over the grid and cards; a click outside it, on
-its own item again, Esc or the pad's Special closes it, and while it is open
-the chips cannot be dragged. Choosing a mode or anything in the Guide or gear
-closes it; rule changes leave the drawer open. Each frame is drawn by its own
-image at its own size from `tools/selection/art/SelectBarFrame.svg` (dark navy
-fill, gold edge; a lit gold variant for hover, the open item and rules that are
-on; crimson for Start), so no border is stretched.
-
-Every rule is still a click on a synchronised button running the same lobby
-action on every client, so online lobbies see each change as before; choosing
-a mode steps the old mode cycle until it reaches the chosen mode, and a preset
-runs the ordinary rule setters. Opening a panel is local to the player who
-clicked it. The pad's up and down walk the fighter cards, then Back, Mode,
-Teams, the rules pill, Guide and the gear; Attack opens a panel, inside it up
-and down pick a row, left and right step it and Attack presses it, and Special
-closes it. F1 and Y keep their keys.
-
-Follow-up: a Moves button on each player card, so the move list opens for that
-fighter without the Guide.
-
 ## Classic tile colour floor
 
 Provenance: Tom's 0.0.192 character-select finding #563 item 22, measured

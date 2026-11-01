@@ -1,13 +1,9 @@
-import type { MatchMode } from "../lobby/lobbyState";
-import type { RulePreset } from "../lobby/rulePresets";
 import type { RosterTile } from "../menu/selectionDrag";
 import type { ItemKind } from "../sim/codes";
 import type { TrainingSetting } from "./ruleButtons";
 
 export interface LobbyNet {
   readonly delayText: string;
-  /** The frames of input delay, short, for the gear badge. */
-  readonly delayBadge: string;
   readonly hostControl: boolean;
   readonly echoes: readonly string[];
 }
@@ -31,8 +27,7 @@ export interface SelectionActions {
   toggleItems(participantId: number): void;
   toggleUltimates(participantId: number): void;
   toggleItemKind(participantId: number, kind: ItemKind): void;
-  chooseMatchMode(participantId: number, mode: MatchMode): void;
-  applyRulePreset(participantId: number, preset: RulePreset): void;
+  cycleMatchMode(participantId: number): void;
   stepClassicTier(participantId: number, direction: -1 | 1): void;
   stepTraining(participantId: number, setting: TrainingSetting, direction: -1 | 1): void;
   toggleHitAreas(participantId: number): void;

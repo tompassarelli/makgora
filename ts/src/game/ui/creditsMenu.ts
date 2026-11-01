@@ -4,6 +4,7 @@ import { CREDITS_TITLE, creditsBody } from "./credits";
 import { ButtonClicks, createBackdrop, placeTopLeft, styleMenuPanel } from "./frames";
 import { InfoPanelState } from "./infoPanelState";
 import { panelButton, panelText } from "./infoPanel";
+import { CREDITS_BOX } from "./selectionLayout";
 import { destroyFrame, Frame, setFrameLevel, setFrameSize, setFrameText, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { Player, player as playerOf } from "wisp/game/players";
 
@@ -17,7 +18,7 @@ export class CreditsMenu {
   private readonly state = new InfoPanelState();
   private readonly clicks: ButtonClicks<CreditsButton>;
 
-  constructor(owner: Frame, opener: Frame, suffix: string, version: string, private readonly participantId: number) {
+  constructor(owner: Frame, rules: Frame, suffix: string, version: string, private readonly participantId: number) {
     this.clicks = new ButtonClicks(`ui.credits.${suffix}.click`, (target, clicker) => this.click(target, clicker));
     this.root = createBackdrop(`MeleeCreditsMenu${suffix}`, owner, 0);
     styleMenuPanel(this.root, `MeleeCreditsPanel${suffix}`);
@@ -28,7 +29,7 @@ export class CreditsMenu {
     setFrameText(panelText(this.root, `MeleeCreditsBody${suffix}`, f32(0.12), f32(0.485), f32(0.56), f32(0.34), f32(0.0105), TextAlignment.top, TextAlignment.left), creditsBody(version));
     this.clicks.add(panelButton(this.root, CLOSE_BOX.x, CLOSE_BOX.y, CLOSE_BOX.width, CLOSE_BOX.height, "Close"), { kind: "creditsClose" }, "Close", "native", CLOSE_BOX);
     setFrameVisible(this.root, false);
-    this.clicks.add(opener, { kind: "creditsOpen" }, undefined, "native");
+    this.clicks.add(panelButton(rules, CREDITS_BOX.x, CREDITS_BOX.y, CREDITS_BOX.width, CREDITS_BOX.height, CREDITS_TITLE), { kind: "creditsOpen" }, CREDITS_TITLE, "native", CREDITS_BOX);
   }
 
   bindActions(): void {
@@ -37,13 +38,10 @@ export class CreditsMenu {
 
   private click(button: CreditsButton, clicker: Player): void {
     if (clicker !== playerOf(this.participantId)) return;
-    if (button.kind === "creditsOpen") this.open();
-    else this.state.close();
-  }
-
-  open(): void {
-    this.state.open();
-    this.onOpen();
+    if (button.kind === "creditsOpen") {
+      this.state.open();
+      this.onOpen();
+    } else this.state.close();
   }
 
   opened(): boolean {

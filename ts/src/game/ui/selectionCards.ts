@@ -50,20 +50,20 @@ export type CardButton = { kind: "costume"; slot: number } | { kind: "team"; slo
 
 export const cardPalette = (game: Readonly<MatchState>, slot: number): number => game.teamBattle && fighterActive(game, slot) ? at(game.teamChoices, slot) : slot;
 
-export type MenuFocus = { readonly kind: "fighter" | "settings" | "team" | "teamBattle" | "mainMenu" | "mode" | "rules" | "guide" | "gear"; readonly slot: number };
+export type MenuFocus = { readonly kind: "fighter" | "settings" | "team" | "teamBattle" | "friendlyFire" | "mainMenu"; readonly slot: number };
 export function menuFocusList(game: Readonly<MatchState>, participantId: number): MenuFocus[] {
   const focus: MenuFocus[] = [];
   if (humanFighterActive(game, participantId)) focus.push({ kind: "fighter", slot: participantId });
   for (const slot of PARTICIPANT_SLOTS) if (fighterActive(game, slot) && !humanFighterActive(game, slot)) {
     focus.push({ kind: "fighter", slot }, { kind: "settings", slot });
   }
+  if (!game.training && !game.classic && !game.lore) focus.push({ kind: "teamBattle", slot: participantId });
   if (game.teamBattle) {
     if (humanFighterActive(game, participantId)) focus.push({ kind: "team", slot: participantId });
     for (const slot of PARTICIPANT_SLOTS) if (canChooseComputer(game, participantId, slot)) focus.push({ kind: "team", slot });
+    focus.push({ kind: "friendlyFire", slot: participantId });
   }
-  focus.push({ kind: "mainMenu", slot: participantId }, { kind: "mode", slot: participantId });
-  if (!game.training && !game.classic && !game.lore) focus.push({ kind: "teamBattle", slot: participantId });
-  focus.push({ kind: "rules", slot: participantId }, { kind: "guide", slot: participantId }, { kind: "gear", slot: participantId });
+  focus.push({ kind: "mainMenu", slot: participantId });
   return focus;
 }
 

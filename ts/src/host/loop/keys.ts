@@ -162,7 +162,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     captureBinding(bindings, key);
     return;
   }
-  if (key === Key.escape && (views(s).selections[slot].closeBar() || views(s).selections[slot].credits.close() || views(s).selections[slot].community.close())) return;
+  if (key === Key.escape && (views(s).selections[slot].credits.close() || views(s).selections[slot].community.close())) return;
   if (key === Key.escape && s.game.phase === Phase.characterMenu && bindings.ready) {
     openTitle(s, slot);
     return;
