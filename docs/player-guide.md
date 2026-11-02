@@ -105,7 +105,9 @@ slot has edits you have not saved, its name ends in *. If another action already
 held that key, the two swap and the screen says "Swapped with" that action. Press
 Delete instead of a key to clear the slot, or click the small red x on a lit key's
 corner; while an action has no key, a Bind button at the right of the hint line
-captures one for it. Escape cancels a rebind. Rename names the selected Custom slot,
+captures one for it. Escape cancels a rebind. Rename turns the Custom button into a
+text field for the slot's name: Enter, OK or a click elsewhere keeps it and Escape puts
+the old name back.
 Reset brings back the Custom defaults, and Delete empties the slot back to the
 Custom defaults with no name; all three are greyed out on WASD and Box. The
 bottom row holds Show keyboard in game on the left and Save and Done on the right.

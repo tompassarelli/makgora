@@ -19,6 +19,7 @@ import {
   customButtonLabel,
   loadSavedBindings,
   beginNaming,
+  cancelNaming,
   endNaming,
   nameSlot,
   pickCustomSlot,
@@ -483,4 +484,26 @@ test("a brand-new player has Show keyboard in game on, turning it off is saved w
   const older = "KM" + current.slice(2, 4) + current.slice(5);
   assertEquals(decodeLayouts(older)?.keyboard, false, "a save from before either setting");
   assertEquals(decodeLayouts(encodeLayouts(layoutSave(presetLayouts(), "wasd", true)))?.keyboard, true, "on survives a save and load");
+});
+
+test("Escape while renaming puts the old name back and saves nothing, while Enter or OK keeps the typed name and saves it [k2 property]", () => {
+  const stored = { encoded: undefined as string | undefined };
+  const settings = persistedSettings(stored);
+  pickCustomSlot(settings, 0);
+  beginNaming(settings);
+  nameSlot(settings, "primary");
+  endNaming(settings);
+  const saved = stored.encoded;
+  beginNaming(settings);
+  nameSlot(settings, "typo");
+  assertEquals(slotLabel(settings), "typo", "the typed name shows while renaming");
+  cancelNaming(settings);
+  assertEquals(settings.naming, false, "Escape ends renaming");
+  assertEquals(slotLabel(settings), "primary", "Escape restores the old name");
+  assertEquals(stored.encoded, saved, "Escape saves nothing");
+  beginNaming(settings);
+  nameSlot(settings, "second");
+  beginNaming(settings);
+  assertEquals(settings.naming, false, "OK ends renaming");
+  assertEquals(slotLabel(persistedSettings(stored)), "second", "OK saves the typed name");
 });

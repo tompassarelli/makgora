@@ -16,7 +16,7 @@ import { leaveTutorial } from "../../game/match/tutorial";
 import { fighterName } from "../../game/roster/kits";
 import { endReplaySegment } from "./replays";
 import { pausedMessage } from "../../game/session/messages";
-import { cancelBindingCapture, captureBinding, closeSlotMenu, endNaming } from "../../game/ui/bindingSettings";
+import { cancelBindingCapture, cancelNaming, captureBinding, closeSlotMenu } from "../../game/ui/bindingSettings";
 import { writeLines } from "wisp/src/platform/fileio";
 import { confirmedChecksum, startInputTrace, traceParticipant } from "./diagnostics";
 import { clearCapturedInputs } from "./inputs";
@@ -126,7 +126,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
   if (!startKey && !keyEventAllowed(s.keyEvents, key, s.participants[slot].bindings.bindings)) return;
   if (journalOwnsKey(s, slot, key)) return;
   if (s.participants[slot].bindings.naming) {
-    if (key === Key.escape) endNaming(s.participants[slot].bindings);
+    if (key === Key.escape) cancelNaming(s.participants[slot].bindings);
     return;
   }
   if (s.trace.active) s.trace.window.keyDown[slot]++;

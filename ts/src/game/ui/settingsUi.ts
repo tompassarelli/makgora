@@ -25,7 +25,7 @@ import {
   toggleKeyboardPreview,
 } from "./bindingSettings";
 import { ButtonClicks, createBackdrop, createText, frameMenuPanel, gameUi, placeTopLeft, setMenuText } from "./frames";
-import { MENU_FONT, MENU_STYLE } from "./hudLayout";
+import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
 import { PREVIEW_ROW_LIT_TEXTURE } from "./inputPreview";
 import { createEvents, destroyEvents, Events, onEvents } from "wisp/game/events";
@@ -77,6 +77,7 @@ const BIND_BUTTON = { x: f32(RIGHT - f32(0.15)), y: below(f32(0.107)), width: f3
 const DIM_KEY = 105;
 const LIT_KEY = 255;
 const CLEAR_SIZE = f32(0.012);
+const NAME_INSET = f32(0.004);
 const DARK = "|cff22180a";
 const MUTED = "|cff8a96a3";
 const HINT = "|cffffffffClick a lit key to rebind, or click its red |r|cffff6060x|r|cffffffff to clear.|r";
@@ -84,12 +85,24 @@ const CAPTURE_HINT = "Press the new key for the flashing action. Delete clears i
 
 function createNameBox(root: Frame, participantId: number): Frame {
   const box = createFrameByType("EDITBOX", `MeleeSettingsNameBox${formatInt(participantId)}`, root, "EscMenuEditBoxTemplate", participantId);
-  placeTopLeft(box, CUSTOM_BUTTON.x, CUSTOM_BUTTON.y);
-  setFrameSize(box, CUSTOM_BUTTON.width, CUSTOM_BUTTON.height);
+  placeTopLeft(box, f32(CUSTOM_BUTTON.x + NAME_INSET), f32(CUSTOM_BUTTON.y - NAME_INSET));
+  setFrameSize(box, f32(CUSTOM_BUTTON.width - f32(2 * NAME_INSET)), f32(CUSTOM_BUTTON.height - f32(2 * NAME_INSET)));
   setFrameTextLimit(box, SLOT_NAME_LIMIT);
-  setFrameLevel(box, 35);
+  setFrameLevel(box, 38);
   setFrameVisible(box, false);
   return box;
+}
+
+function createNameField(root: Frame, name: string, context: number): Frame {
+  const field = createBackdrop(name, root, context);
+  setFrameTexture(field, PANEL_TEXTURE, 0, true);
+  placeTopLeft(field, f32(CUSTOM_BUTTON.x + NAME_INSET), f32(CUSTOM_BUTTON.y - NAME_INSET));
+  setFrameSize(field, f32(CUSTOM_BUTTON.width - f32(2 * NAME_INSET)), f32(CUSTOM_BUTTON.height - f32(2 * NAME_INSET)));
+  setFrameAlpha(field, 255);
+  setFrameEnabled(field, false);
+  setFrameLevel(field, 37);
+  setFrameVisible(field, false);
+  return field;
 }
 
 function createLitFill(art: Frame, name: string, context: number): Frame {
@@ -130,6 +143,7 @@ export class SettingsPanel {
   private readonly dismiss: Frame;
   private readonly edits: readonly (readonly [PanelButton, string])[];
   private readonly nameBox: Frame;
+  private readonly nameField: Frame;
   private readonly nameEvents: Events;
   private readonly keyboardButton: Frame;
   private readonly bindButton: PanelButton;
@@ -188,6 +202,7 @@ export class SettingsPanel {
       [button("MeleeSettingsReset", editButton(1), "Reset", { kind: "reset" }), "Reset"],
       [button("MeleeSettingsDelete", editButton(2), "Delete", { kind: "delete" }), "Delete"],
     ];
+    this.nameField = createNameField(root, `MeleeSettingsNameField${suffix}`, participantId);
     this.nameBox = createNameBox(root, participantId);
     this.nameEvents = this.nameTrigger();
     this.hint = line("MeleeSettingsHint", LEFT, below(f32(0.108)), f32(0.45), f32(0.016), f32(0.0105));
@@ -372,9 +387,10 @@ export class SettingsPanel {
     for (const [preset, frame] of this.presets) setMenuText(frame, preset === settings.layout ? `${MENU_STYLE.gold}${PRESET_NAMES[preset]}|r` : PRESET_NAMES[preset]);
     const custom = settings.layout === "custom";
     const name = customButtonLabel(settings);
-    setFrameVisible(this.customLit, custom);
-    setMenuText(this.custom.label, custom ? `${DARK}${name}|r` : name);
-    setFrameVisible(this.dismiss, settings.picking);
+    setFrameVisible(this.customLit, custom && !settings.naming);
+    setFrameVisible(this.nameField, settings.naming);
+    setMenuText(this.custom.label, settings.naming ? "" : custom ? `${DARK}${name}|r` : name);
+    setFrameVisible(this.dismiss, settings.picking || settings.naming);
     this.slotButtons.forEach(({ art, label }, slot) => {
       setFrameVisible(art, settings.picking);
       const name = customSlotEmpty(settings.customs, slot) ? `${slotLabel(settings, slot)} ${MUTED}(empty)|r` : slotLabel(settings, slot);
@@ -383,7 +399,7 @@ export class SettingsPanel {
     for (const [{ art, label }, caption] of this.edits) {
       setFrameAlpha(art, custom ? LIT_KEY : DIM_KEY);
       setFrameEnabled(art, custom);
-      setMenuText(label, !custom ? `${MUTED}${caption}|r` : caption === "Rename" && settings.naming ? `${MENU_STYLE.gold}Done|r` : caption);
+      setMenuText(label, !custom ? `${MUTED}${caption}|r` : caption === "Rename" && settings.naming ? `${MENU_STYLE.gold}OK|r` : caption);
     }
     this.showNameBox(settings.naming);
   }

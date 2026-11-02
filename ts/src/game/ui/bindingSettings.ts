@@ -73,6 +73,7 @@ export interface BindingSettings {
   layout: BindingPreset;
   picking: boolean;
   naming: boolean;
+  nameBefore: string;
 
   revision: number;
 
@@ -81,7 +82,7 @@ export interface BindingSettings {
 
 export function createBindingSettings(owner: number, persistence: BindingPersistence): BindingSettings {
   const { layouts, customs, slot, keyboard } = layoutSave(presetLayouts(), DEFAULT_PRESET);
-  return { owner, persistence, layouts, customs, slot, keyboard, bindings: layouts[DEFAULT_PRESET], ready: false, profile: "unknown", dirty: false, capture: undefined, layout: DEFAULT_PRESET, picking: false, naming: false, revision: 0, message: "Loading controls..." };
+  return { owner, persistence, layouts, customs, slot, keyboard, bindings: layouts[DEFAULT_PRESET], ready: false, profile: "unknown", dirty: false, capture: undefined, layout: DEFAULT_PRESET, picking: false, naming: false, nameBefore: "", revision: 0, message: "Loading controls..." };
 }
 
 
@@ -342,8 +343,9 @@ export function beginNaming(settings: BindingSettings): void {
   settings.capture = undefined;
   settings.picking = false;
   settings.naming = true;
+  settings.nameBefore = settings.customs[settings.slot]?.name ?? "";
   settings.revision++;
-  settings.message = `Type a name for ${slotLabel(settings)}, then press Enter.`;
+  settings.message = `Type a name for ${slotLabel(settings)}: Enter or OK keeps it, Escape cancels.`;
 }
 
 export function nameSlot(settings: BindingSettings, typed: string): void {
@@ -359,6 +361,15 @@ export function endNaming(settings: BindingSettings): void {
   settings.revision++;
   saveBindingSettings(settings);
   settings.message = `Slot ${settings.slot + 1} is named ${slotLabel(settings)} and saved.`;
+}
+
+export function cancelNaming(settings: BindingSettings): void {
+  const custom = settings.customs[settings.slot];
+  if (!settings.naming || custom === undefined) return;
+  custom.name = settings.nameBefore;
+  settings.naming = false;
+  settings.revision++;
+  settings.message = "Rename cancelled.";
 }
 
 export function deleteProfile(settings: BindingSettings): void {
