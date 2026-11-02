@@ -44,7 +44,7 @@ export function onKeyboardPause(s: ShellState): void {
     if (releaseEscape(hold, slot) && s.game.phase === Phase.match && s.session.paused) pressStart(s, slot);
     return;
   }
-  if (message === ESCAPE_DOWN && pressEscape(hold, slot, leavePauser(s, slot))) return;
+  if (message === ESCAPE_DOWN && (pressEscape(hold, slot, leavePauser(s, slot)) || s.game.phase !== Phase.match)) return;
   if (s.pauseMenu?.title) {
     s.pauseMenu.title = false;
     return;

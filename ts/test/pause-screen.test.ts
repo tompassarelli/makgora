@@ -2,7 +2,8 @@ import { expect, test } from "bun:test";
 import { install, startBuild } from "../src/platform/main";
 import { Phase, setParticipants } from "../src/game/lobby/lobbyState";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
-import { Key } from "../src/host/loop/keyEvents";
+import { KEYBOARD_PAUSE_PREFIX, Key } from "../src/host/loop/keyEvents";
+import { sendSync } from "wisp/game/sync";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { panelActions } from "../src/host/loop/menus";
 import { shell } from "../src/host/loop/state";
@@ -196,6 +197,9 @@ test("holding Esc with key repeat on the pause screen leaves to fighter selectio
     clients.frames(2);
     phases.push(state().phase);
   }
+  clients.client(0).run(() => { sendSync(KEYBOARD_PAUSE_PREFIX, "E"); });
+  clients.frames(10);
+  expect(state().phase).toBe(Phase.characterMenu);
   clients.key(0, Key.escape, 0, false);
   clients.frames(120);
   const left = phases.indexOf(Phase.characterMenu);
