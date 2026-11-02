@@ -71,6 +71,7 @@ import { knownFrame } from "wisp/src/netcode/shadowSchedule";
 import { createTimer, startTimer } from "wisp/game/clock";
 import { createEvents, onEvents } from "wisp/game/events";
 import { displayText, hideOriginFrames, loadFrameFile } from "wisp/game/frames";
+import { releaseStockClicks } from "../../game/ui/stockClicks";
 import { addChatEvent, addKeyEvent, chatText, enableSelections, enableUserControl, osKey } from "wisp/game/input";
 import { enableFog, enableFogMask, setCameraSmoothing, setTimeOfDay, setTimeOfDayScale } from "wisp/game/view";
 import { addLeaveEvent, eventPlayer, localPlayer, player, playerSlot, setPlayerColor } from "wisp/game/players";
@@ -378,6 +379,7 @@ function worldOrigin(): { x: number; y: number; z: number } {
 function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: number; y: number; z: number }): void {
   if (shellState() !== undefined) return;
   hideOriginFrames(true);
+  releaseStockClicks();
 
   if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(localPlayer(), 0.0, 0.0, "The game's menus could not load. Restart the game.");
   enableSelections(false, false);
