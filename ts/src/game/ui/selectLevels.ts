@@ -1,1 +1,1 @@
-export const SELECT_LEVELS = { cardChip: 10, carriedChip: 199, tutorial: 20, credits: 20, community: 20, barScrim: 28, bar: 30, barPanel: 32, ruleHelp: 34, hand: 200, handBadge: 202, stagePool: 30, cpuSettings: 100 } as const;
+export const SELECT_LEVELS = { cardChip: 10, tutorial: 20, credits: 20, community: 20, barScrim: 28, bar: 30, barPanel: 32, ruleHelp: 34, stagePool: 30, cpuSettings: 100, chat: 400, carriedChip: 999, hand: 1000, handBadge: 1002 } as const;

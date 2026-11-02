@@ -7,6 +7,7 @@ import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
 import { slotColor } from "./slotColors";
 import { barTexture } from "../core/selectBarLayout";
 import { CHAT_SLOT } from "../core/selectScreenLayout";
+import { SELECT_LEVELS } from "./selectLevels";
 
 export const CHAT_STYLE: ChatStyle = {
   name: "SmashcraftChat",
@@ -17,7 +18,7 @@ export const CHAT_STYLE: ChatStyle = {
   margin: f32(0.005),
   panelTexture: PANEL_TEXTURE,
   panelAlpha: 210,
-  level: 400,
+  level: SELECT_LEVELS.chat,
   capacity: 100,
   historyRows: 16,
   recentSeconds: f32(6.0),

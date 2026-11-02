@@ -9,6 +9,7 @@ import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, type Client, focus, loadClients, type Region } from "wisp/scripts/warcraft/desktop";
 import { HAND_STATES, type HandState, carriedChipLeft, carriedChipTop, readyChipSize, handLeft, handSize, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
+import { CHAT_SLOT } from "../../src/game/core/selectScreenLayout";
 import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
 import { handBadgeBox } from "../../src/game/ui/selectionHandFrames";
 import { slotColor } from "../../src/game/ui/slotColors";
@@ -26,6 +27,8 @@ const BADGE_COLOUR_DISTANCE = 120;
 const SETTLE = "900 millis";
 const CLEAR_SPOT = { x: 0.03, y: 0.3 };
 const EDGE_SPOT = { x: 0.005, y: 0.3 };
+const CHAT_SPOT = { x: CHAT_SLOT.left + 0.05, y: CHAT_SLOT.bottom + CHAT_SLOT.height * 0.6 };
+const CHAT_FLOOR_SPOT = { x: CHAT_SLOT.left + 0.05, y: CHAT_SLOT.bottom + 0.02 };
 const HOVER_TILE = 3;
 const COVER_PAD = 0.004;
 
@@ -129,12 +132,16 @@ export const measureHandsGate = (clientsFile: string, directory: string, teams: 
     yield* move(second, EDGE_SPOT);
     yield* observe("edge", [{ ...hover, state: "fan" }, { ...EDGE_SPOT, state: "point" }], false);
   }
+  yield* move(second, CHAT_SPOT);
+  yield* observe("chat", [{ ...hover, state: "fan" }, { ...CHAT_SPOT, state: "point" }], false);
+  yield* move(second, CHAT_FLOOR_SPOT);
+  yield* observe("chat-floor", [{ ...hover, state: "fan" }, { ...CHAT_FLOOR_SPOT, state: "point" }], false);
   const shown = (sample: Sample) => sample.error !== undefined && sample.error <= HAND_MATCH_ERROR;
   const badged = (sample: Sample) => sample.badgeDistance === undefined ? sample.phase === "edge" && sample.hand === 1 : sample.badgeDistance <= BADGE_COLOUR_DISTANCE;
   const own = samples.filter(sample => sample.viewer === sample.hand);
   const remote = samples.filter(sample => sample.viewer !== sample.hand);
   const chips = samples.filter(sample => sample.chipError !== undefined);
-  const pass = samples.length === (edgeRoom(reference, handLeft(EDGE_SPOT.x, "point", extent)) ? 12 : 8) && samples.every(shown) && samples.every(badged) && chips.length === 2 && chips.every(sample => (sample.chipError ?? Infinity) <= MATCH_ERROR);
+  const pass = samples.length === (edgeRoom(reference, handLeft(EDGE_SPOT.x, "point", extent)) ? 20 : 16) && samples.every(shown) && samples.every(badged) && chips.length === 2 && chips.every(sample => (sample.chipError ?? Infinity) <= MATCH_ERROR);
   const modified = yield* Clock.currentTimeMillis;
   const text = `SMASHCRAFT GATE hands samples=${samples.length} own=${own.filter(shown).length} remote=${remote.filter(shown).length} badges=${samples.filter(badged).length} chips=${chips.filter(sample => (sample.chipError ?? Infinity) <= MATCH_ERROR).length} pass=${pass ? 1 : 0}`;
   yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, threshold: MATCH_ERROR, badgeDistance: BADGE_COLOUR_DISTANCE, handStates: HAND_STATES, samples }, undefined, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "hands gate evidence", problem: String(cause) }) });

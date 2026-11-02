@@ -11,12 +11,12 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
   {
     id: "gate-select-hands", closes: "smashcraft#744 native check", map: "gate-playable", session: "gate-hands",
     setup: [{ chat: "gate:hands", client: "a" }],
-    pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE hands samples=(?:8|12) own=(?:4|6) remote=(?:4|6) badges=(?:8|12) chips=2 pass=1$", min: 1 }],
+    pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE hands samples=(?:16|20) own=(?:8|10) remote=(?:8|10) badges=(?:16|20) chips=2 pass=1$", min: 1 }],
   },
   {
     id: "gate-select-hands-teams", closes: "hand label colours in Team Battle", map: "gate-playable", session: "gate-hands-teams",
     setup: [{ chat: "-dev teams on", client: "a" }, { chat: "-dev team 0 1", client: "a" }, { chat: "-dev team 0 3", client: "b" }, { chat: "gate:hands-teams", client: "a" }],
-    pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE hands samples=(?:8|12) own=(?:4|6) remote=(?:4|6) badges=(?:8|12) chips=2 pass=1$", min: 1 }],
+    pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE hands samples=(?:16|20) own=(?:8|10) remote=(?:8|10) badges=(?:16|20) chips=2 pass=1$", min: 1 }],
   },
   {
     id: "gate-start-anywhere", closes: "T7 C2", map: "gate-playable", session: "gate-start",
