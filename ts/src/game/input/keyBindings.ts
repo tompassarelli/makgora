@@ -386,7 +386,7 @@ export const ACTION_LABELS: Readonly<Record<Action, string>> = {
   [Action.modX]: "Walk (and steep angles)",
   [Action.lightShield]: "Light shield",
   [Action.shortHop]: "Short hop (LB in the tom pad layout)",
-  [Action.strong]: "Strong (smash, EX special)",
+  [Action.strong]: "Strong (smash)",
   [Action.modY]: "Mod Y (shallow angles, wall ride)",
 };
 
