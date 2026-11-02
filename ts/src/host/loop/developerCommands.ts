@@ -6,7 +6,7 @@ import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases"
 import { createImpactEvents } from "../../game/presentation/impactEvents";
 import { emitImpacts } from "../../game/presentation/impactState";
 import { PARTICIPANT_SLOTS, isParticipantSlot } from "../../game/input/participants";
-import { Phase, START_HOLD_FRAMES, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
+import { Phase, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
 import { setMeterPercent } from "../../game/sim/meter";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { costumeOf } from "../../game/roster/costumes";
@@ -241,8 +241,8 @@ function quickMatchReceipt(s: ShellState, actor: number, message: string, reques
   if (quickCpu !== undefined) {
     const receipt = `dev: quick match cpu ${quickCpu}`;
     prepareQuickCpu(s.game, quickCpu, quickMatchCpuHero(message));
-    startQuickMatch(s, quickMatchCpuStage(message) ?? 0, s.build.scenario, undefined, QUICK_CPU_STOCKS);
-    if (quickMatchCpuHold(message)) s.game.startHold = START_HOLD_FRAMES;
+    const stage = quickMatchCpuStage(message) ?? 0;
+    startQuickMatch(s, stage, s.build.scenario, undefined, QUICK_CPU_STOCKS, quickMatchCpuHold(message) ? { stage, hold: true } : undefined);
     return receipt;
   }
   if (quickStage !== undefined) {

@@ -3,12 +3,14 @@ import { f32 } from "wisp/src/sim/f32";
 export const SCREEN_HEIGHT_UNITS = f32(0.6);
 export const SCREEN_CENTRE_X = f32(0.4);
 
-/** Melee's match clock as shares of the full frame's height, measured on uncropped 4:3 captures (docs/design/match-flow.md, "Clock size"). */
+/** Melee's match clock digit heights as shares of the full frame's height, measured on uncropped 4:3 captures (docs/design/match-flow.md, "Clock size"). */
 export const MELEE_CLOCK_SHARE = {
   digitHeight: f32(0.05),
   hundredthsHeight: f32(0.0417),
-  topMargin: f32(0.1125),
 } as const;
+
+/** Our own choice, not Melee's 11.25%: the share of the screen height between the top edge and the main digits' outline (docs/design/match-flow.md, "Clock size"). */
+export const CLOCK_TOP_MARGIN_SHARE = f32(0.04);
 
 /** Our digits' glyph box in the Wisp window, calibrated on native 1280x720 captures: outer height with outline is HEIGHT_PER_SIZE * size + OUTLINE_ALLOWANCE. */
 const HEIGHT_PER_SIZE = f32(0.8148);
@@ -35,8 +37,8 @@ const hundredthsPad = BOTTOM_PAD_PER_SIZE * CLOCK_HUNDREDTHS_SIZE;
 
 export const CLOCK_GAP = GAP;
 export const CLOCK_SPLIT_X = f32(SCREEN_CENTRE_X - (mainWidth + GAP + hundredthsWidth) / 2 + mainWidth);
-/** Top of the main digits' outline, as Melee keeps it below the frame's top edge. */
-export const CLOCK_GLYPH_TOP = f32(SCREEN_HEIGHT_UNITS * (1 - MELEE_CLOCK_SHARE.topMargin));
+/** Top of the main digits' outline. */
+export const CLOCK_GLYPH_TOP = f32(SCREEN_HEIGHT_UNITS * (1 - CLOCK_TOP_MARGIN_SHARE));
 export const CLOCK_TOP = f32(CLOCK_GLYPH_TOP + BOX_SLACK);
 const mainBottom = CLOCK_GLYPH_TOP - mainOuterHeight - mainPad;
 export const CLOCK_MAIN_BOX = { width: f32(mainWidth + BOX_SLACK), height: f32(CLOCK_TOP - mainBottom) } as const;

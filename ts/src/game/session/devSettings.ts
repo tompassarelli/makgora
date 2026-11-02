@@ -103,6 +103,7 @@ export interface QuickStageSettings {
   view?: "near" | "far" | "off";
 
   fog?: "on" | "off";
+  hold?: boolean;
   pair?: readonly [Character, Character];
 }
 

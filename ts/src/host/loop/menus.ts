@@ -13,7 +13,7 @@ import {
   setTeamBattle, setFriendlyFire, cycleTeam, cycleCostume, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, chooseMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setOrbsOn, setStocks, setTimeLimit, updateConnectedHumans,
-  type MatchState, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
+  type MatchState, START_HOLD_FRAMES, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
 } from "../../game/lobby/lobbyState";
 import { resetMomentRecorder } from "../../game/replay/moment";
 import { applyRulePreset } from "../../game/lobby/rulePresets";
@@ -194,6 +194,7 @@ export function openSettingsScreen(s: ShellState, slot: ParticipantSlot): void {
 
 export function startQuickMatch(s: ShellState, stage = 0, scenario: Scenario = s.build.scenario, character?: Character | readonly Character[], stocks = 1, stageSettings?: QuickStageSettings, costumes?: readonly number[]): void {
   if (prepareQuickMatch(s.game, stage, character, stocks, costumes)) {
+    if (stageSettings?.hold === true) s.game.startHold = START_HOLD_FRAMES;
     for (const panel of views(s).settings) panel.close();
     startMatch(s, scenario, stageSettings);
   }
