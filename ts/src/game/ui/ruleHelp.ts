@@ -7,9 +7,6 @@ import { type BarPanel, barBoxContains } from "../core/selectBarLayout";
 
 const versus = (game: Readonly<MatchState>): boolean => !game.training && !game.classic && !game.lore;
 
-export const RULE_HELP_WIDTH = f32(0.38);
-export const RULE_HELP_HEIGHT = f32(0.046);
-
 const ITEM_SECONDS = ITEM_BUFF_FRAMES / 60;
 
 const MATCH_HELP = {
@@ -42,7 +39,9 @@ const TRAINING_HELP = {
   speed: "Game speed: slow the whole game to half or quarter speed to study moves.",
 } as const;
 
-const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP, friendlyFire: "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams.", inputDelay: "Input delay: the same for every player. Online, Auto follows the slowest connection; the host (the first player) can set a number with − and +, and click the number to go back to Auto. Against computers it stays at 2 frames." };
+export const INPUT_DELAY_HELP = "Input delay: frames a press waits before it acts, the same for every player. Online, Auto follows the slowest connection and the host can press − or + to set a number, or Auto to go back. Against computers it is fixed at 2.";
+
+const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP, friendlyFire: "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams.", inputDelay: INPUT_DELAY_HELP };
 
 const SHOWN_IN: Readonly<Record<string, (game: Readonly<MatchState>) => boolean>> = {
   ...Object.fromEntries(Object.keys(MATCH_HELP).map(name => [name, versus])),

@@ -1,9 +1,9 @@
 import { SELECT_LEVELS } from "./selectLevels";
 import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
 import { RULE_BUTTONS, rulePanel } from "./ruleButtons";
-import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp } from "./ruleHelp";
+import { hoveredRule, ruleHelp } from "./ruleHelp";
 import { type BarButton, type BarTarget, SelectBar, barShown } from "./selectBar";
-import { type BarItem, barBoxContains, helpAnchor } from "../core/selectBarLayout";
+import { type BarBox, type BarItem, HELP_PADDING, barBoxContains, barTexture, helpAnchor, helpBox } from "../core/selectBarLayout";
 import { BAR_HEIGHT } from "../core/selectScreenLayout";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
@@ -48,7 +48,8 @@ import {
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { type HandFrames, createHandFrames, destroyHandFrames, presentHand } from "./selectionHandFrames";
 import { type HandPose, HIDDEN_HAND, SelectionHands, handPalette } from "./selectionHands";
-import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
+import { MENU_FONT, MENU_STYLE, type TextBox } from "./hudLayout";
+import { BAR_COLOURS, BAR_TEXT } from "./barFrames";
 import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_HEADER_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, nextSelectableCharacter, DEFAULT_FIGHTER } from "../roster/kits";
 import { MOVES_HEADER, movesPage } from "../session/messages";
@@ -63,7 +64,7 @@ import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, creat
 import { ROSTER_TILES, TILE_NAME_INSET, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, acceptsClick, cardPalette, cardRowShown, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, applyRuleButton } from "./selectionRules";
-import type { LobbyNet, SelectText, SelectionActions } from "./selectionActions";
+import { FIXED_DELAY, type LobbyNet, type SelectText, type SelectionActions } from "./selectionActions";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
 import { type CpuButton, type CpuDefaults, type CpuSettingsFrames, cpuMenuFocus, createCpuSettings, showCpuSettings } from "./selectionCpuSettings";
 import { destroyEvents, Events } from "wisp/game/events";
@@ -130,13 +131,14 @@ export class SelectionPanel {
   private readonly movesFrames: readonly Frame[];
   private readonly movesTitle: Frame;
   private readonly movesBody: Frame;
-  private net: LobbyNet = { delayText: "", delayBadge: "", hostControl: false, echoes: PARTICIPANT_SLOTS.map(() => "") };
+  private net: LobbyNet = { delay: FIXED_DELAY, delayBadge: "", echoes: PARTICIPANT_SLOTS.map(() => "") };
 
   private readonly modeLabel: Frame;
   private readonly bar: SelectBar;
   private shownLesson = -2;
   private readonly help: Frame;
   private readonly helpText: Frame;
+  private helpShape: BarBox;
   private shownHelp: string | undefined;
   private cpuSlot: number | undefined;
   private cpuFocus: 0 | 1 | 2 = 0;
@@ -247,14 +249,15 @@ export class SelectionPanel {
       this.bar.close();
     };
     this.help = createBackdrop(`MeleeRuleHelp${suffix}`, root, 0);
-    setFrameTexture(this.help, PANEL_TEXTURE, 0, true);
-    setFrameSize(this.help, RULE_HELP_WIDTH, RULE_HELP_HEIGHT);
+    this.helpShape = helpBox("");
+    setFrameTexture(this.help, barTexture("Panel", this.helpShape), 0, true);
+    setFrameSize(this.help, this.helpShape.width, this.helpShape.height);
     setFrameLevel(this.help, SELECT_LEVELS.ruleHelp);
     setFrameEnabled(this.help, false);
     this.helpText = createText(`MeleeRuleHelpText${suffix}`, this.help, 0);
-    setFramePoint(this.helpText, FramePoint.topLeft, this.help, FramePoint.topLeft, f32(0.008), f32(-0.006));
-    setFramePoint(this.helpText, FramePoint.bottomRight, this.help, FramePoint.bottomRight, f32(-0.008), f32(0.006));
-    setFrameFont(this.helpText, MENU_FONT, f32(0.0095), 0);
+    setFramePoint(this.helpText, FramePoint.topLeft, this.help, FramePoint.topLeft, HELP_PADDING.x, f32(-HELP_PADDING.y));
+    setFramePoint(this.helpText, FramePoint.bottomRight, this.help, FramePoint.bottomRight, f32(-HELP_PADDING.x), HELP_PADDING.y);
+    setFrameFont(this.helpText, MENU_FONT, BAR_TEXT, 0);
     setFrameTextAlignment(this.helpText, TextAlignment.middle, TextAlignment.left);
     setFrameEnabled(this.helpText, false);
     setFrameVisible(this.help, false);
@@ -453,7 +456,7 @@ export class SelectionPanel {
   }
 
   private barAction(game: Readonly<MatchState>, action: Action): boolean {
-    const target = this.bar.padAction(action, game, this.net.hostControl, tutorialAvailable(game));
+    const target = this.bar.padAction(action, game, this.net.delay, tutorialAvailable(game));
     if (target !== undefined) this.click(target, playerOf(this.participantId));
     return true;
   }
@@ -793,8 +796,14 @@ export class SelectionPanel {
     const panel = rulePanel(name);
     const box = RULE_BUTTONS[name];
     const anchor = panel === undefined ? { x: box.x, y: f32(f32(box.y - box.height) - f32(0.012)) } : helpAnchor(panel);
-    placeTopLeft(this.help, Math.min(anchor.x, f32(f32(0.8) - RULE_HELP_WIDTH - f32(0.01))), anchor.y);
-    setMenuText(this.helpText, text);
+    const shape = helpBox(text);
+    if (shape.height !== this.helpShape.height) {
+      this.helpShape = shape;
+      setFrameTexture(this.help, barTexture("Panel", shape), 0, true);
+      setFrameSize(this.help, shape.width, shape.height);
+    }
+    placeTopLeft(this.help, Math.min(anchor.x, f32(f32(0.8) - shape.width - f32(0.01))), anchor.y);
+    setMenuText(this.helpText, `${BAR_COLOURS.cream}${text}|r`);
   }
 
 
@@ -827,7 +836,7 @@ export class SelectionPanel {
     }
     const { net } = this;
     this.bar.present({
-      game, fighter: characterFor(game, this.participantId) ?? DEFAULT_FIGHTER, delayText: net.delayText, delayBadge: net.delayBadge, hostControl: net.hostControl,
+      game, fighter: characterFor(game, this.participantId) ?? DEFAULT_FIGHTER, delay: net.delay, delayBadge: net.delayBadge,
       pointer, focus: barFocus(this.menuFocus), start: startState(game, this.controls), tutorial: tutorialAvailable(game),
     });
   }

@@ -2,7 +2,7 @@ import type { TrainingSetting } from "./ruleButtons";
 import { type MatchMode, type MatchState, matchMode } from "../lobby/lobbyState";
 import { PRESET_NAMES, type RulePreset } from "../lobby/rulePresets";
 import { ItemKind, itemBit } from "../sim/codes";
-import type { ClassicLines, SelectionActions } from "./selectionActions";
+import type { ClassicLines, DelayControl, SelectionActions } from "./selectionActions";
 import { type BarBox, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, TRAINING_ROWS, panelHeading } from "../core/selectBarLayout";
 import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, enableControl, labelControl, showControl } from "./barFrames";
 import { setMenuText } from "./frames";
@@ -164,27 +164,43 @@ export function presentRules(rules: RuleFrames, game: Readonly<MatchState>, clas
 }
 
 export interface DelayFrames {
-  readonly line: BarControl;
-  readonly less: BarControl;
-  readonly more: BarControl;
+  readonly stepper: Stepper;
+  readonly auto: BarControl;
+  readonly note: Frame;
 }
 
 export function createDelayControls(panel: Frame, suffix: string, add: AddRule): DelayFrames {
-  const line = barControl(panel, `MeleeDelay${suffix}`, GEAR_ROWS.autoDelay, "Frame", BAR_SMALL_TEXT);
-  if (line.button !== undefined) add(line.button, { kind: "inputDelay", step: 0 }, GEAR_ROWS.autoDelay);
   return {
-    line,
-    less: pressable(panel, add, `MeleeDelayLess${suffix}`, GEAR_ROWS.lessDelay, { kind: "inputDelay", step: -1 }, "−"),
-    more: pressable(panel, add, `MeleeDelayMore${suffix}`, GEAR_ROWS.moreDelay, { kind: "inputDelay", step: 1 }, "+"),
+    stepper: stepper(panel, add, `MeleeDelay${suffix}`, GEAR_ROWS.stepper, step => ({ kind: "inputDelay", step }), BAR_TEXT),
+    auto: pressable(panel, add, `MeleeDelayAuto${suffix}`, GEAR_ROWS.auto, { kind: "inputDelay", step: 0 }, ""),
+    note: barText(panel, `MeleeDelayNote${suffix}`, GEAR_ROWS.reason, BAR_TEXT, TextAlignment.left),
   };
 }
 
-export function presentDelayControls(frames: DelayFrames, delayText: string, hostControl: boolean): void {
-  labelControl(frames.line, delayText);
-  enableControl(frames.line, hostControl);
-  showControl(frames.less, hostControl);
-  showControl(frames.more, hostControl);
+export const delayStepTarget = (delay: DelayControl, direction: -1 | 1): RuleButton | undefined => (direction < 0 ? delay.canLess : delay.canMore) ? { kind: "inputDelay", step: direction } : undefined;
+
+const shade = (on: boolean, bright: string): string => on ? bright : BAR_COLOURS.dim;
+
+export const delayLabel = (delay: DelayControl): string => {
+  const frames = `${delay.high ? BAR_COLOURS.red : shade(delay.adjustable, BAR_COLOURS.gold)}${formatInt(delay.frames)}|r`;
+  return `${shade(delay.adjustable, BAR_COLOURS.cream)}Input delay: |r${frames}${shade(delay.adjustable, BAR_COLOURS.cream)} ${delay.frames === 1 ? "frame" : "frames"}|r`;
+};
+
+export function presentDelayControls(frames: DelayFrames, delay: DelayControl): void {
+  const { less, value, more } = frames.stepper;
+  setMenuText(value, delayLabel(delay));
+  enableControl(less, delay.canLess);
+  enableControl(more, delay.canMore);
+  enableControl(frames.auto, delay.adjustable);
+  labelControl(less, `${shade(delay.canLess, BAR_COLOURS.cream)}−|r`);
+  labelControl(more, `${shade(delay.canMore, BAR_COLOURS.cream)}+|r`);
+  labelControl(frames.auto, `${delay.adjustable && delay.auto ? BAR_COLOURS.gold : shade(delay.adjustable, BAR_COLOURS.cream)}Auto|r`);
+  setMenuText(frames.note, `${delay.adjustable ? BAR_COLOURS.sky : BAR_COLOURS.cream}${delay.note}|r`);
 }
+
+export const delayLit = (frames: DelayFrames, delay: DelayControl): readonly (readonly [BarControl, boolean, boolean])[] => [
+  [frames.auto, delay.adjustable && delay.auto, delay.adjustable], [frames.stepper.less, false, delay.canLess], [frames.stepper.more, false, delay.canMore],
+];
 
 export function rulesKey(game: Readonly<MatchState>, classic: ClassicLines | undefined): string {
   const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, classic: classicRun, lore } = game;

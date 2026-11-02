@@ -352,8 +352,17 @@ one row of a few clusters with the rarely used settings one click deeper
    speed; in Classic and Lore Battles the difficulty or battle and the route.
 4. `Guide` with the `F1` key: Controls & Bindings (the controls and keyboard
    screen, as F1), Character Move List and How to Play (the tutorial menu).
-5. The gear with the input delay in frames (`2F`): Input delay (the online host
-   also gets − and + and clicks the number for Auto), Community and Credits.
+5. The gear with the input delay in frames (`2F`), opening SETTINGS: the input
+   delay as a stepper (`−`, "Input delay: N frames", `+`) with an Auto button
+   beside it, a line under it, then Community and Credits. Only the online host
+   (the first connected player) can press them: `−` and `+` leave Auto for
+   a number, Auto goes back, and the pad steps it with left and right. Everyone
+   else sees all three disabled and dim, with the line saying why: "Fixed at 2
+   vs computers" (or "when playing alone") for one connected player, local
+   players on one machine included, and "Set by the host" for an online guest;
+   the host's line says what Auto follows or would be. The hover help for any
+   rule is a bordered panel in the drawer's art at the drawer buttons' text
+   size, under the open panel so it never covers the row it describes.
 6. `START` with the `Y` key, the only crimson-and-gold fill on the bar while
    every fighter is placed; until then it names what is missing (Place your
    chip, Add a fighter, Choose CPU or Empty, Choose two teams).

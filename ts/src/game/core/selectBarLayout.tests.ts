@@ -1,8 +1,10 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { RULE_BUTTONS, type RuleName, rulePanel } from "../ui/ruleButtons";
+import { ruleHelp } from "../ui/ruleHelp";
+import { createMatchState } from "../lobby/lobbyState";
 import {
-  BAR_ORDER, BAR_PANELS, type BarArtStyle, type BarBox, type BarPanel, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, GUIDE_ROWS, MODE_ROWS, SELECT_BAR, TRAINING_ROWS, barArt, barArtName, barBoxContains,
+  BAR_ORDER, BAR_PANELS, type BarArtStyle, type BarBox, type BarPanel, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, GUIDE_ROWS, MODE_ROWS, SELECT_BAR, TRAINING_ROWS, barArt, barArtName, barBoxContains, HELP_MAX_LINES, helpBox, helpTooLong,
 } from "./selectBarLayout";
 import { BAR_STRIP } from "./selectScreenLayout";
 
@@ -48,7 +50,7 @@ test("Every bar panel opens under the bar inside the screen, and its rows lie in
     ],
     mode: [[...MODE_ROWS.modes, MODE_ROWS.teamBattle, MODE_ROWS.friendlyFire], [...MODE_ROWS.modes, MODE_ROWS.teamToggle, MODE_ROWS.friendlyToggle]],
     guide: [[GUIDE_ROWS.controls, GUIDE_ROWS.moves, GUIDE_ROWS.tutorial]],
-    gear: [[GEAR_ROWS.lessDelay, GEAR_ROWS.autoDelay, GEAR_ROWS.moreDelay, GEAR_ROWS.community, GEAR_ROWS.credits], [GEAR_ROWS.delay, GEAR_ROWS.community, GEAR_ROWS.credits]],
+    gear: [[GEAR_ROWS.stepper.less, GEAR_ROWS.stepper.value, GEAR_ROWS.stepper.more, GEAR_ROWS.auto, GEAR_ROWS.reason, GEAR_ROWS.community, GEAR_ROWS.credits], [GEAR_ROWS.delay, GEAR_ROWS.reason, GEAR_ROWS.community, GEAR_ROWS.credits]],
   };
   for (const panel of ["rules", "mode", "guide", "gear"] as const) {
     const box = BAR_PANELS[panel];
@@ -87,4 +89,29 @@ test("Each framed box has its own art at its own size, one image per style and s
   const drawn = (style: BarArtStyle, b: BarBox): boolean => art.some(item => item.style === style && item.width === b.width && item.height === b.height && barArtName(item.style, item) === barArtName(style, b));
   for (const key of BAR_ORDER) for (const style of key === "start" ? START_STYLES : ITEM_STYLES) assertTrue(drawn(style, SELECT_BAR[key]));
   for (const panel of ["rules", "mode", "guide", "gear"] as const) assertTrue(drawn("Panel", BAR_PANELS[panel]));
+});
+
+test("Every rule's hover help fits its framed panel in at most four lines, in a size the art build makes, as wide as the largest panel's text needs and at least the drawer button text size [k2 property]", () => {
+  const sizes = new Set(barArt().filter(item => item.style === "Panel").map(item => barArtName("Panel", item)));
+  const game = createMatchState();
+  const variants = [game, { ...game, training: true }, { ...game, classic: true }, { ...game, lore: true }];
+  for (const variant of variants) {
+    for (const name of Object.keys(RULE_BUTTONS) as RuleName[]) {
+      const text = ruleHelp(name, variant);
+      assertFalse(helpTooLong(text));
+      assertTrue(sizes.has(barArtName("Panel", helpBox(text))));
+    }
+  }
+  assertTrue(helpBox("x").width >= f32(0.38));
+  assertTrue(helpBox("x".repeat(500)).height <= helpBox("x".repeat(HELP_MAX_LINES * 56)).height);
+});
+
+test("The gear's delay row puts − and + around the value with Auto beside them on one line, and the note sits under it above Community [k2 property]", () => {
+  const { stepper, auto, reason, community, delay } = GEAR_ROWS;
+  assertTrue(right(stepper.less) <= stepper.value.x && right(stepper.value) <= stepper.more.x && right(stepper.more) < auto.x);
+  for (const part of [stepper.less, stepper.value, stepper.more, auto]) {
+    assertEquals(part.y, delay.y);
+    assertTrue(inside(delay, part));
+  }
+  assertTrue(bottom(delay) >= reason.y && bottom(reason) >= community.y);
 });

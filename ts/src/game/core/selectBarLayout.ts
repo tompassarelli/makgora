@@ -69,6 +69,8 @@ const panelHeight = (heading: number, rows: readonly number[]): number =>
   f32(f32(2 * PANEL_PAD) + heading + rows.reduce((sum, height) => f32(f32(sum + height) + ROW_GAP), 0));
 
 const DRAWER_WIDTH = f32(0.34);
+const NOTE_ROW = f32(0.02);
+const GEAR_HEIGHTS = [ROW, NOTE_ROW, ROW, ROW];
 const MODE_ROW = f32(0.036);
 const HEADING = f32(0.02);
 
@@ -77,7 +79,7 @@ export const BAR_PANELS: Readonly<Record<BarPanel, BarBox>> = {
   rules: box(f32(f32(RULES.x + f32(RULES.width / 2)) - f32(DRAWER_WIDTH / 2)), PANEL_TOP, DRAWER_WIDTH, panelHeight(ROW, [ROW, ROW, ROW, ROW, ROW, ROW])),
   mode: box(MODE.x, PANEL_TOP, f32(0.22), panelHeight(HEADING, [MODE_ROW, MODE_ROW, MODE_ROW, MODE_ROW, ROW, ROW])),
   guide: box(f32(right(GUIDE) - f32(0.2)), PANEL_TOP, f32(0.2), panelHeight(HEADING, [ROW, ROW, ROW])),
-  gear: box(f32(right(GEAR) - f32(0.2)), PANEL_TOP, f32(0.2), panelHeight(HEADING, [ROW, ROW, ROW])),
+  gear: box(f32(right(GEAR) - f32(0.28)), PANEL_TOP, f32(0.28), panelHeight(HEADING, GEAR_HEIGHTS)),
 };
 
 const inner = (panel: BarBox) => ({ x: f32(panel.x + PANEL_PAD), width: f32(panel.width - f32(2 * PANEL_PAD)) });
@@ -174,16 +176,38 @@ const menuRow = (panel: BarPanel, index: number): BarBox => {
 export const GUIDE_ROWS = { controls: menuRow("guide", 0), moves: menuRow("guide", 1), tutorial: menuRow("guide", 2) } as const;
 export const GUIDE_KEY = keyIn(GUIDE_ROWS.controls);
 
-const delayRow = menuRow("gear", 0);
-/** The gear's rows: input delay (the online host also gets − and +), Community and Credits. */
+const GEAR_PANEL = BAR_PANELS.gear;
+const GEAR_INNER = inner(GEAR_PANEL);
+const gearRow = (index: number): BarBox => box(GEAR_INNER.x, rowTop(GEAR_PANEL, f32(HEADING + ROW_GAP), index, GEAR_HEIGHTS), GEAR_INNER.width, GEAR_HEIGHTS[index] ?? ROW);
+const delayRow = gearRow(0);
+const AUTO_WIDTH = f32(0.056);
+const autoDelay = box(f32(right(delayRow) - AUTO_WIDTH), delayRow.y, AUTO_WIDTH, ROW);
+const lessDelay = box(delayRow.x, delayRow.y, STEP, ROW);
+const moreDelay = box(f32(f32(autoDelay.x - GAP) - STEP), delayRow.y, STEP, ROW);
+
 export const GEAR_ROWS = {
   delay: delayRow,
-  lessDelay: box(delayRow.x, delayRow.y, STEP, ROW),
-  autoDelay: box(f32(delayRow.x + STEP) + GAP, delayRow.y, f32(delayRow.width - f32(2 * f32(STEP + GAP))), ROW),
-  moreDelay: box(f32(right(delayRow) - STEP), delayRow.y, STEP, ROW),
-  community: menuRow("gear", 1),
-  credits: menuRow("gear", 2),
+  stepper: { less: lessDelay, value: box(right(lessDelay), delayRow.y, f32(moreDelay.x - right(lessDelay)), ROW), more: moreDelay },
+  auto: autoDelay,
+  reason: gearRow(1),
+  community: gearRow(2),
+  credits: gearRow(3),
 } as const;
+
+const HELP_WIDTH = f32(0.4);
+const HELP_PAD_X = f32(0.01);
+const HELP_PAD_Y = f32(0.008);
+const HELP_LINE = f32(0.0135);
+const HELP_CHARS_PER_LINE = 56;
+export const HELP_MAX_LINES = 4;
+const HELP_HEIGHTS = Array.from({ length: HELP_MAX_LINES }, (_, index) => f32(f32(2 * HELP_PAD_Y) + f32((index + 1) * HELP_LINE)));
+
+export function helpBox(text: string): BarBox {
+  const lines = Math.min(HELP_MAX_LINES, Math.max(1, Math.ceil(text.length / HELP_CHARS_PER_LINE)));
+  return box(0, 0, HELP_WIDTH, HELP_HEIGHTS[lines - 1] ?? HELP_LINE);
+}
+export const HELP_PADDING = { x: HELP_PAD_X, y: HELP_PAD_Y } as const;
+export const helpTooLong = (text: string): boolean => text.length > HELP_MAX_LINES * HELP_CHARS_PER_LINE;
 
 /** Where a rule's hover help sits: under the open panel. */
 export const helpAnchor = (panel: BarPanel): BarBox => {
@@ -219,7 +243,7 @@ export function barArt(): readonly BarArt[] {
     ...both(STAGE_BAR.pool),
     ...both(DRAWER_ROWS.reset), ...both(DRAWER_ROWS.presets[0]), ...both(DRAWER_ROWS.stocks.less), ...both(DRAWER_ROWS.ultimates),
     ...both(TRAINING_ROWS.behaviour.value), ...both(DRAWER_ROWS.stocks.value),
-    ...both(MODE_ROWS.modes[0]), ...both(MODE_ROWS.teamToggle), ...both(GUIDE_ROWS.controls), ...both(GEAR_ROWS.autoDelay),
+    ...both(MODE_ROWS.modes[0]), ...both(MODE_ROWS.teamToggle), ...both(GUIDE_ROWS.controls), ...both(GEAR_ROWS.auto), ...HELP_HEIGHTS.map((height): BarArt => ({ style: "Panel", width: HELP_WIDTH, height })),
   ];
   const seen = new Set<string>();
   return art.filter(item => {

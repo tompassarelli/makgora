@@ -2,7 +2,7 @@ import { trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
-import { type MatchState, firstHumanSlot, humanActive, humanCount } from "../../game/lobby/lobbyState";
+import { type MatchState, cpuSlot, firstHumanSlot, humanActive, humanCount } from "../../game/lobby/lobbyState";
 import {
   AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HELD_ERROR_CALLBACKS, type RttEstimate, agreedDelay, chosenDelay, connectionPoor, correctDelay,
   autoDelay, correctedDelay, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, resetRtt, rttEstimate, smoothedRttMs, stepManualDelay,
@@ -10,7 +10,7 @@ import {
 import { type FixedDelay, MAX_INPUT_DELAY, PENDING_CAPACITY, isFixedDelay } from "../../game/netcode/inputSchedule";
 import { createText, gameUi, placeTopLeft } from "../../game/ui/frames";
 import { MENU_STYLE, NET_INDICATOR_TOP } from "../../game/ui/hudLayout";
-import type { LobbyNet } from "../../game/ui/selectionActions";
+import type { DelayControl, LobbyNet } from "../../game/ui/selectionActions";
 import { at } from "wisp/src/runtime/lookup";
 import { type MachineRate, machineRate, noteMachineSecond } from "wisp/src/netcode/rate";
 import { type Roster, isActive } from "../../game/sim/roster";
@@ -129,10 +129,23 @@ export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>, lo
     if (!online || !humanActive(game, slot) || echo < 0) return "";
     return at(net.slotSlow, slot) ? ` · echo |cffff4040${formatInt(echo)} ms|r` : ` · echo ${formatInt(echo)} ms`;
   });
-  const shown = `${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${formatInt(delay)}`;
-  const delayText = !online ? `Input delay: ${shown} frames|r` : net.manual === AUTO_DELAY ? `Input delay: Auto (${shown}|r)` : `Input delay: ${shown}|r (Auto ${formatInt(autoMatchDelay(net, game))})`;
   const delayBadge = `${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${formatInt(delay)}F|r`;
-  return { delayText, delayBadge, echoes, hostControl: isHost(game, local) };
+  return { delay: delayControl(net, game, local, delay), delayBadge, echoes };
+}
+
+const delayNote = (net: Readonly<NetDelay>, game: Readonly<MatchState>, adjustable: boolean, online: boolean): string => {
+  if (adjustable) return net.manual === AUTO_DELAY ? "Auto follows the slowest connection" : `Set by you; Auto would be ${formatInt(autoMatchDelay(net, game))}`;
+  if (online) return "Set by the host";
+  return cpuSlot(game) === undefined ? `Fixed at ${formatInt(DEFAULT_DELAY)} when playing alone` : `Fixed at ${formatInt(DEFAULT_DELAY)} vs computers`;
+};
+
+export function delayControl(net: Readonly<NetDelay>, game: Readonly<MatchState>, local: number, frames: number): DelayControl {
+  const online = isOnline(game);
+  const adjustable = isHost(game, local);
+  return {
+    frames, high: highDelay(frames), auto: !online || net.manual === AUTO_DELAY, adjustable,
+    canLess: adjustable && frames > 0, canMore: adjustable && frames < net.policy.ceiling, note: delayNote(net, game, adjustable, online),
+  };
 }
 
 export function slowMachineLine(net: Readonly<NetDelay>, game: Readonly<MatchState>): string {

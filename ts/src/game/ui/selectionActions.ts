@@ -4,11 +4,22 @@ import type { RosterTile } from "../menu/selectionDrag";
 import type { ItemKind } from "../sim/codes";
 import type { TrainingSetting } from "./ruleButtons";
 
+export interface DelayControl {
+  readonly frames: number;
+  readonly high: boolean;
+  readonly auto: boolean;
+  readonly adjustable: boolean;
+  readonly canLess: boolean;
+  readonly canMore: boolean;
+  readonly note: string;
+}
+
+export const FIXED_DELAY: DelayControl = { frames: 2, high: false, auto: true, adjustable: false, canLess: false, canMore: false, note: "" };
+
 export interface LobbyNet {
-  readonly delayText: string;
+  readonly delay: DelayControl;
   /** The frames of input delay, short, for the gear badge. */
   readonly delayBadge: string;
-  readonly hostControl: boolean;
   readonly echoes: readonly string[];
 }
 

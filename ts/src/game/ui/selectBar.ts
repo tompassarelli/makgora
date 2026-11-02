@@ -4,14 +4,14 @@ import { Action } from "../input/actions";
 import { MATCH_MODES, type MatchMode, type MatchState, matchMode } from "../lobby/lobbyState";
 import { ItemKind, itemBit } from "../sim/codes";
 import { SELECT_LEVELS } from "./selectLevels";
-import type { SelectText } from "./selectionActions";
+import type { DelayControl, SelectText } from "./selectionActions";
 import {
   BAR_CHECK_TEXTURE, BAR_CHEVRON_TEXTURE, BAR_CHEVRON_UP_TEXTURE, BAR_GEAR_TEXTURE, BAR_KEYS, BAR_ORDER, BAR_PANELS, BAR_BAND_TEXTURE, BAR_LINE_TEXTURE, BAR_CHEVRONS, type BarBox, type BarItem, type BarPanel,
   GEAR_ICON, GEAR_ROWS, GUIDE_KEY, GUIDE_ROWS, MODE_ROWS, SELECT_BAR, barBoxContains, barTexture, panelHeading,
 } from "../core/selectBarLayout";
 import { BAR_LINE, BAR_STRIP } from "../core/selectScreenLayout";
 import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, clickArea, enableControl, labelControl, litControl, showControl, styleControl } from "./barFrames";
-import { type DelayFrames, type RuleButton, type RuleFrames, createDelayControls, createRulesDrawer, presentDelayControls, presentRules, rulesKey } from "./selectionRules";
+import { type DelayFrames, type RuleButton, type RuleFrames, createDelayControls, createRulesDrawer, delayLit, delayStepTarget, presentDelayControls, presentRules, rulesKey } from "./selectionRules";
 import { createBackdrop, createWindowBand, fitBandToWindow, placeTopLeft, setMenuText } from "./frames";
 import { art } from "./selectionFrames";
 import { createFrameByType, destroyFrame, Frame, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
@@ -43,9 +43,8 @@ export interface BarStart {
 export interface BarView {
   readonly game: Readonly<MatchState>;
   readonly fighter: number;
-  readonly delayText: string;
+  readonly delay: DelayControl;
   readonly delayBadge: string;
-  readonly hostControl: boolean;
   readonly pointer: { readonly x: number; readonly y: number } | undefined;
   readonly focus: BarItem | undefined;
   readonly start: BarStart;
@@ -262,14 +261,14 @@ export class SelectBar {
   }
 
   /** A pad or key press while a panel is open: what it presses, if anything; every press is the panel's while it is open. */
-  padAction(action: Action, game: Readonly<MatchState>, hostControl: boolean, tutorial: boolean): BarTarget | undefined {
+  padAction(action: Action, game: Readonly<MatchState>, delay: DelayControl, tutorial: boolean): BarTarget | undefined {
     const panel = this.openPanel;
     if (panel === undefined) return undefined;
     if (action === Action.special) {
       this.close();
       return undefined;
     }
-    const rows = this.padRows(panel, game, hostControl, tutorial);
+    const rows = this.padRows(panel, game, delay, tutorial);
     if (rows.length === 0) return undefined;
     const index = this.padActive ? floorMod(this.padRow, rows.length) : 0;
     this.padActive = true;
@@ -285,7 +284,7 @@ export class SelectBar {
     return undefined;
   }
 
-  private padRows(panel: BarPanel, game: Readonly<MatchState>, hostControl: boolean, tutorial: boolean): readonly PadRow[] {
+  private padRows(panel: BarPanel, game: Readonly<MatchState>, delay: DelayControl, tutorial: boolean): readonly PadRow[] {
     const press = (control: BarControl, target: BarTarget): PadRow => ({ controls: [control], press: target });
     if (panel === "mode") {
       const rows: PadRow[] = this.modes.rows.map((row, index) => press(row.control, { kind: "matchMode", mode: MATCH_MODES[index] ?? "versus" }));
@@ -295,10 +294,11 @@ export class SelectBar {
     }
     if (panel === "guide") return [press(this.guide.controls, { kind: "settings" }), press(this.guide.moves, { kind: "moves" }), ...(tutorial ? [press(this.guide.tutorial, { kind: "tutorialOpen" })] : [])];
     if (panel === "gear") {
-      const delay: PadRow = hostControl
-        ? { controls: [this.delay.line], press: { kind: "inputDelay", step: 0 }, step: direction => ({ kind: "inputDelay", step: direction }) }
-        : { controls: [this.delay.line] };
-      return [delay, press(this.gear.community, { kind: "communityOpen" }), press(this.gear.credits, { kind: "creditsOpen" })];
+      const { stepper, auto } = this.delay;
+      const row: PadRow = delay.adjustable
+        ? { controls: [stepper.less, stepper.more, auto], press: { kind: "inputDelay", step: 0 }, step: direction => delayStepTarget(delay, direction) }
+        : { controls: [stepper.less, stepper.more, auto] };
+      return [row, press(this.gear.community, { kind: "communityOpen" }), press(this.gear.credits, { kind: "creditsOpen" })];
     }
     return this.ruleRows(game);
   }
@@ -365,7 +365,7 @@ export class SelectBar {
   private padLit(view: BarView): ReadonlySet<BarControl> {
     const open = this.openPanel;
     if (open === undefined || !this.padActive) return EMPTY_LIT;
-    const rows = this.padRows(open, view.game, view.hostControl, view.tutorial);
+    const rows = this.padRows(open, view.game, view.delay, view.tutorial);
     return new Set(rows[floorMod(this.padRow, Math.max(1, rows.length))]?.controls ?? []);
   }
 
@@ -394,8 +394,12 @@ export class SelectBar {
   }
 
   private presentGear(view: BarView, lit: Lit): void {
-    presentDelayControls(this.delay, view.delayText, view.hostControl);
-    for (const control of [this.delay.line, this.delay.less, this.delay.more, this.gear.community, this.gear.credits]) lit(control, false);
+    presentDelayControls(this.delay, view.delay);
+    for (const [control, on, enabled] of delayLit(this.delay, view.delay)) {
+      if (enabled) lit(control, on);
+      else styleControl(control, control.rest);
+    }
+    for (const control of [this.gear.community, this.gear.credits]) lit(control, false);
   }
 
   private presentMode(game: Readonly<MatchState>, lit: Lit): void {
