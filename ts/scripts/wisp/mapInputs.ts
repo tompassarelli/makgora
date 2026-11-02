@@ -46,7 +46,7 @@ import { UI_FRAMES } from "./uiFrames";
 import { RACES, type Race, fighterRace } from "../../src/game/roster/races";
 import { raceBackingArt } from "../../src/game/ui/raceFrame";
 import { barArtNames } from "../../src/game/core/selectBarLayout";
-import { MENU_FRAME_PIECES, menuFrameName } from "../../src/game/ui/menuFrame";
+import { MENU_FRAME_PIECES, menuFrameName } from "../../src/game/core/menuFrame";
 import { checkCueModels } from "./headlessRender";
 import { mapCueModels } from "./cueModels";
 import { removeGeosets, teamGlowGeosets } from "../groundPlanes";

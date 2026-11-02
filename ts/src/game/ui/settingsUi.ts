@@ -92,6 +92,25 @@ function createNameBox(root: Frame, participantId: number): Frame {
   return box;
 }
 
+function createLitFill(art: Frame, name: string, context: number): Frame {
+  const lit = createBackdrop(name, art, context);
+  setFrameTexture(lit, PREVIEW_ROW_LIT_TEXTURE, 0, true);
+  setFramePoint(lit, FramePoint.topLeft, art, FramePoint.topLeft, f32(0.004), f32(-0.004));
+  setFramePoint(lit, FramePoint.bottomRight, art, FramePoint.bottomRight, f32(-0.004), f32(0.004));
+  setFrameEnabled(lit, false);
+  setFrameLevel(lit, 32);
+  return lit;
+}
+
+function createDismiss(root: Frame, name: string, context: number): Frame {
+  const dismiss = createFrameByType("BUTTON", name, root, "", context);
+  setFramePoint(dismiss, FramePoint.topLeft, root, FramePoint.topLeft, 0.0, 0.0);
+  setFramePoint(dismiss, FramePoint.bottomRight, root, FramePoint.bottomRight, 0.0, 0.0);
+  setFrameLevel(dismiss, 36);
+  setFrameVisible(dismiss, false);
+  return dismiss;
+}
+
 function leaveSlotModes(settings: BindingSettings, kind: SettingsButton["kind"]): void {
   if (kind !== "name") endNaming(settings);
   if (kind !== "custom" && kind !== "slot") closeSlotMenu(settings);
@@ -163,12 +182,7 @@ export class SettingsPanel {
     setFrameText(line("MeleeSettingsTitle", LEFT, below(f32(0.017)), f32(0.3), f32(0.024), f32(0.013)), `${MENU_STYLE.gold}CONTROLS|r`);
     this.presets = BINDING_PRESETS.filter(preset => preset !== "custom").map((preset, index): readonly [BindingPreset, Frame] => [preset, button(`MeleeSettingsPreset${formatInt(index)}`, presetButton(index), PRESET_NAMES[preset], { kind: "preset", preset }).label]);
     this.custom = button("MeleeSettingsCustom", CUSTOM_BUTTON, "", { kind: "custom" }, 31, 33);
-    this.customLit = createBackdrop(`MeleeSettingsCustomLit${suffix}`, this.custom.art, participantId);
-    setFrameTexture(this.customLit, PREVIEW_ROW_LIT_TEXTURE, 0, true);
-    setFramePoint(this.customLit, FramePoint.topLeft, this.custom.art, FramePoint.topLeft, f32(0.004), f32(-0.004));
-    setFramePoint(this.customLit, FramePoint.bottomRight, this.custom.art, FramePoint.bottomRight, f32(-0.004), f32(0.004));
-    setFrameEnabled(this.customLit, false);
-    setFrameLevel(this.customLit, 32);
+    this.customLit = createLitFill(this.custom.art, `MeleeSettingsCustomLit${suffix}`, participantId);
     this.edits = [
       [button("MeleeSettingsName", editButton(0), "Rename", { kind: "name" }), "Rename"],
       [button("MeleeSettingsReset", editButton(1), "Reset", { kind: "reset" }), "Reset"],
@@ -197,11 +211,7 @@ export class SettingsPanel {
     button("MeleeSettingsSave", SAVE_BUTTON, "Save", { kind: "save" });
     button("MeleeSettingsClose", PICKER_DONE, "Done", { kind: "close" });
     this.bindButton = button("MeleeSettingsBind", BIND_BUTTON, "", { kind: "bindUnbound" });
-    this.dismiss = createFrameByType("BUTTON", `MeleeSettingsDismiss${suffix}`, root, "", participantId);
-    setFramePoint(this.dismiss, FramePoint.topLeft, root, FramePoint.topLeft, 0.0, 0.0);
-    setFramePoint(this.dismiss, FramePoint.bottomRight, root, FramePoint.bottomRight, 0.0, 0.0);
-    setFrameLevel(this.dismiss, 36);
-    setFrameVisible(this.dismiss, false);
+    this.dismiss = createDismiss(root, `MeleeSettingsDismiss${suffix}`, participantId);
     this.clicks.add(this.dismiss, { kind: "dismiss" }, undefined, "native");
     const slotButtons: PanelButton[] = [];
     for (let slot = 0; slot < CUSTOM_SLOT_COUNT; slot++) slotButtons.push(button(`MeleeSettingsSlot${formatInt(slot)}`, slotOption(slot), "", { kind: "slot", slot }, 37));

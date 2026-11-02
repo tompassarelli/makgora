@@ -21,7 +21,7 @@ import { RACES } from '../../ts/src/game/roster/races';
 import { RACE_COLOURS } from '../../ts/src/game/ui/raceFrame';
 import { type BarArtStyle, barArt, barArtName } from '../../ts/src/game/core/selectBarLayout';
 import { BAR_LINE, BAR_STRIP } from '../../ts/src/game/core/selectScreenLayout';
-import { MENU_FRAME_PIECES, type MenuFramePiece, menuFrameName } from '../../ts/src/game/ui/menuFrame';
+import { MENU_FRAME_PIECES, type MenuFramePiece, menuFrameName } from '../../ts/src/game/core/menuFrame';
 
 const project = resolve(import.meta.dir, '../..');
 const source = join(project, 'tools/selection/art');

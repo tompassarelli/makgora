@@ -1,7 +1,7 @@
 
 
 
-import { MENU_FRAME_BAND, MENU_FRAME_CORNER, MENU_FRAME_PIECES, type MenuFramePiece, menuFrameTexture } from "./menuFrame";
+import { MENU_FRAME_BAND, MENU_FRAME_CORNER, MENU_FRAME_PIECES, type MenuFramePiece, menuFrameTexture } from "../core/menuFrame";
 
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";

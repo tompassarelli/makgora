@@ -3,7 +3,7 @@ import { STAGE_CHOICES } from "../menu/stageCatalog";
 import { selectionCardTexture, selectionChipTexture } from "./selectionCards";
 import { slotColor } from "./slotColors";
 import { barArtNames } from "../core/selectBarLayout";
-import { MENU_FRAME_PIECES, menuFrameTexture } from "./menuFrame";
+import { MENU_FRAME_PIECES, menuFrameTexture } from "../core/menuFrame";
 import { STAGE_CARD_COAL, STAGE_CHIP_TEXTURE } from "./stageCard";
 
 export function preloadMenuTextures(): string[] {
