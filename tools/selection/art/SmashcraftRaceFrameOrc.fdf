@@ -2,16 +2,6 @@ Frame "SIMPLEFRAME" "SmashcraftRaceFrameOrc" {
     Width 0.06625,
     Height 0.085,
     Layer "BACKGROUND" {
-        Texture "SmashcraftRaceFrameOrcBacking" {
-            File "war3mapImported\RaceBackingOrc.tga",
-            TexCoord 0.125, 0.875, 0, 1,
-            AlphaMode "BLEND",
-            Width 0.04875,
-            Height 0.065,
-            Anchor TOPLEFT, 0.00875, -0.0175,
-        }
-    }
-    Layer "BORDER" {
         Texture "SmashcraftRaceFrameOrcPortrait" {
             TexCoord 0.125, 0.875, 0, 1,
             AlphaMode "BLEND",

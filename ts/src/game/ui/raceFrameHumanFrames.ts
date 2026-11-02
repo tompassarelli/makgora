@@ -4,7 +4,6 @@ export const SMASHCRAFTRACEFRAMEHUMAN_TOC = "war3mapImported\\SmashcraftRaceFram
 
 export interface SmashcraftRaceFrameHumanFrames {
   readonly root: Frame;
-  readonly backing: Frame;
   readonly portrait: Frame;
   readonly archLeft: Frame;
   readonly archMiddle: Frame;
@@ -17,7 +16,6 @@ export function createSmashcraftRaceFrameHuman(parent: Frame, context: number): 
   const root = createSimpleFrame("SmashcraftRaceFrameHuman", parent, context);
   const frames: SmashcraftRaceFrameHumanFrames = {
     root,
-    backing: namedFrame("SmashcraftRaceFrameHumanBacking", context),
     portrait: namedFrame("SmashcraftRaceFrameHumanPortrait", context),
     archLeft: namedFrame("SmashcraftRaceFrameHumanArchLeft", context),
     archMiddle: namedFrame("SmashcraftRaceFrameHumanArchMiddle", context),

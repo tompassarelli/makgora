@@ -12,11 +12,11 @@ export const RACE_FRAME_PX = { width: CONSOLE_ARCH.width, height: CONSOLE_ARCH.h
 
 export const BUST_TEXTURE_PX = 256;
 
-export type FrameLayer = "BACKGROUND" | "BORDER" | "ARTWORK";
+export type FrameLayer = "BACKGROUND" | "ARTWORK";
 
 /** One texture of the frame: where it sits in the frame (pixels at 1920 tall) and which texels it shows as [left, right, top, bottom]. */
 export interface FramePart {
-  readonly key: "backing" | "portrait" | "archLeft" | "archMiddle" | "archRight";
+  readonly key: "portrait" | "archLeft" | "archMiddle" | "archRight";
   readonly layer: FrameLayer;
   readonly file?: string;
   readonly texels: number;
@@ -41,13 +41,12 @@ const BUST_U_LEFT = f32((BUST_TEXTURE_PX - BUST_SHOWN_TEXELS) / 2 / BUST_TEXTURE
 const OPENING_CROP = [BUST_U_LEFT, f32(1.0 - BUST_U_LEFT), 0.0, 1.0] as const;
 
 export const consoleTile = (race: Race, tile: number): string => `UI\\Console\\${race}\\${race}UITile0${tile}.blp`;
-export const raceBacking = (race: Race): string => `war3mapImported\\RaceBacking${race}.tga`;
-export const RACE_BACKING_PX = BUST_TEXTURE_PX;
+/** Our radial glow in the race's colours, drawn into each fighter's bust at build time; the race frame shows the bust alone under the arch. */
+export const raceBackingArt = (race: Race): string => `RaceBacking${race}`;
 
 export function raceFrameParts(race: Race): readonly FramePart[] {
   return [
-    { key: "backing", layer: "BACKGROUND", file: raceBacking(race), texels: RACE_BACKING_PX, texCoord: OPENING_CROP, ...OPENING },
-    { key: "portrait", layer: "BORDER", texels: BUST_TEXTURE_PX, texCoord: OPENING_CROP, ...OPENING },
+    { key: "portrait", layer: "BACKGROUND", texels: BUST_TEXTURE_PX, texCoord: OPENING_CROP, ...OPENING },
     { key: "archLeft", layer: "ARTWORK", file: consoleTile(race, 2), texels: CONSOLE_TILE_PX, texCoord: [tileU(ARCH_RIGHT_PX), 0.0, ARCH_V_TOP, ARCH_V_BOTTOM], x: 0, y: 0, width: ARCH_RIGHT_PX, height: CONSOLE_ARCH.height },
     { key: "archMiddle", layer: "ARTWORK", file: consoleTile(race, 1), texels: CONSOLE_TILE_PX, texCoord: [tileU(CONSOLE_TILE_PX - ARCH_MIDDLE_PX), 1.0, ARCH_V_TOP, ARCH_V_BOTTOM], x: ARCH_RIGHT_PX, y: 0, width: ARCH_MIDDLE_PX, height: CONSOLE_ARCH.height },
     { key: "archRight", layer: "ARTWORK", file: consoleTile(race, 2), texels: CONSOLE_TILE_PX, texCoord: [0.0, tileU(ARCH_RIGHT_PX), ARCH_V_TOP, ARCH_V_BOTTOM], x: ARCH_SPLIT, y: 0, width: ARCH_RIGHT_PX, height: CONSOLE_ARCH.height },

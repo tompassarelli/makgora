@@ -4,7 +4,6 @@ export const SMASHCRAFTRACEFRAMEUNDEAD_TOC = "war3mapImported\\SmashcraftRaceFra
 
 export interface SmashcraftRaceFrameUndeadFrames {
   readonly root: Frame;
-  readonly backing: Frame;
   readonly portrait: Frame;
   readonly archLeft: Frame;
   readonly archMiddle: Frame;
@@ -17,7 +16,6 @@ export function createSmashcraftRaceFrameUndead(parent: Frame, context: number):
   const root = createSimpleFrame("SmashcraftRaceFrameUndead", parent, context);
   const frames: SmashcraftRaceFrameUndeadFrames = {
     root,
-    backing: namedFrame("SmashcraftRaceFrameUndeadBacking", context),
     portrait: namedFrame("SmashcraftRaceFrameUndeadPortrait", context),
     archLeft: namedFrame("SmashcraftRaceFrameUndeadArchLeft", context),
     archMiddle: namedFrame("SmashcraftRaceFrameUndeadArchMiddle", context),
