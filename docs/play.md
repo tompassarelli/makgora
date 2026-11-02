@@ -12,6 +12,12 @@ seven-minute clock. Keyboard controls and the browser's gamepad controls enter
 the playable map's keyboard sampling. The browser draws the map's models,
 camera, effects and HUD from the headless client and plays its sound cues.
 
+In the native window F12 saves the frame on screen with its full scene (every
+model, place, team colour, alpha and the active effects) and the window's facts
+to `~/.local/state/smashcraft/evidence/window-snapshot-<UTC time>/`, for a
+glitch seen once in a playtest; `WISP_WINDOW_SNAPSHOTS=DIR` sends it elsewhere
+(wisp:docs/play.md, "Native window"). The game never hears F12.
+
 `bun wisp play --standalone --window chrome --script test/native/pads/cpu-expert.pad --headless
 --frames 1070 --out build/standalone-cpu --capture-frames 200,600,1000` runs
 the existing native pad driver and saves each frame's checksum plus captures.

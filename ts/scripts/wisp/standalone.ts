@@ -1,4 +1,5 @@
 import type { StandaloneGame, StandaloneInput, StandaloneSession } from "wisp/scripts/wisp/standalone";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import type { MapEntry } from "wisp/src/headless/client";
 import { createKeyFeed } from "wisp/src/headless/keyInput";
@@ -338,6 +339,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   if (digests !== undefined) query.set("digests", digests);
   const compiled = !import.meta.path.endsWith(".ts");
   if (compiled) process.env.SMASHCRAFT_NATIVE_QUERY = query.toString();
+  if (windowed.window === "native") process.env.WISP_WINDOW_SNAPSHOTS ??= join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "smashcraft/evidence");
   const nativeModule = query.size === 0 || compiled ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
   return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...match, ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }), ...(noTutorialOffer === true ? { tutorialOffer: false } : {}) }) }, {
     ...run,
