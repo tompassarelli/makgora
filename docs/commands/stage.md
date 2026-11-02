@@ -13,7 +13,7 @@
   for the existing 3.0 fog comparison; these affect only local presentation.
 - Fighter band separation: `bun wisp accept --only 'sep-*' --pair K --map MAP`
   captures, per stage and camera extreme, Shadow Hunter and Chen paused
-  (`-dev quick stage N pair A / B`, BackSpace pause, H hides the pause menu),
+  (`-dev quick stage N pair A / B`, BackSpace pause, the Toggle controls key hides the pause menu),
   the same scene with both fighters hidden, and the fighters alone. From the
   repository root, `bun tools/stage/contrast.ts --separation MASK SCENE BACKDROP...`
   prints each fighter's L\* band against the backdrop behind it and fails

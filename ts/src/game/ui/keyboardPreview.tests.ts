@@ -1,7 +1,7 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { FRIZ_QUADRATA_WIDTHS, textWidth } from "wisp/src/ui/chatLog";
-import { ACTION_ORDER, Action } from "../input/actions";
+import { SIM_ACTIONS, Action } from "../input/actions";
 import { presetBindings, rebind } from "../input/keyBindings";
 import { PREVIEW_COLUMNS, PREVIEW_INNER, PREVIEW_ROWS, PREVIEW_ROW_HEIGHT, PREVIEW_TEXT_MAX, type PreviewRow, previewKeyText, previewRowHeld, previewTextFit } from "./keyboardPreview";
 
@@ -10,7 +10,7 @@ const rowFor = (label: string): PreviewRow => PREVIEW_ROWS.find(placed => placed
 test("the CONTROLS preview follows Tom's layout, covers every bindable action once, shows each row's current keys in brackets with both shield triggers and [-] when unbound, follows a rebind, lights a row only while one of its keys is held, and scales its text so every label and key fits its column inside the panel [k2 property]", () => {
   const groups = PREVIEW_COLUMNS.map(column => column.map(group => group.map(row => row.label).join(" ")).join(" | ")).join(" || ");
   assertEquals(groups, "Up: Down: Left: Right: | Mod-X (Walk): | A (Atk): B (Spc): X (Jmp): Y (Jmp): || C-Up: C-Down: C-Left: C-Right: | Mod-Y (Tilt): | Shield: Lightshield: Strong (Smash): Grab:");
-  assertEquals(PREVIEW_ROWS.flatMap(placed => placed.row.actions).slice().sort((a, b) => a - b).join(","), ACTION_ORDER.join(","), "every action once");
+  assertEquals(PREVIEW_ROWS.flatMap(placed => placed.row.actions).slice().sort((a, b) => a - b).join(","), SIM_ACTIONS.join(","), "every action the sim knows once, the toggle named in the title");
   const bindings = presetBindings("wasd");
   assertEquals(["Up:", "Down:", "Left:", "Right:"].map(label => previewKeyText(bindings, rowFor(label))).join(" "), "[W] [S] [A] [D]");
   rebind(bindings, Action.leftTrigger, 0, "Q".charCodeAt(0));

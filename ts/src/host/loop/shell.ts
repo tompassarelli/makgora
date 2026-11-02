@@ -317,7 +317,9 @@ function createTriggers(s: ShellState): void {
   registerKey(s, pauseDown, Key.escape, true);
   onEvents(pauseDown, trampoline(KEY_PAUSE_DOWN));
   const previewDown = createEvents();
-  registerKey(s, previewDown, Key.h, true);
+  for (let key = 1; key <= 255; key++) {
+    if (key !== Key.enter && key !== Key.backspace) registerKey(s, previewDown, key, true);
+  }
   onEvents(previewDown, trampoline(KEY_PREVIEW_DOWN));
   syncTrigger(s, KEYBOARD_PAUSE_PREFIX, KEYBOARD_PAUSE, true);
   syncTrigger(s, MAIN_MENU_PREFIX, MAIN_MENU, true);

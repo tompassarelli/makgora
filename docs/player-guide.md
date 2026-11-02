@@ -81,7 +81,7 @@ L + R + A + START over RESET MATCH: hold two shield buttons (shield, light shiel
 second trigger) and Attack, then press Start (Esc or Backspace), or click the plate,
 to return to fighter selection. On a keyboard the plate names the keys you bound
 to those actions. Start, Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
-the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). H on the pause screen is reserved for the Show keyboard in game toggle; G hides the HUD for a clean screenshot.
+the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). The Toggle controls key (F2 by default) on the pause screen is reserved for the Show keyboard in game toggle; G hides the HUD for a clean screenshot.
 
 At fighter selection, up/down (W/S on WASD, Space/E on Box) moves focus
 between fighter cards and CPU Opponent settings. Left/right changes the focused
@@ -116,9 +116,9 @@ Show keyboard in game is on for a new player and off for anyone who saved contro
 existed. In a match a CONTROLS panel sits in the bottom row between the player panels (they move to the screen's edges, and shrink a little with three or four players, to give it room) and lists
 every action with the key you bound to it in brackets ([-] when unbound): movement, Mod-X (Walk), then
 A (Atk), B (Spc), X (Jmp) and Y (Jmp, the short hop) on the left; the C-stick, Mod-Y (Tilt), then
-Shield (both trigger keys), Lightshield, Strong (Smash) and Grab on the right. A row lights while you hold its key (your controller's buttons on a pad). Press H in a match or click "Show keyboard in
+Shield (both trigger keys), Lightshield, Strong (Smash) and Grab on the right. A row lights while you hold its key (your controller's buttons on a pad). Press the Toggle controls key (F2 by default, rebindable on the Controls screen) in a match or click "Show keyboard in
 game" on the Controls screen to hide or show it, and the choice is saved with your controls. If you
-bind H to an action, H stops toggling it and the button still works. Ctrl+T starts a developer input trace.
+unbind Toggle controls, no key toggles it and the button still works; its title then reads plain Controls, and otherwise it reads "Controls - F2 to toggle" with the key you chose. Ctrl+T starts a developer input trace.
 
 Help: type -help (or -commands) in chat for every player command, one line
 each, or press F9 for the quest log's Controls (your current layout and how to

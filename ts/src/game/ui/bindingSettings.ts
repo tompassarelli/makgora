@@ -2,7 +2,7 @@
 
 
 
-import type { Action } from "../input/actions";
+import { Action } from "../input/actions";
 import {
   ACTION_LABELS,
   type BindingPreset,
@@ -291,9 +291,18 @@ export function saveBindingSettings(settings: BindingSettings): void {
   settings.message = "Controls saved for next time.";
 }
 
-export const PREVIEW_KEY = 0x48;
+/** The name of the key bound to Toggle controls, or undefined when the player has left it unbound. */
+export function previewToggleKey(settings: Readonly<BindingSettings>): string | undefined {
+  const key = keyFor(settings.bindings, Action.toggleControls, 0) ?? keyFor(settings.bindings, Action.toggleControls, 1);
+  return key === undefined ? undefined : keyLabel(key);
+}
 
-export const previewKeyFree = (settings: Readonly<BindingSettings>): boolean => actionFor(settings.bindings, PREVIEW_KEY) === undefined;
+/** The Toggle controls key shows or hides the panel and saves the choice; any other key, bound or not, is left alone. Local presentation only: nothing here reaches the sim or the replay. */
+export function pressPreviewKey(settings: BindingSettings, key: number): boolean {
+  if (actionFor(settings.bindings, key) !== Action.toggleControls) return false;
+  toggleKeyboardPreview(settings);
+  return true;
+}
 
 export function toggleKeyboardPreview(settings: BindingSettings): void {
   if (!settings.ready) return;

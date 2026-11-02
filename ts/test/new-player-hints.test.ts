@@ -3,6 +3,7 @@ import { install, startBuild } from "../src/platform/main";
 import { Phase } from "../src/game/lobby/lobbyState";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { Key } from "../src/host/loop/keyEvents";
+import { TOGGLE_CONTROLS_KEY } from "../src/game/input/keyBindings";
 import { shell } from "../src/host/loop/state";
 import { views } from "../src/host/loop/ui";
 import { passStartControls } from "../scripts/wisp/startControls";
@@ -23,7 +24,7 @@ interface Seen {
   readonly stripShown: boolean;
 }
 
-test("a fresh profile shows the new-player strip in a match, H hides it for that player only and H again brings it back, and Esc still pauses with the strip on [k1 scenario]", () => {
+test("a fresh profile shows the new-player strip in a match, the F2 key hides it for that player only and again brings it back, and Esc still pauses with the strip on [k1 scenario]", () => {
   const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, HUMANS);
   const seen = (slot: number): Seen => {
     let result: Seen | undefined;
@@ -55,10 +56,10 @@ test("a fresh profile shows the new-player strip in a match, H hides it for that
   clients.frames(30);
   expect(seen(0)).toMatchObject({ hints: true, stripShown: true });
   expect(seen(1)).toMatchObject({ hints: true, stripShown: true });
-  tap(Key.h);
+  tap(TOGGLE_CONTROLS_KEY);
   expect(seen(0)).toMatchObject({ hints: false, stripShown: false });
   expect(seen(1)).toMatchObject({ hints: true, stripShown: true });
-  tap(Key.h);
+  tap(TOGGLE_CONTROLS_KEY);
   expect(seen(0)).toMatchObject({ hints: true, stripShown: true });
   tap(Key.escape);
   until("the pause", () => HUMANS.every(slot => {

@@ -1,4 +1,4 @@
-// Action numbers are bit positions in the companion I4 protocol and must not change.
+// Action numbers up to modY are bit positions in the companion I4 protocol and must not change; toggleControls is a local presentation action that is bound and saved like the rest but never enters an input mask, the wire or the sim.
 
 
 
@@ -23,6 +23,7 @@ export const Action = {
   shortHop: 16,
   strong: 17,
   modY: 18,
+  toggleControls: 19,
 } as const;
 
 export type Action = (typeof Action)[keyof typeof Action];
@@ -32,8 +33,13 @@ export const ACTION_ORDER: readonly Action[] = Object.values(Action).sort((left,
 
 export const ACTION_COUNT = ACTION_ORDER.length;
 
+/** The actions the sim and the wire know: every bound action except the local toggleControls. */
+export const SIM_ACTIONS: readonly Action[] = ACTION_ORDER.filter((action) => action !== Action.toggleControls);
 
-export const ALL_ACTIONS = (1 << ACTION_COUNT) - 1;
+export const SIM_ACTION_COUNT = SIM_ACTIONS.length;
+
+
+export const ALL_ACTIONS = (1 << SIM_ACTION_COUNT) - 1;
 
 export function bit(action: Action): number {
   return 1 << action;

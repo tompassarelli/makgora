@@ -16,6 +16,7 @@ const ROWS: readonly (readonly [indent: number, keys: string])[] = [
 
 const SYMBOLS: Readonly<Record<string, number>> = { "-": 189, "=": 187, ";": 186, ",": 188, ".": 190, "/": 191, "[": 219, "]": 221 };
 const SPACE = 32;
+const F2 = 113;
 
 export const KEY_CAP_HEIGHT = f32(0.042);
 const KEY_CAP_WIDTH = f32(0.046);
@@ -32,6 +33,8 @@ export function keyboardCaps(left: number, top: number): KeyCap[] {
       caps.push({ key: SYMBOLS[character] ?? character.charCodeAt(0), x, y, width: KEY_CAP_WIDTH });
     }
   });
-  caps.push({ key: SPACE, x: f32(left + f32(2.5 * PITCH)), y: f32(top - f32(ROWS.length * ROW_PITCH)), width: f32(f32(5 * PITCH) - f32(PITCH - KEY_CAP_WIDTH)) });
+  const spaceY = f32(top - f32(ROWS.length * ROW_PITCH));
+  caps.push({ key: F2, x: f32(left + f32(8 * PITCH)), y: spaceY, width: KEY_CAP_WIDTH });
+  caps.push({ key: SPACE, x: f32(left + f32(2.5 * PITCH)), y: spaceY, width: f32(f32(5 * PITCH) - f32(PITCH - KEY_CAP_WIDTH)) });
   return caps;
 }

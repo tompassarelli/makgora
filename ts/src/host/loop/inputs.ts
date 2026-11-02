@@ -1,6 +1,6 @@
 
 import { warcraftChatOpen } from "../../platform/editboxJournal";
-import { ACTION_ORDER, bit } from "../../game/input/actions";
+import { SIM_ACTIONS, bit } from "../../game/input/actions";
 import { clearAttackBuffer } from "../../game/input/attackBuffer";
 import { resetKeys } from "../../game/input/keyboardCapture";
 import { actionFor, keyFor } from "../../game/input/keyBindings";
@@ -83,7 +83,7 @@ export function pollLocalKeys(s: Readonly<ShellState>): number {
   }
   const pressed = (key: number | undefined) => key !== undefined && !menuHeld?.includes(key) && polledKeyDown(s.localKeys, key);
   let held = 0;
-  for (const action of ACTION_ORDER) {
+  for (const action of SIM_ACTIONS) {
     if (pressed(keyFor(bindings, action, 0)) || pressed(keyFor(bindings, action, 1))) held |= bit(action);
   }
   for (const { action, code } of PAD_LAYER) {

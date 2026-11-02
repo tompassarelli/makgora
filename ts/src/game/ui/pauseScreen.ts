@@ -36,7 +36,7 @@ export interface PauseView {
   readonly camera: string;
   readonly pauseKey: string;
   readonly keyboard?: boolean | undefined;
-  readonly keyboardKey?: boolean | undefined;
+  readonly keyboardKey?: string | undefined;
 }
 
 type Place = (edges: Edges) => readonly [number, number, number, number];
@@ -144,7 +144,7 @@ export class PauseScreen {
     }
     setFrameText(this.nameText, `${MENU_STYLE.gold}${view.player === undefined ? "PAUSE" : `PLAYER ${formatInt(view.player)} PAUSE`}|r`);
     setFrameText(this.clockText, view.clock === undefined ? "" : `${MENU_STYLE.text}${view.clock}|r`);
-    const keyboard = view.keyboard === undefined ? "" : `\nShow keyboard in game: ${view.keyboard ? "on" : "off"}${view.keyboardKey === true ? " (H)" : ""}`;
+    const keyboard = view.keyboard === undefined ? "" : `\nShow keyboard in game: ${view.keyboard ? "on" : "off"}${view.keyboardKey === undefined ? "" : ` (${view.keyboardKey})`}`;
     setFrameText(this.menuText, `${MENU_STYLE.text}F10: leave the game  ·  G: hide HUD${keyboard}|r`);
     setFrameText(this.cameraText, `${MENU_STYLE.text}${view.camera}|r`);
     setFrameText(this.resetText, `${MENU_STYLE.gold}RESET MATCH|r`);
