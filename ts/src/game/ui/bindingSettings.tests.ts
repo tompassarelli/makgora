@@ -1,7 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
-import { ACTION_LABELS, BINDING_PRESETS, type BindingPreset, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, rebind, reservedReason, slotIndex, TOGGLE_CONTROLS_KEY, unboundActions } from "../input/keyBindings";
+import { ACTION_LABELS, BINDING_PRESETS, type BindingPreset, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
 import { CUSTOM_SLOT_COUNT, type LayoutBindings, SLOT_NAME_LIMIT, decodeLayouts, encodeLayouts, layoutSave, presetLayouts } from "../input/layoutSave";
 import {
   type BindingLoadResult,
@@ -23,18 +23,16 @@ import {
   pickCustomSlot,
   slotLabel,
   pickBindingPreset,
-  pressPreviewKey,
-  previewToggleKey,
   resetToLayout,
   saveBindingSettings,
   toggleKeyboardPreview,
 } from "./bindingSettings";
 import { PLAYER_FILE_CAPACITY } from "../core/gameFiles";
 import { keyboardCaps } from "./keyboardLayout";
-import { previewTitle } from "./keyboardPreview";
 
 const BACKSPACE = 0x08;
 const ESCAPE = 0x1b;
+const F2 = 0x71;
 const F6 = 0x75;
 const F7 = 0x76;
 const EQUALS = 0xbb;
@@ -83,7 +81,7 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   assertEquals(encodeBindings(settings.bindings), before, "clearing an unbound key");
 
   beginBindingCapture(settings, Action.attack, 0);
-  for (const key of [BACKSPACE, ESCAPE, F6, F7]) {
+  for (const key of [BACKSPACE, ESCAPE, F2, F6, F7]) {
     assertEquals(captureBinding(settings, key), true);
     assertEquals(settings.message, `${reservedReason(key)}. Press another key.`);
     assertEquals(encodeBindings(settings.bindings), before, `reserved ${keyLabel(key)}`);
@@ -442,40 +440,3 @@ test("a brand-new player has Show keyboard in game on, turning it off is saved w
   assertEquals(decodeLayouts(older)?.keyboard, false, "a save from before either setting");
   assertEquals(decodeLayouts(encodeLayouts(layoutSave(presetLayouts(), "wasd", true)))?.keyboard, true, "on survives a save and load");
 });
-
-test("the F2 key toggles Show keyboard in game and saves it like the Controls screen does, a rebind moves the toggle and the panel title, and unbound leaves a plain title [k2 property]", () => {
-  const saved: string[] = [];
-  const empty: BindingLoadResult = { kind: "empty" };
-  const settings = createBindingSettings(0, { load: (_owner, complete) => complete(empty), readLocal: () => empty, save: (_owner, encoded) => { saved.push(encoded); } });
-  initializeBindingSettings(settings);
-  const lastSaved = () => decodeLayouts(saved[saved.length - 1] ?? "")?.keyboard;
-  assertEquals(settings.keyboard, true, "fresh profile shows the panel");
-  assertEquals(previewTitle(previewToggleKey(settings)), "Controls - F2 to toggle");
-  assertEquals(pressPreviewKey(settings, code("J")), false, "another key does not toggle");
-  assertEquals(settings.keyboard, true);
-  assertEquals(pressPreviewKey(settings, TOGGLE_CONTROLS_KEY), true, "F2 is the default toggle");
-  assertEquals(settings.keyboard, false, "F2 hides the panel");
-  assertEquals(lastSaved(), false, "and saves it off");
-  assertEquals(pressPreviewKey(settings, TOGGLE_CONTROLS_KEY), true);
-  assertEquals(settings.keyboard, true, "F2 shows it again");
-  assertEquals(lastSaved(), true, "and saves it on");
-
-  applyBindingPreset(settings, "custom");
-  const moved = code("V");
-  assertEquals(rebind(settings.bindings, Action.toggleControls, 0, moved), true, "Toggle controls moves to V");
-  assertEquals(previewTitle(previewToggleKey(settings)), "Controls - V to toggle", "the title names the new key");
-  const writes = saved.length;
-  assertEquals(pressPreviewKey(settings, TOGGLE_CONTROLS_KEY), false, "the old key no longer toggles");
-  assertEquals(settings.keyboard, true);
-  assertEquals(saved.length, writes, "and nothing is saved");
-  assertEquals(pressPreviewKey(settings, moved), true, "the new key toggles");
-  assertEquals(settings.keyboard, false);
-
-  assertEquals(rebind(settings.bindings, Action.toggleControls, 0, undefined), true, "unbound");
-  assertEquals(previewToggleKey(settings), undefined);
-  assertEquals(previewTitle(previewToggleKey(settings)), "Controls", "the title names no key");
-  assertEquals(pressPreviewKey(settings, moved), false, "nothing toggles");
-  assertEquals(pressPreviewKey(settings, TOGGLE_CONTROLS_KEY), false);
-  assertEquals(settings.keyboard, false);
-});
-

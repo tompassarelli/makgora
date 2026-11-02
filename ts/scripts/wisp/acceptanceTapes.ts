@@ -4,7 +4,7 @@
 
 import "../../test/host-natives";
 import { adaptInput } from "../../src/game/match/inputAdapter";
-import { SIM_ACTION_COUNT, Action, bit } from "../../src/game/input/actions";
+import { ACTION_COUNT, Action, bit } from "../../src/game/input/actions";
 import { type AttackBuffer, attackBuffer } from "../../src/game/input/attackBuffer";
 import { commitEdges, keyboardCapture, sampleKeys } from "../../src/game/input/keyboardCapture";
 import { actionFor, keyLabel, presetBindings } from "../../src/game/input/keyBindings";
@@ -694,6 +694,6 @@ export function generateTapes(): Map<string, string> {
     const missing = [...SOURCES.keys()].filter(source => !sources.has(source));
     if (missing.length > 0) throw new Error(`the actions tape never presses ${missing.join(", ")} for slot ${slot}`);
   });
-  if (new Set(SOURCES.values()).size !== SIM_ACTION_COUNT) throw new Error("the script layout no longer binds the sources the tapes press");
+  if (new Set(SOURCES.values()).size !== ACTION_COUNT) throw new Error("the script layout no longer binds the sources the tapes press");
   return tapes;
 }

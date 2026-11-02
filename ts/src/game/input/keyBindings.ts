@@ -46,7 +46,6 @@ const SLASH = 191;
 const OPEN_BRACKET = 219;
 const CLOSE_BRACKET = 221;
 const MOD_Y_KEY = SEMICOLON;
-export const TOGGLE_CONTROLS_KEY = 113;
 
 const code = (character: string) => character.charCodeAt(0);
 
@@ -54,13 +53,14 @@ const START_KEY = code("Y");
 
 
 
-const RESERVED_KEYS: readonly number[] = [8, 13, 27, 112, 116, 117, 118];
+const RESERVED_KEYS: readonly number[] = [8, 13, 27, 112, 113, 116, 117, 118];
 
 const RESERVED_REASONS: Readonly<Record<number, string>> = {
   8: "Backspace is reserved for Pause",
   13: "Enter is reserved for Warcraft chat",
   27: "Escape is reserved for Pause and cancel",
   112: "F1 is reserved for this screen",
+  113: "F2 is reserved for the in-match Controls panel",
   116: "F5 is reserved for Warcraft shortcuts",
   117: "F6 is reserved for Warcraft shortcuts",
   118: "F7 is reserved for Warcraft shortcuts",
@@ -105,12 +105,11 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   if (custom) bind(Action.strong, code("0"));
   else bind(Action.strong, code("9"));
   bind(Action.modY, MOD_Y_KEY);
-  bind(Action.toggleControls, TOGGLE_CONTROLS_KEY);
   return { keys };
 }
 
 export function previousStandardKeys(): number[] {
-  const keys = presetBindings("standard").keys.slice(0, SLOTS_BEFORE_TOGGLE);
+  const keys = presetBindings("standard").keys.slice();
   const bind = (action: Action, first: number, second: number) => {
     keys[slotIndex(action, 0)] = first;
     keys[slotIndex(action, 1)] = second;
@@ -137,7 +136,7 @@ const previousCStickKeys = (preset: BindingPreset): readonly KeyChange[] => [[Ac
 const PREVIOUS_C_UP: KeyChange = [Action.cUp, code("H")];
 
 const withKeys = (preset: BindingPreset, changes: readonly KeyChange[]): number[] => {
-  const keys = presetBindings(preset).keys.slice(0, SLOTS_BEFORE_TOGGLE);
+  const keys = presetBindings(preset).keys.slice();
   for (const [action, first, second = EMPTY] of [PREVIOUS_C_UP, ...changes]) {
     keys[slotIndex(action, 0)] = first;
     keys[slotIndex(action, 1)] = second;
@@ -162,33 +161,21 @@ const earlierStockKeys = (preset: StockPreset, changes: readonly KeyChange[]): n
 
 function earlierDefaults(preset: BindingPreset): number[][] {
   if (preset === "custom") return [withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), withKeys(preset, EARLIER_CUSTOM_JUMP)];
-  const earlier = [withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), previousSimKeys(preset), ...EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes))];
+  const earlier = [withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), previousDefaultKeys(preset), ...EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes))];
   return preset === "wasd" ? [...earlier, earlierStockKeys(preset, PREVIOUS_STOCK_CHANGES)] : earlier;
 }
 
-function previousSimKeys(preset: StockPreset): number[] {
-  return withKeys(preset, preset === "wasd" ? [...PREVIOUS_STOCK_CHANGES, PREVIOUS_WASD_UP] : PREVIOUS_STOCK_CHANGES);
-}
-
-/** The previous defaults as a player who never touched them holds them now: the old keys plus the default Toggle controls key. */
 export function previousDefaultKeys(preset: StockPreset): number[] {
-  return [...previousSimKeys(preset), TOGGLE_CONTROLS_KEY, EMPTY];
-}
-
-/** A stock layout's sim keys replace an earlier default's, keeping the player's own toggle-controls keys. */
-function adoptPreset(bindings: KeyBindings, preset: BindingPreset): void {
-  const keys = presetBindings(preset).keys;
-  for (let index = SLOTS_BEFORE_TOGGLE; index < KEY_SLOT_COUNT; index++) keys[index] = bindings.keys[index] ?? EMPTY;
-  bindings.keys = keys;
+  return withKeys(preset, preset === "wasd" ? [...PREVIOUS_STOCK_CHANGES, PREVIOUS_WASD_UP] : PREVIOUS_STOCK_CHANGES);
 }
 
 export function replacePreviousDefaults(bindings: KeyBindings, presets: readonly BindingPreset[] = BINDING_PRESETS): void {
   const preset = presets.find((stock) => earlierDefaults(stock).some((earlier) => earlier.every((key, index) => bindings.keys[index] === key)));
-  if (preset !== undefined) adoptPreset(bindings, preset);
+  if (preset !== undefined) bindings.keys = presetBindings(preset).keys;
 }
 
 function replacePreviousPreset(bindings: KeyBindings): void {
-  if (previousStandardKeys().every((key, index) => bindings.keys[index] === key)) adoptPreset(bindings, "standard");
+  if (previousStandardKeys().every((key, index) => bindings.keys[index] === key)) bindings.keys = presetBindings("standard").keys;
 }
 
 export function keyFor({ keys }: Readonly<KeyBindings>, action: Action, slot: KeySlot): number | undefined {
@@ -265,14 +252,12 @@ export function unboundActions(bindings: Readonly<KeyBindings>): Action[] {
 
 
 
-const CURRENT_SAVE = "KE";
+const CURRENT_SAVE = "KD";
 const FIRST_SAVE_WITH_START = "KB";
 const FIRST_SAVE_WITH_MOD_Y_KEPT = "KC";
 const FIRST_SAVE_WITH_C_UP_ON_Y = "KD";
-const FIRST_SAVE_WITH_TOGGLE = "KE";
-const SLOTS_BEFORE_TOGGLE = (Action.modY + 1) * 2;
 const SLOTS_BEFORE_MOD_Y = (Action.strong + 1) * 2;
-const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: SLOTS_BEFORE_MOD_Y - 2, K5: SLOTS_BEFORE_MOD_Y - 2, K6: SLOTS_BEFORE_MOD_Y, K7: SLOTS_BEFORE_MOD_Y, K8: SLOTS_BEFORE_MOD_Y, K9: SLOTS_BEFORE_MOD_Y, KA: SLOTS_BEFORE_MOD_Y, KB: SLOTS_BEFORE_MOD_Y, KC: SLOTS_BEFORE_TOGGLE, KD: SLOTS_BEFORE_TOGGLE, [CURRENT_SAVE]: KEY_SLOT_COUNT };
+const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: SLOTS_BEFORE_MOD_Y - 2, K5: SLOTS_BEFORE_MOD_Y - 2, K6: SLOTS_BEFORE_MOD_Y, K7: SLOTS_BEFORE_MOD_Y, K8: SLOTS_BEFORE_MOD_Y, K9: SLOTS_BEFORE_MOD_Y, KA: SLOTS_BEFORE_MOD_Y, KB: SLOTS_BEFORE_MOD_Y, KC: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
 const DIGITS = "0123456789";
 const SAVED_KEY_DIGITS = 3;
 
@@ -308,11 +293,6 @@ function upgradeToCurrentKeys(bindings: KeyBindings, version: string): void {
   }
   if (version < FIRST_SAVE_WITH_MOD_Y_KEPT) bindModYDefault(bindings);
   if (version < FIRST_SAVE_WITH_C_UP_ON_Y) moveCUpToStart(bindings);
-  if (version < FIRST_SAVE_WITH_TOGGLE) bindToggleDefault(bindings);
-}
-
-function bindToggleDefault(bindings: KeyBindings): void {
-  if (!bindings.keys.includes(TOGGLE_CONTROLS_KEY)) rebind(bindings, Action.toggleControls, 0, TOGGLE_CONTROLS_KEY);
 }
 
 function moveCUpToStart(bindings: KeyBindings): void {
@@ -409,7 +389,6 @@ export const ACTION_LABELS: Readonly<Record<Action, string>> = {
   [Action.shortHop]: "Short hop (LB in the tom pad layout)",
   [Action.strong]: "Strong (smash)",
   [Action.modY]: "Mod Y (shallow angles, wall ride)",
-  [Action.toggleControls]: "Toggle controls panel",
 };
 
 export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
@@ -432,11 +411,10 @@ export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
   [Action.shortHop]: "Hop",
   [Action.strong]: "Strong",
   [Action.modY]: "Mod Y",
-  [Action.toggleControls]: "Controls",
 };
 
 const KEY_NAMES: Readonly<Record<number, string>> = {
-  [SPACE]: "SPACE", [SHIFT]: "SHIFT", [LEFT_SHIFT]: "L-SHIFT", [RIGHT_SHIFT]: "R-SHIFT", [SLASH]: "/", [TOGGLE_CONTROLS_KEY]: "F2", [MINUS]: "-", [EQUALS]: "=", [SEMICOLON]: ";",
+  [SPACE]: "SPACE", [SHIFT]: "SHIFT", [LEFT_SHIFT]: "L-SHIFT", [RIGHT_SHIFT]: "R-SHIFT", [SLASH]: "/", [MINUS]: "-", [EQUALS]: "=", [SEMICOLON]: ";",
   [COMMA]: ",", [PERIOD]: ".", [OPEN_BRACKET]: "[", [CLOSE_BRACKET]: "]",
 };
 

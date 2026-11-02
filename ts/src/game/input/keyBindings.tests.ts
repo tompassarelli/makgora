@@ -1,8 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
-import { Action, ACTION_ORDER, ALL_ACTIONS } from "./actions";
-import { heldActions, playerKeys, pressKey } from "./playerKeys";
+import { Action, ACTION_ORDER } from "./actions";
 import { PAD_LAYER, padLayerAction } from "./padKeys";
-import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, LEFT_SHIFT, RIGHT_SHIFT, SHIFT, actionFor, assignKey, decodeBindings, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, slotIndex, TOGGLE_CONTROLS_KEY } from "./keyBindings";
+import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, LEFT_SHIFT, RIGHT_SHIFT, SHIFT, actionFor, assignKey, decodeBindings, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, rebind, reservedReason, slotIndex } from "./keyBindings";
 import { type LayoutBindings, layoutSave, decodeLayouts, encodeLayouts, presetLayouts } from "./layoutSave";
 
 const code = (character: string) => character.charCodeAt(0);
@@ -211,11 +210,11 @@ test("a saved profile from before Mod X loads with every old key unchanged and ;
     const old = withoutModY(preset);
     const loaded = decodeBindings(oldSave("KB", old));
     assertEquals(loaded?.keys.slice(0, OLD_SLOTS).join(","), old.join(","), `${preset} old keys`);
-    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SEMICOLON},0,${TOGGLE_CONTROLS_KEY},0`, `${preset} Mod Y`);
+    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SEMICOLON},0`, `${preset} Mod Y`);
   }
   for (const version of ["KA", "K9", "K8", "K7", "K6"]) {
     const loaded = decodeBindings(oldSave(version, withoutModY("wasd")));
-    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SEMICOLON},0,${TOGGLE_CONTROLS_KEY},0`, `${version} Mod Y`);
+    assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `${SEMICOLON},0`, `${version} Mod Y`);
   }
   const layouts = BINDING_PRESETS.map((preset) => oldSave("KB", withoutModY(preset))).join("");
   const loaded = decodeLayouts(`KL1${layouts}`);
@@ -230,7 +229,7 @@ test("an old save that already uses ; for another action keeps it there and leav
   old[slotIndex(Action.cDown, 1)] = SEMICOLON;
   const loaded = decodeBindings(oldSave("KB", old));
   assertEquals(loaded?.keys.slice(0, OLD_SLOTS).join(","), old.join(","));
-  assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), `0,0,${TOGGLE_CONTROLS_KEY},0`);
+  assertEquals(loaded?.keys.slice(OLD_SLOTS).join(","), "0,0");
 });
 
 
@@ -267,15 +266,7 @@ test("a saved layout from before Mod Y, with the old Walk on SPACE, the old Mod 
   check(decodeLayouts(encodeSlots({ layouts, active: "wasd" }))?.layouts.wasd, "layout save");
 });
 
-function asEarlierSave(saved: string): string {
-  let earlier = saved.slice(0, 5);
-  let at = 5;
-  for (let marker = saved.indexOf("KE", at); marker >= 0; marker = saved.indexOf("KE", at)) {
-    earlier += saved.slice(at, marker) + "KC" + saved.slice(marker + 2, marker + 116);
-    at = marker + 122;
-  }
-  return earlier + saved.slice(at);
-}
+const asEarlierSave = (saved: string) => saved.replaceAll("KD", "KC");
 
 const editedWithCUpOnH = (preset: BindingPreset, edit: (keys: number[]) => void) => {
   const keys = presetBindings(preset).keys.slice();
@@ -309,23 +300,17 @@ test("a layout saved after the C-up on Y upgrade keeps a deliberate C-up on H [k
   assertEquals(loaded?.layouts.wasd.keys.join(","), deliberate.keys.join(","), "H stays");
 });
 
-test("every preset binds F2 to Toggle controls, a save from before the action gets F2 only where F2 is free, and the toggle never enters a held mask or the sim's action range [k2 property]", () => {
+test("F2 is reserved for the Controls panel: no action takes it by assigning, rebinding or capturing, and no preset binds it [k2 property]", () => {
+  const F2 = 113;
+  assertEquals(reservedReason(F2), "F2 is reserved for the in-match Controls panel");
   for (const preset of BINDING_PRESETS) {
-    assertEquals(slots(preset, Action.toggleControls), "F2 —", `${preset} Toggle controls`);
-    assertEquals(ACTION_LABELS[Action.toggleControls], "Toggle controls panel");
+    const bindings = presetBindings(preset);
+    assertEquals(actionFor(bindings, F2), undefined, `${preset} binds no action to F2`);
+    const before = encodeBindings(bindings);
+    for (const action of ACTION_ORDER) {
+      assertEquals(assignKey(bindings, action, 0, F2).kind, "reserved", `${preset} ${ACTION_LABELS[action]} assign`);
+      assertEquals(rebind(bindings, action, 1, F2), false, `${preset} ${ACTION_LABELS[action]} rebind`);
+    }
+    assertEquals(encodeBindings(bindings), before, `${preset} unchanged`);
   }
-  const taken = presetBindings("wasd");
-  taken.keys[slotIndex(Action.cLeft, 0)] = TOGGLE_CONTROLS_KEY;
-  taken.keys[slotIndex(Action.toggleControls, 0)] = 0;
-  const layouts = { wasd: taken, standard: presetBindings("standard"), custom: presetBindings("custom") };
-  layouts.standard.keys[slotIndex(Action.toggleControls, 0)] = 0;
-  const loaded = decodeLayouts(asEarlierSave(encodeSlots({ layouts, active: "wasd" })));
-  assertEquals(keyFor(loaded?.layouts.wasd ?? { keys: [] }, Action.toggleControls, 0), undefined, "F2 bound to C-left stays with C-left, Toggle controls stays unbound");
-  assertEquals(keyFor(loaded?.layouts.wasd ?? { keys: [] }, Action.cLeft, 0), TOGGLE_CONTROLS_KEY);
-  assertEquals(keyFor(loaded?.layouts.standard ?? { keys: [] }, Action.toggleControls, 0), TOGGLE_CONTROLS_KEY, "a free F2 is bound on load");
-  assertEquals(keyFor(loaded?.layouts.custom ?? { keys: [] }, Action.toggleControls, 0), TOGGLE_CONTROLS_KEY, "the current default survives a load");
-  const keys = playerKeys();
-  assertEquals(pressKey(keys, TOGGLE_CONTROLS_KEY, presetBindings("wasd")), undefined, "the toggle key makes no input action");
-  assertEquals(heldActions(keys), 0, "and no held bit");
-  assertEquals(ALL_ACTIONS, (1 << Action.toggleControls) - 1, "the sim's mask range stops before the toggle");
 });

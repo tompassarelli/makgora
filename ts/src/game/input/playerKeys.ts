@@ -1,4 +1,4 @@
-import { SIM_ACTIONS, Action } from "./actions";
+import { ACTION_ORDER, Action } from "./actions";
 import { type DirectionalInput, clearDirections, directionOf, neutralDirections, updateDirections } from "./directionalInput";
 import type { Direction } from "./inputRow";
 import { type KeyBindings, actionFor, keyFor } from "./keyBindings";
@@ -38,7 +38,7 @@ export function actionHeld({ heldFirst, heldSecond, heldPad }: Readonly<PlayerKe
 
 export function heldActions(keys: Readonly<PlayerKeys>): number {
   let mask = 0;
-  for (const action of SIM_ACTIONS) {
+  for (const action of ACTION_ORDER) {
     if (actionHeld(keys, action)) mask |= 1 << action;
   }
   return mask;
@@ -55,7 +55,7 @@ export function directionZ(keys: Readonly<PlayerKeys>): Direction {
 function holdSlot(keys: PlayerKeys, key: number, bindings: Readonly<KeyBindings>, held: boolean): Action | undefined {
   const bound = actionFor(bindings, key);
   const action = bound ?? padLayerAction(key);
-  if (action === undefined || action === Action.toggleControls) return undefined;
+  if (action === undefined) return undefined;
   const slot = 1 << action;
   if (bound === undefined) keys.heldPad = held ? keys.heldPad | slot : keys.heldPad & ~slot;
   else if (keyFor(bindings, action, 0) === key) keys.heldFirst = held ? keys.heldFirst | slot : keys.heldFirst & ~slot;

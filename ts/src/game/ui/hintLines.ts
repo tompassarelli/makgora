@@ -21,7 +21,7 @@ function padButtons(action: Action): string {
 }
 
 /** A pad player's preview: the pad's buttons for each action, until a drawn pad diagram takes the slot. */
-export function padHintRows(toggleKey: string | undefined): HintRow[] {
+export function padHintRows(): HintRow[] {
   return [
     { keys: "Left stick", label: "move" },
     { keys: padButtons(Action.jump), label: "jump" },
@@ -32,7 +32,7 @@ export function padHintRows(toggleKey: string | undefined): HintRow[] {
     { keys: padButtons(Action.strong), label: "Strong" },
     { keys: "R stick tilt", label: "Mod X + Y" },
     { keys: "Start", label: "pause" },
-    ...(toggleKey === undefined ? [] : [{ keys: toggleKey, label: "hide" }]),
+    { keys: "F2", label: "hide" },
   ];
 }
 

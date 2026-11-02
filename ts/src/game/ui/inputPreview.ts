@@ -1,14 +1,14 @@
 import { f32 } from "wisp/src/sim/f32";
 import { formatInt } from "wisp/game/text";
-import { type BindingSettings, previewToggleKey } from "./bindingSettings";
+import type { BindingSettings } from "./bindingSettings";
 import { type HintDevice, padHintRows, hintText } from "./hintLines";
-import { PREVIEW_DIVIDERS, PREVIEW_INNER, PREVIEW_PANEL, PREVIEW_ROWS, PREVIEW_ROW_HEIGHT, previewKeyText, previewRowHeld, previewTextFit, previewTitle } from "./keyboardPreview";
+import { PREVIEW_DIVIDERS, PREVIEW_INNER, PREVIEW_PANEL, PREVIEW_ROWS, PREVIEW_ROW_HEIGHT, PREVIEW_TITLE, previewKeyText, previewRowHeld, previewTextFit } from "./keyboardPreview";
 import { PLATE_BOTTOM, type PlateRow, previewPanelLeft } from "./plateLayout";
 import { createBackdrop, createText, gameUi, placeTopLeft, sizeText } from "./frames";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { destroyFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 
-/** Tom asked on 2026-11-02 for the panel to sit halfway between the plates' bottom line and the screen bottom; the gap is a share of the screen, so it holds at every window size. */
+/** The panel sits halfway between the plates' bottom line and the screen bottom; the gap is a share of the screen, so it holds at every window size. */
 const PANEL_BOTTOM = f32(PLATE_BOTTOM / 2);
 const PANEL_ALPHA = 214;
 const RULE_PX = f32(0.0006);
@@ -51,6 +51,7 @@ export class InputPreview {
     setFrameEnabled(this.panel, false);
     setFrameVisible(this.panel, false);
     this.title = this.text("InputPreviewTitle", 0);
+    setFrameText(this.title, `${TITLE_COLOUR}${PREVIEW_TITLE}|r`);
     this.rules = [...PREVIEW_DIVIDERS, undefined].map((_divider, index) => {
       const rule = createBackdrop(`InputPreviewRule${formatInt(index)}`, this.panel, 894);
       setFrameTexture(rule, PREVIEW_RULE_TEXTURE, 0, true);
@@ -110,7 +111,6 @@ export class InputPreview {
 
   private fit(settings: Readonly<BindingSettings>): void {
     const { size, columns } = previewTextFit(settings.bindings);
-    setFrameText(this.title, `${TITLE_COLOUR}${previewTitle(previewToggleKey(settings))}|r`);
     placeTopLeft(this.title, this.innerLeft, this.innerTop);
     sizeText(this.title, size, PREVIEW_INNER.width, PREVIEW_ROW_HEIGHT);
     setFrameTextAlignment(this.title, TextAlignment.middle, TextAlignment.center);
@@ -165,7 +165,7 @@ export class InputPreview {
     if (device === "pad") {
       if (settings.revision === this.shownRevision) return;
       this.shownRevision = settings.revision;
-      setFrameText(this.padLabel, hintText(padHintRows(previewToggleKey(settings)), MENU_STYLE.gold));
+      setFrameText(this.padLabel, hintText(padHintRows(), MENU_STYLE.gold));
       return;
     }
     if (settings.revision !== this.shownRevision) {

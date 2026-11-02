@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { SIM_ACTIONS, Action } from "../src/game/input/actions";
+import { ACTION_ORDER, Action } from "../src/game/input/actions";
 import { SAVED_BINDING_FORMAT, keyLabel } from "../src/game/input/keyBindings";
 import { PAD_LAYER, padLayerKey } from "../src/game/input/padKeys";
 import { PAD_LAYOUTS, PAUSE, PAUSE_KEY, type PadBinding, type PadLayout } from "../src/game/input/padLayouts";
@@ -56,7 +56,7 @@ function cursorPacket() {
 
 export function controllerContract() {
   return {
-    actions: SIM_ACTIONS.map((action) => ({ name: actionName(action), bit: action })),
+    actions: ACTION_ORDER.map((action) => ({ name: actionName(action), bit: action })),
     padKeys: padKeys(),
     savedBindings: SAVED_BINDING_FORMAT,
     padPacket: {

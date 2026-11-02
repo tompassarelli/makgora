@@ -1168,9 +1168,8 @@ four specials on the ground and in the air.
   between the groups, centred where they leave room. Everything stays inside
   the 4:3 area. With the preview off the plates close up evenly spaced and
   centred at full size. It shows only
-  in matches. The Controls screen's "Show keyboard in game" button and the Toggle controls key (an ordinary bindable action, F2 by default in every preset;
-  saves from before it get F2 on load when it is free, else it stays unbound; it never enters the sim's input mask)
-  toggle it, and the panel title names that key ("Controls - F2 to toggle", plain "Controls" when unbound), and it is saved with the controls (`encodeLayouts`, save version KO). A
+  in matches. The Controls screen's "Show keyboard in game" button and F2 toggle
+  it. F2 is fixed like F1: no action can be bound to it, it never enters the sim's input mask or the wire, and the panel title always reads "Controls - F2 to toggle". It is saved with the controls (`encodeLayouts`, save version KO). A
   new player starts with it on; a save from before it (KN, KM or KL) loads with
   it off, so existing players keep today's HUD.
 - **Match chat**: the chat box is a narrow column, a quarter of the 4:3 screen

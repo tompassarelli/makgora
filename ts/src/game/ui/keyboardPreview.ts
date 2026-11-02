@@ -30,8 +30,7 @@ export const PREVIEW_COLUMNS: readonly PreviewColumn[] = [
 
 const columnRows = (column: PreviewColumn): readonly PreviewRow[] => column.flatMap(group => group);
 
-/** Tom asked on 2026-11-02 for the panel title to name its toggle key, a rebindable action; with the action unbound the title is plain Controls. */
-export const previewTitle = (toggleKey: string | undefined): string => toggleKey === undefined ? "Controls" : `Controls - ${toggleKey} to toggle`;
+export const PREVIEW_TITLE = "Controls - F2 to toggle";
 export const PREVIEW_PANEL = { width: f32(0.29), height: f32(0.138), margin: f32(0.004) } as const;
 export const PREVIEW_INNER = { width: f32(PREVIEW_PANEL.width - 2 * PREVIEW_PANEL.margin), height: f32(PREVIEW_PANEL.height - 2 * PREVIEW_PANEL.margin) } as const;
 const COLUMN_GAP_EMS = f32(1.2);
