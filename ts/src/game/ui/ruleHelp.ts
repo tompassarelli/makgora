@@ -18,7 +18,7 @@ const MATCH_HELP = {
   endless: "Endless play: no stocks are lost and there is no timer. Fight freely; pause and press Escape to leave.",
   automaticRematch: "Automatic rematch: when a match ends, the same fighters and rules start again after a short countdown.",
   items: `Items: a power-up appears at centre stage every ${ITEM_INTERVAL_MIN_SECONDS}–${ITEM_INTERVAL_MAX_SECONDS} s after a 10 s countdown. Touch it and press Attack to grab it.`,
-  ultimates: "Ultimates: with a full meter bar, Attack + Special unleashes your fighter's ultimate. The bar fills from the orb at centre stage. Off: no ultimates; Attack + Special is the ordinary special.",
+  ultimates: "Ultimates: with a full meter bar, Attack + Special unleashes your fighter's ultimate. The bar fills from the match clock: full 60 s after the start and after each use. With Orbs on, only the centre-stage orb fills it. Off: no ultimates; Attack + Special is the ordinary special.",
 } as const;
 
 const ITEM_HELP = {
