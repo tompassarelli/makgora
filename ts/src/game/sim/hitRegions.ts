@@ -6,7 +6,6 @@ import { downSmashHit } from "./downMoveValues";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, HitElement } from "./codes";
 import type { FighterMoves, StrikeCapsule } from "./heroMoves";
-import { strongHit, weakHit } from "./strongHits";
 import { DIAGONAL_UNIT, ORDINARY_HIT_BASE_KNOCKBACK, ORDINARY_HIT_GROWTH_PERCENT } from "./knockback";
 import {
   DOWN_ATTACK_BASE_KNOCKBACK,
@@ -135,7 +134,6 @@ const DEMON_HUNTER_REGIONS: { readonly [style: number]: Readonly<HitRegion> } = 
   [AttackStyle.downTilt]: { ...region(-97.0, 132.0, -2.0, 52.0, 7.0, 20.0, 83.0, 0.1736481785774231, 0.9848077297210693), strike: { x1: -75.0, z1: 30.0, x2: 110.0, z2: 20.0, radius: 22.0 } },
   [AttackStyle.forwardTiltUp]: { ...region(39.0, 82.0, 133.0, 228.0, 8.0, 80.0, 20.0, 0.8799999952316284, 0.47999998927116394), strike: { x1: 53.0, z1: 147.0, x2: 68.0, z2: 214.0, radius: 14.0 } },
   [AttackStyle.forwardTiltDown]: { ...region(19.0, 134.0, -11.0, 78.0, 8.0, 80.0, 20.0, 0.8799999952316284, -0.47999998927116394), strike: { x1: 35.0, z1: 62.0, x2: 118.0, z2: 5.0, radius: 16.0 } },
-  [AttackStyle.neutralAir]: { ...region(-41.0, 10.0, 57.0, 139.0, 7.0, 95.0, 16.0, DIAGONAL_UNIT, DIAGONAL_UNIT), strike: { x1: -4.0, z1: 125.0, x2: -27.0, z2: 71.0, radius: 14.0 } },
   [AttackStyle.forwardAir]: { ...region(4.0, 76.0, 86.0, 171.0, 6.0, 85.0, 18.0, 0.9399999976158142, 0.3400000035762787), strike: { x1: 62.0, z1: 100.0, x2: 18.0, z2: 157.0, radius: 14.0 } },
   [AttackStyle.backAir]: { ...region(-52.0, 35.0, 88.0, 147.0, 13.0, 100.0, 10.0, -0.9399999976158142, 0.3400000035762787), strike: { x1: 21.0, z1: 133.0, x2: -38.0, z2: 102.0, radius: 14.0 } },
   [AttackStyle.upAir]: { ...region(-55.0, 55.0, 15.0, 215.0, 8.0, 70.0, 50.0, 0.2199999988079071, 0.9750000238418579), strike: { x1: 0.0, z1: 70.0, x2: 0.0, z2: 160.0, radius: 55.0 } },
@@ -144,11 +142,8 @@ const DEMON_HUNTER_REGIONS: { readonly [style: number]: Readonly<HitRegion> } = 
 
 
 
-export const DEMON_HUNTER_NEUTRAL_AIR_CLEAN_FRAMES = 4;
 const FORWARD_AIR_LINK = { ...region(4.0, 76.0, 86.0, 171.0, 2.0, 10.0, 30.0, -0.258819043636322, 0.9659258127212524), strike: { x1: 62.0, z1: 100.0, x2: 18.0, z2: 157.0, radius: 14.0 } };
 const FORWARD_AIR_LAUNCH = { ...region(6.0, 70.0, 86.0, 175.0, 3.0, 85.0, 18.0, 0.7660444378852844, 0.6427876353263855, 2), strike: { x1: 56.0, z1: 100.0, x2: 20.0, z2: 161.0, radius: 14.0 } };
-const NEUTRAL_AIR_CLEAN = { ...DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION, effect: strongHit((DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION).effect) };
-const NEUTRAL_AIR_LATE = { ...NEUTRAL_AIR_CLEAN, effect: weakHit(NEUTRAL_AIR_CLEAN.effect) };
 const JAB3_EFFECT = region(0.0, 0.0, 0.0, 0.0, 6.0, 95.0, 22.0, 0.7660444378852844, 0.6427876353263855);
 const JAB3_RISE = { ...JAB3_EFFECT, minX: -34.0, maxX: 58.0, minZ: 70.0, maxZ: 108.0, strike: { x1: -20.0, z1: 84.0, x2: 44.0, z2: 94.0, radius: 14.0 } };
 const JAB3_CREST = { ...JAB3_EFFECT, minX: -32.0, maxX: 54.0, minZ: 54.0, maxZ: 108.0, strike: { x1: -18.0, z1: 68.0, x2: 40.0, z2: 94.0, radius: 14.0 } };
@@ -162,8 +157,6 @@ function demonHunterRegion(style: AttackStyle, activeFrame: number): Readonly<Hi
       return activeFrame <= 1 ? FORWARD_AIR_LINK : activeFrame >= 4 ? FORWARD_AIR_LAUNCH : NO_HIT_REGION;
     case AttackStyle.jab3:
       return activeFrame <= 0 ? JAB3_RISE : activeFrame === 1 ? JAB3_CREST : JAB3_OVERHEAD;
-    case AttackStyle.neutralAir:
-      return activeFrame < DEMON_HUNTER_NEUTRAL_AIR_CLEAN_FRAMES ? NEUTRAL_AIR_CLEAN : NEUTRAL_AIR_LATE;
     default:
       return DEMON_HUNTER_REGIONS[style] ?? NO_HIT_REGION;
   }

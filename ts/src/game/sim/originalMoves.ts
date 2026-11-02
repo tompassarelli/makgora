@@ -7,6 +7,7 @@ import { AttackStyle, Character, GrabAction, HitElement } from "./codes";
 import { downSmashHit } from "./downMoveValues";
 import { HERO_REFERENCE_HEIGHT, type FighterMoves, type MoveRegion, heroHurtPose, heroMove, heroRegion, strongRegion } from "./heroMoves";
 import { hurtCapsule } from "./geometry/contactGeometry";
+import { strongHit, weakHit } from "./strongHits";
 import { RIFLEMAN_GROUND, type GroundKit, groundHit, splitsMove } from "./heroes/groundNormals";
 import { DEMON_HUNTER_HURTBOXES, type HurtPose, hurtPart, hurtPose, shippedHurtboxes } from "./hurtboxes";
 
@@ -87,8 +88,27 @@ export const DOWN_AIR_LATE: DownAirEffect = { damage: 9.0, growth: 100.0, base: 
 const DOWN_AIR_RECOVERY = DOWN_AIR_TOTAL_FRAMES - (DOWN_AIR_FIRST_ACTIVE - 1) - (DOWN_AIR_LAST_ACTIVE - DOWN_AIR_FIRST_ACTIVE + 1);
 const DOWN_AIR_HURT_PARTS = DEMON_HUNTER_HURTBOXES.attacks[AttackStyle.downAir]?.[0]?.parts ?? [];
 
+export const NEUTRAL_AIR_FIRST_ACTIVE = 4;
+export const NEUTRAL_AIR_CLEAN_LAST = 7;
+export const NEUTRAL_AIR_LAST_ACTIVE = 31;
+const NEUTRAL_AIR_LAUNCH = f32(0.707106781);
+const NEUTRAL_AIR_RECOVERY = 10;
+const NEUTRAL_AIR_LANDING_LAG = 5;
+const NEUTRAL_AIR_BODY = { x1: -4.0, z1: 125.0, x2: -27.0, z2: 71.0, radius: 14.0 };
+const NEUTRAL_AIR_LEG = { x1: 28.0, z1: 78.0, x2: 88.0, z2: 82.0, radius: 16.0 };
+export const NEUTRAL_AIR_CLEAN: MoveRegion["hit"]["effect"] = strongHit({ damage: 7.0, growth: 95.0, base: 16.0, launchX: NEUTRAL_AIR_LAUNCH, launchZ: NEUTRAL_AIR_LAUNCH, electric: false, element: HitElement.slash });
+export const NEUTRAL_AIR_LATE: MoveRegion["hit"]["effect"] = weakHit(NEUTRAL_AIR_CLEAN);
+
+function neutralAirRegions(): MoveRegion[] {
+  return [NEUTRAL_AIR_LEG, NEUTRAL_AIR_BODY].flatMap((strike) => [
+    heroRegion(NEUTRAL_AIR_FIRST_ACTIVE, NEUTRAL_AIR_CLEAN_LAST, strike, NEUTRAL_AIR_CLEAN),
+    heroRegion(NEUTRAL_AIR_CLEAN_LAST + 1, NEUTRAL_AIR_LAST_ACTIVE, strike, NEUTRAL_AIR_LATE),
+  ]);
+}
+
 export const ILLIDAN_MOVES: FighterMoves = {
   normals: {
+    [AttackStyle.neutralAir]: heroMove(NEUTRAL_AIR_FIRST_ACTIVE, NEUTRAL_AIR_LAST_ACTIVE - NEUTRAL_AIR_FIRST_ACTIVE + 1, NEUTRAL_AIR_RECOVERY, NEUTRAL_AIR_LANDING_LAG, neutralAirRegions()),
     [AttackStyle.downAir]: {
       ...heroMove(DOWN_AIR_FIRST_ACTIVE, DOWN_AIR_LAST_ACTIVE - DOWN_AIR_FIRST_ACTIVE + 1, DOWN_AIR_RECOVERY, DOWN_AIR_LANDING_LAG, [
         heroRegion(DOWN_AIR_FIRST_ACTIVE, DOWN_AIR_CLEAN_LAST, DOWN_AIR_LEGS, DOWN_AIR_CLEAN),
