@@ -27,9 +27,6 @@ const BUST_SHOWN_TEXELS = (OPENING.width * BUST_TEXTURE_PX) / OPENING.height;
 const BUST_U_LEFT = f32((BUST_TEXTURE_PX - BUST_SHOWN_TEXELS) / 2 / BUST_TEXTURE_PX);
 const OPENING_CROP = [BUST_U_LEFT, f32(1.0 - BUST_U_LEFT), 0.0, 1.0] as const;
 
-/** Our radial glow in the race's colours, drawn into each fighter's bust at build time. */
-export const raceBackingArt = (race: Race): string => `RaceBacking${race}`;
-
 export function raceFrameParts(): readonly FramePart[] {
   return [{ key: "portrait", layer: "BACKGROUND", texels: BUST_TEXTURE_PX, texCoord: OPENING_CROP, ...OPENING }];
 }
@@ -42,12 +39,12 @@ export function partScale(part: FramePart): { readonly x: number; readonly y: nu
 
 export const raceFrameName = (race: Race): string => `SmashcraftRaceFrame${race}`;
 
-/** Each race's colours for its own HUD art: the nameplate's thin inner edge and the radial backing behind the portrait. */
-export const RACE_COLOURS: { readonly [R in Race]: { readonly tint: number; readonly light: number; readonly mid: number; readonly dark: number } } = {
-  Human: { tint: 0xe8b83a, light: 0x9a1c14, mid: 0x5a0c0a, dark: 0x160404 },
-  NightElf: { tint: 0x4a8fe0, light: 0x2a54b8, mid: 0x122a6a, dark: 0x040a1c },
-  Orc: { tint: 0xd0582a, light: 0x8e3c12, mid: 0x4e1c08, dark: 0x140604 },
-  Undead: { tint: 0x9b6bd6, light: 0x4c2a72, mid: 0x261440, dark: 0x08040f },
+/** Each race's colour for the nameplate's thin inner edge. */
+export const RACE_COLOURS: { readonly [R in Race]: { readonly tint: number } } = {
+  Human: { tint: 0xe8b83a },
+  NightElf: { tint: 0x4a8fe0 },
+  Orc: { tint: 0xd0582a },
+  Undead: { tint: 0x9b6bd6 },
 };
 
 export const namePlateTexture = (race: Race, mirrored: boolean): string => `war3mapImported\\NamePlate${mirrored ? "Mirror" : ""}${race}.tga`;

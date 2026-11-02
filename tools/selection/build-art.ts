@@ -96,7 +96,6 @@ BunRuntime.runMain(Effect.gen(function*() {
   }
   for (const race of RACES) {
     const colours = RACE_COLOURS[race];
-    yield* render(`RaceBacking${race}`, 'RaceBacking.svg', { BACKING_LIGHT: hex(colours.light), BACKING_MID: hex(colours.mid), BACKING_DARK: hex(colours.dark) }, false);
     yield* render(`NamePlate${race}`, 'NamePlate.svg', { RACE_TINT: hex(colours.tint) }, false);
     yield* run(['magick', join(output, `NamePlate${race}.tga`), '-flop', '-depth', '8', `TGA:${join(output, `NamePlateMirror${race}.tga`)}`]);
   }

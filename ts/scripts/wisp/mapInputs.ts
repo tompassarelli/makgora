@@ -34,7 +34,7 @@ import { Character } from "../../src/game/sim/codes";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { ALL_HEROES, PORTRAIT_KINDS, PORTRAIT_FIGHTERS, shipsInMap } from "../../src/game/roster/kits";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
-import { PORTRAIT_QUALITY, type Rgba, encodeBlp, readTga } from "../blp";
+import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";
 import { CLIP_RECORDS, clipPoolFiles, readClipRecords } from "../clipEvidence";
 import { importList } from "./importList";
@@ -43,8 +43,7 @@ import { regenerateCommand } from "../stageThumbnailSpec";
 import { stageCardPath } from "./buildInputs";
 import { buildProject, projectRoot as PROJECT } from "./project";
 import { UI_FRAMES } from "./uiFrames";
-import { RACES, type Race, fighterRace } from "../../src/game/roster/races";
-import { raceBackingArt } from "../../src/game/ui/raceFrame";
+import { RACES } from "../../src/game/roster/races";
 import { barArtNames } from "../../src/game/core/selectBarLayout";
 import { MENU_FRAME_PIECES, menuFrameName } from "../../src/game/core/menuFrame";
 import { checkCueModels } from "./headlessRender";
@@ -238,51 +237,19 @@ const imported = (directory: string, file: string): ArchiveEntry => ({ entry: `w
 
 const PORTRAIT_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "smashcraft/blp-portraits");
 
+export const MAP_PORTRAITS: readonly string[] = PORTRAIT_FIGHTERS.flatMap((character) => portraitCostumes(character).flatMap((costume) => PORTRAIT_KINDS.flatMap((kind) =>
+  [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot) => fighterPortrait(character, kind, slot, costume)))));
 
-
-
-
-
-interface MapPortrait {
-  readonly entry: string;
-  /** The race whose backing a match HUD bust is drawn over: Warcraft keeps no draw order between overlapping textures of one SIMPLEFRAME layer, so the bust carries it. */
-  readonly backing?: Race;
-}
-
-const MAP_PORTRAIT_SOURCES: readonly MapPortrait[] = PORTRAIT_FIGHTERS.flatMap((character) => portraitCostumes(character).flatMap((costume) => PORTRAIT_KINDS.flatMap((kind) =>
-  [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot): MapPortrait => ({
-    entry: fighterPortrait(character, kind, slot, costume),
-    ...(kind === "Bust" ? { backing: fighterRace(character) } : {}),
-  })))));
-
-export const MAP_PORTRAITS: readonly string[] = MAP_PORTRAIT_SOURCES.map((portrait) => portrait.entry);
-
-function overBacking(portrait: Rgba, backing: Rgba): Rgba {
-  if (portrait.width !== backing.width || portrait.height !== backing.height) throw new Error(`backing is ${backing.width}x${backing.height}, portrait ${portrait.width}x${portrait.height}`);
-  const data = new Uint8Array(portrait.data.length);
-  for (let at = 0; at < data.length; at += 4) {
-    const alpha = (portrait.data[at + 3] ?? 0) / 255;
-    for (let channel = 0; channel < 3; channel++) data[at + channel] = Math.round((portrait.data[at + channel] ?? 0) * alpha + (backing.data[at + channel] ?? 0) * (1 - alpha));
-    data[at + 3] = 255;
-  }
-  return { width: portrait.width, height: portrait.height, data, alpha: false };
-}
+export const encodeMapPortrait = (tga: Uint8Array): Uint8Array => encodeBlp(readTga(tga), PORTRAIT_QUALITY);
 
 const portraitImports = (assets: string) => Effect.forEach(
-  MAP_PORTRAIT_SOURCES,
-  ({ entry, backing }) => Effect.gen(function*() {
+  MAP_PORTRAITS,
+  (entry) => Effect.gen(function*() {
     const source = join(assets, "fighter-renders", entry.replace(/^.*war3mapImported\\/, "").replace(/\.blp$/, ".tga"));
     const bytes = yield* tryMapPromise("read portrait", source, () => Bun.file(source).bytes());
-    const backingSource = backing === undefined ? undefined : join(assets, "selection-assets", `${raceBackingArt(backing)}.tga`);
-    const backingBytes = backingSource === undefined ? undefined : yield* tryMapPromise("read race backing", backingSource, () => Bun.file(backingSource).bytes());
-    const hash = new Bun.CryptoHasher("sha256").update(bytes);
-    if (backingBytes !== undefined) hash.update(backingBytes);
-    const encoded = join(PORTRAIT_CACHE, `${hash.digest("hex")}-q${PORTRAIT_QUALITY}.blp`);
+    const encoded = join(PORTRAIT_CACHE, `${new Bun.CryptoHasher("sha256").update(bytes).digest("hex")}-q${PORTRAIT_QUALITY}.blp`);
     if (!(yield* tryMapPromise("check portrait cache", encoded, () => Bun.file(encoded).exists()))) {
-      const blp = yield* tryMapSync("encode portrait", source, () => {
-        const portrait = readTga(bytes);
-        return encodeBlp(backingBytes === undefined ? portrait : overBacking(portrait, readTga(backingBytes)), PORTRAIT_QUALITY);
-      });
+      const blp = yield* tryMapSync("encode portrait", source, () => encodeMapPortrait(bytes));
       yield* tryMapPromise("write portrait", encoded, () => Bun.write(encoded, blp));
     }
     return { entry, source: encoded } satisfies ArchiveEntry;
