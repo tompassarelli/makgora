@@ -14,7 +14,7 @@ import { createFighter, type Fighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { type Controls, fighterAt, neutralControls } from "../../sim/roster";
 import { holdAutoFollowUpOnDeck, pressHeroFollowUp } from "../../match/botHeroKit";
-import { CLAP_REACH, HAMMERFALL_WHIFF_LANDING_LAG, THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_LANDING_LAG } from "./specials";
+import { CLAP_REACH, HAMMERFALL_LANDING_LAG, HAMMERFALL_WHIFF_LANDING_LAG, THUNDER_LEAP_DIVE_FRAME, THUNDER_LEAP_FIRST_ACTIVE, THUNDER_LEAP_HIT, THUNDER_LEAP_LANDING_LAG } from "./specials";
 import { SHORT } from "./moves";
 import { CHARGED_AIM_FRAMES, FOLLOW_UP_FORM, SpecialForm } from "../../sim/specials/schema";
 
@@ -219,7 +219,7 @@ test("Thunder Leap's top does nothing without a change of direction: the stick a
   }
 });
 
-test("Thunder Leap dives on frame 23 on its own in each of the seven zones other than the leap's, and not when the stick is held there only on the frame before or after [k1 scenario]", () => {
+test("Thunder Leap dives on frame 31 on its own in each of the seven zones other than the leap's, and not when the stick is held there only on the frame before or after [k1 scenario]", () => {
   for (const direction of DIRECTIONS) {
     if (direction === UP) continue;
     const early = leapToTop(UP, frame => frame === FIRE_STEP_FRAME - 1 ? holding(direction, true) : REST);
@@ -282,7 +282,7 @@ test("A leap aimed off up dives straight up from the top, and a leap up-right di
   assertEquals(diagonal.king.special.form >= FOLLOW_UP_FORM, false, "up-right after a leap up-right does not dive");
 });
 
-test("Thunder Leap's first strike lands on frame 11 [k3 measure #509]", () => {
+test("Thunder Leap's first strike lands on frame 19 for 10.8 damage on a 113.26-growth, 25-base launch at 80 degrees with no set knockback, 8 frames after the old frame 11 [k3 measure #509]", () => {
   const { state, king, foe } = leapMatch(10.0);
   let first = 0;
   step(state, king, 1, 0, 1, true, true);
@@ -290,7 +290,14 @@ test("Thunder Leap's first strike lands on frame 11 [k3 measure #509]", () => {
     step(state, king, tick, 0, 1, false);
     if (foe.status.damage > 0.0) first = king.special.frame;
   }
-  assertEquals(first, 11, "the leap's hammer meets the foe beside him first on frame 11");
+  assertEquals(first, 19, "the leap's hammer meets the foe beside him first on frame 19");
+  assertEquals(THUNDER_LEAP_FIRST_ACTIVE, 19, "the authored first active frame");
+  assertEquals(foe.status.damage, f32(10.806899070739746), "the leap's hit deals 10.8 damage");
+  assertEquals(THUNDER_LEAP_HIT.growth, f32(113.26249694824219), "the leap sends on the edge class's growth");
+  assertEquals(THUNDER_LEAP_HIT.base, 25.0, "and its base knockback");
+  assertEquals(THUNDER_LEAP_HIT.launchZ, f32(0.984807753012208), "the launch angle is 80 degrees");
+  assertEquals(THUNDER_LEAP_HIT.setKnockback, undefined, "it sends with growth, not a set knockback");
+  assertEquals(THUNDER_LEAP_HIT.electric, false, "no stun beyond the shared electric hitlag");
 });
 
 
@@ -436,7 +443,7 @@ function landingLagAfter(leapHeight: number | undefined, aimZ: number, dive: boo
   return -1;
 }
 
-test("Mountain King lands from Thunder Leap in 11 frames of landing lag after its helpless fall and when he lands during the move, and from a Hammerfall dive that hits no one in its whiff lag of 40 [k3 measure docs/gameplay-design.md]", () => {
+test("Mountain King lands from Thunder Leap in 24 frames of landing lag after its helpless fall and when he lands during the move, and from a Hammerfall dive that hits no one in its whiff lag of 40 [k3 measure docs/gameplay-design.md]", () => {
   const lags = {
     fall: landingLagAfter(undefined, 1, false),
     midMove: landingLagAfter(AIR_HEIGHT, -1, false),
@@ -445,6 +452,9 @@ test("Mountain King lands from Thunder Leap in 11 frames of landing lag after it
   assertEquals(lags.fall, THUNDER_LEAP_LANDING_LAG, "landing from the helpless fall");
   assertEquals(lags.midMove, THUNDER_LEAP_LANDING_LAG, "landing during the leap");
   assertEquals(lags.dive, HAMMERFALL_WHIFF_LANDING_LAG, "landing from a whiffed dive pays the whiff lag");
+  assertEquals(THUNDER_LEAP_LANDING_LAG, 24, "the leap's landing lag is 24");
+  assertEquals(HAMMERFALL_LANDING_LAG, 24, "a Hammerfall that hits keeps 24");
+  assertEquals(HAMMERFALL_WHIFF_LANDING_LAG, 40, "a Hammerfall that whiffs keeps 40");
 });
 
 const BOT_LEAP_XS = [-600.0, -450.0, -300.0, 0.0, 300.0, 450.0, 600.0] as const;

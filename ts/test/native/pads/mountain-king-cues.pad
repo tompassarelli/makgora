@@ -75,12 +75,12 @@
 797 a stick 0 0
 798 a capture
 809 a capture
-# Thunder Leap and Hammerfall on its own at the top (frame 27): the stick pulled down from the leap's up, no special press.
+# Thunder Leap and Hammerfall on its own at the top (frame 31): the stick pulled down from the leap's up, no special press.
 880 a stick 0 1
 880 a tap X 2
 881 a stick 0 0
-882 a capture
-889 a capture
+890 a capture
+897 a capture
 # Expected, frame by frame (headless run of this script): every form of every special starts,
 # b's charge drops on the shield (form 18); Thunder Leap uses its ground form.
 #! expect b 180 special 16 form 0
@@ -94,7 +94,7 @@
 #! expect a 450 special 13 form 0
 #! expect a 796 special 14 form 1
 #! expect a 880 special 15 form 0
-#! expect a 900 special-form 6 action 15
+#! expect a 908 special-form 6 action 15
 # Startup and active cues of each special and branch and both missiles.
 #! scene a ForkedLightningTarget
 #! scene a DefendCaster
@@ -105,8 +105,8 @@
 #! scene a EarthquakeTarget
 #! scene a StormBoltMissile
 #! scene a ShockwaveMissile
-897 a capture
-897 a stick 0 -1
-906 a stick 0 0
+905 a capture
+905 a stick 0 -1
+914 a stick 0 0
 1000 a press VIEW
 1070 a release VIEW

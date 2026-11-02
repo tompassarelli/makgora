@@ -32,12 +32,13 @@ const RUSH_HURT = [hurtPose(13, 18, [hurtCapsule(Character.mountainKing), hurtPa
 
 
 
-const LEAP_DELAY = 2;
+export const THUNDER_LEAP_FIRST_ACTIVE = 19;
+const LEAP_DELAY = THUNDER_LEAP_FIRST_ACTIVE - CHARGED_AIM_FRAMES - 1;
 const LEAP_TRAVEL = 12;
 const leap = (distance: number): readonly SpecialMotion[] => chargedAngleMotion(distance, LEAP_TRAVEL).map((segment, index) =>
   index === 0 ? { ...segment, last: segment.last + LEAP_DELAY } : { ...segment, first: segment.first + LEAP_DELAY, last: segment.last + LEAP_DELAY });
 const FULL_LEAP = leap(heights(f32(3.0)));
-const THUNDER_LEAP = hit(8.645519256591797, "LAUNCH", 80, false, HitElement.electric);
+export const THUNDER_LEAP_HIT = hit(10.806899070739746, "EDGE", 80, false, HitElement.electric);
 const LEAP_HAMMER = capsule(26.0, 41.0, 110.0, -5.0, 16.0);
 
 
@@ -51,7 +52,7 @@ const HAMMERFALL_GROUNDED = hit(10.806899070739746, "LAUNCH", 55, false, HitElem
 const HAMMERFALL_HAMMER = capsule(4.0, 10.0, 4.0, -24.0, 20.0);
 export const HAMMERFALL_LANDING_LAG = 24;
 export const HAMMERFALL_WHIFF_LANDING_LAG = 40;
-export const THUNDER_LEAP_LANDING_LAG = 11;
+export const THUNDER_LEAP_LANDING_LAG = 24;
 const HAMMERFALL: AuthoredSpecial = {
   name: "Hammerfall",
 
@@ -173,7 +174,7 @@ export const MOUNTAIN_KING_SPECIALS: FighterSpecials = {
     description: "Hold a direction as he crouches, then a hammer leap that way; hit or miss, change direction at the top and he dives hammer first that way on his own as Hammerfall, in any of the eight directions other than the one he leapt. Keep the stick where it was, or let it go, and he falls helpless instead.",
     ground: {
       endFrame: THUNDER_LEAP_DIVE_FRAME + 3,
-      regions: [heroRegion(11, 16, LEAP_HAMMER, THUNDER_LEAP)],
+      regions: [heroRegion(THUNDER_LEAP_FIRST_ACTIVE, THUNDER_LEAP_FIRST_ACTIVE + 5, LEAP_HAMMER, THUNDER_LEAP_HIT)],
       aimFrames: CHARGED_AIM_FRAMES,
       motion: FULL_LEAP,
       facesStick: true,

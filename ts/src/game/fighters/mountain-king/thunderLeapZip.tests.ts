@@ -113,8 +113,8 @@ function zipToLanding(dive: Stick, options: { readonly kingX?: number; readonly 
 
 const near = (actual: number, expected: number, what: string) => assertEquals(Math.abs(actual - expected) <= 0.5, true, `${what}: ${actual} against ${expected}`);
 
-test("Thunder Leap zips 3.0H up in 12 frames, hangs 2 frames at the top on frame 23, and Hammerfall dives 0.24H a frame, the sideways dive 2.16H in 9 frames [k3 measure docs/design/roster.md]", () => {
-  assertEquals(THUNDER_LEAP_DIVE_FRAME, 23, "the top is frame 23");
+test("Thunder Leap zips 3.0H up in 12 frames, hangs 2 frames at the top on frame 31, and Hammerfall dives 0.24H a frame, the sideways dive 2.16H in 9 frames [k3 measure docs/design/roster.md]", () => {
+  assertEquals(THUNDER_LEAP_DIVE_FRAME, 31, "the top is frame 31");
   assertEquals(PLUNGE, f32(H * f32(0.24)), "the dive speed is 0.24H a frame");
   const zip = zipMatch(0.0);
   const startZ = zip.king.motion.z;
@@ -132,7 +132,7 @@ test("Thunder Leap zips 3.0H up in 12 frames, hangs 2 frames at the top on frame
   near(f32(zip.king.motion.x - topX), f32(f32(H * f32(0.24)) * DIVE_TRAVEL), "the sideways dive's reach");
 });
 
-test("A Hammerfall dive that hits no one lands in 40 frames of lag, straight down onto the deck or after a sideways dive's helpless fall; one that hits lands in its usual 24, or the leap's 11 after the helpless fall [k1 scenario]", () => {
+test("A Hammerfall dive that hits no one lands in 40 frames of lag, straight down onto the deck or after a sideways dive's helpless fall; one that hits lands in its usual 24, or the leap's 24 after the helpless fall [k1 scenario]", () => {
   const down = zipToLanding({ x: 0, z: -1 });
   assertEquals(down.struck, false, "the straight dive meets no one");
   assertEquals(down.lag, HAMMERFALL_WHIFF_LANDING_LAG, "a whiffed straight dive lands in the whiff lag");
