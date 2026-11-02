@@ -2,7 +2,7 @@ import { isParticipantSlot, type ParticipantSlot } from "../../game/input/partic
 import { chordComplete } from "../../game/input/pauseChord";
 import { Phase, cancelRematchCountdown, humanActive } from "../../game/lobby/lobbyState";
 import { startKeyUp } from "../../game/match/controls";
-import { clearLeaveHold, leaveHold, pressLeaveHold, releaseLeaveHold, tickLeaveHold } from "../../game/match/leaveHold";
+import { clearLeaveHold, leaveHold, pressEscape, releaseEscape, tickLeaveHold } from "../../game/match/leaveHold";
 import { warcraftChatOpen } from "../../platform/editboxJournal";
 import { journalEpoch } from "./journal";
 import { KEYBOARD_PAUSE_PREFIX, Key } from "./keyEvents";
@@ -26,30 +26,30 @@ export function onPauseKeyDown(s: ShellState): void {
 
 export function onPauseKeyUp(s: ShellState): void {
   const slot = playerSlot(eventPlayer());
-  if (s.game.phase !== Phase.match || !isParticipantSlot(slot) || slot !== localSlot() || !humanActive(s.game, slot)) return;
+  if (!isParticipantSlot(slot) || slot !== localSlot() || !humanActive(s.game, slot)) return;
   sendSync(KEYBOARD_PAUSE_PREFIX, ESCAPE_UP);
 }
 
-function holdsToLeave(s: ShellState, slot: ParticipantSlot): boolean {
-  if (s.game.phase !== Phase.match || !s.session.paused || journalEpoch(s)?.journal.barrier.request !== undefined) return false;
-  if (chordComplete(pauseChordKeys(s, slot), s.participants[slot].bindings.bindings)) return false;
-  return pressLeaveHold(s.leaveHold ??= leaveHold(), slot, s.pausedBy);
+function leavePauser(s: ShellState, slot: ParticipantSlot): ParticipantSlot | undefined {
+  if (s.game.phase !== Phase.match || !s.session.paused || journalEpoch(s)?.journal.barrier.request !== undefined) return undefined;
+  return chordComplete(pauseChordKeys(s, slot), s.participants[slot].bindings.bindings) ? undefined : s.pausedBy;
 }
 
 export function onKeyboardPause(s: ShellState): void {
   const slot = playerSlot(eventPlayer());
   if (!isParticipantSlot(slot) || !humanActive(s.game, slot)) return;
   const message = syncData();
+  const hold = s.leaveHold ??= leaveHold();
   if (message === ESCAPE_UP) {
-    if (s.leaveHold !== undefined && releaseLeaveHold(s.leaveHold, slot) && s.game.phase === Phase.match && s.session.paused) pressStart(s, slot);
+    if (releaseEscape(hold, slot) && s.game.phase === Phase.match && s.session.paused) pressStart(s, slot);
     return;
   }
+  if (message === ESCAPE_DOWN && pressEscape(hold, slot, leavePauser(s, slot))) return;
   if (s.pauseMenu?.title) {
     s.pauseMenu.title = false;
     return;
   }
   if (cancelRematchCountdown(s.game, slot)) return;
-  if (message === ESCAPE_DOWN && holdsToLeave(s, slot)) return;
   pressStart(s, slot);
 }
 

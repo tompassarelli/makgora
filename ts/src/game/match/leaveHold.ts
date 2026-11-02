@@ -1,23 +1,30 @@
 import { MATCH_TICKS_PER_SECOND } from "../lobby/lobbyState";
-import type { ParticipantSlot } from "../input/participants";
+import type { ParticipantSlot, Slots } from "../input/participants";
 
 export const LEAVE_HOLD_FRAMES = MATCH_TICKS_PER_SECOND;
 
 export interface LeaveHold {
   slot: ParticipantSlot | undefined;
   frames: number;
+  readonly held: Slots<boolean>;
 }
 
-export const leaveHold = (): LeaveHold => ({ slot: undefined, frames: 0 });
+export const leaveHold = (): LeaveHold => ({ slot: undefined, frames: 0, held: [false, false, false, false] });
 
-export function pressLeaveHold(hold: LeaveHold, slot: ParticipantSlot, pausedBy: ParticipantSlot | undefined): boolean {
-  if (slot !== pausedBy || hold.slot !== undefined) return hold.slot === slot;
-  hold.slot = slot;
-  hold.frames = 0;
+// A press while Esc is still held (the press that paused, or its key repeat) never starts the hold; only a fresh press does.
+export function pressEscape(hold: LeaveHold, slot: ParticipantSlot, pauser: ParticipantSlot | undefined): boolean {
+  const fresh = !hold.held[slot];
+  hold.held[slot] = true;
+  if (slot !== pauser) return false;
+  if (fresh && hold.slot === undefined) {
+    hold.slot = slot;
+    hold.frames = 0;
+  }
   return true;
 }
 
-export function releaseLeaveHold(hold: LeaveHold, slot: ParticipantSlot): boolean {
+export function releaseEscape(hold: LeaveHold, slot: ParticipantSlot): boolean {
+  hold.held[slot] = false;
   if (hold.slot !== slot) return false;
   clearLeaveHold(hold);
   return true;
