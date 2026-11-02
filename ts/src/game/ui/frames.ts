@@ -1,12 +1,13 @@
 
 
 
+import { MENU_FRAME_BAND, MENU_FRAME_CORNER, MENU_FRAME_PIECES, type MenuFramePiece, menuFrameTexture } from "./menuFrame";
 
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
 import { MENU_STYLE, NATIVE_TEXT_BASE } from "./hudLayout";
 import { createEvents, destroyEvents, Events, onEvents } from "wisp/game/events";
-import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, Frame, frameEnabled, FrameEvent, FramePoint, frameVisible, namedFrame, originFrame, OriginFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTexture } from "wisp/game/frames";
+import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, Frame, frameEnabled, FrameEvent, FramePoint, frameVisible, namedFrame, originFrame, OriginFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTexture } from "wisp/game/frames";
 import { eventPlayer, localPlayer, Player, player as playerOf, playerSlot } from "wisp/game/players";
 import { addSyncEvent, syncData } from "wisp/game/sync";
 import { toReal } from "wisp/game/text";
@@ -54,6 +55,36 @@ export function styleMenuPanel(frame: Frame, name: string): Frame {
   setFramePoint(backing, FramePoint.topLeft, frame, FramePoint.topLeft, f32(0.012), f32(-0.012));
   setFramePoint(backing, FramePoint.bottomRight, frame, FramePoint.bottomRight, f32(-0.012), f32(0.012));
   setFrameEnabled(backing, false);
+  return backing;
+}
+
+const MENU_FRAME_ANCHORS: { readonly [piece in MenuFramePiece]: readonly [FramePoint, number, number, FramePoint, number, number] } = {
+  TopLeft: [FramePoint.topLeft, 0, 0, FramePoint.topLeft, 1, -1],
+  Top: [FramePoint.topLeft, 1, 0, FramePoint.topRight, -1, -1],
+  TopRight: [FramePoint.topRight, -1, 0, FramePoint.topRight, 0, -1],
+  Left: [FramePoint.topLeft, 0, -1, FramePoint.bottomLeft, 1, 1],
+  Right: [FramePoint.topRight, -1, -1, FramePoint.bottomRight, 0, 1],
+  BottomLeft: [FramePoint.bottomLeft, 0, 1, FramePoint.bottomLeft, 1, 0],
+  Bottom: [FramePoint.bottomLeft, 1, 1, FramePoint.bottomRight, -1, 0],
+  BottomRight: [FramePoint.bottomRight, -1, 1, FramePoint.bottomRight, 0, 0],
+};
+
+export function frameMenuPanel(frame: Frame, name: string, context: number, level: number): Frame {
+  const backing = createBackdrop(`${name}Backing`, frame, context);
+  setFrameTexture(backing, MENU_STYLE.panelTexture, 0, true);
+  setFramePoint(backing, FramePoint.topLeft, frame, FramePoint.topLeft, MENU_FRAME_BAND, f32(-MENU_FRAME_BAND));
+  setFramePoint(backing, FramePoint.bottomRight, frame, FramePoint.bottomRight, f32(-MENU_FRAME_BAND), MENU_FRAME_BAND);
+  setFrameEnabled(backing, false);
+  setFrameLevel(backing, level);
+  for (const piece of MENU_FRAME_PIECES) {
+    const [from, fromX, fromY, to, toX, toY] = MENU_FRAME_ANCHORS[piece];
+    const edge = createBackdrop(`${name}${piece}`, frame, context);
+    setFrameTexture(edge, menuFrameTexture(piece), 0, true);
+    setFramePoint(edge, FramePoint.topLeft, frame, from, f32(fromX * MENU_FRAME_CORNER), f32(fromY * MENU_FRAME_CORNER));
+    setFramePoint(edge, FramePoint.bottomRight, frame, to, f32(toX * MENU_FRAME_CORNER), f32(toY * MENU_FRAME_CORNER));
+    setFrameEnabled(edge, false);
+    setFrameLevel(edge, level);
+  }
   return backing;
 }
 

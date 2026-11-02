@@ -92,19 +92,23 @@ and press it again to continue. Controller menus use the left stick to move
 the pointer, A to choose and B to go back. The panel shows your current control bindings.
 
 Every game opens on the Controls screen, one for each player, before fighter
-select. Pick a layout at the top: WASD (recommended if you're new), Box
-(the leverless controller style, with Space as up) or Custom; picking one saves it as
-your profile. WASD and Box never change: rebinding a key on either copies that
-layout into Custom with your edit, selects Custom and saves it, and the Customize
-button copies the selected layout into Custom without an edit, replacing what
-Custom held. Load profile brings back your saved setup: when you have one it
-is already loaded and selected, and the screen says so; without one the button
-reads "No saved profile". Below, the keyboard lights every bound key with its
-action; click a lit key, press the key you want instead, then Save. If another
-action already held that key, the two swap and the screen says "Swapped with"
-that action. Press Delete instead of a key to clear the slot, or click the small x
-on a lit key's corner; an action left with no key is listed as Unbound, and a Bind button captures a key for it. Escape cancels a
-rebind. On Custom the bottom row adds Rename, which names the selected slot, and Reset, which brings back the Custom defaults, and Delete profile above Load profile empties the selected slot back to the Custom defaults with no name.
+select. The top row holds WASD (recommended if you're new), Box (the leverless
+controller style, with Space as up) and your selected Custom slot, shown by its
+name and lit gold while selected; picking one saves it as your profile. WASD and
+Box never change: rebinding a key on either copies that layout into the selected
+Custom slot with your edit, selects it and saves it. Click the Custom button again
+while it is selected to open the list of all three Custom slots, each by its name
+(an unused slot says empty); pick one to load it, or press Escape or click
+elsewhere to close the list. Below, the keyboard lights every bound key with its
+action; click a lit key, press the key you want instead, then Save. While a Custom
+slot has edits you have not saved, its name ends in *. If another action already
+held that key, the two swap and the screen says "Swapped with" that action. Press
+Delete instead of a key to clear the slot, or click the small red x on a lit key's
+corner; while an action has no key, a Bind button at the right of the hint line
+captures one for it. Escape cancels a rebind. Rename names the selected Custom slot,
+Reset brings back the Custom defaults, and Delete empties the slot back to the
+Custom defaults with no name; all three are greyed out on WASD and Box. The
+bottom row holds Show keyboard in game on the left and Save and Done on the right.
 Done (or Escape) closes the screen and goes on to fighter
 select; each player confirms their own. F1 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to

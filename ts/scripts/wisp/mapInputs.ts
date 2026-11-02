@@ -46,6 +46,7 @@ import { UI_FRAMES } from "./uiFrames";
 import { RACES, type Race, fighterRace } from "../../src/game/roster/races";
 import { raceBackingArt } from "../../src/game/ui/raceFrame";
 import { barArtNames } from "../../src/game/core/selectBarLayout";
+import { MENU_FRAME_PIECES, menuFrameName } from "../../src/game/ui/menuFrame";
 import { checkCueModels } from "./headlessRender";
 import { mapCueModels } from "./cueModels";
 import { removeGeosets, teamGlowGeosets } from "../groundPlanes";
@@ -93,7 +94,7 @@ const SELECTION_TEXTURES = [
   "SelectionChipP1", "SelectionChipP2", "SelectionChipP3", "SelectionChipP4", "SelectionChipCPUP1", "SelectionChipCPUP2", "SelectionChipCPUP3", "SelectionChipCPUP4",
   "SelectionHandPoint", "SelectionHandFan", "SelectionHandPinch", ...handLabelNames(), "SelectionBullseye",
   ...RACES.flatMap(race => [`NamePlate${race}`, `NamePlateMirror${race}`]), "StockShadow", "PreviewRowLit", "PreviewRule", "PingSignal1", "PingSignal2", "PingSignal3", "PingSignal4",
-  "MarkerArrow0", "MarkerArrow1", "MarkerArrow2", "MarkerArrow3", ...barArtNames(),
+  "MarkerArrow0", "MarkerArrow1", "MarkerArrow2", "MarkerArrow3", ...barArtNames(), ...MENU_FRAME_PIECES.map(menuFrameName),
 ];
 
 

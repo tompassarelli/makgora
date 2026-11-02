@@ -21,6 +21,7 @@ import { RACES } from '../../ts/src/game/roster/races';
 import { RACE_COLOURS } from '../../ts/src/game/ui/raceFrame';
 import { type BarArtStyle, barArt, barArtName } from '../../ts/src/game/core/selectBarLayout';
 import { BAR_LINE, BAR_STRIP } from '../../ts/src/game/core/selectScreenLayout';
+import { MENU_FRAME_PIECES, type MenuFramePiece, menuFrameName } from '../../ts/src/game/ui/menuFrame';
 
 const project = resolve(import.meta.dir, '../..');
 const source = join(project, 'tools/selection/art');
@@ -63,6 +64,16 @@ const render = (name: string, svg: string, replacements: { readonly [placeholder
   yield* Effect.tryPromise({ try: () => Bun.write(file, text), catch: ioFailure });
   yield* run(['magick', '-background', 'none', file, '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
   if (!keep) yield* Effect.try({ try: () => rmSync(file), catch: ioFailure });
+});
+
+const MENU_FRAME_CROPS: { readonly [piece in MenuFramePiece]: string } = {
+  TopLeft: '80x80+0+0', Top: '16x80+248+0', TopRight: '80x80+432+0', Left: '80x16+0+248', Right: '80x16+432+248', BottomLeft: '80x80+0+432', Bottom: '16x80+248+432', BottomRight: '80x80+432+432',
+};
+
+const menuFrameArt = () => Effect.gen(function*() {
+  const full = join(scratch, 'MenuFrame.png');
+  yield* run(['magick', '-background', 'none', join(source, 'MenuFrame.svg'), '-depth', '8', full]);
+  for (const piece of MENU_FRAME_PIECES) yield* run(['magick', full, '-crop', MENU_FRAME_CROPS[piece], '+repage', '-type', 'TrueColorAlpha', '-depth', '8', `TGA:${join(output, `${menuFrameName(piece)}.tga`)}`]);
 });
 
 BunRuntime.runMain(Effect.gen(function*() {
@@ -110,6 +121,7 @@ BunRuntime.runMain(Effect.gen(function*() {
   yield* render('SelectBarLine', 'SelectBarLine.svg', { WIDTH: String(Math.round(BAR_LINE.width * BAR_PIXELS)), HEIGHT: String(Math.round(BAR_LINE.height * BAR_PIXELS)) }, false);
   for (const name of ['SelectBarChevron', 'SelectBarGear', 'SelectBarCheck']) yield* run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
   yield* run(['magick', join(output, 'SelectBarChevron.tga'), '-flip', '-depth', '8', `TGA:${join(output, 'SelectBarChevronUp.tga')}`]);
+  yield* menuFrameArt();
   for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionBullseye', 'SelectionThreeBridges']) {
     yield* run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
   }

@@ -68,7 +68,7 @@ export interface BindingSettings {
 
   ready: boolean;
   profile: SavedProfile;
-  fromProfile: boolean;
+  dirty: boolean;
   capture: BindingCapture | undefined;
   layout: BindingPreset;
   picking: boolean;
@@ -81,7 +81,7 @@ export interface BindingSettings {
 
 export function createBindingSettings(owner: number, persistence: BindingPersistence): BindingSettings {
   const { layouts, customs, slot, keyboard } = layoutSave(presetLayouts(), DEFAULT_PRESET);
-  return { owner, persistence, layouts, customs, slot, keyboard, bindings: layouts[DEFAULT_PRESET], ready: false, profile: "unknown", fromProfile: false, capture: undefined, layout: DEFAULT_PRESET, picking: false, naming: false, revision: 0, message: "Loading controls..." };
+  return { owner, persistence, layouts, customs, slot, keyboard, bindings: layouts[DEFAULT_PRESET], ready: false, profile: "unknown", dirty: false, capture: undefined, layout: DEFAULT_PRESET, picking: false, naming: false, revision: 0, message: "Loading controls..." };
 }
 
 
@@ -101,6 +101,7 @@ function adopt(settings: BindingSettings, save: LayoutSave): void {
   settings.picking = false;
   settings.naming = false;
   settings.bindings = save.layouts[save.active];
+  settings.dirty = false;
 }
 
 function resetLayouts(settings: BindingSettings): void {
@@ -125,12 +126,10 @@ function applyStartingLoad(settings: BindingSettings, result: BindingLoadResult)
   if (saved !== undefined) {
     adopt(settings, saved);
     settings.profile = "saved";
-    settings.fromProfile = true;
     settings.message = "Saved profile loaded. Press Done to choose a fighter.";
   } else {
     resetLayouts(settings);
     settings.profile = result.kind === "unavailable" ? "unavailable" : "none";
-    settings.fromProfile = false;
     settings.message = result.kind === "loaded" ? `Saved controls were invalid; using ${PRESET_NAMES[DEFAULT_PRESET]} defaults.` : `${PRESET_NAMES[DEFAULT_PRESET]} controls ready. Pick a layout, then press Done.`;
   }
   settings.revision++;
@@ -159,7 +158,6 @@ export function loadSavedBindings(settings: BindingSettings, done: (message: str
       settings.capture = undefined;
       settings.revision++;
       settings.profile = "saved";
-      settings.fromProfile = true;
       settings.message = "Saved controls loaded.";
     } else {
       if (result.kind === "empty") settings.profile = "none";
@@ -181,7 +179,6 @@ export function applyBindingPreset(settings: BindingSettings, preset: BindingPre
   settings.layout = preset;
   settings.bindings = settings.layouts[preset];
   settings.revision++;
-  settings.fromProfile = false;
   settings.capture = undefined;
   settings.message = `${PRESET_NAMES[preset]} controls selected.`;
 }
@@ -195,7 +192,7 @@ export function beginBindingCapture(settings: BindingSettings, action: Action, s
 function edited(settings: BindingSettings, message: string): void {
   settings.capture = undefined;
   settings.revision++;
-  settings.fromProfile = false;
+  settings.dirty = true;
   settings.message = message;
 }
 
@@ -218,19 +215,7 @@ function finishEdit(settings: BindingSettings, target: KeyBindings, message: str
   selectCustom(settings, target);
   edited(settings, message);
   saveBindingSettings(settings);
-  settings.fromProfile = false;
   settings.message = `${message} ${from} stays as it was; your keys are in Custom and saved.`;
-}
-
-export function customizeLayout(settings: BindingSettings): void {
-  if (!settings.ready) return;
-  if (settings.layout === "custom") {
-    settings.message = "Custom is already selected. Edit any key.";
-    return;
-  }
-  const from = PRESET_NAMES[settings.layout];
-  selectCustom(settings, editableBindings(settings));
-  edited(settings, `${from} copied to Custom. Edits go to Custom.`);
 }
 
 function clearedMessage(bindings: Readonly<KeyBindings>, action: Action, key: number | undefined): string {
@@ -272,13 +257,8 @@ export function bindFirstUnbound(settings: BindingSettings): void {
 }
 
 export function resetToLayout(settings: BindingSettings): void {
-  if (!settings.ready) return;
-  const stock = presetBindings(settings.layout);
-  if (settings.layout === "custom") selectCustom(settings, stock);
-  else {
-    settings.bindings = stock;
-    settings.layouts[settings.layout] = stock;
-  }
+  if (!settings.ready || settings.layout !== "custom") return;
+  selectCustom(settings, presetBindings("custom"));
   edited(settings, `${PRESET_NAMES[settings.layout]} defaults restored. Save to keep them.`);
 }
 
@@ -287,7 +267,7 @@ export function saveBindingSettings(settings: BindingSettings): void {
   settings.capture = undefined;
   settings.persistence.save(settings.owner, encodeLayouts({ layouts: settings.layouts, active: settings.layout, customs: settings.customs, slot: settings.slot, keyboard: settings.keyboard }));
   settings.profile = "saved";
-  settings.fromProfile = true;
+  settings.dirty = false;
   settings.message = "Controls saved for next time.";
 }
 
@@ -307,7 +287,6 @@ export function pickBindingPreset(settings: BindingSettings, preset: BindingPres
   if (!settings.ready) return;
   applyBindingPreset(settings, preset);
   saveBindingSettings(settings);
-  settings.fromProfile = false;
   settings.message = `${PRESET_NAMES[preset]} controls saved as your profile.`;
 }
 
@@ -323,11 +302,23 @@ export function beginKeyCapture(settings: BindingSettings, key: number): void {
 
 export const slotLabel = (settings: Readonly<BindingSettings>, slot = settings.slot): string => customSlotLabel(settings.customs, slot);
 
-export function loadProfile(settings: BindingSettings): void {
+export const customButtonLabel = (settings: Readonly<BindingSettings>): string => `${slotLabel(settings)}${settings.dirty ? "*" : ""}`;
+
+export function pressCustomButton(settings: BindingSettings): void {
   if (!settings.ready) return;
+  if (settings.layout !== "custom") {
+    pickCustomSlot(settings, settings.slot);
+    return;
+  }
   endNaming(settings);
   settings.picking = !settings.picking;
   if (settings.picking) settings.message = "Pick a Custom slot to load.";
+}
+
+export function closeSlotMenu(settings: BindingSettings): boolean {
+  if (!settings.picking) return false;
+  settings.picking = false;
+  return true;
 }
 
 export function pickCustomSlot(settings: BindingSettings, slot: number): void {
@@ -343,12 +334,11 @@ export function pickCustomSlot(settings: BindingSettings, slot: number): void {
 }
 
 export function beginNaming(settings: BindingSettings): void {
-  if (!settings.ready) return;
+  if (!settings.ready || settings.layout !== "custom") return;
   if (settings.naming) {
     endNaming(settings);
     return;
   }
-  if (settings.layout !== "custom") selectCustom(settings, settings.layouts.custom);
   settings.capture = undefined;
   settings.picking = false;
   settings.naming = true;
@@ -373,7 +363,7 @@ export function endNaming(settings: BindingSettings): void {
 
 export function deleteProfile(settings: BindingSettings): void {
   const custom = settings.customs[settings.slot];
-  if (!settings.ready || custom === undefined) return;
+  if (!settings.ready || settings.layout !== "custom" || custom === undefined) return;
   endNaming(settings);
   settings.picking = false;
   const deleted = slotLabel(settings);

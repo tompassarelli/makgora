@@ -2,7 +2,7 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
 import { ACTION_LABELS, BINDING_PRESETS, type BindingPreset, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
-import { CUSTOM_SLOT_COUNT, type LayoutBindings, SLOT_NAME_LIMIT, decodeLayouts, encodeLayouts, layoutSave, presetLayouts } from "../input/layoutSave";
+import { CUSTOM_SLOT_COUNT, type LayoutBindings, SLOT_NAME_LIMIT, customSlotEmpty, decodeLayouts, encodeLayouts, layoutSave, presetLayouts } from "../input/layoutSave";
 import {
   type BindingLoadResult,
   type BindingSettings,
@@ -12,10 +12,11 @@ import {
   captureBinding,
   clearKey,
   createBindingSettings,
-  customizeLayout,
   deleteProfile,
   initializeBindingSettings,
-  loadProfile,
+  pressCustomButton,
+  closeSlotMenu,
+  customButtonLabel,
   loadSavedBindings,
   beginNaming,
   endNaming,
@@ -220,21 +221,66 @@ test("clearing a key on a stock layout copies it into Custom with the key cleare
   assertEquals(persistedSettings(stored).layout, "custom", "saved");
 });
 
-test("Customize copies the selected layout into Custom and selects it without an edit or a save, replacing what Custom held, and does nothing in Custom [k2 property]", () => {
+test("the custom button selects the active Custom slot from WASD or Box, and only once Custom is selected does it open the slot list; picking a slot loads and saves it, and Esc or a click elsewhere closes the list [k2 property]", () => {
   const stored = { encoded: undefined as string | undefined };
   const settings = persistedSettings(stored);
-  applyBindingPreset(settings, "custom");
+  pickCustomSlot(settings, 1);
   bindAttack(settings, code("B"));
-  const saved = stored.encoded;
-  applyBindingPreset(settings, "standard");
-  customizeLayout(settings);
-  assertEquals(settings.layout, "custom", "Customize selects Custom");
-  assertEquals(settings.bindings.keys.join(","), stockKeys("standard"), "Custom is now a copy of Box");
-  assertEquals(settings.layouts.standard.keys.join(","), stockKeys("standard"), "Box stays stock");
-  assertEquals(stored.encoded, saved, "Customize saves nothing");
+  saveBindingSettings(settings);
+  pickBindingPreset(settings, "wasd");
+  pressCustomButton(settings);
+  assertEquals(settings.layout, "custom", "the custom button selects Custom");
+  assertEquals(settings.slot, 1, "on the active slot");
+  assertEquals(slots(settings, Action.attack), "B —", "with that slot's keys");
+  assertEquals(settings.picking, false, "the first press opens no list");
+  pressCustomButton(settings);
+  assertEquals(settings.picking, true, "a press on the selected custom button opens the list");
+  pressCustomButton(settings);
+  assertEquals(settings.picking, false, "a second press closes it");
+  pressCustomButton(settings);
+  assertEquals(closeSlotMenu(settings), true, "Esc or a click elsewhere closes the list");
+  assertEquals(closeSlotMenu(settings), false, "a closed list has nothing to close");
+  pressCustomButton(settings);
+  pickCustomSlot(settings, 2);
+  assertEquals(settings.picking, false, "picking closes the list");
+  assertEquals(settings.slot, 2, "the picked slot is active");
+  assertEquals(encodeBindings(settings.bindings), encodeBindings(presetBindings("custom")), "with its own keys");
+  assertEquals([0, 1, 2].map(slot => customSlotEmpty(settings.customs, slot)).join(","), "true,false,true", "unnamed stock slots are listed as empty");
+  assertEquals(persistedSettings(stored).slot, 2, "the pick is saved");
+});
+
+test("Rename, Reset and Delete do nothing on WASD or Box [k2 property]", () => {
+  const stored = { encoded: undefined as string | undefined };
+  const settings = persistedSettings(stored);
+  pickCustomSlot(settings, 0);
+  beginNaming(settings);
+  nameSlot(settings, "primary");
+  endNaming(settings);
+  for (const preset of ["wasd", "standard"] as const) {
+    pickBindingPreset(settings, preset);
+    const saved = stored.encoded;
+    const keys = encodeBindings(settings.bindings);
+    beginNaming(settings);
+    resetToLayout(settings);
+    deleteProfile(settings);
+    assertEquals(settings.naming, false, `Rename on ${PRESET_NAMES[preset]}`);
+    assertEquals(settings.layout, preset, `${PRESET_NAMES[preset]} stays selected`);
+    assertEquals(encodeBindings(settings.bindings), keys, `${PRESET_NAMES[preset]} keys`);
+    assertEquals(slotLabel(settings, 0), "primary", `Delete on ${PRESET_NAMES[preset]} keeps the slot`);
+    assertEquals(stored.encoded, saved, `nothing saved on ${PRESET_NAMES[preset]}`);
+  }
+});
+
+test("the custom button's name gains a * after an unsaved edit and Save clears it [k2 property]", () => {
+  const settings = persistedSettings({ encoded: undefined });
+  pickCustomSlot(settings, 0);
+  assertEquals(customButtonLabel(settings), "Custom 1", "saved");
   bindAttack(settings, code("B"));
-  customizeLayout(settings);
-  assertEquals(slots(settings, Action.attack), "B —", "Customize in Custom keeps its keys");
+  assertEquals(customButtonLabel(settings), "Custom 1*", "after an edit");
+  saveBindingSettings(settings);
+  assertEquals(customButtonLabel(settings), "Custom 1", "after Save");
+  resetToLayout(settings);
+  assertEquals(customButtonLabel(settings), "Custom 1*", "after Reset");
 });
 
 test("saving keeps all three layouts and the active one, and a new session reopens on them [k2 property]", () => {
@@ -255,7 +301,7 @@ test("saving keeps all three layouts and the active one, and a new session reope
   assertEquals(slots(reopened, Action.attack), "N —", "WASD keys");
 });
 
-test("a one-set save from before layouts loads as the active layout's keys, and Load profile reopens it on Custom [k2 property]", () => {
+test("a one-set save from before layouts loads as the active layout's keys, and -load reopens it on Custom [k2 property]", () => {
   const keys = presetBindings("wasd");
   keys.keys[slotIndex(Action.attack, 0)] = code("B");
   const old = encodeBindings(keys);
@@ -270,10 +316,10 @@ test("a one-set save from before layouts loads as the active layout's keys, and 
 
   applyBindingPreset(settings, "standard");
   loadSavedBindings(settings, () => undefined);
-  assertEquals(settings.layout, "custom", "Load profile selects Custom");
+  assertEquals(settings.layout, "custom", "-load selects Custom");
   assertEquals(slots(settings, Action.attack), "B —", "Custom gets the profile");
   applyBindingPreset(settings, "standard");
-  assertEquals(slots(settings, Action.attack), "N —", "Box is untouched by Load profile");
+  assertEquals(slots(settings, Action.attack), "N —", "Box is untouched by -load");
 });
 
 test("a one-set save still on the old WASD defaults opens on WASD with C-up on Y, while an edited one stays Custom [k2 property]", () => {
@@ -289,7 +335,7 @@ test("a one-set save still on the old WASD defaults opens on WASD with C-up on Y
   assertEquals(slots(own, Action.cUp), "H —", "edited C-up stays");
 });
 
-test("each layout shows the same keys however the screen reaches it: opening on a save from before the layout defaults moved, then clicking layouts and Load profile in any order [k2 property]", () => {
+test("each layout shows the same keys however the screen reaches it: opening on a save from before the layout defaults moved, then clicking layouts and the Custom slot list in any order [k2 property]", () => {
   const own = presetBindings("standard");
   own.keys[slotIndex(Action.attack, 0)] = code("B");
   const old = encodeSlots({ layouts: { wasd: { keys: previousDefaultKeys("wasd") }, standard: { keys: previousDefaultKeys("standard") }, custom: own }, active: "wasd" });
@@ -300,7 +346,6 @@ test("each layout shows the same keys however the screen reaches it: opening on 
     const seen: Partial<Record<BindingPreset, string>> = { [settings.layout]: shown(settings) };
     for (const click of [...clicks, "wasd", "standard", "custom"]) {
       if (click === "profile") {
-        loadProfile(settings);
         pickCustomSlot(settings, 0);
       }
       else pickBindingPreset(settings, click as BindingPreset);
@@ -321,7 +366,6 @@ test("three Custom slots each keep their own keys and name through a save, and t
   const settings = persistedSettings(stored);
   const attacks = [code("B"), code("K"), code("L")];
   attacks.forEach((key, slot) => {
-    loadProfile(settings);
     pickCustomSlot(settings, slot);
     bindAttack(settings, key);
   });
@@ -366,11 +410,12 @@ test("an older one-Custom save loads its Custom into slot 1, and slots 2 and 3 s
   assertEquals(slots(oneSet, Action.attack), "B —", "one-set keys in slot 1");
 });
 
-test("Load profile opens the three slots by name or Custom 1-3, and picking one selects and saves it [k2 property]", () => {
+test("The selected custom button opens the three slots by name or Custom 1-3, and picking one selects and saves it [k2 property]", () => {
   const stored = { encoded: undefined as string | undefined };
   const settings = persistedSettings(stored);
-  loadProfile(settings);
-  assertEquals(settings.picking, true, "Load profile opens the slots");
+  pickBindingPreset(settings, "custom");
+  pressCustomButton(settings);
+  assertEquals(settings.picking, true, "the custom button opens the slots");
   assertEquals([0, 1, 2].map(slot => slotLabel(settings, slot)).join(","), "Custom 1,Custom 2,Custom 3");
   pickCustomSlot(settings, 2);
   assertEquals(settings.picking, false, "picking closes the slots");
@@ -381,7 +426,6 @@ test("Load profile opens the three slots by name or Custom 1-3, and picking one 
   nameSlot(settings, "Friend");
   endNaming(settings);
   assertEquals(settings.naming, false, "Enter ends naming");
-  loadProfile(settings);
   assertEquals([0, 1, 2].map(slot => slotLabel(settings, slot)).join(","), "Custom 1,Custom 2,Friend");
   assertEquals(persistedSettings(stored).slot, 2, "the pick is saved");
   assertEquals(slotLabel(persistedSettings(stored)), "Friend", "the name is saved");

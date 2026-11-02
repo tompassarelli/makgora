@@ -26,12 +26,6 @@ export const BINDING_PRESETS: readonly BindingPreset[] = ["wasd", "standard", "c
 
 export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { wasd: "WASD", standard: "Box", custom: "Custom" };
 
-export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
-  wasd: "Recommended if you're new. W is up, 8 jumps",
-  standard: "Leverless controller style",
-  custom: "Box with 9 jump, 8 shield and 0 Strong",
-};
-
 const EMPTY = 0;
 const SPACE = 32;
 export const SHIFT = 16;

@@ -16,7 +16,7 @@ import { leaveTutorial } from "../../game/match/tutorial";
 import { fighterName } from "../../game/roster/kits";
 import { endReplaySegment } from "./replays";
 import { pausedMessage } from "../../game/session/messages";
-import { cancelBindingCapture, captureBinding, endNaming } from "../../game/ui/bindingSettings";
+import { cancelBindingCapture, captureBinding, closeSlotMenu, endNaming } from "../../game/ui/bindingSettings";
 import { writeLines } from "wisp/src/platform/fileio";
 import { confirmedChecksum, startInputTrace, traceParticipant } from "./diagnostics";
 import { clearCapturedInputs } from "./inputs";
@@ -154,6 +154,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     cancelBindingCapture(bindings);
     return;
   }
+  if (key === Key.escape && closeSlotMenu(bindings)) return;
   if ((key === Key.escape || key === Key.f9) && settings.isOpen()) {
     settings.close();
     return;

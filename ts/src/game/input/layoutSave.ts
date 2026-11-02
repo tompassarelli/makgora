@@ -40,6 +40,11 @@ export const customSlotLabel = (customs: readonly CustomSlot[], slot: number): s
   return name !== "" ? name : `Custom ${slot + 1}`;
 };
 
+export const customSlotEmpty = (customs: readonly CustomSlot[], slot: number): boolean => {
+  const custom = customs[slot];
+  return custom !== undefined && custom.name === "" && encodeBindings(custom.bindings) === encodeBindings(presetBindings("custom"));
+};
+
 export function presetLayouts(): LayoutBindings {
   return { wasd: presetBindings("wasd"), standard: presetBindings("standard"), custom: presetBindings("custom") };
 }
