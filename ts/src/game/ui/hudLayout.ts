@@ -8,8 +8,8 @@ import { at } from "wisp/src/runtime/lookup";
 
 export const NATIVE_TEXT_BASE = f32(0.0085);
 export const MENU_FONT = "Fonts\\FRIZQT__.TTF";
-/** Top edge of the one-line netplay warning above the fighter plates. */
-export const NET_INDICATOR_TOP = f32(0.145);
+/** Top edge of the one-line netplay warning, above the match chat's lines in the bottom-left corner. */
+export const NET_INDICATOR_TOP = f32(0.215);
 /** The dark tooltip backing behind every menu panel, readout and meter. */
 export const PANEL_TEXTURE = "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp";
 /** The arrow over a fighter in each slot colour. */

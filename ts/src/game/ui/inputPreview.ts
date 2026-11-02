@@ -3,7 +3,7 @@ import { formatInt } from "wisp/game/text";
 import { type BindingSettings, previewKeyFree } from "./bindingSettings";
 import { type HintDevice, padHintRows, hintText } from "./hintLines";
 import { PREVIEW_DIVIDERS, PREVIEW_INNER, PREVIEW_PANEL, PREVIEW_ROWS, PREVIEW_ROW_HEIGHT, PREVIEW_TITLE, previewKeyText, previewRowHeld, previewTextFit } from "./keyboardPreview";
-import { PREVIEW_CELL, type PlateRow, previewCellLeft } from "./plateLayout";
+import { type PlateRow, previewPanelLeft } from "./plateLayout";
 import { createBackdrop, createText, gameUi, placeTopLeft, sizeText } from "./frames";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { destroyFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
@@ -99,7 +99,7 @@ export class InputPreview {
   place(row: PlateRow): void {
     this.laidFor = row.preview;
     if (row.count < 1) return;
-    const left = f32(previewCellLeft(row) + (PREVIEW_CELL - PREVIEW_PANEL.width) / 2);
+    const left = f32(previewPanelLeft(row));
     const top = f32(PANEL_BOTTOM + PREVIEW_PANEL.height);
     this.innerLeft = f32(left + PREVIEW_PANEL.margin);
     this.innerTop = f32(top - PREVIEW_PANEL.margin);

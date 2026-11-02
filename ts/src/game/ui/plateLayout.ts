@@ -3,12 +3,13 @@ import { toInt } from "wisp/src/sim/binary32";
 import { idiv, imod } from "wisp/src/sim/intMath";
 import { unitsForPixels } from "./portraitFrames";
 import { RACE_FRAME_PX } from "./raceFrame";
+import { PREVIEW_PANEL } from "./keyboardPreview";
 
 
 export const PLATE_WIDTH_PX = 544;
 export const PLATE_HEIGHT_PX = 334;
 
-const PLATE_BOTTOM = f32(0.012);
+export const PLATE_BOTTOM = f32(0.012);
 export const PLATE_TOP = PLATE_BOTTOM + unitsForPixels(PLATE_HEIGHT_PX);
 
 export interface PlateBox {
@@ -76,6 +77,18 @@ const STOCK_SHADOWS: readonly PlateBox[] = ICON_INDEXES.map(index => stockShadow
 const STOCKS: readonly PlateBox[] = ICON_INDEXES.map(index => stockIcon(index));
 const STOCK_COUNT: PlateBox = { x: STOCK_LEFT_PX + STOCK_STEP_PX, y: STOCK_TOP_PX, width: 120, height: STOCK_SHADOW_PX };
 
+const scaleBox = (box: PlateBox, scale: number): PlateBox => ({
+  x: f32(box.x * scale), y: f32(PLATE_HEIGHT_PX - scale * (PLATE_HEIGHT_PX - box.y)), width: f32(box.width * scale), height: f32(box.height * scale),
+});
+
+const scaledPanel = (panel: PanelLayout, scale: number): PanelLayout => ({
+  mirrored: panel.mirrored,
+  frame: scaleBox(panel.frame, scale), damage: scaleBox(panel.damage, scale), percent: scaleBox(panel.percent, scale), doom: scaleBox(panel.doom, scale),
+  namePlate: scaleBox(panel.namePlate, scale), name: scaleBox(panel.name, scale), ultimateBar: scaleBox(panel.ultimateBar, scale),
+  stockShadows: panel.stockShadows.map(box => scaleBox(box, scale)), stocks: panel.stocks.map(box => scaleBox(box, scale)), stockCount: scaleBox(panel.stockCount, scale),
+  pingSignal: scaleBox(panel.pingSignal, scale), pingNumber: scaleBox(panel.pingNumber, scale),
+});
+
 const LEFT_PANEL: PanelLayout = {
   mirrored: false, frame: FRAME, damage: DAMAGE, percent: PERCENT, doom: DOOM, namePlate: NAME_PLATE, name: NAME, ultimateBar: ULTIMATE_BAR,
   stockShadows: STOCK_SHADOWS, stocks: STOCKS, stockCount: STOCK_COUNT, pingSignal: PING_SIGNAL, pingNumber: PING_NUMBER,
@@ -100,20 +113,35 @@ const RIGHT_PANEL: PanelLayout = {
   pingNumber: flip(PING_NUMBER),
 };
 
-/** The bottom row: how many plates, how many of them sit left of the input preview (the rest face them, mirrored), and whether the preview is shown between them. */
+/** The bottom row: how many plates, how many of them sit left of the input preview (the rest face them, mirrored), whether the preview is shown between them, and how far the plates are scaled down to leave it room (1 with the preview off). */
 export interface PlateRow {
   readonly count: number;
   readonly split: number;
   readonly preview: boolean;
+  readonly scale: number;
 }
 
 const evenSplit = (count: number): number => count - idiv(count, 2);
 
-export const plateRow = (count: number, preview = false, split = evenSplit(count)): PlateRow => ({ count, split: Math.max(0, Math.min(count, split)), preview });
+const SCREEN_WIDTH = f32(0.8);
+const ROW_EDGE = f32(0.005);
+const PREVIEW_CLEAR = f32(0.005);
+const PLATE_WIDTH = unitsForPixels(PLATE_WIDTH_PX);
+
+// With the preview on the plates crowd to the screen's edges and shrink only as far as the preview's full panel needs.
+const previewScale = (count: number): number => count < 1 ? 1.0 : Math.min(1.0, (SCREEN_WIDTH - 2 * ROW_EDGE - 2 * PREVIEW_CLEAR - PREVIEW_PANEL.width) / (count * PLATE_WIDTH));
+
+export const plateRow = (count: number, preview = false, split = evenSplit(count)): PlateRow => ({ count, split: Math.max(0, Math.min(count, split)), preview, scale: preview ? previewScale(count) : 1.0 });
 
 export const panelMirrored = (position: number, row: PlateRow): boolean => row.count > 1 && position >= row.split;
 
-export const panelLayout = (position: number, row: PlateRow): PanelLayout => panelMirrored(position, row) ? RIGHT_PANEL : LEFT_PANEL;
+export const panelLayout = (position: number, row: PlateRow): PanelLayout => {
+  const panel = panelMirrored(position, row) ? RIGHT_PANEL : LEFT_PANEL;
+  return row.scale === 1.0 ? panel : scaledPanel(panel, row.scale);
+};
+
+/** The top of the tallest plate in the row. */
+export const plateBandTop = (row: PlateRow): number => PLATE_BOTTOM + unitsForPixels(PLATE_HEIGHT_PX) * row.scale;
 
 /** The fighters in plate order and the row's split: in Team Battle each team keeps its plates together and the split falls on the team boundary nearest the middle, so with two teams one sits left of the preview and the other right. */
 export function plateOrder(active: readonly number[], teamBattle: boolean, teamOf: (slot: number) => number): { readonly slots: readonly number[]; readonly split: number } {
@@ -151,22 +179,22 @@ export const stockFadeAlpha = (framesSinceLoss: number): number =>
 
 const ROW_LEFT = f32(0.02);
 const ROW_WIDTH = f32(0.76);
-const PREVIEW_ROW_LEFT = f32(0.005);
-const PREVIEW_ROW_WIDTH = f32(0.79);
-export const PREVIEW_CELL = f32(0.12);
 
-const rowLeft = (row: PlateRow): number => row.preview ? PREVIEW_ROW_LEFT : ROW_LEFT;
+const plateWidth = (row: PlateRow): number => PLATE_WIDTH * row.scale;
 
-const cellWidth = (row: PlateRow): number => row.preview ? (PREVIEW_ROW_WIDTH - PREVIEW_CELL) / row.count : ROW_WIDTH / row.count;
-
-// The preview's cell sits between the left-facing panels and the mirrored ones: p1 [keys] p2, p1 p2 [keys] p3, p1 p2 [keys] p3 p4.
+// Preview off: the plates close up evenly spaced and centred. Preview on: the groups sit at the screen's edges, p1 | keys | p2, p1 p2 | keys | p3, p1 p2 | keys | p3 p4.
 export function plateLeft(position: number, row: PlateRow): number {
-  const gap = row.preview && position >= row.split ? PREVIEW_CELL : 0.0;
-  return rowLeft(row) + cellWidth(row) * (position + 0.5) + gap - unitsForPixels(PLATE_WIDTH_PX) / 2;
+  if (!row.preview) return ROW_LEFT + (ROW_WIDTH / row.count) * (position + 0.5) - PLATE_WIDTH / 2;
+  return position < row.split ? ROW_EDGE + plateWidth(row) * position : SCREEN_WIDTH - ROW_EDGE - plateWidth(row) * (row.count - position);
 }
 
-export const previewCellLeft = (row: PlateRow): number => PREVIEW_ROW_LEFT + cellWidth(row) * row.split;
-
+/** The preview panel's left edge: centred on the screen where the plate groups leave room, else against the nearer group. */
+export function previewPanelLeft(row: PlateRow): number {
+  const groupEnd = ROW_EDGE + plateWidth(row) * row.split;
+  const nextStart = SCREEN_WIDTH - ROW_EDGE - plateWidth(row) * (row.count - row.split);
+  const least = groupEnd + PREVIEW_CLEAR;
+  return Math.max(least, Math.min(nextStart - PREVIEW_CLEAR - PREVIEW_PANEL.width, (SCREEN_WIDTH - PREVIEW_PANEL.width) / 2));
+}
 
 export const boxLeft = (left: number, box: PlateBox): number => left + unitsForPixels(box.x);
 export const boxTop = (box: PlateBox): number => PLATE_TOP - unitsForPixels(box.y);

@@ -105,6 +105,7 @@ export class MatchClock {
 
 
 const OUTLINE_PX = 2;
+const PERCENT_FONT = f32(0.016);
 const HUD_LEVEL = 21;
 const NAME_COLOUR = "|cfff4ead2";
 const PING_COLOUR = "|cff9fb4c2";
@@ -157,10 +158,10 @@ export class FighterHud {
     this.raceFrames = RACES.map((race, index) => createRaceFrame(race, 1600 + slot * 8 + index));
     this.namePlate = createBackdrop(`FighterHUDNamePlate${suffix}`, parent, context);
     this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", parent, context + 2, HUD_LEVEL, 1.0);
-    this.percentOutline = createOutline(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN, MENU_FONT, f32(0.016), HUD_LEVEL);
+    this.percentOutline = createOutline(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN, MENU_FONT, PERCENT_FONT, HUD_LEVEL);
     this.damage = createFrame("SmashcraftDamage", parent, 0, context + 2);
     this.percent = createText(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN);
-    setFrameFont(this.percent, MENU_FONT, f32(0.016), 1);
+    setFrameFont(this.percent, MENU_FONT, PERCENT_FONT, 1);
     setFrameTextAlignment(this.percent, TextAlignment.bottom, TextAlignment.left);
     this.name = createText(`FighterHUDName${suffix}`, parent, context + 3);
     setFrameFont(this.name, MENU_FONT, NAME_FONT, 1);
@@ -212,12 +213,23 @@ export class FighterHud {
     this.left = left;
     this.panel = panel;
     const inner = panel.mirrored ? TextAlignment.right : TextAlignment.left;
-    for (const frame of this.raceFrames) placeBox(frame.root, left, panel.frame);
+    const scale = row.scale;
+    for (const frame of this.raceFrames) {
+      setFrameScale(frame.root, scale);
+      placeBox(frame.root, left, panel.frame, scale);
+    }
     placeBox(this.namePlate, left, panel.namePlate);
-    placeBox(this.damage, left, panel.damage);
+    setFrameScale(this.damage, scale);
+    for (const copy of this.damageOutline) setFrameScale(copy, scale);
+    placeBox(this.damage, left, panel.damage, scale);
     setFrameTextAlignment(this.damage, TextAlignment.middle, TextAlignment.right);
+    setFrameFont(this.percent, MENU_FONT, f32(PERCENT_FONT * scale), 1);
+    for (const copy of this.percentOutline) setFrameFont(copy, MENU_FONT, f32(PERCENT_FONT * scale), 0);
     placeBox(this.percent, left, panel.percent);
     placeBox(this.doomMark, left, panel.doom);
+    setFrameFont(this.name, MENU_FONT, f32(NAME_FONT * scale), 1);
+    setFrameFont(this.stockCount, MENU_FONT, f32(NAME_FONT * scale), 1);
+    setFrameFont(this.pingNumber, MENU_FONT, f32(PING_FONT * scale), 0);
     placeBox(this.name, left, panel.name);
     setFrameTextAlignment(this.name, TextAlignment.middle, inner);
     placeEach(this.stockShadows, left, panel.stockShadows);
@@ -345,8 +357,8 @@ export class FighterHud {
   }
 }
 
-function placeBox(frame: Frame, left: number, box: PlateBox): void {
-  setFrameSize(frame, unitsForPixels(box.width), unitsForPixels(box.height));
+function placeBox(frame: Frame, left: number, box: PlateBox, scale = 1.0): void {
+  setFrameSize(frame, f32(unitsForPixels(box.width) / scale), f32(unitsForPixels(box.height) / scale));
   placeTopLeft(frame, boxLeft(left, box), boxTop(box));
 }
 

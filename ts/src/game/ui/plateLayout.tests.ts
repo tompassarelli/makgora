@@ -9,8 +9,10 @@ import { trainingReadout } from "../session/messages";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
 import { fighterAt } from "../sim/roster";
 import { Phase, requestStageSelect, selectCharacter } from "../lobby/lobbyState";
-import { DAMAGE_DARK_FROM, PLATE_TOP, SHAKE_FRAMES, type PlateBox, type PlateRow, boxLeft, boxTop, damageColour, damageText, meterPlacement, numberJolt, panelLayout, panelMirrored, percentText, plateLeft, plateOrder, plateRow, previewCellLeft, stepJolt, PREVIEW_CELL } from "./plateLayout";
-import { PREVIEW_PANEL } from "./keyboardPreview";
+import { DAMAGE_DARK_FROM, PLATE_TOP, SHAKE_FRAMES, type PlateBox, type PlateRow, boxLeft, boxTop, damageColour, damageText, meterPlacement, numberJolt, panelLayout, panelMirrored, percentText, plateLeft, plateOrder, plateRow, previewPanelLeft, stepJolt, NAME_FONT } from "./plateLayout";
+import { PREVIEW_PANEL, PREVIEW_TEXT_MAX, previewTextFit } from "./keyboardPreview";
+import { NET_INDICATOR_TOP } from "./hudLayout";
+import { presetBindings } from "../input/keyBindings";
 import { unitsForPixels } from "./portraitFrames";
 
 const channels = (colour: number): readonly number[] => [imod(idiv(colour, 65536), 256), imod(idiv(colour, 256), 256), imod(colour, 256)];
@@ -131,7 +133,7 @@ test("the bottom row puts p1 | preview | p2, p1 p2 | preview | p3 and p1 p2 | pr
       const where = `${arrangement.name}, preview ${preview ? "on" : "off"}`;
       const lefts = order.slots.map((_slot, position) => plateLeft(position, row));
       const parts = lefts.map((left, position) => plateParts(left, row, position));
-      const panelLeft = previewCellLeft(row) + (PREVIEW_CELL - PREVIEW_PANEL.width) / 2;
+      const panelLeft = previewPanelLeft(row);
       const panel = span(panelLeft, f32(0.012) + PREVIEW_PANEL.height / 2, PREVIEW_PANEL.width, PREVIEW_PANEL.height);
       parts.forEach((plate, position) => {
         assertEquals(panelMirrored(position, row), count > 1 && position >= order.split, `${where}: plate ${position} faces the middle`);
@@ -141,11 +143,35 @@ test("the bottom row puts p1 | preview | p2, p1 p2 | preview | p3 and p1 p2 | pr
           for (let other = position + 1; other < parts.length; other++) for (const theirs of parts[other] ?? []) assertEquals(!overlaps(part, theirs), true, `${where}: plates ${position} and ${other} apart`);
         }
       });
-      if (preview) assertEquals(panel.left >= SCREEN_LEFT && panel.right <= SCREEN_WIDTH && panel.top <= PLATE_TOP + f32(0.000001), true, `${where}: preview inside the screen and the band`);
+      if (preview) assertEquals(panel.left >= SCREEN_LEFT && panel.right <= SCREEN_WIDTH && panel.top <= f32(0.012) + PREVIEW_PANEL.height + f32(0.000001) && panel.top < NET_INDICATOR_TOP, true, `${where}: preview inside the screen and under the netplay warning`);
       if (preview) continue;
       for (let position = 2; position < count; position++) assertEquals(Math.abs((lefts[position] ?? 0) - (lefts[position - 1] ?? 0) - ((lefts[1] ?? 0) - (lefts[0] ?? 0))) < f32(0.0001), true, `${where}: even spacing`);
       const middle = ((lefts[0] ?? 0) + (lefts[count - 1] ?? 0) + unitsForPixels(544)) / 2;
       assertEquals(Math.abs(middle - SCREEN_WIDTH / 2) < f32(0.001), true, `${where}: centred`);
     }
   }
+});
+
+test("with the CONTROLS panel on, the plates crowd to the screen's edges and shrink only as far as the panel needs, the panel is wider and taller than before and its text is at least the fighter name text, and with it off the plates are unscaled and unmoved [k2 property]", () => {
+  const SCREEN_RIGHT = f32(0.8);
+  const OLD_PANEL = { width: f32(0.116), height: f32(0.104) };
+  assertEquals(PREVIEW_PANEL.width > OLD_PANEL.width * 2 && PREVIEW_PANEL.height > OLD_PANEL.height, true, "the panel's slot is wider and taller");
+  const fit = previewTextFit(presetBindings("wasd"));
+  assertEquals(fit.size >= NAME_FONT && PREVIEW_TEXT_MAX >= NAME_FONT, true, "panel text at least as tall as the fighter name text");
+  for (const arrangement of ARRANGEMENTS) {
+    const count = arrangement.slots.split(",").length;
+    const on = plateRow(count, true, arrangement.split), off = plateRow(count, false, arrangement.split);
+    const where = arrangement.name;
+    assertEquals(off.scale, 1.0, `${where}: preview off keeps the plates unscaled`);
+    assertEquals(on.scale <= 1.0 && on.scale >= f32(0.7), true, `${where}: plates shrink at most to 0.7 (${on.scale})`);
+    assertEquals(Math.abs(plateLeft(0, on) - f32(0.005)) < f32(0.0001), true, `${where}: the first plate sits at the left edge`);
+    if (count > arrangement.split) assertEquals(Math.abs(plateLeft(count - 1, on) + unitsForPixels(544) * on.scale - (SCREEN_RIGHT - f32(0.005))) < f32(0.0001), true, `${where}: the last plate sits at the right edge`);
+    const left = previewPanelLeft(on);
+    const leftEnd = plateLeft(arrangement.split - 1, on) + unitsForPixels(544) * on.scale;
+    const rightStart = count > arrangement.split ? plateLeft(arrangement.split, on) : SCREEN_RIGHT;
+    assertEquals(left >= leftEnd && left + PREVIEW_PANEL.width <= rightStart, true, `${where}: the whole panel fits between the groups`);
+    if (2 * arrangement.split === count) assertEquals(Math.abs(left + PREVIEW_PANEL.width / 2 - SCREEN_RIGHT / 2) < f32(0.0001), true, `${where}: the panel is centred`);
+  }
+  assertEquals(plateRow(2, true).scale, 1.0, "two plates need no scaling");
+  assertEquals(plateRow(4, true).scale < plateRow(3, true).scale && plateRow(3, true).scale < 1.0 && plateRow(4, true).scale > 0.0, true, "more plates shrink more");
 });

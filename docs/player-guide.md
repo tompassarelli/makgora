@@ -113,7 +113,7 @@ remain reserved for Warcraft shortcuts. Pressing a reserved key during a rebind
 is refused and the screen names what it is reserved for.
 
 Show keyboard in game is on for a new player and off for anyone who saved controls before it
-existed. In a match a small CONTROLS panel sits in the bottom row between the player panels and lists
+existed. In a match a CONTROLS panel sits in the bottom row between the player panels (they move to the screen's edges, and shrink a little with three or four players, to give it room) and lists
 every action with the key you bound to it in brackets ([-] when unbound): movement, Mod-X (Walk), then
 A (Atk), B (Spc), X (Jmp) and Y (Jmp, the short hop) on the left; the C-stick, Mod-Y (Tilt), then
 Shield (both trigger keys), Lightshield, Strong (Smash) and Grab on the right. A row lights while you hold its key (your controller's buttons on a pad). Press H in a match or click "Show keyboard in

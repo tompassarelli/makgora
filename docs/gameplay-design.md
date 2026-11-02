@@ -1158,17 +1158,29 @@ four specials on the ground and in the air.
   text shrinks until every label and key fits its column, the columns taking
   width in proportion to their text (`keyboardPreview.ts`); a pad
   player sees the pad's buttons in the same slot, which a drawn pad diagram can
-  later replace. Everything stays inside the plate band and the 4:3 area. With
-  the preview off the plates close up evenly spaced and centred. It shows only
+  later replace. The panel is 0.29 wide and 0.138 tall (it was 0.116 by 0.104,
+  text about 0.004) and its text is capped just above the fighter name text
+  (0.0105), so it reads at 1366x768; to make that room with the preview on the
+  plates move out to the screen's edges (the left group from the left edge, the
+  right group from the right edge) and shrink uniformly, frame, numbers, name
+  and stocks together, only as far as the panel needs (`plateRow`'s scale: 1
+  for two plates, about 0.96 for three, about 0.72 for four), the panel sitting
+  between the groups, centred where they leave room. Everything stays inside
+  the 4:3 area. With the preview off the plates close up evenly spaced and
+  centred at full size. It shows only
   in matches. The Controls screen's "Show keyboard in game" button and H toggle
   it, and it is saved with the controls (`encodeLayouts`, save version KO). A
   new player starts with it on; a save from before it (KN, KM or KL) loads with
   it off, so existing players keep today's HUD.
-- **Match chat**: the chat box sits at the bottom left above p1, in the same
-  place in every arrangement. A match starts with it hidden, even if lines from
-  the select screens are still recent; it appears when a new line arrives and
-  fades on the panel's own recent and fade timing, and Tab opens the history as
-  before (`chatBox`, smashcraft:ts/src/host/loop/matchChat.ts). Esc pauses and resumes
+- **Match chat**: the chat box is a narrow column, a quarter of the 4:3 screen
+  wide, in the bottom-left corner: on the screen's floor where no plate reaches
+  it (one centred plate) and otherwise resting on the tallest plate
+  (`matchChatBox`). A match starts with it fully hidden, typing line included,
+  even if lines from the select screens are still recent; it appears when a new
+  line arrives or the player starts typing (Wisp's `ChatPanel.isTyping`), a
+  line stays 5 seconds and then fades over 1 (`CHAT_STYLE`'s 6 and 1), and Tab
+  opens the history (`chatBox`, smashcraft:ts/src/host/loop/matchChat.ts). The
+  netplay warning sits above the chat's lines (`NET_INDICATOR_TOP`). Esc pauses and resumes
   like Backspace and Start; it is a keyboard event on the pause trigger, not the
   end-cinematic event, and it does not open Warcraft's F10 menu, which the pause
   screen names for leaving the game.

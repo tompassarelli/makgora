@@ -38,7 +38,7 @@ import { EscapeMeter } from "../../game/ui/escapeMeter";
 import { OffscreenBubble } from "../../game/ui/offscreenBubble";
 import { FighterMarker } from "../../game/ui/fighterMarker";
 import { MeterBar } from "../../game/ui/meterBar";
-import { meterPlacement, plateOrder, plateRow } from "../../game/ui/plateLayout";
+import { type PlateRow, meterPlacement, plateOrder, plateRow } from "../../game/ui/plateLayout";
 import { ButtonClicks, gameUi } from "../../game/ui/frames";
 import { ResultsBanner } from "../../game/ui/resultsBanner";
 import type { SelectText, SelectionActions } from "../../game/ui/selectionActions";
@@ -108,6 +108,7 @@ export interface UiObjects {
   readonly clock: MatchClock;
   readonly training: TrainingReadout;
   preview: InputPreview;
+  plateRow?: PlateRow;
   readonly huds: Slots<FighterHud>;
   readonly bubbles: Slots<OffscreenBubble>;
   markers: Slots<FighterMarker>;
@@ -286,6 +287,7 @@ export function layoutHuds(s: ShellState, preview: boolean): void {
   const ui = views(s);
   const order = plateOrder(PARTICIPANT_SLOTS.filter(slot => isActive(s.world, slot)), s.game.teamBattle, slot => s.game.teamChoices[slot] ?? 0);
   const row = plateRow(order.slots.length, preview, order.split);
+  ui.plateRow = row;
   order.slots.forEach((slot, position) => {
     if (!isParticipantSlot(slot)) return;
     ui.huds[slot].layout(position, row);

@@ -31,14 +31,14 @@ export const PREVIEW_COLUMNS: readonly PreviewColumn[] = [
 const columnRows = (column: PreviewColumn): readonly PreviewRow[] => column.flatMap(group => group);
 
 export const PREVIEW_TITLE = "CONTROLS";
-export const PREVIEW_PANEL = { width: f32(0.116), height: f32(0.104), margin: f32(0.003) } as const;
+export const PREVIEW_PANEL = { width: f32(0.29), height: f32(0.138), margin: f32(0.004) } as const;
 export const PREVIEW_INNER = { width: f32(PREVIEW_PANEL.width - 2 * PREVIEW_PANEL.margin), height: f32(PREVIEW_PANEL.height - 2 * PREVIEW_PANEL.margin) } as const;
 const COLUMN_GAP_EMS = f32(1.2);
 const TAB_GAP_EMS = f32(0.5);
 const DIVIDER_ROWS = 0.5;
 const ROWS_TALL = Math.max(...PREVIEW_COLUMNS.map(column => columnRows(column).length + DIVIDER_ROWS * (column.length - 1))) + 1;
 export const PREVIEW_ROW_HEIGHT = f32(PREVIEW_INNER.height / ROWS_TALL);
-export const PREVIEW_TEXT_MAX = f32(PREVIEW_ROW_HEIGHT * f32(0.8));
+export const PREVIEW_TEXT_MAX = f32(PREVIEW_ROW_HEIGHT * f32(0.9));
 
 /** A row's place: its column and its top below the panel's inner top edge, under the title row, each divider adding half a row. */
 export interface PlacedRow {
