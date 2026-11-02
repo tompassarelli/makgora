@@ -9,7 +9,7 @@ import {
 } from "wisp/src/netcode/delay";
 import { type FixedDelay, MAX_INPUT_DELAY, PENDING_CAPACITY, isFixedDelay } from "../../game/netcode/inputSchedule";
 import { createText, gameUi, placeTopLeft } from "../../game/ui/frames";
-import { MENU_STYLE, NET_INDICATOR_TOP } from "../../game/ui/hudLayout";
+import { NET_INDICATOR_TOP } from "../../game/ui/hudLayout";
 import type { DelayControl, LobbyNet } from "../../game/ui/selectionActions";
 import { at } from "wisp/src/runtime/lookup";
 import { type MachineRate, machineRate, noteMachineSecond } from "wisp/src/netcode/rate";
@@ -129,8 +129,7 @@ export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>, lo
     if (!online || !humanActive(game, slot) || echo < 0) return "";
     return at(net.slotSlow, slot) ? ` · echo |cffff4040${formatInt(echo)} ms|r` : ` · echo ${formatInt(echo)} ms`;
   });
-  const delayBadge = `${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${formatInt(delay)}F|r`;
-  return { delay: delayControl(net, game, local, delay), delayBadge, echoes };
+  return { delay: delayControl(net, game, local, delay), echoes };
 }
 
 const delayNote = (net: Readonly<NetDelay>, game: Readonly<MatchState>, adjustable: boolean, online: boolean): string => {

@@ -368,7 +368,7 @@ one row of a few clusters with the rarely used settings one click deeper
    speed; in Classic and Lore Battles the difficulty or battle and the route.
 4. `Guide` with the `F1` key: Controls & Bindings (the controls and keyboard
    screen, as F1), Character Move List and How to Play (the tutorial menu).
-5. The gear with the input delay in frames (`2F`), opening SETTINGS: the input
+5. The plain gear icon, opening SETTINGS: the input
    delay as a stepper (`−`, "Input delay: N frames", `+`) with an Auto button
    beside it, a line under it, then Community and Credits. Only the online host
    (the first connected player) can press them: `−` and `+` leave Auto for

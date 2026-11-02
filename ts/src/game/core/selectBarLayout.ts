@@ -47,8 +47,8 @@ const KEY_HEIGHT = f32(0.018);
 const KEY_INSET = f32(0.006);
 const keyIn = (b: BarBox): BarBox => box(f32(right(b) - KEY_INSET) - KEY_WIDTH, f32(b.y - f32(f32(b.height - KEY_HEIGHT) / 2)), KEY_WIDTH, KEY_HEIGHT);
 
-/** The key badges inside bar items: F1 on Guide, the input delay on the gear, Y on Start. */
-export const BAR_KEYS = { guide: keyIn(GUIDE), gear: keyIn(GEAR), start: keyIn(START) } as const;
+/** The key badges inside bar items: F1 on Guide, Y on Start. */
+export const BAR_KEYS = { guide: keyIn(GUIDE), start: keyIn(START) } as const;
 
 const CHEVRON = f32(0.009);
 const chevronLeftOf = (b: BarBox, x: number): BarBox => box(f32(x - CHEVRON), f32(b.y - f32(f32(b.height - CHEVRON) / 2)), CHEVRON, CHEVRON);
@@ -58,7 +58,7 @@ export const BAR_CHEVRONS = {
   rules: chevronLeftOf(RULES, f32(right(RULES) - f32(0.01))),
   guide: chevronLeftOf(GUIDE, f32(f32(BAR_KEYS.guide.x) - f32(0.005))),
 } as const;
-export const GEAR_ICON = box(f32(GEAR.x + f32(0.008)), f32(GEAR.y - f32(0.006)), f32(0.018), f32(0.018));
+export const GEAR_ICON = box(f32(GEAR.x + f32(0.019)), f32(GEAR.y - f32(0.006)), f32(0.018), f32(0.018));
 
 const PANEL_PAD = f32(0.012);
 const ROW = f32(0.028);

@@ -44,7 +44,6 @@ export interface BarView {
   readonly game: Readonly<MatchState>;
   readonly fighter: number;
   readonly delay: DelayControl;
-  readonly delayBadge: string;
   readonly pointer: { readonly x: number; readonly y: number } | undefined;
   readonly focus: BarItem | undefined;
   readonly start: BarStart;
@@ -188,7 +187,7 @@ export class SelectBar {
   readonly root: Frame;
   private readonly scrim: Frame;
   readonly items: Readonly<Record<BarItem, BarControl>>;
-  private readonly keys: Readonly<Record<"guide" | "gear" | "start", BarControl>>;
+  private readonly keys: Readonly<Record<"guide" | "start", BarControl>>;
   private readonly chevrons: readonly (readonly [BarPanel, Frame])[];
   private readonly panels: Readonly<Record<BarPanel, Frame>>;
   private readonly modes: ModePanel;
@@ -221,7 +220,7 @@ export class SelectBar {
       const b = BAR_CHEVRONS[panel];
       return [panel, art(this.root, name(`Chevron${panel}`), BAR_CHEVRON_TEXTURE, b.x, b.y, b.width, b.height)] as const;
     });
-    this.keys = { guide: keyBadge(this.root, name("GuideKey"), BAR_KEYS.guide, `${BAR_COLOURS.gold}F1|r`), gear: keyBadge(this.root, name("GearKey"), BAR_KEYS.gear, ""), start: keyBadge(this.root, name("StartKey"), BAR_KEYS.start, "") };
+    this.keys = { guide: keyBadge(this.root, name("GuideKey"), BAR_KEYS.guide, `${BAR_COLOURS.gold}F1|r`), start: keyBadge(this.root, name("StartKey"), BAR_KEYS.start, "") };
     this.panels = { mode: createPanel(parent, name, "mode"), rules: createPanel(parent, name, "rules"), guide: createPanel(parent, name, "guide"), gear: createPanel(parent, name, "gear") };
     this.modes = createModePanel(this.panels.mode, name, add);
     this.rules = createRulesDrawer(this.panels.rules, suffix, (frame, target) => add(frame, target, undefined));
@@ -377,7 +376,6 @@ export class SelectBar {
     labelControl(this.items.teams, teamsLabel(game));
     enableControl(this.items.teams, versus);
     labelControl(this.items.rules, this.text.rulesPill(game).map(part => `${BAR_COLOURS.gold}${part}|r`).join(SEPARATOR));
-    labelControl(this.keys.gear, view.delayBadge);
     labelControl(this.items.start, `${BAR_COLOURS.cream}${start.ready ? "START" : start.text}|r`);
     labelControl(this.keys.start, start.key === undefined ? "" : `${BAR_COLOURS.gold}${start.key}|r`);
     showControl(this.keys.start, start.ready && start.key !== undefined);

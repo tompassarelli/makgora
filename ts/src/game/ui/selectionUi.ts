@@ -131,7 +131,7 @@ export class SelectionPanel {
   private readonly movesFrames: readonly Frame[];
   private readonly movesTitle: Frame;
   private readonly movesBody: Frame;
-  private net: LobbyNet = { delay: FIXED_DELAY, delayBadge: "", echoes: PARTICIPANT_SLOTS.map(() => "") };
+  private net: LobbyNet = { delay: FIXED_DELAY, echoes: PARTICIPANT_SLOTS.map(() => "") };
 
   private readonly modeLabel: Frame;
   private readonly bar: SelectBar;
@@ -836,7 +836,7 @@ export class SelectionPanel {
     }
     const { net } = this;
     this.bar.present({
-      game, fighter: characterFor(game, this.participantId) ?? DEFAULT_FIGHTER, delay: net.delay, delayBadge: net.delayBadge,
+      game, fighter: characterFor(game, this.participantId) ?? DEFAULT_FIGHTER, delay: net.delay,
       pointer, focus: barFocus(this.menuFocus), start: startState(game, this.controls), tutorial: tutorialAvailable(game),
     });
   }
