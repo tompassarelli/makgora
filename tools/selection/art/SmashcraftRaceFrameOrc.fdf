@@ -10,30 +10,4 @@ Frame "SIMPLEFRAME" "SmashcraftRaceFrameOrc" {
             Anchor TOPLEFT, 0.00875, -0.0175,
         }
     }
-    Layer "ARTWORK" {
-        Texture "SmashcraftRaceFrameOrcArchLeft" {
-            File "UI\Console\Orc\OrcUITile02.blp",
-            TexCoord 0.195313, 0, 0.363281, 0.894531,
-            AlphaMode "BLEND",
-            Width 0.03125,
-            Height 0.085,
-            Anchor TOPLEFT, 0, 0,
-        }
-        Texture "SmashcraftRaceFrameOrcArchMiddle" {
-            File "UI\Console\Orc\OrcUITile01.blp",
-            TexCoord 0.976563, 1, 0.363281, 0.894531,
-            AlphaMode "BLEND",
-            Width 0.00375,
-            Height 0.085,
-            Anchor TOPLEFT, 0.03125, 0,
-        }
-        Texture "SmashcraftRaceFrameOrcArchRight" {
-            File "UI\Console\Orc\OrcUITile02.blp",
-            TexCoord 0, 0.195313, 0.363281, 0.894531,
-            AlphaMode "BLEND",
-            Width 0.03125,
-            Height 0.085,
-            Anchor TOPLEFT, 0.035, 0,
-        }
-    }
 }

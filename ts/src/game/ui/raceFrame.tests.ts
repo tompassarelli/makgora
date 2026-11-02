@@ -18,37 +18,26 @@ test("each fighter's portrait frame is its race's console art: playable races th
   for (const character of RENDERED_FIGHTERS) assertTrue(RACES.includes(fighterRace(character)));
 });
 
-test("the race frame stands level, whole and never stretched or squashed: its left side is its right side mirrored so no edge is cut through the console art, every arch part shares one row of texels, and every part draws at most one pixel per texel with equal scale on both axes, on a 1920-tall display [k2 property]", () => {
-  for (const race of RACES) {
-    const parts = raceFrameParts(race);
-    for (const part of parts) {
-      const [left, right, top, bottom] = part.texCoord;
-      assertTrue(Math.min(left, right) >= 0.0 && Math.max(left, right) <= 1.0 && left !== right && top >= 0.0 && top < bottom && bottom <= 1.0);
-      const scale = partScale(part);
-      assertTrue(scale.x <= 1.0 && scale.y <= 1.0);
-      assertTrue(Math.abs(scale.x - scale.y) < f32(0.001));
-      assertTrue(part.x >= 0 && part.y >= 0 && part.x + part.width <= RACE_FRAME_PX.width && part.y + part.height <= RACE_FRAME_PX.height);
-    }
-    const [archLeft, archMiddle, archRight] = parts.filter(part => part.layer === "ARTWORK");
-    assertTrue(archLeft !== undefined && archMiddle !== undefined && archRight !== undefined);
-    if (archLeft === undefined || archMiddle === undefined || archRight === undefined) continue;
-    for (const part of [archLeft, archMiddle]) {
-      assertEquals(part.y, archRight.y, `${race} ${part.key} shares the arch's top`);
-      assertEquals(part.height, archRight.height, `${race} ${part.key} shares the arch's height`);
-      assertEquals(part.texCoord[2], archRight.texCoord[2], `${race} ${part.key} is cut from the arch's top texel row`);
-      assertEquals(part.texCoord[3], archRight.texCoord[3], `${race} ${part.key} ends on the arch's bottom texel row`);
-    }
-    assertEquals(archLeft.file, archRight.file, `${race} left side is drawn from the right side's tile`);
-    assertEquals(archLeft.texCoord[0], archRight.texCoord[1], `${race} left side starts where the right side ends`);
-    assertEquals(archLeft.texCoord[1], archRight.texCoord[0], `${race} left side ends where the right side starts`);
-    assertEquals(archLeft.width, archRight.width, `${race} sides match`);
-    assertEquals(archLeft.x, 0, `${race} left side starts the frame`);
-    assertEquals(archLeft.x + archLeft.width, archMiddle.x, `${race} left side meets the middle`);
-    assertEquals(archMiddle.x + archMiddle.width, archRight.x, `${race} middle meets the right side`);
-    assertEquals(archRight.x + archRight.width, RACE_FRAME_PX.width, `${race} right side ends the frame`);
-    assertEquals(archMiddle.texCoord[1], 1.0, `${race} middle runs to tile 01's edge`);
-    assertEquals(archRight.texCoord[0], 0.0, `${race} right side starts at tile 02's edge`);
-  }
+test("the match HUD bust stands free with no arch or border: each race frame holds only the portrait, in the same 156x208 box at (28, 56) of the 212x272 frame the arch opening had, drawn at most one pixel per texel with equal scale on both axes [k2 property]", () => {
+  const parts = raceFrameParts();
+  assertEquals(parts.length, 1, "only the portrait is drawn");
+  const portrait = parts[0];
+  assertTrue(portrait !== undefined);
+  if (portrait === undefined) return;
+  assertEquals(portrait.key, "portrait");
+  assertEquals(portrait.file, undefined, "no console art is drawn");
+  assertEquals(portrait.layer, "BACKGROUND");
+  assertEquals(portrait.x, 28);
+  assertEquals(portrait.y, 56);
+  assertEquals(portrait.width, 156);
+  assertEquals(portrait.height, 208);
+  assertEquals(RACE_FRAME_PX.width, 212);
+  assertEquals(RACE_FRAME_PX.height, 272);
+  const [left, right, top, bottom] = portrait.texCoord;
+  assertTrue(Math.min(left, right) >= 0.0 && Math.max(left, right) <= 1.0 && left !== right && top >= 0.0 && top < bottom && bottom <= 1.0);
+  const scale = partScale(portrait);
+  assertTrue(scale.x <= 1.0 && scale.y <= 1.0);
+  assertTrue(Math.abs(scale.x - scale.y) < f32(0.001));
 });
 
 const right = (box: PlateBox): number => box.x + box.width;

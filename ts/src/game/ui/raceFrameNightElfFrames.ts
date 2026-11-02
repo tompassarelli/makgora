@@ -5,9 +5,6 @@ export const SMASHCRAFTRACEFRAMENIGHTELF_TOC = "war3mapImported\\SmashcraftRaceF
 export interface SmashcraftRaceFrameNightElfFrames {
   readonly root: Frame;
   readonly portrait: Frame;
-  readonly archLeft: Frame;
-  readonly archMiddle: Frame;
-  readonly archRight: Frame;
 }
 
 /** Loads the TOC, then creates the SmashcraftRaceFrameNightElf tree; context tells copies apart. */
@@ -17,9 +14,6 @@ export function createSmashcraftRaceFrameNightElf(parent: Frame, context: number
   const frames: SmashcraftRaceFrameNightElfFrames = {
     root,
     portrait: namedFrame("SmashcraftRaceFrameNightElfPortrait", context),
-    archLeft: namedFrame("SmashcraftRaceFrameNightElfArchLeft", context),
-    archMiddle: namedFrame("SmashcraftRaceFrameNightElfArchMiddle", context),
-    archRight: namedFrame("SmashcraftRaceFrameNightElfArchRight", context),
   };
   return frames;
 }

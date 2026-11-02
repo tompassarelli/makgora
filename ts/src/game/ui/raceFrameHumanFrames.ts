@@ -5,9 +5,6 @@ export const SMASHCRAFTRACEFRAMEHUMAN_TOC = "war3mapImported\\SmashcraftRaceFram
 export interface SmashcraftRaceFrameHumanFrames {
   readonly root: Frame;
   readonly portrait: Frame;
-  readonly archLeft: Frame;
-  readonly archMiddle: Frame;
-  readonly archRight: Frame;
 }
 
 /** Loads the TOC, then creates the SmashcraftRaceFrameHuman tree; context tells copies apart. */
@@ -17,9 +14,6 @@ export function createSmashcraftRaceFrameHuman(parent: Frame, context: number): 
   const frames: SmashcraftRaceFrameHumanFrames = {
     root,
     portrait: namedFrame("SmashcraftRaceFrameHumanPortrait", context),
-    archLeft: namedFrame("SmashcraftRaceFrameHumanArchLeft", context),
-    archMiddle: namedFrame("SmashcraftRaceFrameHumanArchMiddle", context),
-    archRight: namedFrame("SmashcraftRaceFrameHumanArchRight", context),
   };
   return frames;
 }

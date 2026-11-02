@@ -1,14 +1,8 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { Race } from "../roster/races";
 
-/** Edge length of a Classic race console tile (UI\Console\<Race>\<Race>UITile0N), the art the portrait frame is cut from. */
-export const CONSOLE_TILE_PX = 512;
-
-/** The portrait arch of the stock console, in tile 01 and tile 02 laid side by side; every race's console puts it at the same place, its opening centred on texel 506. */
-export const CONSOLE_ARCH = { left: 400, top: 186, width: 212, height: 272 } as const;
-
-/** The frame is drawn at its texels' own size on a 1920-tall display, never stretched past it. */
-export const RACE_FRAME_PX = { width: CONSOLE_ARCH.width, height: CONSOLE_ARCH.height } as const;
+/** The box the bust stands in, pixels on a 1920-tall display; it keeps the size the console arch had so the plate around it stays put. */
+export const RACE_FRAME_PX = { width: 212, height: 272 } as const;
 
 export const BUST_TEXTURE_PX = 256;
 
@@ -16,7 +10,7 @@ export type FrameLayer = "BACKGROUND" | "ARTWORK";
 
 /** One texture of the frame: where it sits in the frame (pixels at 1920 tall) and which texels it shows as [left, right, top, bottom]. */
 export interface FramePart {
-  readonly key: "portrait" | "archLeft" | "archMiddle" | "archRight";
+  readonly key: "portrait";
   readonly layer: FrameLayer;
   readonly file?: string;
   readonly texels: number;
@@ -27,30 +21,17 @@ export interface FramePart {
   readonly height: number;
 }
 
-const ARCH_SPLIT = CONSOLE_TILE_PX - CONSOLE_ARCH.left;
-const ARCH_RIGHT_PX = CONSOLE_ARCH.width - ARCH_SPLIT;
-const ARCH_MIDDLE_PX = CONSOLE_ARCH.width - 2 * ARCH_RIGHT_PX;
-const tileU = (texel: number): number => f32(texel / CONSOLE_TILE_PX);
-const ARCH_V_TOP = tileU(CONSOLE_ARCH.top);
-const ARCH_V_BOTTOM = tileU(CONSOLE_ARCH.top + CONSOLE_ARCH.height);
-
-/** The opening behind the arch, overlapped by the frame art so no edge of the portrait shows. */
-const OPENING = { x: 28, y: 56, width: 156, height: 208 } as const;
+/** Where the bust stands in its box. */
+export const OPENING = { x: 28, y: 56, width: 156, height: 208 } as const;
 const BUST_SHOWN_TEXELS = (OPENING.width * BUST_TEXTURE_PX) / OPENING.height;
 const BUST_U_LEFT = f32((BUST_TEXTURE_PX - BUST_SHOWN_TEXELS) / 2 / BUST_TEXTURE_PX);
 const OPENING_CROP = [BUST_U_LEFT, f32(1.0 - BUST_U_LEFT), 0.0, 1.0] as const;
 
-export const consoleTile = (race: Race, tile: number): string => `UI\\Console\\${race}\\${race}UITile0${tile}.blp`;
-/** Our radial glow in the race's colours, drawn into each fighter's bust at build time; the race frame shows the bust alone under the arch. */
+/** Our radial glow in the race's colours, drawn into each fighter's bust at build time. */
 export const raceBackingArt = (race: Race): string => `RaceBacking${race}`;
 
-export function raceFrameParts(race: Race): readonly FramePart[] {
-  return [
-    { key: "portrait", layer: "BACKGROUND", texels: BUST_TEXTURE_PX, texCoord: OPENING_CROP, ...OPENING },
-    { key: "archLeft", layer: "ARTWORK", file: consoleTile(race, 2), texels: CONSOLE_TILE_PX, texCoord: [tileU(ARCH_RIGHT_PX), 0.0, ARCH_V_TOP, ARCH_V_BOTTOM], x: 0, y: 0, width: ARCH_RIGHT_PX, height: CONSOLE_ARCH.height },
-    { key: "archMiddle", layer: "ARTWORK", file: consoleTile(race, 1), texels: CONSOLE_TILE_PX, texCoord: [tileU(CONSOLE_TILE_PX - ARCH_MIDDLE_PX), 1.0, ARCH_V_TOP, ARCH_V_BOTTOM], x: ARCH_RIGHT_PX, y: 0, width: ARCH_MIDDLE_PX, height: CONSOLE_ARCH.height },
-    { key: "archRight", layer: "ARTWORK", file: consoleTile(race, 2), texels: CONSOLE_TILE_PX, texCoord: [0.0, tileU(ARCH_RIGHT_PX), ARCH_V_TOP, ARCH_V_BOTTOM], x: ARCH_SPLIT, y: 0, width: ARCH_RIGHT_PX, height: CONSOLE_ARCH.height },
-  ];
+export function raceFrameParts(): readonly FramePart[] {
+  return [{ key: "portrait", layer: "BACKGROUND", texels: BUST_TEXTURE_PX, texCoord: OPENING_CROP, ...OPENING }];
 }
 
 /** Drawn pixels per texel along each axis on a 1920-tall display: at most 1 means never stretched, equal means not distorted. */

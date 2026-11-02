@@ -51,7 +51,7 @@ const raceFrame = (race: Race): FrameDefinition => ({
   type: "SIMPLEFRAME",
   width: unitsForPixels(RACE_FRAME_PX.width),
   height: unitsForPixels(RACE_FRAME_PX.height),
-  textures: raceFrameParts(race).map(part => ({
+  textures: raceFrameParts().map(part => ({
     key: part.key, layer: part.layer, ...(part.file === undefined ? {} : { file: part.file }), texCoord: [...part.texCoord] as [number, number, number, number], alphaMode: "BLEND",
     width: unitsForPixels(part.width), height: unitsForPixels(part.height), anchor: { point: "TOPLEFT", x: unitsForPixels(part.x), y: -unitsForPixels(part.y) },
   })),
