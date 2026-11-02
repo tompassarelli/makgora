@@ -6,7 +6,7 @@ Look, animation and VFX captures for iteration and for Tom's review are taken in
 the Wisp native window, the window Tom plays in, not in Warcraft III clients (a
 LAN-pair queue for them took most of a 12 hour Lava Raze effects lane on
 2026-11-01, when Tom directed that the Wisp window is the default). From `ts/`
-on gex45:
+on any host (a host other than gex45 ships the run there, below):
 
 ```sh
 bun scripts/windowStrip.ts PAD.pad --out ~/.local/state/smashcraft/shots/NAME/NAME-low.jpg \
@@ -29,6 +29,20 @@ end or at the 10 minute limit, and set the look per run with
 `$XDG_CONFIG_HOME/wisp/players/OWNER.graphics.json` as `scripts/perf-window.ts` does
 (`--owner` names the player). The frames show Wisp's
 renderer: use Warcraft clients, below, for a difference only Warcraft shows.
+
+Native-window captures run on gex45 (NVIDIA GPU, the assets and the build-input
+store); the laptop's gaming mode holds the `gpu` lease for Tom's play, so a run
+queued there waited its 30 minutes and failed (2026-11-02, workers queued strips
+on whiterabbit). `scripts/windowStrip.ts` and `scripts/perf-window.ts` therefore
+check the host first (`captureRoute` in `scripts/nativeCaptureHost.ts`): on gex45
+they run in place, on any other host they copy this lane's files (tracked and
+unignored untracked), the pad and the `OWNER.graphics.json` look to
+`~/.local/state/smashcraft/remote-runs/RUN` on gex45 over ssh, install packages
+there, run the same script, copy the output folder (the strip, and the frames with
+`--keep-frames`; perf-window's `--out`) back to the `--out` you gave, and remove the
+run folder. The shipped run prints its own log to stderr, and a lease wait or
+gaming mode on gex45 shows as that run's failure. Any new capture script that opens
+the native window goes through the same `runOnCaptureHost`.
 
 Use the Warcraft Classic pool for what only Warcraft shows: online desync and
 net checks, `accept` checks, and the Classic acceptance pass before Tom cuts a

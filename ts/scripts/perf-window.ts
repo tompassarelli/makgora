@@ -1,10 +1,11 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { loadavg } from "node:os";
+import { hostname, loadavg } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Schema, Stream } from "effect";
 import { ChildProcess } from "effect/process";
 import { ProcessFailure, runProcess } from "./hostProcess";
+import { captureRoute, runOnCaptureHost } from "./nativeCaptureHost";
 import { PERF_PRESETS, PERF_STAGES, type PerfPreset, type Pressure, type StageRun, type StandaloneFigures, presetTable } from "./perfWindowTable";
 
 const USAGE = "usage: bun scripts/perf-window.ts [--preset Low|Medium|High|Ultra]... [--stage NAME]... [--frames N] [--rollback N] [--out DIR]";
@@ -59,6 +60,16 @@ function readFigures(file: string, problem: string | undefined): StandaloneFigur
 
 const main = Effect.gen(function*() {
   const { presets, stages, frames, rollback, out } = yield* Effect.try({ try: () => argumentsOf(process.argv.slice(2)), catch: (cause) => new PerfWindowFailure({ problem: String(cause) }) });
+  if (captureRoute(hostname()) === "ship") {
+    yield* runOnCaptureHost({
+      project, script: "scripts/perf-window.ts",
+      args: folders => [...presets.flatMap(preset => ["--preset", preset]), ...stages.flatMap(stage => ["--stage", stage]), "--frames", String(frames), ...(rollback === undefined ? [] : ["--rollback", String(rollback)]), "--out", folders.out],
+      send: [],
+      fetchInto: out,
+    }).pipe(Effect.mapError(cause => new PerfWindowFailure({ problem: cause.message })));
+    console.log(readFileSync(join(out, "perf-window.md"), "utf8"));
+    return;
+  }
   const helper = yield* skillScript("machine-capacity", "scripts/machine-capacity.mjs");
   const desktop = yield* skillScript("private-desktop-development", "scripts/private-desktop.sh");
   yield* probeGpu(helper);
