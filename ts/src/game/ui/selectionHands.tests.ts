@@ -5,12 +5,10 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { createMatchState, setHumanMask } from "../lobby/lobbyState";
 import type { HandState } from "../menu/selectionDrag";
 import { HAND_SEND_INTERVAL, HAND_UPDATES_PER_SECOND, type HandPose, HIDDEN_HAND, SelectionHands } from "./selectionHands";
-import { slotColor } from "./slotColors";
 import type { Team } from "../sim/teams";
 
 const POSITION_STEP = f32(0.0011);
 const STATES: readonly HandState[] = ["point", "fan", "pinch"];
-const BADGE_COLOURS = [0xff0303, 0x0042ff, 0x1ce6b9, 0x540081];
 
 const pose = (state: HandState, x: number, y: number, chip?: number): HandPose => ({ state, chip, x: f32(x), y: f32(y) });
 const near = (value: number | undefined, expected: number, tolerance: number): boolean => Math.abs((value ?? 9) - f32(expected)) <= tolerance;
@@ -44,8 +42,7 @@ test("Each client draws one hand per connected human at the last synced position
         assertEquals(hand?.slot, slot);
         assertEquals(hand?.pose.state, expected.state);
         assertEquals(hand?.pose.chip, expected.chip);
-        assertEquals(hand?.colour, BADGE_COLOURS[slot]);
-        assertEquals(hand?.colour, slotColor(slot).rgb);
+        assertEquals(hand?.palette, slot);
         const tolerance = slot === local ? 0.0 : POSITION_STEP;
         assertTrue(near(hand?.pose.x, expected.x, tolerance));
         assertTrue(near(hand?.pose.y, expected.y, tolerance));
@@ -94,9 +91,9 @@ test("In Team Battle a hand is lettered in the colour of its card's team, and in
   const { game, clients, step } = lobby(4);
   step(100.0, [pose("point", f32(0.2), f32(0.2)), pose("fan", f32(0.3), f32(0.3)), pose("point", f32(0.4), f32(0.4)), pose("fan", f32(0.5), f32(0.5))]);
   const settled = 100.0 + 2 * HAND_SEND_INTERVAL;
-  const colours = () => (clients[0]?.drawn(game, pose("point", f32(0.2), f32(0.2)), settled) ?? []).map(hand => hand.colour);
-  assertEquals(colours().join(","), BADGE_COLOURS.join(","));
+  const colours = () => (clients[0]?.drawn(game, pose("point", f32(0.2), f32(0.2)), settled) ?? []).map(hand => hand.palette);
+  assertEquals(colours().join(","), "0,1,2,3");
   game.teamBattle = true;
   [1, 1, 3, 0].forEach((team, slot) => { game.teamChoices[slot] = team as Team; });
-  assertEquals(colours().join(","), [0x0042ff, 0x0042ff, 0x540081, 0xff0303].join(","));
+  assertEquals(colours().join(","), [1, 1, 3, 0].join(","));
 });

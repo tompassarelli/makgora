@@ -359,7 +359,8 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
     const evidence = (check: string, name: string) => join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), check, name);
     const receiptGates = {
       "gate:cursor": (name: string) => measureCursorGate(selectedClients, name, evidence("gate-cursor-visible", name)),
-      "gate:hands": () => measureHandsGate(selectedClients, evidence("gate-select-hands", "pair")),
+      "gate:hands": () => measureHandsGate(selectedClients, evidence("gate-select-hands", "pair"), undefined),
+      "gate:hands-teams": () => measureHandsGate(selectedClients, evidence("gate-select-hands-teams", "pair"), [1, 3]),
       "gate:start": (name: string) => measureStartGate(selectedClients, name, evidence("gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")),
       "gate:start-rest": (name: string) => measureStartRestGate(selectedClients, name, evidence("gate-start-rest", name)),
       "gate:results": (name: string) => measureResultsGate(selectedClients, evidence("gate-results-rematch", name)),

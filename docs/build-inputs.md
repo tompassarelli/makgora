@@ -173,7 +173,7 @@ come from his three 1024x1024 JPEGs on a flat dark grey background; `bun tools/s
 JPEGs>` keys the background to transparency (outline kept), aligns the cuffs and
 writes the three PNGs on one canvas. The normal `bun tools/selection/build-art.ts`
 point-scales them into `SelectionHandPoint.tga`, `SelectionHandFan.tga` and
-`SelectionHandPinch.tga`, each a 256x256 canvas, and renders the four 128x96 `SelectionHandLabelP1-4.tga` player labels from `SelectionHandLabel.svg` in white, which the label frame tints to its hand's card colour; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Text renders through fontconfig with only the flake's pinned DejaVu fonts
+`SelectionHandPinch.tga`, each a 256x256 canvas, and renders the sixteen 128x96 `SelectionHandLabelP1Red.tga` to `SelectionHandLabelP4Purple.tga` player labels (each P1-P4 lettering in each of the four card colours) from `SelectionHandLabel.svg`; stage select's `SelectionBullseye.tga` is rendered from `tools/selection/art/SelectionBullseye.svg`. Text renders through fontconfig with only the flake's pinned DejaVu fonts
 (`nix build .#selection-fonts`), never the host's, and the output folder is
 cleared first, so the family hashes the same on every host. Store the generated
 `selection-assets` family and commit its hash with the source change.

@@ -47,7 +47,7 @@ import {
 } from "../menu/selectionDrag";
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { type HandFrames, createHandFrames, destroyHandFrames, presentHand } from "./selectionHandFrames";
-import { type HandPose, HIDDEN_HAND, SelectionHands, handColour } from "./selectionHands";
+import { type HandPose, HIDDEN_HAND, SelectionHands, handPalette } from "./selectionHands";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
 import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_HEADER_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, nextSelectableCharacter, DEFAULT_FIGHTER } from "../roster/kits";
@@ -591,7 +591,7 @@ export class SelectionPanel {
     for (const slot of PARTICIPANT_SLOTS) {
       const frames = this.hands[slot];
       const remote = drawn.find(candidate => candidate.slot === slot);
-      const local = slot === this.participantId && localHand.state !== undefined ? { slot, pose: { ...localHand, state: localHand.state }, colour: handColour(game, slot) } : undefined;
+      const local = slot === this.participantId && localHand.state !== undefined ? { slot, pose: { ...localHand, state: localHand.state }, palette: handPalette(game, slot) } : undefined;
       presentHand(frames, slot === this.participantId ? local : choosing ? remote : undefined, this.roster.grid);
     }
   }

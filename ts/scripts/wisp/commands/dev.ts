@@ -25,6 +25,7 @@ export const SMASHCRAFT_DEV: DevProject = {
       "test/drawn-size.test.ts": ["../build-inputs/**"],
       "test/driver-move-normal.test.ts": ["src/**", "scripts/wisp/botMatch.ts", "test/rematch/journalHelper.ts", "../build-inputs/**"],
       "test/element-looks.test.ts": ["test/fixtures/stock-sound-labels.txt", "scripts/wisp/model-facts/**"],
+      "test/frame-tint.test.ts": ["src/**"],
       "test/fighter-hide.test.ts": ["src/**", "test/native/captures/wisp125-warden-nair.pad"],
       "test/native-capture.test.ts": [],
       "test/sheriff.test.ts": ["scripts/sheriff.ts"],

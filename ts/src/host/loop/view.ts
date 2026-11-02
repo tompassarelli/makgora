@@ -519,7 +519,7 @@ export function lockArenaCamera(s: ShellState): void {
     const point = cameraPoint(framing, aspect, fighter?.motion.x ?? 0.0, (fighter?.motion.z ?? 0.0) + 60.0, BUBBLE_POINT);
     const outside = fighter !== undefined && fighterOffscreen(framing, aspect, fighter.character, fighter.motion.x, fighter.motion.z);
     const owner = partnerOwner(fighter, slot);
-    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? DEFAULT_FIGHTER, fighterColor(game, owner), point.column, point.row, aspect, costumeTintFor(game, owner, fighter?.character), costumeFor(game, owner), owner !== slot);
+    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? DEFAULT_FIGHTER, fighterColor(game, owner), point.column, point.row, aspect, costumeFor(game, owner), owner !== slot);
     readEscapeMeter(world, slot, meter);
     if (game.phase !== Phase.match || pauseHudHidden(s)) meter.shown = false;
     const meterPoint = cameraPoint(framing, aspect, meter.x, meter.z, METER_POINT);

@@ -8,7 +8,7 @@ import { MATCH_NOTICE_BOX } from "../../game/ui/hudLayout";
 import type { NoticePlace } from "../../game/ui/noticeLayout";
 import { ultimateReady } from "../../game/presentation/meterCues";
 import { keepNoticeClearOfMarkers } from "./fighterMarkers";
-import { type MatchState, Phase, costumeFor, costumeTintFor, fighterColor, resultChoicesOpen, shownResultPick, timedMatch } from "../../game/lobby/lobbyState";
+import { type MatchState, Phase, costumeFor, fighterColor, resultChoicesOpen, shownResultPick, timedMatch } from "../../game/lobby/lobbyState";
 import type { Fighter } from "../../game/sim/fighter";
 import type { ParticipantSlot } from "../../game/input/participants";
 import type { KeyBindings } from "../../game/input/keyBindings";
@@ -48,7 +48,7 @@ export function markLoreClear(game: MatchState): void {
 export function updateSlotHud(s: ShellState, ui: UiObjects, slot: ParticipantSlot, game: MatchState, selecting: boolean, paused: boolean, menuTitle: boolean, showMatch: boolean): void {
   if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
     const fighter = fighterAt(s.world, slot);
-    ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined, costumeTintFor(game, slot, fighter.character), costumeFor(game, slot), leadsDuo(s.world, slot));
+    ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks, fighter.status.cursedBy !== undefined, costumeFor(game, slot), leadsDuo(s.world, slot));
     ui.meterBars[slot].hud.update(showMatch, fighter.meter.ultimate, ultimateReady(fighter, game.ultimatesOff), fighter.visuals.manaDrained, chargeMeterFill(fighter));
   } else {
     ui.huds[slot].update(false, DEFAULT_FIGHTER, slot, 0.0, 0);

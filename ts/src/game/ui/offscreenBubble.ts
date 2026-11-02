@@ -17,8 +17,6 @@ function bubblePosition(column: number, row: number): { readonly column: number;
   return { column: 0.5 + dx * scale, row: Math.min(f32(0.69), 0.5 + dy * scale), arrow };
 }
 
-import type { CostumeTint } from "../presentation/model/costume";
-import { paintCostume } from "./costumeTint";
 import { Frame, FramePoint, setFrameAbsPoint, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
@@ -30,7 +28,6 @@ export class OffscreenBubble {
   private visible = false;
   private character: Character | undefined;
   private color: number | undefined;
-  private tint: CostumeTint | undefined;
   private costume = 0;
   private partner: boolean | undefined;
 
@@ -49,7 +46,7 @@ export class OffscreenBubble {
     }
   }
 
-  update(visible: boolean, character: Character, color: number, column: number, row: number, aspect: number, tint?: CostumeTint, costume = 0, partner = false): void {
+  update(visible: boolean, character: Character, color: number, column: number, row: number, aspect: number, costume = 0, partner = false): void {
     if (visible !== this.visible) {
       this.visible = visible;
       setFrameVisible(this.portrait, visible);
@@ -67,10 +64,6 @@ export class OffscreenBubble {
       this.character = character;
       this.color = color;
       setFrameTexture(this.portrait, fighterPortrait(character, "Tile", color, costume), 0, true);
-    }
-    if (this.tint !== tint) {
-      this.tint = tint;
-      paintCostume(this.portrait, tint);
     }
     const position = bubblePosition(column, row);
     const x = f32(0.4) + (position.column - 0.5) * aspect * f32(0.6);

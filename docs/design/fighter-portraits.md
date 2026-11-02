@@ -309,10 +309,9 @@ together once per 60 Hz tick from one mouse sample.
 Character select draws every connected human's hand, not only the local one
 (asked for 2026-10-30, after Melee's player hands): each hand carries a P1 to P4
 label in the colour its player card shows (red, blue, teal, purple: the slot's, or in
-Team Battle the colour of the chosen team, `handColour`): the chip's own bold
+Team Battle the colour of the chosen team, `handPalette`): the chip's own bold
 outlined lettering at the chip's own size, inverted (the text in the player
-colour, no disc and no box), rendered white by `tools/selection/art/SelectionHandLabel.svg`,
-tinted to that colour by the label frame (`setFrameColor`)
+colour, no disc and no box), rendered once per lettering and colour (`SelectionHandLabelP1Red` to `SelectionHandLabelP4Purple`, sixteen 128x96 textures) by `tools/selection/art/SelectionHandLabel.svg`, with the label frame swapping to the texture of its hand's slot and colour (`handLabelName`); a frame tint is never used, because Warcraft Classic drew the tinted white label white in Tom's 2026-11-02 playtest and `ts/test/frame-tint.test.ts` refuses any `setFrameColor` call in the map source,
 and centred on texel (135, 119) of the hand canvas, the middle of the gauntlet's back-of-hand plate, and a pinching hand's chip is
 drawn at the hand. Each client knows only
 its own mouse (a pad's cursor is a mouse position too), so it sends its hand's

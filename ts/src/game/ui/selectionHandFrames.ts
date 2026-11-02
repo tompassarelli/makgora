@@ -6,14 +6,15 @@ import { SELECT_LEVELS } from "./selectLevels";
 import { art } from "./selectionFrames";
 import { consoleUi, gameUi, placeTopLeft } from "./frames";
 import type { DrawnHand } from "./selectionHands";
-import { destroyFrame, Frame, frameColor, setFrameColor, setFrameLevel, setFrameVisible } from "wisp/game/frames";
-import { imod, idiv } from "wisp/src/sim/intMath";
+import { destroyFrame, Frame, setFrameLevel, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { handLabelName } from "./handLabelArt";
 import { formatInt } from "wisp/game/text";
 
 interface HandLayer {
   readonly states: Readonly<Record<HandState, Frame>>;
   readonly badge: Frame;
-  badgeColour: number | undefined;
+  badgePalette: number | undefined;
+  readonly slot: number;
 }
 
 // Engine: Warcraft squeezes a game-UI child whose frame crosses the edge of the 4:3 area, but draws a ConsoleUIBackdrop child under every game-UI child; so the hand is drawn in the game UI, over the roster, until it crosses an edge, and then in the console layer, at full size, running off the edge like an OS cursor.
@@ -30,6 +31,8 @@ const LABEL_CHIP_HEIGHT = f32(0.375);
 
 const UI_WIDTH = f32(0.8);
 const UI_HEIGHT = f32(0.6);
+
+const badgeTexture = (slot: number, palette: number): string => `war3mapImported\\${handLabelName(slot, palette)}.tga`;
 
 const TEXTURE_NAMES: Readonly<Record<HandState, string>> = { point: "Point", fan: "Fan", pinch: "Pinch" };
 
@@ -51,10 +54,10 @@ function createLayer(parent: Frame, grid: RosterGrid, tag: string, suffix: strin
     return frame;
   };
   const { width, height } = handBadgeBox(0.0, 0.0, size, readyChipSize(grid));
-  const badge = art(parent, `MeleeHandBadge${tag}${suffix}_${formatInt(slot)}`, `war3mapImported\\SelectionHandLabelP${formatInt(slot + 1)}.tga`, 0.0, 0.0, width, height);
+  const badge = art(parent, `MeleeHandBadge${tag}${suffix}_${formatInt(slot)}`, badgeTexture(slot, slot), 0.0, 0.0, width, height);
   setFrameLevel(badge, SELECT_LEVELS.handBadge);
   setFrameVisible(badge, false);
-  return { states: { point: state("point"), fan: state("fan"), pinch: state("pinch") }, badge, badgeColour: undefined };
+  return { states: { point: state("point"), fan: state("fan"), pinch: state("pinch") }, badge, badgePalette: slot, slot };
 }
 
 export function createHandFrames(grid: RosterGrid, suffix: string, slot: number): HandFrames {
@@ -65,9 +68,9 @@ function presentLayer(layer: HandLayer, hand: DrawnHand | undefined, left: numbe
   for (const state of HAND_STATES) setFrameVisible(layer.states[state], hand?.pose.state === state);
   setFrameVisible(layer.badge, hand !== undefined);
   if (hand === undefined) return;
-  if (layer.badgeColour !== hand.colour) {
-    layer.badgeColour = hand.colour;
-    setFrameColor(layer.badge, frameColor(255, imod(idiv(hand.colour, 65536), 256), imod(idiv(hand.colour, 256), 256), imod(hand.colour, 256)));
+  if (layer.badgePalette !== hand.palette) {
+    layer.badgePalette = hand.palette;
+    setFrameTexture(layer.badge, badgeTexture(layer.slot, hand.palette), 0, true);
   }
   placeTopLeft(layer.states[hand.pose.state], left, top);
   const badge = handBadgeBox(left, top, size, chip);

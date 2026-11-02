@@ -25,7 +25,6 @@ import { slotColor } from "./slotColors";
 import { costumeIndex, costumesFor } from "../roster/costumes";
 import { costumeSystem } from "../roster/costumeSwitch";
 import { MAX_COSTUMES } from "../presentation/model/costume";
-import { paintCostume } from "./costumeTint";
 import { placeTopLeft, setMenuText } from "./frames";
 import { presentLiveFighter } from "./liveCard";
 import { fitName, placeName } from "./namePlate";
@@ -189,8 +188,6 @@ export function pointedCard(game: Readonly<MatchState>, slot: ParticipantSlot, x
 export function presentCardCostume(frames: CardFrames, game: Readonly<MatchState>, slot: ParticipantSlot, participantId: number, shown: boolean, choice: number | undefined): void {
   const costumes = !costumeSystem.enabled || choice === undefined || choice < 0 ? [] : costumesFor(choice);
   const chosen = costumeFor(game, slot);
-  const tint = costumes[chosen]?.tint;
-  paintCostume(frames.portrait, tint);
   setFrameEnabled(frames.costume, shown && costumes.length > 1 && (slot === participantId && humanFighterActive(game, slot) || canChooseComputer(game, participantId, slot)));
   setFrameVisible(frames.costume, shown && costumes.length > 1);
   for (let index = 0; index < frames.dots.length; index++) {

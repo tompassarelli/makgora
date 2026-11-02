@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { PLAYER_COLORS } from '../../ts/src/game/ui/slotColors';
 import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_MARGIN, HAND_TEXELS } from '../../ts/src/game/core/handArt';
+import { handLabelName } from '../../ts/src/game/ui/handLabelArt';
 import { PARTICIPANT_CAPACITY } from '../../ts/src/game/input/participants';
 import { RANDOM_ICON_PX, TILE_BACKGROUND } from '../../ts/scripts/tileArt';
 import { Effect } from '../../ts/node_modules/effect/dist/index.js';
@@ -74,7 +75,7 @@ BunRuntime.runMain(Effect.gen(function*() {
   const slots = PLAYER_COLORS.slice(0, PARTICIPANT_CAPACITY);
   for (const [slot, color] of slots.entries()) {
     yield* render(`SelectionChipP${slot + 1}`, 'SelectionChip.svg', { CHIP_COLOR: hex(mix(color.rgb, 0x000000, 0.2)), CHIP_LABEL: `P${slot + 1}` }, true);
-    yield* render(`SelectionHandLabelP${slot + 1}`, 'SelectionHandLabel.svg', { LABEL_COLOR: '#ffffff', LABEL_TEXT: `P${slot + 1}` }, true);
+    for (const [palette, paletteColor] of slots.entries()) yield* render(handLabelName(slot, palette), 'SelectionHandLabel.svg', { LABEL_COLOR: hex(paletteColor.rgb), LABEL_TEXT: `P${slot + 1}` }, true);
     yield* render(`SelectionChipCPUP${slot + 1}`, 'SelectionChip.svg', { CHIP_COLOR: '#626977', CHIP_LABEL: `P${slot + 1}` }, true);
     yield* render(`SelectionCard${color.name}`, 'SelectionCard.svg', { CARD_COLOR: hex(mix(color.rgb, 0x000000, 0.4)), CARD_EDGE: hex(mix(color.rgb, 0xffffff, 0.35)), CARD_METAL: '#bbc6cf' }, false);
     yield* render(`MarkerArrow${slot}`, 'MarkerArrow.svg', { ARROW_COLOR: hex(color.rgb) }, false);

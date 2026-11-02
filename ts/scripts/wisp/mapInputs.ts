@@ -13,6 +13,7 @@ import type { FighterOriginalClip } from "../../src/generated/clips/fighterOrigi
 import { originalClip, originalClipCount, originalLightPath } from "../../src/generated/clips/fighterOriginalClipInfo";
 import { costumeBody } from "../../src/generated/costumes/costumeBodies";
 import { PARTNER_COSTUME } from "../../src/game/presentation/model/costume";
+import { handLabelNames } from "../../src/game/ui/handLabelArt";
 import * as frostModels from "../../src/generated/assets/frostAssetInfo";
 import * as impactModels from "../../src/game/assets/impactAssetInfo";
 import { IMPORTED_MUSIC } from "../../src/game/assets/importedMusicInfo";
@@ -89,7 +90,7 @@ const SELECTION_TEXTURES = [
   "SelectionTileFrame", "SelectionCardRed", "SelectionCardBlue", "SelectionCardTeal", "SelectionCardPurple",
   "SelectionCardGray", "SelectionAction", "SelectionRandom", "StageBackdrop", "StageChip",
   "SelectionChipP1", "SelectionChipP2", "SelectionChipP3", "SelectionChipP4", "SelectionChipCPUP1", "SelectionChipCPUP2", "SelectionChipCPUP3", "SelectionChipCPUP4",
-  "SelectionHandPoint", "SelectionHandFan", "SelectionHandPinch", "SelectionHandLabelP1", "SelectionHandLabelP2", "SelectionHandLabelP3", "SelectionHandLabelP4", "SelectionBullseye",
+  "SelectionHandPoint", "SelectionHandFan", "SelectionHandPinch", ...handLabelNames(), "SelectionBullseye",
   ...RACES.flatMap(race => [`RaceBacking${race}`, `NamePlate${race}`, `NamePlateMirror${race}`]), "StockShadow", "PreviewRowLit", "PreviewRule", "PingSignal1", "PingSignal2", "PingSignal3", "PingSignal4",
   "MarkerArrow0", "MarkerArrow1", "MarkerArrow2", "MarkerArrow3", ...barArtNames(),
 ];

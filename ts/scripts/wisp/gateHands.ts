@@ -61,7 +61,7 @@ const nearestColour = (frame: Frame, box: UiRect, rgb: number): number | undefin
   return nearest;
 };
 
-export const measureHandsGate = (clientsFile: string, directory: string) => Effect.gen(function*() {
+export const measureHandsGate = (clientsFile: string, directory: string, teams: readonly number[] | undefined) => Effect.gen(function*() {
   const clients = yield* loadClients(clientsFile).pipe(Effect.mapError(fail("hands gate clients")));
   const input = yield* InputInjection;
   const people: Participant[] = [];
@@ -113,7 +113,7 @@ export const measureHandsGate = (clientsFile: string, directory: string) => Effe
         const badge = { left: box.left - COVER_PAD, top: box.top + COVER_PAD, width: box.width + 2 * COVER_PAD, height: box.height + 2 * COVER_PAD };
         const handBox = { left: left - COVER_PAD, top: top + COVER_PAD, width: extent + 2 * COVER_PAD, height: extent + 2 * COVER_PAD };
         const hand = texturePixels(frame, textures[at.state], left, top, extent, extent, badge);
-        const badgeDistance = nearestColour(frame, box, slotColor(owner.slot).rgb);
+        const badgeDistance = nearestColour(frame, box, slotColor(teams?.[owner.slot] ?? owner.slot).rgb);
         const chipError = carried ? texturePixels(frame, textures.chip, carriedChipLeft(at.x, chip), carriedChipTop(at.y, chip), chip, chip, handBox)?.error : undefined;
         samples.push({ file, sha256: createHash("sha256").update(bytes).digest("hex"), phase, viewer: viewer.slot, hand: owner.slot, state: at.state, error: hand?.error, badgeDistance, chipError });
       }
