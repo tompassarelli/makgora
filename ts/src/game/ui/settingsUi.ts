@@ -147,7 +147,7 @@ export class SettingsPanel {
     const suffix = formatInt(participantId);
     this.local = localPlayer() === playerOf(participantId);
     this.clicks = new ButtonClicks(`ui.settings.${suffix}.click`, (button, clicker) => this.click(button, clicker));
-    const root = createBackdrop(`MeleeSettingsRoot${suffix}`, gameUi(), participantId);
+    const root = createFrameByType("FRAME", `MeleeSettingsRoot${suffix}`, gameUi(), "", participantId);
     frameMenuPanel(root, `MeleeSettingsRoot${suffix}`, participantId, 30);
     placeTopLeft(root, PANEL.x, PANEL.top);
     setFrameSize(root, PANEL.width, PANEL.height);
