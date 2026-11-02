@@ -122,6 +122,9 @@ Smashcraft follows that shape with Warcraft III's built-in assets
 - **Choices.** Rematch and New stage go ahead only when every present player
   picks the same one. Character select goes at once when any player picks it,
   since a split vote ends there anyway (Tom, 20 Oct 2026).
+  The results screen opens with Rematch focused for every player, so Attack or
+  Enter with no move picks it. It opened on New stage before 2 Nov 2026, when
+  Tom asked for Rematch to be the default (2 Nov 2026).
 - **Selection.** Hovering a fighter or a stage ticks. Confirming a fighter
   clicks and plays that hero's trained-unit line ("Ready" in its sound set),
   the closest Warcraft has to Smash's announced pick. Fighter and stage

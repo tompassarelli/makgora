@@ -8,7 +8,7 @@ import { MATCH_NOTICE_BOX } from "../../game/ui/hudLayout";
 import type { NoticePlace } from "../../game/ui/noticeLayout";
 import { ultimateReady } from "../../game/presentation/meterCues";
 import { keepNoticeClearOfMarkers } from "./fighterMarkers";
-import { DEFAULT_RESULT_PICK, type MatchState, Phase, costumeFor, costumeTintFor, fighterColor, resultChoicesOpen, timedMatch } from "../../game/lobby/lobbyState";
+import { type MatchState, Phase, costumeFor, costumeTintFor, fighterColor, resultChoicesOpen, shownResultPick, timedMatch } from "../../game/lobby/lobbyState";
 import type { Fighter } from "../../game/sim/fighter";
 import type { ParticipantSlot } from "../../game/input/participants";
 import type { KeyBindings } from "../../game/input/keyBindings";
@@ -89,7 +89,7 @@ export function presentMessages(s: ShellState, game: MatchState, ui: UiObjects, 
 
 function presentMessageText(s: ShellState, game: MatchState, ui: UiObjects, waiting: number, starting: string, local: ParticipantSlot | undefined, localFighter: Readonly<Fighter> | undefined): void {
   const { help, notice } = s.frames;
-  if (game.phase === Phase.result) ui.results.update(resultNotice(game, s.status.text).replace("\n", "  ·  "), matchHelp(game, s.session.paused, startControl(s), localFighter, false), resultChoicesOpen(game) && local !== undefined ? s.resultFocus?.[local] ?? DEFAULT_RESULT_PICK : undefined);
+  if (game.phase === Phase.result) ui.results.update(resultNotice(game, s.status.text).replace("\n", "  ·  "), matchHelp(game, s.session.paused, startControl(s), localFighter, false), resultChoicesOpen(game) && local !== undefined ? shownResultPick(s.resultFocus, local) : undefined);
   const helpText = matchHelp(game, s.session.paused, startControl(s), localFighter, game.phase === Phase.match);
   if (shownMessages.help !== helpText) {
     shownMessages.help = helpText;

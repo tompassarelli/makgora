@@ -27,7 +27,8 @@ export type Phase = (typeof Phase)[keyof typeof Phase];
 export const ResultPick = { rematch: 0, newStage: 1, characters: 2 } as const;
 export type ResultPick = (typeof ResultPick)[keyof typeof ResultPick];
 export const RESULT_PICKS = 3;
-export const DEFAULT_RESULT_PICK: ResultPick = ResultPick.newStage;
+export const DEFAULT_RESULT_PICK: ResultPick = ResultPick.rematch;
+export const shownResultPick = (focus: readonly number[] | undefined, slot: number): number => focus?.[slot] ?? DEFAULT_RESULT_PICK;
 export const MATCH_TICKS_PER_SECOND = 60;
 
 export const CLASSIC_TIER_DEFAULT = 1;

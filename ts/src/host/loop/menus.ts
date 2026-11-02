@@ -9,7 +9,7 @@ import { menuAction } from "../../game/input/keyBindings";
 import { pressKey } from "../../game/input/playerKeys";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import {
-  DEFAULT_RESULT_PICK, Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
+  DEFAULT_RESULT_PICK, Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, shownResultPick, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
   setTeamBattle, setFriendlyFire, cycleTeam, cycleCostume, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, chooseMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setOrbsOn, setStocks, setTimeLimit, updateConnectedHumans,
@@ -76,7 +76,7 @@ export function resultKey(s: ShellState, slot: ParticipantSlot, key: number, act
 
 export function pickResult(s: ShellState, actor: number, choice: number): void {
   if (!isParticipantSlot(actor) || !resultChoicesOpen(s.game)) return;
-  stepResultFocus(s, actor, choice - (s.resultFocus?.[actor] ?? DEFAULT_RESULT_PICK));
+  stepResultFocus(s, actor, choice - shownResultPick(s.resultFocus, actor));
   confirm(s, actor, true);
 }
 
@@ -133,7 +133,7 @@ export function confirm(s: ShellState, slot: ParticipantSlot, clicked = false): 
   } else if (game.phase === Phase.result) {
     if (cancelRematchCountdown(game, slot)) return;
     if (!clicked && !resultChoicesShown(s)) return;
-    const pick = s.resultFocus?.[slot] ?? DEFAULT_RESULT_PICK;
+    const pick = shownResultPick(s.resultFocus, slot);
     if (pick !== ResultPick.rematch && pick !== ResultPick.newStage && pick !== ResultPick.characters) return;
     if (!confirmRematch(game, slot, pick)) return;
     s.resultFocus = undefined;
