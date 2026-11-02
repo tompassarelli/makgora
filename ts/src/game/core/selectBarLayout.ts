@@ -243,7 +243,7 @@ export function barArt(): readonly BarArt[] {
     ...both(STAGE_BAR.pool),
     ...both(DRAWER_ROWS.reset), ...both(DRAWER_ROWS.presets[0]), ...both(DRAWER_ROWS.stocks.less), ...both(DRAWER_ROWS.ultimates),
     ...both(TRAINING_ROWS.behaviour.value), ...both(DRAWER_ROWS.stocks.value),
-    ...both(MODE_ROWS.modes[0]), ...both(MODE_ROWS.teamToggle), ...both(GUIDE_ROWS.controls), ...both(GEAR_ROWS.auto), ...HELP_HEIGHTS.map((height): BarArt => ({ style: "Panel", width: HELP_WIDTH, height })),
+    ...both(MODE_ROWS.modes[0]), ...both(MODE_ROWS.teamToggle), ...both(GUIDE_ROWS.controls), ...both(GEAR_ROWS.auto), ...both(GEAR_ROWS.community),...HELP_HEIGHTS.map((height): BarArt => ({ style: "Panel", width: HELP_WIDTH, height })),
   ];
   const seen = new Set<string>();
   return art.filter(item => {

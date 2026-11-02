@@ -237,6 +237,16 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "Back retains Rook / Advanced and returns focused Opponent settings; Choose reopens it. Start closes into fighter selection without starting a match. After release, focused controls and ordinary chip dragging still work; Enter opens Warcraft chat. Check mouse Close and the settings hit target on both 16:9 and the available wider client.",
     },
     {
+      id: "gear-settings-buttons", closes: "Settings panel Community and Credits art (2026-11-02)", map: "fighter-select", session: "gear-settings",
+      setup: [
+        { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 },
+        { keys: ["w"], client: "a" }, { waitMs: 300 }, { keys: ["n"], client: "a" }, { waitMs: 1000 },
+      ],
+      capture: [{ kind: "frames", name: "gear-settings", client: "a" }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "The gear's SETTINGS panel is open: the −, + and Auto buttons and the Community and Credits rows are all dark boxes with a gold border and cream text; no row is a flat green or empty bar.",
+    },
+    {
       id: "712-tyrande-select", closes: "smashcraft#712 portraits", map: "fighter-select", session: "712-tyrande-portraits",
       setup: [
         { waitMs: 8000 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 },
