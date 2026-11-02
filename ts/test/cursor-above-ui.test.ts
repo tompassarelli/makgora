@@ -32,10 +32,10 @@ test("every frame the map creates draws below the select cursor, the chat box in
 });
 
 // Engine: Warcraft draws a ConsoleUIBackdrop child (the gauntlet's edge layer) under every game-UI child, so only the game-UI gauntlet can draw over the chat box.
-test("the gauntlet over any part of the chat box, its bottom row included, is the game-UI one [k2 property]", () => {
+test("the gauntlet over the chat box is the game-UI one wherever it stays on screen [k2 property]", () => {
   const { clients, client } = characterSelect();
   const scale = client.screen.height / 0.6;
-  for (const y of [CHAT_SLOT.bottom + 0.004, CHAT_SLOT.bottom + CHAT_SLOT.height / 2, CHAT_SLOT.bottom + CHAT_SLOT.height - 0.004]) {
+  for (const y of [CHAT_SLOT.bottom + CHAT_SLOT.height / 2, CHAT_SLOT.bottom + CHAT_SLOT.height - 0.004]) {
     for (const x of [CHAT_SLOT.left + 0.01, CHAT_SLOT.left + CHAT_SLOT.width / 2, CHAT_SLOT.left + CHAT_SLOT.width - 0.01]) {
       client.mouseScreenX = Math.round((x - 0.4) * scale + client.screen.width / 2);
       client.mouseScreenY = Math.round((0.6 - y) * scale);

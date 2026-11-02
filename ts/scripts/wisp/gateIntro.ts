@@ -25,7 +25,9 @@ export const startPromptReady = (words: readonly ScreenWord[], height: number): 
 export const controlsShowing = (words: readonly ScreenWord[]): boolean =>
   words.some(({ text }, index) => CONTROLS_SCREEN.test(text) || (/^press$/i.test(text) && /^done\b/i.test(words[index + 1]?.text ?? "")));
 
-export const fighterSelectShowing = (words: readonly ScreenWord[], height: number): boolean => !controlsShowing(words) && promptWords(words, height).includes("click");
+export const tutorialPromptShowing = (words: readonly ScreenWord[]): boolean => words.some(({ text }) => text === "Not");
+
+export const fighterSelectShowing = (words: readonly ScreenWord[]): boolean => !controlsShowing(words) && !tutorialPromptShowing(words);
 
 export const enlarge = ({ width, height, rgb }: Frame): Frame => {
   const out = new Uint8Array(width * height * 3 * LABEL_SCALE * LABEL_SCALE);
@@ -52,8 +54,8 @@ export const reachFighterSelect = (client: Client, region: Region) => Effect.gen
   for (let step = 0; step <= INTRO_STEPS; step++) {
     const frame = yield* capture(client, region).pipe(Effect.mapError(fail("fighter select capture")));
     const words = yield* screenWords(client, frame).pipe(Effect.mapError(fail("fighter select intro")));
-    if (fighterSelectShowing(words, frame.height)) return;
-    if (step === INTRO_STEPS) return yield* new AcceptFailure({ operation: "fighter select intro", problem: `${client.name} shows ${controlsShowing(words) ? "its Controls screen" : "no fighter select prompt"} after ${INTRO_STEPS} dismissals` });
+    if (fighterSelectShowing(words)) return;
+    if (step === INTRO_STEPS) return yield* new AcceptFailure({ operation: "fighter select intro", problem: `${client.name} shows ${controlsShowing(words) ? "its Controls screen" : "its Tutorial prompt"} after ${INTRO_STEPS} dismissals` });
     const notNow = words.find(word => word.text === "Not");
     const target = controlsShowing(words) ? done : notNow === undefined ? undefined : { x: region.x + notNow.x, y: region.y + notNow.y };
     if (target !== undefined) yield* click(client, target.x, target.y).pipe(Effect.mapError(fail("fighter select intro")));

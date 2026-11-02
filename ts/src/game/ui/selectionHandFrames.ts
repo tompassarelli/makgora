@@ -17,7 +17,7 @@ interface HandLayer {
   readonly slot: number;
 }
 
-// Engine: Warcraft squeezes a game-UI child whose frame crosses the left or right edge of the 4:3 area, but draws a ConsoleUIBackdrop child under every game-UI child; so the hand is drawn in the game UI, over every panel, until it crosses a side edge, and then in the console layer, at full size, running off the edge like an OS cursor.
+// Engine: Warcraft squeezes a game-UI child whose frame crosses any edge of the 4:3 area, the bottom included (gex45 capture, 2 November 2026), but draws a ConsoleUIBackdrop child under every game-UI child; so the hand is drawn in the game UI, over the roster, until it crosses an edge, and then in the console layer, at full size, running off the edge like an OS cursor.
 export interface HandFrames {
   readonly inside: HandLayer;
   readonly edge: HandLayer;
@@ -30,6 +30,7 @@ const LABEL_CHIP_WIDTH = f32(0.5);
 const LABEL_CHIP_HEIGHT = f32(0.375);
 
 const UI_WIDTH = f32(0.8);
+const UI_HEIGHT = f32(0.6);
 
 const badgeTexture = (slot: number, palette: number): string => `war3mapImported\\${handLabelName(slot, palette)}.tga`;
 
@@ -42,7 +43,7 @@ export function handBadgeBox(left: number, top: number, size: number, chip: numb
   return { left: f32(left + f32(LABEL_CENTRE_X * unit) - width / 2), top: f32(top - f32(LABEL_CENTRE_Y * unit) + height / 2), width, height };
 }
 
-export const handCrossesEdge = (left: number, size: number): boolean => left < 0 || f32(left + size) > UI_WIDTH;
+export const handCrossesEdge = (left: number, top: number, size: number): boolean => left < 0 || top > UI_HEIGHT || f32(left + size) > UI_WIDTH || f32(top - size) < 0;
 
 function createLayer(parent: Frame, grid: RosterGrid, tag: string, suffix: string, slot: number): HandLayer {
   const size = handSize(grid);
@@ -80,7 +81,7 @@ export function presentHand(frames: HandFrames, hand: DrawnHand | undefined, gri
   const size = handSize(grid);
   const left = hand === undefined ? 0.0 : handLeft(hand.pose.x, hand.pose.state, size);
   const top = hand === undefined ? 0.0 : handTop(hand.pose.y, hand.pose.state, size);
-  const crossing = hand !== undefined && handCrossesEdge(left, size);
+  const crossing = hand !== undefined && handCrossesEdge(left, top, size);
   const chip = readyChipSize(grid);
   presentLayer(frames.inside, crossing ? undefined : hand, left, top, size, chip);
   presentLayer(frames.edge, crossing ? hand : undefined, left, top, size, chip);

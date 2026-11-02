@@ -143,10 +143,10 @@ const reachFighterSelect = (client: Client, save: (file: string, bytes: Uint8Arr
   for (let pass = 0; pass <= START_PANELS; pass++) {
     const frame = yield* capture(client, viewport).pipe(Effect.mapError(fail("moves gate setup")));
     const words = yield* screenWords(client, frame).pipe(Effect.mapError(fail("moves gate setup")));
-    if (fighterSelectShowing(words, frame.height)) return;
+    if (fighterSelectShowing(words)) return;
     if (pass === START_PANELS) {
       yield* save(`stuck-select-${client.name}.ppm`, encodePpm(frame));
-      return yield* new AcceptFailure({ operation: "moves gate setup", problem: `${client.name} shows ${controlsShowing(words) ? "its Controls screen" : "no fighter select prompt"} after ${START_PANELS} tries; stuck-select-${client.name}.ppm holds its screen` });
+      return yield* new AcceptFailure({ operation: "moves gate setup", problem: `${client.name} shows ${controlsShowing(words) ? "its Controls screen" : "its Tutorial prompt"} after ${START_PANELS} tries; stuck-select-${client.name}.ppm holds its screen` });
     }
     const notNow = words.find(word => word.text === "Not");
     const targets = controlsShowing(words) ? [tape, done] : notNow === undefined ? [] : [{ x: viewport.x + notNow.x, y: viewport.y + notNow.y }];
