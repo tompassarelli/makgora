@@ -30,10 +30,10 @@ import { callbackMatchTick } from "./frame";
 import { clearAllInputs, clearParticipantInputs, currentHumanMask } from "./inputs";
 import { INPUT_PREFIX, journalEpoch, publishMenu, serviceJournalEnd } from "./journal";
 import * as journalPause from "./journalPause";
-import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEY_PREVIEW_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, MAIN_MENU, Key, registerKey, syncKeyEvents } from "./keyEvents";
+import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEY_PAUSE_UP, KEY_PREVIEW_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, MAIN_MENU, Key, registerKey, syncKeyEvents } from "./keyEvents";
 import { onPreviewKeyDown } from "./keyboardPreview";
 import { receiveChat, toggleChatHistory } from "./matchChat";
-import { onKeyboardPause, onPauseKeyDown } from "./keyboardPause";
+import { onKeyboardPause, onPauseKeyDown, onPauseKeyUp, serviceLeaveHold } from "./keyboardPause";
 import { onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
 import { onDevCommand } from "./developerCommands";
 import { MAIN_MENU_PREFIX } from "../../game/ui/mainMenuButton";
@@ -158,6 +158,7 @@ function gameTick(s: ShellState): void {
       journalPause.commitPauseAtFrame(s, rollback, journal);
     }
   } else if (s.game.phase === Phase.match && !s.session.paused) callbackMatchTick(s);
+  serviceLeaveHold(s);
   if (s.game.phase !== Phase.match) clearAllInputs(s);
   else for (const slot of PARTICIPANT_SLOTS) clearPulse(s.participants[slot].keys.directions);
   syncKeyEvents(s);
@@ -316,6 +317,9 @@ function createTriggers(s: ShellState): void {
   registerKey(s, pauseDown, Key.backspace, true);
   registerKey(s, pauseDown, Key.escape, true);
   onEvents(pauseDown, trampoline(KEY_PAUSE_DOWN));
+  const pauseUp = createEvents();
+  registerKey(s, pauseUp, Key.escape, false);
+  onEvents(pauseUp, trampoline(KEY_PAUSE_UP));
   const previewDown = createEvents();
   registerKey(s, previewDown, Key.f2, true);
   onEvents(previewDown, trampoline(KEY_PREVIEW_DOWN));
@@ -452,6 +456,7 @@ export function installShell(): void {
   on(KEY_START_DOWN, withShell(onStartKeyDown));
   on(KEY_START_UP, withShell(onStartKeyUp));
   on(KEY_PAUSE_DOWN, withShell(onPauseKeyDown));
+  on(KEY_PAUSE_UP, withShell(onPauseKeyUp));
   on(KEY_PREVIEW_DOWN, withShell(onPreviewKeyDown));
   on(KEYBOARD_PAUSE, withShell(onKeyboardPause));
   on(MAIN_MENU, withShell(onMainMenu));

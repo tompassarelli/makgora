@@ -80,7 +80,10 @@ back when the match resumes. The plate at the bottom right shows
 L + R + A + START over RESET MATCH: hold two shield buttons (shield, light shield or the
 second trigger) and Attack, then press Start (Esc or Backspace), or click the plate,
 to return to fighter selection. On a keyboard the plate names the keys you bound
-to those actions. Start, Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
+to those actions, and above it a bar reads Hold Esc to leave: the player who paused
+can hold Esc for one second to fill it and return to fighter selection with no other
+keys. Releasing early empties the bar and resumes, so a tap still resumes. Start,
+Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
 the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). F2 on the pause screen is reserved for the Show keyboard in game toggle; G hides the HUD for a clean screenshot.
 
 At fighter selection, up/down (W/S on WASD, P/E on Box, Space/E on Custom) moves focus

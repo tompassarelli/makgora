@@ -283,6 +283,7 @@ export interface ShellState {
   pauseMenu?: { shown: boolean; title: boolean };
   pauseChord?: Slots<import("../../game/input/pauseChord").ChordKeys> | undefined;
   pausedBy?: ParticipantSlot | undefined;
+  leaveHold?: import("../../game/match/leaveHold").LeaveHold | undefined;
   resultFocus?: number[] | undefined;
   titleAwaitRelease?: boolean;
   trainingHints?: boolean;

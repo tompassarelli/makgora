@@ -1139,8 +1139,10 @@ four specials on the ground and in the air.
 - **Pause screen** (owner, 30 Oct): the pause screen follows Melee's. The frozen
   match stays in view with no dimming box or menu; corner brackets frame it, a
   plate names the pausing player, and the reset plate shows L + R + A + Start.
-  Only that combination (or a click on the plate) leaves the match, so a stray
-  button never ends it; Start, Esc or Backspace resumes. The stick pans and the
+  Only that combination, a click on the plate, or (on a keyboard, for the player
+  who paused, owner 2 Nov) holding Esc for one second while a bar fills on the
+  plate leaves the match, so a stray button never ends it; Start, Backspace or a
+  tap of Esc resumes. The stick pans and the
   C-stick zooms a camera that is local to the pausing client and restored on resume, so
   it adds nothing to synced state.
 - **In-game keyboard preview** (owner, 30 Oct; reworked 2 Nov from the owner's

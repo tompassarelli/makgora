@@ -18,6 +18,7 @@ export const KEY_UP = "shell.keyUp";
 export const KEY_START_DOWN = "shell.keyStartDown";
 export const KEY_START_UP = "shell.keyStartUp";
 export const KEY_PAUSE_DOWN = "shell.keyPauseDown";
+export const KEY_PAUSE_UP = "shell.keyPauseUp";
 export const KEY_PREVIEW_DOWN = "shell.keyPreviewDown";
 export const KEYBOARD_PAUSE = "shell.keyboardPause";
 export const KEYBOARD_PAUSE_PREFIX = "SC_KP";

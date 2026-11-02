@@ -3,6 +3,7 @@ import { type KeyBindings, keyNames } from "../../game/input/keyBindings";
 import { PAD_PRESENT_KEY } from "../../game/input/padCapture";
 import { chordLabels } from "../../game/input/pauseChord";
 import { timedMatch } from "../../game/lobby/lobbyState";
+import { leaveHoldFill } from "../../game/match/leaveHold";
 import { clockMain, clockSeconds } from "../../game/ui/clockReadout";
 import type { PauseView } from "../../game/ui/pauseScreen";
 import { osKeyDown } from "../../platform/osKeys";
@@ -28,8 +29,9 @@ export function pauseView(s: Readonly<ShellState>, bindings: Readonly<KeyBinding
     chord: chordLabels(bindings),
     camera: pad ? PAD_CAMERA : keyboardCamera(bindings),
     pauseKey: "Esc",
+    leave: leaveHoldFill(s.leaveHold),
     keyboard: localPreview(s),
   };
 }
 
-export const EMPTY_PAUSE_VIEW: PauseView = { player: undefined, clock: undefined, pad: false, chord: { left: "", right: "", attack: "" }, camera: "", pauseKey: "" };
+export const EMPTY_PAUSE_VIEW: PauseView = { player: undefined, clock: undefined, pad: false, chord: { left: "", right: "", attack: "" }, camera: "", pauseKey: "", leave: 0 };

@@ -35,6 +35,7 @@ export interface PauseView {
   readonly chord: ChordLabels;
   readonly camera: string;
   readonly pauseKey: string;
+  readonly leave: number;
   readonly keyboard?: boolean | undefined;
 }
 
@@ -69,6 +70,10 @@ export class PauseScreen {
   private readonly menuText: Frame;
   private readonly cameraText: Frame;
   private readonly resetText: Frame;
+  private readonly holdTrack: Frame;
+  private readonly holdFill: Frame;
+  private readonly holdText: Frame;
+  private holdShown = true;
   private readonly scales = new Map<Frame, number>();
   private readonly caps: Frame[] = [];
   private readonly capText: Frame[] = [];
@@ -105,6 +110,9 @@ export class PauseScreen {
     this.plate("Reset", PLATE, edges => resetPlateBox(edges));
     this.fixed("ResetBar", PLATE, edges => resetBarBox(edges));
     this.resetText = this.label("ResetText", f32(MENU_STYLE.headerSize * 1.25), edges => resetBarBox(edges), TextAlignment.center);
+    this.holdTrack = this.fixed("HoldTrack", STEEL, edges => holdBarBox(edges), 150);
+    this.holdFill = this.fixed("HoldFill", GOLD, () => [0, 0, 0, 0]);
+    this.holdText = this.label("HoldText", MENU_STYLE.bodySize, edges => holdBarBox(edges), TextAlignment.center);
     for (let index = 0; index < 4; index++) {
       this.caps.push(this.cap(index));
       this.capText.push(this.label(`Cap${formatInt(index)}`, MENU_STYLE.headerSize, () => [0, 0, 0, 0], TextAlignment.center));
@@ -147,6 +155,18 @@ export class PauseScreen {
     setFrameText(this.menuText, `${MENU_STYLE.text}F10: leave the game  ·  G: hide HUD${keyboard}|r`);
     setFrameText(this.cameraText, `${MENU_STYLE.text}${view.camera}|r`);
     setFrameText(this.resetText, `${MENU_STYLE.gold}RESET MATCH|r`);
+    this.holdBar(!view.pad, view.pauseKey, view.leave);
+  }
+
+  private holdBar(shown: boolean, key: string, fill: number): void {
+    if (shown !== this.holdShown) for (const frame of [this.holdTrack, this.holdText]) setFrameVisible(frame, shown);
+    this.holdShown = shown;
+    setFrameVisible(this.holdFill, shown && fill > 0);
+    if (!shown) return;
+    setFrameText(this.holdText, `${MENU_STYLE.text}Hold ${key} to leave|r`);
+    if (fill <= 0) return;
+    const [left, top, width, height] = holdBarBox(this.edges);
+    this.set(this.holdFill, [left, top, f32(width * Math.min(1, fill)), height]);
   }
 
   private layoutCaps(labels: readonly string[], pad: boolean): void {
@@ -252,4 +272,9 @@ export class PauseScreen {
 const resetBarBox = (edges: Edges): readonly [number, number, number, number] => {
   const [left, top, width, height] = resetPlateBox(edges);
   return [f32(left + f32(0.018)), f32(top - height + f32(0.044)), f32(width - f32(0.036)), f32(0.032)];
+};
+
+const holdBarBox = (edges: Edges): readonly [number, number, number, number] => {
+  const [left, top, width] = resetPlateBox(edges);
+  return [left, f32(top + f32(0.036)), width, f32(0.028)];
 };

@@ -77,12 +77,12 @@ export function startDown(s: ShellState, slot: ParticipantSlot): void {
 }
 
 
-function pauseChordKeys(s: ShellState, slot: ParticipantSlot): ChordKeys {
+export function pauseChordKeys(s: ShellState, slot: ParticipantSlot): ChordKeys {
   s.pauseChord ??= [chordKeys(), chordKeys(), chordKeys(), chordKeys()];
   return s.pauseChord[slot];
 }
 
-function exitPausedMatch(s: ShellState, title = false): void {
+export function exitPausedMatch(s: ShellState, title = false): void {
   ownConfirmedState(s);
   keepShellMomentEnd(s);
   endReplaySegment(s);
