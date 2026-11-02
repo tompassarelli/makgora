@@ -135,6 +135,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
   const { keys, bindings } = participant;
   const settings = views(s).settings[slot];
   if (key < 0 || key > 255 || keyDown(keys, key)) return;
+  if (key === Key.escape && s.game.phase !== Phase.match && s.leaveHold?.held[slot] === true) return;
   const menu = menuAction(bindings.bindings, key);
   if (s.pauseMenu?.title && (menu === Action.attack || key === Key.y)) {
     if (menu === Action.attack && s.titleAwaitRelease) return;

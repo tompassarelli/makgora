@@ -82,7 +82,8 @@ second trigger) and Attack, then press Start (Esc or Backspace), or click the pl
 to return to fighter selection. On a keyboard the plate names the keys you bound
 to those actions, and above it a bar reads Hold Esc to leave: the player who paused
 can hold Esc for one second to fill it and return to fighter selection with no other
-keys. Releasing early empties the bar and resumes, so a tap still resumes. Start,
+keys; an Esc still held after leaving does nothing at fighter selection until it is
+released. Releasing early empties the bar and resumes, so a tap still resumes. Start,
 Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
 the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). F2 on the pause screen is reserved for the Show keyboard in game toggle; G hides the HUD for a clean screenshot.
 
