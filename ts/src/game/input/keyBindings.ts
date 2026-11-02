@@ -81,8 +81,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.moveLeft, code(wasd ? "A" : "W"));
   bind(Action.moveRight, code(wasd ? "D" : "R"));
   bind(Action.moveDown, code(wasd ? "S" : "E"));
-  if (wasd) bind(Action.moveUp, code("W"));
-  else bind(Action.moveUp, SPACE);
+  bind(Action.moveUp, wasd ? code("W") : preset === "standard" ? code("P") : SPACE);
   bind(Action.jump, code(custom ? "9" : "8"));
   bind(Action.attack, code("N"));
   bind(Action.special, code("U"));
@@ -93,7 +92,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.cRight, code("L"));
   bind(Action.cUp, START_KEY);
   bind(Action.cDown, code("K"));
-  bind(Action.modX, code("P"));
+  bind(Action.modX, preset === "standard" ? SPACE : code("P"));
   bind(Action.lightShield, code(wasd ? "E" : "A"));
   bind(Action.shortHop, code("I"));
   if (custom) bind(Action.strong, code("0"));
@@ -102,8 +101,22 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   return { keys };
 }
 
+type KeyChange = readonly [action: Action, first: number, second?: number];
+
+const SPACE_UP_BOX: readonly KeyChange[] = [[Action.moveUp, SPACE], [Action.modX, code("P")]];
+
+const applyKeys = (keys: number[], changes: readonly KeyChange[]): number[] => {
+  for (const [action, first, second = EMPTY] of changes) {
+    keys[slotIndex(action, 0)] = first;
+    keys[slotIndex(action, 1)] = second;
+  }
+  return keys;
+};
+
+export const spaceUpBoxKeys = (): number[] => applyKeys(presetBindings("standard").keys.slice(), SPACE_UP_BOX);
+
 export function previousStandardKeys(): number[] {
-  const keys = presetBindings("standard").keys.slice();
+  const keys = spaceUpBoxKeys();
   const bind = (action: Action, first: number, second: number) => {
     keys[slotIndex(action, 0)] = first;
     keys[slotIndex(action, 1)] = second;
@@ -123,24 +136,19 @@ export function previousStandardKeys(): number[] {
 
 type StockPreset = "wasd" | "standard";
 
-type KeyChange = readonly [action: Action, first: number, second?: number];
+const earlierBase = (preset: BindingPreset): number[] => preset === "standard" ? spaceUpBoxKeys() : presetBindings(preset).keys.slice();
 
 const previousCStickKeys = (preset: BindingPreset): readonly KeyChange[] => [[Action.cUp, preset === "custom" ? MINUS : code("0")], [Action.cDown, code("P")], [Action.modX, code("K")]];
 
 const PREVIOUS_C_UP: KeyChange = [Action.cUp, code("H")];
 
-const withKeys = (preset: BindingPreset, changes: readonly KeyChange[]): number[] => {
-  const keys = presetBindings(preset).keys.slice();
-  for (const [action, first, second = EMPTY] of [PREVIOUS_C_UP, ...changes]) {
-    keys[slotIndex(action, 0)] = first;
-    keys[slotIndex(action, 1)] = second;
-  }
-  return keys;
-};
+const withKeys = (preset: BindingPreset, changes: readonly KeyChange[]): number[] => applyKeys(earlierBase(preset), [PREVIOUS_C_UP, ...changes]);
 
 const PREVIOUS_STOCK_CHANGES: readonly KeyChange[] = [[Action.strong, code("9"), START_KEY]];
 
 const PREVIOUS_WASD_UP: KeyChange = [Action.moveUp, code("W"), SPACE];
+
+const previousDefaultChanges = (preset: StockPreset): readonly KeyChange[] => preset === "wasd" ? [...PREVIOUS_STOCK_CHANGES, PREVIOUS_WASD_UP] : PREVIOUS_STOCK_CHANGES;
 
 const EARLIER_STOCK_CHANGES: readonly (readonly KeyChange[])[] = [
   [[Action.cUp, code("9")], [Action.lightShield, code("0")], [Action.strong, START_KEY]],
@@ -155,12 +163,12 @@ const earlierStockKeys = (preset: StockPreset, changes: readonly KeyChange[]): n
 
 function earlierDefaults(preset: BindingPreset): number[][] {
   if (preset === "custom") return [withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), withKeys(preset, EARLIER_CUSTOM_JUMP)];
-  const earlier = [withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), previousDefaultKeys(preset), ...EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes))];
+  const earlier = [...(preset === "standard" ? [spaceUpBoxKeys()] : []), withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), previousDefaultKeys(preset), withKeys(preset, [...previousCStickKeys(preset), ...previousDefaultChanges(preset)]), ...EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes))];
   return preset === "wasd" ? [...earlier, earlierStockKeys(preset, PREVIOUS_STOCK_CHANGES)] : earlier;
 }
 
 export function previousDefaultKeys(preset: StockPreset): number[] {
-  return withKeys(preset, preset === "wasd" ? [...PREVIOUS_STOCK_CHANGES, PREVIOUS_WASD_UP] : PREVIOUS_STOCK_CHANGES);
+  return withKeys(preset, previousDefaultChanges(preset));
 }
 
 export function replacePreviousDefaults(bindings: KeyBindings, presets: readonly BindingPreset[] = BINDING_PRESETS): void {

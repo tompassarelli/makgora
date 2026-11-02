@@ -257,12 +257,12 @@ Strong at: Reading habits and fighting up close.
 Watch for: Hesitation at risky openings.
 
 [Done]
-Move: W/R + Space/E   Choose: N   Back: U
+Move: W/R + P/E   Choose: N   Back: U
 ```
 
 The last line uses actual bindings. Controller prompts say **Move: Stick or
-D-pad · Choose: A · Back: X**. Default keyboard controls are W/R left/right,
-Space/E up/down, N Choose, U Back; Enter remains Warcraft chat.
+D-pad · Choose: A · Back: X**. Box keyboard controls are W/R left/right,
+P/E up/down, N Choose, U Back; Enter remains Warcraft chat.
 
 1. CPU cards and their **Opponent settings** buttons participate in menu
    focus. Move to the button and press Choose; no pointer is required.

@@ -83,7 +83,7 @@ to return to fighter selection. On a keyboard the plate names the keys you bound
 to those actions. Start, Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
 the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). F2 on the pause screen is reserved for the Show keyboard in game toggle; G hides the HUD for a clean screenshot.
 
-At fighter selection, up/down (W/S on WASD, Space/E on Box) moves focus
+At fighter selection, up/down (W/S on WASD, P/E on Box, Space/E on Custom) moves focus
 between fighter cards and CPU Opponent settings. Left/right changes the focused
 fighter; N opens focused settings. Inside the panel, up/down visits Opponent,
 Difficulty and Done; left/right changes the value. N advances to the next row or chooses Done, and U or Close returns
@@ -93,7 +93,7 @@ the pointer, A to choose and B to go back. The panel shows your current control 
 
 Every game opens on the Controls screen, one for each player, before fighter
 select. The top row holds WASD (recommended if you're new), Box (the leverless
-controller style, with Space as up) and your selected Custom slot, shown by its
+controller style, with P as up and Space as Walk) and your selected Custom slot, shown by its
 name and lit gold while selected; picking one saves it as your profile. WASD and
 Box never change: rebinding a key on either copies that layout into the selected
 Custom slot with your edit, selects it and saves it. Click the Custom button again
@@ -137,9 +137,9 @@ saved" appears. The match goes on undisturbed.
 
 WASD, the default, uses A/D to move, W to aim up, S to fast-fall or drop
 through platforms, 8 to jump, Q to shield or air-dodge, E for light
-shield, O to grab, I to short hop, 9 for Strong, N to attack, and U for a special. Every layout puts the C-stick on Y (up), J (left), K (down) and L (right) and Walk on P (Tom, 2026-11-01). Box moves with W/R,
-aims up with Space and down with E, jumps with 8 and shields with Q (light
-shield A, Strong 9). Custom is Box with 9 to jump, Q/8 to shield, A for light shield and 0 for Strong. Shield + N or O
+shield, O to grab, I to short hop, 9 for Strong, N to attack, and U for a special. Every layout puts the C-stick on Y (up), J (left), K (down) and L (right) (Tom, 2026-11-01). Walk is P on WASD and Custom and Space on Box (Tom, 2026-11-02). Box moves with W/R,
+aims up with P and down with E, jumps with 8 and shields with Q (light
+shield A, Strong 9). Custom is Box with Space to aim up, P to walk, 9 to jump, Q/8 to shield, A for light shield and 0 for Strong. Shield + N or O
 grabs. While holding an
 opponent, tap N to pummel once or a movement/C-stick direction to throw forward,
 backward, up, or down; after the pummel, throw or the opponent goes free. Mash
@@ -172,7 +172,7 @@ lasts until the dash would become a run. On keyboard, hold down together with
 the back key: the diagonal counts as a light tilt (on a platform, a fresh down
 press drops you through it).
 
-Attacks buffer for six frames, including through jump squat. Two modifiers shape the stick (Tom's design, 2026-10-30). Mod X, labelled Walk in the controls (P; renamed for clarity on 2026-10-30), reduces the horizontal value only: it walks, gives forward tilts, and with up and a side sends a steep up-diagonal about 67 degrees above horizontal. Mod Y (;) reduces the vertical value only: it gives up and down tilts, and with a side and up or down sends a shallow diagonal about 23 degrees from horizontal for wall rides. Hold both for the all-purpose tilt, which shields tilt with. Demon Hunter's Wing Ascent launches along either diagonal and steered flights such as Kael'thas's phoenix turn toward it, while the eight-way aimed specials still read it as a diagonal;
+Attacks buffer for six frames, including through jump squat. Two modifiers shape the stick (Tom's design, 2026-10-30). Mod X, labelled Walk in the controls (P, or Space on Box; renamed for clarity on 2026-10-30), reduces the horizontal value only: it walks, gives forward tilts, and with up and a side sends a steep up-diagonal about 67 degrees above horizontal. Mod Y (;) reduces the vertical value only: it gives up and down tilts, and with a side and up or down sends a shallow diagonal about 23 degrees from horizontal for wall rides. Hold both for the all-purpose tilt, which shields tilt with. Demon Hunter's Wing Ascent launches along either diagonal and steered flights such as Kael'thas's phoenix turn toward it, while the eight-way aimed specials still read it as a diagonal;
 Hold down while rising into a platform without an aerial to stand on it
 instantly, with a small landing puff. Without down, or during an aerial, you
 pass through; so does down with Mod Y held. Held down keeps you crouching; attack gives down tilt and special
