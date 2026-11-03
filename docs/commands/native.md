@@ -120,9 +120,8 @@ Adjacent rows pair right then left. The collector retains only the packed RGB
 canvas, writes no raw capture frames, and produces `FIGHTER.jpg` (at most
 128 KiB), `FIGHTER.rows.json` and `FIGHTER.captures.json` timing/missed-frame evidence.
 The row key is exactly `{"R01":{"slot":"side_b","facing":"right"},...}`;
-never show the key to the cold viewer. Default reel holds are 6 ticks rather
-than ordinary captures' 180, with one opening tick and no tail; increase `--hold-ticks` if measured collection
-misses frames. A 0.0.133 reel is a diagnostic rebuild with driver/capture
+never show the key to the cold viewer. Default reel holds are 30 ticks (500 ms) rather
+than ordinary captures' 180, with one opening tick and no tail: the drawn frame stamp takes longer than the 6-tick (100 ms) hold to show on a screen capture, which missed 2 to 4 of 8 frames per row, while 30 captured all 66 frames on two runs. A run that misses frames fails naming the missed frames and their hold; rebuild with a longer `--hold-ticks`. A 0.0.133 reel is a diagnostic rebuild with driver/capture
 changes, not the byte-identical retained native baseline map. Native full-roster
 wall time, pixel legibility, calibrated crops and one-pair versus two-pair
 throughput still require measurement on the assigned VM clients.

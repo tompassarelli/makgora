@@ -46,6 +46,14 @@ export class CaptureFailure extends Schema.TaggedError<CaptureFailure, { readonl
   override get message(): string { return this.problem; }
 }
 const fail = (problem: string): never => { throw new CaptureFailure({ problem }); };
+
+export const REEL_HOLD_TICKS = 30;
+
+export function missedFramesProblem(missed: readonly { readonly fixture: string; readonly frame: number; readonly phase: string; readonly holdTicks?: number | undefined }[], ending?: string): string {
+  const holds = [...new Set(missed.map(row => row.holdTicks))].map(ticks => ticks === undefined ? "the map's own hold" : `${ticks} ticks (${Math.round(ticks * 1000 / 60)} ms)`);
+  const list = missed.map(row => `${row.fixture}@${row.frame}${row.phase === "held" ? "" : ` ${row.phase}`}`).join(", ");
+  return `missed frames ${list}: held ${holds.join(" and ")} each, too short for the drawn frame stamp to reach a screen capture; rebuild the reel with a longer --hold-ticks (default ${REEL_HOLD_TICKS})${ending === undefined ? "" : `; ${ending}`}`;
+}
 const attempt = <A>(operation: string, run: () => A) => Effect.try({ try: run, catch: cause => new CaptureFailure({ problem: `${operation}: ${String(cause)}` }) });
 
 const FIXTURES_MODULE = join(import.meta.dir, "../src/platform/captureFixtures.ts");
@@ -118,7 +126,7 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
 });
 
 const SilhouetteRow = Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite, conceal: Schema.optionalKey(Schema.Literals(["fighter", "cues"])) });
-const FixtureRecord = Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), reel: Schema.optionalKey(Schema.Struct({ fighter: Schema.String, row: Schema.String, slot: Schema.String, facing: Schema.Literals(["right", "left"]) })), silhouette: Schema.optional(SilhouetteRow) });
+const FixtureRecord = Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), holdTicks: Schema.optionalKey(Schema.Finite), reel: Schema.optionalKey(Schema.Struct({ fighter: Schema.String, row: Schema.String, slot: Schema.String, facing: Schema.Literals(["right", "left"]) })), silhouette: Schema.optional(SilhouetteRow) });
 const Manifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, mapSha256: Schema.optionalKey(Schema.String), sourceRevision: Schema.optionalKey(Schema.String), fixtures: Schema.Array(FixtureRecord) }));
 const CaptureRecord = Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, phase: Schema.Literals(["held", "shown", "hidden"]), file: Schema.String, capturedMs: Schema.Finite, width: Schema.Finite, height: Schema.Finite });
 const Checkpoint = Schema.fromJsonString(Schema.Struct({ version: Schema.Literals([1]), mapSha256: Schema.String, sourceRevision: Schema.String, captures: Schema.Array(CaptureRecord) }));
@@ -320,7 +328,7 @@ export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen
     if ((resumable ? captureDone : lastScript >= manifest.fixtures.length) && Date.now() - idleSince > 30000) break;
   }
   const phases = (fixture: { readonly silhouette?: unknown }) => fixture.silhouette === undefined ? ["held"] as const : ["shown", "hidden"] as const;
-  const missed = manifest.fixtures.flatMap(fixture => fixture.frames.flatMap(frame => phases(fixture).filter(phase => !saved.has(`${fixture.name}/${frame}/${phase}`)).map(phase => ({ fixture: fixture.name, frame, phase }))));
+  const missed = manifest.fixtures.flatMap(fixture => fixture.frames.flatMap(frame => phases(fixture).filter(phase => !saved.has(`${fixture.name}/${frame}/${phase}`)).map(phase => ({ fixture: fixture.name, frame, phase, holdTicks: fixture.holdTicks }))));
   if (canvas !== undefined && missed.length === 0) {
     const fighter = manifest.fixtures[0]?.reel?.fighter ?? fail("missing reel fighter");
     const bytes = yield* writeSheet(canvas, manifest.fixtures.map(row => ({ row: row.reel?.row ?? "", frames: row.frames })), join(out, `${fighter}.jpg`));
@@ -353,7 +361,7 @@ export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen
   const torn = log.filter(row => row.stamp === "torn").length;
   console.log(JSON.stringify({ captured: saved.size, wanted, missed: missed.length, screenCaptures: log.length, unreadable, torn, medianCaptureMs: [...log.map(row => row.captureMs)].sort((a, b) => a - b)[Math.floor(log.length / 2)] ?? 0 }));
   if (wrongSize.length > 0) return yield* new CaptureFailure({ problem: wrongSize.join("; ") });
-  if (missed.length > 0) return yield* new CaptureFailure({ problem: `missed ${missed.map(row => `${row.fixture}@${row.frame}${row.phase === "held" ? "" : ` ${row.phase}`}`).join(", ")}; ${attemptEnding(log, Date.now() - started >= minutes * 60000 ? minutes : undefined)}` });
+  if (missed.length > 0) return yield* new CaptureFailure({ problem: missedFramesProblem(missed, Date.now() - started >= minutes * 60000 ? attemptEnding(log, minutes) : undefined) });
 }));
 
 const plan = (args: readonly string[]) => Effect.gen(function*() {
@@ -376,7 +384,7 @@ const reel = (args: readonly string[]) => Effect.gen(function*() {
   const out = option(args, "--out");
   if (out === undefined) return yield* new CaptureFailure({ problem: "usage: reel --out DIR [--fighter SLUG] [--hold-ticks N]" });
   const { reelFixtures } = yield* Effect.promise(() => import("./nativeCapturePlan"));
-  const batches = yield* attempt("enumerate reel", () => reelFixtures(option(args, "--fighter"), Number(option(args, "--hold-ticks") ?? "6")));
+  const batches = yield* attempt("enumerate reel", () => reelFixtures(option(args, "--fighter"), Number(option(args, "--hold-ticks") ?? String(REEL_HOLD_TICKS))));
   yield* attempt("write reel scripts", () => {
     for (const fixtures of batches) {
       const fighter = fixtures[0]?.reel?.fighter ?? fail("empty fighter reel");
