@@ -89,3 +89,14 @@ Native Classic captures on gex45 (3 Nov 2026, map built from 61b0d50594, pool pa
 - Flags: the side ledges hover (2 of 3), which is hard rule 1 working as built; the deck floats over the void with no support (3 of 3); the haze or floor behind the deck is a flat plane with no depth (2 of 3); the chained blocks on the top step look dropped there (2 of 3); the stair steps are flat slabs with little shading (3 of 3). None flagged the towers overlapping the deck.
 
 `tools/stage/contrast.ts --separation` on these frames still fails: worst gap -44.1 L\* (limit 0), and Chen's lower quartile sits at L\* 9 against a backdrop band of 9 to 25 in every view.
+
+## Cold read of take 6 in Classic (#875)
+
+Native Classic captures on gex45 (3 Nov 2026, map built from 79522b844, pool pair 1, `bun wisp accept --only 'sep-2-*' --pair 1`, evidence `~/.local/state/makgora/accept/20261103-180008/`) after the arch fell to `[30, 41, 60]` and four dark far ice shelves were added below the deck. Three fresh viewers, given only the near and far images:
+
+- First look: near, the fighters first in 2 of 3 (the pale tower block first in the other); far, the arch first in 3 of 3, with the fighters called tiny and not the clearest shapes in 3 of 3.
+- Centrepiece: the pale towered citadel under the arch, 3 of 3.
+- Flags: the new far shelves and a thin slab beside the citadel base read as floating slabs (3 of 3); the haze or floor behind the deck is still a flat plane (3 of 3); the towers frame the deck ends slightly (2 of 3 at far zoom).
+- `tools/stage/contrast.ts --separation`: worst gap -15.5 L\* near (was -44.1) and -42.8 far (was -44.1), limit 0. The dark shelves lower the backdrop band to L\* 5 to 24, below Chen's dark half at L\* 9.
+
+The shelves did not read as depth; they read as more floating plates, and the arch still leads at far zoom because the far camera shrinks the fighters, not because of the arch's tint. The next take should try a lighter, haze-graded floor instead of discrete shelves and a smaller arch, not a darker one.
