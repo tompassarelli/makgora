@@ -4,7 +4,7 @@ import { Character } from "../sim/codes";
 import { RENDERED_FIGHTERS } from "../roster/kits";
 import { RACES, fighterRace } from "../roster/races";
 import { CAP_HEIGHT, DAMAGE_FONT, NAME_FONT, STOCK_SHOWN_PX, type PlateBox, panelLayout, plateRow, pingBars, stockFadeAlpha, STOCK_FADE_FRAMES } from "./plateLayout";
-import { RACE_FRAME_PX, partScale, raceFrameParts } from "./raceFrame";
+import { RACE_FRAME_PX, namePlateTexture, partScale, raceFrameParts } from "./raceFrame";
 import { pixelsForUnits } from "./portraitFrames";
 
 test("each fighter's portrait frame is its race's console art: playable races their own, neutrals by the side they fought on, Vashj and the Murlocs Night Elf and Ragnaros Orc since Classic has no Naga console [k3 measure docs/design/fighter-portraits.md]", () => {
@@ -70,6 +70,8 @@ test("both plates mirror each other: the frame keeps its texture's size, the sto
       assertTrue(bar.y < bottom(panel.namePlate) && bottom(bar) > panel.namePlate.y);
     }
   }
+  assertEquals(namePlateTexture(false), "war3mapImported\\NamePlate.tga");
+  assertEquals(namePlateTexture(true), "war3mapImported\\NamePlateMirror.tga");
   const leftPanel = panelLayout(0, plateRow(2)), rightPanel = panelLayout(1, plateRow(2));
   assertEquals(leftPanel.frame.x, 544 - right(rightPanel.frame), "frames mirror");
   leftPanel.stocks.forEach((stock, index) => assertEquals(stock.x, 544 - right(rightPanel.stocks[index] ?? stock), `stock ${index} mirrors`));

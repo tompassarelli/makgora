@@ -76,7 +76,7 @@ export const ROT_PATCH: SpecialProjectile = {
 export const ROT_TRAIL: AuraTrail<SpecialProjectile> = { patch: ROT_PATCH, every: ROT_PATCH_EVERY, minTravel: 24.0, limit: ROT_PATCH_LIMIT };
 
 export const ROT: ToggleAura<SpecialProjectile> = {
-  frame: 5, radius: ROT_RADIUS, every: 10, damage: 1.0, slowScale: f32(0.85), slowFrames: 12, selfEvery: 20, selfDamage: 1.0,
+  frame: 5, radius: ROT_RADIUS, every: 20, damage: 2.0, slowScale: f32(0.85), slowFrames: 22, selfEvery: 20, selfDamage: 1.0,
   trail: ROT_TRAIL,
 };
 const rot: AuthoredSpecial = { endFrame: 10, toggleAura: ROT };

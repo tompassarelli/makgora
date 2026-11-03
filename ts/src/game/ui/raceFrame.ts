@@ -39,14 +39,6 @@ export function partScale(part: FramePart): { readonly x: number; readonly y: nu
 
 export const raceFrameName = (race: Race): string => `SmashcraftRaceFrame${race}`;
 
-/** Each race's colour for the nameplate's thin inner edge. */
-export const RACE_COLOURS: { readonly [R in Race]: { readonly tint: number } } = {
-  Human: { tint: 0xe8b83a },
-  NightElf: { tint: 0x4a8fe0 },
-  Orc: { tint: 0xd0582a },
-  Undead: { tint: 0x9b6bd6 },
-};
-
-export const namePlateTexture = (race: Race, mirrored: boolean): string => `war3mapImported\\NamePlate${mirrored ? "Mirror" : ""}${race}.tga`;
+export const namePlateTexture = (mirrored: boolean): string => `war3mapImported\\NamePlate${mirrored ? "Mirror" : ""}.tga`;
 export const STOCK_SHADOW_TEXTURE = "war3mapImported\\StockShadow.tga";
 export const pingSignalTexture = (bars: number): string => `war3mapImported\\PingSignal${bars}.tga`;

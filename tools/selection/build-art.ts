@@ -17,8 +17,6 @@ import { ProcessFailure, runProcess } from '../../ts/scripts/hostProcess';
 import { findExtractor, reforgedStorage } from '../../ts/scripts/wisp/renderAssetStore';
 import { gameCursorArt } from './gameCursorArt';
 import { clearArt, writeFontConfig } from './pinnedFonts';
-import { RACES } from '../../ts/src/game/roster/races';
-import { RACE_COLOURS } from '../../ts/src/game/ui/raceFrame';
 import { type BarArtStyle, barArt, barArtName } from '../../ts/src/game/core/selectBarLayout';
 import { BAR_LINE, BAR_STRIP } from '../../ts/src/game/core/selectScreenLayout';
 import { MENU_FRAME_PIECES, type MenuFramePiece, menuFrameName } from '../../ts/src/game/core/menuFrame';
@@ -94,11 +92,8 @@ BunRuntime.runMain(Effect.gen(function*() {
   for (const [pose, art] of [['Point', 'point'], ['Fan', 'fan'], ['Pinch', 'pinch']] as const) {
     yield* run(['magick', join(source, `wc3-hand-${art}.png`), '-filter', 'point', '-resize', `${HAND_ART_COLUMNS}x${HAND_ART_ROWS}!`, '-background', 'none', '-gravity', 'northwest', '-splice', `${HAND_MARGIN}x${HAND_MARGIN}`, '-extent', `${HAND_TEXELS}x${HAND_TEXELS}`, '-depth', '8', `TGA:${join(output, `SelectionHand${pose}.tga`)}`]);
   }
-  for (const race of RACES) {
-    const colours = RACE_COLOURS[race];
-    yield* render(`NamePlate${race}`, 'NamePlate.svg', { RACE_TINT: hex(colours.tint) }, false);
-    yield* run(['magick', join(output, `NamePlate${race}.tga`), '-flop', '-depth', '8', `TGA:${join(output, `NamePlateMirror${race}.tga`)}`]);
-  }
+  yield* run(['magick', '-background', 'none', join(source, 'NamePlate.svg'), '-depth', '8', `TGA:${join(output, 'NamePlate.tga')}`]);
+  yield* run(['magick', join(output, 'NamePlate.tga'), '-flop', '-depth', '8', `TGA:${join(output, 'NamePlateMirror.tga')}`]);
   for (let bars = 1; bars <= 4; bars++) {
     const fills = Object.fromEntries([1, 2, 3, 4].map(bar => [`BAR${bar}`, bar <= bars ? '#dbe8f2' : '#262a31']));
     yield* render(`PingSignal${bars}`, 'PingSignal.svg', fills, false);

@@ -43,7 +43,6 @@ import { regenerateCommand } from "../stageThumbnailSpec";
 import { stageCardPath } from "./buildInputs";
 import { buildProject, projectRoot as PROJECT } from "./project";
 import { UI_FRAMES } from "./uiFrames";
-import { RACES } from "../../src/game/roster/races";
 import { barArtNames } from "../../src/game/core/selectBarLayout";
 import { MENU_FRAME_PIECES, menuFrameName } from "../../src/game/core/menuFrame";
 import { checkCueModels } from "./headlessRender";
@@ -92,7 +91,7 @@ const SELECTION_TEXTURES = [
   "SelectionCardGray", "SelectionAction", "SelectionRandom", "StageBackdrop", "StageChip",
   "SelectionChipP1", "SelectionChipP2", "SelectionChipP3", "SelectionChipP4", "SelectionChipCPUP1", "SelectionChipCPUP2", "SelectionChipCPUP3", "SelectionChipCPUP4",
   "SelectionHandPoint", "SelectionHandFan", "SelectionHandPinch", ...handLabelNames(), "SelectionBullseye",
-  ...RACES.flatMap(race => [`NamePlate${race}`, `NamePlateMirror${race}`]), "StockShadow", "PreviewRowLit", "PreviewRule", "PingSignal1", "PingSignal2", "PingSignal3", "PingSignal4",
+  "NamePlate", "NamePlateMirror", "StockShadow", "PreviewRowLit", "PreviewRule", "PingSignal1", "PingSignal2", "PingSignal3", "PingSignal4",
   "MarkerArrow0", "MarkerArrow1", "MarkerArrow2", "MarkerArrow3", ...barArtNames(), ...MENU_FRAME_PIECES.map(menuFrameName),
 ];
 

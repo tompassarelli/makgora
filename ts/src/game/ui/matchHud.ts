@@ -253,7 +253,7 @@ export class FighterHud {
     if (this.shownRace !== race) {
       this.shownRace = race;
       this.raceFrames.forEach((frame, index) => setFrameVisible(frame.root, visible && RACES[index] === race));
-      setFrameTexture(this.namePlate, namePlateTexture(race, this.panel.mirrored), 0, true);
+      setFrameTexture(this.namePlate, namePlateTexture(this.panel.mirrored), 0, true);
       this.shownCharacter = undefined;
     }
     if (this.shownCharacter !== character || this.shownCostume !== costume || this.shownColor !== color || this.shownMirrored !== this.panel.mirrored) {

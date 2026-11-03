@@ -93,16 +93,18 @@ Specials:
   a hit during the reel knocks him off. Otherwise he rises 1.4 reference
   heights with a 6% hit and falls helpless. Once per airtime.
 - **Rot** (down). A 10-frame toggle. While it runs, a poison cloud around him
-  deals 1% every 10 frames to foes within 90 units of his body and slows
-  their ground speed by 15%, and costs him 1% every 20 frames. It goes off
+  deals 2% every 20 frames to foes within 90 units of his body and slows
+  their ground speed by 15%, and costs him 1% on the same 20-frame clock (Tom
+  asked on 2026-11-03 for the same 20-frame tick rate with 2% to foes and 1%
+  to himself). It goes off
   with his stock. The on state and its clock are rollback state.
   Tom asked on 2026-10-31 for Rot to leave a lingering trail so it controls
   space like a trap. While it is on and he stands on a floor, a rot patch
   (a flattened stock `PlagueCloudCaster`, 0.4 of the cloud's radius, 36 units) is
   dropped under him at once when none lives, then every 12 frames he has moved
   24 units or more from the newest. A patch stays 180 frames, outlasting the
-  cloud, and wounds and slows a foe on it with the cloud's own 1% and 15% on
-  the same 10-frame clock, so a foe takes at most one wound a tick from the
+  cloud, and wounds and slows a foe on it with the cloud's own 2% and 15% on
+  the same 20-frame clock, so a foe takes at most one wound a tick from the
   cloud and every patch together. At most 15 patches live (the oldest goes
   first), none drop in the air, and the patches are decorative projectiles
   saved with his other projectiles. The 24 units, the 12-frame spacing and the

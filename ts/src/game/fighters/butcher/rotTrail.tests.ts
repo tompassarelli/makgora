@@ -168,7 +168,7 @@ function wounds(d: Duel, frames: number): number[] {
   return at;
 }
 
-function everyTen(at: readonly number[]): void {
+function everyTick(at: readonly number[]): void {
   assertGreaterThan(at.length, 2);
   for (let index = 1; index < at.length; index++) assertEquals((at[index] ?? 0) - (at[index - 1] ?? 0), ROT.every);
 }
@@ -182,8 +182,8 @@ test("A foe standing in a patch after the aura is off is wounded and slowed at t
   assertGreaterThan(Math.abs(f32(patch.x - d.butcher.motion.x)), 150.0);
   placeOn(d.foe, patch);
   const before = d.foe.status.damage;
-  const at = wounds(d, 60);
-  everyTen(at);
+  const at = wounds(d, 80);
+  everyTick(at);
   assertEquals(d.foe.status.damage, f32(before + f32(at.length * ROT.damage)));
   assertEquals(d.foe.status.slowScale, ROT.slowScale);
   assertGreaterThan(d.foe.status.slowFrames, 0);
@@ -210,7 +210,7 @@ test("A foe on a patch just off the ground, or beside it past its reach, is not 
   assertTrue(!hit);
 });
 
-test("A foe in the aura and in overlapping patches takes one wound every 10 frames, not one per source [k3 measure docs/design/butcher.md]", () => {
+test("A foe in the aura and in overlapping patches takes one wound every 20 frames, not one per source [k3 measure docs/design/butcher.md]", () => {
   const d = duel();
   rotOn(d);
   runFor(d, 30);
@@ -221,7 +221,7 @@ test("A foe in the aura and in overlapping patches takes one wound every 10 fram
   assertEquals(touching.length, 3);
   placeOn(d.butcher, newest);
   placeOn(d.foe, newest);
-  everyTen(wounds(d, 50));
+  everyTick(wounds(d, 80));
 });
 
 test("At most 15 patches live, enough for a run to keep every patch its full 180 frames: the drop that would be the 16th removes the oldest [k3 measure docs/design/butcher.md]", () => {

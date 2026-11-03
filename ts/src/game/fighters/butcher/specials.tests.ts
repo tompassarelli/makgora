@@ -146,7 +146,7 @@ test("Hook Swing below the ledge tethers to it and reels him into ledge hang [k3
 
 const ROT_ON = 3;
 const ROT_OFF = 123;
-test("Rot toggles on, wounds and slows a foe beside him every 10 frames while bleeding him every 20, and toggles off [k3 measure docs/design/butcher.md]", () => {
+test("Rot toggles on, wounds for 2% and slows a foe beside him while bleeding him 1% on the same 20-frame clock, and toggles off [k3 measure docs/design/butcher.md]", () => {
   const d = duel({ foeAhead: 120.0 });
   let slowed = false;
   let auraFrames = 0;
@@ -157,6 +157,8 @@ test("Rot toggles on, wounds and slows a foe beside him every 10 frames while bl
   }
   assertTrue(slowed);
   assertTrue(!d.butcher.status.aura);
+  assertEquals(ROT.every, ROT.selfEvery);
+  assertEquals(ROT.damage, f32(2.0 * ROT.selfDamage));
   assertEquals(d.foe.status.damage, f32(idiv(auraFrames, ROT.every) * ROT.damage));
   assertEquals(d.butcher.status.damage, f32(idiv(auraFrames, ROT.selfEvery) * ROT.selfDamage));
   assertGreaterThan(auraFrames, 100);

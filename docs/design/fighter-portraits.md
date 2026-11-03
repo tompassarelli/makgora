@@ -213,10 +213,9 @@ colours and light from 150%. The ultimate bar fills a thin track over the
 nameplate.
 
 The nameplate (smashcraft:tools/selection/art/NamePlate.svg) is near-black at
-85% opacity inside a gold frame, with the race's colour as a thin line along
-its inner edge (Human gold, Night Elf blue, Orc ember, Undead violet), and the
-name in pale cream, so it reads on every stage and the sides stay apart (Tom,
-2026-11-01, after the Rivals reference). The stocks sit under the nameplate,
+85% opacity inside a gold frame, with the name in pale cream, so it reads on
+every stage (Tom, 2026-11-01, after the Rivals reference; the race-colour inner
+line was removed at Tom's request, 2026-11-03). The stocks sit under the nameplate,
 below and clear of the frame, with nothing behind them but each icon's own
 soft drop shadow and thin dark outline (smashcraft:tools/selection/art/StockShadow.svg),
 so they stand out on any stage: one 40-pixel head render per remaining stock,
