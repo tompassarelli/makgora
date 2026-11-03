@@ -1,0 +1,9 @@
+{
+  "argv": ["bun", "wisp"],
+  "cwd": "ts",
+  "started": "2026-11-03T15:16:35.000Z",
+  "ended": "2026-11-03T15:18:50.000Z",
+  "clients": ["a", "b"],
+  "git": { "commit": "78eadc99d0fa1fca8d72e1332559982a870e7133", "dirty": false },
+  "desyncs": []
+}

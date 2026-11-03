@@ -1,0 +1,17 @@
+function PreloadFiles takes nothing returns nothing
+
+	call PreloadStart()
+	call Preload( "makgora-replay-part 1 8" )
+	call Preload( "digests npgeg5 dc4lu0 lwvmnm v9f762 5h2la0 qla6c8 zlmq6m 0x5sje ft7ov1 a1fr8f f8am2c iitbr8 115we2 eayf1n g6d3n5 9ujv4o 36kj0s r5lxm3 fz9hcy 3xchnr qeeutw spm9ck ea2hic 44il1n qlinia l87b0f 8pw99c" )
+	call Preload( "digests i6wujs 84d7uu pfof3u rzbfo2 rzhfp5 cxa2eu 46whbo 90d017 1czevh ql4daw zdhsv7 48zk8v aqy0rn bgs2og bwz9qc 6sv770 c7nqol orp504 7wlea9 g2olsq rf5tpu 30h1vt ecy9sx wy9nix g4sncb 89acv9 ssbq0d" )
+	call Preload( "digests ts5gm0 lwvcb7 fe6w5h l4sxge h65mvw hlxpyc i1pt0s abnapm rgunh2 78toxc duaznd 3szznm" )
+	call Preload( "checkpoint 1080 44045:21551" )
+	call Preload( "rows 20:3:0,0,0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0" )
+	call Preload( "digests n0nuhm nq239b j0ulsc ev4j3g g6yagt 37l7np 1phdj8 1prfcg yd1dma x22diu cdd6hl xag1se wythxk y0r004 42xkap 4ed1hp xwb1gs rowi5k vetlgi 19pk1r" )
+	call Preload( "checkpoint 1100 34279:27324" )
+	call Preload( "end 7" )
+	call PreloadEnd( 0.0 )
+
+endfunction
+
+
