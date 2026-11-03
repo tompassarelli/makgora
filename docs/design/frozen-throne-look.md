@@ -79,3 +79,13 @@ Tom's native-window playtest (2026-11-01, map 0.3-dev.702) found the skull pilla
 ## Take 5 status
 
 Tom's playtest (2026-11-01) undid two misreads. The platform stems (take 2) and the slim centre stem (take 4) are gone: the platforms float (hard rule 1). The skull pillars take 4 deleted are back, grounded on the stair's top step and chained (hard rule 2, layer 7). Chain0 draws about 250 units above its model extents at scale 5 in the native window, so its height was set from captures, not from its bounds. Captures: `~/.local/state/makgora/shots/throne-window-fix/take5-near.png` and `take5-far.png` (native window, near and far match camera).
+
+## Cold read of take 5 in Classic (#875)
+
+Native Classic captures on gex45 (3 Nov 2026, map built from 61b0d50594, pool pair 1, `bun wisp accept --only 'sep-2-*'`, Shadow Hunter against Chen Stormstout paused, both clients' views, near and far camera; evidence `~/.local/state/makgora/accept/20261103-133446/`). Three fresh viewers, given only the images, read:
+
+- First look: near, the fighters first in 2 of 3 (the stepped altar first in the third); far, the arch first in 3 of 3, with the fighters third and called tiny.
+- Centrepiece: the throne's stepped altar and towers, 3 of 3.
+- Flags: the side ledges hover (2 of 3), which is hard rule 1 working as built; the deck floats over the void with no support (3 of 3); the haze or floor behind the deck is a flat plane with no depth (2 of 3); the chained blocks on the top step look dropped there (2 of 3); the stair steps are flat slabs with little shading (3 of 3). None flagged the towers overlapping the deck.
+
+`tools/stage/contrast.ts --separation` on these frames still fails: worst gap -44.1 L\* (limit 0), and Chen's lower quartile sits at L\* 9 against a backdrop band of 9 to 25 in every view.

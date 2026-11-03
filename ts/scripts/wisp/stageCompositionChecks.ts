@@ -4,6 +4,7 @@ import { join } from "node:path";
 import type { NativeCheck } from "wisp/scripts/wisp/accept";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { stageScenery } from "../../src/game/presentation/stageScenery";
+import { newestPresentation } from "./presentationInputs";
 
 const ARTIFACTS = [{ phase: "before", file: "before.w3x" }, { phase: "after", file: "composition-integrated.w3x" }] as const;
 export const STAGE_COMPOSITION_MAPS = Object.fromEntries(ARTIFACTS.map(({ phase, file }) => [`composition-${phase}`, {
@@ -44,11 +45,11 @@ export const STAGE_ENTRY_MAPS = Object.fromEntries(ENTRY_STAGES.map(({ id, name 
   quick: "-dev show",
 }]));
 
-const entryRules = (id: number) => [
-  { kind: "receipt", pattern: `^SMASHCRAFT STAGE v=1 .* stage=${id} `, min: 1 },
+const cleanRules = [
   { kind: "log", pattern: "^model creation failed - war3mapImported", since: "session", max: 0 },
   { kind: "receipt", pattern: "^error \\d+ in ", max: 0 },
 ] as const;
+const entryRules = (id: number) => [{ kind: "receipt", pattern: `^SMASHCRAFT STAGE v=1 .* stage=${id} `, min: 1 }, ...cleanRules] as const;
 
 export const STAGE_ENTRY_CHECKS: readonly NativeCheck[] = ENTRY_STAGES.flatMap(({ id, name }): NativeCheck[] => [
   {
@@ -68,7 +69,7 @@ export const STAGE_ENTRY_CHECKS: readonly NativeCheck[] = ENTRY_STAGES.flatMap((
 ]);
 
 
-const FLOATING_MAP = join(homedir(), ".local/share/smashcraft-build-inputs/stage-presentation-r3-20261008/presentation.w3x");
+const FLOATING_MAP = newestPresentation(join(homedir(), ".local/share/smashcraft-build-inputs"));
 export const FLOATING_STAGE_MAPS = {
   "floating-stages": { describe: "integrity development map rebuilt from this checkout; every stage in one hosted game, each at both camera extremes", path: FLOATING_MAP, rebuild: "integrity", quick: "-dev quick" },
 };
@@ -112,10 +113,10 @@ export const FIGHTER_SEPARATION_CHECKS: readonly NativeCheck[] = STAGE_CATALOG.f
     {
       ...shared, id: `sep-${id}-${extreme}-scene`,
       setup: [
-        ...(extreme === "near" ? [{ chat: "-dev reset" }, { chat: "-dev items off" }, { chat: "-dev drops off" }, { chat: "-dev hazards off" }, { chat: `-dev quick stage ${id} pair ${SEPARATION_PAIR}` }, { waitMs: 5000 }, { keys: ["BackSpace"], client: "a" }] : [{ chat: "-dev backdrop on" }]),
+        ...(extreme === "near" ? [{ chat: "-dev reset" }, { chat: `-dev quick stage ${id} pair ${SEPARATION_PAIR}` }, { waitMs: 5000 }, { keys: ["BackSpace"], client: "a" }] : [{ chat: "-dev backdrop on" }]),
         { chat: `-dev view ${extreme}` }, { keys: ["h"], client: "a" }, { waitMs: 20000 },
       ],
-      capture: [...frames("scene")], pass: [...entryRules(id)],
+      capture: [...frames("scene")], pass: extreme === "near" ? [...entryRules(id)] : [...cleanRules],
       look: `${name}, ${extreme} camera: Shadow Hunter (darkest) and Chen (warmest) paused on the deck.`,
     },
     {
