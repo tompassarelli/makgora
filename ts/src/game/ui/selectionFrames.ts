@@ -1,7 +1,8 @@
 import type { SessionWinsFrames } from "./sessionWinsFrames";
 import { f32 } from "wisp/src/sim/f32";
 import { type RosterTile, cardDown, cardRight, cardSize } from "../menu/selectionDrag";
-import { type RosterGrid, rosterLayout } from "../menu/selectionGrid";
+import { type RosterGrid, cellRect, laidOut, rosterLayout } from "../menu/selectionGrid";
+import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { NATIVE_TEXT_BASE } from "./hudLayout";
 import { PLAYABLE_CHARACTERS, fighterName, DEFAULT_FIGHTER } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
@@ -136,6 +137,26 @@ export function tileLabel(tile: RosterTile): string {
   return fighter === undefined ? nameText(RANDOM_FIGHTER) : TILE_NAMES[fighter] ?? nameText(fighter);
 }
 
+export function placeTile(grid: Readonly<RosterGrid>, tile: RosterTile, frames: readonly Frame[] | undefined, mark: Frame | undefined, button: Frame | undefined): void {
+  const [tileFrame, portraitFrame, name] = frames ?? [];
+  if (tileFrame === undefined || portraitFrame === undefined || name === undefined || button === undefined || !laidOut(grid, tile)) return;
+  const scale = f32(grid.scale);
+  const portrait = tilePortrait(scale);
+  const inset = (TILE_PORTRAIT_SLOT * scale - portrait) / 2;
+  const { left, top } = cellRect(grid, tile);
+  const x = f32(left);
+  const y = f32(top);
+  placeTopLeft(tileFrame, x, y);
+  setFrameSize(tileFrame, f32(grid.cellWidth), f32(grid.cellHeight));
+  placeTopLeft(portraitFrame, x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset);
+  setFrameSize(portraitFrame, portrait, portrait);
+  placeTopLeft(name, x + TILE_NAME_INSET * scale, y - f32(0.106) * scale);
+  sizeText(name, TILE_NAME_SIZE, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.023) * scale);
+  if (mark !== undefined) placeForgeMark(mark, x, y, grid);
+  placeTopLeft(button, x, y);
+  setFrameSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
+}
+
 export const FORGE_MARK = "|cffff8c1aFORGE|r";
 
 export const tileShown = (game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean): boolean => tileOffered(game, tile) && fighterShown(characterOfTile(tile), forgeShown);
@@ -150,9 +171,17 @@ export function placeForgeMark(mark: Frame, x: number, y: number, grid: Readonly
   sizeText(mark, FORGE_MARK_SIZE, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.012) * scale);
 }
 
-export function forgeMark(parent: Frame, name: string, x: number, y: number, grid: Readonly<RosterGrid>): Frame {
+export function showTile(game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean, frames: readonly Frame[] | undefined, mark: Frame | undefined, button: Frame | undefined): void {
+  const selectable = tileShown(game, tile, forgeShown);
+  if (mark !== undefined) setFrameVisible(mark, tileMarked(game, tile, forgeShown));
+  for (const frame of frames ?? []) setFrameVisible(frame, selectable);
+  if (button !== undefined) setFrameVisible(button, selectable);
+}
+
+export function forgeMark(parent: Frame, name: string, tile: RosterTile, grid: Readonly<RosterGrid>): Frame | undefined {
+  if (fighterStatus(characterOfTile(tile)) !== "forge") return undefined;
   const scale = f32(grid.scale);
-  const mark = label(parent, name, x + TILE_NAME_INSET * scale, y - f32(0.004) * scale, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.012) * scale, FORGE_MARK_SIZE);
+  const mark = label(parent, name, TILE_NAME_INSET * scale, -f32(0.004) * scale, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.012) * scale, FORGE_MARK_SIZE);
   setFrameText(mark, FORGE_MARK);
   setFrameVisible(mark, false);
   return mark;

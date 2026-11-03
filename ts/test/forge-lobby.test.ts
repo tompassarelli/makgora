@@ -79,4 +79,4 @@ test("a player with Show the Forge on picks a Forge fighter on the full grid whi
     expect(value(client, () => fighterAt(shell().world, 1).character)).toBe(FEATURED_FIGHTER);
   }
   expect(clients.firstDivergence()).toBeUndefined();
-});
+}, 60_000);

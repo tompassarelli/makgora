@@ -45,7 +45,6 @@ import {
   selectionDrag,
   updateSelectionDrag,
 } from "../menu/selectionDrag";
-import { cellRect, laidOut } from "../menu/selectionGrid";
 import { type HandFrames, createHandFrames, destroyHandFrames, presentHand, resizeHandFrames } from "./selectionHandFrames";
 import { type HandPose, HIDDEN_HAND, SelectionHands, handPalette } from "./selectionHands";
 import { MENU_FONT, MENU_STYLE, type TextBox } from "./hudLayout";
@@ -54,16 +53,15 @@ import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_HEADER_TOP
 import { PLAYABLE_CHARACTERS, nextSelectableCharacter, DEFAULT_FIGHTER } from "../roster/kits";
 import { MOVES_HEADER, movesPage } from "../session/messages";
 import { Character } from "../sim/codes";
-import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { CreditsMenu } from "./creditsMenu";
 import { forgeShown } from "./forgeSetting";
-import { fighterShown, fighterStatus } from "../roster/forge";
+import { fighterShown } from "../roster/forge";
 import { MainMenuButton } from "./mainMenuButton";
 import { anyOpen, overAny } from "./menuHover";
 import { CommunityMenu } from "./communityMenu";
 import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffer, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offerTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
-import { ROSTER_TILES, TILE_NAME_INSET, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, forgeMark, label, placeForgeMark, selectGrid, tileMarked, tileShown, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
+import { ROSTER_TILES, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, forgeMark, label, placeTile, selectGrid, showTile, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, acceptsClick, cardPalette, cardRowShown, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, applyRuleButton } from "./selectionRules";
 import { FIXED_DELAY, type LobbyNet, type SelectText, type SelectionActions } from "./selectionActions";
@@ -187,7 +185,7 @@ export class SelectionPanel {
       setMenuText(tileName, tileLabel(choice));
       this.tiles.push([tileFrame, tilePortraitFrame, tileName]);
       this.tilePortraits.push(tilePortraitFrame);
-      this.forgeMarks.push(fighterStatus(characterOfTile(choice)) === "forge" ? forgeMark(root, `MeleeTileForge${name}`, 0.0, 0.0, grid) : undefined);
+      this.forgeMarks.push(forgeMark(root, `MeleeTileForge${name}`, choice, grid));
       const button = createFrameByType("BUTTON", `MeleeTileButton${name}`, root, "", 0);
       this.tileButtons.push(this.clicks.add(button, { kind: "tile", tile: choice }, undefined, "native"));
     }
@@ -732,27 +730,7 @@ export class SelectionPanel {
   // Local presentation: each client lays out only the fighters it shows, so picks travel as roster tiles, never grid cells.
   private layTiles(): void {
     const grid = this.roster.grid;
-    const scale = f32(grid.scale);
-    const portrait = tilePortrait(scale);
-    const inset = (TILE_PORTRAIT_SLOT * scale - portrait) / 2;
-    for (let tile = 0; tile < this.tiles.length; tile++) {
-      const [tileFrame, tilePortraitFrame, tileName] = this.tiles[tile] ?? [];
-      const button = this.tileButtons[tile];
-      if (tileFrame === undefined || tilePortraitFrame === undefined || tileName === undefined || button === undefined || !laidOut(grid, tile)) continue;
-      const { left, top } = cellRect(grid, tile);
-      const x = f32(left);
-      const y = f32(top);
-      placeTopLeft(tileFrame, x, y);
-      setFrameSize(tileFrame, f32(grid.cellWidth), f32(grid.cellHeight));
-      placeTopLeft(tilePortraitFrame, x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset);
-      setFrameSize(tilePortraitFrame, portrait, portrait);
-      placeTopLeft(tileName, x + TILE_NAME_INSET * scale, y - f32(0.106) * scale);
-      sizeText(tileName, TILE_NAME_SIZE, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.023) * scale);
-      const mark = this.forgeMarks[tile];
-      if (mark !== undefined) placeForgeMark(mark, x, y, grid);
-      placeTopLeft(button, x, y);
-      setFrameSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
-    }
+    for (let tile = 0; tile < this.tiles.length; tile++) placeTile(grid, tile, this.tiles[tile], this.forgeMarks[tile], this.tileButtons[tile]);
     setFrameSize(this.bullseye, bullseyeSize(grid), bullseyeSize(grid));
     for (const frames of this.hands) resizeHandFrames(frames, grid);
   }
@@ -769,14 +747,7 @@ export class SelectionPanel {
       this.shownTilePalette = palette;
       this.tilePortraits.forEach((frame, tile) => setFrameTexture(frame, portraitTexture(characterOfTile(tile), true, palette), 0, true));
     }
-    for (let tile = 0; tile < this.tiles.length; tile++) {
-      const selectable = tileShown(game, tile, forge);
-      const mark = this.forgeMarks[tile];
-      if (mark !== undefined) setFrameVisible(mark, tileMarked(game, tile, forge));
-      for (const frame of this.tiles[tile] ?? []) setFrameVisible(frame, selectable);
-      const button = this.tileButtons[tile];
-      if (button !== undefined) setFrameVisible(button, selectable);
-    }
+    for (let tile = 0; tile < this.tiles.length; tile++) showTile(game, tile, forge, this.tiles[tile], this.forgeMarks[tile], this.tileButtons[tile]);
   }
 
   private dragChips(game: Readonly<MatchState>, x: number, y: number): void {
