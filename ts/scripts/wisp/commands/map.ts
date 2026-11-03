@@ -96,7 +96,7 @@ const checkMapSize = (out: string, imports: readonly ArchiveEntry[], bounded: bo
   if (problem !== undefined) return yield* new MapBuildFailure({ operation: "check map size", path: out, cause: problem });
 });
 
-const tomsLibraryOut = (path: string) => new UsageFailure({ problem: `${path} is in Tom's Maps/00-Smashcraft, which holds only installed builds; build to a private folder` });
+const tomsLibraryOut = (path: string) => new UsageFailure({ problem: `${path} is in Tom's Maps/00-Makgora, which holds only installed builds; build to a private folder` });
 
 const RELEASE_OPTIONS: readonly string[] = ["--name", "--out", "--commit"];
 

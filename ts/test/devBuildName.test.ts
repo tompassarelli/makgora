@@ -51,16 +51,16 @@ test("a dev build is named for the next release and the first-parent commits sin
 
 test("a dev build file name parses back to its version and number, and a release or candidate file carries no number [k2 property]", () => {
   for (const build of [1, 9, 830, 12345]) {
-    expect(parseInstalled(`Smashcraft 0.1.5-dev.${build}.w3x`)).toEqual({ version: [0, 1, 5], build, candidate: undefined });
+    expect(parseInstalled(`Mak'gora 0.1.5-dev.${build}.w3x`)).toEqual({ version: [0, 1, 5], build, candidate: undefined });
   }
-  expect(parseInstalled("Smashcraft 0.2-dev.830.w3x")).toEqual({ version: [0, 2, 0], build: 830, candidate: undefined });
-  expect(parseInstalled("Smashcraft 0.2.w3x")).toEqual({ version: [0, 2, 0], build: undefined, candidate: undefined });
-  expect(parseInstalled("Smashcraft 0.1.4.w3x")).toEqual({ version: [0, 1, 4], build: undefined, candidate: undefined });
-  expect(parseInstalled("Smashcraft 0.1.5 RC-2.w3x")).toEqual({ version: [0, 1, 5], build: undefined, candidate: 2 });
-  expect(PLAYABLE_FILE.exec("Smashcraft 0.1.5-dev c9e5fbd.w3x")).toBeNull();
+  expect(parseInstalled("Mak'gora 0.2-dev.830.w3x")).toEqual({ version: [0, 2, 0], build: 830, candidate: undefined });
+  expect(parseInstalled("Mak'gora 0.2.w3x")).toEqual({ version: [0, 2, 0], build: undefined, candidate: undefined });
+  expect(parseInstalled("Mak'gora 0.1.4.w3x")).toEqual({ version: [0, 1, 4], build: undefined, candidate: undefined });
+  expect(parseInstalled("Mak'gora 0.1.5 RC-2.w3x")).toEqual({ version: [0, 1, 5], build: undefined, candidate: 2 });
+  expect(PLAYABLE_FILE.exec("Mak'gora 0.1.5-dev c9e5fbd.w3x")).toBeNull();
   expect(parseInstalled("Mak'gora 0.3.0.w3x")).toEqual({ version: [0, 3, 0], build: undefined, candidate: undefined });
   expect(buildLabel("Mak'gora 0.4-dev.7.w3x")).toBe("0.4-dev.7");
-  expect(buildLabel("Smashcraft 0.3-dev.692.w3x")).toBe("0.3-dev.692");
+  expect(buildLabel("Mak'gora 0.3-dev.692.w3x")).toBe("0.3-dev.692");
 });
 
 test("installing a dev build leaves the latest release and the newest dev build at the top of the Maps folder and moves older releases to old/ [k5 boundary maps-folder]", () => {
@@ -69,20 +69,20 @@ test("installing a dev build leaves the latest release and the newest dev build 
   const root = library(documents);
   try {
     mkdirSync(root, { recursive: true });
-    for (const file of ["Smashcraft 0.1.3.w3x", "Smashcraft 0.1.4.w3x", "Smashcraft 0.1.5.w3x", "Smashcraft 0.1.6-dev.829.w3x", "Smashcraft 0.1.5-dev c9e5fbd.w3x"]) writeFileSync(join(root, file), file);
-    const next = join(staging, "Smashcraft 0.2-dev.830.w3x");
+    for (const file of ["Mak'gora 0.1.3.w3x", "Mak'gora 0.1.4.w3x", "Mak'gora 0.1.5.w3x", "Mak'gora 0.1.6-dev.829.w3x", "Mak'gora 0.1.5-dev c9e5fbd.w3x"]) writeFileSync(join(root, file), file);
+    const next = join(staging, "Mak'gora 0.2-dev.830.w3x");
     writeFileSync(next, "next");
     installLatest(documents, next);
-    expect(readdirSync(root).filter((entry) => entry.endsWith(".w3x")).sort()).toEqual(["Smashcraft 0.1.5.w3x", "Smashcraft 0.2-dev.830.w3x"]);
-    expect(readdirSync(join(root, OLD_FOLDER)).sort()).toEqual(["Smashcraft 0.1.3.w3x", "Smashcraft 0.1.4.w3x"]);
-    expect(existsSync(join(root, "Smashcraft 0.1.6-dev.829.w3x"))).toBe(false);
-    const after = join(staging, "Smashcraft 0.2.w3x");
+    expect(readdirSync(root).filter((entry) => entry.endsWith(".w3x")).sort()).toEqual(["Mak'gora 0.1.5.w3x", "Mak'gora 0.2-dev.830.w3x"]);
+    expect(readdirSync(join(root, OLD_FOLDER)).sort()).toEqual(["Mak'gora 0.1.3.w3x", "Mak'gora 0.1.4.w3x"]);
+    expect(existsSync(join(root, "Mak'gora 0.1.6-dev.829.w3x"))).toBe(false);
+    const after = join(staging, "Mak'gora 0.2.w3x");
     writeFileSync(after, "release");
     installLatest(documents, after);
-    expect(readdirSync(join(root, OLD_FOLDER)).sort()).toEqual(["Smashcraft 0.1.3.w3x", "Smashcraft 0.1.4.w3x", "Smashcraft 0.1.5.w3x"]);
-    writeFileSync(join(root, "Smashcraft 0.1.6-dev.900.w3x"), "old patch line");
-    writeFileSync(join(root, "Smashcraft 0.3-dev.2.w3x"), "next minor");
-    expect(pendingTidy(documents)).toEqual({ remove: ["Smashcraft 0.2-dev.830.w3x", "Smashcraft 0.1.6-dev.900.w3x"], archive: [] });
+    expect(readdirSync(join(root, OLD_FOLDER)).sort()).toEqual(["Mak'gora 0.1.3.w3x", "Mak'gora 0.1.4.w3x", "Mak'gora 0.1.5.w3x"]);
+    writeFileSync(join(root, "Mak'gora 0.1.6-dev.900.w3x"), "old patch line");
+    writeFileSync(join(root, "Mak'gora 0.3-dev.2.w3x"), "next minor");
+    expect(pendingTidy(documents)).toEqual({ remove: ["Mak'gora 0.2-dev.830.w3x", "Mak'gora 0.1.6-dev.900.w3x"], archive: [] });
   } finally {
     rmSync(documents, { recursive: true, force: true });
     rmSync(staging, { recursive: true, force: true });
@@ -90,16 +90,16 @@ test("installing a dev build leaves the latest release and the newest dev build 
 });
 
 test("a hand release build runs the argv Tom's dev builds run, so it cannot carry the debug build's settings [k5 boundary map-release-argv]", () => {
-  const dev = playableMapBuild("Smashcraft 0.2", "/tmp/out.w3x", false, TOM_EDITION);
+  const dev = playableMapBuild("Mak'gora 0.2", "/tmp/out.w3x", false, TOM_EDITION);
   expect(dev.slice(0, 2)).toEqual(["bun", "wisp"]);
-  expect(releaseBuildArgs(["--name", "Smashcraft 0.2", "--out", "/tmp/out.w3x"])).toEqual(dev.slice(4));
-  expect(releaseBuildArgs(["--out", "/tmp/out.w3x", "--commit", "abc123", "--predict-cost", "--name", "Smashcraft 0.2"])).toEqual(
-    playableMapBuild("Smashcraft 0.2", "/tmp/out.w3x", true, TOM_EDITION, "abc123").slice(4),
+  expect(releaseBuildArgs(["--name", "Mak'gora 0.2", "--out", "/tmp/out.w3x"])).toEqual(dev.slice(4));
+  expect(releaseBuildArgs(["--out", "/tmp/out.w3x", "--commit", "abc123", "--predict-cost", "--name", "Mak'gora 0.2"])).toEqual(
+    playableMapBuild("Mak'gora 0.2", "/tmp/out.w3x", true, TOM_EDITION, "abc123").slice(4),
   );
 });
 
 test("a release build takes only a name, an output, a commit and the cost prediction, and an unknown option fails rather than picking another profile [k2 property]", () => {
-  expect(releaseBuildArgs(["--name", "Smashcraft 0.2"])).toBeUndefined();
+  expect(releaseBuildArgs(["--name", "Mak'gora 0.2"])).toBeUndefined();
   expect(releaseBuildArgs(["--out", "/tmp/out.w3x"])).toBeUndefined();
   expect(releaseBuildArgs(["--name", "n", "--out", "o", "--profile", "main"])).toBeUndefined();
   expect(releaseBuildArgs(["--name", "n", "--out", "o", "--edition", "full"])).toBeUndefined();
@@ -107,6 +107,6 @@ test("a release build takes only a name, an output, a commit and the cost predic
 });
 
 test("a map build without --profile is refused and points at the release build [k5 boundary map-build-bare]", async () => {
-  const outcome = await Effect.runPromise(Effect.flip(build(["--name", "Smashcraft 0.2", "--out", "/tmp/out.w3x"])));
+  const outcome = await Effect.runPromise(Effect.flip(build(["--name", "Mak'gora 0.2", "--out", "/tmp/out.w3x"])));
   expect(String(outcome.problem)).toContain("map release");
 });

@@ -37,7 +37,7 @@ const landing = (fetchStores: boolean, failure: PlayProblem = unstored) => {
       stored = fetchStores;
       return fetchStores ? Effect.succeed(true) : Effect.fail(new PlayProblem({ problem: "no host of gex45 stores these" }));
     }),
-    install: ({ version }, _held) => Effect.succeed({ version, path: "Maps/00-Smashcraft/map.w3x" }),
+    install: ({ version }, _held) => Effect.succeed({ version, path: "Maps/00-Makgora/map.w3x" }),
     notes: () => Effect.succeed("checklist.md"),
     windowLibrary: () => Effect.void,
     budget: () => Effect.void,
@@ -76,9 +76,9 @@ describe("tom build watcher", () => {
     const documents = join(directory, "documents");
     const root = library(documents);
     mkdirSync(root, { recursive: true });
-    const older = ["Smashcraft 0.1.3.w3x", "Smashcraft 0.1.4.w3x", "Smashcraft 0.1.5-dev.823.w3x"];
+    const older = ["Mak'gora 0.1.3.w3x", "Mak'gora 0.1.4.w3x", "Mak'gora 0.1.5-dev.823.w3x"];
     for (const file of older) writeFileSync(join(root, file), file);
-    const source = join(directory, "Smashcraft 0.1.5-dev.824.w3x");
+    const source = join(directory, "Mak'gora 0.1.5-dev.824.w3x");
     writeFileSync(source, "next");
     let running: string | undefined = "Warcraft III is running in Tom's prefix (pid 42)";
     const client = Effect.sync(() => running);
@@ -93,14 +93,14 @@ describe("tom build watcher", () => {
     const names = () => readdirSync(root).filter((entry) => entry.endsWith(".w3x")).sort();
     try {
       expect(Effect.runSync(watchOnce(steps, files).pipe(Effect.result))._tag).toBe("Success");
-      expect(names()).toEqual([...older, "Smashcraft 0.1.5-dev.824.w3x"].sort());
+      expect(names()).toEqual([...older, "Mak'gora 0.1.5-dev.824.w3x"].sort());
       expect(older.every((file) => readFileSync(join(root, file), "utf8") === file)).toBe(true);
       expect(Effect.runSync(steps.tidy)).toContain("waits: Warcraft III is running");
       expect(names()).toHaveLength(4);
       running = undefined;
       expect(Effect.runSync(steps.tidy)).toContain("Tidied");
-      expect(names()).toEqual(["Smashcraft 0.1.4.w3x", "Smashcraft 0.1.5-dev.824.w3x"]);
-      expect(existsSync(join(root, "old", "Smashcraft 0.1.3.w3x"))).toBe(true);
+      expect(names()).toEqual(["Mak'gora 0.1.4.w3x", "Mak'gora 0.1.5-dev.824.w3x"]);
+      expect(existsSync(join(root, "old", "Mak'gora 0.1.3.w3x"))).toBe(true);
       expect(Effect.runSync(steps.tidy)).toBeUndefined();
     } finally {
       rmSync(directory, { recursive: true });
@@ -149,7 +149,7 @@ describe("tom build watcher", () => {
       ...landing(true).steps,
       build: () => Effect.succeed({ version: "0.3-dev.460", source: "map.w3x", stages: [] }),
       boot: () => Effect.succeed("map.w3x does not reach character select: problem the map threw before character select settled"),
-      install: ({ version }) => Effect.sync(() => { installed = true; return { version, path: "Maps/00-Smashcraft/map.w3x" }; }),
+      install: ({ version }) => Effect.sync(() => { installed = true; return { version, path: "Maps/00-Makgora/map.w3x" }; }),
     };
     try {
       const outcome = Effect.runSync(watchOnce(steps, files).pipe(Effect.result));

@@ -109,7 +109,7 @@ export const online: Command = ([action, ...args]) => Effect.gen(function*() {
       const map = newestPlayable(install.documents);
       if (map === undefined) {
         yield* say("Mak'gora isn't in Warcraft III's maps yet. Press Play once to add it.");
-        return yield* new UsageFailure({ problem: `no Smashcraft X.Y.Z.w3x in ${install.documents}/Maps/00-Smashcraft` });
+        return yield* new UsageFailure({ problem: `no Mak'gora X.Y.Z.w3x in ${install.documents}/Maps/00-Makgora` });
       }
       yield* explained(Effect.scoped(Effect.gen(function*() {
         const menus = yield* menusOf(install, repair);

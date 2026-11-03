@@ -47,8 +47,8 @@ export const gameFilesLayer = Layer.effect(GameFiles, Effect.gen(function*() {
   return GameFiles.of({
     ...files,
     installMap: (documents, map) => resolve(documents) === tom
-      ? Effect.fail(new GameFileFailure({ operation: "install map", path: documents, cause: "Tom's Maps/00-Smashcraft takes only main builds and one lane build to try; run tests on a pool client" }))
+      ? Effect.fail(new GameFileFailure({ operation: "install map", path: documents, cause: "Tom's Maps/00-Makgora takes only main builds and one lane build to try; run tests on a pool client" }))
       : files.installMap(documents, map),
   });
-})).pipe(Layer.provide(GameFiles.layer({ mapFolder: "Maps/00-Smashcraft/tests", replacedMaps: "Maps/00-Smashcraft/tests", preserveMaps: true })));
+})).pipe(Layer.provide(GameFiles.layer({ mapFolder: "Maps/00-Makgora/tests", replacedMaps: "Maps/00-Makgora/tests", preserveMaps: true })));
 export const sourceErrorsLayer = SourceErrors.layer({ sourceMapDirectory, filePrefix: "makgora" });

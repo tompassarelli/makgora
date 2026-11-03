@@ -84,7 +84,7 @@ const landing = (bootRefusal: string | undefined) => {
     boot: () => Effect.succeed(bootRefusal),
     tidy: Effect.succeed(undefined),
     fetchInputs: Effect.succeed(false),
-    install: ({ version }) => Effect.sync(() => { calls.push("install"); return { version, path: "Maps/00-Smashcraft/map.w3x" }; }),
+    install: ({ version }) => Effect.sync(() => { calls.push("install"); return { version, path: "Maps/00-Makgora/map.w3x" }; }),
     notes: () => Effect.succeed("checklist.md"),
     windowLibrary: (sha) => Effect.sync(() => { calls.push(`window ${sha}`); }),
     budget: () => Effect.void,

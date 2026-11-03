@@ -26,8 +26,8 @@ export const TOM_EDITION: Edition = "classic";
 export const playableBuildArgs = (title: string, out: string, predictCost = false, edition: Edition = "full", commit?: string) =>
   ["map", "build", "--profile", "playable", "--edition", edition, "--name", title, "--out", out, ...(commit === undefined ? [] : ["--commit", commit]), ...(predictCost ? [PREDICT_COST] : [])];
 
-export const LANE_FILE = /^(?:Mak'gora|Smashcraft) (\d+\.\d+(?:\.\d+)?)-([a-z0-9]+(?:-[a-z0-9]+)*)\.w3x$/;
-export const PLAYABLE_FILE = /^(?:Mak'gora|Smashcraft) (\d+\.\d+(?:\.\d+)?)(?:-dev\.(\d+)| RC-(\d+))?\.w3x$/;
+export const LANE_FILE = /^Mak'gora (\d+\.\d+(?:\.\d+)?)-([a-z0-9]+(?:-[a-z0-9]+)*)\.w3x$/;
+export const PLAYABLE_FILE = /^Mak'gora (\d+\.\d+(?:\.\d+)?)(?:-dev\.(\d+)| RC-(\d+))?\.w3x$/;
 export const buildLabel = (file: string) => PLAYABLE_FILE.test(file) ? file.slice(file.indexOf(" ") + 1, -".w3x".length) : undefined;
 
 

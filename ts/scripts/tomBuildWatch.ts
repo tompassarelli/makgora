@@ -202,7 +202,7 @@ export const watch = <R>(steps: WatchSteps<R>, files: WatchFiles, current: Effec
     );
     if (line !== undefined) console.log(line);
     const note = yield* steps.tidy.pipe(
-      Effect.catch(({ problem }) => Effect.sync(() => { console.error(`Tidy of Maps/00-Smashcraft failed: ${problem}`); return undefined; })),
+      Effect.catch(({ problem }) => Effect.sync(() => { console.error(`Tidy of Maps/00-Makgora failed: ${problem}`); return undefined; })),
     );
     if (note !== undefined && note !== lastNote) console.log(note);
     lastNote = note;
@@ -304,7 +304,7 @@ const gh = (...args: readonly string[]) =>
 const reportBudget = (sha: string, timing: Timing) => Effect.gen(function*() {
   const problem = budgetProblem(timing);
   const open = (yield* gh("issue", "list", "--state", "open", "--search", `"${SPEED_BUDGET_TITLE}" in:title`, "--json", "number", "--jq", ".[].number")).split("\n").filter((line) => line !== "");
-  const body = `Landing ${sha}: ${problem}.\n\n${stageReport(timing)}\n\nBudgets: build <= ${BUILD_BUDGET_SECONDS} s, commit to installed in Maps/00-Smashcraft <= ${LAND_TO_MAPS_BUDGET_SECONDS} s, measured by the Tom build watcher (makgora:tools/tom-build/, ~/.local/state/agents/handoffs/tom-build.log). Find the stage that grew and what it recomputes whose inputs did not change.`;
+  const body = `Landing ${sha}: ${problem}.\n\n${stageReport(timing)}\n\nBudgets: build <= ${BUILD_BUDGET_SECONDS} s, commit to installed in Maps/00-Makgora <= ${LAND_TO_MAPS_BUDGET_SECONDS} s, measured by the Tom build watcher (makgora:tools/tom-build/, ~/.local/state/agents/handoffs/tom-build.log). Find the stage that grew and what it recomputes whose inputs did not change.`;
   if (problem === undefined) {
     for (const number of open) yield* gh("issue", "close", number, "--comment", `Landing ${sha} was within both budgets. ${stageReport(timing)}`);
     return;

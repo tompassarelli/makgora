@@ -22,8 +22,8 @@ const fixture = () => {
     const prefix = join(data, "wisp/lan/clients", name, "pfx");
     const retail = join(prefix, "drive_c/Program Files (x86)/Warcraft III/_retail_");
     mkdirSync(join(retail, "x86_64"), { recursive: true });
-    mkdirSync(join(prefix, DOCUMENTS_IN_PREFIX, "Maps/00-Smashcraft"), { recursive: true });
-    writeFileSync(join(prefix, DOCUMENTS_IN_PREFIX, "Maps/00-Smashcraft/Smashcraft 0.1-dev.1.w3x"), "map");
+    mkdirSync(join(prefix, DOCUMENTS_IN_PREFIX, "Maps/00-Makgora"), { recursive: true });
+    writeFileSync(join(prefix, DOCUMENTS_IN_PREFIX, "Maps/00-Makgora/Mak'gora 0.1-dev.1.w3x"), "map");
     writeFileSync(join(prefix, "user.reg"), "WINE REGISTRY Version 2\n");
     const page = join(retail, "webui/index.html");
     mkdirSync(dirname(page), { recursive: true });

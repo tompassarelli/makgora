@@ -4,8 +4,8 @@ import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 import { PLAYABLE_FILE, parseInstalled } from "./greenBuilds";
 import { PLAYTEST_PREFIX } from "./project";
 
-export const LIBRARY_FOLDER = "Maps/00-Smashcraft";
-export const MAP_FOLDER = "00-Smashcraft";
+export const LIBRARY_FOLDER = "Maps/00-Makgora";
+export const MAP_FOLDER = "00-Makgora";
 export const OLD_FOLDER = "old";
 
 export const library = (documents: string) => {
@@ -20,7 +20,7 @@ export const insideTomsLibrary = (path: string) => {
   return from === "" || (!from.startsWith("..") && !isAbsolute(from));
 };
 
-export const RELEASE_FILE = /^(?:Mak'gora|Smashcraft) \d+\.\d+(?:\.\d+)?\.w3x$/;
+export const RELEASE_FILE = /^Mak'gora \d+\.\d+(?:\.\d+)?\.w3x$/;
 const DEV_FILE = (file: string) => parseInstalled(file)?.build !== undefined;
 const KEPT_FILE = (file: string) => PLAYABLE_FILE.test(file) && !DEV_FILE(file);
 

@@ -106,7 +106,7 @@ export const freshMatch = (map: string) => Effect.scoped(Effect.gen(function*() 
     yield* Effect.forEach(clients.all, (client) => files.installMap(client.documents, map), { discard: true });
   }).pipe(step("map installed"));
 
-  const host = (client: Client) => hostLobby(page(client), { folder: "00-Smashcraft/tests", file: basename(map), gameName: game, password })
+  const host = (client: Client) => hostLobby(page(client), { folder: "00-Makgora/tests", file: basename(map), gameName: game, password })
     .pipe(step(`${client.name} hosting "${game}"`));
 
 

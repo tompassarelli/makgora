@@ -6,7 +6,7 @@ to `origin/main` on each start, under `Nice=10` and idle I/O. Every 10 s it fetc
 `origin/main`; when the tip is a commit it has not built, it builds that tip's
 Classic playable map (the edition Tom plays, about 47 MB; `wisp play` keeps the
 private full HD build) with the play build path, without the optional controller helper,
-and installs it under Maps/00-Smashcraft (makgora:docs/play.md); `wisp play`
+and installs it under Maps/00-Makgora (makgora:docs/play.md); `wisp play`
 builds the helper when Tom starts a controller session. Commits that land during a build
 are skipped for the newest tip. Between landings it only fetches. While Warcraft III
 runs in Tom's prefix it still builds and adds the new file but removes and moves nothing
@@ -47,11 +47,11 @@ forgets the sha so the next poll tries again.
 
 Before installing, the watcher runs `bun wisp map boot` on the built map (its check driver compiles beside the map build, so `boot=` in the stages is only what follows the build)
 (makgora:docs/commands/map.md). A map that does not reach character select is
-not installed: the previous build stays in Maps/00-Smashcraft, the journal says
+not installed: the previous build stays in Maps/00-Makgora, the journal says
 why, and `~/.local/state/agents/handoffs/tom-build-refused.log` gets one line
 `<utc> <sha> <version> <reason>`.
 
-Each install replaces the previous build in Maps/00-Smashcraft and removes any
+Each install replaces the previous build in Maps/00-Makgora and removes any
 `Makgora X.Y-LANE.w3x` lane map (`bun scripts/laneBuild.ts --install`,
 makgora:docs/play.md).
 
