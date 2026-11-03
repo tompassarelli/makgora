@@ -26,7 +26,7 @@ export const RAZE_AIR_LANDING_LAG = 20;
 export const RAZE_DAMAGE = 12.0;
 const RAZE_FLOOR_STEP = h(f32(0.3));
 
-const TELL_MODEL = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx";
+const TELL_MODEL = "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx";
 const COLUMN_MODEL = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx";
 // FlameStrike1.mdx draws its column only in birth, fading in by 1.05 s and out by 5.1 s; the eruption and its glow play that stretch across their frames.
 const COLUMN_FROM = f32(1.05);
@@ -47,7 +47,7 @@ const column = (life: number, from: number): Pick<SpecialProjectile, "model" | "
 const base = { offsetX: 0.0, velocityX: 0.0, velocityZ: 0.0, radius: RAZE_RADIUS, reflectable: false, limit: 1 } as const;
 
 export const CRATER_FRAMES = 180;
-const CRATER_MODEL = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx";
+const CRATER_MODEL = RAZE_FISSURE_MODEL;
 
 export const CRATER: SpecialProjectile = {
   ...base, model: CRATER_MODEL, modelRadius: COLUMN_ART_RADIUS, modelOffsetZ: f32(-2.0 * RAZE_RADIUS), life: CRATER_FRAMES,

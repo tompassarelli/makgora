@@ -134,11 +134,12 @@ const BLACK_ARROW_FRAMES = SYLVANAS_SPECIALS.neutral.ground.endFrame;
 const BLACK_ARROW_SHOT = SYLVANAS_SPECIALS.neutral.ground.projectiles?.[0]?.spawnFrame ?? BLACK_ARROW_FRAMES;
 const GLAIVE_GLINT: Cue = { ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.3)), "birth", 0.0), anchorFrames: Array.from({ length: WARDEN_SPECIALS.side.ground.endFrame }, () => ({ x: -70.0, z: 62.0 })), color: [200, 230, 255], sound: "MetalLightSliceMetal" };
 const FROST = cue("Abilities\\Spells\\Undead\\ReplenishMana\\SpiritTouchTarget.mdx", "hand", f32(0.8));
+const DEVOTION_GLOW_MODEL = "Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx";
 const ARCANE = cue("Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx", "hand", 0.5);
 const VAMPIRIC = cue("Abilities\\Spells\\Undead\\UnholyFrenzy\\UnholyFrenzyTarget.mdx", "hand", f32(0.8));
 // The pounce winds up for 4 frames while a swarm of bats gathers from behind into his chest, so the leap is read before it moves.
 const POUNCE_COIL: Cue = { ...cue("Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx", "body", f32(0.6)), anchorFrames: [{ x: -95.0, z: 95.0 }, { x: -70.0, z: 80.0 }, { x: -45.0, z: 65.0 }, { x: -20.0, z: 55.0 }] };
-const KAEL_PHOENIX_CHARGE: MoveCues = { spell: "Phoenix", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "body", 0.5), active: cue("Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx", "body", f32(0.6)) };
+const KAEL_PHOENIX_CHARGE: MoveCues = { spell: "Phoenix", startup: cue("Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx", "body", 0.5), active: cue("Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx", "body", f32(0.6)) };
 // The flight is the phoenix itself: Kael's body is replaced by it until the flight ends.
 const KAEL_PHOENIX_FORM: MoveCues = { spell: "Phoenix", startup: KAEL_PHOENIX_CHARGE.active, active: { ...timed(cue("units\\human\\Phoenix\\Phoenix.mdx", "body", f32(0.55)), "stand", 0.0), replacesBody: true } };
 const FROST_TRAP = cue(FROST_TRAP_MODEL, "feet", f32(0.4));
@@ -273,7 +274,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.kaelthas]: {
     neutral: { spell: "Pyroblast", startup: { ...cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.25), scaleEnd: f32(0.9), scaleFrames: PYROBLAST_STARTUP_FRAMES }, active: drawn("Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdx", "hand") },
-    side: { spell: "Flame Strike", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5), active: drawn("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx", "ahead") },
+    side: { spell: "Flame Strike", startup: cue("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx", "hand", 0.5), active: drawn("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx", "ahead") },
     up: KAEL_PHOENIX_CHARGE,
     down: { spell: "Banish", startup: { ...cue(BANISH_SWIRL_MODEL, "hand", f32(0.2)), scaleEnd: f32(0.5), scaleFrames: BANISH_DELAY_FRAMES }, active: cue(BANISH_SWIRL_MODEL, "hand", 0.5) },
   },
@@ -351,14 +352,14 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.uther]: {
     neutral: { spell: "Holy Light", startup: timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.3)), "birth", 0.0), active: cue("Abilities\\Spells\\Human\\Heal\\HealTarget.mdx", "ahead", f32(0.7)) },
-    side: { spell: "Devotion Aura", startup: cue("Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", "feet", f32(1.6)), active: cue("Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", "feet", f32(1.6)) },
+    side: { spell: "Devotion Aura", startup: cue(DEVOTION_GLOW_MODEL, "feet", f32(1.6)), active: cue(DEVOTION_GLOW_MODEL, "feet", f32(1.6)) },
     up: { spell: "Hammer of the Righteous", startup: timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.4)), "birth", 0.0), active: cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.6)) },
     down: { spell: "Divine Shield", startup: cue("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", "body", f32(1.0)), active: cue("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", "body", f32(1.0)) },
   },
   [Character.dreadlord]: {
     neutral: { spell: "Carrion Swarm", startup: VAMPIRIC, active: cue("Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmDamage.mdx", "hand", f32(0.8)) },
     side: { spell: "Corkscrew Pounce", startup: POUNCE_COIL, active: cue("Abilities\\Spells\\Items\\VampiricPotion\\VampPotionCaster.mdx", "behind", f32(0.8)) },
-    up: { spell: "Bat Ascension", startup: VAMPIRIC, active: cue("Abilities\\Spells\\Undead\\DarkSummoning\\DarkSummonTarget.mdx", "body", f32(0.6)) },
+    up: { spell: "Bat Ascension", startup: VAMPIRIC, active: cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdx", "body", f32(0.6)) },
     down: { spell: "Sleep", startup: VAMPIRIC, active: cue("Abilities\\Spells\\Undead\\Sleep\\SleepSpecialArt.mdx", "hand", f32(0.8)) },
   },
   [Character.shadowHunter]: {

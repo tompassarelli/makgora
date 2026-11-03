@@ -407,7 +407,7 @@ export async function readModelFacts(read: (path: string) => Promise<Uint8Array 
 }
 
 /** Uses main shipped before the flat check that it judges edge-on; each stays Unknown until a Warcraft capture confirms it or a replacement model lands. */
-const EDGE_ON_PENDING: ReadonlySet<string> = new Set(["uther/side-special Devotion Aura startup", "uther/side-special Devotion Aura active", "dreadlord/up-special Bat Ascension active", "cairne-bloodhoof/ultimate projectile", "kael'thas-sunstrider/side-special Flame Strike startup", "kael'thas-sunstrider/up-special Phoenix startup", "kael'thas-sunstrider/ultimate projectile", "archimonde/side-special Rain of Fire active", "firelord/down-special projectile", "sylvanas-windrunner/ultimate burst", "archimonde/neutral-special Finger of Death projectile", "archimonde/side-special Rain of Fire projectile"]);
+const EDGE_ON_PENDING: ReadonlySet<string> = new Set(["archimonde/side-special Rain of Fire active", "archimonde/neutral-special Finger of Death projectile", "archimonde/side-special Rain of Fire projectile"]);
 
 /** Judges one use: a missing Classic model, a travelling effect held at a fighter anchor, or its model facts. */
 export function judgeUse(use: EffectUse, facts: ModelFacts | null): EffectFinding {

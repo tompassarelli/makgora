@@ -250,7 +250,7 @@ throw. Up throw lifts them on a column of light and starts juggles (7%,
 
 **Specials** (every special is free):
 - Neutral, **Holy Light:** a golden column bursts at a spot one body-width ahead on frame 16 (`HolyBoltSpecialArt`), 10% at 80°. A hit heals Uther 2%, capped at 6% per stock. 44 frames total, punishable on a whiff.
-- Side, **Devotion Aura:** a golden ring (`DevotionAura`) as he steps forward with armour against hits up to 8% on frames 6-22, ending in a hammer bash (11%). Shield stops it; grabs and strong hits beat the armour.
+- Side, **Devotion Aura:** a golden Defend shield flash (`DefendCaster`) as he steps forward with armour against hits up to 8% on frames 6-22, ending in a hammer bash (11%). Shield stops it; grabs and strong hits beat the armour.
 - Up, **Hammer of the Righteous:** a rising two-handed hammer arc that climbs 2.4 body heights with light steering and hits 8% on frames 8-14. It spends the aerial jump and ends helpless.
 - Down, **Divine Shield:** a golden bubble (`DivineShieldTarget`) makes him intangible to strikes and projectiles on frames 4-26. Grabs beat it, he cannot act inside it, and 24 frames of recovery follow. It is a read, not a reflector, since Tyrande owns the reflector.
 - Ultimate, **Resurrection:** after a 24-frame telegraph, rings of golden light (`ResurrectTarget`) rise across 1.6 stage-body-widths on both sides, launching foes upward (26% total within ultimates.md's damage target), and Uther heals 10%. This is a tier-2 reading: Warcraft's Resurrection raises allies, so here the light raises him and throws the living up. It is distinct from Cairne's Reincarnation, which triggers on death. Shield or dodge the telegraph.
