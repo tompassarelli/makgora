@@ -97,7 +97,7 @@ the pointer, A to choose and B to go back. The panel shows your current control 
 
 Every game opens on the Controls screen, one for each player, before fighter
 select. The top row holds WASD (recommended if you're new), Box (the leverless
-controller style, with P as up and Space as Walk) and your selected Custom slot, shown by its
+controller style, with P as up and Space as Walk) and, once you customize a layout, your selected Custom slot, shown by its
 name and lit gold while selected; picking one saves it as your profile. WASD and
 Box never change: rebinding a key on either copies that layout into a new Custom profile (WASD - custom1, Box - custom1, and so on) without overwriting an existing Custom profile, selects it and saves it. Click the Custom button again
 while it is selected to open the list of all Custom slots, each by its name

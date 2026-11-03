@@ -14,6 +14,7 @@ import {
   customButtonLabel,
   deleteProfile,
   endNaming,
+  hasCustomProfile,
   nameSlot,
   pickBindingPreset,
   pickCustomSlot,
@@ -399,19 +400,22 @@ export class SettingsPanel {
   private renderLayouts(settings: Readonly<BindingSettings>): void {
     for (const [preset, frame] of this.presets) setMenuText(frame, preset === settings.layout ? `${MENU_STYLE.gold}${PRESET_NAMES[preset]}|r` : PRESET_NAMES[preset]);
     const custom = settings.layout === "custom";
+    const showCustom = hasCustomProfile(settings);
     const name = customButtonLabel(settings);
+    setFrameVisible(this.custom.art, showCustom);
     setFrameVisible(this.customLit, custom && !settings.naming);
     setFrameVisible(this.nameField, settings.naming);
     setMenuText(this.custom.label, settings.naming ? "" : custom ? `${DARK}${name}|r` : name);
     setFrameVisible(this.dismiss, settings.picking || settings.naming);
     this.slotButtons.forEach(({ art, label }, slot) => {
-      const exists = slot < settings.customs.length;
+      const exists = slot < settings.customs.length && (!customSlotEmpty(settings.customs, slot) || slot === settings.slot);
       setFrameVisible(art, settings.picking && exists);
       if (!exists) return;
       const name = customSlotEmpty(settings.customs, slot) ? `${slotLabel(settings, slot)} ${MUTED}(empty)|r` : slotLabel(settings, slot);
       setMenuText(label, slot === settings.slot ? `${MENU_STYLE.gold}${name}|r` : name);
     });
     for (const [{ art, label }, caption] of this.edits) {
+      setFrameVisible(art, showCustom);
       setFrameAlpha(art, custom ? LIT_KEY : DIM_KEY);
       setFrameEnabled(art, custom);
       setMenuText(label, !custom ? `${MUTED}${caption}|r` : caption === "Rename" && settings.naming ? `${MENU_STYLE.gold}OK|r` : caption);

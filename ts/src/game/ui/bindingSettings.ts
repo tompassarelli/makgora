@@ -352,9 +352,16 @@ export const slotLabel = (settings: Readonly<BindingSettings>, slot = settings.s
 
 export const customButtonLabel = (settings: Readonly<BindingSettings>): string => `${slotLabel(settings)}${settings.dirty ? "*" : ""}`;
 
+export const hasCustomProfile = (settings: Readonly<BindingSettings>): boolean =>
+  settings.layout === "custom" || settings.customs.some((_, slot) => !customSlotEmpty(settings.customs, slot));
+
 export function pressCustomButton(settings: BindingSettings): void {
-  if (!settings.ready) return;
+  if (!settings.ready || !hasCustomProfile(settings)) return;
   if (settings.layout !== "custom") {
+    if (customSlotEmpty(settings.customs, settings.slot)) {
+      const populated = settings.customs.findIndex((_, index) => !customSlotEmpty(settings.customs, index));
+      if (populated >= 0) settings.slot = populated;
+    }
     pickCustomSlot(settings, settings.slot);
     return;
   }

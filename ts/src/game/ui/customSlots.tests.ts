@@ -2,15 +2,19 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { Action } from "../input/actions";
 import { PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings } from "../input/keyBindings";
 import { customSlotEmpty, decodeLayouts } from "../input/layoutSave";
-import { type BindingLoadResult, applyBindingPreset, beginBindingCapture, beginNaming, captureBinding, initializeBindingSettings, cancelNaming, closeSlotMenu, createBindingSettings, customButtonLabel, deleteProfile, endNaming, nameSlot, pickBindingPreset, pickCustomSlot, pressCustomButton, resetToLayout, saveBindingSettings, slotLabel } from "./bindingSettings";
+import { type BindingLoadResult, applyBindingPreset, beginBindingCapture, beginNaming, captureBinding, hasCustomProfile, initializeBindingSettings, cancelNaming, closeSlotMenu, createBindingSettings, customButtonLabel, deleteProfile, endNaming, nameSlot, pickBindingPreset, pickCustomSlot, pressCustomButton, resetToLayout, saveBindingSettings, slotLabel } from "./bindingSettings";
 import { bindAttack, code, persistedSettings, slots } from "./bindingSettingsFixture";
 
-test("the custom button selects the active Custom slot from WASD or Box, and only once Custom is selected does it open the slot list; picking a slot loads and saves it, and Esc or a click elsewhere closes the list [k2 property]", () => {
+test("the custom button is hidden on a fresh profile until a layout is customized, selects the active Custom slot from WASD or Box, and only once Custom is selected does it open the slot list; picking a slot loads and saves it, and Esc or a click elsewhere closes the list [k2 property]", () => {
   const stored = { encoded: undefined as string | undefined };
   const settings = persistedSettings(stored);
+  assertEquals(hasCustomProfile(settings), false, "fresh profile has no custom profile yet");
+  pressCustomButton(settings);
+  assertEquals(settings.layout, "wasd", "pressing the hidden custom button on a fresh profile does nothing");
   pickCustomSlot(settings, 1);
   bindAttack(settings, code("B"));
   saveBindingSettings(settings);
+  assertEquals(hasCustomProfile(settings), true, "custom profile exists after an edit");
   pickBindingPreset(settings, "wasd");
   pressCustomButton(settings);
   assertEquals(settings.layout, "custom", "the custom button selects Custom");
