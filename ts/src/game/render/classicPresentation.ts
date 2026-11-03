@@ -28,7 +28,8 @@ const QUARTER_TURN = f32(1.5707963);
 const FLINCH_UNITS = 40.0;
 const DAMAGE_FRAMES = 45;
 const DAMAGE_RISE = f32(1.5);
-const DAMAGE_SIDE = 140.0;
+const DAMAGE_SIDE = 170.0;
+const DAMAGE_CHEST = 300.0;
 const DAMAGE_TEXT_HEIGHT = f32(0.034);
 
 const moment: BossMoment = { strike: -1, index: 0, phase: BossPhase.opening, frame: 0 };
@@ -53,6 +54,7 @@ export class ClassicPresentation {
   private readonly damage: FloatingText;
   private damageAge = DAMAGE_FRAMES;
   private damageX = 0.0;
+  private damageY = 0.0;
   private damageZ = 0.0;
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
@@ -83,9 +85,10 @@ export class ClassicPresentation {
     setFloatingTextVisible(this.damage, false);
   }
 
-  private showDamage(x: number, z: number, amount: number): void {
+  private showDamage(x: number, y: number, z: number, amount: number): void {
     this.damageAge = 0;
     this.damageX = x;
+    this.damageY = y;
     this.damageZ = z;
     setFloatingText(this.damage, `-${formatInt(amount)}`, DAMAGE_TEXT_HEIGHT);
     setFloatingTextVisible(this.damage, true);
@@ -94,7 +97,7 @@ export class ClassicPresentation {
   private tickDamage(): void {
     if (this.damageAge >= DAMAGE_FRAMES) return;
     const { origin } = this;
-    setFloatingTextPosition(this.damage, origin.x + this.damageX + DAMAGE_SIDE, origin.y, origin.z + this.damageZ + f32(this.damageAge * DAMAGE_RISE));
+    setFloatingTextPosition(this.damage, origin.x + this.damageX + DAMAGE_SIDE, origin.y + this.damageY, origin.z + this.damageZ + f32(this.damageAge * DAMAGE_RISE));
     setFloatingTextColor(this.damage, 255, 220, 60, this.damageAge < DAMAGE_FRAMES / 2 ? 255 : idiv(510 * (DAMAGE_FRAMES - this.damageAge), DAMAGE_FRAMES));
     this.damageAge++;
     if (this.damageAge >= DAMAGE_FRAMES) setFloatingTextVisible(this.damage, false);
@@ -155,7 +158,7 @@ export class ClassicPresentation {
     const { origin } = this;
     const state = game.run.boss;
     const at = bossPosition(boss, clock);
-    if (this.shownHealth >= 0 && state.health < this.shownHealth) this.showDamage(at.x, at.z, this.shownHealth - state.health);
+    if (this.shownHealth >= 0 && state.health < this.shownHealth) this.showDamage(at.x, boss.depth, f32(boss.standZ + DAMAGE_CHEST), this.shownHealth - state.health);
     this.shownHealth = state.health;
     this.tickDamage();
     const flinch = state.flash > 0 ? f32(FLINCH_UNITS * f32(state.flash / BOSS_FLASH_FRAMES)) : 0.0;

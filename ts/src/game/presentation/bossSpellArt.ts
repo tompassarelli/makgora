@@ -11,9 +11,10 @@ export const RAIN_OF_FIRE_MODEL = "Abilities\\Spells\\Demon\\RainOfFire\\RainOfF
 export const RAIN_OF_FIRE_LANDS = 46;
 export const RAIN_OF_FIRE_FRAMES = 84;
 export const RAIN_OF_FIRE_SCALE = f32(0.75);
-export const COLUMN_FIRE_MODEL = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx";
-export const COLUMN_FIRE_SCALE = { from: f32(0.5), to: f32(1.6) } as const;
-export const FIRE_BURST_MODEL = "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx";
+export const COLUMN_FIRE_MODEL = "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx";
+export const COLUMN_FIRE_SCALE = { from: f32(0.3), to: f32(0.9) } as const;
+export const FIRE_BURST_MODEL = "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx";
+export const FIRE_BURST_SCALE = f32(0.7);
 export const FIRE_BURST_FRAMES = 40;
 
 export const FINGER_LIGHTNING = "AFOD";
@@ -32,10 +33,8 @@ export const SHOCKWAVE_TRAIL_SCALE = { from: f32(0.8), to: f32(1.8) } as const;
 export const SHOCKWAVE_POINTS = 11;
 export const SHOCKWAVE_SPACING = 120.0;
 export const SHOCKWAVE_SWEEP = f32(0.6);
-export const SHOCKWAVE_MODEL = "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx";
-export const SHOCKWAVE_STOMPS = 6;
-export const SHOCKWAVE_STOMP_SPACING = 200.0;
-export const SHOCKWAVE_STOMP_SCALE = f32(1.3);
+export const SHOCKWAVE_MODEL = "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx";
+export const SHOCKWAVE_PILLAR_SCALE = f32(1.2);
 export const SHOCKWAVE_FRAMES = 60;
 
 export const BODY_CAST: { readonly [spell: number]: { readonly tell: string; readonly active: string | undefined } } = {
@@ -45,7 +44,6 @@ export const BODY_CAST: { readonly [spell: number]: { readonly tell: string; rea
 };
 
 export const shockwavePointX = (index: number): number => f32((index - (SHOCKWAVE_POINTS - 1) / 2) * SHOCKWAVE_SPACING);
-export const shockwaveStompX = (index: number): number => f32((index - (SHOCKWAVE_STOMPS - 1) / 2) * SHOCKWAVE_STOMP_SPACING);
 
 export function shockwaveIgnition(index: number, bossX: number, tell: number): number {
   const reach = Math.max(Math.abs(shockwavePointX(0) - bossX), Math.abs(shockwavePointX(SHOCKWAVE_POINTS - 1) - bossX));

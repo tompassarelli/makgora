@@ -1,9 +1,9 @@
 import { f32 } from "wisp/src/sim/f32";
 import {
   BossSpell, COLUMN_FIRE_MODEL, COLUMN_FIRE_SCALE, FINGER_AIM_ALPHA, FINGER_CHARGE_MODEL, FINGER_CHARGE_SCALE, FINGER_CHARGE_Z, FINGER_IMPACT_FRAMES, FINGER_IMPACT_MODEL,
-  FINGER_IMPACT_SCALE, FINGER_LIGHTNING, FINGER_LINGER_FRAMES, FIRE_BURST_FRAMES, FIRE_BURST_MODEL, RAIN_OF_FIRE_FRAMES, RAIN_OF_FIRE_LANDS, RAIN_OF_FIRE_MODEL, RAIN_OF_FIRE_SCALE,
-  SHOCKWAVE_FRAMES, SHOCKWAVE_MODEL, SHOCKWAVE_POINTS, SHOCKWAVE_STOMP_SCALE, SHOCKWAVE_STOMPS, SHOCKWAVE_TRAIL_MODEL, SHOCKWAVE_TRAIL_SCALE, BOSS_HAND_Z,
-  growth, shockwaveIgnition, shockwavePointX, shockwaveStompX,
+  FINGER_IMPACT_SCALE, FINGER_LIGHTNING, FINGER_LINGER_FRAMES, FIRE_BURST_FRAMES, FIRE_BURST_MODEL, FIRE_BURST_SCALE, RAIN_OF_FIRE_FRAMES, RAIN_OF_FIRE_LANDS, RAIN_OF_FIRE_MODEL, RAIN_OF_FIRE_SCALE,
+  SHOCKWAVE_FRAMES, SHOCKWAVE_MODEL, SHOCKWAVE_PILLAR_SCALE, SHOCKWAVE_POINTS, SHOCKWAVE_TRAIL_MODEL, SHOCKWAVE_TRAIL_SCALE, BOSS_HAND_Z,
+  growth, shockwaveIgnition, shockwavePointX,
 } from "../presentation/bossSpellArt";
 import { HIDDEN_EFFECT_DEPTH, FLOOR_HEIGHT } from "../presentation/arenaCamera";
 import type { WorldOrigin } from "./effects";
@@ -95,7 +95,7 @@ export class BossSpells {
     }
     if (this.once(2, cast.into >= cast.tell && cast.into < activeEnd)) {
       this.endGrowing();
-      for (const zone of cast.zones) this.spawn(FIRE_BURST_MODEL, centre(cast, zone), 0.0, f32(zone.halfWidth / 70.0), FIRE_BURST_FRAMES);
+      for (const zone of cast.zones) this.spawn(FIRE_BURST_MODEL, centre(cast, zone), 0.0, f32(FIRE_BURST_SCALE * f32(zone.halfWidth / 90.0)), FIRE_BURST_FRAMES);
     }
   }
 
@@ -127,7 +127,7 @@ export class BossSpells {
       if (this.once(index, cast.into >= lit && cast.into < cast.tell)) this.grow(SHOCKWAVE_TRAIL_MODEL, shockwavePointX(index), 0.0, SHOCKWAVE_TRAIL_SCALE.from, SHOCKWAVE_TRAIL_SCALE.to, lit, cast.tell, 1.0);
     }
     if (this.once(SHOCKWAVE_POINTS, cast.into >= cast.tell && cast.into < activeEnd)) {
-      for (let index = 0; index < SHOCKWAVE_STOMPS; index++) this.spawn(SHOCKWAVE_MODEL, shockwaveStompX(index), 0.0, SHOCKWAVE_STOMP_SCALE, SHOCKWAVE_FRAMES);
+      for (let index = 0; index < SHOCKWAVE_POINTS; index++) this.spawn(SHOCKWAVE_MODEL, shockwavePointX(index), 0.0, SHOCKWAVE_PILLAR_SCALE, SHOCKWAVE_FRAMES);
     }
     if (cast.into >= activeEnd) this.endGrowing();
   }

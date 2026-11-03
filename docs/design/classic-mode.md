@@ -122,7 +122,7 @@ at one of them.
   number and a red bar, counting down to 0 as Master Hand's HP does in
   Melee's Classic. Each hit shakes and reddens the number, leaves a yellow
   trail on the bar that drains after a moment, flashes the boss red, knocks
-  him back a step and floats the damage dealt beside him (Tom's playtest,
+  him back a step and floats the damage dealt beside his chest (Tom's playtest,
   2026-11-03, found no sign that hits landed).
 - **Deterministic pattern** (stage rule 13, #274, in
   makgora:docs/design/stage-art.md). Each boss repeats a fixed timetable of
@@ -225,12 +225,14 @@ Archimonde's strikes show their own stock spell art instead of the outline
 below (Tom's playtest, 2026-11-03, could not read the outline as a spell);
 each grows toward its hit frame, and nothing is written on screen:
 
-- **Rain of Fire**: Flame Strike's gathering fire
-  (`FlameStrikeTarget.mdx`) grows on each column through the tell, and Rain
+- **Rain of Fire**: a burning fire (`TownBurningFireEmitter.mdx`) stands on
+  each column from the first tell frame and grows to the hit, and Rain
   of Fire's own meteors (`RainOfFireTarget.mdx`) start falling on each column
-  46 frames before the hit so they land on its first active frame, with an
-  Incinerate burst (`FireLordDeathExplode.mdx`) as they land. He casts with
-  Spell, then Attack.
+  46 frames before the hit so they land on its first active frame, with a
+  fire tower (`DoomDeath.mdx`) on each column as they land. Flame Strike's
+  fire, War Stomp and Incinerate drew in the Wisp window but not in Warcraft
+  (2026-11-03 capture): their particles lie flat on the ground, edge-on to
+  the side camera, or are too small. He casts with Spell, then Attack.
 - **Finger of Death**: a fel orb (`GreenDragonMissile.mdx`) charges on the
   player's locked spot, growing through the tell, while Finger of Death's
   lightning (`AFOD`) runs from his hand to it, brightening; on the hit the
@@ -238,8 +240,8 @@ each grows toward its hit frame, and nothing is written on screen:
   (`DemonBoltImpact.mdx`). Spell, then Attack.
 - **Doom's Shockwave**: fire (`BreathOfFireDamage.mdx`) runs along the deck
   from under him to both edges over the first 60% of the tell and swells,
-  then War Stomp (`WarStompCaster.mdx`) bursts at six points across the
-  deck. He plays Spell Slam.
+  then a fire jet (`FireTrapUp.mdx`) shoots up at each of those 11 points
+  across the deck. He plays Spell Slam.
 
 The Lich King's and Kil'jaeden's strikes keep the outline: their stock
 spell wind-up runs alongside a yellow rectangular area outline from Warcraft's
