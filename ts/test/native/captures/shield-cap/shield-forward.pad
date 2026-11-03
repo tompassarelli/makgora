@@ -1,14 +1,31 @@
-# Shield-cap native proof: Rifleman raises his shield, then holds the stick full forward, then full back, up and down; the bubble should sit no farther from the body than the tilt modifier's largest tilt.
+# Shield-cap native proof: Rifleman raises his shield, then eases the stick to full forward, full back, up and down (a ramp, so the flick doesn't roll him); the bubble should sit no farther from the body than the tilt modifier's largest tilt.
 #! chat -dev quick pair rifleman / mountain king
 60 a shield 1
 80 a capture
-90 a stick 1 0
-110 a capture
-120 a stick -1 0
-140 a capture
-150 a stick 0 1
-170 a capture
-180 a stick 0 -1
-200 a capture
-210 a stick 0 0
-211 a shield 0
+90 a stick 0.4 0
+96 a stick 0.7 0
+102 a stick 1 0
+125 a capture
+130 a stick 0.7 0
+134 a stick 0.4 0
+138 a stick 0 0
+145 a stick -0.4 0
+151 a stick -0.7 0
+157 a stick -1 0
+180 a capture
+185 a stick -0.7 0
+189 a stick -0.4 0
+193 a stick 0 0
+200 a stick 0 0.4
+206 a stick 0 0.7
+212 a stick 0 1
+235 a capture
+240 a stick 0 0.7
+244 a stick 0 0.4
+248 a stick 0 0
+255 a stick 0 -0.4
+261 a stick 0 -0.7
+267 a stick 0 -1
+290 a capture
+300 a stick 0 0
+301 a shield 0
