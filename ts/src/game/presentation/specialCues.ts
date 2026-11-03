@@ -39,6 +39,7 @@ import { GROM_BLOODLUST_MODEL } from "../assets/importedModelInfo";
 import { joined, variantAt } from "./variantCues";
 import { MOUNTAIN_KING_SPECIALS } from "../fighters/mountain-king/specials";
 import { HOOK_MODEL } from "../fighters/butcher/specials";
+import { REST_END_FRAME, REST_HEAD_X } from "../fighters/peon/specials";
 import { HOOK_LINK_MODEL } from "./hookChain";
 import { HOWL_FIRST, HOWL_REACH } from "../fighters/pit-lord/specials";
 import { SYLVANAS_SPECIALS } from "../fighters/sylvanas/specials";
@@ -188,7 +189,7 @@ const LOG_TEAR_DUST = Array.from({ length: 30 }, () => ({ x: 165.0, z: 6.0 }));
 export const PEON_REST_CUES: MoveCues = {
   spell: "Rest",
   startup: cue("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", "body", f32(1.0)),
-  active: { ...cue("Abilities\\Spells\\Undead\\Sleep\\SleepTarget.mdx", "body", f32(1.5)), rebirthFrames: 48 },
+  active: { ...cue("Abilities\\Spells\\Undead\\Sleep\\SleepTarget.mdx", "body", f32(1.5)), rebirthFrames: 48, anchorFrames: Array.from({ length: REST_END_FRAME }, () => ({ x: REST_HEAD_X, z: 50.0 })) },
 };
 
 
