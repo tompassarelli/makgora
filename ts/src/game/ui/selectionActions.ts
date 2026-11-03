@@ -21,7 +21,7 @@ export interface LobbyNet {
   readonly echoes: readonly string[];
 }
 
-/** Classic's or a Lore Battle's two drawer lines: the start setting and the route. */
+/** Classic's or a Lore Battle's two drawer lines: the chosen battle (empty in Classic) and the route. */
 export interface ClassicLines {
   readonly setting: string;
   readonly route: string;
@@ -56,7 +56,7 @@ export interface SelectionActions {
   toggleItemKind(participantId: number, kind: ItemKind): void;
   chooseMatchMode(participantId: number, mode: MatchMode): void;
   applyRulePreset(participantId: number, preset: RulePreset): void;
-  stepClassicTier(participantId: number, direction: -1 | 1): void;
+  stepLoreBattle(participantId: number, direction: -1 | 1): void;
   stepTraining(participantId: number, setting: TrainingSetting, direction: -1 | 1): void;
   toggleHitAreas(participantId: number): void;
   stepSpeed(participantId: number): void;

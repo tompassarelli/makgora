@@ -10,7 +10,7 @@ import { pressKey } from "../../game/input/playerKeys";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import {
   DEFAULT_RESULT_PICK, Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, shownResultPick, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
-  setTeamBattle, setFriendlyFire, cycleTeam, cycleCostume, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, chooseMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
+  setTeamBattle, setFriendlyFire, cycleTeam, cycleCostume, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, chooseMatchMode, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setOrbsOn, setStocks, setTimeLimit, updateConnectedHumans,
   type MatchState, START_HOLD_FRAMES, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
@@ -328,10 +328,8 @@ export function panelActions(): PanelActions {
       applyRulePreset: (participant, preset) => withSlot(participant, (s, slot) => {
         if (controlsAvailable(s, slot)) applyRulePreset(s.game, slot, preset);
       }),
-      stepClassicTier: (participant, direction) => withSlot(participant, (s, slot) => {
-        if (!controlsAvailable(s, slot)) return;
-        if (s.game.lore) stepLoreBattle(s.game, slot, direction, LORE_BATTLES.length);
-        else stepClassicTier(s.game, slot, direction);
+      stepLoreBattle: (participant, direction) => withSlot(participant, (s, slot) => {
+        if (controlsAvailable(s, slot)) stepLoreBattle(s.game, slot, direction, LORE_BATTLES.length);
       }),
       stepTraining: (participant, setting, direction) => withSlot(participant, (s, slot) => {
         if (!controlsAvailable(s, slot)) return;

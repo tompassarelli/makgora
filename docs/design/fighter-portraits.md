@@ -355,7 +355,7 @@ one row of a few clusters with the rarely used settings one click deeper
    count and time steppers, Ultimates, Items, Endless play, Automatic rematch,
    the Speed and Heavy item toggles while items are on, and Reset default; in
    Training the partner's behaviour, drift, tech and damage, hit areas and game
-   speed; in Classic and Lore Battles the difficulty or battle and the route.
+   speed; in Classic the route; in Lore Battles the battle and the route.
 4. `Guide` with the `F2` key: Controls & Bindings (the controls and keyboard
    screen, as F2), Character Move List and How to Play (the tutorial menu).
 5. The plain gear icon, opening SETTINGS: the input

@@ -90,7 +90,6 @@ export interface ConfiguredRun {
 
   fight: number;
 
-  tier: number;
   outcome: RunOutcome;
 
   cleared: boolean;
@@ -115,7 +114,7 @@ export function createBossState(): BossState {
 
 export function createConfiguredRun(): ConfiguredRun {
   return {
-    active: false, current: undefined, player: 0, fighter: 1, fight: 0, tier: 0, outcome: RunOutcome.none, cleared: false,
+    active: false, current: undefined, player: 0, fighter: 1, fight: 0, outcome: RunOutcome.none, cleared: false,
     frames: 0, damageTaken: 0.0, lastDamage: 0.0, continues: 0,
     savedHumanFighters: 0, savedComputers: 0, savedStocks: 3, savedMinutes: 7, savedHazards: true, savedItems: false,
     boss: createBossState(),
@@ -153,7 +152,6 @@ export function copyConfiguredRun(target: ConfiguredRun, source: Readonly<Config
   target.player = source.player;
   target.fighter = source.fighter;
   target.fight = source.fight;
-  target.tier = source.tier;
   target.outcome = source.outcome;
   target.cleared = source.cleared;
   target.frames = source.frames;
@@ -169,7 +167,7 @@ export function copyConfiguredRun(target: ConfiguredRun, source: Readonly<Config
   copyBossState(target.boss, source.boss);
 }
 
-const INT_FIELDS = ["player", "fighter", "fight", "tier", "outcome", "frames", "continues", "savedHumanFighters", "savedComputers", "savedStocks", "savedMinutes"] as const;
+const INT_FIELDS = ["player", "fighter", "fight", "outcome", "frames", "continues", "savedHumanFighters", "savedComputers", "savedStocks", "savedMinutes"] as const;
 const BOSS_INT_FIELDS = ["kind", "health", "maxHealth", "strike", "hitMask", "lastSerial", "lastWindow", "flash"] as const;
 
 

@@ -11,7 +11,7 @@ import { Character, ItemKind, itemBit } from "../sim/codes";
 import { scheduleMatchItems } from "../match/centreItem";
 import { type MatchOrbs, copyMatchOrbs, createMatchOrbs, resetMatchOrbs } from "../sim/orbState";
 import { lobbyMatchSeed, nextMatchSeed } from "../match/botRandom";
-import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, drawCpuFighter, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
+import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, drawCpuFighter, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
 import { type Roster, fighterAt, isActive, isContender } from "../sim/roster";
 import { type MatchItems, copyMatchItems, createMatchItems } from "../match/items";
 import { type Team } from "../sim/teams";
@@ -31,7 +31,6 @@ export const DEFAULT_RESULT_PICK: ResultPick = ResultPick.rematch;
 export const shownResultPick = (focus: readonly number[] | undefined, slot: number): number => focus?.[slot] ?? DEFAULT_RESULT_PICK;
 export const MATCH_TICKS_PER_SECOND = 60;
 
-export const CLASSIC_TIER_DEFAULT = 1;
 
 export interface MatchState {
   readonly camera: MatchCamera;
@@ -90,7 +89,6 @@ export interface MatchState {
   readonly orbs: MatchOrbs;
 
   classic: boolean;
-  classicTier: number;
 
   lore: boolean;
   loreBattle: number;
@@ -117,7 +115,7 @@ export function createMatchState(): MatchState {
 
     remainingFrames: 7 * 60 * MATCH_TICKS_PER_SECOND, startHold: 0, matchFrame: 0, timedOut: false, practice: false,
     training: false, trainer: createTrainingState(), items: createMatchItems(), orbs: createMatchOrbs(), ultimatesOff: false,
-    classic: false, classicTier: CLASSIC_TIER_DEFAULT, lore: false, loreBattle: 0, run: createConfiguredRun(),
+    classic: false, lore: false, loreBattle: 0, run: createConfiguredRun(),
   };
 }
 
@@ -269,7 +267,6 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
   target.ultimatesOff = source.ultimatesOff;
   copyMatchOrbs(target.orbs, source.orbs);
   target.classic = source.classic;
-  target.classicTier = source.classicTier;
   target.lore = source.lore;
   target.loreBattle = source.loreBattle;
   copyConfiguredRun(target.run, source.run);
@@ -512,11 +509,6 @@ export const matchMode = (game: Readonly<MatchState>): MatchMode => game.lore ? 
 
 export function chooseMatchMode(game: MatchState, slot: number, mode: MatchMode): void {
   for (let step = 0; step < MATCH_MODES.length && matchMode(game) !== mode; step++) cycleMatchMode(game, slot);
-}
-
-
-export function stepClassicTier(game: MatchState, slot: number, direction: number): void {
-  if (settingRules(game, slot) && game.classic) game.classicTier = Math.max(0, Math.min(CPU_TIERS.length - 1, game.classicTier + direction));
 }
 
 

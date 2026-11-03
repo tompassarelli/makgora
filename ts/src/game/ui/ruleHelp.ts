@@ -41,15 +41,15 @@ const TRAINING_HELP = {
 
 export const INPUT_DELAY_HELP = "Input delay: frames a press waits before it acts, the same for every player. Online, Auto follows the slowest connection and the host can press − or + to set a number, or Auto to go back. Against computers it is fixed at 2.";
 
-const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP, friendlyFire: "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams.", inputDelay: INPUT_DELAY_HELP };
+const HELP: Readonly<Record<Exclude<RuleName, "training" | "previousLoreBattle" | "nextLoreBattle">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP, friendlyFire: "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams.", inputDelay: INPUT_DELAY_HELP };
 
 const SHOWN_IN: Readonly<Record<string, (game: Readonly<MatchState>) => boolean>> = {
   ...Object.fromEntries(Object.keys(MATCH_HELP).map(name => [name, versus])),
   ...Object.fromEntries(Object.keys(ITEM_HELP).map(name => [name, (game: Readonly<MatchState>) => versus(game) && game.items.on])),
   ...Object.fromEntries(Object.keys(TRAINING_HELP).map(name => [name, (game: Readonly<MatchState>) => game.training])),
   friendlyFire: (game) => versus(game) && game.teamBattle,
-  easierClassic: (game) => game.classic || game.lore,
-  harderClassic: (game) => game.classic || game.lore,
+  previousLoreBattle: (game) => game.lore,
+  nextLoreBattle: (game) => game.lore,
 };
 
 const ruleShown = (name: RuleName, game: Readonly<MatchState>): boolean => SHOWN_IN[name]?.(game) ?? true;
@@ -77,6 +77,6 @@ function modeHelp(game: Readonly<MatchState>): string {
 
 export function ruleHelp(name: RuleName, game: Readonly<MatchState>): string {
   if (name === "training") return modeHelp(game);
-  if (name === "easierClassic" || name === "harderClassic") return game.lore ? "Battle: choose which lore battle to fight." : "Difficulty: how strong the opponents are on this Classic run.";
+  if (name === "previousLoreBattle" || name === "nextLoreBattle") return "Battle: choose which lore battle to fight.";
   return HELP[name];
 }

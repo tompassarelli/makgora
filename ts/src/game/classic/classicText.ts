@@ -1,19 +1,12 @@
 
 
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
-import { CPU_TIERS } from "../match/cpuProfiles";
 import { MATCH_TICKS_PER_SECOND, type MatchState } from "../lobby/lobbyState";
 import { fighterName } from "../roster/kits";
 import { BossPhase, bossClock, bossDefinition, bossMoment } from "./bosses";
 import { CLASSIC_FIGHTS } from "./classic";
 import { classicRoute } from "./routes";
 import { RunOutcome } from "./runState";
-
-const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
-export const tierName = (tier: number): string => titleCase(CPU_TIERS[tier] ?? "rookie");
-
-
-export const classicTierSetting = (tier: number): string => `Classic start: ${tierName(tier)}`;
 
 
 export function classicRouteSummary(character: number): string {
@@ -41,7 +34,7 @@ export function runTime(frames: number): string {
 export function classicResults(game: Readonly<MatchState>): string {
   const { run } = game;
   const continues = run.continues === 1 ? "1 continue" : `${run.continues} continues`;
-  return `Time ${runTime(run.frames)} · ${Math.floor(run.damageTaken)}% damage taken · ${continues} · finished on ${tierName(run.tier)}`;
+  return `Time ${runTime(run.frames)} · ${Math.floor(run.damageTaken)}% damage taken · ${continues}`;
 }
 
 
@@ -66,7 +59,7 @@ export function classicResultHelp(game: Readonly<MatchState>, confirm: string): 
     const next = run.fight + 1 === CLASSIC_FIGHTS - 1 ? "the final battle" : `round ${run.fight + 2}`;
     return `Press ${confirm} for ${next}. Back ends the run.`;
   }
-  return `Press ${confirm} to continue one tier easier (${tierName(Math.max(0, run.tier - 1))}). Back ends the run.`;
+  return `Press ${confirm} to try this fight again. Back ends the run.`;
 }
 
 

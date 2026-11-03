@@ -144,9 +144,9 @@ export const TRAINING_ROWS = {
   speed: drawerHalf(4, 1),
 } as const;
 
-/** The drawer's rows in Classic and Lore Battles: the difficulty or battle, then the route. */
+/** The drawer's rows in Classic and Lore Battles: the lore battle (Lore Battles only), then the route. */
 export const CLASSIC_ROWS = {
-  tier: wideStep(0),
+  battle: wideStep(0),
   route: box(DRAWER_INNER.x, drawerRow(1), DRAWER_INNER.width, f32(f32(4 * ROW) + f32(3 * ROW_GAP))),
 } as const;
 

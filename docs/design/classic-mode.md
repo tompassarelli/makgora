@@ -61,9 +61,8 @@ On Steam 31.4% clear Arcade Battle and 14.1% finish five Character Episodes.
 
 What Classic takes from them:
 
-- From Ultimate: a themed route per fighter, a chosen starting difficulty that
-  climbs, a continue that lowers it, and a boss with health instead of
-  stocks.
+- From Ultimate: a themed route per fighter, a difficulty that climbs from
+  fight to fight, and a boss with health instead of stocks.
 - From SF6 and Tekken: a short ladder (five or six fights, about ten
   minutes), a rival fight that tells the fighter's story, and a short ending
   for that fighter.
@@ -75,12 +74,12 @@ Every route is six fights:
 
 | Fight | Opponents | Stage | Stocks (player / each rival) | Time | Named opponent and tier |
 | --- | --- | --- | --- | --- | --- |
-| 1 | one lore rival | the rival's stage | 1 / 1 | 3:00 | Vale, start tier |
-| 2 | one lore rival | the rival's stage | 1 / 1 | 3:00 | Ember, start tier |
-| 3 | one lore rival | the rival's stage | 1 / 1 | 3:00 | Flint, start + 1 |
-| 4 | two lore rivals together | the first rival's stage | 2 / 1 | 3:00 | Kite and Wren, start + 1 |
-| 5 | the arch-rival | the fighter's home stage | 2 / 2 | 4:00 | Rook, start + 2 |
-| 6 | the lore boss | the boss's stage, hazards off | 2 / boss health | 5:00 | (boss health from start + 2) |
+| 1 | one lore rival | the rival's stage | 1 / 1 | 3:00 | Vale, Beginner |
+| 2 | one lore rival | the rival's stage | 1 / 1 | 3:00 | Ember, Beginner |
+| 3 | one lore rival | the rival's stage | 1 / 1 | 3:00 | Flint, Intermediate |
+| 4 | two lore rivals together | the first rival's stage | 2 / 1 | 3:00 | Kite and Wren, Intermediate |
+| 5 | the arch-rival | the fighter's home stage | 2 / 2 | 4:00 | Rook, Advanced |
+| 6 | the lore boss | the boss's stage, hazards off | 2 / boss health | 5:00 | (boss health from Advanced) |
 
 Rival fights keep their stage's hazards; items are off. A rival's stage is
 usually its own home stage, so a route visits the places of its story; a
@@ -91,12 +90,14 @@ Each fight is one data entry of the configured-match engine (below).
 
 ## Difficulty curve
 
-The player chooses a starting difficulty at fighter selection, one of the
-computer players' five tiers (Rookie, Beginner, Intermediate, Advanced,
-Expert; makgora:docs/design/cpu-profiles.md); the default is Beginner. The
-fights climb from it: start, start, +1, +1, +2, capped at Expert. A loss
-offers a continue: the same fight again, with the whole run one tier easier
-(not below Rookie). Back at any result ends the run. **Judgement:** whole
+Classic has one difficulty, as the arcade ladders it borrows from do: the
+player never picks one, and the run only ever gets harder, never easier (Tom
+decided this on 2026-11-03). The fights climb through the computer players'
+tiers (makgora:docs/design/cpu-profiles.md): Beginner, Beginner,
+Intermediate, Intermediate, Advanced, and the boss's health and strike set
+from Advanced, capped at Expert. A loss offers a continue: the same fight
+again at the same tier. Back at any result ends the run. Not required: a
+hardcore mode or an achievement for a harder run. **Judgement:** whole
 tiers instead of Ultimate's 0.1 steps, because the tiers are the authored
 difficulty Mak'gora has and each one plays visibly differently.
 
@@ -142,7 +143,7 @@ those tied to Illidan's bargain, the Broken Isles and the Legion's demons.
 Clearing the boss shows the ending card over the result: the fighter's card
 portrait, its name as the speaker in Warcraft's transmission colours, two or
 three lines in the fighter's voice, and the results line:
-`Time 9:42 · 312% damage taken · 1 continue · finished on Beginner`. Time is
+`Time 9:42 · 312% damage taken · 1 continue`. Time is
 match time across every fight, lost ones included; damage taken counts every
 increase in the player's damage. The next press returns to fighter selection
 with the menu's settings as they were. Not required: per-fighter cutscenes,

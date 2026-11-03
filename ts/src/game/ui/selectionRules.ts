@@ -15,7 +15,7 @@ import { formatInt } from "wisp/game/text";
 
 export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
   | { kind: "items" } | { kind: "ultimates" } | { kind: "itemKind"; item: ItemKind } | { kind: "matchMode"; mode: MatchMode } | { kind: "partner"; setting: TrainingSetting; direction: -1 | 1 } | { kind: "hitAreas" } | { kind: "speed" }
-  | { kind: "classicTier"; direction: -1 | 1 } | { kind: "inputDelay"; step: -1 | 0 | 1 } | { kind: "preset"; preset: RulePreset };
+  | { kind: "loreBattle"; direction: -1 | 1 } | { kind: "inputDelay"; step: -1 | 0 | 1 } | { kind: "preset"; preset: RulePreset };
 
 export type AddRule = (frame: Frame, target: RuleButton, box: BarBox) => Frame;
 
@@ -41,11 +41,11 @@ export interface RuleFrames {
   readonly partner: Readonly<Record<TrainingSetting, Stepper>>;
   readonly hitAreas: BarControl;
   readonly speed: BarControl;
-  readonly classic: Stepper;
+  readonly battle: Stepper;
   readonly route: Frame;
   readonly versus: RuleGroup;
   readonly training: RuleGroup;
-  readonly classicFrames: RuleGroup;
+  readonly loreFrames: RuleGroup;
 }
 
 const PRESETS: readonly RulePreset[] = ["tourney", "party", "endless"];
@@ -90,17 +90,17 @@ export function createRulesDrawer(drawer: Frame, suffix: string, add: AddRule): 
   const partner = { behaviour: partnerRow("behaviour"), escape: partnerRow("escape"), tech: partnerRow("tech"), damage: partnerRow("damage") };
   const hitAreas = pressable(drawer, add, name("HitAreas"), TRAINING_ROWS.hitAreas, { kind: "hitAreas" }, "");
   const speed = pressable(drawer, add, name("Speed"), TRAINING_ROWS.speed, { kind: "speed" }, "");
-  const classic = stepper(drawer, add, name("Classic"), CLASSIC_ROWS.tier, direction => ({ kind: "classicTier", direction }), BAR_TEXT);
+  const battle = stepper(drawer, add, name("Classic"), CLASSIC_ROWS.battle, direction => ({ kind: "loreBattle", direction }), BAR_TEXT);
   const route = barText(drawer, name("Route"), CLASSIC_ROWS.route, BAR_SMALL_TEXT, TextAlignment.left);
   const steps = (...all: Stepper[]): RuleGroup => ({ controls: all.flatMap(s => [s.less, s.more]), texts: all.map(s => s.value) });
   const versusSteps = steps(stocks, time);
   const trainingSteps = steps(partner.behaviour, partner.escape, partner.tech, partner.damage);
-  const classicSteps = steps(classic);
+  const battleSteps = steps(battle);
   return {
-    heading, presets, reset, stocks, time, toggles, itemKinds, partner, hitAreas, speed, classic, route,
+    heading, presets, reset, stocks, time, toggles, itemKinds, partner, hitAreas, speed, battle, route,
     versus: { controls: [...presets, reset, ...versusSteps.controls, toggles.ultimates, toggles.items, toggles.endless, toggles.automaticRematch], texts: [stockLabel, timeLabel, ...versusSteps.texts] },
     training: { controls: [...trainingSteps.controls, hitAreas, speed], texts: trainingSteps.texts },
-    classicFrames: { controls: classicSteps.controls, texts: [...classicSteps.texts, route] },
+    loreFrames: battleSteps,
   };
 }
 
@@ -145,7 +145,7 @@ function presentTraining(rules: RuleFrames, game: Readonly<MatchState>): void {
 }
 
 function presentClassic(rules: RuleFrames, lines: ClassicLines): void {
-  setMenuText(rules.classic.value, `${BAR_COLOURS.gold}${lines.setting}|r`);
+  setMenuText(rules.battle.value, `${BAR_COLOURS.gold}${lines.setting}|r`);
   setMenuText(rules.route, lines.route);
 }
 
@@ -157,7 +157,8 @@ export function presentRules(rules: RuleFrames, game: Readonly<MatchState>, clas
   showAll(rules.versus, mode === "versus");
   for (const control of rules.itemKinds) showControl(control, mode === "versus");
   showAll(rules.training, mode === "training");
-  showAll(rules.classicFrames, mode === "classic" || mode === "lore");
+  showAll(rules.loreFrames, mode === "lore");
+  setFrameVisible(rules.route, mode === "classic" || mode === "lore");
   if (mode === "versus") presentVersus(rules, game);
   else if (mode === "training") presentTraining(rules, game);
   else if (classic !== undefined) presentClassic(rules, classic);
@@ -221,7 +222,7 @@ const RULE_HANDLERS: RuleHandlers = {
   ultimates: (actions, id) => actions.toggleUltimates(id),
   itemKind: (actions, id, button) => actions.toggleItemKind(id, button.item),
   matchMode: (actions, id, button) => actions.chooseMatchMode(id, button.mode),
-  classicTier: (actions, id, button) => actions.stepClassicTier(id, button.direction),
+  loreBattle: (actions, id, button) => actions.stepLoreBattle(id, button.direction),
   partner: (actions, id, button) => actions.stepTraining(id, button.setting, button.direction),
   hitAreas: (actions, id) => actions.toggleHitAreas(id),
   speed: (actions, id) => actions.stepSpeed(id),
