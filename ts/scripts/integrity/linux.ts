@@ -38,7 +38,7 @@ function ioctl(fd: number, request: number, argument: number | Uint8Array | Int3
 }
 
 const UDEV_DATA = "/run/udev/data";
-const TWIN_PROPERTY = "E:SMASHCRAFT_TEST_PAD_NODE=";
+const TWIN_PROPERTY = "E:MAKGORA_TEST_PAD_NODE=";
 
 export interface Pad {
   readonly fd: number;

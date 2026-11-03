@@ -50,7 +50,7 @@ export const CLOCK_MONOTONIC = 1;
 
 export const INPUT_EVENT_BYTES = 24;
 const ABS_CNT = 0x40;
-const PAD_NAME = "Smashcraft Event Retention Virtual Gamepad";
+const PAD_NAME = "Makgora Event Retention Virtual Gamepad";
 
 export const PAD_BUTTONS = [BTN_A, BTN_B, BTN_X, BTN_Y, BTN_TL, BTN_TR, BTN_START] as const;
 const PAD_AXES = [ABS_X, ABS_Y, ABS_Z, ABS_RX, ABS_RY, ABS_RZ] as const;
