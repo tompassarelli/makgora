@@ -48,7 +48,7 @@ export class BossPlate {
   private readonly barBack: Frame;
   private readonly trail: Frame;
   private readonly fill: Frame;
-  private shown = false;
+  private shown = true;
   private shownName = "";
   private shownHealth = -1;
   private trailFill = 1.0;

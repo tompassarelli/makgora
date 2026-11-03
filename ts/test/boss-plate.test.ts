@@ -93,3 +93,21 @@ test("Archimonde's boss plate shows his name, portrait and remaining health, cou
   expect(heights[heights.length - 1] ?? 1).toBeLessThan(DAMAGE_TEXT_HEIGHT / 4);
   expect(client.errors).toEqual([]);
 });
+
+test("no boss plate frame is drawn on character select or in a versus match [k1 scenario]", () => {
+  const clients = headless.clients({ install, start: () => startBuild(BUILD) }, [0]);
+  const client = clients.client(0);
+  clients.start();
+  clients.frames(120);
+  const plateFrames = () => client.frames.snapshot({ visibleOnly: true }).filter(frame => frame.name.startsWith("BossPlate") || frame.context === BOSS_PLATE_CONTEXT).map(frame => frame.name);
+  expect(plateFrames()).toEqual([]);
+  clients.chat(0, "-dev quick cpu wren expert hero rifleman");
+  let phase = -1;
+  for (let frame = 0; frame < LOBBY_FRAMES && phase !== Phase.match; frame++) {
+    clients.frames(1);
+    client.run(() => { phase = shellState()?.game.phase ?? -1; });
+  }
+  expect(phase).toBe(Phase.match);
+  clients.frames(30);
+  expect(plateFrames()).toEqual([]);
+});
