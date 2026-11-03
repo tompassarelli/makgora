@@ -19,6 +19,8 @@ export interface LayoutSave {
   readonly customs: readonly CustomSlot[];
   readonly slot: number;
   readonly keyboard: boolean;
+  readonly stickJump: boolean;
+  readonly cStickTilt: boolean;
 }
 
 const LAYOUT_SAVE = "KL";
@@ -50,15 +52,16 @@ export function presetLayouts(): LayoutBindings {
 }
 
 /** A brand-new player sees the keyboard preview; a save from before the setting existed loads with it off. */
-export function layoutSave(layouts: LayoutBindings, active: BindingPreset, keyboard = true): LayoutSave {
+export function layoutSave(layouts: LayoutBindings, active: BindingPreset, keyboard = true, stickJump = false, cStickTilt = true): LayoutSave {
   const customs: CustomSlot[] = [];
   for (let slot = 0; slot < CUSTOM_SLOT_COUNT; slot++) customs.push({ bindings: slot === 0 ? layouts.custom : presetBindings("custom"), name: "" });
-  return { layouts, active, customs, slot: 0, keyboard };
+  return { layouts, active, customs, slot: 0, keyboard, stickJump, cStickTilt };
 }
 
-export function encodeLayouts({ layouts, active, customs, slot, keyboard }: LayoutSave): string {
+export function encodeLayouts({ layouts, active, customs, slot, keyboard, stickJump, cStickTilt }: LayoutSave): string {
   const custom = customs.map(({ bindings, name }) => encodeBindings(bindings) + String(name.length).padStart(2, "0") + name).join("");
-  return KEYBOARD_SAVE + BINDING_PRESETS.indexOf(active) + slot + (keyboard ? 1 : 0) + encodeBindings(layouts.wasd) + encodeBindings(layouts.standard) + custom;
+  const flags = (keyboard ? 1 : 0) + (stickJump ? 2 : 0) + (cStickTilt ? 0 : 4);
+  return KEYBOARD_SAVE + BINDING_PRESETS.indexOf(active) + slot + flags + encodeBindings(layouts.wasd) + encodeBindings(layouts.standard) + custom;
 }
 
 interface Cursor {
@@ -102,8 +105,8 @@ function decodeOneCustom(saved: string, active: BindingPreset): LayoutSave | und
 function decodeCustomSlots(saved: string, active: BindingPreset, withFlag: boolean, withKeyboard: boolean): LayoutSave | undefined {
   const slot = DIGITS.indexOf(saved.charAt(3));
   if (slot < 0 || slot >= CUSTOM_SLOT_COUNT) return undefined;
-  const flagDigit = withFlag ? saved.charAt(4) : "0";
-  if (flagDigit !== "0" && flagDigit !== "1") return undefined;
+  const flags = withFlag ? DIGITS.indexOf(saved.charAt(4)) : 0;
+  if (flags < 0 || flags > (withKeyboard ? 7 : 1)) return undefined;
   const layouts = presetLayouts();
   const cursor = { saved, at: withFlag ? 5 : 4 };
   for (const preset of ["wasd", "standard"] as const) {
@@ -121,7 +124,12 @@ function decodeCustomSlots(saved: string, active: BindingPreset, withFlag: boole
   const chosen = customs[slot];
   if (chosen === undefined || cursor.at !== saved.length) return undefined;
   layouts.custom = chosen.bindings;
-  return { layouts, active, customs, slot, keyboard: withKeyboard && flagDigit === "1" };
+  return {
+    layouts, active, customs, slot,
+    keyboard: withKeyboard && (flags & 1) !== 0,
+    stickJump: withKeyboard && (flags & 2) !== 0,
+    cStickTilt: !withKeyboard || (flags & 4) === 0,
+  };
 }
 
 export function decodeLayouts(saved: string): LayoutSave | undefined {

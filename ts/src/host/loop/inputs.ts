@@ -6,7 +6,7 @@ import { resetKeys } from "../../game/input/keyboardCapture";
 import { actionFor, keyFor } from "../../game/input/keyBindings";
 import { PAD_LAYER } from "../../game/input/padKeys";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot, participantActive } from "../../game/input/participants";
-import { clearKeys } from "../../game/input/playerKeys";
+import { clearKeys, withControlOptions } from "../../game/input/playerKeys";
 import { endReplaySegment } from "./replays";
 import { humanFighterActive, humanPresent } from "../../game/lobby/lobbyState";
 import { type ShellState, keepShellMomentEnd, localSlot } from "./state";
@@ -73,7 +73,7 @@ export function pollLocalKeys(s: Readonly<ShellState>): number {
   beginKeyPoll(s.localKeys);
   const slot = localSlot();
   if (!isParticipantSlot(slot) || !windowFocused() || !humanFighterActive(s.game, slot) || (s.chatOpen?.() ?? warcraftChatOpen(s.chatFrame))) return 0;
-  const { bindings } = s.participants[slot].bindings;
+  const { bindings, stickJump, cStickTilt } = s.participants[slot].bindings;
   const menuHeld = s.pauseKeysHeld;
   if (menuHeld !== undefined) {
     for (let index = menuHeld.length - 1; index >= 0; index--) {
@@ -89,5 +89,5 @@ export function pollLocalKeys(s: Readonly<ShellState>): number {
   for (const { action, code } of PAD_LAYER) {
     if (pressed(code) && actionFor(bindings, code) === undefined) held |= bit(action);
   }
-  return held;
+  return withControlOptions(held, stickJump, cStickTilt);
 }

@@ -64,6 +64,8 @@ export interface BindingSettings {
   customs: readonly CustomSlot[];
   slot: number;
   keyboard: boolean;
+  stickJump: boolean;
+  cStickTilt: boolean;
   bindings: KeyBindings;
 
   ready: boolean;
@@ -81,8 +83,8 @@ export interface BindingSettings {
 }
 
 export function createBindingSettings(owner: number, persistence: BindingPersistence): BindingSettings {
-  const { layouts, customs, slot, keyboard } = layoutSave(presetLayouts(), DEFAULT_PRESET);
-  return { owner, persistence, layouts, customs, slot, keyboard, bindings: layouts[DEFAULT_PRESET], ready: false, profile: "unknown", dirty: false, capture: undefined, layout: DEFAULT_PRESET, picking: false, naming: false, nameBefore: "", revision: 0, message: "Loading controls..." };
+  const { layouts, customs, slot, keyboard, stickJump, cStickTilt } = layoutSave(presetLayouts(), DEFAULT_PRESET);
+  return { owner, persistence, layouts, customs, slot, keyboard, stickJump, cStickTilt, bindings: layouts[DEFAULT_PRESET], ready: false, profile: "unknown", dirty: false, capture: undefined, layout: DEFAULT_PRESET, picking: false, naming: false, nameBefore: "", revision: 0, message: "Loading controls..." };
 }
 
 
@@ -98,6 +100,8 @@ function adopt(settings: BindingSettings, save: LayoutSave): void {
   settings.customs = save.customs;
   settings.slot = save.slot;
   settings.keyboard = save.keyboard;
+  settings.stickJump = save.stickJump;
+  settings.cStickTilt = save.cStickTilt;
   settings.layout = save.active;
   settings.picking = false;
   settings.naming = false;
@@ -266,7 +270,7 @@ export function resetToLayout(settings: BindingSettings): void {
 export function saveBindingSettings(settings: BindingSettings): void {
   if (!settings.ready) return;
   settings.capture = undefined;
-  settings.persistence.save(settings.owner, encodeLayouts({ layouts: settings.layouts, active: settings.layout, customs: settings.customs, slot: settings.slot, keyboard: settings.keyboard }));
+  settings.persistence.save(settings.owner, encodeLayouts({ layouts: settings.layouts, active: settings.layout, customs: settings.customs, slot: settings.slot, keyboard: settings.keyboard, stickJump: settings.stickJump, cStickTilt: settings.cStickTilt }));
   settings.profile = "saved";
   settings.dirty = false;
   settings.message = "Controls saved for next time.";
@@ -277,6 +281,20 @@ export function toggleKeyboardPreview(settings: BindingSettings): void {
   settings.keyboard = !settings.keyboard;
   saveBindingSettings(settings);
   settings.message = settings.keyboard ? "The keyboard shows in game." : "The keyboard is hidden in game.";
+}
+
+export function toggleStickJump(settings: BindingSettings): void {
+  if (!settings.ready) return;
+  settings.stickJump = !settings.stickJump;
+  saveBindingSettings(settings);
+  settings.message = settings.stickJump ? "Stick Jump is on." : "Stick Jump is off.";
+}
+
+export function toggleCStickTilt(settings: BindingSettings): void {
+  if (!settings.ready) return;
+  settings.cStickTilt = !settings.cStickTilt;
+  saveBindingSettings(settings);
+  settings.message = settings.cStickTilt ? "C-Stick Tilt Attack is on." : "C-Stick Tilt Attack is off (Smash Attack).";
 }
 
 export function cancelBindingCapture(settings: BindingSettings): void {

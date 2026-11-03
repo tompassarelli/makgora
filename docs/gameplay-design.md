@@ -172,9 +172,8 @@ into each state and check each allowed and refused option.
 
 Where Smashcraft keeps its own rule, and why:
 
-- Tap jump stays off: jumps use the jump button and Up stays the up-attack
-  direction on keyboard. The jump and dash-1f-jump zones are computed but do
-  not jump.
+- Tap jump is off by default: jumps use the jump button and Up stays the up-attack
+  direction on keyboard. Turning on Stick Jump on the Controls screen makes holding Up also press Jump (full cardinal up + Jump) unless Mod Y or Shield + Mod X is held.
 - Turns have no separate 11-frame Turn state: a tilt turn walks the other way
   at once and a smash turn is the dash back.
 - Specials are not gated by ground state (Melee's Dash allows only the side
@@ -233,7 +232,7 @@ Where Smashcraft keeps its own rule, and why:
   stops and tilts on the press frame while A with a direction stays the dash
   attack (Tom's keyboard playtest, 2026-10-28: a held direction key is a
   full stick, so tilting while moving otherwise gave the dash attack); in the
-  air it gives the aerials. Smashes come only from Strong.
+  air it gives the aerials. Turning off C-Stick Tilt Attack on the Controls screen makes the C-stick give uncharged smashes on the ground instead.
 - A held stick at full deflection (keyboard keys and a pad at the rim) still
   dashes when it was not a fresh flick, keeping the walk modifier's release
   to a dash (smashcraft:docs/physics.md); a pad held at 0.8–0.99 walks fast.
@@ -1152,10 +1151,10 @@ four specials on the ground and in the air.
   one side, the split falling on the team boundary nearest the middle
   (`plateOrder`). The preview is a CONTROLS panel after the owner's sketch (2 Nov):
   two columns in the owner's rows, labels and order listing every bindable
-  action with the local player's own key in brackets, [-] when unbound: Up,
+  action with the local player's own key, - when unbound: Up,
   Down, Left, Right, then Mod-X (Walk), then A (Atk), B (Spc), X (Jmp)
   and Y (Jmp, short hop) on the left; C-Up to C-Right, then Mod-Y (Tilt),
-  then Shield (both trigger keys, [Q]/[7]), Lightshield, Strong (Smash) and
+  then Shield (both trigger keys, Q/7), Lightshield, Strong (Smash) and
   Grab on the right; each row lit while one of its keys is held. Its
   text shrinks until every label and key fits its column, the columns taking
   width in proportion to their text (`keyboardPreview.ts`); a pad

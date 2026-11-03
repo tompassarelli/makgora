@@ -36,12 +36,26 @@ export function actionHeld({ heldFirst, heldSecond, heldPad }: Readonly<PlayerKe
 }
 
 
-export function heldActions(keys: Readonly<PlayerKeys>): number {
+const SHIELD_TRIGGERS = (1 << Action.leftTrigger) | (1 << Action.rightTrigger) | (1 << Action.lightShield);
+const C_STICK_ACTIONS = (1 << Action.cLeft) | (1 << Action.cRight) | (1 << Action.cUp) | (1 << Action.cDown);
+
+export function withControlOptions(held: number, stickJump = false, cStickTilt = true): number {
+  let out = held;
+  if (stickJump) {
+    const up = (out & (1 << Action.moveUp)) !== 0 && (out & (1 << Action.moveDown)) === 0;
+    const tilted = (out & (1 << Action.modY)) !== 0 || ((out & (1 << Action.modX)) !== 0 && (out & SHIELD_TRIGGERS) !== 0);
+    if (up && !tilted) out |= 1 << Action.jump;
+  }
+  if (!cStickTilt && (out & C_STICK_ACTIONS) !== 0) out |= 1 << Action.strong;
+  return out;
+}
+
+export function heldActions(keys: Readonly<PlayerKeys>, stickJump = false, cStickTilt = true): number {
   let mask = 0;
   for (const action of ACTION_ORDER) {
     if (actionHeld(keys, action)) mask |= 1 << action;
   }
-  return mask;
+  return withControlOptions(mask, stickJump, cStickTilt);
 }
 
 export function directionX(keys: Readonly<PlayerKeys>): Direction {

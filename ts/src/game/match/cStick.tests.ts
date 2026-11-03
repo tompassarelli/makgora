@@ -9,10 +9,11 @@ import { createRoster } from "../sim/roster";
 import { DASH_SMASH_LAST_FRAME } from "../sim/stickZones";
 import { lift } from "../sim/testDuel";
 import { Action, bit } from "../input/actions";
+import { withControlOptions } from "../input/playerKeys";
 import { adaptInput } from "./inputAdapter";
 import { commitEdges, keyboardCapture, sampleKeys } from "../input/keyboardCapture";
 
-const A = bit(Action.attack), S = bit(Action.strong);
+const A = bit(Action.attack), S = bit(Action.strong), MY = bit(Action.modY);
 const R = bit(Action.moveRight), L = bit(Action.moveLeft), U = bit(Action.moveUp), D = bit(Action.moveDown);
 const CR = bit(Action.cRight), CL = bit(Action.cLeft), CU = bit(Action.cUp), CD = bit(Action.cDown);
 
@@ -108,4 +109,31 @@ test("a C-stick press out of a dash, a run or a run brake is the tilt it names: 
   for (let i = 0; i < 60 && a.owner.ground.action !== GroundAction.run; i++) a.press(R);
   a.press(R | A);
   assertEquals(a.owner.attack.style, AttackStyle.dashAttack);
+});
+
+test("Stick Jump makes Move Up jump with full cardinal up while Mod Y + Up still tilts, and turning C-Stick Tilt Attack off makes C-stick smash on the ground and aerial in the air [k1 scenario]", () => {
+  const jump = keyboard(1);
+  assertEquals(withControlOptions(U, true, true), U | bit(Action.jump));
+  jump.press(withControlOptions(U, true, true));
+  assertTrue(jump.owner.jump.squat > 0);
+
+  const tilt = keyboard(1);
+  tilt.press(withControlOptions(U | MY | A, true, true));
+  assertEquals(tilt.owner.jump.squat, 0);
+  assertEquals(tilt.owner.attack.style, AttackStyle.upTilt);
+
+  const groundSmash = (key: number): AttackStyle => key === CU ? AttackStyle.upSmash : key === CD ? AttackStyle.downSmash : AttackStyle.forwardSmash;
+  for (const facing of [1, -1] as const) {
+    for (const key of [CR, CL, CU, CD]) {
+      const { owner, press } = keyboard(facing);
+      press(withControlOptions(key, false, false));
+      assertEquals(owner.attack.style, groundSmash(key));
+      assertEquals(owner.facing, key === CR ? 1 : key === CL ? -1 : facing);
+      assertEquals(owner.attack.smashCharging, false);
+    }
+  }
+  const air = keyboard(1);
+  lift(air.owner, f32(400.0));
+  air.press(withControlOptions(CL, false, false));
+  assertEquals(air.owner.attack.style, AttackStyle.backAir);
 });

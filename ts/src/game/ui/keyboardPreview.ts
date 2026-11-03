@@ -76,14 +76,14 @@ export const PREVIEW_DIVIDERS: readonly { readonly column: number; readonly y: n
 
 const firstKey = (bindings: Readonly<KeyBindings>, action: Action): number | undefined => keyFor(bindings, action, 0) ?? keyFor(bindings, action, 1);
 
-/** The row's keys in brackets as the player's current bindings name them, both when a row's two actions are bound ([Q]/[7]), or [-] when none is. */
+/** The row's keys as the player's current bindings name them, both when a row's two actions are bound (Q/7), or - when none is. */
 export function previewKeyText(bindings: Readonly<KeyBindings>, row: PreviewRow): string {
   const shown: string[] = [];
   for (const action of row.actions) {
     const key = firstKey(bindings, action);
-    if (key !== undefined) shown.push(`[${keyLabel(key)}]`);
+    if (key !== undefined) shown.push(keyLabel(key));
   }
-  return shown.length === 0 ? "[-]" : shown.join("/");
+  return shown.length === 0 ? "-" : shown.join("/");
 }
 
 export function previewRowHeld(bindings: Readonly<KeyBindings>, row: PreviewRow, down: (this: void, key: number) => boolean): boolean {

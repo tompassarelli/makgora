@@ -113,8 +113,7 @@ captures one for it. Escape cancels a rebind. Rename turns the Custom button int
 text field for the slot's name: Enter, OK or a click elsewhere keeps it and Escape puts
 the old name back.
 Reset brings back the Custom defaults, and Delete empties the slot back to the
-Custom defaults with no name; all three are greyed out on WASD and Box. The
-bottom row holds Show keyboard in game on the left and Save and Done on the right.
+Custom defaults with no name; all three are greyed out on WASD and Box. The bottom row holds Show keyboard in game on the left and Save and Done on the right, with Stick Jump (off by default; when on, pressing Up jumps with full cardinal up unless Mod Y or Shield + Mod X is held) and C-Stick Tilt Attack (on by default; when off, the C-stick keys give uncharged smashes on the ground and aerials in the air) just above the status line.
 Done (or Escape) closes the screen and goes on to fighter
 select; each player confirms their own. F1 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to
@@ -124,7 +123,7 @@ is refused and the screen names what it is reserved for.
 
 Show keyboard in game is on for a new player and off for anyone who saved controls before it
 existed. In a match a CONTROLS panel sits in the bottom row between the player panels (they move to the screen's edges, and shrink a little with three or four players, to give it room) and lists
-every action with the key you bound to it in brackets ([-] when unbound): movement, Mod-X (Walk), then
+every action with the key you bound to it (- when unbound): movement, Mod-X (Walk), then
 A (Atk), B (Spc), X (Jmp) and Y (Jmp, the short hop) on the left; the C-stick, Mod-Y (Tilt), then
 Shield (both trigger keys), Lightshield, Strong (Smash) and Grab on the right. A row lights while you hold its key (your controller's buttons on a pad). Press F2 in a match or click "Show keyboard in
 game" on the Controls screen to hide or show it, and the choice is saved with your controls. If you

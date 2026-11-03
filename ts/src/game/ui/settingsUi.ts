@@ -22,7 +22,9 @@ import {
   resetToLayout,
   saveBindingSettings,
   slotLabel,
+  toggleCStickTilt,
   toggleKeyboardPreview,
+  toggleStickJump,
 } from "./bindingSettings";
 import { ButtonClicks, createBackdrop, createText, frameMenuPanel, gameUi, placeTopLeft, setMenuText } from "./frames";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
@@ -37,7 +39,7 @@ export interface SettingsActions {
   closeSettings(participantId: number): void;
 }
 
-type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "custom" } | { kind: "slot"; slot: number } | { kind: "dismiss" } | { kind: "name" } | { kind: "delete" } | { kind: "save" } | { kind: "close" } | { kind: "key"; key: number } | { kind: "clear"; key: number } | { kind: "reset" } | { kind: "bindUnbound" } | { kind: "keyboard" };
+type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "custom" } | { kind: "slot"; slot: number } | { kind: "dismiss" } | { kind: "name" } | { kind: "delete" } | { kind: "save" } | { kind: "close" } | { kind: "key"; key: number } | { kind: "clear"; key: number } | { kind: "reset" } | { kind: "bindUnbound" } | { kind: "keyboard" } | { kind: "stickJump" } | { kind: "cStickTilt" };
 
 interface KeyButton {
   readonly key: number;
@@ -63,6 +65,7 @@ const PRESET_WIDTH = f32(0.118);
 const EDIT_STEP = f32(0.079);
 const EDIT_WIDTH = f32(0.075);
 const SLOT_HEIGHT = f32(0.03);
+const OPTIONS_Y = below(f32(0.376));
 const BOTTOM_Y = below(f32(0.448));
 const BOTTOM_HEIGHT = f32(0.027);
 const BOTTOM_WIDTH = f32(0.105);
@@ -73,6 +76,8 @@ export const slotOption = (slot: number) => ({ x: CUSTOM_BUTTON.x, y: f32(f32(CU
 export const PICKER_DONE = { x: f32(RIGHT - BOTTOM_WIDTH), y: BOTTOM_Y, width: BOTTOM_WIDTH, height: BOTTOM_HEIGHT } as const;
 const SAVE_BUTTON = { x: f32(f32(PICKER_DONE.x - BOTTOM_WIDTH) - f32(0.004)), y: BOTTOM_Y, width: BOTTOM_WIDTH, height: BOTTOM_HEIGHT } as const;
 export const KEYBOARD_BUTTON = { x: LEFT, y: BOTTOM_Y, width: f32(0.22), height: BOTTOM_HEIGHT } as const;
+export const STICK_JUMP_BUTTON = { x: LEFT, y: OPTIONS_Y, width: f32(0.18), height: BOTTOM_HEIGHT } as const;
+export const C_STICK_TILT_BUTTON = { x: f32(LEFT + f32(0.184)), y: OPTIONS_Y, width: f32(0.22), height: BOTTOM_HEIGHT } as const;
 const BIND_BUTTON = { x: f32(RIGHT - f32(0.15)), y: below(f32(0.107)), width: f32(0.15), height: f32(0.022) } as const;
 const DIM_KEY = 105;
 const LIT_KEY = 255;
@@ -146,6 +151,8 @@ export class SettingsPanel {
   private readonly nameField: Frame;
   private readonly nameEvents: Events;
   private readonly keyboardButton: Frame;
+  private readonly stickJumpButton: Frame;
+  private readonly cStickTiltButton: Frame;
   private readonly bindButton: PanelButton;
   private open = false;
   private rootShown = false;
@@ -221,8 +228,10 @@ export class SettingsPanel {
       setFrameTextAlignment(action, TextAlignment.middle, TextAlignment.center);
       return { key, frame: art, action, clear };
     });
-    this.status = line("MeleeSettingsStatus", LEFT, below(f32(0.375)), f32(0.6), f32(0.016));
+    this.status = line("MeleeSettingsStatus", LEFT, below(f32(0.412)), f32(0.6), f32(0.016));
     this.keyboardButton = button("MeleeSettingsKeyboard", KEYBOARD_BUTTON, "", { kind: "keyboard" }).label;
+    this.stickJumpButton = button("MeleeSettingsStickJump", STICK_JUMP_BUTTON, "", { kind: "stickJump" }).label;
+    this.cStickTiltButton = button("MeleeSettingsCStickTilt", C_STICK_TILT_BUTTON, "", { kind: "cStickTilt" }).label;
     button("MeleeSettingsSave", SAVE_BUTTON, "Save", { kind: "save" });
     button("MeleeSettingsClose", PICKER_DONE, "Done", { kind: "close" });
     this.bindButton = button("MeleeSettingsBind", BIND_BUTTON, "", { kind: "bindUnbound" });
@@ -310,6 +319,8 @@ export class SettingsPanel {
     else if (button.kind === "reset") resetToLayout(settings);
     else if (button.kind === "bindUnbound") bindFirstUnbound(settings);
     else if (button.kind === "keyboard") toggleKeyboardPreview(settings);
+    else if (button.kind === "stickJump") toggleStickJump(settings);
+    else if (button.kind === "cStickTilt") toggleCStickTilt(settings);
     else beginKeyCapture(settings, button.key);
   }
 
@@ -364,7 +375,7 @@ export class SettingsPanel {
     if (!this.local || !this.open) return;
     const { settings } = this;
     const { capture } = settings;
-    const signature = `${settings.keyboard ? "k" : "-"}${settings.layout}${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.dirty ? "d" : "-"}${settings.picking ? "s" : "-"}${settings.naming ? "n" : "-"}${formatInt(settings.slot)}${settings.customs.map(custom => custom.name).join("|")}${capture === undefined ? "-" : formatInt(capture.action * 2 + capture.slot)}`;
+    const signature = `${settings.keyboard ? "k" : "-"}${settings.stickJump ? "j" : "-"}${settings.cStickTilt ? "t" : "-"}${settings.layout}${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.dirty ? "d" : "-"}${settings.picking ? "s" : "-"}${settings.naming ? "n" : "-"}${formatInt(settings.slot)}${settings.customs.map(custom => custom.name).join("|")}${capture === undefined ? "-" : formatInt(capture.action * 2 + capture.slot)}`;
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
     this.showRoot(true);
@@ -375,6 +386,8 @@ export class SettingsPanel {
   private renderHeader(settings: Readonly<BindingSettings>): void {
     this.renderLayouts(settings);
     setMenuText(this.keyboardButton, `Show keyboard in game: ${settings.keyboard ? `${MENU_STYLE.gold}On|r` : "Off"}`);
+    setMenuText(this.stickJumpButton, `Stick Jump: ${settings.stickJump ? `${MENU_STYLE.gold}On|r` : "Off"}`);
+    setMenuText(this.cStickTiltButton, `C-Stick Tilt Attack: ${settings.cStickTilt ? `${MENU_STYLE.gold}On|r` : "Off"}`);
     setFrameText(this.hint, settings.capture === undefined ? HINT : `${MENU_STYLE.gold}${CAPTURE_HINT}|r`);
     const first = unboundActions(settings.bindings)[0];
     setFrameVisible(this.bindButton.art, first !== undefined);

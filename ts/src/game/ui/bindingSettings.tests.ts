@@ -22,7 +22,9 @@ import {
   pickBindingPreset,
   resetToLayout,
   saveBindingSettings,
+  toggleCStickTilt,
   toggleKeyboardPreview,
+  toggleStickJump,
 } from "./bindingSettings";
 import { PLAYER_FILE_CAPACITY } from "../core/gameFiles";
 import { keyboardCaps } from "./keyboardLayout";
@@ -310,7 +312,7 @@ test("three Custom slots each keep their own keys and name through a save, and t
   const longest = createBindingSettings(0, { load: () => undefined, readLocal: () => undefined, save: () => undefined });
   longest.ready = true;
   for (const custom of longest.customs) custom.name = "W".repeat(SLOT_NAME_LIMIT);
-  const full = encodeLayouts({ layouts: longest.layouts, active: "custom", customs: longest.customs, slot: CUSTOM_SLOT_COUNT - 1, keyboard: true });
+  const full = encodeLayouts({ layouts: longest.layouts, active: "custom", customs: longest.customs, slot: CUSTOM_SLOT_COUNT - 1, keyboard: true, stickJump: true, cStickTilt: false });
   assertEquals(full.length <= PLAYER_FILE_CAPACITY, true, `${full.length} characters fit ${PLAYER_FILE_CAPACITY}`);
   assertEquals(decodeLayouts(full)?.customs.map(custom => custom.name).join(","), longest.customs.map(custom => custom.name).join(","), "longest names round-trip");
 });
@@ -351,8 +353,18 @@ test("a brand-new player has Show keyboard in game on, turning it off is saved w
   const current = encodeLayouts(layoutSave(presetLayouts(), "wasd", false));
   const withHints = "KN" + current.slice(2, 4) + "1" + current.slice(5);
   assertEquals(decodeLayouts(withHints)?.keyboard, false, "a save from the new-player hints days, hints on");
+  assertEquals(decodeLayouts(withHints)?.stickJump, false, "stick jump defaults off on older saves");
+  assertEquals(decodeLayouts(withHints)?.cStickTilt, true, "c-stick tilt defaults on on older saves");
   const older = "KM" + current.slice(2, 4) + current.slice(5);
   assertEquals(decodeLayouts(older)?.keyboard, false, "a save from before either setting");
   assertEquals(decodeLayouts(encodeLayouts(layoutSave(presetLayouts(), "wasd", true)))?.keyboard, true, "on survives a save and load");
+
+  assertEquals(settings.stickJump, false, "stick jump starts off");
+  assertEquals(settings.cStickTilt, true, "c-stick tilt starts on");
+  toggleStickJump(settings);
+  toggleCStickTilt(settings);
+  const toggled = decodeLayouts(saved[saved.length - 1] ?? "");
+  assertEquals(toggled?.stickJump, true, "stick jump saved on");
+  assertEquals(toggled?.cStickTilt, false, "c-stick tilt saved off");
 });
 

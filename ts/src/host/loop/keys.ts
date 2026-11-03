@@ -189,7 +189,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
   participant.lastInputAction = action;
   traceParticipant(s, slot, `mapped action ${action}`);
   if (game.phase === Phase.characterMenu && views(s).selections[slot].menuAction(action)) return;
-  if (game.phase === Phase.match) sampleKeys(participant.capture, heldActions(keys));
+  if (game.phase === Phase.match) sampleKeys(participant.capture, heldActions(keys, bindings.stickJump, bindings.cStickTilt));
   else if (action === Action.moveLeft || action === Action.moveRight) choose(s, slot, 1);
   else if (action === Action.attack) {
     if (game.phase === Phase.characterMenu) views(s).selections[slot].placeHovered();
@@ -223,7 +223,7 @@ function participantKeyUp(s: ShellState, slot: ParticipantSlot, startKey = false
   traceParticipant(s, slot, `received up ${key}`);
   const participant = s.participants[slot];
   releaseKey(participant.keys, key, participant.bindings.bindings);
-  if (s.game.phase === Phase.match) sampleKeys(participant.capture, heldActions(participant.keys));
+  if (s.game.phase === Phase.match) sampleKeys(participant.capture, heldActions(participant.keys, participant.bindings.stickJump, participant.bindings.cStickTilt));
 }
 
 function triggerSlot(): ParticipantSlot | undefined {
