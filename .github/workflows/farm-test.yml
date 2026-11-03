@@ -1,7 +1,7 @@
 name: Farm test
 
 # The checks main's CI runs, for one commit on free hosted runners, each group
-# only when the change can affect it (smashcraft:ts/scripts/landingChecks.ts).
+# only when the change can affect it (makgora:ts/scripts/landingChecks.ts).
 # safe-push's landing gate dispatches it with the groups it selected; `bun wisp
 # farm test` dispatches it and prints the summary the merge job uploads.
 on:
@@ -149,7 +149,7 @@ jobs:
   # adds its last output lines to the summary.
   # Checks need no shard plan, so they start beside it on the dispatched ref (Autoland passes an exact SHA).
   # A group runs when the `checks` input names it, or, without one, when a changed path reaches it
-  # (smashcraft:ts/scripts/landingChecks.ts). A `checks` input starts only the groups it names, so a landing's gate run takes no hosted runner for the others and queues behind fewer jobs. parity-N replays one quarter of the tapes by measured replay cost and lua runs parity numeric and the stack-trace profile beside them; computer-N checks half of the roster's computer-fighter coverage by `CPU_COVERAGE_SHARD`; static is the clean room, the kind-tag, ledger and type check with the effect-kit check reading its output (one type-check, not two), the cue models and the Autoland suite parity check.
+  # (makgora:ts/scripts/landingChecks.ts). A `checks` input starts only the groups it names, so a landing's gate run takes no hosted runner for the others and queues behind fewer jobs. parity-N replays one quarter of the tapes by measured replay cost and lua runs parity numeric and the stack-trace profile beside them; computer-N checks half of the roster's computer-fighter coverage by `CPU_COVERAGE_SHARD`; static is the clean room, the kind-tag, ledger and type check with the effect-kit check reading its output (one type-check, not two), the cue models and the Autoland suite parity check.
   checks:
     needs: route
     runs-on: ${{ matrix.group != 'perf' && github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && needs.route.outputs.runner || 'ubuntu-latest' }}
@@ -279,7 +279,7 @@ jobs:
         timeout-minutes: 20
         env:
           GROUP: ${{ matrix.group }}
-        # The group's checks and their selection are smashcraft:ts/scripts/landingChecks.ts, which safe-push's landing gate runs on its own machine.
+        # The group's checks and their selection are makgora:ts/scripts/landingChecks.ts, which safe-push's landing gate runs on its own machine.
         run: |
           set +e
           bun scripts/landingRun.ts farm "$GROUP" "$RUNNER_TEMP/changed"

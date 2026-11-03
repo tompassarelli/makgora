@@ -1,6 +1,6 @@
 name: Scratch retire
 
-# A farm/ or probe/ branch is scratch for one measurement: when a farm run completes, delete every such branch no run is using (smashcraft:docs/commands/farm.md).
+# A farm/ or probe/ branch is scratch for one measurement: when a farm run completes, delete every such branch no run is using (makgora:docs/commands/farm.md).
 on:
   workflow_run:
     workflows: [Farm test, Balance, Perf, Headless pads, Memory soak]

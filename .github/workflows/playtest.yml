@@ -5,7 +5,7 @@ name: Playtest
 # main, each seed played twice to compare state hashes, sharded over hosted
 # runners one process a core like the balance field. One report, and a
 # comment a finding kind on its epic, or on the After 0.1 issue when no epic
-# matches, never a new issue (smashcraft:ts/scripts/playtestCore.ts).
+# matches, never a new issue (makgora:ts/scripts/playtestCore.ts).
 on:
   workflow_dispatch:
     inputs:
@@ -186,7 +186,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           SHA: ${{ needs.plan.outputs.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        # planIssueActions decides (smashcraft:ts/scripts/playtestCore.ts); this only applies it.
+        # planIssueActions decides (makgora:ts/scripts/playtestCore.ts); this only applies it.
         run: |
           bun scripts/playtest.ts --issues playtest/findings.json --header "Commit ${SHA:0:10}, run $RUN_URL" > playtest/actions.jsonl
           while IFS= read -r -u 3 line; do

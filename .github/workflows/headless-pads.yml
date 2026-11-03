@@ -1,6 +1,6 @@
 name: Headless pads
 
-# Every native check script (smashcraft:ts/test/native/pads/*.pad) played
+# Every native check script (makgora:ts/test/native/pads/*.pad) played
 # through the real wc3-journal helper into headless clients on free hosted
 # runners, one job a script; each must land its edges on their frames and
 # hold its own `#!` expectations. `bun wisp farm pads` dispatches it, for a

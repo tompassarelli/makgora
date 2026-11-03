@@ -1,6 +1,6 @@
 name: Autoland heartbeat
 
-# Lives only while Autoland has work (smashcraft:docs/ci.md#autoland-sweep): Autoland's plan and the sweep start it when none runs.
+# Lives only while Autoland has work (makgora:docs/ci.md#autoland-sweep): Autoland's plan and the sweep start it when none runs.
 on:
   workflow_dispatch:
 

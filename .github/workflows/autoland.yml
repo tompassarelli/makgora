@@ -1,6 +1,6 @@
 name: Autoland
 
-# Main's one landing queue (smashcraft:docs/ci.md#autoland); ts/scripts/autolandCore.ts decides, this file applies.
+# Main's one landing queue (makgora:docs/ci.md#autoland); ts/scripts/autolandCore.ts decides, this file applies.
 on:
   push:
     branches: ["claude/**"]
@@ -19,7 +19,7 @@ on:
         description: "Set by Autoland: land the tips that passed alone"
         default: ""
       farm-runner:
-        description: One-off runner label for the suite's even shard jobs, for injecting a stall (smashcraft#513)
+        description: One-off runner label for the suite's even shard jobs, for injecting a stall (makgora#513)
         default: ""
 
 run-name: ${{ github.event_name == 'push' && format('Autoland {0} (push)', github.ref_name) || inputs.test && format('Autoland test {0} {1}', inputs.slot, inputs.test) || inputs.train && 'Autoland train' || inputs.branch && format('Autoland plan {0}', inputs.branch) || 'Autoland plan' }}
@@ -132,7 +132,7 @@ env:
   FLAG_CONFLICT: |
     flag() {
       local branch="$1" tip="$2" text="$3" marker="<!-- autoland-conflict $2 ${4:-resolved} -->" lane="<!-- autoland-conflict-lane $1 $2 -->" issue alarm
-      for issue in $(git log --format=%B "$base..$tip" | grep -oiE '\b(refs|fixes|closes)[: ]+((tompassarelli/)?smashcraft)?#[0-9]+' | grep -oE '[0-9]+$' | sort -un); do
+      for issue in $(git log --format=%B "$base..$tip" | grep -oiE '\b(refs|fixes|closes)[: ]+((tompassarelli/)?makgora)?#[0-9]+' | grep -oE '[0-9]+$' | sort -un); do
         gh api "repos/$GH_REPO/issues/$issue/comments?per_page=100" --jq '.[].body' 2>/dev/null | grep -qF "$marker" && continue
         gh issue comment "$issue" --body "Autoland: \`$branch\` (${tip:0:10}) $text ($RUN_URL)
     $marker" > /dev/null || echo "::warning::couldn't comment on #$issue"
@@ -140,7 +140,7 @@ env:
       [ "${4:-}" = alarm ] || return 0
       alarm=$(gh issue list --state open --search 'in:title "Autoland stalled"' --json number,title --jq '[.[] | select(.title == "Autoland stalled")][0].number // empty')
       if [ -z "$alarm" ]; then
-        gh issue create --title "Autoland stalled" --label bug --label priority:now --label evidence:code --body "\`$branch\` (${tip:0:10}) $text ($RUN_URL) (smashcraft#513). This alarm stays open until the lane is pushed again, lands or is deleted.
+        gh issue create --title "Autoland stalled" --label bug --label priority:now --label evidence:code --body "\`$branch\` (${tip:0:10}) $text ($RUN_URL) (makgora#513). This alarm stays open until the lane is pushed again, lands or is deleted.
     $lane" > /dev/null
       else
         gh api "repos/$GH_REPO/issues/$alarm/comments?per_page=100" --jq '.[].body' 2>/dev/null | grep -qF "$lane" && return 0

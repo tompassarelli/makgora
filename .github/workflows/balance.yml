@@ -1,10 +1,10 @@
 name: Balance
 
-# The balance gate's computer field (smashcraft:docs/design/roster.md, "Balance
+# The balance gate's computer field (makgora:docs/design/roster.md, "Balance
 # gate") on free hosted runners: `bun wisp farm balance` dispatches it. Every
 # pair of selectable fighters at the commit is played by its own
 # `cpuField --pairs` process, one a core, then one job merges the shards. On
-# a full-roster run each fighter's spam probe (smashcraft:docs/design/balance.md)
+# a full-roster run each fighter's spam probe (makgora:docs/design/balance.md)
 # then attacks only with its top damage move against every other fighter, one
 # process a core, and the verdict job writes the field, style, conversion and
 # balance tables with both verdicts to the run's summary.
@@ -124,7 +124,7 @@ jobs:
           [ ! -f .git/shallow ] || rm -rf .git
           git init -q .
           git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$GITHUB_REPOSITORY"
-          mirror="/srv/farm-mirror/smashcraft.git/objects"
+          mirror="/srv/farm-mirror/makgora.git/objects"
           if [ -d "$mirror" ]; then echo "$mirror" > .git/objects/info/alternates; fi
           git -c gc.auto=0 fetch -q --no-tags origin "$SHA"
           git checkout -q --force --detach "$SHA"
@@ -236,7 +236,7 @@ jobs:
           [ ! -f .git/shallow ] || rm -rf .git
           git init -q .
           git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$GITHUB_REPOSITORY"
-          mirror="/srv/farm-mirror/smashcraft.git/objects"
+          mirror="/srv/farm-mirror/makgora.git/objects"
           if [ -d "$mirror" ]; then echo "$mirror" > .git/objects/info/alternates; fi
           git -c gc.auto=0 fetch -q --no-tags origin "$SHA"
           git checkout -q --force --detach "$SHA"

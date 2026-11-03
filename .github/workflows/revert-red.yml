@@ -3,7 +3,7 @@ name: Revert red main
 # "Main is red" hands each failed CI or Background sweeps run on main here after
 # the sheriff. When the landing's parent was green and no green run of that
 # workflow follows within 15 minutes, the landing is reverted with a new commit
-# (smashcraft:ts/scripts/revertRed.ts).
+# (makgora:ts/scripts/revertRed.ts).
 on:
   workflow_dispatch:
     inputs:

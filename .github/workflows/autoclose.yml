@@ -1,6 +1,6 @@
 name: Auto-close
 
-# After a landing (a safe-push to main, or Autoland's dispatch), reruns each referenced issue's declared Done-when checks on the new main (smashcraft:docs/ci.md#auto-close).
+# After a landing (a safe-push to main, or Autoland's dispatch), reruns each referenced issue's declared Done-when checks on the new main (makgora:docs/ci.md#auto-close).
 on:
   push:
     branches: [main]

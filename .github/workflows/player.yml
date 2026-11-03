@@ -1,6 +1,6 @@
 name: Player build
 
-# The packaged player (smashcraft#807): the compiled play command, Wisp's native window library, the map packager and the CASC extractor, for Linux and Windows.
+# The packaged player (makgora#807): the compiled play command, Wisp's native window library, the map packager and the CASC extractor, for Linux and Windows.
 # Nothing here is published; the package is a run artifact.
 on:
   workflow_dispatch:
@@ -77,16 +77,16 @@ jobs:
       - name: Build the package
         run: |
           library=$(find node_modules/wisp/window/target/release -maxdepth 1 \( -name libwisp_window.so -o -name wisp_window.dll \) | head -1)
-          bun scripts/playerBuild.ts --out "$RUNNER_TEMP/package/smashcraft-play-${{ matrix.name }}" --library "$PWD/$library" --tools "$RUNNER_TEMP/tools" --commit "$GITHUB_SHA"
+          bun scripts/playerBuild.ts --out "$RUNNER_TEMP/package/makgora-play-${{ matrix.name }}" --library "$PWD/$library" --tools "$RUNNER_TEMP/tools" --commit "$GITHUB_SHA"
         working-directory: ts
       - name: Run it where Bun is not on the path
         run: |
-          cd "$RUNNER_TEMP/package/smashcraft-play-${{ matrix.name }}"
-          ext=""; [ "${{ matrix.name }}" = windows ] && ext=.exe; PATH=/usr/bin:/bin:/c/Windows/System32 "./smashcraft-play$ext" --version | tee "$RUNNER_TEMP/version.txt"
+          cd "$RUNNER_TEMP/package/makgora-play-${{ matrix.name }}"
+          ext=""; [ "${{ matrix.name }}" = windows ] && ext=.exe; PATH=/usr/bin:/bin:/c/Windows/System32 "./makgora-play$ext" --version | tee "$RUNNER_TEMP/version.txt"
           expected=$(cd "$GITHUB_WORKSPACE/ts" && bun scripts/playerBuild.ts --name-only --commit "$GITHUB_SHA")
           [ "$(tr -d '\r' < "$RUNNER_TEMP/version.txt")" = "$expected" ]
       - uses: actions/upload-artifact@v4
         with:
-          name: smashcraft-play-${{ matrix.name }}
-          path: ${{ runner.temp }}/package/smashcraft-play-${{ matrix.name }}
+          name: makgora-play-${{ matrix.name }}
+          path: ${{ runner.temp }}/package/makgora-play-${{ matrix.name }}
           if-no-files-found: error
