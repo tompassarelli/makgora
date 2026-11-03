@@ -161,7 +161,7 @@ function createModePanel(panel: Frame, name: Name, add: AddBarTarget): ModePanel
 
 function createGuide(panel: Frame, name: Name, add: AddBarTarget): Readonly<Record<"controls" | "moves" | "tutorial", BarControl>> {
   heading(panel, name("GuideHeading"), "guide", "PLAYER GUIDE");
-  keyBadge(panel, name("GuideRowKey"), GUIDE_KEY, `${BAR_COLOURS.gold}F1|r`);
+  keyBadge(panel, name("GuideRowKey"), GUIDE_KEY, `${BAR_COLOURS.gold}F2|r`);
   return {
     controls: rowControl(panel, add, name("GuideControls"), GUIDE_ROWS.controls, { kind: "settings" }, `${BAR_COLOURS.cream}Controls & Bindings|r`),
     moves: rowControl(panel, add, name("GuideMoves"), GUIDE_ROWS.moves, { kind: "moves" }, `${BAR_COLOURS.cream}Character Move List|r`),
@@ -220,7 +220,7 @@ export class SelectBar {
       const b = BAR_CHEVRONS[panel];
       return [panel, art(this.root, name(`Chevron${panel}`), BAR_CHEVRON_TEXTURE, b.x, b.y, b.width, b.height)] as const;
     });
-    this.keys = { guide: keyBadge(this.root, name("GuideKey"), BAR_KEYS.guide, `${BAR_COLOURS.gold}F1|r`), start: keyBadge(this.root, name("StartKey"), BAR_KEYS.start, "") };
+    this.keys = { guide: keyBadge(this.root, name("GuideKey"), BAR_KEYS.guide, `${BAR_COLOURS.gold}F2|r`), start: keyBadge(this.root, name("StartKey"), BAR_KEYS.start, "") };
     this.panels = { mode: createPanel(parent, name, "mode"), rules: createPanel(parent, name, "rules"), guide: createPanel(parent, name, "guide"), gear: createPanel(parent, name, "gear") };
     this.modes = createModePanel(this.panels.mode, name, add);
     this.rules = createRulesDrawer(this.panels.rules, suffix, (frame, target) => add(frame, target, undefined));

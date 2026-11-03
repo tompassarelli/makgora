@@ -7,7 +7,7 @@ and open it from Custom Games. Public 0.1 uses the Classic look. Set Graphics
 to Classic and restart Warcraft III after changing it. A
 controller is optional: the Smashcraft controller helper turns its buttons
 and sticks into its own pad keys, which work with any Controls layout, so
-pad players keep whichever layout they like (the Controls screen that opens each game, or F1, changes it; it saves straight away).
+pad players keep whichever layout they like (the Controls screen that opens each game, or F2, changes it; it saves straight away).
 The default Melee layout uses A to
 attack, B for specials, X/Y to jump, RB to grab and LB for Strong;
 Tom's layout uses A to attack, X for specials, Y to jump, B to grab, LB to
@@ -114,7 +114,7 @@ the old name back.
 Reset brings back the Custom defaults, and Delete empties the slot back to the
 Custom defaults with no name; all three are greyed out on WASD and Box. The bottom row holds Show controls in game on the left and Save and Done on the right, with Stick Jump (off by default; when on, pressing Up jumps with full cardinal up unless Mod Y or Shield + Mod X is held) and C-Stick Tilt Attack (on by default; when off, the C-stick keys give uncharged smashes on the ground and aerials in the air) just above the status line.
 Done (or Escape) closes the screen and goes on to fighter
-select; each player confirms their own. F1 opens it again before a match.
+select; each player confirms their own. F2 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to
 bring back your saved ones. Y binds to any action and stays Start on fighter and stage select; Backspace and Escape (Pause) are reserved for rebinding; F6 and F7
 remain reserved for Warcraft shortcuts. Pressing a reserved key during a rebind
@@ -125,7 +125,7 @@ existed. In a match a CONTROLS panel sits in the bottom row between the player p
 every action with the key you bound to it (- when unbound): movement, Mod-X (Walk), then
 A (Atk), B (Spc), X (Jmp) and Y (Jmp, the short hop) on the left; the C-stick, Mod-Y (Tilt), then
 Shield (both trigger keys), Lightshield, Strong (Smash) and Grab on the right. A row lights while you hold its key (your controller's buttons on a pad). Press F2 in a match or click "Show controls in
-game" on the Controls screen to hide or show it, and the choice is saved with your controls. If you
+game" on the Controls screen to hide or show it, and the choice is saved with your controls.
 F2 is fixed like F1 and cannot be bound to an action; the panel title reads "Controls - F2 to toggle". Ctrl+T starts a developer input trace.
 
 Help: type -help (or -commands) in chat for every player command, one line

@@ -47,7 +47,7 @@ const KEY_HEIGHT = f32(0.018);
 const KEY_INSET = f32(0.006);
 const keyIn = (b: BarBox): BarBox => box(f32(right(b) - KEY_INSET) - KEY_WIDTH, f32(b.y - f32(f32(b.height - KEY_HEIGHT) / 2)), KEY_WIDTH, KEY_HEIGHT);
 
-/** The key badges inside bar items: F1 on Guide, Y on Start. */
+/** The key badges inside bar items: F2 on Guide, Y on Start. */
 export const BAR_KEYS = { guide: keyIn(GUIDE), start: keyIn(START) } as const;
 
 const CHEVRON = f32(0.009);
@@ -172,7 +172,7 @@ const menuRow = (panel: BarPanel, index: number): BarBox => {
   return box(x, rowTop(p, f32(HEADING + ROW_GAP), index, []), width, ROW);
 };
 
-/** The Guide's rows: Controls & Bindings (F1), the move list and the tutorial. */
+/** The Guide's rows: Controls & Bindings (F2), the move list and the tutorial. */
 export const GUIDE_ROWS = { controls: menuRow("guide", 0), moves: menuRow("guide", 1), tutorial: menuRow("guide", 2) } as const;
 export const GUIDE_KEY = keyIn(GUIDE_ROWS.controls);
 

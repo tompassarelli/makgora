@@ -53,7 +53,7 @@ const RESERVED_REASONS: Readonly<Record<number, string>> = {
   8: "Backspace is reserved for Pause",
   13: "Enter is reserved for Warcraft chat",
   27: "Escape is reserved for Pause and cancel",
-  112: "F1 is reserved for this screen",
+  112: "F1 is reserved for Warcraft help",
   113: "F2 is reserved for the in-match Controls panel",
   116: "F5 is reserved for Warcraft shortcuts",
   117: "F6 is reserved for Warcraft shortcuts",

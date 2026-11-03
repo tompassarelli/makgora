@@ -214,9 +214,9 @@ export class SettingsPanel {
     this.nameBox = createNameBox(root, participantId);
     this.nameEvents = this.nameTrigger();
     this.hint = line("MeleeSettingsHint", LEFT, below(f32(0.108)), f32(0.45), f32(0.016), f32(0.0105));
-    this.help = line("MeleeSettingsHelp", f32(RIGHT - f32(0.2)), below(f32(0.108)), f32(0.2), f32(0.016), f32(0.0095));
+    this.help = line("MeleeSettingsHelp", f32(RIGHT - f32(0.25)), below(f32(0.108)), f32(0.25), f32(0.016), f32(0.0095));
     setFrameTextAlignment(this.help, TextAlignment.middle, TextAlignment.right);
-    setFrameText(this.help, `${MUTED}F1 - F9 for help.|r`);
+    setFrameText(this.help, `${MUTED}F2 to toggle controls HUD in game|r`);
     this.keys = keyboardCaps(LEFT, below(f32(0.135))).map(({ key, x, y, width }): KeyButton => {
       const { art } = button(`MeleeSettingsKey${formatInt(key)}`, { x, y, width, height: KEY_CAP_HEIGHT }, "", { kind: "key", key });
       const clear = this.clearCross(root, key, f32(f32(x + width) - CLEAR_SIZE), y);

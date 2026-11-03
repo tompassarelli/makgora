@@ -169,7 +169,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     openTitle(s, slot);
     return;
   }
-  if (key === Key.f1) return;
+  if (key === Key.f2) return;
   if (!bindings.ready) return;
   if (key === 13 && s.game.phase !== Phase.match) return;
   const { game } = s;
@@ -215,7 +215,7 @@ function participantKeyUp(s: ShellState, slot: ParticipantSlot, startKey = false
     return;
   }
   if (journalOwnsKey(s, slot, key)) return;
-  if (key === Key.f1) {
+  if (key === Key.f2) {
     openSettingsScreen(s, slot);
     return;
   }

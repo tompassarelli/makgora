@@ -356,8 +356,8 @@ one row of a few clusters with the rarely used settings one click deeper
    the Speed and Heavy item toggles while items are on, and Reset default; in
    Training the partner's behaviour, drift, tech and damage, hit areas and game
    speed; in Classic and Lore Battles the difficulty or battle and the route.
-4. `Guide` with the `F1` key: Controls & Bindings (the controls and keyboard
-   screen, as F1), Character Move List and How to Play (the tutorial menu).
+4. `Guide` with the `F2` key: Controls & Bindings (the controls and keyboard
+   screen, as F2), Character Move List and How to Play (the tutorial menu).
 5. The plain gear icon, opening SETTINGS: the input
    delay as a stepper (`−`, "Input delay: N frames", `+`) with an Auto button
    beside it, a line under it, then Community and Credits. Only the online host
@@ -395,7 +395,7 @@ runs the ordinary rule setters. Opening a panel is local to the player who
 clicked it. The pad's up and down walk the fighter cards, then Back, Mode,
 Teams, the rules pill, Guide and the gear; Attack opens a panel, inside it up
 and down pick a row, left and right step it and Attack presses it, and Special
-closes it. F1 and Y keep their keys.
+closes it. F2 and Y keep their keys.
 
 The bar's words that come from match flow and Classic progress (the mode
 label, the pill, the mode names and Classic's and Lore Battles' lines) are
