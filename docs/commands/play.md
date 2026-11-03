@@ -26,7 +26,9 @@
   the candidate outside Maps; installation also requires every declared `gate-*`
   check to have verdict `pass` in Classic on its exact bytes.
   Native owners run `bun wisp accept --only gate-* --map CANDIDATE --out DIR`
-  on the Classic pool's clients and retain the existing `report.json`, with top-level
+  on the Classic pool's clients, `gate-panel-buttons` on a pair started with
+  `--pool-profile capture-classic-3x2`, the 3:2 size where Warcraft's stock
+  console frames covered Done (makgora:docs/stock-frames.md), and retain the existing `report.json`, with top-level
   `candidateMapSha256` and `graphicsLook` (`classic`), under
   `~/.local/state/makgora/green-builds/accept/SHA256/LOOK/report.json`
   or one subfolder down, `LOOK/RUN/report.json`; the install reads them all

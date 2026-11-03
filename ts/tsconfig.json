@@ -41,6 +41,8 @@
     "scripts/**/*.ts",
     "codegen/**/*.ts",
     "plugins/**/*.ts",
+    "test/accept-map-profiles.test.ts",
+    "test/button-sweep.test.ts",
     "test/fighter-marker.test.ts",
     "test/frame-tint.test.ts",
     "test/item-pickup-models.test.ts",

@@ -29,6 +29,11 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE start-rest frames=(\\d+) character=\\1 stage=\\1 .* pass=1$", min: 1 }],
   },
   {
+    id: "gate-panel-buttons", closes: "makgora#1047", map: "candidate-dev", session: "gate-panel-buttons",
+    setup: [{ waitMs: 8000 }, { chat: "-dev buttons", client: "a" }, { chat: "gate:buttons", client: "a" }],
+    pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE buttons size=\\d+x\\d+ buttons=([1-9]\\d*) points=\\d+ clicked=\\d+ boxless=0 pass=1$", min: 1 }],
+  },
+  {
     id: "gate-bindings", closes: "T7 C3", map: "gate-playable", session: "gate-bindings",
     setup: [{ chat: "gate:bindings", client: "a" }],
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE bindings labels=\\d+ samples=(\\d+) passed=\\1 pass=1 remaps=none$", min: 1 }],

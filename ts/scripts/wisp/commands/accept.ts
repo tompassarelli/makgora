@@ -23,7 +23,7 @@ import { lan } from "wisp/scripts/wisp/commands/lan";
 import { step } from "wisp/scripts/wisp/timings";
 import { GameFiles, dataDirectory, readGameFile } from "wisp/scripts/wisp/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
-import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile } from "../acceptChecks";
+import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile, mapProfilesFor } from "../acceptChecks";
 import { currentPlaytest } from "../currentPlaytest";
 import { readClientEntries, readyPackager, resolveTools, validateClients } from "../nativeTools";
 import { DevCommandReceipt, MeleeReady } from "../boundary";
@@ -46,6 +46,7 @@ import { measureCursorGate } from "../gateCursor";
 import { measureHandsGate } from "../gateHands";
 import { measureStartGate } from "../gateStart";
 import { measureStartRestGate } from "../gateStartRest";
+import { measureButtonsGate } from "../gateButtons";
 import { measureBindingsGate } from "../gateBindings";
 import { measureMovesGate } from "../gateMoves";
 import { movesShardId, parseShardChat } from "../smokeShards";
@@ -273,10 +274,7 @@ const prepareCandidate = (args: readonly string[], only: readonly string[], dryR
   if (!dryRun) yield* readyPackager().pipe(Effect.mapError(cause => new UsageFailure({ problem: describeCause(cause) })));
   const building = given === undefined && !dryRun && needsCandidate({ ...SMASHCRAFT_ACCEPT, maps: MAP_PROFILES }, only);
   const candidate = given ?? (building ? yield* headCandidate.pipe(Effect.mapError(cause => new UsageFailure({ problem: describeCause(cause) }))) : undefined);
-  const profiles: Readonly<Record<string, SmashcraftMapProfile>> = given !== undefined
-    ? Object.fromEntries(Object.entries(MAP_PROFILES).map(([name, { rebuild: _rebuild, ...profile }]) => [name, { ...profile, path: given }]))
-    : candidate === undefined ? MAP_PROFILES
-    : Object.fromEntries(Object.entries(MAP_PROFILES).map(([name, profile]) => [name, name === "gate-playable" ? { ...profile, path: candidate } : profile]));
+  const profiles = mapProfilesFor(MAP_PROFILES, given, candidate);
   return { given, tools, candidate, profiles };
 });
 
@@ -362,6 +360,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
       "gate:hands": () => measureHandsGate(selectedClients, evidence("gate-select-hands", "pair"), undefined),
       "gate:hands-teams": () => measureHandsGate(selectedClients, evidence("gate-select-hands-teams", "pair"), [1, 3]),
       "gate:start": (name: string) => measureStartGate(selectedClients, name, evidence("gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")),
+      "gate:buttons": (name: string) => measureButtonsGate(selectedClients, name, evidence("gate-panel-buttons", name)),
       "gate:start-rest": (name: string) => measureStartRestGate(selectedClients, name, evidence("gate-start-rest", name)),
       "gate:results": (name: string) => measureResultsGate(selectedClients, evidence("gate-results-rematch", name)),
       "gate:stages": (name: string) => measureStagesGate(selectedClients, evidence("gate-stages", name), controlled.start("gate-playable", "gate-stages")),

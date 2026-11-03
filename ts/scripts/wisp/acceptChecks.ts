@@ -32,6 +32,8 @@ export interface SmashcraftMapProfile {
   readonly quick: string;
 
   readonly computers?: number;
+
+  readonly keptWithMap?: true;
 }
 
 
@@ -64,6 +66,7 @@ export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
   underside: { describe: "development map built with scenario underside (smashcraft:docs/player-view.md), `-dev quick`", path: join(inputs, "stage-model-20261006/Smashcraft diagnostic underside.w3x"), quick: "-dev quick" },
   "cpu-startup": { describe: "development map rebuilt from this checkout, hosted with one lobby computer and left on fighter select", path: PRESENTATION, rebuild: "main", quick: "", computers: 1 },
   "fighter-select": { describe: "development map rebuilt from this checkout, two players left on fighter select", path: PRESENTATION, rebuild: "main", quick: "" },
+  "candidate-dev": { describe: "development map rebuilt from this checkout, the candidate's own commit, left at the first-run Controls screen; a given --map does not replace it, because its dev console instruments the same panels and stock-frame startup the candidate ships", path: PRESENTATION, rebuild: "main", quick: "", keptWithMap: true },
   "shield-energy": { describe: "development map rebuilt from this checkout, held shield-down/full/mid/low samples with drawn-state receipts", path: PRESENTATION, rebuild: "main", quick: SHIELD_ENERGY_SETUP },
   training: { describe: "development map rebuilt from this checkout, `-dev quick training` (a computer partner shielding at 40%, hit areas on)", path: PRESENTATION, rebuild: "main", quick: QUICK_TRAINING_COMMAND },
 
@@ -85,6 +88,16 @@ export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
     quick: `${QUICK_HERO_COMMAND}${name.toLowerCase()}`,
   }])),
 };
+
+type MapProfiles = Readonly<Record<string, SmashcraftMapProfile>>;
+
+const withoutRebuild = ({ rebuild: _rebuild, ...profile }: SmashcraftMapProfile): SmashcraftMapProfile => profile;
+
+export function mapProfilesFor(profiles: MapProfiles, given: string | undefined, candidate: string | undefined): MapProfiles {
+  if (given !== undefined) return Object.fromEntries(Object.entries(profiles).map(([name, profile]) => [name, profile.keptWithMap === true ? profile : { ...withoutRebuild(profile), path: given }]));
+  if (candidate === undefined) return profiles;
+  return Object.fromEntries(Object.entries(profiles).map(([name, profile]) => [name, name === "gate-playable" ? { ...profile, path: candidate } : profile]));
+}
 
 
 const NO_ERRORS: Rule = { kind: "receipt", pattern: "^error \\d+ in ", max: 0 };

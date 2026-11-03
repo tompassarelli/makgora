@@ -97,7 +97,7 @@ export function greenStep(commits: readonly Candidate[], installed: readonly num
 }
 
 export const GREEN_GATE_CHECKS: readonly string[] = [
-  "gate-cursor-visible", "gate-start-anywhere", "gate-bindings", ...smokeShardIds(),
+  "gate-cursor-visible", "gate-start-anywhere", "gate-bindings", "gate-panel-buttons", ...smokeShardIds(),
 ];
 export const GREEN_GATE_LOOKS = ["classic"] as const;
 

@@ -43,3 +43,28 @@ and was caught only because the worker tried it first.
 
 `makgora:ts/test/stockFrames.test.ts` pins the hide list and fails when a
 hidden stock frame is the parent of any frame the map made.
+
+## The native button sweep
+
+Every `ButtonClicks.add` registers its frame and click box (makgora:ts/src/game/ui/buttonSweep.ts).
+`-dev buttons` lists the registered buttons with their visibility and box in
+`smashcraft-dev-buttons-pSLOT.txt` and turns click logging on: from then on a
+click on any registered button is appended to
+`smashcraft-dev-button-clicks-pSLOT.txt` and its handler does not run, so a
+panel stays open while it is swept. The accept check `gate-panel-buttons`
+(makgora:ts/scripts/wisp/gateButtons.ts) clicks each visible button at 5
+points across its width and fails, naming the button and the point, when a
+point produces no click or another button's click, or when a visible
+registered button has no click box. It sweeps the buttons shown when it runs,
+the first-run Controls screen, and its receipt carries the window size. The
+playable build has no dev console, so the check runs on `candidate-dev`, the
+development map rebuilt from the candidate's own commit, which a given
+`--map` does not replace; the panels and the stock-frame startup are the same
+code in both builds. It is one of the green gate's required checks
+(`GREEN_GATE_CHECKS`, makgora:ts/scripts/wisp/greenBuilds.ts).
+
+On 2026-11-03 on gex45 it passed at 1920x1080 (`capture-classic-1080`) and at
+2880x1920 (Wisp's `capture-classic-3x2` pool profile): 71 visible buttons,
+355 of 355 points clicked. On a build with the two startup calls removed it
+failed at 2880x1920 naming Done (`ui.settings.0.click#561:close`) at points 2
+to 5 of 5 (makgora#1047).

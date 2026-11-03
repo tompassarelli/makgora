@@ -26,6 +26,9 @@
   the name). When accept reports that the map does not carry a model, build a
   new set named by the date and the commit with `bun wisp map build --profile
   main` rather than overwriting an old one.
+  A profile with `keptWithMap` (`candidate-dev`) keeps rebuilding from the
+  checkout under `--map`, so a gate run on a candidate still gets the dev
+  console build of the candidate's own commit (makgora:ts/scripts/wisp/acceptChecks.ts `mapProfilesFor`).
   Move smoke (#32): one check pair per fighter pair, `gate-moves-NN` and
   `gate-specials-spot-NN` for NN 01-13 (makgora:ts/scripts/wisp/smokeShards.ts),
   so each shard is one session and one match that fits a 5-minute native run.

@@ -17,6 +17,7 @@ import { applyFighterSetup } from "../../game/session/fighterSetup";
 import { prepareDevState, commitDevState } from "./devState";
 import { applySetupCommand } from "../../game/session/sessionSetup";
 import { writeLines } from "wisp/src/platform/fileio";
+import { startButtonSweep } from "../../game/ui/buttonSweep";
 import { probeFrameCostClock } from "./frameCost";
 import { probeRenderClock } from "./renderClock";
 import { probeCallbackClock } from "./callbackClock";
@@ -55,6 +56,7 @@ export function onDevCommand(s: ShellState): void {
 
 const CINE_OFF_SUFFIX = " |cine off";
 const HOST_DELAY_COMMAND = "-dev hostdelay ";
+const BUTTONS_COMMAND = "-dev buttons";
 
 function hostDelayCommand(s: ShellState, actor: number, text: string): string {
   const manual = text === "auto" ? AUTO_DELAY : parseInt(text);
@@ -142,12 +144,19 @@ type DeveloperRequests = ReturnType<typeof developerRequests>;
 
 const LOOK_COMMANDS = ["-dev pause ", "-dev hints "];
 
+function toolReceipt(message: string): string | undefined {
+  if (message === "-dev trace") return "dev: trace";
+  if (message === BUTTONS_COMMAND) return `dev: buttons ${formatInt(startButtonSweep(localSlot()))}`;
+  return undefined;
+}
+
 function sessionReceipt(s: ShellState, actor: number, message: string, requests: DeveloperRequests): string | undefined {
   const { fighterSetup, showcase, lore, classic } = requests;
   if (fighterSetup !== undefined) return fighterSetup;
   const capture = captureRequest(message);
   if (capture !== undefined) return applyCaptureCommand(s, capture);
-  if (message === "-dev trace") return "dev: trace";
+  const tool = toolReceipt(message);
+  if (tool !== undefined) return tool;
   if (message.startsWith(HOST_DELAY_COMMAND)) return hostDelayCommand(s, actor, message.substring(HOST_DELAY_COMMAND.length));
   if (message === "-dev soak") return startNativeSoak(s) ? "dev: native soak four CPUs" : "dev: native soak requires an integrity map at selection";
   if (showcase !== undefined) return applyShowcaseCommand(s, showcase, () => applyDeveloperCommand(s, actor, RESET_COMMAND));
