@@ -1,7 +1,7 @@
 // Histories retain shared observations. Storage is reused only after every
 // live input and replay snapshot has released that sample.
 import { at } from "wisp/src/runtime/lookup";
-import { botObservationCanonical, forgetObservationText, writeObservations } from "../replay/canonical";
+import { botObservationCanonical, forgetObservationText, writeObservations } from "../replay/observationCanonical";
 import { realParts, splitFiniteReal, writeCanonicalNumber } from "../replay/canonicalNumbers";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";

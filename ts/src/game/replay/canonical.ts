@@ -1,6 +1,8 @@
 import { canonicalNumber, canonicalReal, realParts, splitFiniteReal, writeCanonicalNumber } from "./canonicalNumbers";
-import { fighterMovesCanonical, fighterSpecialsCanonical } from "./kitCanonical";
-import { specialPlacementCanonical, specialProjectileCanonical } from "./specialCanonical";
+import { REPLAY_CHECKSUM_MODULUS, canonicalChecksum, checksumText, foldChecksumRange, type ChecksumLanes } from "./checksum";
+import { movesDigestField, placementDigestField, publishKitDigests, specialsDigestField } from "./kitDigests";
+import { botObservationCanonical, type ObservationWriter, writeObservations } from "./observationCanonical";
+import { specialProjectileCanonical } from "./specialCanonical";
 import { type FighterFieldSink, type FighterKitText, writeFighterFields } from "../../generated/state/fighterState";
 
 
@@ -12,8 +14,7 @@ import { PARTICIPANT_SLOTS, participantActive, type Slots } from "../input/parti
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import type { BotObservationFrame } from "../match/botPerception";
-import type { FighterMoves } from "../sim/heroMoves";
-import type { AuthoredSpecial, FighterSpecials, SpecialPlacement } from "../sim/specials/schema";
+import type { AuthoredSpecial } from "../sim/specials/schema";
 import { writeMatchItems } from "../match/items";
 import { writeMatchOrbs } from "../sim/orbState";
 import type { Fighter } from "../sim/fighter";
@@ -27,49 +28,12 @@ import type { PacingAndPresentation } from "../match/pacingAndPresentation";
 import { ALL_HEROES } from "../roster/kits";
 import { ILLIDAN_MOVES, RIFLEMAN_MOVES } from "../sim/originalMoves";
 
-const REPLAY_CHECKSUM_MODULUS = 1_000_003;
 
 export function canonicalSlot(slot: number | undefined, participantMask: number): number {
   if (slot === undefined) return -1;
   return participantActive(participantMask, slot) ? slot : -2;
 }
 
-
-interface ChecksumLanes {
-  valid: boolean;
-  first: number;
-  second: number;
-}
-
-function foldChecksum(lanes: ChecksumLanes, fragment: string): void {
-  foldChecksumRange(lanes, fragment, 0, fragment.length);
-}
-
-
-function foldChecksumRange(lanes: ChecksumLanes, text: string, start: number, end: number): void {
-  if (!lanes.valid) return;
-  let { first, second } = lanes;
-  for (let index = start; index < end; index++) {
-    const byte = text.charCodeAt(index);
-    if (byte < 32 || byte > 126) {
-      lanes.valid = false;
-      return;
-    }
-
-    first = floorMod(first * 257 + byte + 1, REPLAY_CHECKSUM_MODULUS);
-    second = floorMod(second * 263 + byte + 1, REPLAY_CHECKSUM_MODULUS);
-  }
-  lanes.first = first;
-  lanes.second = second;
-}
-
-const checksumText = ({ valid, first, second }: Readonly<ChecksumLanes>): string => (valid ? `${first}:${second}` : "invalid-ascii");
-
-export function canonicalChecksum(text: string): string {
-  const lanes: ChecksumLanes = { valid: true, first: 0, second: 0 };
-  foldChecksum(lanes, text);
-  return checksumText(lanes);
-}
 
 
 /** Where writeState sends each field: canonical text, or the per-frame state hash. */
@@ -99,199 +63,16 @@ function fieldKey(prefix: string, name: string): string {
 
 
 
-const MOVES_DIGESTS = new Map<Readonly<FighterMoves>, string>();
-const SPECIALS_DIGESTS = new Map<Readonly<FighterSpecials>, string>();
-const PLACEMENT_DIGESTS = new Map<Readonly<SpecialPlacement>, string>();
-const placedSpecCanonical = (spec: Readonly<SpecialPlacement>): string => specialPlacementCanonical(spec, "placedSpec");
-declare global {
-  var __smashcraftKitDigests: Record<string, string | undefined> | undefined;
-}
-
-
-const retainedKitDigests: Record<string, string | undefined> = {};
-
-function kitDigestField<K>(name: string, kit: K | undefined, digests: Map<K, string>, text: (kit: K) => string): string {
-  if (kit === undefined) return "";
-  let digest = digests.get(kit);
-  if (digest === undefined) {
-    const canonical = text(kit);
-    digest = retainedKitDigests[canonical] ?? globalThis.__smashcraftKitDigests?.[canonical];
-    if (digest === undefined) digest = canonicalChecksum(canonical);
-    retainedKitDigests[canonical] = digest;
-    digests.set(kit, digest);
-  }
-  return `|${name}.digest=${digest}`;
-}
 
 
 const FIGHTER_KITS: FighterKitText = {
   slot: (slot, participantMask) => canonicalSlot(slot, participantMask),
-  moves: (name, moves) => kitDigestField(name, moves, MOVES_DIGESTS, fighterMovesCanonical),
-  specials: (name, specials) => kitDigestField(name, specials, SPECIALS_DIGESTS, fighterSpecialsCanonical),
-  placedSpec: (name, spec) => kitDigestField(name, spec, PLACEMENT_DIGESTS, placedSpecCanonical),
+  moves: (name, moves) => movesDigestField(name, moves),
+  specials: (name, specials) => specialsDigestField(name, specials),
+  placedSpec: (name, spec) => placementDigestField(name, spec),
   projectileSpec: (spec, prefix) => specialProjectileCanonical(spec, prefix),
 };
 
-export function observedOpponentKitCanonical(fighter: Readonly<Fighter>): string {
-  return kitDigestField("moves", fighter.tuning.moves, MOVES_DIGESTS, fighterMovesCanonical)
-    + kitDigestField("specials", fighter.tuning.specials, SPECIALS_DIGESTS, fighterSpecialsCanonical);
-}
-
-const absentKit = {};
-const kitTexts = new WeakMap<object, WeakMap<object, string>>();
-
-function kitText(f: Readonly<Fighter>): string {
-  const moves = f.tuning.moves ?? absentKit;
-  const specials = f.tuning.specials ?? absentKit;
-  let texts = kitTexts.get(moves);
-  if (texts === undefined) {
-    texts = new WeakMap<object, string>();
-    kitTexts.set(moves, texts);
-  }
-  let text = texts.get(specials);
-  if (text === undefined) {
-    text = observedOpponentKitCanonical(f).replaceAll("|", ";");
-    texts.set(specials, text);
-  }
-  return text;
-}
-
-export interface ObservationWriter {
-  readonly byte: (this: void, code: number) => void;
-
-  readonly number: (this: void, value: number) => void;
-  readonly text: (this: void, text: string, repetitions: number) => void;
-}
-const PROJECTILE_OBSERVATION_FIELDS = ["life", "x", "z", "direction", "velocityX", "velocityZ", "serial"] as const;
-interface RepeatedProjectile { readonly values: readonly [number, number, number, number, number, number, number]; readonly text: string }
-let repeatedProjectile: RepeatedProjectile | undefined;
-
-function repeatedProjectileText(p: Readonly<Fighter["projectiles"][number]>): string | undefined {
-  if (p.life !== 0) return undefined;
-  if (repeatedProjectile === undefined) {
-    const values: RepeatedProjectile["values"] = [p.life, p.x, p.z, p.direction, p.velocityX, p.velocityZ, p.serial];
-    const parts: string[] = [];
-    const emit = (code: number) => { parts.push(String.fromCharCode(code)); };
-    for (const key of PROJECTILE_OBSERVATION_FIELDS) {
-      emit(44); writeCanonicalNumber(emit, p[key]);
-    }
-    repeatedProjectile = { values, text: parts.join("") };
-  }
-  const values = repeatedProjectile.values;
-  if (p.life !== values[0] || p.x !== values[1] || p.z !== values[2] || p.direction !== values[3]
-    || p.velocityX !== values[4] || p.velocityZ !== values[5] || p.serial !== values[6]) return undefined;
-  return repeatedProjectile.text;
-}
-
-export function writeObservations(writer: ObservationWriter, opponents: Slots<Readonly<Fighter> | undefined>): void {
-  for (const slot of PARTICIPANT_SLOTS) {
-    if (slot !== 0) writer.byte(44);
-    const f = opponents[slot];
-    writeCanonicalNumber(writer.byte, f === undefined ? 0 : 1);
-    if (f === undefined) continue;
-    writer.byte(44);
-    const kit = kitText(f);
-    writer.text(kit, 1);
-    writer.number(f.tuning.physics.gravity);
-    writer.number(f.tuning.physics.terminalSpeed);
-    writer.number(f.tuning.tech.ceilingImpulseFrame);
-    writer.number(f.character);
-    writer.number(f.facing);
-    writer.number(f.motion.x);
-    writer.number(f.motion.z);
-    writer.number(f.motion.deltaX);
-    writer.number(f.motion.deltaZ);
-    writer.number(f.motion.vx);
-    writer.number(f.motion.vz);
-    writer.number(f.motion.grounded ? 1 : 0);
-    writer.number(f.motion.surface ?? -1);
-    writer.number(f.attack.style ?? -1);
-    writer.number(f.attack.frame);
-    writer.number(f.attack.duration);
-    writer.number(f.attack.serial);
-    writer.number(f.attack.cooldown);
-    writer.number(f.special.action);
-    writer.number(f.special.frame);
-    writer.number(f.special.duration);
-    writer.number(f.special.lockFrames);
-    writer.number(f.special.form);
-    writer.number(f.special.grabFrame);
-    if (f.special.seekTarget !== 0) writer.number(f.special.seekTarget + 300);
-    writer.number(f.shield.raised ? 1 : 0);
-    writer.number(f.shield.stun);
-    writer.number(f.shield.releaseLag);
-    writer.number(f.launch.hitstun);
-    writer.number(f.launch.hitlag);
-    writer.number(f.hits.lastAttacker ?? -1);
-    writer.number(f.status.out ? 1 : 0);
-    writer.number(f.status.stocks);
-    writer.number(f.status.damage);
-    writer.number(f.status.invincible);
-    writer.number(f.status.frozenFrames);
-    writer.number(f.status.condition);
-    writer.number(f.status.conditionFrames);
-    writer.number(f.status.poisonFrames);
-    writer.number(f.landing.lag);
-    writer.number(f.down.state);
-    writer.number(f.down.frame);
-    writer.number(f.down.direction);
-    writer.number(f.down.faceUp ? 1 : 0);
-    writer.number(f.grab.owner ?? -1);
-    writer.number(f.grab.target ?? -1);
-    writer.number(f.grab.action);
-    writer.number(f.ledge.state);
-    writer.number(f.ledge.side);
-    writer.number(f.ledge.intangible);
-    writer.number(f.dodge.groundFrame);
-    writer.number(f.dodge.groundDirection);
-    writer.number(f.dodge.airDodging ? 1 : 0);
-    writer.number(f.dodge.airFrame);
-    writer.number(f.surfaceRecovery.state);
-    writer.number(f.surfaceRecovery.frame);
-    writer.number(f.cannon.held ?? -1);
-    writer.number(f.bear.life);
-    writer.number(f.bear.x);
-    writer.number(f.bear.z);
-    writer.number(f.bear.hitSerial);
-    let repeatedCount = 0;
-    let repeatedText = "";
-    for (const p of f.projectiles) {
-      const repeated = repeatedProjectileText(p);
-      if (repeated !== undefined) { repeatedText = repeated; repeatedCount++; continue; }
-      if (repeatedCount > 0) { writer.text(repeatedText, repeatedCount); repeatedCount = 0; }
-      writer.number(p.life);
-      writer.number(p.x);
-      writer.number(p.z);
-      writer.number(p.direction);
-      writer.number(p.velocityX);
-      writer.number(p.velocityZ);
-      writer.number(p.serial);
-    }
-    if (repeatedCount > 0) writer.text(repeatedText, repeatedCount);
-  }
-}
-
-
-const observationTexts = new WeakMap<Readonly<BotObservationFrame>, string>();
-
-/** Drops a sample's text when its storage is reused; a history never changes a sample it holds (settleObservationChecksum). */
-export function forgetObservationText(sample: Readonly<BotObservationFrame>): void {
-  observationTexts.delete(sample);
-}
-
-export function botObservationCanonical(sample: Readonly<BotObservationFrame>): string {
-  const known = observationTexts.get(sample);
-  if (known !== undefined) return known;
-  const parts: string[] = [];
-  const byte = (code: number) => { parts.push(String.fromCharCode(code)); };
-  writeObservations({ byte,
-    number: value => { parts.push(`,${canonicalNumber(value)}`); },
-    text: (text, repetitions) => { parts.push(text.repeat(repetitions)); },
-  }, sample.opponents);
-  const text = parts.join("");
-  observationTexts.set(sample, text);
-  return text;
-}
 
 function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
   const { world, match, controls, runtime } = state;
@@ -596,11 +377,13 @@ export function foldStateChecksum(fold: StateChecksumFold, characters: number): 
 }
 
 
+
+
 export function prepareKitDigests(): void {
-  for (const moves of [RIFLEMAN_MOVES, ILLIDAN_MOVES]) kitDigestField("moves", moves, MOVES_DIGESTS, fighterMovesCanonical);
+  for (const moves of [RIFLEMAN_MOVES, ILLIDAN_MOVES]) movesDigestField("moves", moves);
   for (const hero of ALL_HEROES) {
-    kitDigestField("moves", hero.moves, MOVES_DIGESTS, fighterMovesCanonical);
-    kitDigestField("specials", hero.specials, SPECIALS_DIGESTS, fighterSpecialsCanonical);
+    movesDigestField("moves", hero.moves);
+    specialsDigestField("specials", hero.specials);
     const specials = hero.specials;
     if (specials === undefined) continue;
     for (const kit of [specials.neutral, specials.side, specials.up, specials.down]) {
@@ -611,9 +394,9 @@ export function prepareKitDigests(): void {
       for (const branch of kit.ground.followUps ?? []) forms.push(branch.special);
       for (const branch of kit.air?.followUps ?? []) forms.push(branch.special);
       for (const form of forms) {
-        kitDigestField("placedSpec", form.placement, PLACEMENT_DIGESTS, placedSpecCanonical);
+        placementDigestField("placedSpec", form.placement);
       }
     }
   }
-  globalThis.__smashcraftKitDigests = retainedKitDigests;
+  publishKitDigests();
 }

@@ -1,6 +1,6 @@
 
 import { join } from "node:path";
-import { canonicalChecksum } from "../src/game/replay/canonical";
+import { canonicalChecksum } from "../src/game/replay/checksum";
 import { Effect } from "effect";
 import { MalformedGameFile } from "wisp/scripts/wisp/preloadRecord";
 import { GameFiles, readGameFile } from "wisp/scripts/wisp/gameFiles";
