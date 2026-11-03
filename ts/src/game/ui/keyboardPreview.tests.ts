@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { FRIZ_QUADRATA_WIDTHS, textWidth } from "wisp/src/ui/chatLog";
 import { ACTION_ORDER, Action } from "../input/actions";
 import { presetBindings, rebind } from "../input/keyBindings";
-import { controlsDescription } from "./helpText";
+import { controlsDescription } from "./guide/text";
 import { PREVIEW_COLUMNS, PREVIEW_INNER, PREVIEW_ROWS, PREVIEW_ROW_HEIGHT, PREVIEW_TEXT_MAX, PREVIEW_TITLE, type PreviewRow, previewKeyText, previewRowHeld, previewTextFit } from "./keyboardPreview";
 
 const rowFor = (label: string): PreviewRow => PREVIEW_ROWS.find(placed => placed.row.label === label)?.row ?? { label, actions: [] };

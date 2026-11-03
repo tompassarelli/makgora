@@ -57,7 +57,7 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 
 ## Game
 
-- [Player guide](player-guide.md): controls, menus and match flow.
+- [Player guide](player-guide.md): controls, rules, menus, match flow and the tutorial, generated with its Hive copy (player-guide.bbcode.txt) by `bun run generate` from makgora:ts/src/game/ui/guide/, the same text the game draws; `bun run check` fails on a stale or hand-edited output. Every player-teaching fact lives there once, so the docs, the website (which links here) and the game cannot drift (Tom asked for one source, 2026-11-04).
 - [Move list](move-list.md): every fighter's specials and ultimate by official name, generated from the kit data by `bun install` (from ts/; untracked).
 - [Gameplay design decisions](gameplay-design.md): the owner's principles and decisions and open questions; each deviation from Melee is a row of the [Melee parity ledger](design/melee-parity.md). The only place Mak'gora's stance is written.
 - [Melee case study](design/melee/README.md): Melee's movement, attacks, defence, archetypes, techniques and jank, described with numbers computed from the reference data.

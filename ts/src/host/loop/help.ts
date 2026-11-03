@@ -1,5 +1,5 @@
 import { PARTICIPANT_SLOTS, isParticipantSlot } from "../../game/input/participants";
-import { COMMANDS_DESCRIPTION, COMMANDS_TITLE, COMMANDS_COMMAND, CONTROLS_TITLE, HELP_COMMAND, HOW_TO_PLAY, HOW_TO_PLAY_TITLE, PLAYER_COMMANDS, controlsDescription } from "../../game/ui/helpText";
+import { COMMANDS_DESCRIPTION, COMMANDS_TITLE, COMMANDS_COMMAND, CONTROLS_TITLE, HELP_COMMAND, HOW_TO_PLAY, HOW_TO_PLAY_TITLE, PLAYER_COMMANDS, controlsDescription } from "../../game/ui/guide/text";
 import { trampoline } from "wisp/src/platform/dispatch";
 import { localParticipantSlot } from "./diagnostics";
 import type { ShellState } from "./state";

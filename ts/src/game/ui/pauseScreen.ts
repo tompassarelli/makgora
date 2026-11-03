@@ -1,3 +1,4 @@
+import { PAUSE_KEYS } from "./guide/text";
 import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
 import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, sizeText } from "./frames";

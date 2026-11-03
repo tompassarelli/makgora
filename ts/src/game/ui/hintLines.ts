@@ -1,3 +1,4 @@
+import { CONTROLS_PANEL_KEY } from "./guide/text";
 import { Action } from "../input/actions";
 import { PAD_LAYOUTS, type PadControl } from "../input/padLayouts";
 
@@ -32,7 +33,7 @@ export function padHintRows(): HintRow[] {
     { keys: padButtons(Action.strong), label: "Strong" },
     { keys: "R stick tilt", label: "Mod X + Y" },
     { keys: "Start", label: "pause" },
-    { keys: "F2", label: "hide" },
+    { keys: CONTROLS_PANEL_KEY, label: "hide" },
   ];
 }
 

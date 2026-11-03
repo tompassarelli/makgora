@@ -3,6 +3,7 @@ import { CONTROLLER_CONTRACT_PATH, controllerContractText, padLayoutProducers } 
 import * as fighterArtData from "./fighterArtData";
 import * as fighterDifference from "./fighterDifference";
 import * as fighterState from "./fighterState";
+import * as playerGuide from "./playerGuide";
 import * as strikeIndex from "./strikeIndex";
 import { syncGenerated, tsRoot } from "./sync";
 
@@ -11,6 +12,8 @@ const producers = [
   ...fighterArtData.producers(),
   { output: fighterDifference.output, render: fighterDifference.renderFighterDifference },
   { output: strikeIndex.output, render: () => strikeIndex.renderStrikeIndex() },
+  { output: playerGuide.markdownOutput, render: playerGuide.renderMarkdown },
+  { output: playerGuide.bbcodeOutput, render: playerGuide.renderBbcode },
   { output: relative(tsRoot, CONTROLLER_CONTRACT_PATH), render: controllerContractText },
   ...padLayoutProducers.map(({ path, render }) => ({ output: relative(tsRoot, path), render })),
 ];
