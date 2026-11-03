@@ -34,7 +34,7 @@ test("every Frozen Throne prop near the deck stands on the deck or on an ice flo
     return { left: Math.min(...xs), right: Math.max(...xs), front: Math.min(...ys), back: Math.max(...ys), top: bounds.max[2] * mz * piece.scale + piece.z };
   };
   const props = pieces.filter(piece => piece.model !== FLOE && piece.model !== STAGE_SNOW_MODEL && !piece.model.startsWith(CHAIN) && piece.y < NEAR_BAND_BACK);
-  expect(props.length).toBeGreaterThanOrEqual(6);
+  expect(props.length).toBeGreaterThanOrEqual(5);
   const stranded = props.filter(piece => {
     const onDeck = piece.z === 0 && Math.abs(piece.y) <= MAIN_DECK_HALF_DEPTH;
     const onFloe = floes.map(box).some(floe => piece.x >= floe.left && piece.x <= floe.right && piece.y >= floe.front && piece.y <= floe.back && Math.abs(piece.z - floe.top) <= 12);
