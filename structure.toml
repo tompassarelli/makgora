@@ -33,7 +33,7 @@ paths = [
   "ts/src/game/assets/frostAssetInfo.ts", "ts/src/game/assets/stageAssetInfo.ts", "ts/src/game/assets/stageSkyInfo.ts",
   "ts/src/game/assets/terrainAssetInfo.ts",
   "ts/src/game/presentation/*ClipInfo.ts", "ts/src/game/presentation/*AssetInfo.ts", "ts/src/game/presentation/drawnStrideInfo.ts",
-  "ts/src/game/presentation/reachCueInfo.ts", "ts/src/game/presentation/cueEmitterInfo.ts", "ts/src/game/presentation/heroStrikeMomentInfo.ts",
+  "ts/src/game/presentation/reachCueInfo.ts", "ts/src/game/presentation/cueEmitterInfo.ts",
   "ts/src/game/presentation/fighterViewBounds.ts",
   "ts/src/game/fighters/cairne/clips.ts", "ts/src/game/fighters/jaina/clips.ts", "ts/src/game/fighters/malfurion/clips.ts",
   "ts/src/game/fighters/medivh/clips.ts", "ts/src/game/fighters/peon/clips.ts", "ts/src/game/fighters/peon/goldSackClips.ts", "ts/src/game/fighters/sylvanas/clips.ts",
@@ -244,7 +244,7 @@ paths = ["ts/src/game/presentation/fighterViewBounds.ts"]
 producer = "ts/scripts/fighterViewBounds.ts"
 [[generated]]
 paths = ["ts/src/game/presentation/drawnStrideInfo.ts", "ts/src/game/presentation/reachCueInfo.ts", "ts/src/game/presentation/cueEmitterInfo.ts",
-         "ts/src/game/presentation/heroStrikeMomentInfo.ts", "ts/src/game/fighters/*/strikeMoments.ts", "ts/scripts/wisp/drawnMotionInfo.ts", "ts/scripts/wisp/drawnReachInfo.ts",
+         "ts/src/game/fighters/*/strikeMoments.ts", "ts/scripts/wisp/drawnMotionInfo.ts", "ts/scripts/wisp/drawnReachInfo.ts",
          "ts/scripts/wisp/modelFacts.ts", "ts/scripts/wisp/modelFactsTable.ts"]
 producer = "ts/scripts/wisp/commands/view.ts"
 [[generated]]

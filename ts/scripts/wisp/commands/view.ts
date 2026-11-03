@@ -27,7 +27,7 @@ import { characterModelScale } from "../../../src/game/presentation/modelScale";
 import { type DrawnReachRow, REACH_CHECKED, drawnReachSource, measureDrawnReach } from "../drawnReach";
 import { DRAWN_REACH } from "../drawnReachInfo";
 import { STRIKE_FILE_GLOB, measureStrikeMoments, staleStrikeFighters, strikeMomentSources } from "../strikeMoments";
-import { HERO_STRIKE_MOMENTS } from "../../../src/game/presentation/heroStrikeMomentInfo";
+import { HERO_STRIKE_MOMENTS } from "../../../src/generated/strikes/heroStrikeMomentInfo";
 import { checkoutInputs } from "../buildInputs";
 import { BODY_HEIGHT, type ReachCueRow, measureReachCue, measuredStyles, reachCueSource, showsReachCue } from "../reachCues";
 import { ALL_HEROES, SELECTABLE_CHARACTERS, isSelectableCharacter, fighterName, fighterSlug, shipsInMap } from "../../../src/game/roster/kits";

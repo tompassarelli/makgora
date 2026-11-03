@@ -14,7 +14,7 @@ import * as fighterArtData from "../../../codegen/fighterArtData";
 import { syncGenerated } from "../../../codegen/sync";
 import { DERIVE_LEASE_SECONDS, openPaths, pruneInputs } from "../inputsPrune";
 import { projectRoot } from "../project";
-import { HERO_STRIKE_MOMENTS } from "../../../src/game/presentation/heroStrikeMomentInfo";
+import { HERO_STRIKE_MOMENTS } from "../../../src/generated/strikes/heroStrikeMomentInfo";
 import { measureStrikeMoments, staleStrikeFighters } from "../strikeMoments";
 import { heroModelSource } from "../../heroModelSource";
 import { FAMILIES, FAMILY_NAMES, type Family, INPUTS_STORE, MANIFEST, checkoutInputs, isSharded, readManifest, readPins, storeFamily, storeShards, unstoredPins, writePin, writeShardPins } from "../buildInputs";

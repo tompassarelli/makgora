@@ -25,7 +25,7 @@ import { hopClipFrames, hopFrames, JUMP_CLIP_FRAMES, jumpPose } from "./hopPose"
 import { refireClipFrames, refireKey, refiredClip } from "./specialRefire";
 import { pinnedSpecialSeconds, playsFollowUpPose, windUpRate } from "./specialPhase";
 import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion";
-import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
+import { HERO_STRIKE_MOMENTS } from "../../generated/strikes/heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 import { heroCueWindows } from "./cueWindows";
 import { FRAME_SECONDS } from "./frameClock";

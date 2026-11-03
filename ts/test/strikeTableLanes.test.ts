@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { HERO_STRIKE_MOMENTS } from "../src/game/presentation/heroStrikeMomentInfo";
+import { HERO_STRIKE_MOMENTS } from "../src/generated/strikes/heroStrikeMomentInfo";
 import { type StrikeMoment, strikeMomentSources } from "../scripts/wisp/strikeMoments";
 
 const committed: StrikeMoment[] = Object.entries(HERO_STRIKE_MOMENTS).flatMap(([character, styles]) =>

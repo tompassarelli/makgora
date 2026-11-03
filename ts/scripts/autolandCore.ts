@@ -206,7 +206,7 @@ export const looping = (descriptions: readonly string[]): boolean =>
 export type Tree = ReadonlyMap<string, string>;
 export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md", "ts/test/lua/cost-baseline.tsv", "docs/design/melee-parity.md"];
 export const CACHE_RECORDS: readonly string[] = ["ts/scripts/wisp/cue-models.tsv"];
-export const GENERATED_CODE = /^ts\/src\/generated\/(?:state\/|fighter-art\/|fighterArtData\.ts$)/;
+export const GENERATED_CODE = /^ts\/src\/generated\/(?:state\/|fighter-art\/|strikes\/|fighterArtData\.ts$)/;
 const generated = (path: string): boolean => GENERATED_REPORTS.includes(path) || CACHE_RECORDS.includes(path);
 const NEVER_DISJOINT = /^(?:\.github\/workflows\/|ts\/scripts\/autoland)/;
 const changed = (from: Tree, to: Tree): string[] => [...new Set([...from.keys(), ...to.keys()])].filter((path) => from.get(path) !== to.get(path));

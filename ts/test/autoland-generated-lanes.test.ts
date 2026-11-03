@@ -76,7 +76,7 @@ test("two lanes that add state for different heroes, whose rows sit side by side
 });
 
 test("a conflict in the state or fighter-art tables resolves only when no source file conflicts beside it [k2 property]", () => {
-  const tables = [GENERATED, "ts/src/generated/state/fighterDifference.ts", "ts/src/generated/fighterArtData.ts", "ts/src/generated/fighter-art/chen.ts"];
+  const tables = [GENERATED, "ts/src/generated/state/fighterDifference.ts", "ts/src/generated/fighterArtData.ts", "ts/src/generated/fighter-art/chen.ts", "ts/src/generated/strikes/heroStrikeMomentInfo.ts"];
   for (const path of tables) expect(GENERATED_CODE.test(path)).toBe(true);
   for (const path of ["ts/src/generated/assets/white-facts/chen.ts", "ts/src/generated/clips/chen.ts", "ts/src/game/sim/state/fighterSchema.ts"]) expect(GENERATED_CODE.test(path)).toBe(false);
   expect(resolveConflicts(tables.map((path) => ({ path })))).toMatchObject({ resolve: true, code: tables });

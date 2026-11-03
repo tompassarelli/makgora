@@ -8,7 +8,7 @@ import { measureStrikeMoments, staleStrikeFighters } from "../../ts/scripts/wisp
 import { capture, type PoseFrame, sampleAttack, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { clipFor, smashClipsFor } from "../../ts/src/game/presentation/fighterClips";
 import { advanceFighterPose, createFighterPose } from "../../ts/src/game/presentation/fighterPose";
-import { HERO_STRIKE_MOMENTS } from "../../ts/src/game/presentation/heroStrikeMomentInfo";
+import { HERO_STRIKE_MOMENTS } from "../../ts/src/generated/strikes/heroStrikeMomentInfo";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { beginFighterAttack } from "../../ts/src/game/sim/attacks";
 import { AttackPhase, AttackStyle, type Character } from "../../ts/src/game/sim/codes";

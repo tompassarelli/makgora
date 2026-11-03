@@ -5,7 +5,7 @@ import { Character, SpecialAction } from "../sim/codes";
 import { SpecialForm, specialForm } from "../sim/specials/schema";
 import { specialClip } from "./fighterClips";
 import { FRAME_SECONDS } from "./frameClock";
-import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
+import { HERO_STRIKE_MOMENTS } from "../../generated/strikes/heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 
 test("Maiev's Shadow Strike clip, played evenly across the move, reaches its measured throw pose within half a tick of the frame the dagger spawns, standing and in the air [k3 measure docs/design/maiev.md]", () => {
