@@ -330,10 +330,10 @@ function stageScriptedMove(s: ShellState, slot: number, args: readonly string[])
 }
 
 function applyShowcaseEdge(s: ShellState, edge: Edge): boolean {
-  const target = fighterAt(s.world, edge.slot === 0 ? 1 : 0);
+  const target = (): Fighter => fighterAt(s.world, edge.slot === 0 ? 1 : 0);
   if (edge.action === "move") stageScriptedMove(s, edge.slot, edge.args);
-  else if (edge.action === "brace") braceTarget(target);
-  else if (edge.action === "cross") crossTarget(target, edge.args);
+  else if (edge.action === "brace") braceTarget(target());
+  else if (edge.action === "cross") crossTarget(target(), edge.args);
   else if (edge.action === "hold") beginHeldCamera(s, edge.frame + whole(edge.args[0] ?? "0"));
   else return false;
   return true;
