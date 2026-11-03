@@ -17,6 +17,7 @@ import { applyFighterSetup } from "../../game/session/fighterSetup";
 import { prepareDevState, commitDevState } from "./devState";
 import { applySetupCommand } from "../../game/session/sessionSetup";
 import { writeLines } from "wisp/src/platform/fileio";
+import { startButtonSweep } from "../../game/ui/buttonSweep";
 import { probeFrameCostClock } from "./frameCost";
 import { probeRenderClock } from "./renderClock";
 import { probeCallbackClock } from "./callbackClock";
@@ -55,6 +56,7 @@ export function onDevCommand(s: ShellState): void {
 
 const CINE_OFF_SUFFIX = " |cine off";
 const HOST_DELAY_COMMAND = "-dev hostdelay ";
+const BUTTONS_COMMAND = "-dev buttons";
 
 function hostDelayCommand(s: ShellState, actor: number, text: string): string {
   const manual = text === "auto" ? AUTO_DELAY : parseInt(text);
@@ -165,6 +167,7 @@ function sessionReceipt(s: ShellState, actor: number, message: string, requests:
     startDevClassic(s, classic.character, classic.boss);
     return receipt;
   }
+  if (message === BUTTONS_COMMAND) return `dev: buttons ${formatInt(startButtonSweep(localSlot()))}`;
   if (message.startsWith("-dev shield-energy ")) return shieldEnergyReceipt(s, message);
   if (LOOK_COMMANDS.some(prefix => message.startsWith(prefix))) return lookReceipt(s, message);
   return matchStartReceipt(s, actor, message, requests);

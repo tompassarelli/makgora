@@ -11,6 +11,7 @@ import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, Frame, f
 import { eventPlayer, localPlayer, Player, player as playerOf, playerSlot } from "wisp/game/players";
 import { addSyncEvent, syncData } from "wisp/game/sync";
 import { toReal } from "wisp/game/text";
+import { recordSweepClick, registerSweepButton, sweepActive, targetKind, unregisterSweepButtons } from "./buttonSweep";
 
 declare global {
   function GetHandleId(handle: Frame): number;
@@ -164,6 +165,7 @@ export interface ClickBox {
 
 interface Button<T> {
   readonly id: number;
+  readonly label: string;
   readonly frame: Frame;
   readonly target: T;
   readonly box: ClickBox | undefined;
@@ -201,6 +203,8 @@ export class ButtonClicks<T> {
           this.hover?.(this.hovered?.target, clicker);
           return;
         }
+        if (localPlayer() === clicker) recordSweepClick(button.label);
+        if (sweepActive()) return;
         releaseFocus(button.frame, clicker);
         handle(button.target, clicker);
         return;
@@ -216,7 +220,7 @@ export class ButtonClicks<T> {
       addFrameEvent(this.trigger, frame, FrameEvent.mouseEnter);
       addFrameEvent(this.trigger, frame, FrameEvent.mouseLeave);
     }
-    this.buttons.push({ id: GetHandleId(frame), frame, target, box });
+    this.buttons.push({ id: GetHandleId(frame), label: registerSweepButton(this.name, targetKind(target), frame, box), frame, target, box });
     return frame;
   }
 
@@ -236,6 +240,7 @@ export class ButtonClicks<T> {
   }
 
   destroy(): void {
+    unregisterSweepButtons(this.buttons.map(({ frame }) => frame));
     destroyEvents(this.trigger);
   }
 }

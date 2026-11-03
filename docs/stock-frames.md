@@ -43,3 +43,18 @@ and was caught only because the worker tried it first.
 
 `smashcraft:ts/test/stockFrames.test.ts` pins the hide list and fails when a
 hidden stock frame is the parent of any frame the map made.
+
+## The native button sweep
+
+Every `ButtonClicks.add` registers its frame and click box (smashcraft:ts/src/game/ui/buttonSweep.ts).
+`-dev buttons` lists the registered buttons with their visibility and box in
+`smashcraft-dev-buttons-pSLOT.txt` and turns click logging on: from then on a
+click on any registered button is appended to
+`smashcraft-dev-button-clicks-pSLOT.txt` and its handler does not run, so a
+panel stays open while it is swept. The accept check `gate-panel-buttons`
+(smashcraft:ts/scripts/wisp/gateButtons.ts) clicks each visible button at 5
+points across its width and fails, naming the button and the point, when a
+point produces no click or another button's click, or when a visible
+registered button has no click box. It sweeps the buttons shown when it runs
+(the first-run Controls screen); the receipt carries the window size, and the
+check is not yet in the green gate (smashcraft#1047).
