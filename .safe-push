@@ -10,3 +10,4 @@
 	link = ts/node_modules
 [after-landing]
 	check = "standalone-parity :: cd ts && bun wisp parity standalone test/native/pads/cpu-expert.pad --presentation native || { echo 'This landing moved the sim off the native recording of test/native/pads/cpu-expert.pad at the first divergent frame above. If the landing was an intended gameplay change, re-record the pad in the native client on a LAN pair and replace its native recording in ts/test/corpus with bun wisp parity corpus keep; if not, fix the drift.'; exit 1; }"
+	check = release-assets :: cd ts && bun scripts/releaseAssets.ts

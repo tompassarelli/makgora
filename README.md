@@ -9,8 +9,9 @@ Warcraft III is still a great platform for custom games, and Melee's movement an
 combat remain the model for the platform fighter. Mak'gora brings that
 depth to Warcraft III's heroes, with the rollback netcode that online play needs.
 
-- **Download and release notes:** [latest GitHub release](https://github.com/tompassarelli/makgora/releases/latest).
-  The map is attached to each release; Git holds code only.
+- **Download:** [Hive Workshop](https://www.hiveworkshop.com/threads/makgora.375492/).
+  **Release notes:** [latest GitHub release](https://github.com/tompassarelli/makgora/releases/latest).
+  GitHub holds code and notes only, never the map.
 - **How to play and controls:** [player guide](docs/player-guide.md).
 - **Games, questions and bug reports:** [Discord](https://discord.gg/JQGZs2UJR) and
   [issues](https://github.com/tompassarelli/makgora/issues), where status and next work live.
@@ -28,10 +29,14 @@ the community models credited below. The map plays only inside your own copy of
 Warcraft III; it never replaces the game.
 
 - **Respect copyright and publisher IP.** The map uses Warcraft III's own
-  models with animations we authored. The repositories contain no extracted
-  Blizzard files: models, textures, sounds, data, scripts or in-game text.
-  Build inputs stay private, outside Git, and Nintendo's code and assets are
-  neither in the repositories nor shipped with Mak'gora.
+  models with animations we authored, plus credited Hive Workshop models,
+  some of them ported by their authors from other Blizzard games. Those models
+  ship only inside the map, and the map ships only on Hive Workshop and
+  Battle.net, never on GitHub; a check after each landing fails if a GitHub
+  release carries a map or model file. The repositories contain no Blizzard
+  files: models, textures, sounds, data, scripts or in-game text. Build inputs
+  stay private, outside Git, and Nintendo's code and assets are neither in the
+  repositories nor shipped with Mak'gora.
 - **Learn by observation.** Behaviour is measured from the outside: what
   Warcraft III shows, plays, logs and writes, and the traffic of LAN games we
   host, plus public documentation. Melee's feel comes from public frame data
@@ -46,6 +51,9 @@ Warcraft III; it never replaces the game.
 
 The long form, with what counts as observation and how the checks enforce it,
 is Wisp's [clean-room rules](https://github.com/tompassarelli/wisp/blob/main/docs/clean-room.md).
+The map's credited Hive Workshop models are Mak'gora's one exception to their
+ban on distributing Blizzard art (decided 4 November 2026); Wisp's standalone
+engine keeps the ban.
 
 ## Develop
 
