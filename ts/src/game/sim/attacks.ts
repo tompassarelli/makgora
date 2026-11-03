@@ -6,16 +6,14 @@ import { f32 } from "wisp/src/sim/f32";
 import { AttackPhase, AttackStyle, Character, DASH_GRAB_REQUEST, GroundAction } from "./codes";
 import { grabPivots, groundOptionOpen, groundState } from "./groundMovement";
 import { GroundOption, GroundState, groundOptionAllowed } from "./stickZones";
-import { attackPhase, attackStartup, attackActive, canStartAttackStyle, inEarlyAscent, inGrabContext, isIntangible, jabChainStep } from "./conditions";
+import { attackPhase, attackStartup, attackActive, canBeGrabbed, canStartAttackStyle, inEarlyAscent, isIntangible, jabChainStep } from "./conditions";
 import { finishDamageContacts, openDamageContacts } from "./contacts";
-import { canBeGrabbedBy } from "./duoLocks";
 import { liftPartner, strikeWithTossed } from "./duoToss";
 import { alreadyHitRegion, recordHitRegion } from "./hitEntries";
 import type { Fighter } from "./fighter";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, copyHitEffect, copyHitRegion, emptyHitRegion, SHARED_GRAB_REGION } from "./hitRegions";
 import { applyAttackHit } from "./hits";
 import { isEthereal } from "./heroStatus";
-import { hangsOnLedge } from "./ledge";
 import { belowStandingPlatform } from "./platformMoves";
 import { spendParasol } from "./parasol";
 import { isAerialAttack, isJab } from "./moves";
@@ -82,7 +80,7 @@ function selectHitRegion(world: Roster, attackerSlot: number, targetSlot: number
 
   const grabsDivine = attack.style === AttackStyle.grab && target.status.divineFrames > 0;
   if (attacker.status.out || attacker.launch.hitlag > 0 || target.status.out || (isIntangible(target) && !grabsDivine) || belowStandingPlatform(attacker, target, stage)) return false;
-  if (attack.style === AttackStyle.grab && !canBeGrabbedBy(world, attackerSlot, targetSlot)) return false;
+  if (attack.style === AttackStyle.grab && !canBeGrabbed(target)) return false;
   if (attack.style === AttackStyle.grab) {
     const startup = attackStartup(attacker, attack.style);
     const active = attackActive(attacker, attack.style);
@@ -247,7 +245,7 @@ export function resolveAttacks(world: Roster, stage?: number): void {
       if (!isActive(world, target) || !attackReaches(world, source, target) || grabbed[target] || choices[target] !== undefined) continue;
       const victim = fighterAt(world, target);
       const candidate = Math.abs(f32(victim.motion.x - sourceX));
-      if (contactBetween(source, target).window > 0 && victim.status.frozenFrames === 0 && !inGrabContext(victim) && !hangsOnLedge(victim)
+      if (contactBetween(source, target).window > 0 && canBeGrabbed(victim)
         && (best === undefined || candidate < distance)) {
         best = target;
         distance = candidate;

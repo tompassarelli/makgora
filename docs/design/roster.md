@@ -192,7 +192,7 @@ Standing, dash and pivot grab boxes follow the shared [scaled grab envelope](gra
 
 Use the existing escape system if one exists. Otherwise use a deterministic 45-frame base hold plus min(30, floor(victim percent / 5)) frames, reduced by validated new input edges at most once every three frames. Each accepted edge removes two hold frames. Throw input starts immediately and locks out pummel. Each kit authors its pummel's look (no launch; no mana gain or healing); its 3 percent damage, hold length, mashing and the pummel's timing and single use are shared (makgora:docs/gameplay-design.md, "Grab holds and pummels", #101). Throws list damage, release frame counted from throw entry, thrower recovery after release, launch angle, and knockback class. Every up throw is a JUGGLE and every down throw a CHASE; forward and back throws follow the kit's identity (makgora:docs/gameplay-design.md, "Throw roles"). The tables of kits not yet built keep their first-pass rows until the kit is measured. Targets are held until release and then enter normal hitstun. Do not add a second guaranteed hit via throw animation contact.
 
-Use #85's adopted regrab rule: a fighter cannot be grabbed while its remaining hitstun comes from a throw, including remaining hitstun after a gentle landing. This restriction ends with that throw hitstun or a replacing hit, and does not block ordinary attacks. Do not add a fixed post-throw protection timer. Throws cannot be cancelled or redirected after entry. Thrower movement is limited to the scripted anchor motion; no walk-off carrying. In multiplayer, an external hit breaks the hold before release and clears both actors consistently. Resolve same-frame external hits, throw releases, and grabs with stable rules; do not let player-slot iteration decide.
+A fighter can be grabbed in every state but a knockdown, a hold already on it and a ledge hang, as in Smash (Tom, 3 Nov 2026; makgora:docs/gameplay-design.md, "Throw regrabs"), so a throw can chain into a regrab. Do not add a post-throw protection timer. Throws cannot be cancelled or redirected after entry. Thrower movement is limited to the scripted anchor motion; no walk-off carrying. In multiplayer, an external hit breaks the hold before release and clears both actors consistently. Resolve same-frame external hits, throw releases, and grabs with stable rules; do not let player-slot iteration decide.
 
 ### Projectiles and summons
 
@@ -1466,7 +1466,8 @@ the Val'kyr Shadowguard left the kit.
   takes 4 damage with no knockback and is yanked over 10 frames to 70 units
   in front of him at his height, a shackle chain (the stock Aerial Shackles
   lightning) joining them, then stays stunned for 18 frames from the frame it
-  arrives; nobody can grab it in that stun and any hit ends it. He is free
+  arrives; it can be grabbed in that stun, as in any state but a knockdown
+  (Tom, 3 Nov), and any hit ends it. He is free
   7 frames before it up close and 17 from the far end, so his jab follows a
   close grip and his tilts a far one, never a smash or a throw. A shield stops the coil, nothing
   reflects it, the stage blocks the pull, and the victim is immune to another

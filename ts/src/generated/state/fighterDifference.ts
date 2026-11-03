@@ -390,9 +390,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   if ((expected.victim ?? RESTING_VICTIM).duoChain !== (actual.victim ?? RESTING_VICTIM).duoChain) return "victimDuoChain";
   if ((expected.victim ?? RESTING_VICTIM).duoFree !== (actual.victim ?? RESTING_VICTIM).duoFree) return "victimDuoFree";
   if ((expected.victim ?? RESTING_VICTIM).netImmune !== (actual.victim ?? RESTING_VICTIM).netImmune) return "victimNetImmune";
-  if ((expected.victim ?? RESTING_VICTIM).grabImmuneDuo !== (actual.victim ?? RESTING_VICTIM).grabImmuneDuo) return "victimGrabImmuneDuo";
   if ((expected.victim ?? RESTING_VICTIM).handoffs !== (actual.victim ?? RESTING_VICTIM).handoffs) return "victimHandoffs";
-  if ((expected.victim ?? RESTING_VICTIM).handoffWindow !== (actual.victim ?? RESTING_VICTIM).handoffWindow) return "victimHandoffWindow";
   if ((expected.victim ?? RESTING_VICTIM).shieldRun !== (actual.victim ?? RESTING_VICTIM).shieldRun) return "victimShieldRun";
   if ((expected.victim ?? RESTING_VICTIM).shieldFree !== (actual.victim ?? RESTING_VICTIM).shieldFree) return "victimShieldFree";
   return undefined;

@@ -4,7 +4,8 @@ import { max } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, ContactKind, GrabAction, SpecialAction } from "./codes";
 import { collectDamageContact } from "./contacts";
-import { canBeGrabbedBy, handoffPummels } from "./duoLocks";
+import { canBeGrabbed } from "./conditions";
+import { handoffPummels } from "./duoLocks";
 import type { Fighter } from "./fighter";
 import { clearDash } from "./groundMovement";
 import type { AppliedStatus } from "./appliedStatus";
@@ -60,7 +61,7 @@ export function applyAttackHit(
   if (attackerSlot !== targetSlot && !canHit(world, attackerSlot, targetSlot)) return;
   const target = fighterAt(world, targetSlot);
   if (style === AttackStyle.grab) {
-    if (canBeGrabbedBy(world, attackerSlot, targetSlot)) catchTarget(world, attackerSlot, targetSlot);
+    if (canBeGrabbed(target)) catchTarget(world, attackerSlot, targetSlot);
     return;
   }
   collectDamageContact(world, attackerSlot, targetSlot, effect, facing, ContactKind.launch, directContact, undefined, shieldContact, status, contactZ);

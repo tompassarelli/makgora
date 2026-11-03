@@ -430,8 +430,8 @@ export const DEFENCE_ROWS: readonly LedgerRow[] = [
   },
   {
     id: "throw-regrab", family: "defence", name: "Regrab during a throw's hitstun",
-    melee: { value: "allowed: throws chain into grabs", source: wiki("Throw") }, ours: () => "refused until the throw's hitstun ends",
+    melee: { value: "allowed: throws chain into grabs", source: wiki("Throw") }, ours: () => "allowed: throws chain into grabs",
     anchor: { file: CONDITIONS, symbol: "canBeGrabbed" },
-    status: { kind: "deviation", reason: "removes throw-to-regrab chains while keeping throw-to-attack combos (docs/gameplay-design.md, Throw regrabs)", decided: "2026-10-06" },
+    status: { kind: "parity", reason: "a fighter not knocked down can be grabbed, as in Smash (docs/gameplay-design.md, Throw regrabs)", decided: "2026-11-03", issue: 1077 },
   },
 ];

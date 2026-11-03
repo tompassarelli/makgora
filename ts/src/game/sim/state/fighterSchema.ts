@@ -190,7 +190,7 @@ export const FIGHTER_DIFF_ORDER: readonly string[] = [
   "waterHydraStrikeFrame", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "projectileBounces[${i}]", "projectileHomeward[${i}]",
   "projectileLastStruck[${i}]", "projectileGustStruck[${i}]", "grabReel", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy", "pullBy", "pullFrames", "pullHold",
   "duoRole", "duoLink", "duoRing[${i}]", "duoHead", "duoOrder", "duoOrderFrame", "duoReviveSpent", "duoSwapCooldown", "duoTossCooldown",
-  "victimDuoChain", "victimDuoFree", "victimNetImmune", "victimGrabImmuneDuo", "victimHandoffs", "victimHandoffWindow", "victimShieldRun", "victimShieldFree",
+  "victimDuoChain", "victimDuoFree", "victimNetImmune", "victimHandoffs", "victimShieldRun", "victimShieldFree",
 ];
 
 export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
@@ -222,7 +222,7 @@ export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
   status: ["damage", "offscreenFrames", "stocks", "respawn", "out", "invincible", "frozenFrames", "freezeImmunityFrames", "armorFrames", "armorMaxDamage", "armorKnockback", "armorChills", "condition", "conditionFrames", "conditionGroup", "conditionImmunityFrames", "conditionHits", "conditionImmunity[]", "poisonFrames", "poisonEvery", "poisonDamage", "soakFrames", "soakLevel", "poisonStacks", "poisonStackFrames", "divineFrames", "cursedBy", "curseFrames", "healed", "summonFrames", "buff", "buffFrames", "manaShield", "petrifyIn", "petrified", "petrifyDamage", "aura", "auraFrames", "slowFrames", "slowScale", "stacks", "struckBy", "pullBy", "pullFrames", "pullHold"],
   meter: ["ex", "ultimate"],
   duo: ["role", "link", "ring[]", "head", "order", "orderFrame", "reviveSpent", "swapCooldown", "tossCooldown"],
-  victim: ["duoChain", "duoFree", "netImmune", "grabImmuneDuo", "handoffs", "handoffWindow", "shieldRun", "shieldFree"],
+  victim: ["duoChain", "duoFree", "netImmune", "handoffs", "shieldRun", "shieldFree"],
   pack: ["length", "life", "age", "x", "z", "direction", "durability", "serial", "spec", "struck[]", "specialStruck", "mode", "modeFrame", "apart", "bitten", "hits", "percent", "hitstun", "velocityX", "velocityZ", "jumps", "surface"],
   projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "poolHits", "poolWait", "spec", "surface", "x", "z", "velocityX", "velocityZ", "damageMultiplier", "bounces", "homeward", "lastStruck", "gustStruck"],
 };
@@ -675,9 +675,7 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "victim.duoChain", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.duoChain", writer: "int", when: ["nonzero"] }, diff: "victimDuoChain", respawn: { blast: "0", respawn: "0" } },
   { path: "victim.duoFree", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.duoFree", writer: "int", when: ["nonzero"] }, diff: "victimDuoFree", respawn: { blast: "0", respawn: "0" } },
   { path: "victim.netImmune", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.netImmune", writer: "int", when: ["nonzero"] }, diff: "victimNetImmune", respawn: { blast: "0", respawn: "0" } },
-  { path: "victim.grabImmuneDuo", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.grabImmuneDuo", writer: "int", when: ["nonzero"] }, diff: "victimGrabImmuneDuo", respawn: { blast: "0", respawn: "0" } },
   { path: "victim.handoffs", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.handoffs", writer: "int", when: ["nonzero"] }, diff: "victimHandoffs", respawn: { blast: "0", respawn: "0" } },
-  { path: "victim.handoffWindow", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.handoffWindow", writer: "int", when: ["nonzero"] }, diff: "victimHandoffWindow", respawn: { blast: "0", respawn: "0" } },
   { path: "victim.shieldRun", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.shieldRun", writer: "int", when: ["nonzero"] }, diff: "victimShieldRun", respawn: { blast: "0", respawn: "0" } },
   { path: "victim.shieldFree", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "victim.shieldFree", writer: "int", when: ["nonzero"] }, diff: "victimShieldFree", respawn: { blast: "0", respawn: "0" } },
 ];

@@ -523,9 +523,7 @@ export interface Victim {
   duoChain: number;
   duoFree: number;
   netImmune: number;
-  grabImmuneDuo: number;
   handoffs: number;
-  handoffWindow: number;
   shieldRun: number;
   shieldFree: number;
 }
@@ -600,7 +598,7 @@ export function createDuo(): Duo {
 }
 
 export function createVictim(): Victim {
-  return { duoChain: 0, duoFree: 0, netImmune: 0, grabImmuneDuo: 0, handoffs: 0, handoffWindow: 0, shieldRun: 0, shieldFree: 0 };
+  return { duoChain: 0, duoFree: 0, netImmune: 0, handoffs: 0, shieldRun: 0, shieldFree: 0 };
 }
 
 /** A solo fighter holds no duo record and an unstruck one no victim record; readers take these resting values for them. */

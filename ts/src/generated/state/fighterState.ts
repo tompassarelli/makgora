@@ -586,9 +586,7 @@ function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Reado
     victim.duoChain = sourceVictim.duoChain;
     victim.duoFree = sourceVictim.duoFree;
     victim.netImmune = sourceVictim.netImmune;
-    victim.grabImmuneDuo = sourceVictim.grabImmuneDuo;
     victim.handoffs = sourceVictim.handoffs;
-    victim.handoffWindow = sourceVictim.handoffWindow;
     victim.shieldRun = sourceVictim.shieldRun;
     victim.shieldFree = sourceVictim.shieldFree;
   }
@@ -1091,9 +1089,7 @@ function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): 
     { const a = victim.duoChain, b = sourceVictim.duoChain; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     { const a = victim.duoFree, b = sourceVictim.duoFree; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     { const a = victim.netImmune, b = sourceVictim.netImmune; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
-    { const a = victim.grabImmuneDuo, b = sourceVictim.grabImmuneDuo; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     { const a = victim.handoffs, b = sourceVictim.handoffs; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
-    { const a = victim.handoffWindow, b = sourceVictim.handoffWindow; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     { const a = victim.shieldRun, b = sourceVictim.shieldRun; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     { const a = victim.shieldFree, b = sourceVictim.shieldFree; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   }
@@ -1658,9 +1654,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   if (victim.duoChain !== 0) sink.int(prefix, "victim.duoChain", victim.duoChain);
   if (victim.duoFree !== 0) sink.int(prefix, "victim.duoFree", victim.duoFree);
   if (victim.netImmune !== 0) sink.int(prefix, "victim.netImmune", victim.netImmune);
-  if (victim.grabImmuneDuo !== 0) sink.int(prefix, "victim.grabImmuneDuo", victim.grabImmuneDuo);
   if (victim.handoffs !== 0) sink.int(prefix, "victim.handoffs", victim.handoffs);
-  if (victim.handoffWindow !== 0) sink.int(prefix, "victim.handoffWindow", victim.handoffWindow);
   if (victim.shieldRun !== 0) sink.int(prefix, "victim.shieldRun", victim.shieldRun);
   if (victim.shieldFree !== 0) sink.int(prefix, "victim.shieldFree", victim.shieldFree);
 }
@@ -1784,9 +1778,7 @@ export function blastFighterFields(f: Fighter): void {
     victim.duoChain = 0;
     victim.duoFree = 0;
     victim.netImmune = 0;
-    victim.grabImmuneDuo = 0;
     victim.handoffs = 0;
-    victim.handoffWindow = 0;
     victim.shieldRun = 0;
     victim.shieldFree = 0;
   }
@@ -2035,9 +2027,7 @@ export function respawnFighterFields(f: Fighter, startX: number): void {
     victim.duoChain = 0;
     victim.duoFree = 0;
     victim.netImmune = 0;
-    victim.grabImmuneDuo = 0;
     victim.handoffs = 0;
-    victim.handoffWindow = 0;
     victim.shieldRun = 0;
     victim.shieldFree = 0;
   }

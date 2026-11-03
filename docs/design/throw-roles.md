@@ -88,8 +88,8 @@ then brought back in the sequel as a shield counter and a way into combos.
   though set-knockback throws last longer. Sheik's down throw is the standard
   example, and Marth's up throw on Fox and Falco is another. Smash 4 ended
   chain grabs with a grab immunity after each throw
-  (https://www.ssbwiki.com/Chain_grab). Our #85 rule ends them in a different
-  way, by tying the immunity to the throw's own hitstun.
+  (https://www.ssbwiki.com/Chain_grab). Ours keep them, as Melee does: any fighter not
+  knocked down can be grabbed (Tom, 3 Nov 2026, #1077).
 
 ## Role menu
 

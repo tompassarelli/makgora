@@ -193,7 +193,7 @@ test("Death Grip in the air pulls an airborne foe to his height and his side, an
   }
 });
 
-test("From the frame it arrives the foe is stunned for exactly 18 frames, cannot be grabbed in them, and is free on the next [k3 measure docs/design/roster.md]", () => {
+test("From the frame it arrives the foe is stunned for exactly 18 frames, can be grabbed in every one of them, and is free on the next [k3 measure docs/design/roster.md]", () => {
   for (const facing of [1, -1]) {
     const g = grip({ facing, foeAhead: 300.0 });
     assertEquals(g.stunFrames, DEATH_GRIP_STUN_FRAMES);
@@ -202,12 +202,12 @@ test("From the frame it arrives the foe is stunned for exactly 18 frames, cannot
     step(d, "none");
     step(d, "neutral");
     while (!stunned(d.foe)) step(d, "none");
-    let grabbable = false;
+    let grabbable = true;
     while (stunned(d.foe)) {
-      grabbable ||= canBeGrabbed(d.foe);
+      grabbable &&= canBeGrabbed(d.foe);
       step(d, "none");
     }
-    assertTrue(!grabbable);
+    assertTrue(grabbable);
     assertTrue(canBeGrabbed(d.foe));
   }
 });

@@ -287,7 +287,7 @@ One rule prevents each loop the pair could build. `bun wisp interactions --attac
 | Risk | Rule that prevents it | Checked by |
 |---|---|---|
 | Wobbling (pummel plus partner hits in a grab) | A body's strikes skip a foe its linked body holds, and Grgl's controls go neutral during Mrgl's grab hold | Unit test, plus `bun wisp agency --attacker murloc --starter grab` |
-| Handoff chain grab | `victim.handoffs` allows one handoff per chain. After the chain's second throw neither body can grab the victim for 90 frames, doubling to 180 if the chain repeats within 300 frames. The pummel count carries across the handoff | Unit test, plus the agency grab starter |
+| Handoff chain grab | None by design: a fighter not knocked down can be grabbed, so either body may regrab out of any throw (Tom, 3 Nov 2026, #1077). `victim.handoffs` counts the chain so the pummel count carries across the handoff | Unit test, plus the agency grab starter |
 | Net loop | The net breaks at 3 hits or 75 frames. Grgl's hits never add frames. After a break the victim cannot be netted for 120 frames, and a second net on a rooted victim deals only its 3% | Unit test |
 | Alternating jab or tilt lock from two bodies | `victim.duoChain` caps at 12 duo hits. Past the cap, duo hits deal damage with zero hitstun and knockback until the victim has been actionable for 20 frames. Hitstun from the two bodies never adds; it takes the maximum | Agency sweep, plus the soak's `lock-loop` detector |
 | Jab-reset lock on a lying victim | The victim-side jab-reset limit in `sim/contacts.ts` is shared by both bodies, because it lives on the victim | Agency `--starter "jab reset"` |

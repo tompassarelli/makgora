@@ -16,7 +16,7 @@ export function latchesOn(world: Roster, ownerSlot: number, targetSlot: number, 
   if (latch === undefined || shieldContact || projectile.damageMultiplier !== 1.0) return false;
   const owner = fighterAt(world, ownerSlot);
   const target = fighterAt(world, targetSlot);
-  if (!canReel(owner) || !canBeGrabbed(target) || inGrabContext(target)) return false;
+  if (!canReel(owner) || !canBeGrabbed(target)) return false;
   cancelSpecialState(owner);
   catchTarget(world, ownerSlot, targetSlot);
   target.grab.grabbedFrames += latch.reelFrames;

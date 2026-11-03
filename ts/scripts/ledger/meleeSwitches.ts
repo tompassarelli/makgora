@@ -5,7 +5,6 @@ import { FOX_NEUTRAL_AIR, maievNeutralAir } from "./moves";
 const SWITCHES: Readonly<Record<string, () => void>> = {
   "air-dodge": () => { meleeHandling.airDodgeEndsHelpless = true; },
   "strong-hit-hitlag": () => { meleeHandling.strongHitsAddNoHitlag = true; },
-  "throw-regrab": () => { meleeHandling.throwsAllowRegrab = true; },
   "maiev-neutral-air-angle": () => { for (const effect of maievNeutralAir()) effect.sakurai = true; },
   "maiev-neutral-air-damage": () => { for (const effect of maievNeutralAir()) effect.damage = FOX_NEUTRAL_AIR.damage; },
   "maiev-neutral-air-knockback": () => {

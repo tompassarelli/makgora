@@ -10,8 +10,7 @@ import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { AttackStyle, Character, ContactKind, DuoOrder, GrabAction } from "../src/game/sim/codes";
 import { observeDamageContacts, queueDamageContact } from "../src/game/sim/contacts";
 import {
-  DUO_CHAIN_CAP, DUO_CHAIN_FREE_FRAMES, DUO_SHIELD_STUN_CAP, HANDOFF_IMMUNE_FRAMES, HANDOFF_REPEAT_IMMUNE_FRAMES,
-  HANDOFF_REPEAT_WINDOW_FRAMES, advanceDuoLocks,
+  DUO_CHAIN_CAP, DUO_CHAIN_FREE_FRAMES, DUO_SHIELD_STUN_CAP, advanceDuoLocks,
 } from "../src/game/sim/duoLocks";
 import { SHIELD_MAX, createFighter } from "../src/game/sim/fighter";
 import { advanceGrabs } from "../src/game/sim/grabs";
@@ -42,7 +41,7 @@ export const DUO_RULES = [
   "shieldstun cap",
   "partner hitstun never adds",
   "linked bodies never hit each other",
-  "handoff chain limit",
+  "regrab out of every throw",
   "pummel count carries across a handoff",
   "toss of Grgl",
 ] as const;
@@ -121,13 +120,6 @@ function throwFoe(world: Roster, slot: number): boolean {
   let frame = 0;
   while (thrower.grab.target !== undefined && frame++ < THROW_FRAMES) advanceGrabs(world, input);
   return thrower.grab.target === undefined;
-}
-
-function settleThrow(world: Roster, frames: number): void {
-  const foe = fighterAt(world, FOE);
-  foe.launch.hitstun = 0;
-  foe.launch.throwHitstun = false;
-  for (let frame = 0; frame < frames; frame++) advanceDuoLocks(world);
 }
 
 function partnerSkipsHeldFoe(foe: DuoFoe): DuoRow {
@@ -245,28 +237,9 @@ function chain(world: Roster, found: Finding): void {
 function handoffChain(foe: DuoFoe): DuoRow {
   const found = finding();
   const world = trio(foe);
-  const target = fighterAt(world, FOE);
   chain(world, found);
-  const immune = target.victim?.grabImmuneDuo ?? 0;
-  expect(found, immune === HANDOFF_IMMUNE_FRAMES, `second throw sets ${immune} frames`, `the second throw set ${immune} frames of grab immunity, not ${HANDOFF_IMMUNE_FRAMES}`);
-  expect(found, !(grab(world, MRGL) || grab(world, GRGL)), "no regrab after the chain", "a body regrabbed out of the second throw");
-  settleThrow(world, HANDOFF_IMMUNE_FRAMES - 1);
-  expect(found, !(grab(world, MRGL) || grab(world, GRGL)), "shut out at 89 frames", "the foe could be grabbed again before 90 frames");
-  settleThrow(world, 1);
-  expect(found, grab(world, GRGL), "grabbable at 90 frames", "the foe could not be grabbed again at 90 frames");
-  throwFoe(world, GRGL);
-  settleThrow(world, HANDOFF_IMMUNE_FRAMES + HANDOFF_REPEAT_WINDOW_FRAMES);
-  chain(world, found);
-  settleThrow(world, 0);
-  const again = fighterAt(world, FOE).victim?.grabImmuneDuo ?? 0;
-  expect(found, again === HANDOFF_IMMUNE_FRAMES, `chain after the window sets ${again}`, `a chain after the repeat window set ${again} frames, not ${HANDOFF_IMMUNE_FRAMES}`);
-  const repeat = trio(foe);
-  chain(repeat, finding());
-  settleThrow(repeat, HANDOFF_IMMUNE_FRAMES);
-  chain(repeat, finding());
-  const doubled = fighterAt(repeat, FOE).victim?.grabImmuneDuo ?? 0;
-  expect(found, doubled === HANDOFF_REPEAT_IMMUNE_FRAMES, `repeat chain sets ${doubled}`, `a repeat chain set ${doubled} frames, not ${HANDOFF_REPEAT_IMMUNE_FRAMES}`);
-  return finish(foe, "handoff chain limit", found);
+  expect(found, grab(world, MRGL), "regrab out of the second throw", "a body could not regrab out of the chain's second throw");
+  return finish(foe, "regrab out of every throw", found);
 }
 
 function pummelCarry(foe: DuoFoe): DuoRow {
@@ -353,7 +326,7 @@ const SCENARIOS: readonly (readonly [DuoRule, (foe: DuoFoe) => DuoRow])[] = [
   ["shieldstun cap", shieldstunCap],
   ["partner hitstun never adds", partnerHitstun],
   ["linked bodies never hit each other", linkedBodiesNeverHit],
-  ["handoff chain limit", handoffChain],
+  ["regrab out of every throw", handoffChain],
   ["pummel count carries across a handoff", pummelCarry],
   ["toss of Grgl", tossGrgl],
 ];

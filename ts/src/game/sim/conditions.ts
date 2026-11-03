@@ -1,8 +1,7 @@
 
 
-import { AttackPhase, AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, HeroStatusKind, LedgeState, ShieldBreak, SurfaceContact } from "./codes";
+import { AttackPhase, AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ShieldBreak, SurfaceContact } from "./codes";
 import type { Fighter } from "./fighter";
-import { meleeHandling } from "./meleeHandling";
 import { parasolBlocksActions } from "./parasol";
 import { attackStartupFrames, characterAttackActiveFrames, jabChainFrom, nextJab } from "./moves";
 
@@ -58,7 +57,7 @@ export function inGrabContext(f: Readonly<Fighter>): boolean {
 
 
 export function canBeGrabbed(f: Readonly<Fighter>): boolean {
-  return f.status.frozenFrames <= 0 && f.status.condition !== HeroStatusKind.gripped && (meleeHandling.throwsAllowRegrab || !(f.launch.throwHitstun && f.launch.hitstun > 0));
+  return f.grab.owner === undefined && f.grab.grabbedFrames <= 0 && !isDownDamageState(f) && f.ledge.state !== LedgeState.hang;
 }
 
 

@@ -2,7 +2,7 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { createMatchState } from "../../lobby/lobbyState";
 import { initializeMatchFighters } from "../../match/step";
 import { AttackStyle, Character, GrabAction } from "../../sim/codes";
-import { HANDOFF_IMMUNE_FRAMES, HANDOFF_REPEAT_IMMUNE_FRAMES, HANDOFF_REPEAT_WINDOW_FRAMES, advanceDuoLocks } from "../../sim/duoLocks";
+import { advanceDuoLocks } from "../../sim/duoLocks";
 import { createFighter } from "../../sim/fighter";
 import { advanceGrabs } from "../../sim/grabs";
 import { applyAttackHit } from "../../sim/hits";
@@ -50,42 +50,21 @@ function chain(world: Roster): void {
   throwFoe(world, GRGL);
 }
 
-test("A chain allows one handoff, and its second throw shuts both bodies out of the foe for 90 frames [k3 measure docs/design/murloc.md]", () => {
+test("A pair chain sets no grab immunity: either body can regrab out of every throw, as any grab can [k3 measure docs/design/murloc.md]", () => {
   const world = trio();
-  const foe = fighterAt(world, FOE);
   chain(world);
-  assertEquals(foe.victim?.grabImmuneDuo ?? 0, HANDOFF_IMMUNE_FRAMES, "the second throw sets the immunity");
-  assertEquals(grab(world, MRGL) || grab(world, GRGL), false, "neither body regrabs out of the second throw");
-  settle(world, HANDOFF_IMMUNE_FRAMES - 1);
-  assertEquals(grab(world, MRGL) || grab(world, GRGL), false, "89 frames on, both bodies are still shut out");
-  settle(world, 1);
-  assertEquals(grab(world, GRGL), true, "at 90 frames the foe can be grabbed again");
+  assertEquals(grab(world, MRGL), true, "the leader regrabs out of the partner's throw");
+  throwFoe(world, MRGL);
+  assertEquals(grab(world, GRGL), true, "the partner regrabs again");
 });
 
-test("A repeat chain within 300 frames doubles the grab immunity to 180, and one after it does not [k3 measure docs/design/murloc.md]", () => {
-  const world = trio();
-  const foe = fighterAt(world, FOE);
-  chain(world);
-  settle(world, HANDOFF_IMMUNE_FRAMES);
-  assertEquals(foe.victim?.grabImmuneDuo ?? 0, 0, "the first immunity has run out");
-  chain(world);
-  assertEquals(foe.victim?.grabImmuneDuo ?? 0, HANDOFF_REPEAT_IMMUNE_FRAMES, "a repeat inside the window doubles it");
-  settle(world, HANDOFF_REPEAT_IMMUNE_FRAMES + HANDOFF_REPEAT_WINDOW_FRAMES);
-  chain(world);
-  assertEquals(foe.victim?.grabImmuneDuo ?? 0, HANDOFF_IMMUNE_FRAMES, "a chain after the window is a first one again");
-});
-
-test("A throw nobody follows up does not count toward a later chain [k3 measure docs/design/murloc.md]", () => {
+test("A throw nobody follows up ends the chain once the foe is free [k3 measure docs/design/murloc.md]", () => {
   const world = trio();
   const foe = fighterAt(world, FOE);
   assertEquals(grab(world, MRGL), true, "the leader grabs the foe");
   throwFoe(world, MRGL);
   settle(world, 1);
   assertEquals(foe.victim?.handoffs ?? 0, 0, "the chain ended when the foe got up");
-  assertEquals(grab(world, GRGL), true, "the partner grabs the standing foe");
-  throwFoe(world, GRGL);
-  assertEquals(foe.victim?.grabImmuneDuo ?? 0, 0, "a lone throw sets no immunity");
-  assertEquals(grab(world, MRGL), true, "the leader can hand off out of it");
 });
 
 test("The pummel count carries across a handoff [k3 measure docs/design/murloc.md]", () => {
