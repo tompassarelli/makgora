@@ -168,7 +168,7 @@ export const measureBindingsGate = (clientsFile: string, name: string, directory
         if (label === "Pause") yield* send(control, up);
         yield* batch(client, [{ kind: "keys", keys: ["ctrl+F7"] }]).pipe(Effect.mapError(fail("bindings gate probe export")));
         const page = yield* pollUntil(Effect.try({
-          try: () => readdirSync(data).filter(file => /^smashcraft-response-p0-run\d+-page0\.txt$/.test(file) && statSync(join(data, file)).mtimeMs >= started).sort((a, b) => Number(/run(\d+)/.exec(b)?.[1]) - Number(/run(\d+)/.exec(a)?.[1]))[0],
+          try: () => readdirSync(data).filter(file => /^makgora-response-p0-run\d+-page0\.txt$/.test(file) && statSync(join(data, file)).mtimeMs >= started).sort((a, b) => Number(/run(\d+)/.exec(b)?.[1]) - Number(/run(\d+)/.exec(a)?.[1]))[0],
           catch: cause => new AcceptFailure({ operation: "bindings gate journal", problem: String(cause) }),
         }), { every: "100 millis", within: "5 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "bindings gate journal", problem: `no fresh response page for ${label}` })) });
         const text = readFileSync(join(data, page), "latin1");
@@ -201,7 +201,7 @@ export const measureBindingsGate = (clientsFile: string, name: string, directory
     }
   }));
   const passed = measured.filter(sample => sample.pass).length;
-  const receipt = `SMASHCRAFT GATE bindings labels=${labels.length} samples=${measured.length} passed=${passed} pass=${passed === samples.length ? 1 : 0} remaps=${remaps ?? "none"}`;
+  const receipt = `MAKGORA GATE bindings labels=${labels.length} samples=${measured.length} passed=${passed} pass=${passed === samples.length ? 1 : 0} remaps=${remaps ?? "none"}`;
   yield* save("measurements.json", `${JSON.stringify({ text: receipt, helper, helperSha256, controllerSource: dependency.source, contractPath, contractSha256: createHash("sha256").update(contractText).digest("hex"), device: pad.device, gamepad, remaps, phases, measured }, null, 2)}\n`);
   return { name: "bindings-gate", text: receipt, modified: Date.now() } satisfies ReceiptFile;
 }).pipe(Effect.scoped);

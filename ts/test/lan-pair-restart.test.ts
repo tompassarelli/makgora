@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { Effect, Exit } from "effect";
 import { type PairStatus, restartPair } from "../scripts/wisp/commands/lanPoolUnit";
 
-const state = mkdtempSync(join(tmpdir(), "smashcraft-pair-restart-"));
+const state = mkdtempSync(join(tmpdir(), "makgora-pair-restart-"));
 const ownState = process.env["XDG_STATE_HOME"];
 process.env["XDG_STATE_HOME"] = state;
 afterAll(() => {

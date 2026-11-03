@@ -35,7 +35,7 @@ const nativeSequence = matchesText === "native";
 const releaseMatches = matchesText === undefined || nativeSequence ? undefined : Number(matchesText);
 const declarationsText = readFile(declarationsPath);
 const { functions } = parseNativeDeclarations(declarationsText);
-const clients = luaLockstep({ filePrefix: "smashcraft", localNatives: PREDICTED_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: makgoraNativeBehavior }, readFile(bundlePath), declarationsText, undefined, syncDelivery(MEASURED_BATTLE_NET, 7));
+const clients = luaLockstep({ filePrefix: "makgora", localNatives: PREDICTED_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: makgoraNativeBehavior }, readFile(bundlePath), declarationsText, undefined, syncDelivery(MEASURED_BATTLE_NET, 7));
 const host = clients.client(0);
 const censuses = clients.clients.map((client) => new HandleCensus(client, functions));
 

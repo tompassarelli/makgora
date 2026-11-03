@@ -26,7 +26,7 @@ interface ClientFactories {
 
 export const clientWith = (factories: ClientFactories): Command => (args) => Effect.gen(function*() {
   const selected = yield* Effect.try({ try: () => clientArguments(args), catch: cause => cause instanceof UsageFailure ? cause : new UsageFailure({ problem: String(cause) }) });
-  return yield* factories.make(selected.clientsFile, { filePrefix: "smashcraft" }, factories.doctor(selected.clientsFile), factories.signOut(selected.clientsFile))(selected.args);
+  return yield* factories.make(selected.clientsFile, { filePrefix: "makgora" }, factories.doctor(selected.clientsFile), factories.signOut(selected.clientsFile))(selected.args);
 });
 
 

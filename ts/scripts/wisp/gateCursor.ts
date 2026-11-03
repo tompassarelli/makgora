@@ -136,7 +136,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   const states = samples.every(sample => EXPECTED_STATE[sample.phase] === undefined || !sample.visible || sample.state === EXPECTED_STATE[sample.phase]);
   const pinch = samples.every(sample => !sample.visible || sample.pinched === (sample.phase === "carrying") || sample.phase === "pick" || sample.phase === "drop");
   const modified = yield* Clock.currentTimeMillis;
-  const text = `SMASHCRAFT GATE cursor frames=${samples.length} visible=${visible} sweepMs=${sweepMs} picked=${picked ? 1 : 0} dropped=${dropped ? 1 : 0} parked=${parked ? 1 : 0} pinch=${pinch ? 1 : 0} states=${states ? 1 : 0} pass=${visible === samples.length && picked && dropped && parked && pinch && states && sweepMs >= 5000 ? 1 : 0}`;
+  const text = `MAKGORA GATE cursor frames=${samples.length} visible=${visible} sweepMs=${sweepMs} picked=${picked ? 1 : 0} dropped=${dropped ? 1 : 0} parked=${parked ? 1 : 0} pinch=${pinch ? 1 : 0} states=${states ? 1 : 0} pass=${visible === samples.length && picked && dropped && parked && pinch && states && sweepMs >= 5000 ? 1 : 0}`;
   yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, threshold: 24, positiveControl: control.file, negativeControlError, missingFrameIds: samples.flatMap((sample, index) => sample.visible ? [] : [index]), region, handSize: handExtent, samples }, null, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "cursor gate evidence", problem: String(cause) }) });
   return { name: "cursor-gate", text, modified } satisfies ReceiptFile;
 }).pipe(Effect.scoped);

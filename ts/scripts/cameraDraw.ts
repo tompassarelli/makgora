@@ -87,7 +87,7 @@ function addPageLines(rows: Map<number, Callback>, lines: readonly string[]): vo
 
 export const callbacks = (directory: string, slot: number, run: number) => Effect.gen(function*() {
   const rows = new Map<number, Callback>();
-  const glob = new Bun.Glob(`**/*smashcraft-response-p${slot}-run${run}-page*.txt`);
+  const glob = new Bun.Glob(`**/*makgora-response-p${slot}-run${run}-page*.txt`);
   let pages = 0;
   for (const file of glob.scanSync({ cwd: directory, onlyFiles: true })) {
     const path = join(directory, file);

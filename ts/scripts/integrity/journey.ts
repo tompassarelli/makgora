@@ -332,7 +332,7 @@ function chatSteps(context: JourneyContext) {
 
 
   const journalChat = (epoch: number, text: string) => Effect.gen(function*() {
-    const name = `smashcraft-journal-text-ack-${build}-e${epoch}-p0.txt`;
+    const name = `makgora-journal-text-ack-${build}-e${epoch}-p0.txt`;
     const read = rig.file(0, name);
     const fields = (file: GameFile | undefined) => receiptFields(file?.text ?? "");
     const before = fields(yield* read);

@@ -18,7 +18,7 @@ const KEY_EQUALS = 0xbb;
 test("the -clip chat command saves a moment and the = key does not [k1 scenario]", () => {
   const clients = headless.clients({ install, start: () => startBuild(BUILD) }, [0]);
   const client = clients.client(0);
-  const saved = () => [...client.files.keys()].filter(name => name.includes("smashcraft-repro")).length;
+  const saved = () => [...client.files.keys()].filter(name => name.includes("makgora-repro")).length;
   clients.start();
   clients.frames(120);
   clients.chat(0, "-dev quick cpu wren expert hero rifleman");

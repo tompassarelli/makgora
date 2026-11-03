@@ -12,13 +12,13 @@
     "war3-model": "4.0.1",
     "wisp": "file:vendor/wisp-8bad54705d63429faa66f6b5062e477e84c9e8e1.tgz"
   },
-  "name": "smashcraft",
+  "name": "makgora",
   "private": true,
   "license": "MIT",
   "type": "module",
   "packageManager": "bun@1.3.13",
   "scripts": {
-    "postinstall": "git config merge.smashcraft-generated.name 'per-entry merge of generated files' && git config merge.smashcraft-generated.driver 'f=ts/scripts/mergeGenerated.ts; if [ -f \"$f\" ]; then bun \"$f\" %O %A %B %P; else git merge-file -L ours -L base -L theirs %A %O %B; fi' && bun node_modules/@effect/tsgo/dist/effect-tsgo.cjs patch --typescript --typescript-package typescript-native",
+    "postinstall": "git config merge.makgora-generated.name 'per-entry merge of generated files' && git config merge.makgora-generated.driver 'f=ts/scripts/mergeGenerated.ts; if [ -f \"$f\" ]; then bun \"$f\" %O %A %B %P; else git merge-file -L ours -L base -L theirs %A %O %B; fi' && bun node_modules/@effect/tsgo/dist/effect-tsgo.cjs patch --typescript --typescript-package typescript-native",
     "check": "bun scripts/check.ts",
     "generate": "bun codegen/run.ts",
     "test": "bun scripts/test.ts",

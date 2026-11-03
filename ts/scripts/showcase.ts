@@ -6,7 +6,7 @@ import { hostPath, linePreloadFile, payloadPreloadFile, preloadLines } from "wis
 import { driverCommandFile, driverReadyFile, driverStatusFile } from "wisp/src/runtime/nativeDriver";
 import { pollUntil } from "./hostPoll";
 
-const FILE_PREFIX = "smashcraft";
+const FILE_PREFIX = "makgora";
 
 export class ShowcaseFailure extends Schema.TaggedError<ShowcaseFailure, { readonly brand: unique symbol }>()("ShowcaseFailure", { problem: Schema.String }) {
   override get message(): string {

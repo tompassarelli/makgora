@@ -40,7 +40,7 @@ import { CUE_FRAMES, type CueMeasurement, cueMoves, measureCueMoves } from "../c
 
 const scenes = (directories: readonly string[]) => Effect.forEach(directories, (directory) => Effect.gen(function*() {
   const reports = yield* Effect.forEach(FILE_SLOT_NUMBERS, (slot) => {
-    const path = join(directory, sceneFile(slot, "smashcraft"));
+    const path = join(directory, sceneFile(slot, "makgora"));
     return readGameFile(path, SceneReportFile).pipe(Effect.map((file) => (file === undefined ? [] : [{ path, ...file }])));
   });
   const newest = reports.flat().sort((a, b) => b.modified - a.modified)[0];

@@ -119,7 +119,7 @@ function play(link: Link, matchFrames: number): Fields[][] {
   for (const [frame, checksum] of checksums[0] ?? []) for (const other of checksums.slice(1)) expect(other.get(frame) ?? checksum).toBe(checksum);
   return HUMANS.map((_, index) => {
     const files = clients.clients[index]?.files ?? new Map<string, string[]>();
-    const lines = [...files.entries()].filter(([name]) => name.startsWith("smashcraft-rates-")).sort(([a], [b]) => a.localeCompare(b)).flatMap(([, rows]) => rows);
+    const lines = [...files.entries()].filter(([name]) => name.startsWith("makgora-rates-")).sort(([a], [b]) => a.localeCompare(b)).flatMap(([, rows]) => rows);
     return parseSessionRates(lines).seconds.filter(second => second.ph === Phase.match).slice(1, -1);
   });
 }

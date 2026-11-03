@@ -59,7 +59,7 @@ export const MAP_PROFILES: Readonly<Record<string, MakgoraMapProfile>> = {
   "slash-lit": { describe: "integrity map built with the slash hit spark's contact light", path: join(inputs, "particles-192-20261008/after.w3x"), quick: "-dev quick" },
   presentation: { describe: "development map rebuilt from this checkout, `-dev quick` (Illidan and Rifleman idle on the default stage)", path: PRESENTATION, rebuild: "main", quick: "-dev quick" },
   "team-results": { describe: "development map rebuilt from this checkout, left at fighter select for the four-computer team setup", path: PRESENTATION, rebuild: "main", quick: "" },
-  showcase: { describe: "showcase-profile map from `bun wisp map build --profile showcase`, given with --map, left at fighter select for the -dev showcase verbs", path: join(inputs, "showcase/Smashcraft showcase.w3x"), quick: "" },
+  showcase: { describe: "showcase-profile map from `bun wisp map build --profile showcase`, given with --map, left at fighter select for the -dev showcase verbs", path: join(inputs, "showcase/Mak'gora showcase.w3x"), quick: "" },
 
 
   keyboard: { describe: "playable input (native-perf profile) rebuilt from this checkout, `-dev quick cpu wren expert` (Wren Expert, three stocks)", path: join(inputs, "keyboard-native-166-20261007/keyboard-native.w3x"), rebuild: "native-perf", quick: `${QUICK_CPU_COMMAND}wren expert` },
@@ -102,7 +102,7 @@ export function mapProfilesFor(profiles: MapProfiles, given: string | undefined,
 
 const NO_ERRORS: Rule = { kind: "receipt", pattern: "^error \\d+ in ", max: 0 };
 
-const DEV_RECEIPT: Rule = { kind: "receipt", pattern: "^SMASHCRAFT DEV v=1 ", min: 1 };
+const DEV_RECEIPT: Rule = { kind: "receipt", pattern: "^MAKGORA DEV v=1 ", min: 1 };
 
 const NO_IMPORT_FAILURES: Rule = { kind: "log", pattern: "^model creation failed - war3mapImported", since: "session", max: 0 };
 
@@ -165,7 +165,7 @@ const effectChecks: NativeCheck[] = [12, 13, 14, 15, 24, 2, 7, 5, 6, 4, 9, 11, 2
     id: `82-effects-${index}`,
     closes: "makgora#82 box 2",
     map: "presentation",
-    setup: [{ waitMs: 3000 }, { chat: `-dev effects ${index}` }, { receipt: "^SMASHCRAFT DEV v=1 ", seconds: 4 }],
+    setup: [{ waitMs: 3000 }, { chat: `-dev effects ${index}` }, { receipt: "^MAKGORA DEV v=1 ", seconds: 4 }],
     capture: [
       { kind: "frames", name: "centre", count: 6, everyMs: 50 },
       { kind: "reading", name: "label", pattern: `dev: effects ${index} (\\S+ \\S+)` },
@@ -178,7 +178,7 @@ const effectChecks: NativeCheck[] = [12, 13, 14, 15, 24, 2, 7, 5, 6, 4, 9, 11, 2
 
 const contactLightChecks: NativeCheck[] = (["before", "after"] as const).map((phase): NativeCheck => ({
   id: `192-tech-${phase}`, closes: "makgora#192 box 3", map: phase === "before" ? "unlit-contact" : "floating-stages", session: phase === "before" ? "contact-light" : "floating-stages",
-  setup: [{ chat: "-dev reset" }, { chat: "-dev quick" }, { chat: "-dev view off" }, { waitMs: 5000 }, { chat: "-dev effects 12" }, { receipt: "^SMASHCRAFT DEV v=1 ", seconds: 4 }],
+  setup: [{ chat: "-dev reset" }, { chat: "-dev quick" }, { chat: "-dev view off" }, { waitMs: 5000 }, { chat: "-dev effects 12" }, { receipt: "^MAKGORA DEV v=1 ", seconds: 4 }],
   capture: [{ kind: "frames", name: "contact", client: "a", count: 6, everyMs: 50 }],
   pass: [NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT],
   look: `Tech contact ${phase}: compare the same chest-height spark, fighter surface and team colours at 50 ms intervals. The contact light must make the contact easier to read in HD; Classic retains the complete spark. Record graphics mode and native frame cost alongside the original #168 budget.`,
@@ -187,7 +187,7 @@ const contactLightChecks: NativeCheck[] = (["before", "after"] as const).map((ph
 
 const slashLightChecks: NativeCheck[] = (["before", "after"] as const).map((phase): NativeCheck => ({
   id: `192-slash-${phase}`, closes: "makgora#192 box 3", map: phase === "before" ? "slash-unlit" : "slash-lit", session: `slash-${phase}`,
-  setup: [{ chat: "-dev reset" }, { chat: "-dev quick" }, { chat: "-dev view off" }, { waitMs: 5000 }, { chat: "-dev effects 4" }, { receipt: "^SMASHCRAFT DEV v=1 ", seconds: 4 }],
+  setup: [{ chat: "-dev reset" }, { chat: "-dev quick" }, { chat: "-dev view off" }, { waitMs: 5000 }, { chat: "-dev effects 4" }, { receipt: "^MAKGORA DEV v=1 ", seconds: 4 }],
   capture: [{ kind: "frames", name: "contact", client: "a", count: 6, everyMs: 25 }, { kind: "reading", name: "label", pattern: "dev: effects 4 (\\S+ \\S+)" }],
   pass: [NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT, { kind: "reading", name: "label", pattern: "ImpactHit- MetalLightSliceFlesh1", orLook: true }],
   look: `Slash hit ${phase}: the same chest-height spark at 25 ms intervals over its 150 ms life. After must light the nearer fighter's surface warm white and fade by 140 ms in Reforged; Classic shows the identical spark with no light. Record graphics mode and native frame cost against the #168 budget.`,
@@ -496,14 +496,14 @@ export const MAKGORA_ACCEPT: AcceptSuite = {
       look: "Kael'thas's Banish lands on player 2's Dreadlord: the victim turns green and see-through yet stays drawn on every frame of the 90-frame status, then returns to full colour and opacity.",
     },
     {
-      id: "482-shield-energy", closes: "smashcraft-dev#482 box 3 (Classic)", map: "shield-energy", session: "482-shield",
+      id: "482-shield-energy", closes: "makgora-dev#482 box 3 (Classic)", map: "shield-energy", session: "482-shield",
       setup: [{ chat: "-dev reset" }, { chat: SHIELD_ENERGY_SETUP }],
       capture: [{ kind: "frames", name: "shield-down-full-mid-low", client: "a", count: 4 }],
-      pass: [NO_IMPORT_FAILURES, NO_ERRORS, ...["down", "full", "mid", "low"].map(sample => ({ kind: "receipt" as const, client: "a", pattern: `^SMASHCRAFT SHIELD sample=${sample} .* pass=1$`, min: 1, max: 1 }))],
-      look: "Four held frames in order: shield down, full, mid, low. Each frame has a SMASHCRAFT SHIELD receipt with frame, raised, energy, and centreX/centreZ/radius from the drawn pose. The partner holds its shield while energy drains naturally. Compare the bubble with the receipt geometry. Classic raised=T with no visible bubble is FAIL, never RECAPTURE.",
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS, ...["down", "full", "mid", "low"].map(sample => ({ kind: "receipt" as const, client: "a", pattern: `^MAKGORA SHIELD sample=${sample} .* pass=1$`, min: 1, max: 1 }))],
+      look: "Four held frames in order: shield down, full, mid, low. Each frame has a MAKGORA SHIELD receipt with frame, raised, energy, and centreX/centreZ/radius from the drawn pose. The partner holds its shield while energy drains naturally. Compare the bubble with the receipt geometry. Classic raised=T with no visible bubble is FAIL, never RECAPTURE.",
     },
     {
-      id: "406-voice-trace", closes: "smashcraft-dev#406 box 4 (voice cap half)", map: "presentation", session: "406-voices",
+      id: "406-voice-trace", closes: "makgora-dev#406 box 4 (voice cap half)", map: "presentation", session: "406-voices",
       setup: [{ chat: "-dev reset" }, { chat: "-dev slots 1 14" }, { chat: `${QUICK_CPU_COMMAND}wren expert` }, { waitMs: 8000 }, { keys: ["ctrl+t"], client: "a" }, { waitMs: 7000 }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "wc3-melee-input-trace.txt on client a holds per-voice lines `frame F class C slot S live L` with every L <= 16.",

@@ -222,7 +222,7 @@ export const MAKGORA_FRAME: readonly FrameFeature[] = [
 
 
 export const makgoraPlayerView = ({ frame, scene }: { readonly frame: boolean; readonly scene: boolean }): PlayerViewExpectations => ({
-  filePrefix: "smashcraft",
+  filePrefix: "makgora",
   ...(frame ? { frame: MAKGORA_FRAME } : {}),
   ...(scene ? { scene: MAKGORA_SCENE } : {}),
 });

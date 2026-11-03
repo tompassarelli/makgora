@@ -68,7 +68,7 @@ export const measureStartGate = (clientsFile: string, name: string, directory: s
     yield* focus(client).pipe(Effect.mapError(fail("start gate focus")));
     const menu = () => Effect.gen(function*() {
       const file = yield* Effect.try({
-        try: () => readdirSync(join(client.documents, "CustomMapData")).filter(file => /^smashcraft-journal-menu-.*\.txt$/.test(file)).map(name => ({ name, path: join(client.documents, "CustomMapData", name) })).filter(file => statSync(file.path).mtimeMs >= since).sort((a, b) => statSync(b.path).mtimeMs - statSync(a.path).mtimeMs)[0],
+        try: () => readdirSync(join(client.documents, "CustomMapData")).filter(file => /^makgora-journal-menu-.*\.txt$/.test(file)).map(name => ({ name, path: join(client.documents, "CustomMapData", name) })).filter(file => statSync(file.path).mtimeMs >= since).sort((a, b) => statSync(b.path).mtimeMs - statSync(a.path).mtimeMs)[0],
         catch: cause => new AcceptFailure({ operation: "start gate menu", problem: String(cause) }),
       });
       if (file === undefined) return undefined;
@@ -147,7 +147,7 @@ export const measureStartGate = (clientsFile: string, name: string, directory: s
   const started = samples.filter(sample => sample.started).length;
   const distinct = new Set(samples.map(sample => `${sample.selected.pixelX},${sample.selected.pixelY}`)).size;
   const offButtons = samples.filter(sample => sample.offButton).length;
-  const text = `SMASHCRAFT GATE start trials=${samples.length} started=${started} distinct=${distinct} offButton=${offButtons} pass=${negativeControl !== undefined && samples.length === 3 && started === 3 && distinct === 3 && offButtons === 3 ? 1 : 0}`;
+  const text = `MAKGORA GATE start trials=${samples.length} started=${started} distinct=${distinct} offButton=${offButtons} pass=${negativeControl !== undefined && samples.length === 3 && started === 3 && distinct === 3 && offButtons === 3 ? 1 : 0}`;
   const modified = yield* Clock.currentTimeMillis;
   yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, helperPath, helperSha256, cursor: { modelSha256: cursor.modelSha256, textureSha256: cursor.textureSha256, left: cursor.left, top: cursor.top, width: cursor.width, height: cursor.height, u: cursor.u, v: cursor.v, uWidth: cursor.uWidth, vHeight: cursor.vHeight }, negativeControl, samples }, null, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "start gate evidence", problem: String(cause) }) });
   return { name: "start-gate", text, modified } satisfies ReceiptFile;

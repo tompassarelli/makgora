@@ -103,7 +103,7 @@ yield* command(["client", "watch", "--once", "--clients-file", clientsFile]);
 const clients = yield* (loadClients(clientsFile));
 const hostedAt = single ? 0 : Date.now();
 if (pair === "online") yield* (freshMatch(map).pipe(
-  Effect.provide(Layer.mergeAll(Clients.layer(clientsFile), gameFilesLayer, ClientWatch.layer({ filePrefix: "smashcraft" }))),
+  Effect.provide(Layer.mergeAll(Clients.layer(clientsFile), gameFilesLayer, ClientWatch.layer({ filePrefix: "makgora" }))),
 ));
 else if (!single) yield* command(["lan", "fresh", map, "--pair", pair]);
 const data = clients.map(client => join(client.documents, "CustomMapData"));
@@ -127,7 +127,7 @@ if (host === undefined) return yield* padCutFailure("Missing LAN host");
 const timeline: { event: string; hostMs: number; monotonicNs: string; frames?: (number | undefined)[] }[] = [];
 const frame = (directory: string, slot: number) => {
   try {
-    const lines = preloadLines(readFileSync(join(directory, `smashcraft-drawn-typescript-native-input-p${slot}.txt`), "utf8")) ?? [];
+    const lines = preloadLines(readFileSync(join(directory, `makgora-drawn-typescript-native-input-p${slot}.txt`), "utf8")) ?? [];
     return Number(lines.join(" ").match(/frame=(\d+)/)?.[1]);
   } catch { return undefined; }
 };
@@ -197,7 +197,7 @@ yield* Effect.gen(function*() {
     if (!result.includes("interrupted=0")) return yield* padCutFailure(`Client ${slot} match did not end normally: ${result}`);
     outcomes.push(result);
     copyFileSync(join(directory, record.file), join(out, `p${slot}-${record.file}`));
-    const pages = readdirSync(directory).filter(name => /^smashcraft-response-p\d+-run\d+-page\d+\.txt$/.test(name)
+    const pages = readdirSync(directory).filter(name => /^makgora-response-p\d+-run\d+-page\d+\.txt$/.test(name)
       && statSync(join(directory, name)).mtimeMs >= fresh);
     if (pages.length === 0) return yield* padCutFailure(`No callback export for client ${slot}`);
     const rows = new Map<number, { before?: number; after?: number; phase?: number }>();

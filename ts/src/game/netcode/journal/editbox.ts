@@ -117,8 +117,8 @@ export class EditboxSession {
     this.dirty = false;
     const { build, epoch, slot, stream } = this;
     return {
-      name: `smashcraft-journal-text-ack-${build}-e${epoch}-p${slot}.txt`,
-      line: `SMASHCRAFT TEXT ACK v=1 build=${build} epoch=${epoch} slot=${slot} received=${stream.received()} `
+      name: `makgora-journal-text-ack-${build}-e${epoch}-p${slot}.txt`,
+      line: `MAKGORA TEXT ACK v=1 build=${build} epoch=${epoch} slot=${slot} received=${stream.received()} `
         + `consumed=${stream.acknowledged()} revision=${this.revision} chat=${this.chatSerial} `
         + `chatState=${CHAT_STATE[this.chat]} chatFrame=${chatEntry ? 1 : 0}`,
     };
@@ -126,7 +126,7 @@ export class EditboxSession {
 
 
   chatFile(): string {
-    return `smashcraft-journal-chat-${this.build}-e${this.epoch}-s${this.slot}-n${this.chatSerial}.pld`;
+    return `makgora-journal-chat-${this.build}-e${this.epoch}-s${this.slot}-n${this.chatSerial}.pld`;
   }
 }
 

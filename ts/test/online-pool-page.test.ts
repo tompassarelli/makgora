@@ -13,7 +13,7 @@ afterEach(() => {
 });
 
 const fixture = () => {
-  const home = mkdtempSync(join(tmpdir(), "smashcraft-online-pool-"));
+  const home = mkdtempSync(join(tmpdir(), "makgora-online-pool-"));
   cleanups.push(() => rmSync(home, { recursive: true, force: true }));
   const data = join(home, "data");
   const pages = new Map<string, string>();

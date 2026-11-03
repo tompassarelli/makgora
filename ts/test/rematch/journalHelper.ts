@@ -211,7 +211,7 @@ export class JournalHelpers {
 
       const box = client.frames.named("JournalControllerInput", 969);
       const typing = box !== undefined && client.frames.shown(box) && !this.silent.has(client.slot);
-      const receipt = client.files.get(`smashcraft-journal-text-ack-${this.build}-e${epoch}-p${client.slot}.txt`)?.join("") ?? "";
+      const receipt = client.files.get(`makgora-journal-text-ack-${this.build}-e${epoch}-p${client.slot}.txt`)?.join("") ?? "";
       const consumed = Number(wordAfter(receipt, " consumed=") === "" ? "0" : wordAfter(receipt, " consumed="));
       const received = Number(wordAfter(receipt, " received=") === "" ? "0" : wordAfter(receipt, " received="));
       while ((helper.typed[0]?.[0] ?? Infinity) <= received) helper.typed.shift();

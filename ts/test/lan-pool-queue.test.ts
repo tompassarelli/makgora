@@ -16,7 +16,7 @@ afterEach(() => {
 const PAIR = 93;
 
 const sandbox = () => {
-  const folder = mkdtempSync(join(tmpdir(), "smashcraft-lan-pool-"));
+  const folder = mkdtempSync(join(tmpdir(), "makgora-lan-pool-"));
   cleanups.push(() => rmSync(folder, { recursive: true, force: true }));
   const bin = join(folder, "bin");
   mkdirSync(bin);
@@ -57,7 +57,7 @@ const sandbox = () => {
 
 const HELD_SECONDS = 3;
 
-test("two smashcraft sessions waiting on a held pair get it one at a time, in the order they asked, through wisp's queue [k5 boundary lan-pool-queue]", async () => {
+test("two makgora sessions waiting on a held pair get it one at a time, in the order they asked, through wisp's queue [k5 boundary lan-pool-queue]", async () => {
   const env = sandbox();
   const claimFile = join(env.XDG_STATE_HOME, "wisp/lan", `pair-${PAIR}`, "claim.json");
   const queue = join(env.XDG_STATE_HOME, "wisp/lan", `pair-${PAIR}`, "queue");

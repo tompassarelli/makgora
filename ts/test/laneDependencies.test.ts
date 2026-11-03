@@ -30,7 +30,7 @@ const project = (root: string, dependencies: Record<string, string>) => {
 };
 
 test("a lane made by git worktree add runs bun run check and bun run test with no install or link step, and after its hand-made node_modules link dangles from a removed lane a rebase onto a new dependency replaces the link with that lane's own install [k5 boundary git-lane-dependencies]", () => {
-  const root = mkdtempSync(join(tmpdir(), "smashcraft-lane-deps-"));
+  const root = mkdtempSync(join(tmpdir(), "makgora-lane-deps-"));
   try {
     for (const name of ["first", "second"]) writePackage(join(root, "packages", name), name, { main: "index.js" });
     for (const name of ["first", "second"]) writeFileSync(join(root, "packages", name, "index.js"), "");

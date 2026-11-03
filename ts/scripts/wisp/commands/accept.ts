@@ -155,7 +155,7 @@ const matchEnd = (receipts: readonly ReceiptFile[], since: number) => {
 
 
 export const smokeProblem = (frame: Frame, receipts: readonly ReceiptFile[], since: number) => Effect.gen(function*() {
-  const quick = receipts.filter(({ name }) => name.startsWith("smashcraft-dev-")).sort((a, b) => b.modified - a.modified)[0];
+  const quick = receipts.filter(({ name }) => name.startsWith("makgora-dev-")).sort((a, b) => b.modified - a.modified)[0];
   if (quick === undefined) return "two fighters present: the host wrote no quick-match receipt";
   const setup = yield* DevCommandReceipt.decode(quick.name, quick.text).pipe(Effect.option);
   if (setup._tag === "None") return `two fighters present: ${quick.name} doesn't read as a quick-match receipt`;
@@ -346,7 +346,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
       : Effect.fail(new AcceptFailure({ operation: `start ${map}`, problem: `${pairDropText(drop)}; the next accept on pair ${drop.pair} restarts it` }))))));
   const liveDriver = liveAcceptDriver({
     start,
-    receipt: (name) => name.startsWith("smashcraft-dev-") || name.startsWith("smashcraft-stage-") || name.startsWith("smashcraft-error-") || name.startsWith("smashcraft-render-clock-") || name.startsWith("smashcraft-replay-") || name.startsWith("smashcraft-match-"),
+    receipt: (name) => name.startsWith("makgora-dev-") || name.startsWith("makgora-stage-") || name.startsWith("makgora-error-") || name.startsWith("makgora-render-clock-") || name.startsWith("smashcraft-replay-") || name.startsWith("smashcraft-match-"),
   }).pipe(Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, ...(solo ? [] : [makgoraWatch]))));
   let smoke: ReturnType<typeof withSmokeCapture> | undefined;
   const driver = Layer.effect(AcceptDriver, Effect.gen(function*() {

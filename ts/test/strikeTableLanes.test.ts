@@ -30,7 +30,7 @@ const regenerate = (repo: string, moments: readonly StrikeMoment[], message: str
 };
 
 test("two lanes that refit the two halves of the roster, so a one-file table would hold their rows side by side in any order, land one after the other without a conflict, as Autoland's dry merge and train rebase run them, and the landed tables equal a fresh generation [k5 boundary git-strike-tables]", () => {
-  const repo = mkdtempSync(join(tmpdir(), "smashcraft-strike-lanes-"));
+  const repo = mkdtempSync(join(tmpdir(), "makgora-strike-lanes-"));
   try {
     expect(git(repo, "init", "-q", "-b", "main").exitCode).toBe(0);
     regenerate(repo, committed, "base");

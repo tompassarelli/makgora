@@ -209,7 +209,7 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     for (const job of group.jobs) pads.set(job.id, yield* movePads(join(directory, `reel-${index}`), job, join(directory, `pads-${index}`)));
     const fixtures = new Map([...pads].map(([id, rows]) => [id, rows.map(row => row.fixture)]));
     const map = join(directory, `g${index}.w3x`);
-    yield* spawnLogged(["bun", settings.capacity, "session", "--class", "moderate", "--owner", `capture-queue-build-${batch}`, "--", "bun", "scripts/nativeCapture.ts", "build", "--out", map, "--name", `Smashcraft capture queue ${batch} g${index}`, ...group.jobs.map(job => join(directory, `pads-${index}`, job.id))], sourceTs, logFile);
+    yield* spawnLogged(["bun", settings.capacity, "session", "--class", "moderate", "--owner", `capture-queue-build-${batch}`, "--", "bun", "scripts/nativeCapture.ts", "build", "--out", map, "--name", `Mak'gora capture queue ${batch} g${index}`, ...group.jobs.map(job => join(directory, `pads-${index}`, job.id))], sourceTs, logFile);
     const manifest = `${map.replace(/\.w3x$/, "")}.captures.json`;
     const identity = yield* attempt("read the map manifest", () => JSON.parse(readFileSync(manifest, "utf8")) as { readonly mapSha256: string; readonly sourceRevision: string; readonly fixtures: readonly { readonly name: string; readonly frames: readonly number[] }[] });
     yield* log({ step: "map build", group: index, lanes: group.jobs.map(job => job.lane), fixtures: [...fixtures.values()].flat().length, seconds: seconds(built), mapSha256: identity.mapSha256, sourceRevision: identity.sourceRevision });

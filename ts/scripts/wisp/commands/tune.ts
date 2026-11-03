@@ -14,7 +14,7 @@ export const tune: Command = (args) => Effect.gen(function*() {
     project: buildProject(profile),
     sourceDirectory: join(tsDirectory, "src"),
     sourceMapDirectory,
-    filePrefix: "smashcraft",
+    filePrefix: "makgora",
     root: tsDirectory,
     tunables: MAKGORA_TUNABLES,
   })(remaining);

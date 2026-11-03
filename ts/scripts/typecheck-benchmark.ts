@@ -9,7 +9,7 @@ import { ChildProcess } from "effect/process";
 const project = resolve(import.meta.dir, "..");
 const source = resolve(project, "src/game/core/gameFiles.ts");
 const original = readFileSync(source, "utf8");
-const body = '`smashcraft-dev-${build}-p${slot}.txt`';
+const body = '`makgora-dev-${build}-p${slot}.txt`';
 const signature = "export const devCommandReceiptFile = (build: string, slot: number)";
 const targetMs = 1000;
 let currentSource = original;
@@ -61,7 +61,7 @@ const main = Effect.gen(function*() {
   }
   requireSuccess(yield* check("cold full type-check (reported)"));
 
-  edit(original.replace(body, '`smashcraft-dev-probe-${build}-p${slot}.txt`'));
+  edit(original.replace(body, '`makgora-dev-probe-${build}-p${slot}.txt`'));
   const edited = yield* check("full type-check after shared implementation edit (target ≤1 s)");
   requireSuccess(edited);
   if (edited.elapsedMs > targetMs) {

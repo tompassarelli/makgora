@@ -265,7 +265,7 @@ export const nativeSession = (out: string, helper: string, preset: string | unde
   }
   const log = (slot: number) => readFileSync(join(out, `helper-${slot}.log`), "utf8");
   const logs = (): [string, string] => [log(SLOTS[0]), log(SLOTS[1])];
-  const watch = Context.get(yield* Layer.build(ClientWatch.layer({ filePrefix: "smashcraft" })), ClientWatch);
+  const watch = Context.get(yield* Layer.build(ClientWatch.layer({ filePrefix: "makgora" })), ClientWatch);
   return { clients, data, pads, helpers, build, logs, startedMs, watch };
 });
 
@@ -280,7 +280,7 @@ const ChatReceipt = Schema.Struct({ epoch: Schema.FiniteFromString, revision: Sc
 
 
 export function nativeChatReceipt(text: string) {
-  const line = preloadLines(text)?.find((line) => line.startsWith("SMASHCRAFT TEXT ACK v=1 "));
+  const line = preloadLines(text)?.find((line) => line.startsWith("MAKGORA TEXT ACK v=1 "));
   if (line === undefined) return undefined;
   return Option.getOrUndefined(Schema.decodeUnknownOption(ChatReceipt)(Object.fromEntries(line.split(" ").map((field) => field.split("=")))));
 }
@@ -314,7 +314,7 @@ export const nativeChat = (session: NativeSession, text: string) => setupCommand
   const host = session.clients[0];
   const epoch = matchStart(session.logs()[0])?.epoch;
   if (epoch === undefined) return yield* new IntegrityFailure({ operation: "open chat", path: host.name, cause: "no current journal match" });
-  const path = join(session.data[0], `smashcraft-journal-text-ack-${session.build}-e${epoch}-p0.txt`);
+  const path = join(session.data[0], `makgora-journal-text-ack-${session.build}-e${epoch}-p0.txt`);
   const receipt = () => existsSync(path) ? nativeChatReceipt(readFileSync(path, "latin1")) : undefined;
   const before = receipt();
   if (before === undefined || before.epoch !== epoch || before.chatState !== 0) return yield* new IntegrityFailure({ operation: "open chat", path, cause: "journal is not receiving input" });

@@ -51,11 +51,11 @@ export function padMouse(s: ShellState): void {
     pad.calibration.first = point;
     pad.calibration.last = undefined;
     pad.packet = undefined;
-    if (s.build.analogPadDiagnostic === true) writeLines(`smashcraft-pad-calibration-p${localSlot()}.txt`, [`corner start ${point.x} ${point.y} native-seconds ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents}`]);
+    if (s.build.analogPadDiagnostic === true) writeLines(`makgora-pad-calibration-p${localSlot()}.txt`, [`corner start ${point.x} ${point.y} native-seconds ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents}`]);
   } else if (pressed(0x22)) {
     pad.calibration.last = point;
     pad.packet = undefined;
-    if (s.build.analogPadDiagnostic === true) writeLines(`smashcraft-pad-calibration-p${localSlot()}.txt`, [`corner end ${point.x} ${point.y} native-seconds ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents}`]);
+    if (s.build.analogPadDiagnostic === true) writeLines(`makgora-pad-calibration-p${localSlot()}.txt`, [`corner end ${point.x} ${point.y} native-seconds ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents}`]);
   } else if (s.build.analogPad === "cursor") {
     pad.packet = cursorWorldPacket(pad.calibration, point.x, point.y);
   }
@@ -90,7 +90,7 @@ export function exportPad(s: ShellState): void {
   const pad = s.pad;
   if (pad === undefined || s.build.analogPadDiagnostic !== true) return;
   const epoch = s.rollback?.epoch ?? 0;
-  writeLines(`smashcraft-pad-${s.build.analogPad}-e${epoch}-p${localSlot()}.txt`, [
+  writeLines(`makgora-pad-${s.build.analogPad}-e${epoch}-p${localSlot()}.txt`, [
     `pad ${s.build.id} epoch ${epoch} mouse-events ${pad.mouseEvents} sync-events ${pad.syncEvents} rows ${pad.rows.length} started ${pad.startedAt} finished ${s.trace.clockPeriods * 1000.0 + localElapsed(s.trace.clock)}`,
     ...pad.rows,
     ...pad.mouse,

@@ -5,7 +5,7 @@ import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 
 const DEFAULT_FOLDER = join(process.env.HOME ?? "", ".local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData");
-export const RATES_FILE = /^smashcraft-rates-(.+)-(\d+)\.txt$/;
+export const RATES_FILE = /^makgora-rates-(.+)-(\d+)\.txt$/;
 const GAP_FLAG_US = 250000;
 const SLOW_SIM = 55;
 const SLOW_CB = 55;
@@ -58,7 +58,7 @@ export function parseSessionRates(lines: readonly string[]): SessionRateLines {
   let header: string | undefined;
   for (const line of lines) {
     const words = line.split(" ");
-    if (words[0] === "smashcraft-rates") header = line;
+    if (words[0] === "makgora-rates") header = line;
     else if (words[0] === "r") seconds.push(fields(words.slice(1)));
     else if (/^r\d+$/.test(words[0] ?? "")) {
       const part = fields(words.slice(1));
@@ -182,7 +182,7 @@ export function sessionRateReport(path: string): string[] {
     minutes.push({ minute: Number(match[2]), mtime: statSync(file).mtimeMs, lines: parseSessionRates(lines) });
     loads.set(match[1] ?? "", minutes);
   }
-  if (loads.size === 0) return [`no smashcraft-rates files in ${folder}`];
+  if (loads.size === 0) return [`no makgora-rates files in ${folder}`];
   const report: string[] = [];
   const ordered = [...loads.entries()].sort((left, right) => Math.min(...left[1].map(m => m.mtime)) - Math.min(...right[1].map(m => m.mtime)));
   for (const [load, minutes] of ordered) {
@@ -205,7 +205,7 @@ export function sessionRateReport(path: string): string[] {
 }
 
 export const rates: Command = (args) => Effect.gen(function*() {
-  if (args.length > 1) return yield* new UsageFailure({ problem: "perf rates takes one smashcraft-rates file or CustomMapData folder" });
+  if (args.length > 1) return yield* new UsageFailure({ problem: "perf rates takes one makgora-rates file or CustomMapData folder" });
   const path = args[0] ?? DEFAULT_FOLDER;
   yield* Console.log(sessionRateReport(path).join("\n"));
 });

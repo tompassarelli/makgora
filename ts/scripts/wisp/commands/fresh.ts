@@ -54,7 +54,7 @@ export const fresh: Command = (rawArgs) => Effect.gen(function*() {
     const since = yield* Clock.currentTimeMillis;
     yield* sendQuickMatchCommand.pipe(step("quick match and client receipts"));
     yield* checkPlayerView(makgoraPlayerView({ frame: true, scene: sceneProfiles.has(profile) }), since, freshFrames).pipe(step("player view"));
-  }).pipe(Effect.provide(Layer.merge(options.services.pipe(Layer.provideMerge(Clients.layer(clientsFile))), ClientWatch.layer({ filePrefix: "smashcraft" })))), { clientsFile });
+  }).pipe(Effect.provide(Layer.merge(options.services.pipe(Layer.provideMerge(Clients.layer(clientsFile))), ClientWatch.layer({ filePrefix: "makgora" })))), { clientsFile });
 });
 
 
@@ -102,7 +102,7 @@ export const freshMatch = (map: string) => Effect.scoped(Effect.gen(function*() 
 
 
   const install = Effect.gen(function*() {
-    yield* prepareHotFolders(clients.all.map((client) => dataDirectory(client.documents)), "smashcraft");
+    yield* prepareHotFolders(clients.all.map((client) => dataDirectory(client.documents)), "makgora");
     yield* Effect.forEach(clients.all, (client) => files.installMap(client.documents, map), { discard: true });
   }).pipe(step("map installed"));
 

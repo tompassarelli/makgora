@@ -35,7 +35,7 @@ export function playThroughReload(headless: HeadlessRuntime, entry: MapEntry, se
     expect(movement.length).toBeGreaterThan(0);
     expect(combat.map(({ args }) => args[0])).toEqual(movement.map(({ args }) => args[0]));
     for (const { args } of movement) expect(created).toContain(args[0]);
-    const receipt = client.files.get(`smashcraft-object-data-p${client.slot}.txt`);
+    const receipt = client.files.get(`makgora-object-data-p${client.slot}.txt`);
     expect(receipt?.[0]).toMatch(/^object-data frame \d+ objects \d+:\d+ state /);
     expect(receipt?.filter(line => line.includes(" speed 270 cooldown 1.5")).length).toBe(movement.length);
   }

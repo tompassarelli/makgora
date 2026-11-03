@@ -138,7 +138,7 @@ const readRecord = (root: string) =>
     const errorReports = yield* tryIntegrity("list error reports", root, () =>
       readdirSync(root, { withFileTypes: true })
         .filter((entry) => entry.isDirectory() && entry.name.startsWith("epoch-"))
-        .flatMap((entry) => readdirSync(join(root, entry.name)).filter((name) => /smashcraft-error-p\d+\.txt$/.test(name)).map((name) => `${entry.name}/${name}`)));
+        .flatMap((entry) => readdirSync(join(root, entry.name)).filter((name) => /makgora-error-p\d+\.txt$/.test(name)).map((name) => `${entry.name}/${name}`)));
     return { results, errorReports } satisfies PlayableRecord;
   });
 

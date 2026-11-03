@@ -58,8 +58,8 @@ fn virtual_pad() -> Option<(VirtualDevice, PathBuf)> {
 }
 
 fn menu(dir: &Path, epoch: u32, phase: &str) {
-    let body = format!("function PreloadFiles takes nothing returns nothing\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=itest slot=0 epoch={epoch} phase={phase}\" )\nendfunction\n");
-    let path = dir.join("smashcraft-journal-menu-itest-s0.txt");
+    let body = format!("function PreloadFiles takes nothing returns nothing\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=itest slot=0 epoch={epoch} phase={phase}\" )\nendfunction\n");
+    let path = dir.join("makgora-journal-menu-itest-s0.txt");
     fs::write(path.with_extension("tmp"), body).unwrap();
     fs::rename(path.with_extension("tmp"), path).unwrap();
 }
@@ -124,8 +124,8 @@ fn the_service_follows_a_fake_session_through_new_sessions_and_game_restarts() {
     until("the old helper to end", || (!Path::new(&format!("/proc/{first}")).exists()).then_some(()));
 
     // The new session's first match is adopted: the helper announces readiness.
-    fs::write(data.join("smashcraft-journal-ready-itest-e1-p0.txt"),
-        "function PreloadFiles takes nothing returns nothing\n\tcall Preload( \"SMASHCRAFT JOURNAL v=1 build=itest epoch=1 slot=0 delay=0 first_frame=1\" )\nendfunction\n").unwrap();
+    fs::write(data.join("makgora-journal-ready-itest-e1-p0.txt"),
+        "function PreloadFiles takes nothing returns nothing\n\tcall Preload( \"MAKGORA JOURNAL v=1 build=itest epoch=1 slot=0 delay=0 first_frame=1\" )\nendfunction\n").unwrap();
     until("the helper's readiness for epoch 1", || fs::read_to_string(documents.join("typed.txt")).ok().filter(|typed| typed.contains("|JR11;")));
 
     // Warcraft III restarted: the helper is replaced for the new game.

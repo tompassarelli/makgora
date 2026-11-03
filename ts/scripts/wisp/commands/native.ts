@@ -20,7 +20,7 @@ const RunRow = Schema.Struct({ id: Schema.String, identity: Schema.String, start
 const Run = Schema.Struct({ batches: Schema.Array(RunRow) });
 const decodePlan = (text: string) => Schema.decodeEffect(Schema.fromJsonString(Plan))(text);
 const state = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
-export const plannerMapBuild = (batch: Pick<Batch, "id" | "map" | "look">): readonly string[] => ["map", "build", "--profile", "integrity", "--name", `Smashcraft native ${batch.id}`, "--out", batch.map, "--edition", batch.look === "classic" ? "classic" : "full"];
+export const plannerMapBuild = (batch: Pick<Batch, "id" | "map" | "look">): readonly string[] => ["map", "build", "--profile", "integrity", "--name", `Mak'gora native ${batch.id}`, "--out", batch.map, "--edition", batch.look === "classic" ? "classic" : "full"];
 const evidenceFiles = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
   const path = join(dir, entry.name);
   return entry.isDirectory() ? evidenceFiles(path) : statSync(path).size > 0 ? [path] : [];

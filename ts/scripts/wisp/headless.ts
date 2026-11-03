@@ -18,7 +18,7 @@ const MAKGORA_DAMAGE_OUTLINE_TEMPLATE = {
 } as const;
 
 export const MAKGORA_HEADLESS: HeadlessMap = {
-  filePrefix: "smashcraft",
+  filePrefix: "makgora",
   globalPrefixes: ["__makgora"],
   localNatives: MAKGORA_LOCAL_NATIVES,
   intentionalNoops: MAKGORA_NOOPS,

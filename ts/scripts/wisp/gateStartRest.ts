@@ -124,7 +124,7 @@ export const measureStartRestGate = (clientsFile: string, name: string, director
   const dy = character.art === undefined || stage.art === undefined ? Infinity : Math.abs(character.art.top - stage.art.top);
   const sameSpot = dx <= SAME_SPOT_PIXELS && dy <= SAME_SPOT_PIXELS;
   const steady = (screen: typeof character) => screen.visible === REST_FRAMES && screen.spread <= BLINK_SPREAD;
-  const text = `SMASHCRAFT GATE start-rest frames=${REST_FRAMES} character=${character.visible} stage=${stage.visible} characterSpread=${character.spread.toFixed(1)} stageSpread=${stage.spread.toFixed(1)} autoPlaced=${autoPlaced ? 1 : 0} startDx=${dx} startDy=${dy} pass=${steady(character) && steady(stage) && sameSpot ? 1 : 0}`;
+  const text = `MAKGORA GATE start-rest frames=${REST_FRAMES} character=${character.visible} stage=${stage.visible} characterSpread=${character.spread.toFixed(1)} stageSpread=${stage.spread.toFixed(1)} autoPlaced=${autoPlaced ? 1 : 0} startDx=${dx} startDy=${dy} pass=${steady(character) && steady(stage) && sameSpot ? 1 : 0}`;
   const modified = yield* Clock.currentTimeMillis;
   yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, cursorError: CURSOR_ERROR, blinkSpread: BLINK_SPREAD, sameSpotPixels: SAME_SPOT_PIXELS, region, startButton: STAGE_START_BUTTON, cursor: { modelSha256: cursor.modelSha256, textureSha256: cursor.textureSha256 }, entry, placed, character, stage }, null, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "start rest gate evidence", problem: String(cause) }) });
   return { name: "start-rest-gate", text, modified } satisfies ReceiptFile;

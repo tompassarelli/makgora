@@ -37,8 +37,8 @@
       "event": "menu",
       "phase": "CHARACTER",
       "contents": [
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=0 slot=0 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=0 slot=1 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=0 slot=0 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=0 slot=1 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
       ],
       "observed_monotonic_ns": 631245713110002
     },
@@ -46,8 +46,8 @@
       "event": "menu",
       "phase": "STAGE",
       "contents": [
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=0 slot=0 phase=STAGE\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=0 slot=1 phase=STAGE\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=0 slot=0 phase=STAGE\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=0 slot=1 phase=STAGE\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
       ],
       "observed_monotonic_ns": 631246930942982
     },
@@ -56,8 +56,8 @@
       "epoch": 1,
       "publications": [
         {
-          "path": "/home/tom/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/smashcraft-journal-start-playable-0045-e1-s0.txt",
-          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable-0045 epoch=1 slot=0 sequence=0 state=START frame=1\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+          "path": "/home/tom/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/makgora-journal-start-playable-0045-e1-s0.txt",
+          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable-0045 epoch=1 slot=0 sequence=0 state=START frame=1\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
           "mtime_realtime_ns": 1791221406682862091,
           "sample_monotonic_before_ns": 631252756851376,
           "sample_realtime_ns": 1791221406708005615,
@@ -65,8 +65,8 @@
           "publication_monotonic_estimate_ns": 631252731720310
         },
         {
-          "path": "/home/tom/.local/share/wc3-melee/client-b/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/smashcraft-journal-start-playable-0045-e1-s1.txt",
-          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable-0045 epoch=1 slot=1 sequence=0 state=START frame=1\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+          "path": "/home/tom/.local/share/wc3-melee/client-b/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/makgora-journal-start-playable-0045-e1-s1.txt",
+          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable-0045 epoch=1 slot=1 sequence=0 state=START frame=1\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
           "mtime_realtime_ns": 1791221406686058103,
           "sample_monotonic_before_ns": 631252757448395,
           "sample_realtime_ns": 1791221406708592585,
@@ -81,8 +81,8 @@
       "epoch": 1,
       "publications": [
         {
-          "path": "/home/tom/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/smashcraft-journal-end-playable-0045-e1-s0.txt",
-          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable-0045 epoch=1 slot=0 sequence=0 state=END frame=273\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+          "path": "/home/tom/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/makgora-journal-end-playable-0045-e1-s0.txt",
+          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable-0045 epoch=1 slot=0 sequence=0 state=END frame=273\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
           "mtime_realtime_ns": 1791221411259221109,
           "sample_monotonic_before_ns": 631257333302707,
           "sample_realtime_ns": 1791221411284446196,
@@ -90,8 +90,8 @@
           "publication_monotonic_estimate_ns": 631257308084342
         },
         {
-          "path": "/home/tom/.local/share/wc3-melee/client-b/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/smashcraft-journal-end-playable-0045-e1-s1.txt",
-          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable-0045 epoch=1 slot=1 sequence=0 state=END frame=273\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+          "path": "/home/tom/.local/share/wc3-melee/client-b/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/makgora-journal-end-playable-0045-e1-s1.txt",
+          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable-0045 epoch=1 slot=1 sequence=0 state=END frame=273\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
           "mtime_realtime_ns": 1791221411257822287,
           "sample_monotonic_before_ns": 631257333760795,
           "sample_realtime_ns": 1791221411284895628,
@@ -113,8 +113,8 @@
       "event": "menu",
       "phase": "RESULT",
       "contents": [
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=0 phase=RESULT\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=1 phase=RESULT\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=0 phase=RESULT\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=1 phase=RESULT\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
       ],
       "observed_monotonic_ns": 631263468631454
     },
@@ -122,8 +122,8 @@
       "event": "menu",
       "phase": "CHARACTER",
       "contents": [
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=0 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=1 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=0 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=1 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
       ],
       "observed_monotonic_ns": 631263596880636
     },
@@ -131,8 +131,8 @@
       "event": "menu",
       "phase": "STAGE",
       "contents": [
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=0 phase=STAGE\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=1 phase=STAGE\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=0 phase=STAGE\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=1 slot=1 phase=STAGE\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
       ],
       "observed_monotonic_ns": 631264911106957
     },
@@ -141,8 +141,8 @@
       "epoch": 2,
       "publications": [
         {
-          "path": "/home/tom/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/smashcraft-journal-start-playable-0045-e2-s0.txt",
-          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable-0045 epoch=2 slot=0 sequence=0 state=START frame=1\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+          "path": "/home/tom/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/makgora-journal-start-playable-0045-e2-s0.txt",
+          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable-0045 epoch=2 slot=0 sequence=0 state=START frame=1\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
           "mtime_realtime_ns": 1791221419954621733,
           "sample_monotonic_before_ns": 631266009298223,
           "sample_realtime_ns": 1791221419960444197,
@@ -150,8 +150,8 @@
           "publication_monotonic_estimate_ns": 631266003483774
         },
         {
-          "path": "/home/tom/.local/share/wc3-melee/client-b/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/smashcraft-journal-start-playable-0045-e2-s1.txt",
-          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable-0045 epoch=2 slot=1 sequence=0 state=START frame=1\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+          "path": "/home/tom/.local/share/wc3-melee/client-b/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/makgora-journal-start-playable-0045-e2-s1.txt",
+          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable-0045 epoch=2 slot=1 sequence=0 state=START frame=1\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
           "mtime_realtime_ns": 1791221419959778059,
           "sample_monotonic_before_ns": 631266009484142,
           "sample_realtime_ns": 1791221419960617562,
@@ -166,8 +166,8 @@
       "epoch": 2,
       "publications": [
         {
-          "path": "/home/tom/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/smashcraft-journal-end-playable-0045-e2-s0.txt",
-          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable-0045 epoch=2 slot=0 sequence=0 state=END frame=285\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+          "path": "/home/tom/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/makgora-journal-end-playable-0045-e2-s0.txt",
+          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable-0045 epoch=2 slot=0 sequence=0 state=END frame=285\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
           "mtime_realtime_ns": 1791221424736340083,
           "sample_monotonic_before_ns": 631270815254298,
           "sample_realtime_ns": 1791221424766402416,
@@ -175,8 +175,8 @@
           "publication_monotonic_estimate_ns": 631270785201002
         },
         {
-          "path": "/home/tom/.local/share/wc3-melee/client-b/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/smashcraft-journal-end-playable-0045-e2-s1.txt",
-          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable-0045 epoch=2 slot=1 sequence=0 state=END frame=285\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+          "path": "/home/tom/.local/share/wc3-melee/client-b/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData/makgora-journal-end-playable-0045-e2-s1.txt",
+          "contents": "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable-0045 epoch=2 slot=1 sequence=0 state=END frame=285\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
           "mtime_realtime_ns": 1791221424737264806,
           "sample_monotonic_before_ns": 631270815612580,
           "sample_realtime_ns": 1791221424766746682,
@@ -198,8 +198,8 @@
       "event": "menu",
       "phase": "RESULT",
       "contents": [
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=2 slot=0 phase=RESULT\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=2 slot=1 phase=RESULT\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=2 slot=0 phase=RESULT\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=2 slot=1 phase=RESULT\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
       ],
       "observed_monotonic_ns": 631277023396107
     },
@@ -207,8 +207,8 @@
       "event": "menu",
       "phase": "CHARACTER",
       "contents": [
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=2 slot=0 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
-        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0045 epoch=2 slot=1 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=2 slot=0 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n",
+        "function PreloadFiles takes nothing returns nothing\n\r\n\tcall PreloadStart()\r\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0045 epoch=2 slot=1 phase=CHARACTER\" )\r\n\tcall Preload( \"connected=3 human-fighters=3 computers=0 fighters=3\" )\r\n\tcall PreloadEnd( 0.0 )\r\n\nendfunction\n\n\r\n"
       ],
       "observed_monotonic_ns": 631277152962697
     }

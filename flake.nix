@@ -11,7 +11,7 @@
       devShells.${system}.default = pkgs.mkShell {
         packages = [ pkgs.blender ];
         shellHook = ''
-          export WC3_MDL_ADDON="$HOME/.local/share/smashcraft-build-inputs/store/mdl-exporter4/${addonPin}"
+          export WC3_MDL_ADDON="$HOME/.local/share/makgora-build-inputs/store/mdl-exporter4/${addonPin}"
           if [ ! -d "$WC3_MDL_ADDON" ]; then
             echo "Missing pinned mdl-exporter4 input: $WC3_MDL_ADDON" >&2
             exit 1

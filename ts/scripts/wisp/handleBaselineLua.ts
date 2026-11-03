@@ -16,7 +16,7 @@ const matches = matchesText === undefined ? SOAK_MATCHES : Number(matchesText);
 if (bundlePath === undefined || declarationsPath === undefined || !(matches >= 2)) throw new Error("usage: lua handles.lua MAP_LUA WARCRAFT_D_TS [MATCHES >= 2]");
 const declarationsText = readFile(declarationsPath);
 const { functions } = parseNativeDeclarations(declarationsText);
-const clients = luaLockstep({ filePrefix: "smashcraft", localNatives: MAKGORA_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: makgoraNativeBehavior }, readFile(bundlePath), declarationsText, undefined, syncDelivery(MEASURED_BATTLE_NET, 7));
+const clients = luaLockstep({ filePrefix: "makgora", localNatives: MAKGORA_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: makgoraNativeBehavior }, readFile(bundlePath), declarationsText, undefined, syncDelivery(MEASURED_BATTLE_NET, 7));
 // compactEmulator hands back and clears each client's errors so far.
 const errors: string[] = [];
 const run = playHandleBaseline(clients, functions, matches, gameOf, { compact: (client, released) => {

@@ -49,4 +49,4 @@ export function specialsSpot(runs: readonly (readonly Settle[])[], area: number)
 }
 
 export const specialsReceipt = (fighters: number, results: readonly SpotResult[]): string =>
-  `SMASHCRAFT GATE specials fighters=${fighters} checked=${results.length} clear=${results.filter(result => result.pass).length} pass=${results.length > 0 && results.every(result => result.pass) ? 1 : 0}`;
+  `MAKGORA GATE specials fighters=${fighters} checked=${results.length} clear=${results.filter(result => result.pass).length} pass=${results.length > 0 && results.every(result => result.pass) ? 1 : 0}`;

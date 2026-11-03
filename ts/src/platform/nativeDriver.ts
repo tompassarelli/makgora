@@ -175,7 +175,7 @@ function saveFrame(s: ShellState): void {
   if (!beginMomentSave(s.moment.recorder, momentInput(s.build), s.world, s.game, s.controls, s.runtime)) throw new Error("native driver: could not save held frame");
   let saved = continueMomentSave(s.moment.recorder, s.diagnostic);
   while (saved === undefined) saved = continueMomentSave(s.moment.recorder, s.diagnostic);
-  writeRepro(reproFile(localSlot(), saved.frame, ++s.moment.saved, "smashcraft"), { build: s.build.id, frame: saved.frame, checksum: saved.checksum }, saved.lines);
+  writeRepro(reproFile(localSlot(), saved.frame, ++s.moment.saved, "makgora"), { build: s.build.id, frame: saved.frame, checksum: saved.checksum }, saved.lines);
 }
 function publish(s: ShellState): void {
   publishNativeDriverStatus(s.runtime.simulationFrame, confirmedChecksum(s), state().paused);

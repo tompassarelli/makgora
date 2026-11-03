@@ -16,8 +16,8 @@ interface SweepButton {
 }
 
 export const SWEEP_PRECISION = 5;
-export const buttonListFile = (slot: number) => `smashcraft-dev-buttons-p${formatInt(slot)}.txt`;
-export const buttonClickFile = (slot: number) => `smashcraft-dev-button-clicks-p${formatInt(slot)}.txt`;
+export const buttonListFile = (slot: number) => `makgora-dev-buttons-p${formatInt(slot)}.txt`;
+export const buttonClickFile = (slot: number) => `makgora-dev-button-clicks-p${formatInt(slot)}.txt`;
 
 // Lua: the registry and the click log are module state that lives for the session; panels are built once at startup and a reload rebuilds them.
 const registered: SweepButton[] = [];

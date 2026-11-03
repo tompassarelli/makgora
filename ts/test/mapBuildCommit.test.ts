@@ -5,8 +5,8 @@ const MAP = "5fe9a1b32fb8144fa8e3e8607feb07bf6f3d510a";
 const CHECKOUT = "dedc0361928c3c2e0b2c5f0a0c1b9e8d7f6a5b4c";
 
 test("a released map's script names the commit its description was stamped with [k2 property]", () => {
-  expect(stampedCommit(`SetMapDescription([[Smashcraft heroes fight. ${buildSentence(MAP)}]])`)).toBe(MAP);
-  expect(stampedCommit("SetMapDescription([[Smashcraft heroes fight.]])")).toBeUndefined();
+  expect(stampedCommit(`SetMapDescription([[Mak'gora heroes fight. ${buildSentence(MAP)}]])`)).toBe(MAP);
+  expect(stampedCommit("SetMapDescription([[Mak'gora heroes fight.]])")).toBeUndefined();
 });
 
 test("--player-assets-only refuses a map built from another commit than the checkout, naming both [k2 property]", () => {

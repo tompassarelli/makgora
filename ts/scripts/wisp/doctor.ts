@@ -46,7 +46,7 @@ export const makgoraDoctor = (clientsFile = clientState): DoctorDeclaration => {
   return { clientsFile, start, ...(Object.keys(accounts).length === 0 ? {} : { accounts }) };
 };
 
-export const makgoraWatch = ClientWatch.layer({ filePrefix: "smashcraft" });
+export const makgoraWatch = ClientWatch.layer({ filePrefix: "makgora" });
 
 export const checkClients = (print: (line: string) => void = console.log, clientsFile = clientState) =>
   Effect.try({ try: () => makgoraDoctor(clientsFile), catch: (cause) => new DoctorStop({ problem: `can't read the clients from ${clientsFile}: ${String(cause)}` }) }).pipe(

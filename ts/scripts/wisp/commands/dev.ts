@@ -46,7 +46,7 @@ export const MAKGORA_DEV: DevProject = {
     envForFiles: testWorkerEnvironment,
   },
   journey: { module: "scripts/wisp/journeys.ts", export: "MAKGORA_JOURNEYS", name: "quick-match" },
-  hot: { project: buildProject("main"), sourceDirectory: join(tsDirectory, "src"), sourceMapDirectory, filePrefix: "smashcraft" },
+  hot: { project: buildProject("main"), sourceDirectory: join(tsDirectory, "src"), sourceMapDirectory, filePrefix: "makgora" },
 };
 
 export const dev = makeDev(MAKGORA_DEV);

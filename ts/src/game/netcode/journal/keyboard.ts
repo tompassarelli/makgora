@@ -103,8 +103,8 @@ export class KeyboardMailbox {
   receipt(): { readonly name: string; readonly line: string } {
     const { build, epoch, slot, chunks } = this;
     return {
-      name: `smashcraft-journal-mailbox-ack-${build}-e${epoch}-s${slot}-c${chunks}.txt`,
-      line: `SMASHCRAFT KEYBOARD ACK v=1 build=${build} epoch=${epoch} slot=${slot} chunk=${chunks}`,
+      name: `makgora-journal-mailbox-ack-${build}-e${epoch}-s${slot}-c${chunks}.txt`,
+      line: `MAKGORA KEYBOARD ACK v=1 build=${build} epoch=${epoch} slot=${slot} chunk=${chunks}`,
     };
   }
 }

@@ -6,9 +6,9 @@ import { BunRuntime, BunServices } from '../../ts/node_modules/@effect/platform-
 import { ProcessFailure, runProcess } from '../../ts/scripts/hostProcess';
 
 const POSES = [
-  { name: 'point', file: 'smashcraft-hand-default.jpeg' },
-  { name: 'fan', file: 'smashcraft-hand-over-character-not-pinching.jpeg' },
-  { name: 'pinch', file: 'smashcraft-hand-pinching.jpeg' },
+  { name: 'point', file: 'makgora-hand-default.jpeg' },
+  { name: 'fan', file: 'makgora-hand-over-character-not-pinching.jpeg' },
+  { name: 'pinch', file: 'makgora-hand-pinching.jpeg' },
 ] as const;
 const REFERENCE = 'fan';
 const BACKGROUND_TOLERANCE = 14;

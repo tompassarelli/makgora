@@ -27,7 +27,7 @@ const git = (repo: string, ...args: string[]) => {
 };
 
 test("the packaged player reports the build name play-current gives its commit, and its README opens with it [k5 boundary git-player-version]", async () => {
-  const repo = mkdtempSync(join(tmpdir(), "smashcraft-player-version-"));
+  const repo = mkdtempSync(join(tmpdir(), "makgora-player-version-"));
   try {
     git(repo, "init", "-q", "-b", "main");
     git(repo, "commit", "-q", "--allow-empty", "-m", "before the release");

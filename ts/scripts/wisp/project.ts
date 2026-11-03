@@ -51,4 +51,4 @@ export const gameFilesLayer = Layer.effect(GameFiles, Effect.gen(function*() {
       : files.installMap(documents, map),
   });
 })).pipe(Layer.provide(GameFiles.layer({ mapFolder: "Maps/00-Smashcraft/tests", replacedMaps: "Maps/00-Smashcraft/tests", preserveMaps: true })));
-export const sourceErrorsLayer = SourceErrors.layer({ sourceMapDirectory, filePrefix: "smashcraft" });
+export const sourceErrorsLayer = SourceErrors.layer({ sourceMapDirectory, filePrefix: "makgora" });

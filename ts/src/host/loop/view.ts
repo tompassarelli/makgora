@@ -444,7 +444,7 @@ function presentShieldEnergyCapture(s: ShellState, game: MatchState, world: Read
       s.session.paused = true;
       pauseMatchPresentation(s, true);
       capture.lines.push(shieldEnergyReceipt(capture.sample, fighter, runtime.simulationFrame));
-      writeLines(`smashcraft-dev-shield-energy-p${localSlot()}.txt`, capture.lines);
+      writeLines(`makgora-dev-shield-energy-p${localSlot()}.txt`, capture.lines);
     }
   }
 }

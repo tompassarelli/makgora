@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { Effect } from "effect";
 import { type Gh, retireScratch, retirement } from "../scripts/scratchRetire";
 
-const REPO = "tompassarelli/smashcraft";
+const REPO = "tompassarelli/makgora";
 const NOW = Date.parse("2026-10-29T14:00:00Z");
 const TIP = "a".repeat(40);
 

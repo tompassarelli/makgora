@@ -106,7 +106,7 @@ export function withCursorOffsets(clients: readonly ClientDelay[]): ClientDelay[
   });
 }
 
-const PAGE = /^(?:.*-)?smashcraft-response-p(\d+)-run(\d+)-page(\d+)\.txt$/;
+const PAGE = /^(?:.*-)?makgora-response-p(\d+)-run(\d+)-page(\d+)\.txt$/;
 
 function pageFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

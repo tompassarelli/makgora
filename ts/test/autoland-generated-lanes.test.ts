@@ -35,7 +35,7 @@ const lane = (repo: string, branch: string, hero: string) => {
 };
 
 test("two lanes that add state for different heroes, whose rows sit side by side in the one generated state file, conflict on it alone and land through Autoland's rebase regenerated, equal to a fresh generation [k5 boundary git-state-lanes]", async () => {
-  const repo = mkdtempSync(join(tmpdir(), "smashcraft-state-lanes-"));
+  const repo = mkdtempSync(join(tmpdir(), "makgora-state-lanes-"));
   try {
     expect(git(repo, "init", "-q", "-b", "main").exitCode).toBe(0);
     write(repo, "heroes/base", "copy base state\n");

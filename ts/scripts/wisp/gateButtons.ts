@@ -10,8 +10,8 @@ import { type SweepMiss, parseButtonList, parseClickLog, sweepMisses, sweepPoint
 import { viewportPoint } from "./gateIntro";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
-const LIST_FILE = /^smashcraft-dev-buttons-p\d+\.txt$/;
-const CLICK_FILE = /^smashcraft-dev-button-clicks-p\d+\.txt$/;
+const LIST_FILE = /^makgora-dev-buttons-p\d+\.txt$/;
+const CLICK_FILE = /^makgora-dev-button-clicks-p\d+\.txt$/;
 
 const newest = (folder: string, pattern: RegExp, since: number) => readdirSync(folder)
   .filter(file => pattern.test(file) && statSync(join(folder, file)).mtimeMs >= since)
@@ -54,7 +54,7 @@ export const measureButtonsGate = (clientsFile: string, name: string, directory:
     misses.push(...sweepMisses(button, landed));
   }
   const pass = boxless.length === 0 && misses.length === 0 && buttons.length > 0;
-  const text = `SMASHCRAFT GATE buttons size=${size} buttons=${buttons.length} points=${points} clicked=${clicked} boxless=${boxless.length} pass=${pass ? 1 : 0}`;
+  const text = `MAKGORA GATE buttons size=${size} buttons=${buttons.length} points=${points} clicked=${clicked} boxless=${boxless.length} pass=${pass ? 1 : 0}`;
   yield* Effect.try({
     try: () => { mkdirSync(directory, { recursive: true, mode: 0o700 }); writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, size, buttons, boxless, misses }, null, 2)}\n`, { mode: 0o600 }); },
     catch: cause => new AcceptFailure({ operation: "buttons gate evidence", problem: String(cause) }),

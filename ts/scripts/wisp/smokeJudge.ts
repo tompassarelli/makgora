@@ -181,7 +181,7 @@ export function smokeReceipt({ replay, results }: SmokeVerdict, fighters: number
   const keys = results.filter(({ kind }) => kind === "binding");
   const replayed = replay.problems.length === 0 && replay.reached === replay.recorded;
   const pass = replayed && results.every(({ pass }) => pass) && moves.length > 0 && keys.length > 0;
-  return `SMASHCRAFT GATE moves fighters=${fighters} moves=${moves.length} started=${moves.filter(({ pass }) => pass).length} keys=${keys.length} live=${keys.filter(({ pass }) => pass).length} replayed=${replayed ? 1 : 0} pass=${pass ? 1 : 0}`;
+  return `MAKGORA GATE moves fighters=${fighters} moves=${moves.length} started=${moves.filter(({ pass }) => pass).length} keys=${keys.length} live=${keys.filter(({ pass }) => pass).length} replayed=${replayed ? 1 : 0} pass=${pass ? 1 : 0}`;
 }
 
 export const smokeLines = ({ replay, results }: SmokeVerdict): string[] => [

@@ -19,7 +19,7 @@ const head = (repo: string) => git(repo, "rev-parse", "HEAD");
 const name = (repo: string, revision: string) => Effect.runPromise(playName(revision, repo));
 
 test("a dev build is named for the next release and the first-parent commits since the last release tag, growing with each main commit and ignoring a merged side branch's own commits [k5 boundary git-dev-build-number]", async () => {
-  const repo = mkdtempSync(join(tmpdir(), "smashcraft-dev-build-"));
+  const repo = mkdtempSync(join(tmpdir(), "makgora-dev-build-"));
   try {
     git(repo, "init", "-q", "-b", "main");
     commit(repo, "before the release");

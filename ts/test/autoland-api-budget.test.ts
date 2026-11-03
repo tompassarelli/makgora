@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { type Lane, OPEN_STATES, STARTED, TESTING, TEST_SLOTS, TRAIN_TITLE, jobReads, laneSince, listedRuns, openRuns, plan, sinceMisses, testTitle } from "../scripts/autolandCore";
 
-const REPO = "tompassarelli/smashcraft";
+const REPO = "tompassarelli/makgora";
 const NOW = Date.parse("2026-10-25T21:00:00Z");
 const SELF = 9000;
 const tip = (index: number): string => index.toString(16).padStart(40, "a");

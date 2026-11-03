@@ -17,7 +17,7 @@ import { userSessionEnv } from "./nativeUnit";
 import { NATIVE_OUTER_PID } from "./pairGuard";
 import { privateDesktopUnitEnv } from "./privateDesktopUnitEnv";
 
-export const POOL_UNIT_PREFIX = "smashcraft-lan-pool";
+export const POOL_UNIT_PREFIX = "makgora-lan-pool";
 const FOREGROUND = "--foreground";
 const WISP_PROGRAM = join(import.meta.dir, "../../wisp.ts");
 

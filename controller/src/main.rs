@@ -345,7 +345,7 @@ mod linux {
             return Ok(None);
         }
         let prefix =
-            format!("SMASHCRAFT TEXT ACK v=1 build={build} epoch={epoch} slot={slot} received=");
+            format!("MAKGORA TEXT ACK v=1 build={build} epoch={epoch} slot={slot} received=");
         let Some(start) = contents.find(&prefix) else {
             return Err(io::Error::other("native text receipt identity mismatch"));
         };
@@ -773,7 +773,7 @@ mod linux {
                     now.duration_since(previous) >= Duration::from_millis(10)
                 }) {
                     let path = self.dir.join(format!(
-                        "smashcraft-journal-text-ack-{}-e{}-p{}.txt",
+                        "makgora-journal-text-ack-{}-e{}-p{}.txt",
                         self.build, self.epoch, self.slot
                     ));
                     match fs::read_to_string(path) {
@@ -810,7 +810,7 @@ mod linux {
                 }
                 if self.chat_state == 1 && paused && self.is_idle() && self.chat_quiet != self.chat {
                     self.chat_quiet = self.chat;
-                    let path = self.dir.join(format!("smashcraft-journal-chat-{}-e{}-s{}-n{}.pld", self.build, self.epoch, self.slot, self.chat));
+                    let path = self.dir.join(format!("makgora-journal-chat-{}-e{}-s{}-n{}.pld", self.build, self.epoch, self.slot, self.chat));
                     publish_symbol(&path, b'Q')?;
                     eprintln!("chat_quiescent epoch={} chat={} mono_ns={}", self.epoch, self.chat, monotonic_ns()?);
                 }
@@ -1019,7 +1019,7 @@ mod linux {
 
     fn mailbox_ack_path(dir: &Path, build: &str, epoch: u32, slot: u32, chunk: u32) -> PathBuf {
         dir.join(format!(
-            "smashcraft-journal-mailbox-ack-{build}-e{epoch}-s{slot}-c{chunk}.txt"
+            "makgora-journal-mailbox-ack-{build}-e{epoch}-s{slot}-c{chunk}.txt"
         ))
     }
 
@@ -1254,7 +1254,7 @@ mod linux {
     }
 
     fn lifecycle_path(dir: &Path, build: &str, epoch: u32, slot: u32, kind: &str) -> PathBuf {
-        dir.join(format!("smashcraft-journal-{kind}-{build}-e{epoch}-s{slot}.txt"))
+        dir.join(format!("makgora-journal-{kind}-{build}-e{epoch}-s{slot}.txt"))
     }
 
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1264,7 +1264,7 @@ mod linux {
         if contents.lines().rev().find(|line| !line.trim().is_empty()).map(str::trim) != Some("endfunction") {
             return None;
         }
-        let prefix = format!("SMASHCRAFT JOURNAL MENU v=1 build={build} epoch={epoch} slot={slot} phase=");
+        let prefix = format!("MAKGORA JOURNAL MENU v=1 build={build} epoch={epoch} slot={slot} phase=");
         let value = contents.split_once(&prefix)?.1.split_once('"')?.0;
         match value {
             "CHARACTER" => Some(MenuPhase::Character),
@@ -1276,7 +1276,7 @@ mod linux {
     }
 
     fn fresh_menu(dir: &Path, build: &str, epoch: u32, slot: u32, after_ns: u128, now_ns: u128) -> Result<Option<MenuPhase>, String> {
-        let path = dir.join(format!("smashcraft-journal-menu-{build}-s{slot}.txt"));
+        let path = dir.join(format!("makgora-journal-menu-{build}-s{slot}.txt"));
         let mut file = match fs::File::open(&path) {
             Ok(file) => file,
             Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
@@ -1490,8 +1490,8 @@ mod linux {
     fn menu_requires_fresh_complete_matching_map_permission() {
         let dir = env::temp_dir().join(format!("journal-menu-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
-        let path = dir.join("smashcraft-journal-menu-menu-test-s1.txt");
-        let body = "call Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=menu-test epoch=2 slot=1 phase=RESULT\" )\n";
+        let path = dir.join("makgora-journal-menu-menu-test-s1.txt");
+        let body = "call Preload( \"MAKGORA JOURNAL MENU v=1 build=menu-test epoch=2 slot=1 phase=RESULT\" )\n";
         fs::write(&path, body).unwrap();
         let now = clock_ns(libc::CLOCK_REALTIME).unwrap();
         assert_eq!(fresh_menu(&dir, "menu-test", 2, 1, 0, now).unwrap(), None);
@@ -1510,7 +1510,7 @@ mod linux {
     }
 
     fn quiescent_path(dir: &Path, build: &str, epoch: u32, slot: u32) -> PathBuf {
-        dir.join(format!("smashcraft-journal-quiescent-{build}-e{epoch}-s{slot}.pld"))
+        dir.join(format!("makgora-journal-quiescent-{build}-e{epoch}-s{slot}.pld"))
     }
 
     fn clear_epoch_acknowledgements(dir: &Path, build: &str, epoch: u32, slot: u32) -> Result<(), String> {
@@ -1521,7 +1521,7 @@ mod linux {
         }?;
         // A new game reuses epoch and chat serials. Old Q files must be gone
         // before READY lets this epoch request chat or observe quiescence.
-        let prefix = format!("smashcraft-journal-chat-{build}-e{epoch}-s{slot}-n");
+        let prefix = format!("makgora-journal-chat-{build}-e{epoch}-s{slot}-n");
         for entry in fs::read_dir(dir).map_err(|error| format!("read prior chat acknowledgements: {error}"))? {
             let entry = entry.map_err(|error| format!("read prior chat acknowledgement: {error}"))?;
             let name = entry.file_name();
@@ -1539,7 +1539,7 @@ mod linux {
     fn new_game_clears_only_its_epochs_stale_chat_acknowledgements() {
         let dir = env::temp_dir().join(format!("chat-ack-reuse-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
-        let chat = |build: &str, epoch, slot, serial| dir.join(format!("smashcraft-journal-chat-{build}-e{epoch}-s{slot}-n{serial}.pld"));
+        let chat = |build: &str, epoch, slot, serial| dir.join(format!("makgora-journal-chat-{build}-e{epoch}-s{slot}-n{serial}.pld"));
         let stale = chat("test", 1, 0, 1);
         let later = chat("test", 1, 0, 2);
         let retained = [chat("test", 1, 1, 1), chat("test", 2, 0, 1), chat("peer", 1, 0, 1)];
@@ -1567,7 +1567,7 @@ mod linux {
     }
 
     fn fresh_ready(dir: &Path, build: &str, slot: u32, last_epoch: u32, after_ns: u128) -> Result<Option<(u32, u32, u128)>, String> {
-        let prefix = format!("smashcraft-journal-ready-{build}-e");
+        let prefix = format!("makgora-journal-ready-{build}-e");
         let suffix = format!("-p{slot}.txt");
         let mut selected = None;
         for entry in fs::read_dir(dir).map_err(|e| e.to_string())? {
@@ -1892,8 +1892,8 @@ mod linux {
         let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("target")
             .join(format!("journal-lifecycle-test-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
-        let path = dir.join("smashcraft-journal-ready-test-e1-p0.txt");
-        let prefix = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"SMASHCRAFT JOURNAL v=1 build=test epoch=1 slot=0 delay=0 first_frame=1\" )\n";
+        let path = dir.join("makgora-journal-ready-test-e1-p0.txt");
+        let prefix = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"MAKGORA JOURNAL v=1 build=test epoch=1 slot=0 delay=0 first_frame=1\" )\n";
         fs::write(&path, prefix).unwrap();
         assert!(fresh_ready(&dir, "test", 0, 0, 0).unwrap().is_none());
         fs::write(&path, format!("{prefix}endfunction\n")).unwrap();
@@ -1908,7 +1908,7 @@ mod linux {
 
     #[test]
     fn lifecycle_start_uses_publication_and_terminal_marker_follows_old_rows() {
-        let prefix = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=test epoch=1 slot=0 sequence=0 state=START frame=1\" )\n";
+        let prefix = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=test epoch=1 slot=0 sequence=0 state=START frame=1\" )\n";
         assert!(control_if_complete(prefix).unwrap().is_none());
         let complete = format!("{prefix}endfunction\n");
         assert_eq!(control_if_complete(&complete).unwrap().unwrap().state, ControlState::Started);
@@ -1930,7 +1930,7 @@ mod linux {
 
     #[test]
     fn reads_native_preload_readiness() {
-        let receipt = "function PreloadFiles takes nothing returns nothing\n\tcall Preload( \"SMASHCRAFT JOURNAL v=1 build=netcode-0022 epoch=1 slot=3\" )\n\tcall Preload( \"input=shadow-d0-r24 delay=0 rollback=24 first_frame=1\" )\nendfunction\n";
+        let receipt = "function PreloadFiles takes nothing returns nothing\n\tcall Preload( \"MAKGORA JOURNAL v=1 build=netcode-0022 epoch=1 slot=3\" )\n\tcall Preload( \"input=shadow-d0-r24 delay=0 rollback=24 first_frame=1\" )\nendfunction\n";
         assert_eq!(
             parse_ready(receipt).unwrap(),
             ("netcode-0022".into(), 1, 3, 0)
@@ -1940,7 +1940,7 @@ mod linux {
 
     #[test]
     fn reads_sequenced_pause_and_resume_control_receipts() {
-        let pause = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable epoch=7 slot=2 sequence=3 state=PAUSE frame=91\" )\nendfunction";
+        let pause = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable epoch=7 slot=2 sequence=3 state=PAUSE frame=91\" )\nendfunction";
         assert_eq!(
             parse_control(pause).unwrap(),
             ControlCommand {
@@ -1959,7 +1959,7 @@ mod linux {
 
     #[test]
     fn control_reader_waits_for_the_native_writer_to_finish() {
-        let command = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=playable epoch=7 slot=2 sequence=3 state=PAUSE frame=91\" )\nendfunction\n";
+        let command = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=playable epoch=7 slot=2 sequence=3 state=PAUSE frame=91\" )\nendfunction\n";
         for length in 0..command.find("endfunction").unwrap() + "endfunction".len() {
             assert_eq!(control_if_complete(&command[..length]).unwrap(), None);
         }
@@ -1977,7 +1977,7 @@ mod linux {
         let path = control_path(&dir, "test", 1, 0, 1);
         let clock = ControlClock::new(&dir).unwrap();
         let ready_ns = monotonic_ns().unwrap() - 2_000_000_000;
-        let prefix = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=test epoch=1 slot=0 sequence=1 state=PAUSE frame=1205\" )\n";
+        let prefix = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=test epoch=1 slot=0 sequence=1 state=PAUSE frame=1205\" )\n";
         fs::write(&path, format!("{prefix}endfunction\n")).unwrap();
         let old_time = UNIX_EPOCH + Duration::from_nanos((ready_ns as i128 + clock.offset_ns - 1_000_000_000) as u64);
         fs::File::open(&path).unwrap().set_times(fs::FileTimes::new().set_modified(old_time)).unwrap();
@@ -2046,9 +2046,9 @@ mod linux {
         let dir = std::env::temp_dir().join(format!("mailbox-ack-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
         let path = mailbox_ack_path(&dir, "test", 7, 2, 9);
-        fs::write(&path, "function PreloadFiles takes nothing returns nothing\ncall Preload( \"SMASHCRAFT KEYBOARD ACK v=1 build=test epoch=7 slot=2 chunk=9\" )\n").unwrap();
+        fs::write(&path, "function PreloadFiles takes nothing returns nothing\ncall Preload( \"MAKGORA KEYBOARD ACK v=1 build=test epoch=7 slot=2 chunk=9\" )\n").unwrap();
         assert!(!mailbox_ack_matches(&path, "test", 7, 2, 9).unwrap());
-        fs::write(&path, "function PreloadFiles takes nothing returns nothing\ncall Preload( \"SMASHCRAFT KEYBOARD ACK v=1 build=test epoch=7 slot=2 chunk=9\" )\nendfunction\n").unwrap();
+        fs::write(&path, "function PreloadFiles takes nothing returns nothing\ncall Preload( \"MAKGORA KEYBOARD ACK v=1 build=test epoch=7 slot=2 chunk=9\" )\nendfunction\n").unwrap();
         assert!(mailbox_ack_matches(&path, "test", 7, 2, 9).unwrap());
         assert!(!mailbox_ack_matches(&path, "test", 7, 2, 10).unwrap());
         fs::remove_dir_all(dir).unwrap();
@@ -2167,7 +2167,7 @@ mod linux {
         // precede a genuine new tap; no intermediate drain may discard it.
         let held = timed_button(monotonic_ns().unwrap(), true);
         queue.push(held, false, false).unwrap();
-        let prefix = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"SMASHCRAFT JOURNAL CONTROL v=1 build=test epoch=1 slot=0 sequence=3 state=RESUME frame=91\" )\n";
+        let prefix = "function PreloadFiles takes nothing returns nothing\ncall Preload( \"MAKGORA JOURNAL CONTROL v=1 build=test epoch=1 slot=0 sequence=3 state=RESUME frame=91\" )\n";
         fs::write(&path, prefix).unwrap();
         let incomplete = read_control(&path, clock, 0).unwrap();
         assert!(incomplete.publication.is_none());
@@ -3094,7 +3094,7 @@ mod linux {
             "@J10000000001000000000102742|I421100;"
         );
         let prefix =
-            "call Preload( \"SMASHCRAFT TEXT ACK v=1 build=focus epoch=1 slot=0 received=7 consumed=5 revision=2 chat=0 chatState=0 chatFrame=1\" )\n";
+            "call Preload( \"MAKGORA TEXT ACK v=1 build=focus epoch=1 slot=0 received=7 consumed=5 revision=2 chat=0 chatState=0 chatFrame=1\" )\n";
         assert_eq!(text_receipt(prefix, "focus", 1, 0).unwrap(), None);
         let complete = format!("{prefix}endfunction\n");
         assert_eq!(text_receipt(&complete, "focus", 1, 0).unwrap(), Some(TextReceipt { received: 7, consumed: 5, revision: 2, chat: 0, chat_state: 0 }));
@@ -3105,7 +3105,7 @@ mod linux {
 
     #[test]
     fn chat_receipts_preserve_queue_until_consumed_and_close_requires_neutral() {
-        let receipt = |state| format!("call Preload( \"SMASHCRAFT TEXT ACK v=1 build=chat epoch=1 slot=0 received=1 consumed=1 revision=9 chat=2 chatState={state} chatFrame=1\" )\nendfunction\n");
+        let receipt = |state| format!("call Preload( \"MAKGORA TEXT ACK v=1 build=chat epoch=1 slot=0 received=1 consumed=1 revision=9 chat=2 chatState={state} chatFrame=1\" )\nendfunction\n");
         for state in 0..=3 {
             let parsed = text_receipt(&receipt(state), "chat", 1, 0).unwrap().unwrap();
             assert_eq!((parsed.chat, parsed.chat_state), (2, state));
@@ -3386,7 +3386,7 @@ mod linux {
         rows: &[String],
     ) -> io::Result<()> {
         let base = dir.join(format!(
-            "smashcraft-journal-{build}-e{epoch}-s{slot}-n{first}"
+            "makgora-journal-{build}-e{epoch}-s{slot}-n{first}"
         ));
         publish_vocabulary(&base, &encode_packet(epoch, first, rows))
     }
@@ -3466,7 +3466,7 @@ mod linux {
 
     fn control_path(dir: &Path, build: &str, epoch: u32, slot: u32, sequence: u32) -> PathBuf {
         dir.join(format!(
-            "smashcraft-journal-control-{build}-e{epoch}-s{slot}-n{sequence}.txt"
+            "makgora-journal-control-{build}-e{epoch}-s{slot}-n{sequence}.txt"
         ))
     }
 
@@ -3480,7 +3480,7 @@ mod linux {
         frame: u32,
     ) -> io::Result<()> {
         let base = dir.join(format!(
-            "smashcraft-journal-ack-{build}-e{epoch}-s{slot}-n{sequence}"
+            "makgora-journal-ack-{build}-e{epoch}-s{slot}-n{sequence}"
         ));
         let state = match state {
             ControlState::Started => "START",
@@ -3558,7 +3558,7 @@ mod linux {
         let rows = [press, release];
         // The filename and I4 header both retain frame 4 (including delay).
         publish(&dir, "vocabulary", 91, 2, 4, &rows).unwrap();
-        let base = dir.join("smashcraft-journal-vocabulary-e91-s2-n4");
+        let base = dir.join("makgora-journal-vocabulary-e91-s2-n4");
         let wire = encode_packet(91, 4, &rows);
         assert_eq!(read_wire(&base), wire);
         assert_eq!(
@@ -3576,7 +3576,7 @@ mod linux {
             publish_control_ack(&dir, "vocabulary", 91, 2, sequence, state, 6).unwrap();
             assert_eq!(
                 read_wire(&dir.join(format!(
-                    "smashcraft-journal-ack-vocabulary-e91-s2-n{sequence}"
+                    "makgora-journal-ack-vocabulary-e91-s2-n{sequence}"
                 ))),
                 expected
             );

@@ -125,7 +125,7 @@ export class EditboxIngress {
     this.observedChat = open;
     this.chatEpoch = receiptEpoch;
     this.chatRevision++;
-    writeLine(nativeChatFile(build, slot), `SMASHCRAFT CHAT v=1 build=${build} slot=${slot} epoch=${receiptEpoch} revision=${this.chatRevision} available=${this.chat !== undefined ? 1 : 0} open=${open ? 1 : 0}`);
+    writeLine(nativeChatFile(build, slot), `MAKGORA CHAT v=1 build=${build} slot=${slot} epoch=${receiptEpoch} revision=${this.chatRevision} available=${this.chat !== undefined ? 1 : 0} open=${open ? 1 : 0}`);
   }
 
 

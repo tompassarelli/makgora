@@ -21,7 +21,7 @@ function report(frame: number, phase: string): void {
   startFile();
   addFileLine(`DAMAGE_BLEND_PROBE frame=${frame} phase=${phase} blendSeconds=0.05`);
   addFileLine("left-to-right: ready-frozen, ready-running, tilt-frozen, tilt-running; upper row faces right, lower row faces left");
-  endFile("smashcraft-damage-blend-probe.txt");
+  endFile("makgora-damage-blend-probe.txt");
 }
 
 export function start(this: void): void {

@@ -1,5 +1,5 @@
 // Stamps a map bundle with its source version: the text of SOURCE_STAMP in
-// smashcraft:ts/src/game/shell/sourceVersion.ts becomes the version, in the
+// makgora:ts/src/game/shell/sourceVersion.ts becomes the version, in the
 // emitted bundle only. Wisp's incremental compiler runs beforeEmit on every
 // compile, so the development map is stamped as the playable one is, and a
 // full TypeScriptToLua compile gives the same bundle.

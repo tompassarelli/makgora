@@ -45,6 +45,6 @@ export function serviceMomentSave(s: ShellState): void {
   const saved = continueMomentSave(moment.recorder, s.diagnostic);
   if (saved === undefined) return;
   moment.saved++;
-  writeRepro(reproFile(localSlot(), saved.frame, moment.saved, "smashcraft"), { build: s.build.id, frame: saved.frame, checksum: saved.checksum }, saved.lines);
+  writeRepro(reproFile(localSlot(), saved.frame, moment.saved, "makgora"), { build: s.build.id, frame: saved.frame, checksum: saved.checksum }, saved.lines);
   moment.notice = NOTICE_SECONDS;
 }

@@ -152,7 +152,7 @@ export const startHelper = (command: readonly string[], env: Record<string, stri
 
 
 const watchClients = (clients: readonly Client[]) => Effect.gen(function*() {
-  const watch = Context.get(yield* Layer.build(ClientWatch.layer({ filePrefix: "smashcraft" })), ClientWatch);
+  const watch = Context.get(yield* Layer.build(ClientWatch.layer({ filePrefix: "makgora" })), ClientWatch);
   let lost: IntegrityFailure | undefined;
   yield* Effect.forkScoped(Effect.forever(Effect.gen(function*() {
     for (const client of clients) {

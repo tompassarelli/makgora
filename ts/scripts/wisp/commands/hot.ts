@@ -7,5 +7,5 @@ import { buildProject, profileOption, sourceMapDirectory, tsDirectory } from "..
 
 export const hot: Command = (args) => Effect.gen(function*() {
   const { profile, args: remaining } = yield* profileOption(args);
-  return yield* makeHot({ project: buildProject(profile), sourceDirectory: join(tsDirectory, "src"), sourceMapDirectory, filePrefix: "smashcraft" })(remaining);
+  return yield* makeHot({ project: buildProject(profile), sourceDirectory: join(tsDirectory, "src"), sourceMapDirectory, filePrefix: "makgora" })(remaining);
 });

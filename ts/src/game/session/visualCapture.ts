@@ -18,7 +18,7 @@ export function visualCaptureStopBefore(slot: number, stopBefore?: number): numb
   return frame === undefined ? stopBefore : stopBefore === undefined ? frame + 1 : Math.min(stopBefore, frame + 1);
 }
 export const clearVisualCapture = (slot: number): void => { captures.delete(slot); };
-export const visualReleaseFile = (token: string, slot: number, frame: number) => `smashcraft-visual-${token}-p${slot}-f${frame}.txt`;
+export const visualReleaseFile = (token: string, slot: number, frame: number) => `makgora-visual-${token}-p${slot}-f${frame}.txt`;
 
 
 export function configureVisualCapture(message: string, slot: number): string {

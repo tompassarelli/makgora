@@ -140,7 +140,7 @@ export const measureHandsGate = (clientsFile: string, directory: string, teams: 
   const chips = samples.filter(sample => sample.chipError !== undefined);
   const pass = samples.length === (edgeRoom(reference, handLeft(EDGE_SPOT.x, "point", extent)) ? 16 : 12) && samples.every(shown) && samples.every(badged) && chips.length === 2 && chips.every(sample => (sample.chipError ?? Infinity) <= MATCH_ERROR);
   const modified = yield* Clock.currentTimeMillis;
-  const text = `SMASHCRAFT GATE hands samples=${samples.length} own=${own.filter(shown).length} remote=${remote.filter(shown).length} badges=${samples.filter(badged).length} chips=${chips.filter(sample => (sample.chipError ?? Infinity) <= MATCH_ERROR).length} pass=${pass ? 1 : 0}`;
+  const text = `MAKGORA GATE hands samples=${samples.length} own=${own.filter(shown).length} remote=${remote.filter(shown).length} badges=${samples.filter(badged).length} chips=${chips.filter(sample => (sample.chipError ?? Infinity) <= MATCH_ERROR).length} pass=${pass ? 1 : 0}`;
   yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, threshold: MATCH_ERROR, badgeDistance: BADGE_COLOUR_DISTANCE, handStates: HAND_STATES, samples }, undefined, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "hands gate evidence", problem: String(cause) }) });
   return { name: "hands-gate", text, modified } satisfies ReceiptFile;
 }).pipe(Effect.scoped);

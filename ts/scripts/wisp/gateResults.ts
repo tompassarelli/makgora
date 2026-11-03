@@ -212,7 +212,7 @@ export const measureResultsGate = (clientsFile: string, directory: string) => Ef
   const cursor = yield* cursorOverRematch(d, host, stock);
   const rematch = yield* rematchByBoth(d, guest, host, result.epoch);
   const started = rematch.next !== undefined;
-  const text = `SMASHCRAFT GATE results stocks=${stocks} epoch=${result.epoch} result=1 cursor=${cursor.cursor ? 1 : 0} held=${rematch.held ? 1 : 0} rematch=${started ? 1 : 0} pass=${cursor.cursor && rematch.held && started ? 1 : 0}`;
+  const text = `MAKGORA GATE results stocks=${stocks} epoch=${result.epoch} result=1 cursor=${cursor.cursor ? 1 : 0} held=${rematch.held ? 1 : 0} rematch=${started ? 1 : 0} pass=${cursor.cursor && rematch.held && started ? 1 : 0}`;
   const modified = yield* Clock.currentTimeMillis;
   yield* Effect.try({
     try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, threshold: CURSOR_THRESHOLD, holdMillis: HOLD_MILLIS, rematchAt: REMATCH, away: AWAY, initial, stage, match, result, cursor, rematch }, null, 2)}\n`, { mode: 0o600 }),

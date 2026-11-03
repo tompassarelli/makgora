@@ -19,7 +19,7 @@ export const STAGE_COMPOSITION_CHECKS: readonly NativeCheck[] = ARTIFACTS.flatMa
     setup: [{ chat: "-dev reset" }, { chat: `-dev quick stage ${id}` }, { chat: "-dev backdrop on" }, { waitMs: 5000 }, { keys: ["y"] }],
     capture: [{ kind: "frames", name: "composition", client: "a" }, { kind: "frames", name: "composition", client: "b" }],
     pass: [
-      { kind: "receipt", pattern: `^SMASHCRAFT STAGE v=1 .* stage=${id} `, min: 1 },
+      { kind: "receipt", pattern: `^MAKGORA STAGE v=1 .* stage=${id} `, min: 1 },
       { kind: "log", pattern: "^model creation failed - war3mapImported", since: "session", max: 0 },
       { kind: "receipt", pattern: "^error \\d+ in ", max: 0 },
     ],
@@ -49,7 +49,7 @@ const cleanRules = [
   { kind: "log", pattern: "^model creation failed - war3mapImported", since: "session", max: 0 },
   { kind: "receipt", pattern: "^error \\d+ in ", max: 0 },
 ] as const;
-const entryRules = (id: number) => [{ kind: "receipt", pattern: `^SMASHCRAFT STAGE v=1 .* stage=${id} `, min: 1 }, ...cleanRules] as const;
+const entryRules = (id: number) => [{ kind: "receipt", pattern: `^MAKGORA STAGE v=1 .* stage=${id} `, min: 1 }, ...cleanRules] as const;
 
 export const STAGE_ENTRY_CHECKS: readonly NativeCheck[] = ENTRY_STAGES.flatMap(({ id, name }): NativeCheck[] => [
   {
@@ -83,7 +83,7 @@ export const FLOATING_STAGE_CHECKS: readonly NativeCheck[] = STAGE_CATALOG.flatM
   ],
   capture: [{ kind: "frames", name: `${extreme}`, client: "a" }, { kind: "frames", name: `${extreme}`, client: "b" }],
   pass: [
-    { kind: "receipt", pattern: `^SMASHCRAFT STAGE v=1 .* stage=${id} `, min: 1 },
+    { kind: "receipt", pattern: `^MAKGORA STAGE v=1 .* stage=${id} `, min: 1 },
     { kind: "log", pattern: "^model creation failed - war3mapImported", since: "session", max: 0 },
     { kind: "receipt", pattern: "^error \\d+ in ", max: 0 },
   ],

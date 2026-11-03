@@ -32,7 +32,7 @@ export interface Drawn {
 
 export function parseDrawn(text: string): Drawn | undefined {
   for (const line of preloadLines(text) ?? []) {
-    const match = /^SMASHCRAFT DRAWN v=1 build=\S+ epoch=(\d+) frame=(\d+)/.exec(line);
+    const match = /^MAKGORA DRAWN v=1 build=\S+ epoch=(\d+) frame=(\d+)/.exec(line);
     if (match !== null) return { epoch: Number(match[1]), frame: Number(match[2]) };
   }
   return undefined;

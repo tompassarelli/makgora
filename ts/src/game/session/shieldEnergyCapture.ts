@@ -26,5 +26,5 @@ export function shieldEnergyReceipt(sample: ShieldEnergySample, fighter: Readonl
   const valid = sample === "down" ? !raised && !pose.visible
     : raised && pose.visible && pose.scale > 0 && (sample === "full" ? energy >= SHIELD_MAX - 1
       : sample === "mid" ? energy > SHIELD_MAX / 3 && energy <= SHIELD_MAX / 2 : energy > 0 && energy <= SHIELD_MAX / 12);
-  return `SMASHCRAFT SHIELD sample=${sample} frame=${frame} raised=${raised ? "T" : "F"} energy=${energy} drawn=${pose.visible ? "T" : "F"} centreX=${pose.x} centreZ=${pose.z} radius=${f32(pose.scale * SHIELD_MODEL_RADIUS)} pass=${valid ? 1 : 0}`;
+  return `MAKGORA SHIELD sample=${sample} frame=${frame} raised=${raised ? "T" : "F"} energy=${energy} drawn=${pose.visible ? "T" : "F"} centreX=${pose.x} centreZ=${pose.z} radius=${f32(pose.scale * SHIELD_MODEL_RADIUS)} pass=${valid ? 1 : 0}`;
 }

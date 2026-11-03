@@ -30,7 +30,7 @@ declare function print(this: void, ...values: unknown[]): void;
 
 const [bundle, declarations, run = "quick-match", framesText = "1800", samples] = [arg[1], arg[2], arg[3], arg[4], arg[5]];
 if (bundle === undefined || declarations === undefined) throw new Error("usage: lua perf.lua MAP_LUA WARCRAFT_D_TS [RUN [FRAMES [samples]]]");
-const map = { filePrefix: "smashcraft", localNatives: MAKGORA_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: () => makgoraNativeBehavior() };
+const map = { filePrefix: "makgora", localNatives: MAKGORA_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: () => makgoraNativeBehavior() };
 const options = { samples: samples === "samples" };
 const computer = SELECTABLE_CHARACTERS.find((character) => run === `bot-${fighterSlug(character)}`);
 const capturing = run === "native-perf-four";
@@ -55,7 +55,7 @@ const measured = (headless: LuaHeadlessMap, played: (this: void, clients: Lockst
 };
 function writeCapture(clients: Lockstep, notes: string[]): string[] {
   const out = os.getenv("PERF_CAPTURE");
-  const receipt = clients.client(0).files.get("smashcraft-perf-capture-p0-run1.txt");
+  const receipt = clients.client(0).files.get("makgora-perf-capture-p0-run1.txt");
   if (receipt === undefined) return ["p0 wrote no frame capture"];
   if (out === undefined) {
     notes.push(`p0 capture of ${receipt.length - 1} callbacks; set PERF_CAPTURE=FILE to keep it`);

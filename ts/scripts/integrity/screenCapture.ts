@@ -55,7 +55,7 @@ export const captureScreen = (options: ScreenCaptureOptions) => Effect.gen(funct
   const client = clients.find(client => client.name === options.client);
   if (client === undefined) return yield* new IntegrityFailure({ operation: "select screen client", path: options.clientsFile, cause: `${options.client} is absent` });
   if (/^:0(?:\.0)?$/.test(client.x11.DISPLAY ?? "")) return yield* new IntegrityFailure({ operation: "select private screen client", path: client.name, cause: "the integrity screen recorder requires a private desktop" });
-  const view = yield* ClientWatch.use(watch => watch.view(client)).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" })));
+  const view = yield* ClientWatch.use(watch => watch.view(client)).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "makgora" })));
   console.log(`${client.name}: ${describeView(view)}`);
   if (view.state.kind !== "in match") return yield* new IntegrityFailure({ operation: "capture match pixels", path: client.name, cause: `expected a running match, observed ${describeView(view)}` });
   yield* tryIntegrity("create private screen capture", options.out, () => mkdirSync(options.out));

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "smashcraft",
+      "name": "makgora",
       "devDependencies": {
         "@effect/platform-bun": "4.0.5",
         "@effect/tsgo": "0.53.5",

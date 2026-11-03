@@ -82,7 +82,7 @@ const calibrate = (match: number) => Effect.scoped(Effect.gen(function*() {
  for (const [slot, target] of targets.entries()) {
   for (const corner of ["start", "end"]) {
     const anchor = yield* calibrateCursor({ args: target.args, env: { ...Bun.env, ...target.client.x11, ...target.client.wayland },
-      path: join(data[slot] ?? "", `smashcraft-pad-calibration-p${slot}.txt`), log: join(plan.out, `calibration-${slot}-${corner}.log`), corner });
+      path: join(data[slot] ?? "", `makgora-pad-calibration-p${slot}.txt`), log: join(plan.out, `calibration-${slot}-${corner}.log`), corner });
     anchors.push({ match, slot, ...anchor });
   }
  }
@@ -121,7 +121,7 @@ yield* Effect.gen(function*() {
         for (const line of lines) yield* producer.write(line);
       }
       for (const [slot, directory] of data.entries()) {
-        const file = readdirSync(directory).find(file => file.startsWith(`smashcraft-pad-${route}-e`) && file.endsWith(`-p${slot}.txt`) && statSync(join(directory, file)).mtimeMs >= started);
+        const file = readdirSync(directory).find(file => file.startsWith(`makgora-pad-${route}-e`) && file.endsWith(`-p${slot}.txt`) && statSync(join(directory, file)).mtimeMs >= started);
         if (file !== undefined) found.set(slot, file);
       }
       yield* Effect.sleep(100);

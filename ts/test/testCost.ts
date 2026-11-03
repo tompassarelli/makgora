@@ -6,7 +6,7 @@ import { steppedFrames } from "../src/game/match/frameCount";
 const out = process.env.TEST_COST_OUT;
 const ceiling = Number(process.env.TEST_COST_CEILING_FRAMES ?? "0");
 
-const unitKey = "smashcraftTestCostUnit";
+const unitKey = "makgoraTestCostUnit";
 export const chargeTestsTo = (unit: string): void => {
   (globalThis as Record<string, unknown>)[unitKey] = unit;
 };

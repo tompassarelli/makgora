@@ -9,7 +9,7 @@ import { tsDirectory } from "./projectRoot";
 const inputsRoot = join(homedir(), ".local/share/makgora-build-inputs");
 export const WINDOW_SOURCE_COPY = join(inputsRoot, "window-source");
 export const WINDOW_LOCK = join(inputsRoot, "locks/window-library.lock");
-export const WINDOW_OWNER = "smashcraft:tom-build-window";
+export const WINDOW_OWNER = "makgora:tom-build-window";
 export const WINDOW_TIMEOUT_SECONDS = 3600;
 export const LIBRARY_FILE = process.platform === "win32" ? "wisp_window.dll" : "libwisp_window.so";
 

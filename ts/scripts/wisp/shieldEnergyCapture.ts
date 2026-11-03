@@ -5,7 +5,7 @@ import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { SHIELD_ENERGY_SAMPLES, SHIELD_ENERGY_SETUP } from "../../src/game/session/shieldEnergyCapture";
 
 const heldSample = (sample: string, before: ReadonlyMap<string, number>) => (file: ReceiptFile) =>
-  file.modified > (before.get(file.name) ?? -Infinity) && (preloadLines(file.text) ?? []).some(line => line.startsWith(`SMASHCRAFT SHIELD sample=${sample} `));
+  file.modified > (before.get(file.name) ?? -Infinity) && (preloadLines(file.text) ?? []).some(line => line.startsWith(`MAKGORA SHIELD sample=${sample} `));
 
 export function withShieldEnergyCapture(driver: AcceptDriver["Service"]): AcceptDriver["Service"] {
   let next = -1;

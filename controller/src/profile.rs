@@ -1,5 +1,5 @@
 //! The Mak'gora profile: the map publishes
-//! `CustomMapData/smashcraft-journal-menu-BUILD-sSLOT.txt` for the local
+//! `CustomMapData/makgora-journal-menu-BUILD-sSLOT.txt` for the local
 //! player, naming its build, slot, epoch and menu phase; `wc3-journal
 //! --follow-matches` serves it (makgora:controller/README.md).
 //!
@@ -38,7 +38,7 @@ pub fn newest_menu(dir: &Path) -> Option<Menu> {
     let (modified, path, build, slot) = fs::read_dir(dir).ok()?.flatten()
         .filter_map(|entry| {
             let name = entry.file_name().into_string().ok()?;
-            let (build, slot) = name.strip_prefix("smashcraft-journal-menu-")?.strip_suffix(".txt")?.rsplit_once("-s")?;
+            let (build, slot) = name.strip_prefix("makgora-journal-menu-")?.strip_suffix(".txt")?.rsplit_once("-s")?;
             let slot = slot.parse::<u32>().ok()?;
             let modified = entry.metadata().ok()?.modified().ok()?;
             Some((modified, entry.path(), build.to_owned(), slot))
@@ -55,7 +55,7 @@ pub fn menu_fields(contents: &str, build: &str, slot: u32) -> Option<(u32, Strin
     if contents.lines().rev().find(|line| !line.trim().is_empty()).map(str::trim) != Some("endfunction") {
         return None;
     }
-    let line = contents.split("SMASHCRAFT JOURNAL MENU v=1 ").nth(1)?.split('"').next()?;
+    let line = contents.split("MAKGORA JOURNAL MENU v=1 ").nth(1)?.split('"').next()?;
     let field = |key: &str| line.split_whitespace().find_map(|token| token.strip_prefix(key)?.strip_prefix('='));
     if field("build")? != build || field("slot")?.parse::<u32>().ok()? != slot {
         return None;
@@ -279,7 +279,7 @@ mod tests {
 
     #[test]
     fn reads_only_complete_publications_for_their_own_name() {
-        let body = "function PreloadFiles takes nothing returns nothing\n\tcall Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0047 epoch=2 slot=0 phase=RESULT\" )\n\tcall Preload( \"connected=1 human-fighters=1 computers=4 fighters=5\" )\n";
+        let body = "function PreloadFiles takes nothing returns nothing\n\tcall Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0047 epoch=2 slot=0 phase=RESULT\" )\n\tcall Preload( \"connected=1 human-fighters=1 computers=4 fighters=5\" )\n";
         assert_eq!(menu_fields(body, "playable-0047", 0), None);
         let complete = format!("{body}endfunction\n");
         assert_eq!(menu_fields(&complete, "playable-0047", 0), Some((2, "RESULT".into())));
@@ -293,8 +293,8 @@ mod tests {
         fs::create_dir_all(&dir).unwrap();
         assert_eq!(newest_menu(&dir), None);
         let write = |build: &str, slot: u32, epoch: u32| {
-            fs::write(dir.join(format!("smashcraft-journal-menu-{build}-s{slot}.txt")),
-                format!("call Preload( \"SMASHCRAFT JOURNAL MENU v=1 build={build} epoch={epoch} slot={slot} phase=CHARACTER\" )\nendfunction\n")).unwrap();
+            fs::write(dir.join(format!("makgora-journal-menu-{build}-s{slot}.txt")),
+                format!("call Preload( \"MAKGORA JOURNAL MENU v=1 build={build} epoch={epoch} slot={slot} phase=CHARACTER\" )\nendfunction\n")).unwrap();
             std::thread::sleep(Duration::from_millis(20));
         };
         write("playable-0046", 0, 3);
@@ -308,8 +308,8 @@ mod tests {
     fn a_menu_from_before_this_game_started_is_no_session() {
         let documents = std::env::temp_dir().join(format!("makgora-fresh-{}", std::process::id()));
         fs::create_dir_all(documents.join("CustomMapData")).unwrap();
-        fs::write(documents.join("CustomMapData/smashcraft-journal-menu-old-s0.txt"),
-            "call Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=old epoch=0 slot=0 phase=CHARACTER\" )\nendfunction\n").unwrap();
+        fs::write(documents.join("CustomMapData/makgora-journal-menu-old-s0.txt"),
+            "call Preload( \"MAKGORA JOURNAL MENU v=1 build=old epoch=0 slot=0 phase=CHARACTER\" )\nendfunction\n").unwrap();
         let game = |birth| Game { pid: 1, birth, documents: documents.clone(), target: Target::Headless { text_out: "/dev/null".into() } };
         let boot = started_at(0).unwrap();
         let later = (SystemTime::now().duration_since(boot).unwrap().as_millis() / 10) as u64 + 360_000;
@@ -388,16 +388,16 @@ mod tests {
         let key_session = profile.session(&game).unwrap().key;
         for (phase, pointing) in [("CHARACTER", true), ("CPU", true), ("CHARACTER", true), ("STAGE", true), ("RESULT", true), ("BLOCKED", false)] {
             std::thread::sleep(Duration::from_millis(20));
-            fs::write(data.join("smashcraft-journal-menu-playable-0047-s0.txt"),
-                format!("call Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=playable-0047 epoch=1 slot=0 phase={phase}\" )\nendfunction\n")).unwrap();
+            fs::write(data.join("makgora-journal-menu-playable-0047-s0.txt"),
+                format!("call Preload( \"MAKGORA JOURNAL MENU v=1 build=playable-0047 epoch=1 slot=0 phase={phase}\" )\nendfunction\n")).unwrap();
             assert_eq!(profile.session(&game).unwrap().key, key_session);
             assert!(profile.keys());
             assert_eq!(profile.pointer_menu(), pointing, "{phase}");
         }
         // A journal map opened after it publishes a menu: that session wins.
         std::thread::sleep(Duration::from_millis(20));
-        fs::write(data.join("smashcraft-journal-menu-typescript-integrity-s0.txt"),
-            "call Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=typescript-integrity epoch=0 slot=0 phase=CHARACTER\" )\nendfunction\n").unwrap();
+        fs::write(data.join("makgora-journal-menu-typescript-integrity-s0.txt"),
+            "call Preload( \"MAKGORA JOURNAL MENU v=1 build=typescript-integrity epoch=0 slot=0 phase=CHARACTER\" )\nendfunction\n").unwrap();
         assert!(profile.session(&game).unwrap().key.starts_with("typescript-integrity/s0/"));
         assert!(!profile.keys());
         fs::remove_dir_all(documents).unwrap();

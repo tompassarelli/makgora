@@ -50,7 +50,7 @@ export const measureStagesGate = (clientsFile: string, directory: string, restar
     stages.push({ id, name, started: match._tag === "Some", frames });
   }
   const started = stages.filter(stage => stage.started).length;
-  const text = `SMASHCRAFT GATE stages stages=${stages.length} started=${started} pass=${started === STAGE_CATALOG.length ? 1 : 0}`;
+  const text = `MAKGORA GATE stages stages=${stages.length} started=${started} pass=${started === STAGE_CATALOG.length ? 1 : 0}`;
   const modified = yield* Clock.currentTimeMillis;
   yield* Effect.try({
     try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, shotsMillis: MATCH_SHOTS_MILLIS, stages }, null, 2)}\n`, { mode: 0o600 }),

@@ -145,7 +145,7 @@ const moments: string[] = [];
 
 const firstWrite = Math.min(...starts.flatMap((event) => (event.publications ?? []).map((publication) => publication.mtime_realtime_ns / 1e6)));
 for (const folder of dataFolders) {
-  for (const name of readdirSync(folder).filter((entry) => /^smashcraft-repro-p\d+-f\d+-\d+\.txt$/.test(entry))) {
+  for (const name of readdirSync(folder).filter((entry) => /^makgora-repro-p\d+-f\d+-\d+\.txt$/.test(entry))) {
     const source = join(folder, name);
     if (statSync(source).mtimeMs < firstWrite) continue;
     mkdirSync(momentsDirectory, { recursive: true });
@@ -156,7 +156,7 @@ for (const folder of dataFolders) {
 
 
 const { replayRepro } = await import("../../src/game/replay/moment");
-const momentFiles = existsSync(momentsDirectory) ? readdirSync(momentsDirectory).filter((entry) => /^smashcraft-repro-p\d+-f\d+-\d+\.txt$/.test(entry)).sort() : [];
+const momentFiles = existsSync(momentsDirectory) ? readdirSync(momentsDirectory).filter((entry) => /^makgora-repro-p\d+-f\d+-\d+\.txt$/.test(entry)).sort() : [];
 const momentReplays = momentFiles.map((name) => {
   const file = join(momentsDirectory, name);
   try {

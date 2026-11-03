@@ -5,7 +5,7 @@ const SETUP_COMPUTERS: readonly Rule[] = (["a", "b"] as const).map((client): Rul
 export const fighterSelectChecks = (pass: readonly Rule[]): NativeCheck[] => [
   ...(["first", "second"] as const).map((order): NativeCheck => ({
     id: `c40-cpu-startup-${order}`, closes: "makgora#7 C40N", map: "cpu-startup", session: `cpu-startup-${order}`,
-    setup: [{ waitMs: 8000 }, { chat: "-dev stocks 3" }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "a", seconds: 10 }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "b", seconds: 10 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 }],
+    setup: [{ waitMs: 8000 }, { chat: "-dev stocks 3" }, { receipt: "^MAKGORA DEV v=1 ", client: "a", seconds: 10 }, { receipt: "^MAKGORA DEV v=1 ", client: "b", seconds: 10 }, { keys: ["Escape"], client: "a" }, { keys: ["Escape"], client: "b" }, { waitMs: 500 }],
     capture: [{ kind: "frames", name: "fighter-select", client: "a" }, { kind: "frames", name: "fighter-select", client: "b" }],
     pass: [...pass, ...SETUP_COMPUTERS],
     look: "With each client's first-run Controls panel closed, the computer's starting fighter in SETUP characters= is the same on both clients and matches both fighter-select frames; it differs between the first and second session.",

@@ -16,7 +16,7 @@ const START_FRAMES = 240;
 const [bundlePath, declarationsPath, slotText] = [arg[1], arg[2], arg[3]];
 const slot = Number(slotText);
 if (bundlePath === undefined || declarationsPath === undefined || !Number.isInteger(slot)) throw new Error("usage: lua boot.lua MAP_LUA WARCRAFT_D_TS SLOT");
-const clients = luaLockstep({ players: [slot], filePrefix: "smashcraft", localNatives: MAKGORA_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: makgoraNativeBehavior }, readFile(bundlePath), readFile(declarationsPath));
+const clients = luaLockstep({ players: [slot], filePrefix: "makgora", localNatives: MAKGORA_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: makgoraNativeBehavior }, readFile(bundlePath), readFile(declarationsPath));
 const problems: string[] = [];
 const [booted, failure] = pcall(() => {
   clients.start();

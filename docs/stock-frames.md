@@ -48,9 +48,9 @@ hidden stock frame is the parent of any frame the map made.
 
 Every `ButtonClicks.add` registers its frame and click box (makgora:ts/src/game/ui/buttonSweep.ts).
 `-dev buttons` lists the registered buttons with their visibility and box in
-`smashcraft-dev-buttons-pSLOT.txt` and turns click logging on: from then on a
+`makgora-dev-buttons-pSLOT.txt` and turns click logging on: from then on a
 click on any registered button is appended to
-`smashcraft-dev-button-clicks-pSLOT.txt` and its handler does not run, so a
+`makgora-dev-button-clicks-pSLOT.txt` and its handler does not run, so a
 panel stays open while it is swept. The accept check `gate-panel-buttons`
 (makgora:ts/scripts/wisp/gateButtons.ts) clicks each visible button at 5
 points across its width and fails, naming the button and the point, when a

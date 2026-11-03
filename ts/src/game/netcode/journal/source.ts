@@ -64,7 +64,7 @@ export class JournalInputSource {
 
 
   packetBase(): string {
-    return `smashcraft-journal-${this.build}-e${this.epoch}-s${this.slot}-n${this.expectedFrame()}`;
+    return `makgora-journal-${this.build}-e${this.epoch}-s${this.slot}-n${this.expectedFrame()}`;
   }
 
 
@@ -123,7 +123,7 @@ export class JournalInputSource {
 
 
   controlAckBase(): string {
-    return `smashcraft-journal-ack-${this.build}-e${this.epoch}-s${this.slot}-n${this.controlSequence}`;
+    return `makgora-journal-ack-${this.build}-e${this.epoch}-s${this.slot}-n${this.controlSequence}`;
   }
 
 

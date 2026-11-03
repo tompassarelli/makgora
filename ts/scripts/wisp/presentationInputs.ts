@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-export const PRESENTATION_MAP = "Smashcraft diagnostic native presentation.w3x";
+export const PRESENTATION_MAP = "Mak'gora diagnostic native presentation.w3x";
 const INPUT_SET = /^native-acceptance-\d{8}(-[0-9a-f]{7,40})?$/;
 
 const complete = (dir: string) => existsSync(join(dir, PRESENTATION_MAP)) && existsSync(join(dir, `${PRESENTATION_MAP}.base.lua`));

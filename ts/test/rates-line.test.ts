@@ -36,7 +36,7 @@ test("two clients over Battle.net latency write r lines whose per-sender latenes
   for (const client of clients.clients) expect(client.errors).toEqual([]);
   HUMANS.forEach((slot, index) => {
     const files = clients.clients[index]?.files ?? new Map<string, string[]>();
-    const lines = [...files.entries()].filter(([name]) => name.startsWith("smashcraft-rates-")).sort(([a], [b]) => a.localeCompare(b)).flatMap(([, rows]) => rows);
+    const lines = [...files.entries()].filter(([name]) => name.startsWith("makgora-rates-")).sort(([a], [b]) => a.localeCompare(b)).flatMap(([, rows]) => rows);
     for (const line of lines) expect(line.length).toBeLessThanOrEqual(RATES_RECORD_CHARS);
     const match = parseSessionRates(lines).seconds.filter(second => second.ph === Phase.match).slice(1);
     expect(match.length).toBeGreaterThan(5);

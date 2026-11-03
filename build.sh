@@ -12,7 +12,7 @@ fi
 private_assets=${WC3_PRIVATE_ASSETS:?Set WC3_PRIVATE_ASSETS to the private prepared clip directory.}
 candidate=${WC3_TS_CANDIDATE_ID:-$(date +%s)}
 [[ "$candidate" =~ ^[A-Za-z0-9._-]+$ ]] || { echo 'WC3_TS_CANDIDATE_ID may contain only letters, digits, dots, underscores, and hyphens.' >&2; exit 2; }
-map_name="Smashcraft diagnostic ts-$candidate"
+map_name="Mak'gora diagnostic ts-$candidate"
 private_build_root=$(realpath -m -- "$private_assets/build")
 case "$private_build_root" in "$project_dir"|"$project_dir"/*) echo 'Private build inputs must be outside the checkout.' >&2; exit 2;; esac
 output=$(realpath -m -- "${WC3_BUILD_OUTPUT:-$private_build_root/$map_name.w3x}")

@@ -153,5 +153,5 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
     yield* Console.log(`elapsed ${((performance.now() - started) / 1000).toFixed(1)} s; ${out}`);
     if (failed) return yield* failure("growth exceeds the stated post-warmup bounds");
   });
-  yield* onHealthyClients(Effect.scoped(run).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" }))), { clientsFile: selected.clients, retry: false });
+  yield* onHealthyClients(Effect.scoped(run).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "makgora" }))), { clientsFile: selected.clients, retry: false });
 });

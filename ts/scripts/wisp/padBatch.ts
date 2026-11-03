@@ -171,7 +171,7 @@ const hotServices = Layer.build(MapBuild.layer(buildProject("integrity")).pipe(L
 
 
 const hotReloader = (services: Effect.Success<typeof hotServices>, data: readonly [string, string]) =>
-  Layer.build(HotReload.layer(data, "smashcraft").pipe(Layer.provide(Layer.succeedContext(services)))).pipe(Effect.map((context) => Context.get(context, HotReload)));
+  Layer.build(HotReload.layer(data, "makgora").pipe(Layer.provide(Layer.succeedContext(services)))).pipe(Effect.map((context) => Context.get(context, HotReload)));
 
 export interface BatchOptions {
   readonly scripts: readonly string[];

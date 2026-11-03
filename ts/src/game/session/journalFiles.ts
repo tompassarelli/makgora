@@ -21,7 +21,7 @@ export interface JournalIdentity {
 type ControlRequest = "PAUSE" | "PAUSE_COMMIT" | "RESUME";
 
 function controlLine({ build, epoch, slot }: JournalIdentity, sequence: number, state: string, frame: number): string {
-  return `SMASHCRAFT JOURNAL CONTROL v=1 build=${build} epoch=${epoch} slot=${slot} sequence=${sequence} state=${state} frame=${frame}`;
+  return `MAKGORA JOURNAL CONTROL v=1 build=${build} epoch=${epoch} slot=${slot} sequence=${sequence} state=${state} frame=${frame}`;
 }
 
 export function controlFile(identity: JournalIdentity, sequence: number, state: ControlRequest, frame: number): PreloadFile {
@@ -49,7 +49,7 @@ export function endFile(identity: JournalIdentity, frame: number, winner: number
 }
 
 
-export const quiescentFile = ({ build, epoch, slot }: JournalIdentity) => `smashcraft-journal-quiescent-${build}-e${epoch}-s${slot}.pld`;
+export const quiescentFile = ({ build, epoch, slot }: JournalIdentity) => `makgora-journal-quiescent-${build}-e${epoch}-s${slot}.pld`;
 
 const TRANSPORT_DESCRIPTIONS: Readonly<Record<JournalIngress, string>> = {
   editbox: "transport=editbox-v1; semicolon-delimited I4; local poll and consumed-prefix drain; text-capacity=4096",
@@ -70,9 +70,9 @@ export function readyFile(identity: JournalIdentity, { inputProfile, ingress, de
   return {
     name: journalReadyFile(build, epoch, slot),
     lines: [
-      `SMASHCRAFT JOURNAL v=1 build=${build} epoch=${epoch} slot=${slot}`,
+      `MAKGORA JOURNAL v=1 build=${build} epoch=${epoch} slot=${slot}`,
       `input=${inputProfile} delay=${delay} rollback=${rollback} first_frame=${1 + delay}`,
-      `filename=smashcraft-journal-${build}-e${epoch}-s${slot}-n{SEQUENCE}.pld`,
+      `filename=makgora-journal-${build}-e${epoch}-s${slot}-n{SEQUENCE}.pld`,
       "packet=canonical I4; records=1 or 2 consecutive original frames; include neutral rows; no sparse events",
       TRANSPORT_DESCRIPTIONS[ingress],
       "pause=sequenced control request; companion ACK names the next input frame; simulation pauses or resumes only at that acknowledged confirmed frame",
@@ -95,7 +95,7 @@ export function menuFile(identity: JournalIdentity, phase: MenuPhase, roster: Me
   return {
     name: journalMenuFile(build, slot),
     lines: [
-      `SMASHCRAFT JOURNAL MENU v=1 build=${build} epoch=${epoch} slot=${slot} phase=${phase}`,
+      `MAKGORA JOURNAL MENU v=1 build=${build} epoch=${epoch} slot=${slot} phase=${phase}`,
       `connected=${roster.connected} human-fighters=${roster.humanFighters} computers=${roster.computers} fighters=${roster.fighters}`,
     ],
   };
@@ -126,7 +126,7 @@ export function devReceiptFile({ build, epoch, slot }: JournalIdentity, receipt:
   return {
     name: devCommandReceiptFile(build, slot),
     lines: [
-      `SMASHCRAFT DEV v=1 build=${build} receipt=${receipt} step=${step} steps=${steps} epoch=${epoch} rb=${rollback} delay=${delay} batch=${batch} rematchSeconds=${rematchSeconds} `,
+      `MAKGORA DEV v=1 build=${build} receipt=${receipt} step=${step} steps=${steps} epoch=${epoch} rb=${rollback} delay=${delay} batch=${batch} rematchSeconds=${rematchSeconds} `,
       `SETUP phase=${game.phase} human-fighters=${game.humanFighterMask} computers=${game.computerMask} characters=${a},${b},${c},${d} stocks=${game.stockCount} minutes=${game.timeLimitMinutes} automatic-rematch=${game.automaticRematch ? 1 : 0} team-battle=${game.teamBattle ? 1 : 0} friendly-fire=${game.friendlyFire ? 1 : 0} teams=${game.teamChoices.join(",")} stage=${game.stageChoice} wins=${wins.join(",")} `,
     ],
   };
@@ -134,5 +134,5 @@ export function devReceiptFile({ build, epoch, slot }: JournalIdentity, receipt:
 
 
 export function stageDrawnFile({ build, epoch, slot }: JournalIdentity, stage: number, decks: number): PreloadFile {
-  return { name: stageReceiptFile(build, slot), lines: [`SMASHCRAFT STAGE v=1 build=${build} epoch=${epoch} stage=${stage} decks=${decks} `] };
+  return { name: stageReceiptFile(build, slot), lines: [`MAKGORA STAGE v=1 build=${build} epoch=${epoch} stage=${stage} decks=${decks} `] };
 }

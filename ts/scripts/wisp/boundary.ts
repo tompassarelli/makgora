@@ -29,7 +29,7 @@ export const MeleeReady = preloadRecord(
 export const DevCommandReceipt = preloadRecord(
   {
     head: [
-      "SMASHCRAFT DEV v=1 build={build} receipt={receipt} step={step} steps={steps} epoch={epoch} rb={rollback} delay={delay} batch={batch} rematchSeconds={rematchSeconds} ",
+      "MAKGORA DEV v=1 build={build} receipt={receipt} step={step} steps={steps} epoch={epoch} rb={rollback} delay={delay} batch={batch} rematchSeconds={rematchSeconds} ",
       "SETUP phase={phase} human-fighters={humanFighters} computers={computers} characters={characters} stocks={stocks} minutes={minutes} automatic-rematch={automaticRematch} team-battle={teamBattle} friendly-fire={friendlyFire} teams={teams} stage={stage} wins={wins} ",
     ],
   },
@@ -61,7 +61,7 @@ export const DevCommandReceipt = preloadRecord(
 
 
 export const StageReceipt = preloadRecord(
-  { head: ["SMASHCRAFT STAGE v=1 build={build} epoch={epoch} stage={stage} decks={decks} "] },
+  { head: ["MAKGORA STAGE v=1 build={build} epoch={epoch} stage={stage} decks={decks} "] },
   Schema.Struct({ build: Schema.NonEmptyString, epoch: Count, stage: Count, decks: Count.check(Schema.isGreaterThanOrEqualTo(1)) }),
 );
 
@@ -88,7 +88,7 @@ const Identity = { build: Schema.NonEmptyString, epoch: Count, slot: Count };
 
 
 export const JournalControl = preloadRecord(
-  { head: ["SMASHCRAFT JOURNAL CONTROL v=1 build={build} epoch={epoch} slot={slot} sequence={sequence} state={state} frame={frame} winner={winner}"] },
+  { head: ["MAKGORA JOURNAL CONTROL v=1 build={build} epoch={epoch} slot={slot} sequence={sequence} state={state} frame={frame} winner={winner}"] },
   Schema.Struct({
     ...Identity,
     sequence: Count,
@@ -100,12 +100,12 @@ export const JournalControl = preloadRecord(
 
 
 export const JournalMenu = preloadRecord(
-  { head: ["SMASHCRAFT JOURNAL MENU v=1 build={build} epoch={epoch} slot={slot} phase={phase}", "connected={connected} human-fighters={humanFighters} computers={computers} fighters={fighters}"] },
+  { head: ["MAKGORA JOURNAL MENU v=1 build={build} epoch={epoch} slot={slot} phase={phase}", "connected={connected} human-fighters={humanFighters} computers={computers} fighters={fighters}"] },
   Schema.Struct({ ...Identity, phase: Schema.Literals(["CHARACTER", "STAGE", "RESULT", "BLOCKED"]), connected: Count, humanFighters: Count, computers: Count, fighters: Count }),
 );
 
 const JournalReady = preloadRecord(
-  { head: ["SMASHCRAFT JOURNAL v=1 build={build} epoch={epoch} slot={slot}", "input={input} delay={delay} rollback={rollback} first_frame={firstFrame}"], rest: "instructions" },
+  { head: ["MAKGORA JOURNAL v=1 build={build} epoch={epoch} slot={slot}", "input={input} delay={delay} rollback={rollback} first_frame={firstFrame}"], rest: "instructions" },
   Schema.Struct({ ...Identity, input: Schema.NonEmptyString, delay: Count, rollback: Count, firstFrame: Count, instructions: Schema.Array(Schema.NonEmptyString).check(Schema.isMinLength(4)) }),
 );
 
@@ -193,18 +193,18 @@ export function writtenGameFileKind(name: string): GameFileKind<unknown> | undef
   if (name === files.INPUT_START_FILE) return InputTraceStart;
   if (name === files.INPUT_TRACE_FILE) return InputTrace;
   if (name === files.PHYSICS_REPORT_FILE) return PhysicsReport;
-  if (/^smashcraft-object-data-p\d+\.txt$/.test(name)) return ObjectDataReceipt;
-  if (/^smashcraft-dev-.*-p\d+\.txt$/.test(name)) return DevCommandReceipt;
-  if (/^smashcraft-stage-.*-p\d+\.txt$/.test(name)) return StageReceipt;
-  if (/^smashcraft-journal-(?:control|start|end)-.*\.txt$/.test(name)) return JournalControl;
-  if (/^smashcraft-journal-menu-.*\.txt$/.test(name)) return JournalMenu;
-  if (/^smashcraft-journal-ready-.*\.txt$/.test(name)) return JournalReady;
-  if (/^smashcraft-journal-transport-ready-.*\.txt$/.test(name)) return JournalTransportReady;
-  if (/^smashcraft-journal-failure-.*\.txt$/.test(name)) return JournalFailure;
-  if (/^smashcraft-response-p\d+-run\d+-page\d+\.txt$/.test(name)) return ResponsePage;
-  if (/^smashcraft-edge-p\d+-run\d+-row\d+-(?:poll|present)\.txt$/.test(name)) return EdgeStamp;
-  if (/^smashcraft-frame-cost-clock-p\d+\.txt$/.test(name)) return FrameCostClock;
-  if (/^smashcraft-frame-cost-.*-p\d+-(?:typescript|wurst)\.txt$/.test(name)) return FrameCost;
+  if (/^makgora-object-data-p\d+\.txt$/.test(name)) return ObjectDataReceipt;
+  if (/^makgora-dev-.*-p\d+\.txt$/.test(name)) return DevCommandReceipt;
+  if (/^makgora-stage-.*-p\d+\.txt$/.test(name)) return StageReceipt;
+  if (/^makgora-journal-(?:control|start|end)-.*\.txt$/.test(name)) return JournalControl;
+  if (/^makgora-journal-menu-.*\.txt$/.test(name)) return JournalMenu;
+  if (/^makgora-journal-ready-.*\.txt$/.test(name)) return JournalReady;
+  if (/^makgora-journal-transport-ready-.*\.txt$/.test(name)) return JournalTransportReady;
+  if (/^makgora-journal-failure-.*\.txt$/.test(name)) return JournalFailure;
+  if (/^makgora-response-p\d+-run\d+-page\d+\.txt$/.test(name)) return ResponsePage;
+  if (/^makgora-edge-p\d+-run\d+-row\d+-(?:poll|present)\.txt$/.test(name)) return EdgeStamp;
+  if (/^makgora-frame-cost-clock-p\d+\.txt$/.test(name)) return FrameCostClock;
+  if (/^makgora-frame-cost-.*-p\d+-(?:typescript|wurst)\.txt$/.test(name)) return FrameCost;
   return undefined;
 }
 
@@ -225,7 +225,7 @@ export interface NativeChatEntryReceipt {
 const ChatEntryReceipt = Schema.Struct({ build: Schema.NonEmptyString, epoch: Schema.FiniteFromString, revision: Schema.FiniteFromString, available: Schema.Literals(["0", "1"]), open: Schema.Literals(["0", "1"]) });
 
 export function nativeChatEntryReceipt(text: string): NativeChatEntryReceipt | undefined {
-  const line = preloadLines(text)?.find((line) => line.startsWith("SMASHCRAFT CHAT v=1 "));
+  const line = preloadLines(text)?.find((line) => line.startsWith("MAKGORA CHAT v=1 "));
   if (line === undefined) return undefined;
   return Option.getOrUndefined(Schema.decodeUnknownOption(ChatEntryReceipt)(Object.fromEntries(line.split(" ").map((field) => field.split("=")))));
 }
