@@ -11,7 +11,8 @@
   fighter's position, velocity, action, timers, shield and damage
   (makgora:ts/src/game/replay/frameDigest.ts). `bun wisp parity corpus [DIR...]`
   replays every recording (by default makgora:ts/test/corpus/ and the local
-  corpus) in Bun and 32-bit Lua, each on the commit that recorded it, and names
+  corpus) in Bun and 32-bit Lua, each on the commit that recorded it, fails when
+  a named DIR holds no recordings, and names
   each replay's first divergent frame and field; `bun wisp parity corpus keep
   RECORDING...` copies local recordings into makgora:ts/test/corpus/, which
   CI and `farm test` replay on every push.

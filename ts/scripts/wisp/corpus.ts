@@ -304,6 +304,8 @@ export function corpusReport(outcomes: readonly ReplayOutcome[], recordings: num
 export const corpus = (args: readonly string[]) => Effect.gen(function*() {
   if (args[0] === "keep") return yield* keep(args.slice(1));
   const roots = (args.length > 0 ? args : [CHECKED_IN_CORPUS, localCorpus()]).map((root) => resolve(root));
+  const empty = args.length > 0 ? roots.filter((root) => findRecordings(root).length === 0) : [];
+  if (empty.length > 0) return yield* new CorpusFailure({ problem: `no recordings under ${empty.join(", ")}` });
   const found = roots.map((root) => assembleReplays(findRecordings(root)));
   const recordings = roots.reduce((count, root) => count + findRecordings(root).length, 0);
   const replays = found.flatMap(({ replays: some }) => some);
