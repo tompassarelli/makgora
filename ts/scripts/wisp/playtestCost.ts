@@ -3,7 +3,7 @@ import { basename, join } from "node:path";
 import { Console, Effect } from "effect";
 import { PerfFailure, measureRun } from "wisp/scripts/wisp/commands/perf";
 import { parsePerfRun } from "wisp/scripts/wisp/perf";
-import { sourceHash } from "../generated";
+import { sourceHash } from "../sourceHash";
 import { MAKGORA_PERF } from "./commands/perf";
 import { tsDirectory } from "./project";
 

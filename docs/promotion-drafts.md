@@ -18,7 +18,7 @@ Mak'gora is now [B]Mak'gora[/B]. New in 0.3:
 [*]New names: Samuro, Rokhan, Mannoroth, Arthas, Stitches, and the duo Mrgl & Grgl
 [*]Reworks for Thrall, Mal'Ganis, Ragnaros, Stitches and Rexxar, and darker stage backdrops
 [/LIST]
-Controllers work through [URL="https://github.com/tompassarelli/padbridge/releases/latest"]padbridge[/URL], and a ranked ladder is coming. News and the roadmap: [URL="PROJECT_URL"]Mak'gora project page[/URL]. Games and feedback: [URL="https://discord.gg/JQGZs2UJR"]Discord[/URL].
+How to install and play: [URL="https://github.com/tompassarelli/makgora/blob/main/docs/player-guide.md"]player guide[/URL]. A ranked ladder is coming. News and the roadmap: [URL="PROJECT_URL"]Mak'gora project page[/URL]. Games and feedback: [URL="https://discord.gg/JQGZs2UJR"]Discord[/URL].
 ```
 
 ## Mak'gora 0.3: Discord announcement
@@ -27,7 +27,7 @@ Controllers work through [URL="https://github.com/tompassarelli/padbridge/releas
 
 New in 0.3: Onyxia joins (Lady Katrana Prestor, who can reveal the black dragon), up to eight costumes per fighter, a new-player mode that shows your keys on screen, a longer Tutorial, the new names Samuro, Rokhan, Mannoroth, Arthas, Stitches and Mrgl & Grgl, and reworks for Thrall, Mal'Ganis, Ragnaros, Stitches and Rexxar.
 
-Download: https://www.hiveworkshop.com/threads/smashcraft.375492/ (put the map in your Warcraft III Maps folder, Graphics on Classic, open it from Custom Game). Controllers work through padbridge: https://github.com/tompassarelli/padbridge/releases/latest
+Download: https://www.hiveworkshop.com/threads/smashcraft.375492/ · How to install and play: https://github.com/tompassarelli/makgora/blob/main/docs/player-guide.md
 
 A ranked ladder is coming. Project page: PROJECT_URL · Patreon: PATREON_URL
 
@@ -36,8 +36,8 @@ Post your games, clips and bugs here. — Tompas
 # Mak'gora 0.1.0 promotion drafts (history)
 
 
-Private drafts for Tom to post after [the release gates](https://github.com/tompassarelli/makgora/issues/346) pass and the map is uploaded to Hive Workshop. These describe the intended 0.1.0 release, not a release available today. The existing [GitHub Issues channel](https://github.com/tompassarelli/makgora/issues) is the feedback destination. Download links use the Hive Workshop placeholder; Tom can substitute the map page once it exists. GitHub repositories hold code only, with no map release attachments. Controls, installation and the restart caveat come from [the player guide](player-guide.md).
-The live Hive Workshop page is written in [hive-post.md](hive-post.md) (makgora:docs/hive-post.md); `bun run hive:post` in ts/ prints it as Hive BBCode to paste into the page editor (makgora:ts/scripts/hivePost.ts): `#` is the centred title and the next line its subtitle, `##` a section heading, `###` a bold label, `-` and `1.` lists, and `**bold**`, `*italic*`, `code` and links convert inline.
+Private drafts for Tom to post after [the release gates](https://github.com/tompassarelli/makgora/issues/346) pass and the map is uploaded to Hive Workshop. These describe the intended 0.1.0 release, not a release available today. The existing [GitHub Issues channel](https://github.com/tompassarelli/makgora/issues) is the feedback destination. Download links use the Hive Workshop placeholder; Tom can substitute the map page once it exists. GitHub repositories hold code only, with no map release attachments. Controls, installation and the restart caveat are in [the player guide](player-guide.md), not restated here.
+The live Hive Workshop page is written in [hive-post.md](hive-post.md) (makgora:docs/hive-post.md); `bun run hive:post` in ts/ prints it as Hive BBCode to paste into the page editor, followed by the generated [player guide](player-guide.bbcode.txt), so the page never restates guide facts by hand (makgora:ts/scripts/hivePost.ts): `#` is the centred title and the next line its subtitle, `##` a section heading, `###` a bold label, `-` and `1.` lists, and `**bold**`, `*italic*`, `code` and links convert inline.
 
 
 ## Hive Workshop map page
@@ -46,39 +46,17 @@ The live Hive Workshop page is written in [hive-post.md](hive-post.md) (makgora:
 
 Pick a Warcraft fighter, fight across floating stages, and knock your opponents out. Created by Tompas, Mak'gora has 26 fighters, Classic graphics, computer opponents, Training, Classic routes and Lore Battles.
 
-This is the first public version; it's early, expect rough edges, tell us what feels off. Send feedback through [Mak'gora GitHub Issues](https://github.com/tompassarelli/makgora/issues), including your Warcraft version, fighters, stage and what happened. A short clip helps. Type -clip in chat during a match to save its last ten seconds for a bug report; the saved `makgora-repro-*.txt` is in Warcraft III's CustomMapData folder.
+This is the first public version; it's early, expect rough edges, tell us what feels off. Send feedback through [Mak'gora GitHub Issues](https://github.com/tompassarelli/makgora/issues), including your Warcraft version, fighters, stage and what happened. A short clip helps.
 
-**Controls:** keyboard play needs no extra software. Open Controls with F1 before a match to choose QWERTY or Custom and save bindings. Custom uses W/R to move, Space to aim up, E to aim down or drop through platforms, I/9 to jump, Z to short hop, N to attack, U for specials, Q/8 to shield or air-dodge, and O to grab. Y confirms selections and pauses or resumes. Optional controllers use the Mak'gora controller helper; keyboard play is the simplest way to start.
-
-**Install:** requires Warcraft III 3.0 with Graphics set to Classic. Download `Makgora 0.1.0.w3x` from [Hive Workshop](https://www.hiveworkshop.com/), put it in your Warcraft III Maps folder, and open it through Custom Games. Start with Training to learn the controls, or select computer opponents for a match.
-
-**How to use a controller:** install and start the optional [Mak'gora controller helper](https://github.com/tompassarelli/padbridge), connect your pad, and open the map through Custom Games. The default controls already match the helper; if you saved Custom controls earlier, press F1, choose QWERTY and Save. Keep the Warcraft window focused. The helper starts with **Melee**; choose **Tom** on the companion's Controller page if you prefer that layout. These are Xbox button labels, with no custom remaps:
-
-| Control | Melee (default) | Tom |
-| --- | --- | --- |
-| A | Attack | Attack |
-| B | Special | Grab |
-| X | Jump | Special |
-| Y | Jump | Jump |
-| LB | Strong: hold with A for a smash | Short hop, even when held |
-| RB | Grab | Strong: hold with A for a smash |
-| LT (left trigger) | Shield / air-dodge | Shield / air-dodge |
-| RT (right trigger) | Shield / air-dodge | Shield / air-dodge |
-| Left stick | Move; up aims, down crouches / fast-falls / drops through platforms | Same |
-| Right stick | Directional tilts on the ground; aerial attacks in the air | Same |
-| Start | Confirm selections; pause / resume | Same |
-
-Tap a jump button for a short hop or hold it for a full hop. Stick-up does not jump unless you enable Tap jump. In fighter and stage menus, the left stick moves the pointer, A chooses, B goes back and Start confirms. Start with Training and try each trigger separately; either one shields on the ground and air-dodges in the air.
-
-**Known issues:** the guide documents unreliable Ctrl+R restarting and a past F5 hang when returning to the menu. Use New Match after a result; to leave, use Warcraft's ordinary Quit Mission and recreate the custom game. Follow [open reports](https://github.com/tompassarelli/makgora/issues) for current problems and workarounds.
+**How to play:** installing, controls, controllers, bug clips and known issues are in [the player guide](player-guide.md).
 
 ## Discord announcement
 
 Mak'gora 0.1.0 is the first public version of my Warcraft III platform fighter: 26 Warcraft fighters, Classic graphics, computer opponents, Training, Classic routes and Lore Battles. It's early, expect rough edges, tell us what feels off.
 
-[Download the map from Hive Workshop](https://www.hiveworkshop.com/), put `Makgora 0.1.0.w3x` in your Warcraft III Maps folder, then open Custom Games. Requires Warcraft III 3.0 with Graphics set to Classic; keyboard play needs no helper. Start with Training. F1 opens Controls before a match; the Custom layout uses W/R to move, I to jump, N to attack, U for specials, Q to shield, O to grab and Y to pause.
+[Download the map from Hive Workshop](https://www.hiveworkshop.com/) and start with Training; the player guide covers install, controls and bug clips.
 
-Please send feedback to [Mak'gora GitHub Issues](https://github.com/tompassarelli/makgora/issues), with the fighters, stage and Warcraft version. Type -clip in chat to save a recent match moment for a report. For now, avoid Ctrl+R and F5 restarting; use New Match or Warcraft's Quit Mission instead. — Tompas
+Please send feedback to [Mak'gora GitHub Issues](https://github.com/tompassarelli/makgora/issues), with the fighters, stage and Warcraft version. — Tompas
 
 ## Reddit: r/WC3
 
@@ -86,9 +64,9 @@ Please send feedback to [Mak'gora GitHub Issues](https://github.com/tompassarell
 
 I've made Mak'gora, a Warcraft III platform fighter with 26 Warcraft fighters, floating stages, computer opponents, Training, Classic routes and Lore Battles. This public version uses Classic graphics.
 
-This is the first public version; it's early, expect rough edges, tell us what feels off. [Download from Hive Workshop](https://www.hiveworkshop.com/): put `Makgora 0.1.0.w3x` in your Warcraft III Maps folder and open it through Custom Games. Requires Warcraft III 3.0 with Graphics set to Classic. Keyboard play is built in; controllers use an optional helper. Start with Training and F1 for Controls. Custom uses W/R to move, I to jump, N to attack, U for specials, Q to shield, O to grab and Y to pause.
+This is the first public version; it's early, expect rough edges, tell us what feels off. [Download from Hive Workshop](https://www.hiveworkshop.com/) and start with Training; the player guide covers install, controls and bug clips.
 
-I'd like feedback on how the fights feel and anything confusing when you start. Reply here or use [Mak'gora GitHub Issues](https://github.com/tompassarelli/makgora/issues); please mention the fighters, stage and Warcraft version. -clip in chat saves a recent match moment for a report. Known restart caveat: avoid Ctrl+R and F5; use New Match or Warcraft's Quit Mission. — Tompas
+I'd like feedback on how the fights feel and anything confusing when you start. Reply here or use [Mak'gora GitHub Issues](https://github.com/tompassarelli/makgora/issues); please mention the fighters, stage and Warcraft version. — Tompas
 
 ## Trailer edit: 75 seconds
 

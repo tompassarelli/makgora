@@ -2,7 +2,9 @@ import { expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { GENERATED_CODE, resolveConflicts } from "../scripts/autolandCore";
+import { GENERATED_DOCS, generatedCode, resolveConflicts } from "../scripts/autolandCore";
+import { output as moveListOutput } from "../codegen/moveList";
+import { bbcodeOutput, markdownOutput } from "../codegen/playerGuide";
 import { rebaseLane } from "../scripts/autolandRebase";
 
 for (const role of ["AUTHOR", "COMMITTER"]) {
@@ -77,9 +79,15 @@ test("two lanes that add state for different heroes, whose rows sit side by side
 
 test("a conflict in the state or fighter-art tables resolves only when no source file conflicts beside it [k2 property]", () => {
   const tables = [GENERATED, "ts/src/generated/state/fighterDifference.ts", "ts/src/generated/fighterArtData.ts", "ts/src/generated/fighter-art/chen.ts", "ts/src/generated/strikes/heroStrikeMomentInfo.ts"];
-  for (const path of tables) expect(GENERATED_CODE.test(path)).toBe(true);
-  for (const path of ["ts/src/generated/assets/white-facts/chen.ts", "ts/src/generated/clips/chen.ts", "ts/src/game/sim/state/fighterSchema.ts"]) expect(GENERATED_CODE.test(path)).toBe(false);
+  for (const path of tables) expect(generatedCode(path)).toBe(true);
+  for (const path of ["ts/src/generated/assets/white-facts/chen.ts", "ts/src/generated/clips/chen.ts", "ts/src/game/sim/state/fighterSchema.ts"]) expect(generatedCode(path)).toBe(false);
   expect(resolveConflicts(tables.map((path) => ({ path })))).toMatchObject({ resolve: true, code: tables });
   const beside = resolveConflicts([{ path: GENERATED }, { path: "ts/src/game/sim/state/fighterSchema.ts" }]);
   expect(beside).toEqual({ resolve: false, why: "ts/src/game/sim/state/fighterSchema.ts is not generated; Autoland never resolves source" });
+});
+
+test("the generated docs the codegen writes resolve as generated code, so Autoland regenerates them when two lanes both change them [k2 property]", () => {
+  const outputs = [moveListOutput, markdownOutput, bbcodeOutput];
+  expect([...GENERATED_DOCS].sort()).toEqual(outputs.map((path) => path.replace(/^\.\.\//, "")).sort());
+  expect(resolveConflicts(GENERATED_DOCS.map((path) => ({ path })))).toMatchObject({ resolve: true, code: GENERATED_DOCS });
 });

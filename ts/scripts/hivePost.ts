@@ -61,5 +61,6 @@ export const hiveBbcode = (markdown: string): string => {
 
 if (import.meta.main) {
   const source = process.argv[2] ?? join(import.meta.dir, "../../docs/hive-post.md");
-  process.stdout.write(hiveBbcode(readFileSync(source, "utf8")));
+  const guide = readFileSync(join(import.meta.dir, "../../docs/player-guide.bbcode.txt"), "utf8").split("\n").slice(2).join("\n");
+  process.stdout.write(`${hiveBbcode(readFileSync(source, "utf8"))}\n${guide}`);
 }

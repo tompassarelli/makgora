@@ -44,6 +44,9 @@ export const CONTROL_ROWS: readonly (readonly [string, Action])[] = [
 const QUEST_LOG_ACTIONS: readonly Action[] = [Action.moveLeft, Action.moveRight, Action.moveUp, Action.moveDown, Action.jump, Action.attack, Action.special, Action.grab, Action.leftTrigger];
 const LAYOUT_ROWS = CONTROL_ROWS.filter(([, action]) => QUEST_LOG_ACTIONS.includes(action));
 
+export const CONTROLS_REBIND_HINT = "Click a lit key to rebind, or click its red x to clear.";
+export const CONTROLS_CAPTURE_HINT = "Press the new key for the flashing action. Delete clears it, Escape cancels.";
+
 export const CONTROLS_CHANGE = `To change it, press ${CONTROLS_PANEL_KEY} at fighter select: pick WASD, Box or a Custom slot; click a key and press another to rebind it. Save keeps it for next time.`;
 
 export function controlsDescription(bindings: Readonly<KeyBindings>): string {

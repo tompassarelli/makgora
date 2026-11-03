@@ -16,7 +16,6 @@ import { step } from "wisp/scripts/wisp/timings";
 import { glowFreeCaptureImports, decodeBuildOptions, editionImports, importedAssets, rebuildMap, type MapEdition } from "../mapInputs";
 import { buildProject, gameFilesLayer, profileOption, projectRoot, sourceErrorsLayer } from "../project";
 import { describeMapSize, mapBudgetProblem, mapGrowthProblem, type MapSize, readMapBaseline, readTables, storedBytes, writeMapBaseline } from "../../mapSize";
-import { ensureGenerated } from "../../generated";
 import { MAKGORA_MAP } from "../../mapInfo";
 import { fighterUnits, fileIoAbility } from "../../objectData";
 import { POST_PROCESSING_FILE } from "../../postProcessing";
@@ -127,7 +126,6 @@ export const build: Command = (args) => Effect.gen(function*() {
   if (predict && !playable) return yield* new UsageFailure({ problem: `${PREDICT_COST} needs --profile playable` });
   return yield* decodeBuildOptions(inputsOnly ? ["--name", "Input check", "--out", "build/input-check.w3x", ...options.args] : options.args, playable ? "classic" : "full").pipe(
     Effect.flatMap((options) => Effect.gen(function*() {
-      yield* Effect.sync(ensureGenerated);
       const { base, container, assets, summon, packager, edition, commit, ...map } = options;
       if (insideTomsLibrary(map.out)) return yield* tomsLibraryOut(map.out);
       const declared = base !== undefined && container !== undefined && assets !== undefined && summon !== undefined

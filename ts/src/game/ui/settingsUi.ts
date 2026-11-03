@@ -28,6 +28,7 @@ import {
   toggleStickJump,
 } from "./bindingSettings";
 import { ButtonClicks, createBackdrop, createText, frameMenuPanel, gameUi, placeTopLeft, setMenuText } from "./frames";
+import { CONTROLS_CAPTURE_HINT, CONTROLS_REBIND_HINT } from "./guide/text";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
 import { PREVIEW_ROW_LIT_TEXTURE } from "./inputPreview";
@@ -88,8 +89,7 @@ const CLEAR_SIZE = f32(0.012);
 const NAME_INSET = f32(0.004);
 const DARK = "|cff22180a";
 const MUTED = "|cff8a96a3";
-const HINT = "|cffffffffClick a lit key to rebind, or click its red |r|cffff6060x|r|cffffffff to clear.|r";
-const CAPTURE_HINT = "Press the new key for the flashing action. Delete clears it, Escape cancels.";
+const HINT = `|cffffffff${CONTROLS_REBIND_HINT.replace("red x", "red |r|cffff6060x|r|cffffffff")}|r`;
 
 function createNameBox(root: Frame, participantId: number): Frame {
   const box = createFrameByType("EDITBOX", `MeleeSettingsNameBox${formatInt(participantId)}`, root, "EscMenuEditBoxTemplate", participantId);
@@ -402,7 +402,7 @@ export class SettingsPanel {
     setMenuText(this.stickJumpButton, `Stick Jump: ${settings.stickJump ? `${MENU_STYLE.gold}On|r` : "Off"}`);
     setMenuText(this.cStickTiltButton, `C-Stick Tilt Attack: ${settings.cStickTilt ? `${MENU_STYLE.gold}On|r` : "Off"}`);
     setMenuText(this.forgeButton, forgeSettingText(forgeShown(), MENU_STYLE.gold));
-    setFrameText(this.hint, settings.capture === undefined ? HINT : `${MENU_STYLE.gold}${CAPTURE_HINT}|r`);
+    setFrameText(this.hint, settings.capture === undefined ? HINT : `${MENU_STYLE.gold}${CONTROLS_CAPTURE_HINT}|r`);
     const first = unboundActions(settings.bindings)[0];
     setFrameVisible(this.bindButton.art, first !== undefined);
     setFrameVisible(this.help, first === undefined);

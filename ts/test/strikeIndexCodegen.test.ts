@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { renderStrikeIndex } from "../codegen/strikeIndex";
-import { GENERATED_CODE, resolveConflicts } from "../scripts/autolandCore";
+import { generatedCode, resolveConflicts } from "../scripts/autolandCore";
 import { rebaseLane } from "../scripts/autolandRebase";
 
 for (const role of ["AUTHOR", "COMMITTER"]) {
@@ -56,7 +56,7 @@ test("adding a fighter directory with a strikeMoments.ts changes the generated s
 });
 
 test("two lanes that add different fighters conflict on the strike index alone and land through Autoland's rebase regenerated, equal to a fresh generation [k5 boundary git-strike-index-lanes]", async () => {
-  expect(GENERATED_CODE.test(INDEX)).toBe(true);
+  expect(generatedCode(INDEX)).toBe(true);
   expect(resolveConflicts([{ path: INDEX }])).toMatchObject({ resolve: true, code: [INDEX] });
   const repo = mkdtempSync(join(tmpdir(), "makgora-strike-index-lanes-"));
   const lane = (branch: string, folder: string, key: string) => {

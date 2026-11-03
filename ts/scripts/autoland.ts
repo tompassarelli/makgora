@@ -1,7 +1,7 @@
 import { appendFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { parseArgs } from "node:util";
-import { ATTESTED, JOB_BUDGET, attestation, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, jobReads, jobsMatter, laneSince, listedRuns, openRuns, sinceMisses, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, handbackDue, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree, type Resolution } from "./autolandCore";
+import { ATTESTED, GENERATED_DOCS, JOB_BUDGET, attestation, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, jobReads, jobsMatter, laneSince, listedRuns, openRuns, sinceMisses, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, handbackDue, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree, type Resolution } from "./autolandCore";
 import { rebaseLane, run, type Stages } from "./autolandRebase";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
@@ -77,7 +77,7 @@ function regenerateCode(paths: readonly string[]): string | undefined {
     const result = run("ts", command, ...args);
     if (!result.ok) return `${[command, ...args].join(" ")} failed after the rebase: ${(result.out + result.err).trim().split("\n").slice(-3).join(" ")}`;
   }
-  run(".", "git", "add", "-A", "--", "ts/src/generated");
+  run(".", "git", "add", "-A", "--", "ts/src/generated", ...GENERATED_DOCS);
   if (run(".", "git", "diff", "--cached", "--quiet").ok) return undefined;
   const commit = run(".", "git", "commit", "-q", "-m", `Regenerate ${paths.join(" ")} after the rebase`);
   return commit.ok ? undefined : `committing the regenerated files failed: ${commit.err.trim()}`;

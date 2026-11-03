@@ -206,7 +206,8 @@ export const looping = (descriptions: readonly string[]): boolean =>
 export type Tree = ReadonlyMap<string, string>;
 export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md", "ts/test/lua/cost-baseline.tsv", "docs/design/melee-parity.md"];
 export const CACHE_RECORDS: readonly string[] = ["ts/scripts/wisp/cue-models.tsv"];
-export const GENERATED_CODE = /^ts\/src\/generated\/(?:state\/|fighter-art\/|strikes\/|fighterArtData\.ts$)/;
+export const GENERATED_DOCS: readonly string[] = ["docs/move-list.md", "docs/player-guide.md", "docs/player-guide.bbcode.txt"];
+export const generatedCode = (path: string): boolean => /^ts\/src\/generated\/(?:state\/|fighter-art\/|strikes\/|fighterArtData\.ts$)/.test(path) || GENERATED_DOCS.includes(path);
 const generated = (path: string): boolean => GENERATED_REPORTS.includes(path) || CACHE_RECORDS.includes(path);
 const NEVER_DISJOINT = /^(?:\.github\/workflows\/|ts\/scripts\/autoland)/;
 const changed = (from: Tree, to: Tree): string[] => [...new Set([...from.keys(), ...to.keys()])].filter((path) => from.get(path) !== to.get(path));
@@ -266,7 +267,7 @@ export function mergeFamily({ base, ours, theirs }: FamilySides): { readonly tre
 export function resolveConflicts(conflicts: readonly Conflict[]): Resolution {
   const recorded = conflicts.filter(({ path }) => CACHE_RECORDS.includes(path)).map(({ path }) => path);
   if (recorded.length > 0) return { resolve: false, why: `${recorded.join(" ")} is recorded from the Warcraft III install that Autoland's runners don't hold, so Autoland keeps neither side; rebase the lane onto main, run bun scripts/cueModels.ts --record from ts/ on the landing machine, and push again` };
-  const source = conflicts.filter(({ path }) => pinFamily(path) === undefined && !GENERATED_REPORTS.includes(path) && !GENERATED_CODE.test(path)).map(({ path }) => path);
+  const source = conflicts.filter(({ path }) => pinFamily(path) === undefined && !GENERATED_REPORTS.includes(path) && !generatedCode(path)).map(({ path }) => path);
   if (source.length > 0) return { resolve: false, why: `${source.join(" ")} ${source.length === 1 ? "is" : "are"} not generated; Autoland never resolves source` };
   const pins: { path: string; tree: Tree; hash: string }[] = [];
   for (const { path, sides } of conflicts.filter(({ path }) => pinFamily(path) !== undefined)) {
@@ -275,7 +276,7 @@ export function resolveConflicts(conflicts: readonly Conflict[]): Resolution {
     if ("both" in merged) return { resolve: false, why: `${path} changed ${merged.both.length} file(s) on both sides: ${merged.both.slice(0, 5).join(" ")}` };
     pins.push({ path, tree: merged.tree, hash: familyHash(merged.tree) });
   }
-  return { resolve: true, pins, reports: conflicts.filter(({ path }) => GENERATED_REPORTS.includes(path)).map(({ path }) => path), code: conflicts.filter(({ path }) => GENERATED_CODE.test(path)).map(({ path }) => path) };
+  return { resolve: true, pins, reports: conflicts.filter(({ path }) => GENERATED_REPORTS.includes(path)).map(({ path }) => path), code: conflicts.filter(({ path }) => generatedCode(path)).map(({ path }) => path) };
 }
 
 const FLAGGED = /<!-- autoland-conflict-lane (\S+) ([0-9a-f]{40}) -->/g;

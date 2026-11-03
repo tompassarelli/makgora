@@ -1,7 +1,7 @@
 # Mak'gora 0.3
 *A platform fighter inside Warcraft III*
 
-**Pick one of 31 Warcraft heroes, fight across floating stages and knock your rivals off the screen.** Free, for 1 to 4 players. Put **Mak'gora 0.3.w3x** in your Warcraft III Maps folder, set Graphics to Classic and open it from Custom Game.
+**Pick a Warcraft hero, fight across floating stages and knock your rivals off the screen.** Free, for 1 to 4 players. Installing, controls, controllers, rules and modes are in the player guide below (also on [GitHub](https://github.com/tompassarelli/makgora/blob/main/docs/player-guide.md)).
 ## New in 0.3
 - **Onyxia joins** as Lady Katrana Prestor, who can reveal the black dragon.
 - **Costumes:** up to eight per fighter, picked on character select.
@@ -9,7 +9,6 @@
 - **New-player mode** shows your own keys on screen, and the Tutorial now teaches specials, EX specials and the ultimate.
 - **Menus:** a gauntlet cursor, a Melee-style pause screen and chat on the select screens.
 - **Reworks** for Thrall, Mal'Ganis, Ragnaros, Stitches and Rexxar, darker stage backdrops so the fighters read first, and Blackrock's barrel is now a recovery launcher.
-**Controllers:** play with a pad through [padbridge](https://github.com/tompassarelli/padbridge/releases/latest), which turns the pad into keys while Warcraft III is in front.
 **Ranked ladder coming:** a ladder with ratings is next on the roadmap; follow the project page for news.
 Join the [Discord](https://discord.gg/JQGZs2UJR) if you'd like to play games sometime and/or contribute. [Project page](PROJECT_URL) · [Patreon](PATREON_URL) · [Release notes and source](https://github.com/tompassarelli/makgora) · [Report a bug](https://github.com/tompassarelli/makgora/issues)
 ## Credits

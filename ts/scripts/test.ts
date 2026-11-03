@@ -16,12 +16,10 @@ import { BUN_TEST_CEILING_FRAMES, addCost, cpuReport, readBaseline, type Costs }
 import { refuseUntagged } from "./oracleTags";
 import { refuseLiteralCopies } from "./literalCopies";
 import { platformLayer } from "wisp/scripts/platform/layer";
-import { ensureGenerated } from "./generated";
 import { usableCpus } from "./usableCpus";
 
 const project = resolve(import.meta.dir, "..");
 process.chdir(project);
-ensureGenerated();
 const AFTER_LANDING_ONLY = ["test/standaloneParityCheck.test.ts"];
 const files = [...new Bun.Glob("**/*{.test,_test,.spec,_spec}.{js,jsx,ts,tsx}").scanSync(project)]
   .filter((file) => !file.startsWith("build/") && !file.split("/").some((part) => part === "node_modules" || part === ".git"))

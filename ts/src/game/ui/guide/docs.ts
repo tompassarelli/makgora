@@ -4,7 +4,7 @@ import { LESSONS } from "../../match/tutorial";
 import { SELECTABLE_CHARACTERS } from "../../roster/kits";
 import { isFeatured } from "../../roster/forge";
 import type { Character } from "../../sim/codes";
-import { CONTROLS_PANEL_KEY, HELP_KEY, MATCH_RULE_HELP, WARCRAFT_MENU_KEY } from "./text";
+import { CONTROLS_CAPTURE_HINT, CONTROLS_PANEL_KEY, CONTROLS_REBIND_HINT, HELP_KEY, MATCH_RULE_HELP, WARCRAFT_MENU_KEY } from "./text";
 
 export interface GuideSection { readonly title: string; readonly paragraphs: readonly string[] }
 
@@ -47,7 +47,7 @@ export const GUIDE_SECTIONS: readonly GuideSection[] = [
   ] },
   { title: "The Controls screen", paragraphs: [
     "Every game opens on the Controls screen, one for each player, before fighter select. The top row holds WASD (recommended if you're new), Box (the leverless controller style) and, once you customize a layout, your selected Custom slot; picking one saves it as your profile. Rebinding a key on WASD or Box copies that layout into a new Custom profile (WASD - custom1, Box - custom1, and so on), selects it and saves it.",
-    "Click a lit key, press the key you want instead, then Save. If another action already held that key, the two swap. Press Delete instead of a key to clear it. Escape cancels a rebind. Rename names the Custom slot; Reset brings back the Custom defaults. The bottom row holds Show controls in game, Stick Jump (off by default: when on, pressing Up jumps) and C-Stick Tilt Attack (on by default: when off, the C-stick gives uncharged smashes on the ground and aerials in the air), with Save and Done on the right.",
+    `${CONTROLS_REBIND_HINT} ${CONTROLS_CAPTURE_HINT} If another action already held that key, the two swap; Save keeps the layout. Rename names the Custom slot; Reset brings back the Custom defaults. The bottom row holds Show controls in game, Stick Jump (off by default: when on, pressing Up jumps) and C-Stick Tilt Attack (on by default: when off, the C-stick gives uncharged smashes on the ground and aerials in the air), with Save and Done on the right.`,
     `Done (or Escape) closes the screen; each player confirms their own. ${CONTROLS_PANEL_KEY} opens it again before a match. Type -save in chat to save your controls and delay, or -load to bring them back. Backspace and Escape are reserved for pause; F1, ${CONTROLS_PANEL_KEY}, F5, F6 and F7 are reserved too, and the screen names why if you try one.`,
     `In a match, a CONTROLS panel between the player panels lists every action with its key and lights a row while you hold it. Press ${CONTROLS_PANEL_KEY} in a match to hide or show it; the choice is saved with your controls.`,
   ] },
