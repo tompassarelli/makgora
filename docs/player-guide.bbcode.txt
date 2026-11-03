@@ -6,7 +6,7 @@ Requires Warcraft III 3.0 and a keyboard; nothing else to install. Download the 
 
 A controller is optional: the Mak'gora controller helper turns its buttons and sticks into its own pad keys, which work with any Controls layout. The default Melee pad layout uses A to attack, B for specials, X/Y to jump, RB to grab and LB for Strong; Tom's pad layout uses A to attack, X for specials, Y to jump, B to grab, LB to short hop and RB for Strong. In both, either trigger shields or air-dodges and Start pauses.
 
-The game has character and stage selection, 32 fighters, computer opponents, floating platforms, blast zones, stocks, rematches and configurable controls. Every fighter's specials and ultimate are listed by name in the [URL=https://github.com/tompassarelli/makgora/blob/main/docs/move-list.md]move list[/URL].
+The game has character and stage selection, 16 fighters, computer opponents, floating platforms, blast zones, stocks, rematches and configurable controls. Every fighter's specials and ultimate are listed by name in the [URL=https://github.com/tompassarelli/makgora/blob/main/docs/move-list.md]move list[/URL]. More fighters are in the Forge, still in development: turn on Show the Forge on the Controls screen to see them.
 
 [B]Keyboard controls[/B]
 [TABLE]

@@ -29,6 +29,7 @@ import type { Scenario } from "../../game/session/build";
 import type { Character } from "../../game/sim/codes";
 import { type PlaytestRequest, preparePlaytest } from "../../game/session/playtest";
 import { nextStage } from "../../game/menu/stageCatalog";
+import { isFeaturedStage } from "../../game/roster/forge";
 import { nextMatchCharacter } from "../../game/lobby/lobbyState";
 import { stepCpuOpponent, stepCpuTier } from "../../game/match/cpuProfiles";
 import { traceSelectionState } from "./diagnostics";
@@ -56,7 +57,7 @@ export function choose(s: ShellState, slot: ParticipantSlot, direction: -1 | 1):
     cancelPendingPlaytest();
     selectCharacter(s.game, slot, nextMatchCharacter(s.game, characterFor(s.game, slot), direction));
     makePreview(s);
-  } else if (s.game.phase === Phase.stageMenu) selectStage(s.game, slot, nextStage(s.game.stageChoice, direction));
+  } else if (s.game.phase === Phase.stageMenu) selectStage(s.game, slot, nextStage(s.game.stageChoice, direction, isFeaturedStage));
   else if (resultChoicesShown(s)) stepResultFocus(s, slot, direction);
 }
 

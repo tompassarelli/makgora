@@ -20,7 +20,9 @@ import { STAGE_START_BUTTON, stageStartContains } from "./selectionLayout";
 import { BAR_BAND_TEXTURE, BAR_KEYS, BAR_LINE_TEXTURE, STAGE_BAR, barTexture } from "../core/selectBarLayout";
 import { BAR_LINE, BAR_STRIP, type ScreenBox, STAGE_LIST_BOX, STAGE_PREVIEW_BOX } from "../core/selectScreenLayout";
 import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, labelControl, litControl } from "./barFrames";
-import { art } from "./selectionFrames";
+import { FORGE_MARK, art } from "./selectionFrames";
+import { forgeShown } from "./forgeSetting";
+import { isFeaturedStage, stageShown, stageStatus } from "../roster/forge";
 import { destroyEvents, Events } from "wisp/game/events";
 import { createFrame, createFrameByType, destroyFrame, Frame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { MouseButton, mouseDown, pointerX as inputPointerX, pointerY as inputPointerY, setPointer } from "wisp/game/input";
@@ -93,6 +95,8 @@ export class StagePanel {
   private readonly bar: Readonly<Record<StageBarItem, BarControl>>;
   private readonly clicks: ButtonClicks<StageButton>;
   private readonly tileNames: Frame[] = [];
+  private readonly tileCards: (readonly [number, StageCard, Frame])[] = [];
+  private shownForge: boolean | undefined;
   private readonly sync: Events;
   private readonly poolRoot: Frame;
   private readonly poolMode: Frame;
@@ -132,7 +136,9 @@ export class StagePanel {
       placeTopLeft(button, stageTileLeft(choice), stageTileTop(choice));
       setFrameSize(button, STAGE_TILE.width, STAGE_TILE.height);
       this.clicks.add(button, { kind: "stage", choice });
-      new StageCard(root, `MeleeStageTile${formatInt(choice)}`, stageTileLeft(choice), stageTileTop(choice), STAGE_TILE.width, STAGE_TILE.height, true).show(choice);
+      const card = new StageCard(root, `MeleeStageTile${formatInt(choice)}`, stageTileLeft(choice), stageTileTop(choice), STAGE_TILE.width, STAGE_TILE.height, true);
+      card.show(choice);
+      this.tileCards.push([choice, card, button]);
       this.tileNames[choice] = namedFrame(`MeleeStageTile${formatInt(choice)}Name`, 0);
       setMenuText(this.tileNames[choice], stage.name);
     }
@@ -241,6 +247,23 @@ export class StagePanel {
   }
 
 
+  private showForge(forge: boolean): void {
+    if (this.shownForge === forge) return;
+    this.shownForge = forge;
+    for (const [choice, card, button] of this.tileCards) {
+      const shown = stageShown(choice, forge);
+      card.setVisible(shown, choice);
+      setFrameVisible(button, shown);
+      const name = this.tileNames[choice];
+      if (name !== undefined) setMenuText(name, stageStatus(choice) === "forge" ? `${stageInfo(choice).name} ${FORGE_MARK}` : stageInfo(choice).name);
+    }
+    for (let index = 0; index < STAGE_CATALOG.length; index++) {
+      const stage = STAGE_CATALOG[index];
+      const frame = this.poolStages[index];
+      if (stage !== undefined && frame !== undefined) setFrameVisible(frame, isFeaturedStage(stage.id));
+    }
+  }
+
   private showToggle(control: BarControl, text: string, on: boolean): void {
     labelControl(control, `${on ? BAR_COLOURS.gold : BAR_COLOURS.cream}${text}|r`);
     litControl(control, on);
@@ -294,6 +317,7 @@ export class StagePanel {
     }
     fitToWindow(this.backdrop);
     fitBandToWindow(this.band, BAR_STRIP);
+    this.showForge(forgeShown());
     let x = f32(stageTileLeft(game.stageChoice) + f32(STAGE_TILE.width / 2));
     let y = f32(stageTileTop(game.stageChoice) - f32(STAGE_TILE.height / 2));
     const width = toReal(screenWidth());
@@ -302,7 +326,7 @@ export class StagePanel {
       const pointerAtX = pointerX(toReal(inputPointerX()), width, height);
       const pointerAtY = pointerY(toReal(inputPointerY()), height);
       const dropped = updateStageDrag(this.drag, mouseDown(MouseButton.left), pointerAtX, pointerAtY, game.stageChoice);
-      if (dropped !== undefined) sendSync("stage-drop", formatInt(dropped));
+      if (dropped !== undefined && stageShown(dropped, forgeShown())) sendSync("stage-drop", formatInt(dropped));
       if (this.drag.gesture?.kind === "carry") {
         x = pointerAtX;
         y = pointerAtY;

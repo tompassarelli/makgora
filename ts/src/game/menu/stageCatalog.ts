@@ -60,7 +60,8 @@ export function selectableStageChoice(choice: number): choice is StageChoice {
   return choice === RANDOM_STAGE || selectableStage(choice);
 }
 
-export function nextStage(choice: number, direction: -1 | 1): StageChoice {
-  const index = STAGE_CHOICES.findIndex(stage => stage.id === choice);
-  return at(STAGE_CHOICES, floorMod(index + direction, STAGE_CHOICES.length)).id;
+export function nextStage(choice: number, direction: -1 | 1, shown: (stage: number) => boolean = () => true): StageChoice {
+  const choices = STAGE_CHOICES.filter(stage => stage.id === choice || stage.id === RANDOM_STAGE || shown(stage.id));
+  const index = choices.findIndex(stage => stage.id === choice);
+  return at(choices, floorMod(index + direction, choices.length)).id;
 }

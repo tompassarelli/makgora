@@ -31,6 +31,7 @@ import { ButtonClicks, createBackdrop, createText, frameMenuPanel, gameUi, place
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
 import { PREVIEW_ROW_LIT_TEXTURE } from "./inputPreview";
+import { forgeSettingText, forgeShown, toggleForgeShown } from "./forgeSetting";
 import { createEvents, destroyEvents, Events, onEvents } from "wisp/game/events";
 import { addFrameEvent, createFrame, createFrameByType, destroyFrame, eventFrameEvent, eventFrameText, Frame, FrameEvent, FramePoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTextLimit, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { eventPlayer, localPlayer, Player, player as playerOf } from "wisp/game/players";
@@ -40,7 +41,7 @@ export interface SettingsActions {
   closeSettings(participantId: number): void;
 }
 
-type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "custom" } | { kind: "slot"; slot: number } | { kind: "dismiss" } | { kind: "name" } | { kind: "delete" } | { kind: "save" } | { kind: "close" } | { kind: "key"; key: number } | { kind: "clear"; key: number } | { kind: "reset" } | { kind: "bindUnbound" } | { kind: "keyboard" } | { kind: "stickJump" } | { kind: "cStickTilt" };
+type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "custom" } | { kind: "slot"; slot: number } | { kind: "dismiss" } | { kind: "name" } | { kind: "delete" } | { kind: "save" } | { kind: "close" } | { kind: "key"; key: number } | { kind: "clear"; key: number } | { kind: "reset" } | { kind: "bindUnbound" } | { kind: "keyboard" } | { kind: "stickJump" } | { kind: "cStickTilt" } | { kind: "forge" };
 
 interface KeyButton {
   readonly key: number;
@@ -79,6 +80,7 @@ const SAVE_BUTTON = { x: f32(f32(PICKER_DONE.x - BOTTOM_WIDTH) - f32(0.004)), y:
 export const KEYBOARD_BUTTON = { x: LEFT, y: BOTTOM_Y, width: f32(0.22), height: BOTTOM_HEIGHT } as const;
 export const STICK_JUMP_BUTTON = { x: LEFT, y: OPTIONS_Y, width: f32(0.18), height: BOTTOM_HEIGHT } as const;
 export const C_STICK_TILT_BUTTON = { x: f32(LEFT + f32(0.184)), y: OPTIONS_Y, width: f32(0.22), height: BOTTOM_HEIGHT } as const;
+export const FORGE_BUTTON = { x: f32(LEFT + f32(0.408)), y: OPTIONS_Y, width: f32(0.2), height: BOTTOM_HEIGHT } as const;
 const BIND_BUTTON = { x: f32(RIGHT - f32(0.15)), y: below(f32(0.107)), width: f32(0.15), height: f32(0.022) } as const;
 const DIM_KEY = 105;
 const LIT_KEY = 255;
@@ -154,6 +156,7 @@ export class SettingsPanel {
   private readonly keyboardButton: Frame;
   private readonly stickJumpButton: Frame;
   private readonly cStickTiltButton: Frame;
+  private readonly forgeButton: Frame;
   private readonly bindButton: PanelButton;
   private open = false;
   private rootShown = false;
@@ -233,6 +236,7 @@ export class SettingsPanel {
     this.keyboardButton = button("MeleeSettingsKeyboard", KEYBOARD_BUTTON, "", { kind: "keyboard" }).label;
     this.stickJumpButton = button("MeleeSettingsStickJump", STICK_JUMP_BUTTON, "", { kind: "stickJump" }).label;
     this.cStickTiltButton = button("MeleeSettingsCStickTilt", C_STICK_TILT_BUTTON, "", { kind: "cStickTilt" }).label;
+    this.forgeButton = button("MeleeSettingsForge", FORGE_BUTTON, "", { kind: "forge" }).label;
     button("MeleeSettingsSave", SAVE_BUTTON, "Save", { kind: "save" });
     button("MeleeSettingsClose", PICKER_DONE, "Done", { kind: "close" });
     this.bindButton = button("MeleeSettingsBind", BIND_BUTTON, "", { kind: "bindUnbound" });
@@ -322,7 +326,15 @@ export class SettingsPanel {
     else if (button.kind === "keyboard") toggleKeyboardPreview(settings);
     else if (button.kind === "stickJump") toggleStickJump(settings);
     else if (button.kind === "cStickTilt") toggleCStickTilt(settings);
+    else if (button.kind === "forge") this.toggleForge();
     else beginKeyCapture(settings, button.key);
+  }
+
+  private toggleForge(): void {
+    if (!this.local) return;
+    toggleForgeShown();
+    this.lastSignature = "";
+    this.update();
   }
 
   isOpen(): boolean {
@@ -376,7 +388,7 @@ export class SettingsPanel {
     if (!this.local || !this.open) return;
     const { settings } = this;
     const { capture } = settings;
-    const signature = `${settings.keyboard ? "k" : "-"}${settings.stickJump ? "j" : "-"}${settings.cStickTilt ? "t" : "-"}${settings.layout}${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.dirty ? "d" : "-"}${settings.picking ? "s" : "-"}${settings.naming ? "n" : "-"}${formatInt(settings.slot)}${settings.customs.map(custom => custom.name).join("|")}${capture === undefined ? "-" : formatInt(capture.action * 2 + capture.slot)}`;
+    const signature = `${forgeShown() ? "f" : "-"}${settings.keyboard ? "k" : "-"}${settings.stickJump ? "j" : "-"}${settings.cStickTilt ? "t" : "-"}${settings.layout}${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.dirty ? "d" : "-"}${settings.picking ? "s" : "-"}${settings.naming ? "n" : "-"}${formatInt(settings.slot)}${settings.customs.map(custom => custom.name).join("|")}${capture === undefined ? "-" : formatInt(capture.action * 2 + capture.slot)}`;
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
     this.showRoot(true);
@@ -389,6 +401,7 @@ export class SettingsPanel {
     setMenuText(this.keyboardButton, `Show controls in game: ${settings.keyboard ? `${MENU_STYLE.gold}On|r` : "Off"}`);
     setMenuText(this.stickJumpButton, `Stick Jump: ${settings.stickJump ? `${MENU_STYLE.gold}On|r` : "Off"}`);
     setMenuText(this.cStickTiltButton, `C-Stick Tilt Attack: ${settings.cStickTilt ? `${MENU_STYLE.gold}On|r` : "Off"}`);
+    setMenuText(this.forgeButton, forgeSettingText(forgeShown(), MENU_STYLE.gold));
     setFrameText(this.hint, settings.capture === undefined ? HINT : `${MENU_STYLE.gold}${CAPTURE_HINT}|r`);
     const first = unboundActions(settings.bindings)[0];
     setFrameVisible(this.bindButton.art, first !== undefined);

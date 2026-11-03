@@ -1,6 +1,8 @@
 import { STAGE_CATALOG, randomStage, selectableStage } from "./stageCatalog";
+import { isFeaturedStage } from "../roster/forge";
 
 const ALL_STAGE_MASK = STAGE_CATALOG.reduce((mask, stage) => mask | (1 << stage.id), 0);
+const featuredStageMask = (): number => STAGE_CATALOG.reduce((mask, stage) => isFeaturedStage(stage.id) ? mask | (1 << stage.id) : mask, 0);
 
 export interface StagePool {
   only: boolean;
@@ -9,7 +11,7 @@ export interface StagePool {
 }
 
 export const createStagePool = (): StagePool => ({ only: false, selectedMask: 0, remainingMask: 0 });
-export const activeStageMask = (pool: Readonly<StagePool>): number => pool.only ? pool.selectedMask : ALL_STAGE_MASK ^ pool.selectedMask;
+export const activeStageMask = (pool: Readonly<StagePool>): number => (pool.only ? pool.selectedMask : ALL_STAGE_MASK ^ pool.selectedMask) & featuredStageMask();
 export const stageInPool = (pool: Readonly<StagePool>, choice: number): boolean => (activeStageMask(pool) & (1 << choice)) !== 0;
 export const stagePoolCount = (pool: Readonly<StagePool>): number => STAGE_CATALOG.filter(stage => stageInPool(pool, stage.id)).length;
 
@@ -25,9 +27,9 @@ export function togglePoolMode(pool: StagePool): void {
 }
 
 export function togglePoolStage(pool: StagePool, choice: number): boolean {
-  if (!selectableStage(choice)) return false;
+  if (!selectableStage(choice) || !isFeaturedStage(choice)) return false;
   const selected = pool.selectedMask ^ (1 << choice);
-  if ((pool.only ? selected : ALL_STAGE_MASK ^ selected) === 0) return false;
+  if (((pool.only ? selected : ALL_STAGE_MASK ^ selected) & featuredStageMask()) === 0) return false;
   pool.selectedMask = selected;
   pool.remainingMask = 0;
   return true;

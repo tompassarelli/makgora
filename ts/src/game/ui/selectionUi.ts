@@ -56,12 +56,14 @@ import { MOVES_HEADER, movesPage } from "../session/messages";
 import { Character } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, tilePortrait } from "./portraitFrames";
 import { CreditsMenu } from "./creditsMenu";
+import { forgeShown } from "./forgeSetting";
+import { fighterShown, fighterStatus } from "../roster/forge";
 import { MainMenuButton } from "./mainMenuButton";
 import { anyOpen, overAny } from "./menuHover";
 import { CommunityMenu } from "./communityMenu";
 import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffer, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offerTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
-import { ROSTER_TILES, TILE_NAME_INSET, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, label, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
+import { ROSTER_TILES, TILE_NAME_INSET, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, forgeMark, label, tileMarked, tileShown, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, acceptsClick, cardPalette, cardRowShown, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, applyRuleButton } from "./selectionRules";
 import { FIXED_DELAY, type LobbyNet, type SelectText, type SelectionActions } from "./selectionActions";
@@ -97,6 +99,7 @@ export interface MenuControlHit {
 export class SelectionPanel {
   private readonly tiles: Frame[][] = [];
   private readonly tilePortraits: Frame[] = [];
+  private readonly forgeMarks: (Frame | undefined)[] = [];
   private shownTilePalette: number | undefined;
   private readonly tileButtons: Frame[] = [];
   private readonly root: Frame;
@@ -190,6 +193,7 @@ export class SelectionPanel {
       setMenuText(tileName, text);
       this.tiles.push([tileFrame, tilePortraitFrame, tileName]);
       this.tilePortraits.push(tilePortraitFrame);
+      this.forgeMarks.push(fighterStatus(characterOfTile(choice)) === "forge" ? forgeMark(root, `MeleeTileForge${name}`, x, y, grid) : undefined);
       const button = createFrameByType("BUTTON", `MeleeTileButton${name}`, root, "", 0);
       placeTopLeft(button, x, y);
       setFrameSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
@@ -513,8 +517,8 @@ export class SelectionPanel {
     }
     if (action === Action.moveLeft || action === Action.moveRight) {
       const direction = action === Action.moveLeft ? -1 : 1;
-      if (target.slot === this.participantId) this.actions.selectChoice(this.participantId, nextMatchCharacter(game, characterFor(game, target.slot), direction));
-      else this.actions.selectCpuChoice(this.participantId, target.slot, nextCpuCharacter(game, target.slot, direction));
+      if (target.slot === this.participantId) this.actions.selectChoice(this.participantId, nextMatchCharacter(game, characterFor(game, target.slot), direction, forgeShown()));
+      else this.actions.selectCpuChoice(this.participantId, target.slot, nextCpuCharacter(game, target.slot, direction, forgeShown()));
       return true;
     }
     if (action === Action.attack && this.menuFocus !== undefined) {
@@ -604,7 +608,7 @@ export class SelectionPanel {
 
   private sendPlacement({ slot, tile }: Placement): void {
     const game = this.choosing();
-    if (game === undefined) return;
+    if (game === undefined || !fighterShown(characterOfTile(tile), forgeShown())) return;
     if (slot === this.participantId && humanFighterActive(game, slot)) sendSync("fighter-drop", formatInt(tile));
     else if (canChooseComputer(game, this.participantId, slot)) sendSync("cpu-fighter-drop", `${formatInt(slot)}${formatInt(tile)}`);
   }
@@ -738,8 +742,11 @@ export class SelectionPanel {
       this.shownTilePalette = palette;
       this.tilePortraits.forEach((frame, tile) => setFrameTexture(frame, portraitTexture(characterOfTile(tile), true, palette), 0, true));
     }
+    const forge = forgeShown();
     for (let tile = 0; tile < this.tiles.length; tile++) {
-      const selectable = tileOffered(game, tile);
+      const selectable = tileShown(game, tile, forge);
+      const mark = this.forgeMarks[tile];
+      if (mark !== undefined) setFrameVisible(mark, tileMarked(game, tile, forge));
       for (const frame of this.tiles[tile] ?? []) setFrameVisible(frame, selectable);
       const button = this.tileButtons[tile];
       if (button !== undefined) setFrameVisible(button, selectable);

@@ -1190,6 +1190,24 @@ four specials on the ground and in the air.
 
 ## Fighters
 
+### The Forge
+
+Owner decision, 4 November 2026: the menus feature only the fighters and
+stages Tom has endorsed as finished and fun; everything else is in the Forge,
+in development, like Deadlock's experimental heroes. Tom chose the 16 featured
+fighters the same day. The Forge list is makgora:ts/src/game/roster/forge.ts:
+`FORGE_FIGHTERS` holds fighter slugs and `FORGE_STAGES` stage ids, so moving a
+fighter or stage in or out of the Forge is adding or deleting one line there;
+`isFeatured`, `fighterStatus` and `stageStatus` answer for other code.
+
+With the local setting Show the Forge off (Controls settings, saved in this
+client's own file and never sent), character and stage select hide Forge
+entries; with it on they appear with an orange FORGE mark. CPU Random, the
+stage pool and Classic rivals use featured entries only, whatever the setting,
+so every client draws the same; a Classic fight whose planned rivals are all
+in the Forge takes a featured stand-in. An opponent's Forge pick is still
+accepted and fought online, because the setting filters only local menus.
+
 ### Expansion roster defaults
 
 Owner decision, 6 October 2026: adopt the 2 October expansion brief as

@@ -3,9 +3,12 @@
 
 
 import { at } from "wisp/src/runtime/lookup";
+import { floorMod } from "wisp/src/sim/intMath";
 import { CPU_TIERS, type CpuOpponentId } from "../match/cpuProfiles";
 import { type MatchState, Phase, characterReady, endConfiguredRun, firstHumanSlot } from "../lobby/lobbyState";
-import { fighterName } from "../roster/kits";
+import { PLAYABLE_CHARACTERS, fighterName } from "../roster/kits";
+import { isFeatured, shownFighters } from "../roster/forge";
+import type { Character } from "../sim/codes";
 import { bossDefinition, bossHealth } from "./bosses";
 import { applyConfiguredMatch, beginConfiguredRun } from "./configuredMatch";
 import { classicRoute, type ClassicRoute } from "./routes";
@@ -38,14 +41,28 @@ function classicEntry(route: Readonly<ClassicRoute>, fight: number, tier: number
     };
   }
   const plan = at(route.fights, fight);
-  const opponents: ConfiguredOpponent[] = plan.rivals.map((character, index) => ({
+  const rivals = classicRivals(route, fight);
+  const opponents: ConfiguredOpponent[] = rivals.map((character, index) => ({
     character, opponent: index === 0 ? at(IDENTITIES, fight) : "wren", tier: at(CPU_TIERS, level), stocks: at(RIVAL_STOCKS, fight),
   }));
   return {
     id, opponents, stage: plan.stage, stocks: at(PLAYER_STOCKS, fight), timeMinutes: at(FIGHT_MINUTES, fight), playerDamage: 0,
     hazards: true, win: WinCondition.ko, boss: BossKind.none, bossHealth: 0, last: false,
-    speaker: fighterName(at(plan.rivals, 0)), intro: plan.line,
+    speaker: fighterName(at(rivals, 0)), intro: at(rivals, 0) === at(plan.rivals, 0) ? plan.line : CLASSIC_STAND_IN_LINE,
   };
+}
+
+
+export const CLASSIC_STAND_IN_LINE = "Your road runs through me. Show me what you have.";
+
+export function classicRivals(route: Readonly<ClassicRoute>, fight: number): readonly Character[] {
+  const planned = at(route.fights, fight).rivals;
+  const featured = planned.filter(character => isFeatured(character));
+  if (featured.length > 0) return featured;
+  const others = shownFighters(PLAYABLE_CHARACTERS).filter(character => character !== route.fighter);
+  const fresh = others.filter(character => !route.fights.some(other => other.rivals.includes(character)));
+  const pool = fresh.length > 0 ? fresh : others;
+  return [at(pool, floorMod(fight, pool.length))];
 }
 
 

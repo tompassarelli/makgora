@@ -10,6 +10,7 @@ import { matchStartNotice } from "../session/messages";
 import { resetMatchFrameInput } from "../match/frameInput";
 import { PLAYABLE_CHARACTERS, fighterName } from "../roster/kits";
 import { fighterAt } from "../sim/roster";
+import { shownFighters } from "../roster/forge";
 import { type PlayerFileQueue, lobbyCounter, receiveLobbyCounter } from "../../host/loop/playerFileQueue";
 import {
   Phase, RANDOM_FIGHTER, ResultPick, beginRematchCountdown, confirmRematch, cpuFighterRandom, cycleSlotMode, requestStageSelect, selectCharacter,
@@ -48,7 +49,7 @@ function lobbyWithRandomCpu(seed: number): TapeSession {
 
 function assertDrawn(session: TapeSession): void {
   const { match, world } = session.live;
-  const fighter = drawCpuFighter(PLAYABLE_CHARACTERS, match.matchSeed, CPU);
+  const fighter = drawCpuFighter(shownFighters(PLAYABLE_CHARACTERS), match.matchSeed, CPU);
   assertEquals(match.characterChoices[CPU], fighter, "fighter drawn from the match seed");
   assertEquals(fighterAt(world, CPU).character, fighter, "spawned fighter");
   assertEquals(match.cpuResolvedOpponents[CPU], resolveCpuOpponent("random", match.matchSeed, CPU), "opponent drawn from the match seed");

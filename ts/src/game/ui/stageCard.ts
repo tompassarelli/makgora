@@ -25,6 +25,7 @@ export class StageCard {
   private readonly panel: Frame;
   private readonly picture: Frame;
   private readonly name: Frame | undefined;
+  private readonly strip: Frame | undefined;
 
   constructor(parent: Frame, id: string, left: number, top: number, width: number, height: number, banner: boolean) {
     const box = stagePictureBox(left, top, width, height, banner);
@@ -45,6 +46,7 @@ export class StageCard {
       placeTopLeft(strip, left, f32(top - height * f32(0.78)));
       setFrameSize(strip, width, f32(height * f32(0.22)));
       setFrameEnabled(strip, false);
+      this.strip = strip;
       const name = createText(`${id}Name`, parent, 0);
       placeTopLeft(name, f32(left + height * f32(0.06)), f32(top - height * f32(0.78)));
       setFrameSize(name, f32(width - height * f32(0.08)), f32(height * f32(0.22)));
@@ -53,6 +55,13 @@ export class StageCard {
       setFrameEnabled(name, false);
       this.name = name;
     }
+  }
+
+  setVisible(visible: boolean, choice: number): void {
+    setFrameVisible(this.picture, visible);
+    setFrameVisible(this.panel, visible && choice !== RANDOM_STAGE);
+    if (this.strip !== undefined) setFrameVisible(this.strip, visible);
+    if (this.name !== undefined) setFrameVisible(this.name, visible);
   }
 
   show(choice: number): void {

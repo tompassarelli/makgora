@@ -1,6 +1,7 @@
 import { CLASSIC_CHARACTERS, classicRoute } from "../classic/routes";
 import { type StagePool, createStagePool, copyStagePool, nextPoolStage, consumePoolStage, togglePoolMode, togglePoolStage } from "../menu/stagePool";
 import { PLAYABLE_CHARACTERS, isMatchCharacter, nextCharacterIn, DEFAULT_FIGHTER } from "../roster/kits";
+import { shownFighters } from "../roster/forge";
 import { type CostumeTint, costumeIndex, costumeOf, costumesFor } from "../roster/costumes";
 import { costumeSystem } from "../roster/costumeSwitch";
 import { RANDOM_STAGE, selectableStageChoice } from "../menu/stageCatalog";
@@ -99,7 +100,10 @@ export interface MatchState {
 }
 
 
-const defaultChoice = (index: number): Character => PLAYABLE_CHARACTERS[floorMod(index, PLAYABLE_CHARACTERS.length)] ?? DEFAULT_FIGHTER;
+const defaultChoice = (index: number): Character => {
+  const featured = shownFighters(PLAYABLE_CHARACTERS);
+  return featured[floorMod(index, featured.length)] ?? DEFAULT_FIGHTER;
+};
 
 export function createMatchState(): MatchState {
   return {
@@ -299,8 +303,8 @@ export function selectableMatchCharacter(game: Readonly<MatchState>, choice: num
   return isMatchCharacter(choice) && (!game.classic || classicRoute(choice) !== undefined);
 }
 
-export function nextMatchCharacter(game: Readonly<MatchState>, current: number | undefined, direction: number): Character {
-  return nextCharacterIn(game.classic ? CLASSIC_CHARACTERS.filter(character => PLAYABLE_CHARACTERS.includes(character)) : PLAYABLE_CHARACTERS, current, direction);
+export function nextMatchCharacter(game: Readonly<MatchState>, current: number | undefined, direction: number, forgeShown = false): Character {
+  return nextCharacterIn(shownFighters(game.classic ? CLASSIC_CHARACTERS.filter(character => PLAYABLE_CHARACTERS.includes(character)) : PLAYABLE_CHARACTERS, forgeShown), current, direction);
 }
 
 export function selectCharacter(game: MatchState, slot: number, choice: number): void {
@@ -332,17 +336,18 @@ export function selectCpuCharacter(game: MatchState, actor: number, slot: number
   game.characterReadiness[slot] = true;
 }
 
-export function nextCpuCharacter(game: Readonly<MatchState>, slot: number, direction: number): number {
-  if (!randomFighterOffered(game)) return nextMatchCharacter(game, characterFor(game, slot), direction);
-  const last = PLAYABLE_CHARACTERS.length - 1;
-  const index = cpuFighterRandom(game, slot) ? (direction > 0 ? -1 : last + 1) : PLAYABLE_CHARACTERS.indexOf(game.characterChoices[slot] ?? DEFAULT_FIGHTER);
+export function nextCpuCharacter(game: Readonly<MatchState>, slot: number, direction: number, forgeShown = false): number {
+  if (!randomFighterOffered(game)) return nextMatchCharacter(game, characterFor(game, slot), direction, forgeShown);
+  const choices = shownFighters(PLAYABLE_CHARACTERS, forgeShown);
+  const last = choices.length - 1;
+  const index = cpuFighterRandom(game, slot) ? (direction > 0 ? -1 : last + 1) : choices.indexOf(game.characterChoices[slot] ?? DEFAULT_FIGHTER);
   const next = index + (direction > 0 ? 1 : -1);
-  return next < 0 || next > last ? RANDOM_FIGHTER : PLAYABLE_CHARACTERS[next] ?? DEFAULT_FIGHTER;
+  return next < 0 || next > last ? RANDOM_FIGHTER : choices[next] ?? DEFAULT_FIGHTER;
 }
 
 function drawCpuFighters(game: MatchState): void {
   if (game.run.active) return;
-  for (const slot of PARTICIPANT_SLOTS) if (cpuFighterRandom(game, slot)) game.characterChoices[slot] = drawCpuFighter(PLAYABLE_CHARACTERS, game.matchSeed, slot);
+  for (const slot of PARTICIPANT_SLOTS) if (cpuFighterRandom(game, slot)) game.characterChoices[slot] = drawCpuFighter(shownFighters(PLAYABLE_CHARACTERS), game.matchSeed, slot);
 }
 
 export function practiceSelected(game: Readonly<MatchState>): boolean {

@@ -9,7 +9,8 @@ import { Character } from "../sim/codes";
 import { createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
 import { SELECT_GRID_ORDER } from "./selectionLayout";
 import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
-import { createFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameSize, setFrameTextAlignment, setFrameTexture, TextAlignment } from "wisp/game/frames";
+import { createFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
+import { fighterShown, fighterStatus } from "../roster/forge";
 import { formatInt, parseInt, textLength, toReal } from "wisp/game/text";
 
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
@@ -124,4 +125,18 @@ export const tileOffered = (game: Readonly<MatchState>, tile: RosterTile): boole
 export function tileLabel(tile: RosterTile): string {
   const fighter = GRID_FIGHTERS[tile];
   return fighter === undefined ? nameText(RANDOM_FIGHTER) : TILE_NAMES[fighter] ?? nameText(fighter);
+}
+
+export const FORGE_MARK = "|cffff8c1aFORGE|r";
+
+export const tileShown = (game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean): boolean => tileOffered(game, tile) && fighterShown(characterOfTile(tile), forgeShown);
+
+export const tileMarked = (game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean): boolean => tileShown(game, tile, forgeShown) && fighterStatus(characterOfTile(tile)) === "forge";
+
+export function forgeMark(parent: Frame, name: string, x: number, y: number, grid: Readonly<RosterGrid>): Frame {
+  const scale = f32(grid.scale);
+  const mark = label(parent, name, x + TILE_NAME_INSET * scale, y - f32(0.004) * scale, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.012) * scale, f32(0.0062));
+  setFrameText(mark, FORGE_MARK);
+  setFrameVisible(mark, false);
+  return mark;
 }
