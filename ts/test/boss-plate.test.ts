@@ -7,7 +7,9 @@ import { install, startBuild } from "../src/platform/main";
 import { activeRollback, shellState } from "../src/host/loop/state";
 import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
-import { BOSS_PLATE_CONTEXT } from "../src/game/ui/bossPlate";
+import { BOSS_NAME_SIZE, BOSS_PLATE_CONTEXT } from "../src/game/ui/bossPlate";
+import { NATIVE_TEXT_BASE } from "../src/game/ui/hudLayout";
+import { DAMAGE_HEAD, DAMAGE_TEXT_HEIGHT } from "../src/game/render/classicPresentation";
 
 const headless = testHeadless(MAKGORA_HEADLESS);
 
@@ -19,7 +21,7 @@ type Rectangle = readonly [number, number, number, number];
 const disjoint = ([left, top, right, bottom]: Rectangle, [otherLeft, otherTop, otherRight, otherBottom]: Rectangle): boolean =>
   right <= otherLeft + EDGE || otherRight <= left + EDGE || bottom >= otherTop - EDGE || otherBottom >= top - EDGE;
 
-test("Archimonde's boss plate shows his name, portrait and remaining health, counts down as he loses health with the bar shrinking to match, and stays clear of the player's plate [k1 scenario]", () => {
+test("Archimonde's boss plate shows his name, portrait and remaining health, counts down as he loses health with the bar shrinking to match, stays clear of the player's plate, draws his name at its set size by scale, and floats each hit's damage at chest height on the fighters' plane, shrinking out instead of fading [k1 scenario]", () => {
   const clients = headless.clients({ install, start: () => startBuild(BUILD) }, [0]);
   const client = clients.client(0);
   clients.start();
@@ -47,6 +49,9 @@ test("Archimonde's boss plate shows his name, portrait and remaining health, cou
   clients.frames(30);
   const start = shown();
   expect(start.named("BossPlateName")?.text).toContain("Archimonde");
+  const name = start.named("BossPlateName");
+  expect(name?.plain).toBe(true);
+  expect(NATIVE_TEXT_BASE * (name?.scale ?? 0)).toBeCloseTo(BOSS_NAME_SIZE, 5);
   expect(start.named("BossPlatePortrait")?.texture).toBe("ReplaceableTextures\\CommandButtons\\BTNArchimonde.blp");
   expect(client.frames.named("MakgoraDamage", BOSS_PLATE_CONTEXT)?.text).toContain(`${full}|r`);
   expect(start.fill).toBeCloseTo(1.0, 3);
@@ -68,5 +73,23 @@ test("Archimonde's boss plate shows his name, portrait and remaining health, cou
     expect(client.frames.named("MakgoraDamage", BOSS_PLATE_CONTEXT)?.text).toContain(`${left}|r`);
     expect(now.fill).toBeCloseTo(left / full, 3);
   }
+  let origin = { x: 0, y: 0, z: 0 };
+  client.run(() => { const s = shellState(); if (s !== undefined) origin = { ...s.origin }; });
+  const heights: number[] = [];
+  for (let age = 0; age < 60; age++) {
+    const tag = client.textTags.poses().find(shown => shown.text === `-${full - 38}`);
+    if (tag === undefined) break;
+    expect(tag.y).toBeCloseTo(origin.y, 3);
+    expect(tag.z - origin.z).toBeGreaterThanOrEqual(DAMAGE_HEAD);
+    expect(tag.z - origin.z).toBeLessThan(DAMAGE_HEAD + 80);
+    expect(tag.color[3]).toBe(255);
+    heights.push(tag.height);
+    clients.frames(1);
+  }
+  expect(heights.length).toBeGreaterThan(30);
+  expect(heights.length).toBeLessThan(50);
+  expect(heights[0]).toBeCloseTo(DAMAGE_TEXT_HEIGHT, 5);
+  for (let index = 1; index < heights.length; index++) expect(heights[index] ?? 0).toBeLessThanOrEqual(heights[index - 1] ?? 0);
+  expect(heights[heights.length - 1] ?? 1).toBeLessThan(DAMAGE_TEXT_HEIGHT / 4);
   expect(client.errors).toEqual([]);
 });

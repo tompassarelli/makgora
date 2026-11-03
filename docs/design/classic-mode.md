@@ -122,7 +122,8 @@ at one of them.
   number and a red bar, counting down to 0 as Master Hand's HP does in
   Melee's Classic. Each hit shakes and reddens the number, leaves a yellow
   trail on the bar that drains after a moment, flashes the boss red, knocks
-  him back a step and floats the damage dealt beside his chest (Tom's playtest,
+  him back a step and floats the damage dealt on the fighters' plane at chest height, shrinking
+  out over its last half (Tom's playtest,
   2026-11-03, found no sign that hits landed).
 - **Deterministic pattern** (stage rule 13, #274, in
   makgora:docs/design/stage-art.md). Each boss repeats a fixed timetable of
