@@ -14,7 +14,7 @@ export const RAIN_OF_FIRE_SCALE = f32(0.75);
 export const COLUMN_FIRE_MODEL = "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx";
 export const COLUMN_FIRE_SCALE = { from: f32(0.3), to: f32(0.9) } as const;
 export const FIRE_BURST_MODEL = "Doodads\\Cinematic\\FirePillarMedium\\FirePillarMedium.mdx";
-export const FIRE_BURST_SCALE = f32(1.8);
+export const FIRE_BURST_SCALE = f32(1.2);
 export const FIRE_BURST_FRAMES = 40;
 
 export const FINGER_LIGHTNING = "AFOD";
