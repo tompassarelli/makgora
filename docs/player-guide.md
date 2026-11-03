@@ -80,12 +80,12 @@ back when the match resumes. The plate at the bottom right shows
 L + R + A + START over RESET MATCH: hold two shield buttons (shield, light shield or the
 second trigger) and Attack, then press Start (Esc or Backspace), or click the plate,
 to return to fighter selection. On a keyboard the plate names the keys you bound
-to those actions, and above it a bar reads Hold Esc to leave: the player who paused
+to those actions, and above it a bar reads Hold Esc to leave, tap to unpause: the player who paused
 can hold Esc for one second to fill it and return to fighter selection with no other
 keys; an Esc still held after leaving does nothing at fighter selection until it is
 released. Releasing early empties the bar and resumes, so a tap still resumes. Start,
 Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
-the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). F2 on the pause screen is reserved for the Show controls in game toggle; G hides the HUD for a clean screenshot.
+the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). The pause screen lists its keys one per line under the PAUSE plate: F2 shows or hides the in-game controls (with their state), and F10 opens the Warcraft menu.
 
 At fighter selection, up/down (W/S on WASD, P/E on Box, Space/E on Custom) moves focus
 between fighter cards and CPU Opponent settings. Left/right changes the focused

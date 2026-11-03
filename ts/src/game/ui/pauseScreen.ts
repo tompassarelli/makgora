@@ -51,6 +51,7 @@ const RESET_WIDTH = f32(0.33);
 const RESET_HEIGHT = f32(0.092);
 const NAME_WIDTH = f32(0.27);
 const NAME_HEIGHT = f32(0.044);
+const TEXT_INSET = f32(0.008);
 
 export function windowEdges(pixelWidth: number, pixelHeight: number): Edges {
   const aspect = pixelHeight <= 0 ? f32(4.0 / 3.0) : f32(pixelWidth / pixelHeight);
@@ -58,6 +59,17 @@ export function windowEdges(pixelWidth: number, pixelHeight: number): Edges {
   const halfHeight = Math.max(f32(0.3), f32(f32(0.4) / aspect));
   return { left: f32(f32(0.4) - halfWidth), right: f32(f32(0.4) + halfWidth), top: f32(f32(0.3) + halfHeight), bottom: f32(f32(0.3) - halfHeight) };
 }
+
+/** The bar over the reset plate: holding the pause key leaves, a tap resumes. */
+/** The pause screen's key list, one key per line: F2 the in-game controls (while a keyboard player can toggle them), F10 Warcraft's menu. */
+export function pauseKeyLines(keyboard: boolean | undefined): readonly (readonly [string, string])[] {
+  const lines: [string, string][] = [];
+  if (keyboard !== undefined) lines.push(["F2", `Show controls: ${keyboard ? "On" : "Off"}`]);
+  lines.push(["F10", "Warcraft menu"]);
+  return lines;
+}
+
+export const holdBarLabel = (key: string): string => `Hold ${key} to leave, tap to unpause`;
 
 export const resetPlateBox = (edges: Edges): readonly [number, number, number, number] =>
   [f32(edges.right - MARGIN - RESET_WIDTH), f32(edges.bottom + MARGIN + RESET_HEIGHT), RESET_WIDTH, RESET_HEIGHT];
@@ -103,8 +115,8 @@ export class PauseScreen {
       });
     }
     this.nameText = this.label("NameText", f32(MENU_STYLE.headerSize * 1.5), edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.05)) - f32(0.008)), NAME_WIDTH, f32(0.03)], TextAlignment.center);
-    this.clockText = this.label("Clock", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.022))), NAME_WIDTH, f32(0.02)], TextAlignment.right);
-    this.menuText = this.label("Menu", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH), f32(edges.top - f32(MARGIN + f32(0.1))), NAME_WIDTH, f32(0.034)], TextAlignment.right);
+    this.clockText = this.label("Clock", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH - TEXT_INSET), f32(edges.top - f32(MARGIN + f32(0.022))), NAME_WIDTH, f32(0.02)], TextAlignment.right);
+    this.menuText = this.label("Menu", MENU_STYLE.bodySize, edges => [f32(edges.right - MARGIN - NAME_WIDTH - TEXT_INSET), f32(edges.top - f32(MARGIN + f32(0.1))), NAME_WIDTH, f32(0.04)], TextAlignment.right);
     this.emblem();
     this.cameraText = this.label("Camera", MENU_STYLE.bodySize, edges => [f32(edges.left + MARGIN + f32(0.1)), f32(edges.bottom + MARGIN + f32(0.062)), f32(0.3), f32(0.04)], TextAlignment.left);
     this.plate("Reset", PLATE, edges => resetPlateBox(edges));
@@ -151,8 +163,7 @@ export class PauseScreen {
     }
     setFrameText(this.nameText, `${MENU_STYLE.gold}${view.player === undefined ? "PAUSE" : `PLAYER ${formatInt(view.player)} PAUSE`}|r`);
     setFrameText(this.clockText, view.clock === undefined ? "" : `${MENU_STYLE.text}${view.clock}|r`);
-    const keyboard = view.keyboard === undefined ? "" : `\nShow controls in game: ${view.keyboard ? "on" : "off"} (F2)`;
-    setFrameText(this.menuText, `${MENU_STYLE.text}F10: leave the game  ·  G: hide HUD${keyboard}|r`);
+    setFrameText(this.menuText, pauseKeyLines(view.keyboard).map(([key, label]) => `${MENU_STYLE.gold}${key}|r  ${MENU_STYLE.text}${label}|r`).join("\n"));
     setFrameText(this.cameraText, `${MENU_STYLE.text}${view.camera}|r`);
     setFrameText(this.resetText, `${MENU_STYLE.gold}RESET MATCH|r`);
     this.holdBar(!view.pad, view.pauseKey, view.leave);
@@ -163,7 +174,7 @@ export class PauseScreen {
     this.holdShown = shown;
     setFrameVisible(this.holdFill, shown && fill > 0);
     if (!shown) return;
-    setFrameText(this.holdText, `${MENU_STYLE.text}Hold ${key} to leave|r`);
+    setFrameText(this.holdText, `${MENU_STYLE.text}${holdBarLabel(key)}|r`);
     if (fill <= 0) return;
     const [left, top, width, height] = holdBarBox(this.edges);
     this.set(this.holdFill, [left, top, f32(width * Math.min(1, fill)), height]);
