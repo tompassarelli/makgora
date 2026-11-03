@@ -1,6 +1,6 @@
 # Tom builds
 
-`smashcraft-tom-build.service` runs `bun scripts/tomBuildWatch.ts` from its own
+`makgora-tom-build.service` runs `bun scripts/tomBuildWatch.ts` from its own
 detached worktree `~/code/makgora/worktrees/tom-build-watch/ts`, which it moves
 to `origin/main` on each start, under `Nice=10` and idle I/O. Every 10 s it fetches
 `origin/main`; when the tip is a commit it has not built, it builds that tip's
@@ -16,15 +16,15 @@ To install and start the unit:
 
     git -C ~/code/makgora/main worktree add --detach ~/code/makgora/worktrees/tom-build-watch origin/main
     mkdir -p ~/.config/systemd/user
-    cp tools/tom-build/smashcraft-tom-build.service ~/.config/systemd/user/
+    cp tools/tom-build/makgora-tom-build.service ~/.config/systemd/user/
     systemctl --user daemon-reload
-    systemctl --user enable --now smashcraft-tom-build.service
+    systemctl --user enable --now makgora-tom-build.service
 
 The watcher exits as soon as `origin/main` moves past the commit it runs
 from, and `Restart=always` starts it again on the new tip, so every build is
 named and installed by the newest watcher code. To stop it, and keep it from starting at login:
 
-    systemctl --user disable --now smashcraft-tom-build.service
+    systemctl --user disable --now makgora-tom-build.service
 
 Each installed build appends one line to
 `~/.local/state/agents/handoffs/tom-build.log`:
@@ -37,7 +37,7 @@ the Warcraft III processes on the host, and `stages` the build's
 fetch of pinned inputs the store lacked, run before the build starts, present only then); `-` is
 unknown. A build above 20% pressure counts against neither budget: the watcher
 neither files nor closes a speed-budget issue for it. A failed build is in
-`journalctl --user -u smashcraft-tom-build`. Every sha the watcher starts is
+`journalctl --user -u makgora-tom-build`. Every sha the watcher starts is
 recorded in `~/.local/state/makgora/tom-build/attempted`, so it never builds
 a sha twice, even after a failure or restart. Before each build the watcher runs `bun wisp inputs fetch` for the store hosts in
 `INPUT_HOSTS` (gex45, skipping the host it runs on), which copies only the pinned entries the local store
