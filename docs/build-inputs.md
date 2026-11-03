@@ -207,11 +207,11 @@ imported as a TGA. A texture override changes only the art: it cannot move the
 click point, resize the cursor or add states.
 
 Character and stage select hide Warcraft's cursor and draw their own hand or
-bullseye; while any Warcraft menu or chat is open over them (an `EscMenuMainPanel`,
+bullseye, and a match hides it while playing; while any Warcraft menu or chat is open (an `EscMenuMainPanel`,
 `EscMenuOptionsPanel` or `EscMenuOptionsConfirmDialog` frame, or the chat entry, is
-visible, read locally by `warcraftMenuOpen` in ts/src/host/loop/warcraftMenu.ts)
+visible, read locally by `warcraftMenuOpen` in ts/src/host/loop/warcraftMenu.ts, or woken on F10 in any phase)
 they hide their own and enable Warcraft's cursor, which is the gauntlet here, and
-restore theirs when it closes.
+restore the previous cursor state when it closes.
 
 ## Other shared paths
 

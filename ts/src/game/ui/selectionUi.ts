@@ -577,8 +577,7 @@ export class SelectionPanel {
   }
 
   wakeStockCursor(): void {
-    const phase = this.game?.phase;
-    if (!this.ownsLocalClient() || (phase !== Phase.characterMenu && phase !== Phase.stageMenu)) return;
+    if (!this.ownsLocalClient()) return;
     this.gameMenuWake = GAME_MENU_WAKE_UPDATES;
     this.warcraftMenuOpen = true;
     showCursor(true);

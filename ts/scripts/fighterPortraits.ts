@@ -464,7 +464,6 @@ const frameOf = (character: number, variant: number) => character * VARIANTS.len
 /** The scene under one light pass. */
 const lit = (scene: RenderScene, pass: LightPass): RenderScene => ({ ...scene, environment: { ...scene.environment, dayNight: { ...scene.environment.dayNight, unit: lightPath(pass) } } });
 
-const BUST_FADE = 'min(min(1, (1 - j / h) / 0.3), min(i / (w * 0.1), (w - i) / (w * 0.1)))';
 const STOCK_FADE = 'max(0, min(1, (0.5 - hypot(i / w - 0.5, j / h - 0.5)) / 0.1))';
 const fadeAlpha = (mask: string) => ['(', '+clone', '-alpha', 'extract', '(', '+clone', '-fx', mask, ')', '-compose', 'multiply', '-composite', ')', '-compose', 'CopyOpacity', '-composite'];
 const TGA = ['-depth', '8', '-compress', 'none'];
@@ -494,7 +493,7 @@ function crops(raw: string, directory: string, name: string, suffix: string, kin
     run(['magick', raw, '-crop', box, '+repage', '-resize', `${inner}x${inner}`, '-background', 'none', '-gravity', 'center', '-extent', `${CARD_TEXTURE_PX}x${CARD_TEXTURE_PX}`, ...TGA, file('Card')]);
   }
   if (kinds.includes('Tile')) run(['magick', ...TILE_BACKGROUND, '(', raw, '-crop', portrait, '+repage', '-resize', `${TILE_TEXTURE_PX}x${TILE_TEXTURE_PX}`, ')', '-composite', '-alpha', 'off', ...TGA, file('Tile')]);
-  if (kinds.includes('Bust')) run(['magick', raw, '-crop', portrait, '+repage', '-resize', `${TILE_TEXTURE_PX}x${TILE_TEXTURE_PX}`, ...fadeAlpha(BUST_FADE), ...TGA, file('Bust')]);
+  if (kinds.includes('Bust')) run(['magick', raw, '-crop', portrait, '+repage', '-resize', `${TILE_TEXTURE_PX}x${TILE_TEXTURE_PX}`, ...TGA, file('Bust')]);
   if (kinds.includes('Stock')) {
     const stock = window(1.5 * head.size / zoom, 0.5);
     run(['magick', raw, '-crop', `${stock.size}x${stock.size}+${stock.left}+${stock.top}`, '+repage', '-resize', `${STOCK_ICON_PX}x${STOCK_ICON_PX}`, ...fadeAlpha(STOCK_FADE), ...TGA, file('Stock')]);

@@ -153,9 +153,10 @@ fighter's `Bust` render in the `BACKGROUND` layer, in the same 156x208-pixel
 box at (28, 56) of a 212x272 frame box that the arch's opening had, so the
 percent, bar, nameplate and stocks did not move. Nothing stands behind the
 bust: smashcraft:ts/scripts/wisp/mapInputs.ts encodes each fighter's bust
-render with its own transparency, so the bust stands free over the game
-(the race-colour glow once baked into it was removed at Tom's request,
-2026-11-03). The frame draws at its texels' own size
+render with its own transparency and full opacity to its bottom edge, so the
+bust stands free over the game without fading out toward the nameplate
+(the race-colour glow once baked into it and the bottom alpha fade were
+removed at Tom's request, 2026-11-03). The frame draws at its texels' own size
 (212x272 pixels on a 2880x1920 display, smaller at 1080p), and the bust shows
 the middle 192x256 texels of its 256-pixel texture at 0.8125 scale, so no part
 is stretched or squashed. Simple frames draw beneath every other frame in

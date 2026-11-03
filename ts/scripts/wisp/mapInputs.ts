@@ -34,7 +34,7 @@ import { Character } from "../../src/game/sim/codes";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { ALL_HEROES, PORTRAIT_KINDS, PORTRAIT_FIGHTERS, shipsInMap } from "../../src/game/roster/kits";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
-import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
+import { PORTRAIT_QUALITY, type Rgba, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";
 import { CLIP_RECORDS, clipPoolFiles, readClipRecords } from "../clipEvidence";
 import { importList } from "./importList";
@@ -239,16 +239,36 @@ const PORTRAIT_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cach
 export const MAP_PORTRAITS: readonly string[] = PORTRAIT_FIGHTERS.flatMap((character) => portraitCostumes(character).flatMap((costume) => PORTRAIT_KINDS.flatMap((kind) =>
   [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot) => fighterPortrait(character, kind, slot, costume)))));
 
-export const encodeMapPortrait = (tga: Uint8Array): Uint8Array => encodeBlp(readTga(tga), PORTRAIT_QUALITY);
+export function unfadeBust(image: Rgba): Rgba {
+  const { width, height, alpha } = image;
+  if (!alpha) return image;
+  const data = image.data.slice();
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const fade = Math.min(Math.min(1, (1 - y / height) / 0.3), Math.min(x / (width * 0.1), (width - x) / (width * 0.1)));
+      const ceiling = Math.round(255 * fade);
+      const at = (y * width + x) * 4 + 3;
+      const value = data[at] ?? 0;
+      if (value > 0 && ceiling > 0 && fade < 1) {
+        data[at] = value >= ceiling ? 255 : Math.min(255, Math.round(value / fade));
+      }
+    }
+  }
+  return { ...image, data };
+}
+
+export const encodeMapPortrait = (tga: Uint8Array, bust = true): Uint8Array =>
+  encodeBlp(bust ? unfadeBust(readTga(tga)) : readTga(tga), PORTRAIT_QUALITY);
 
 const portraitImports = (assets: string) => Effect.forEach(
   MAP_PORTRAITS,
   (entry) => Effect.gen(function*() {
+    const bust = entry.includes("FighterBust");
     const source = join(assets, "fighter-renders", entry.replace(/^.*war3mapImported\\/, "").replace(/\.blp$/, ".tga"));
     const bytes = yield* tryMapPromise("read portrait", source, () => Bun.file(source).bytes());
-    const encoded = join(PORTRAIT_CACHE, `${new Bun.CryptoHasher("sha256").update(bytes).digest("hex")}-q${PORTRAIT_QUALITY}.blp`);
+    const encoded = join(PORTRAIT_CACHE, `${new Bun.CryptoHasher("sha256").update(bytes).digest("hex")}${bust ? "-opaque" : ""}-q${PORTRAIT_QUALITY}.blp`);
     if (!(yield* tryMapPromise("check portrait cache", encoded, () => Bun.file(encoded).exists()))) {
-      const blp = yield* tryMapSync("encode portrait", source, () => encodeMapPortrait(bytes));
+      const blp = yield* tryMapSync("encode portrait", source, () => encodeMapPortrait(bytes, bust));
       yield* tryMapPromise("write portrait", encoded, () => Bun.write(encoded, blp));
     }
     return { entry, source: encoded } satisfies ArchiveEntry;
