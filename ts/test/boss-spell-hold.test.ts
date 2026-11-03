@@ -49,3 +49,38 @@ test("Archimonde's Rain of Fire and Doom's Shockwave impact bursts appear first 
     runtime.restore();
   }
 });
+
+test("a held or paused match freezes Archimonde's Rain of Fire impact bursts where they stand and keeps them until play resumes, so a held capture frame shows the burst its frame drew [k1 scenario]", () => {
+  const runtime = installHeadless(MAKGORA_HEADLESS);
+  try {
+    const clients = runtime.clients({ install() {}, start() {} }, [0]);
+    const client = clients.client(0);
+    clients.start();
+    client.run(() => {
+      const origin = { x: 0.0, y: PLAYABLE_BOUNDS.centreY, z: FLOOR_HEIGHT };
+      const spells = new BossSpells(origin);
+      const cast = spellCast();
+      cast.spell = BossSpell.rainOfFire;
+      cast.strike = 0;
+      cast.tell = 50;
+      cast.active = 14;
+      cast.zones = [-300.0, 0.0, 300.0].map((x) => ({ x, halfWidth: 90.0, bottom: 0.0, top: 400.0 }));
+      const bursts = () => client.effects.snapshot({}).filter((pose) => pose.model === FIRE_BURST_MODEL);
+      for (let into = 0; into <= cast.tell; into++) {
+        cast.into = into;
+        spells.present(cast);
+      }
+      const drawn = bursts().map((pose) => pose.handle.id);
+      expect(drawn.length).toBe(cast.zones.length);
+      spells.setPaused(true);
+      for (let held = 0; held < 600; held++) spells.present(cast);
+      expect(bursts().map((pose) => pose.handle.id)).toEqual(drawn);
+      for (const pose of bursts()) expect(pose.timeScale).toBe(0);
+      spells.setPaused(false);
+      for (const pose of bursts()) expect(pose.timeScale).toBe(1);
+      spells.destroy();
+    });
+  } finally {
+    runtime.restore();
+  }
+});

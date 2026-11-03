@@ -7,7 +7,7 @@ import {
 } from "../presentation/bossSpellArt";
 import { HIDDEN_EFFECT_DEPTH, FLOOR_HEIGHT } from "../presentation/arenaCamera";
 import type { WorldOrigin } from "./effects";
-import { Beam, createBeam, createEffect, destroyBeam, destroyEffect, Effect, moveBeam, setBeamColor, setEffectPosition, setEffectScale } from "wisp/game/effects";
+import { Beam, createBeam, createEffect, destroyBeam, destroyEffect, Effect, moveBeam, setBeamColor, setEffectPosition, setEffectScale, setEffectTimeScale } from "wisp/game/effects";
 
 export interface SpellZone { readonly x: number; readonly halfWidth: number; readonly bottom: number; readonly top: number }
 
@@ -44,6 +44,7 @@ export class BossSpells {
   private done = 0;
   private beamsUntil = -1;
   private frame = 0;
+  private paused = false;
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
     const hidden = origin.z - FLOOR_HEIGHT - HIDDEN_EFFECT_DEPTH;
@@ -53,6 +54,7 @@ export class BossSpells {
   }
 
   present(cast: Readonly<SpellCast> | undefined): void {
+    if (this.paused) return;
     this.frame++;
     this.expire();
     if (cast === undefined) {
@@ -70,6 +72,13 @@ export class BossSpells {
     else this.shockwave(cast);
     for (const grown of this.growing) setEffectScale(grown.effect, growth(grown.from, grown.to, cast.into - grown.start, grown.end - grown.start));
     if (this.beamsUntil >= 0 && this.frame >= this.beamsUntil) this.hideBeams();
+  }
+
+  setPaused(paused: boolean): void {
+    this.paused = paused;
+    const scale = paused ? 0.0 : 1.0;
+    for (const shown of this.timed) setEffectTimeScale(shown.effect, scale);
+    for (const grown of this.growing) setEffectTimeScale(grown.effect, scale);
   }
 
   clear(): void {
