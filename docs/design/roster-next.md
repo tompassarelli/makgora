@@ -157,6 +157,69 @@ copy captured 18 September 2026.
     files, which the clean-room rule forbids, cannot be read from the page.
   - Not imported yet: the terms and provenance go to Tom first.
 
+#### Whitemane, Valeera and Renault Morgraine (read 4 November 2026)
+
+Tom asked on 4 November 2026 for Sally Whitemane and Valeera Sanguinar as Forge
+placeholder fighters, and for Renault Morgraine as an unused import for
+Whitemane's later abilities. The Valeera and Renault pages were read live
+through automation-chrome on the private desktop; Whitemane's page was read
+from the Wayback Machine's copy captured 10 October 2026.
+
+- **Sally Whitemane HotS**, https://www.hiveworkshop.com/threads/sally-whitemane-hots.374513/
+  - Not imported: its animations come from Heroes of the Storm. Author:
+    Lumi. Approved and recommended, created 22 September 2026,
+    `High Inquisitor Whitemane HotS.mdx`, 2,481 polygons, no textures of its own.
+  - Source, in the author's words: "An overhaul of kangyun's Whitemane model
+    to resemble her look in Heroes of the Storm", with "some extra animations
+    added in. Most of them are imported from HotS to varying results." The
+    credits list names "Razorclaw_X for the HotS Whitemane port which I took
+    the animations from" and "Blizzard Entertainment for the original HotS
+    animations".
+  - Conditions: "Feel free to edit the model & always give credits to the
+    original authors."
+  - The mesh is community work, but the file carries animation data
+    extracted from Heroes of the Storm, which the clean-room rule forbids.
+    The decision goes to Tom.
+- **Valeera Sanguinar (DE Compatible)**, https://www.hiveworkshop.com/threads/valeera-sanguinar-de-compatible.327683/
+  - Not imported: it holds World of Warcraft geometry and textures. Author:
+    Symphoneum. Filed under Reforged HD Models, approved and recommended,
+    tagged "Contains External Material", created 3 October 2020, updated
+    19 October 2026, 202.87 MB, 13 resources (`Valeera_DE_opt.mdx`,
+    `Valeera_v2_opt.mdx`, `Valeera.mdx`, `Felblade.mdx` and portraits).
+  - Source, in the author's words: "All geosets and textures are from
+    Warcraft 3: Reforged and World of Warcraft." The 2.0 version's "pauldrons
+    were ported from WoW using the import/export tools that @twilac developed
+    for Blender, as well as WoW-Tools", the changelog adds "daggers ported
+    from the WoW model" (27 September 2021), and "The icon is from HotS".
+  - Conditions: "Please credit Symphoneum if used in a project. Feel free to
+    use the model as you see fit and have fun!"
+  - The terms allow use, but World of Warcraft files are forbidden by the
+    clean-room rule. The decision goes to Tom.
+- **Renault Morgraine**, https://www.hiveworkshop.com/threads/renault-morgraine.354152/
+  - Imported. Author: kangyun. Filed under Classic SD Models, approved and
+    recommended, created 9 June 2024.
+  - Source, in the author's words: "Just decide to remake some of my old model
+    and make them more accurate with the original wow model... and special thx
+    to @Stefan.K for the Scarlet Crusader Symbol". Its "refrence" is a WoW
+    screenshot; the page names no ported or extracted source and is not filed
+    under Ported Models. Both files have no texture of their own and draw only
+    Warcraft III Classic textures (Arthas, Priest, Medivh, Proudmoore,
+    Sorceress, BE_Robe and others). Tom judged it a custom work (2026-11-04).
+  - Conditions: the page states no usage terms; its readme ends "Don't forget
+    to credit the author." We credit kangyun and Stefan.K.
+  - Files: `Renault Morgraine.mdx` (2,134 polygons, 349,980 bytes, sha256
+    `110aa3a4c13bc0bdf2c635ebb700e3653e08c41f04b8ba3431c3571237714dd9`;
+    sequences Stand - 1, Stand - 2, Stand Ready, Stand Victory, Stand Channel,
+    Stand Fourth, Stand Fifth, Walk, Attack - 1, Attack - 2, Spell, Death,
+    Dissipate) and `Renault Morgraine_Portrait.mdx` (999 polygons, sha256
+    `d0f7029a5d2da0d8c21c0bca64f1c973ee9a9cc6e7a15789c3e6c15b399626c4`),
+    imported at the readme's path `war3mapImported\Renault Morgraine.mdx` and
+    its `_Portrait`; bundle zip sha256
+    `125a0a09090e6859dc729a8bc8f31cdf8d6a204a61b08c567d8054d69acff6df`.
+    No kit uses it yet.
+  - Credit line: "Renault Morgraine by kangyun (Hive Workshop), with Stefan.K's
+    Scarlet Crusade symbol."
+
 ### H1 intake (29 October 2026)
 
 Both models were downloaded through a plain headful Chrome on gex45's private

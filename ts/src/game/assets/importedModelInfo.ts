@@ -41,6 +41,8 @@ export const ONYXIA_DRAGON_MODEL = "war3mapImported\\OnyxiaDragon.mdx";
 
 export const ONYXIA_DRAGON_STOCK_SCALE = { unit: "OnyxiaDragon", scale: f32(0.48) } as const;
 
+export const RENAULT_MORGRAINE_MODEL = "war3mapImported\\Renault Morgraine.mdx";
+
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string; readonly reanimated?: true }[] = [
   { entry: GROM_BLOODLUST_MODEL, file: "GromBloodlustQuiet.mdx" },
   { entry: SCOURGE_WALL_MODEL, file: "UndeadWalls.mdx" },
@@ -58,5 +60,7 @@ export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly f
   { entry: PRESTOR_MODEL, file: "KatranaPrestorHero.mdx" },
   { entry: "KatranaPrestor.blp", file: "KatranaPrestor.blp" },
   { entry: ONYXIA_DRAGON_MODEL, file: "OnyxiaDragon.mdx" },
+  { entry: RENAULT_MORGRAINE_MODEL, file: "Renault Morgraine.mdx" },
+  { entry: "war3mapImported\\Renault Morgraine_Portrait.mdx", file: "Renault Morgraine_Portrait.mdx" },
   ...["Attach", "Body", "Fin", "Head", "Limbs"].map((part) => ({ entry: `OnyxiaDragon${part}.blp`, file: `OnyxiaDragon${part}.blp` })),
 ];

@@ -21,6 +21,7 @@ Join the [Discord](https://discord.gg/JQGZs2UJR) if you'd like to play games som
 - Tyrande model: [Tyrande Whisperwind (Re-Classic)](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/) by johnwar, from Hive Workshop, built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas models and kangyun's Tyrande, used with kangyun's permission; every move reanimated for Mak'gora
 - Onyxia (Lady Katrana Prestor) model: [Katrana Prestor](https://www.hiveworkshop.com/threads/katrana-prestor.362851/) by Footman16, from Hive Workshop, an edit of AndrewOverload519's Female Human Mage with kangyun's Sally Whitemane staff, both used with their authors' permission
 - Onyxia (dragon) model: [Onyxia](https://www.hiveworkshop.com/threads/onyxia.348925/) by Symphoneum, from Hive Workshop, built from Warcraft III Reforged models, converted to a Classic model
+- Renault Morgraine model: [Renault Morgraine](https://www.hiveworkshop.com/threads/renault-morgraine.354152/) by kangyun, from Hive Workshop, with Stefan.K's Scarlet Crusade symbol
 - Naxxramas wall model: [Undead Walls Pack](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/) by Kuzakani, from Hive Workshop, used with credit
 - Cursors, wordmark & stage-select art: Mak'gora originals (the pinching-hand cursor made with AI assistance)
 - Mrgl & Grgl sound: World of Warcraft, Blizzard Entertainment

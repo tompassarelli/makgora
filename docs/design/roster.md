@@ -349,6 +349,15 @@ The map's description carries the same credits.
   and imported as `war3mapImported\OnyxiaDragon.mdx` with five
   `OnyxiaDragon*.blp` textures for Onyxia's dragon form.
 
+- [Renault Morgraine by kangyun](https://www.hiveworkshop.com/threads/renault-morgraine.354152/)
+  (Hive Workshop, approved and recommended, Classic SD models), with Stefan.K's
+  Scarlet Crusade symbol: `Renault Morgraine.mdx` and its portrait, imported as
+  `war3mapImported\Renault Morgraine.mdx` for Sally Whitemane's later
+  abilities and unused by any kit for now. It is a 2,134-polygon model that
+  draws only Warcraft III's own Classic textures. The page states no terms and
+  its readme asks for credit (read 4 November 2026,
+  makgora:docs/design/roster-next.md#whitemane-valeera-and-renault-morgraine-read-4-november-2026).
+
 Source terms read on 29 October 2026 from the Wayback Machine's 20 October
 2025 copy of the page: johnwar names Ujimasa Hojo's Archer, Dark Ranger,
 Sylvanas Windrunner and derivatives and kangyun's Tyrande Whisperwind (Heavy
