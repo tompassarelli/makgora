@@ -30,7 +30,7 @@ unrelated to the cue. Missing or malformed captures stop grading with a file
 error; no missing frame can silently pass.
 
 The #82 reference rubric is `ts/test/native/rubrics/82-f9d0fbf3.json`, for
-`~/.local/state/smashcraft/native-batch-bc-20261008/82-fullscreen-captures`.
+`~/.local/state/makgora/native-batch-bc-20261008/82-fullscreen-captures`.
 Its 1,000-pixel visibility threshold separates the two faint electric cues
 from the readable stars, ice, rings and dust in the independent model judge's
 14 captured cases (12 pass, 2 fail). The region excludes the side fighters.

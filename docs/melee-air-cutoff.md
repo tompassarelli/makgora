@@ -2,7 +2,7 @@
 
 An airborne launch slows by a fixed decay every frame; SmashWiki "Knockback"
 gives 0.051 a frame for launch speed. Attacker recoil decays the same way by
-Smashcraft's recoil decay in smashcraft:ts/src/game/sim/motion.ts, which no
+Mak'gora's recoil decay in makgora:ts/src/game/sim/motion.ts, which no
 public page states. Once the speed falls below its decay, the channel stops
 instead of decaying past zero.
 
@@ -56,5 +56,5 @@ Below its cutoff, the simulation clears vertical launch and horizontal attacker
 recoil, leaving horizontal launch and vertical recoil unchanged, so launch's
 branch clears both launch axes while recoil's has a cross-channel effect. It
 updates launch before recoil and skips empty recoil vectors, avoiding
-accidental suppression of ordinary launches. These stores are Smashcraft's
+accidental suppression of ordinary launches. These stores are Mak'gora's
 rule in motion.ts; no public page states Melee's.

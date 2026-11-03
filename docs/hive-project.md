@@ -8,7 +8,7 @@ Draft of the Hive Workshop Map Development thread that serves as Mak'gora's proj
 [CENTER][SIZE=6][B]Mak'gora[/B][/SIZE]
 [I]A platform fighter inside Warcraft III[/I][/CENTER]
 
-[B]Pick a Warcraft hero, fight across floating stages and knock your rivals off the screen.[/B] Mak'gora is a free fan-made platform fighter for 1 to 4 players, built as a Warcraft III custom map with Melee-style movement, 31 fighters, computer opponents, a tutorial and a training mode. It was called Smashcraft until 0.3.
+[B]Pick a Warcraft hero, fight across floating stages and knock your rivals off the screen.[/B] Mak'gora is a free fan-made platform fighter for 1 to 4 players, built as a Warcraft III custom map with Melee-style movement, 31 fighters, computer opponents, a tutorial and a training mode. It was called Mak'gora until 0.3.
 
 [SIZE=5][B]Play[/B][/SIZE]
 [URL="https://www.hiveworkshop.com/threads/smashcraft.375492/"]Download Mak'gora 0.3 from its map page[/URL], put it in your Warcraft III Maps folder, set Graphics to Classic and open it from Custom Game. Controllers work through [URL="https://github.com/tompassarelli/padbridge/releases/latest"]padbridge[/URL].

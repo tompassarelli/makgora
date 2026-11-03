@@ -16,6 +16,6 @@ Outside material the repository's art and design rest on: source, licence, use.
   only, not imported.
 - Super Smash Bros. Ultimate captures (Delfino Plaza, Wuhu Island, Pirate
   Ship), Nintendo's: judgment only, kept local at
-  ~/.local/share/smashcraft-stage-references, never committed or imported.
+  ~/.local/share/makgora-stage-references, never committed or imported.
 - Foam, ripple and shaft textures and shaders: generated in repository code;
   original work, no outside source.

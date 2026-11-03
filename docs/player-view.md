@@ -7,11 +7,11 @@ every attempted layer and the map or stock path selected for each asset.
 Asset paths come from this checkout's immutable
 `build-inputs/`. Stock textures come from `WC3_TEXTURES`, or are extracted
 with `CASC_EXTRACTOR` and `WC3_STORAGE`. The extractor
-is built by `smashcraft-tools extract-animation-assets`; DDS textures are converted with
+is built by `makgora-tools extract-animation-assets`; DDS textures are converted with
 ImageMagick (`magick` on version 7, `convert` on version 6). Ubuntu CI
 installs its `imagemagick` package before running the stock-texture tests.
 Extracted assets stay in
-`~/.local/share/smashcraft-render-assets/` outside the repository.
+`~/.local/share/makgora-render-assets/` outside the repository.
 Stock cache directories use the selected installation's `.build.info` hash;
 updating Warcraft therefore extracts the new stock art. For a native comparison,
 set `WC3_STORAGE` to that client's installation and `WC3_ASSET_MANIFEST=FILE` to
@@ -41,12 +41,12 @@ the command. `--compare NATIVE_RUN` also compares the normal parity records.
 with their label or source path, callback frame and observed match frame.
 
 Logic tests, type checks, the desync guard and the native match gate can all
-pass while a player sees no stage or an effect that never leaves. Smashcraft
+pass while a player sees no stage or an effect that never leaves. Mak'gora
 uses Wisp's player-view checks (wisp:docs/player-view.md) to fail on those:
 
-- **Scene report.** The development entry (smashcraft:ts/src/host/entries/devMain.ts)
+- **Scene report.** The development entry (makgora:ts/src/host/entries/devMain.ts)
   and the integrity entry start Wisp's scene recorder through
-  smashcraft:ts/src/platform/sceneReport.ts. The recorder's clock is the
+  makgora:ts/src/platform/sceneReport.ts. The recorder's clock is the
   confirmed simulation frame. An effect is out of view only when it is parked
   on the ground beneath the floor, where `hideEffect` puts it and
   `AddSpecialEffect` creates it: alpha, scale and time scale do not stop a
@@ -55,7 +55,7 @@ uses Wisp's player-view checks (wisp:docs/player-view.md) to fail on those:
 - **Frame probe.** One frame per client, captured off-screen from its private
   desktop and kept on disk.
 
-smashcraft:ts/scripts/wisp/playerView.ts declares the expectations. Each kind
+makgora:ts/scripts/wisp/playerView.ts declares the expectations. Each kind
 of effect lists its models, taken from the game's asset modules where the host
 can load them, and the longest a player should see one stay in view. The stage
 needs one drawn deck. A model the declaration doesn't list fails the check as
@@ -64,15 +64,15 @@ soon as it is in view, so a new model needs a kind before it ships.
 ## Hidden effects a player still sees
 
 The winter arena's sky, fog and backdrop are declared in
-smashcraft:ts/src/game/presentation/stageScenery.ts and drawn by
-smashcraft:ts/src/host/loop/stageScenery.ts. They never enter match or
+makgora:ts/src/game/presentation/stageScenery.ts and drawn by
+makgora:ts/src/host/loop/stageScenery.ts. They never enter match or
 replay state. Frozen Throne uses classic Lordaeron Winter sky and Icecrown
 doodads referenced by their game paths. Its drifting snow is an authored
-model from smashcraft:tools/stage/package.ts using the stock snowflake texture:
+model from makgora:tools/stage/package.ts using the stock snowflake texture:
 terrain weather falls below the elevated arena. Each mesh and particle reach
 stays behind the fighting volume; fog starts beyond it. The player-view test
 checks those bounds in every declared camera and a winter match's scene.
-Run `bun wisp headless frozen-throne` from smashcraft:ts/ for the two-client
+Run `bun wisp headless frozen-throne` from makgora:ts/ for the two-client
 journey; a developer build accepts `-dev quick frozen-throne` for native capture.
 
 The scene check also applies Wisp's render visibility (wisp:docs/player-view.md):
@@ -81,7 +81,7 @@ collapsed effect in view whose model keeps emitting particles, on a parked
 effect whose mesh or particles reach the arena camera's frame, and on an
 effect destroyed in view whose death animation emits. It reads:
 
-- **Model facts**: smashcraft:ts/scripts/wisp/model-facts/ (one file per model, read by modelFacts.ts), generated for
+- **Model facts**: makgora:ts/scripts/wisp/model-facts/ (one file per model, read by modelFacts.ts), generated for
   every model a kind names. Imported models are read from the build's
   `--assets` inputs, stock models from the game's archives in the classic
   graphics the clients draw: the smoke in the four-fighter recording is the
@@ -90,7 +90,7 @@ effect destroyed in view whose death animation emits. It reads:
   fails the check:
 
   ```sh
-  # The CascLib extractor, as `smashcraft-tools extract-animation-assets` builds it:
+  # The CascLib extractor, as `makgora-tools extract-animation-assets` builds it:
   nix shell nixpkgs#gcc --command g++ -O2 -I CASCLIB/src tools/animations/casc-extract.cpp CASCLIB/build/libcasc.a -pthread -o build/animation-assets/casc-extract
   cd ts && bun wisp view models --assets ASSETS --summon ASSETS/summon-original-clips \
     --extractor ../build/animation-assets/casc-extract --storage "WARCRAFT_III_DIR"
@@ -105,7 +105,7 @@ effect destroyed in view whose death animation emits. It reads:
   Only numbers are kept: geosets, triangles, lights, boxes, and each
   emitter's rate, lifespan, reach and when it runs. Model files stay in the
   private inputs and the game's install.
-- **Arena cameras**: the camera smashcraft:ts/src/game/presentation/arenaCamera.ts
+- **Arena cameras**: the camera makgora:ts/src/game/presentation/arenaCamera.ts
   frames for every span of live fighters inside the blast zones, in quarters
   of each zone, at the clients' 16:9. Warcraft spreads the 70-degree field of
   view across the frame's width: in the 1280x720 four-fighter recording,
@@ -117,11 +117,11 @@ effect destroyed in view whose death animation emits. It reads:
   until every live fighter's drawn body, plus one shared margin (80 above,
   100 below, 15 at the sides), is in view and no body is taller than 30% of
   the frame (today's mid-size pairs draw at 28–29%). Bodies come from
-  smashcraft:ts/src/game/presentation/fighterViewBounds.ts, each
+  makgora:ts/src/game/presentation/fighterViewBounds.ts, each
   fighter's Stand pose, generated by
   `WC3_STORAGE=CLIENT_INSTALL bun scripts/fighterViewBounds.ts` from ts/.
   At the stage's zoom limit (#80) a far fighter may leave the frame and gets
-  its offscreen bubble. smashcraft:ts/test/fighter-framing.test.ts checks
+  its offscreen bubble. makgora:ts/test/fighter-framing.test.ts checks
   every pair at 16:9, 16:10 and 4:3.
 - **Parking**: `hideEffect` parks hidden effects on the ground beneath the
   stage center, FLOOR_HEIGHT below the floor, where they are created.
@@ -154,7 +154,7 @@ same way, and a child of `ConsoleUIBackdrop` covered the whole window. The
 backdrops are therefore children of `ConsoleUIBackdrop`, sized from the local
 client's aspect to its full width or height plus a small bleed and refitted
 when the window resizes (`createWindowBackdrop` and `fitToWindow`,
-smashcraft:ts/src/game/ui/frames.ts). Interactive content stays in the 4:3
+makgora:ts/src/game/ui/frames.ts). Interactive content stays in the 4:3
 area. Chat still draws over them: the lines are Wisp's chat panel, a game UI
 frame above the backdrop, and Warcraft's chat entry box showed over the
 backdrop in the same captures. Before the chat panel, a `ConsoleUIBackdrop`
@@ -164,16 +164,16 @@ Warcraft with an ACCESS_VIOLATION writing address 0x31 when a game ended with
 chat lines on screen (#681): on pool pair 1 on 2026-10-28, typing a chat line
 at fighter select and starting the next game crashed both clients 2 times in
 2, and the same build without the level change ran 5 such game ends clean. The
-map never changes the chat frame (smashcraft:ts/test/engineFrames.test.ts).
+map never changes the chat frame (makgora:ts/test/engineFrames.test.ts).
 
 ## Below the deck
 
 The match HUD covers the frame from about 77% of its height down
-(smashcraft:ts/src/game/ui/matchHud.ts). Framing fighters 160 below the
+(makgora:ts/src/game/ui/matchHud.ts). Framing fighters 160 below the
 camera's target put a fighter under the main deck, and the deck's underside,
 behind it: on 0.0.49 the deck's charcoal reached 76–91% of the frame height
 and the HUD started at about 82%
-(smashcraft:evidence/bot-session-0049-native-20261006/README.md). So when the
+(makgora:evidence/bot-session-0049-native-20261006/README.md). So when the
 lowest fighter would show below 72% of the frame, the camera follows it down,
 as Melee's follows a fighter under the stage, keeps up to 100 units below it in
 view down to the underside, and backs off to keep the highest fighter's head
@@ -181,14 +181,14 @@ below the frame's top 3%. Parking caps how far it lowers: the frame's lowest
 ray meets the ground no nearer than 1300 units beyond the stage center, which
 keeps the margins above. A framing with every fighter on or above the floor
 and the lowest showing above 72% is unchanged.
-smashcraft:ts/test/player-view.test.ts places a fighter within 100 units of the
+makgora:ts/test/player-view.test.ts places a fighter within 100 units of the
 underside, under it or beside the walls, with the other fighter KO'd, on a deck,
 high, at the top blast zone or far to a side, and checks the camera the
 development build sets: the fighter and the underside nearest it show above
 77% of the frame in all 60 cases.
 
 For a native capture, set `CURRENT_BUILD`'s scenario to `underside`
-(smashcraft:ts/src/game/session/currentBuild.ts), build the development map and
+(makgora:ts/src/game/session/currentBuild.ts), build the development map and
 run `bun wisp fresh MAP.w3x`. The quick match freezes player 1 in the air
 beside the main deck's lower right corner, level with its underside, for ten
 seconds, and fresh saves each client's frame at match frame 30.
@@ -198,7 +198,7 @@ seconds, and fresh saves each client's frame at match frame 30.
 - `bun wisp fresh MAP.w3x` checks every client after the quick match's
   receipts: the scene report once the match has run 30 frames (main and
   integrity profiles), and one frame saved to
-  `~/.local/state/smashcraft/frames/CLIENT.ppm` (every profile).
+  `~/.local/state/makgora/frames/CLIENT.ppm` (every profile).
 - The native journeys (`bun wisp integrity capture --four-fighters`, `integrity capture`)
   check both at each match start, about one second in, saving frames to
   `OUT/player-view-EPOCH/CLIENT.ppm`, and the scene again at each result,
@@ -229,7 +229,7 @@ recording are measured alike.
   between the fighters' feet at match start and the HUD, at least 1% of the
   frame's height in rows (14 at 1440, 8 at 720) must hold an unbroken run of
   deck colour at least 20% of the frame's width long. Deck colour is the
-  charcoal, steel or brass of smashcraft:ts/src/game/assets/stagePalette.ts,
+  charcoal, steel or brass of makgora:ts/src/game/assets/stagePalette.ts,
   each channel within 40; the deck model is unshaded, so it renders in those
   colours. The slate top is left out: it is within 32 of the sky and clouds.
 

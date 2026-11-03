@@ -1,16 +1,16 @@
-# Smashcraft controller plug-in
+# Mak'gora controller plug-in
 
-Smashcraft's controller support is [padbridge](https://github.com/tompassarelli/padbridge)
+Mak'gora's controller support is [padbridge](https://github.com/tompassarelli/padbridge)
 (the always-on service, the fighter layout, Any map, the status model) plus this
-plug-in: `wc3-journal`, built from this folder, which reports Smashcraft
+plug-in: `wc3-journal`, built from this folder, which reports Mak'gora
 sessions to the service (`wc3-journal --plugin`) and is the journal helper that
 serves them. The pinned padbridge version is the `rev` in
-`smashcraft:controller/Cargo.toml` (and the client's `padbridge-model`
+`makgora:controller/Cargo.toml` (and the client's `padbridge-model`
 dependency); move both together.
 
 ## Build and run
 
-Rust 1.96.1 (`smashcraft:controller/rust-toolchain.toml`), a C/C++ compiler,
+Rust 1.96.1 (`makgora:controller/rust-toolchain.toml`), a C/C++ compiler,
 CMake, libudev and libxkbcommon. On this workstation:
 
 ```sh
@@ -18,33 +18,33 @@ cd controller
 nix-shell -p stdenv.cc cmake pkg-config libxkbcommon udev --run 'cargo test --locked --jobs 2'
 ```
 
-`bun wisp controller` (smashcraft:docs/commands/controller.md) builds both
+`bun wisp controller` (makgora:docs/commands/controller.md) builds both
 pieces and restarts the login unit `padbridge.service`, which runs
 
 ```sh
 ~/.local/share/padbridge/bin/padbridge --service \
-  --plugin ~/.local/share/smashcraft-build-inputs/controller/wc3-journal
+  --plugin ~/.local/share/makgora-build-inputs/controller/wc3-journal
 ```
 
-`smashcraft:controller/tests/service.rs` runs padbridge's service with
+`makgora:controller/tests/service.rs` runs padbridge's service with
 this plug-in program over its real protocol: a virtual pad, a fake session
 through a new map session and a game restart.
 
-## Smashcraft sessions
+## Mak'gora sessions
 
-The plug-in (smashcraft:controller/src/profile.rs) reads the newest menu
+The plug-in (makgora:controller/src/profile.rs) reads the newest menu
 publication in CustomMapData for the build, slot and current epoch, and names
 one `--follow-matches` helper for them (`--epoch` passes the map's current
 epoch, so a helper started mid-session drives that menu). A newer menu
 publication starts a new map session (a lower epoch, or another build or
 slot), so the service replaces the helper. Publications older than the game's
-start are ignored. The client's Automatic profile runs Smashcraft while this
-game has published a Smashcraft menu since it started, and Any map otherwise.
+start are ignored. The client's Automatic profile runs Mak'gora while this
+game has published a Mak'gora menu since it started, and Any map otherwise.
 
 A build that reads keyboard input (the playable build, #166)
 publishes menu phases too: its ready file `CustomMapData/wc3-melee-ready.txt` names
 the build and `INPUT keyboard-d2-r7` (the development build uses `INPUT callback`). Newer than the game's start and any different build's menu,
-it is a Smashcraft session on keys (`session=BUILD/keys/N`): the service
+it is a Mak'gora session on keys (`session=BUILD/keys/N`): the service
 runs no helper, uses the pointer in fighter, stage and results menus, and presses the pad's keys during matches through the same mapper as
 `padbridge --emit`, on the map's pad keys (contracts/controller.json `padKeys`; the default melee layout: A c, B v, X/Y t, RB 2, LB ` (meter), LT 3, RT 4; tom: A c, B 2, X v, Y t, LB 1, RB ` (meter), LT 3, RT 4;
 Start y, left stick [/]/'/; (left/right/down/up), right stick ,/./-/\ (left/right/up/down; it tilts on the ground and throws aerials in the air), plus 6 when the right stick is set to Tilt attacks), into the game's window
@@ -111,8 +111,8 @@ start`: then only Start reaches the outer menus, and the service's menu pointer
 does the rest, including in the CPU opponent settings panel. Held controls require neutral after startup, a menu phase
 change, focus loss, and entering gameplay.
 
-The map publishes `smashcraft-journal-menu-BUILD-sSLOT.txt`, containing
-`SMASHCRAFT JOURNAL MENU v=1 build=BUILD epoch=EPOCH slot=SLOT phase=PHASE` in
+The map publishes `makgora-journal-menu-BUILD-sSLOT.txt`, containing
+`MAKGORA JOURNAL MENU v=1 build=BUILD epoch=EPOCH slot=SLOT phase=PHASE` in
 a complete native preload file. PHASE is CHARACTER, CPU, STAGE, RESULT or BLOCKED.
 Eligible menus refresh every 15 map ticks (normally 250 ms); the helper requires
 a matching publication newer than its startup/previous match and no older than
@@ -159,7 +159,7 @@ must become neutral before new gameplay, menu or pause inputs are accepted.
 `controller_disconnected` records detection; `controller_release frame=N`
 records its assigned release; `controller_reconnected source=...` identifies
 the recovered event path. Bounded native recovery is recorded in
-smashcraft:evidence/controller-reconnect-native-20261005/README.md.
+makgora:evidence/controller-reconnect-native-20261005/README.md.
 
 Each record the helper types is an envelope of about 30 characters around
 its payload, and it types at most 16 records past what the map's receipt says
@@ -167,7 +167,7 @@ it consumed. Warcraft takes typed text into the edit box at a cost that grows
 with how much it takes at once: in 0.0.48's native bot session, the 16 records
 (608 characters) typed after a 2 s stop held the client about 180 ms, and its
 input stayed 15–25 frames late for 5 s
-(smashcraft:evidence/bot-session-0048-native-20261006/). So the helper types
+(makgora:evidence/bot-session-0048-native-20261006/). So the helper types
 at most 160 characters past the record the receipt says arrived. While a
 row packet waits untyped, consecutive packets from the same epoch combine
 using the existing `I5` message encoding, up to 64 frames and only while the
@@ -187,7 +187,7 @@ window (journal envelopes and menu keys) is appended to FILE as one line, and
 `--out` names the folder the headless client writes its files to. There is
 no window, so focus never suspends output; chat's Return key needs a game
 window and stops the helper. `bun wisp integrity headless` starts it this way
-(smashcraft:docs/typescript.md).
+(makgora:docs/typescript.md).
 
 The explicit `--ready-file PATH --epoch-monotonic-ns NS` mode remains for native
 diagnostic drivers. `--first-frame N` (default 1) and `--stop-frame N` belong to
@@ -230,7 +230,7 @@ Current evidence and remaining acceptance are in
 `roadmap #16`. The Linux journal path passed bounded tap/stall,
 focus and pause/resume trials. Automatic start/results/rematch with the same
 helpers passed two native match lifecycles; keyboard confirmed the menus.
-See `smashcraft:evidence/match-lifecycle-native-20261005/README.md` for exact builds,
+See `makgora:evidence/match-lifecycle-native-20261005/README.md` for exact builds,
 failed attempts and limits. Physical controller-to-screen timing, cross-machine
 clock agreement, chat, physical reconnect and other-platform acceptance remain open.
 
@@ -276,7 +276,7 @@ focus switch cannot route its text to another application's window. This does
 not guarantee Warcraft consumes those events: the native focus trial retained
 zero sink events but exposed a missing-frame gap on return. Native acknowledgment
 and replay remain required before claiming focus-safe delivery; see
-smashcraft:evidence/native-focus-20261005/README.md.
+makgora:evidence/native-focus-20261005/README.md.
 
 The editbox path holds no global transport keys; the legacy mailbox retains its existing signal state
 until eligible and gates its cleanup too, so unfocused teardown does not emit

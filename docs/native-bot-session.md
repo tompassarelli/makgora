@@ -3,7 +3,7 @@
 `bun wisp integrity capture --bot` plays a candidate in the two signed-in
 clients the way a bot playtest does. It uses the same virtual pads,
 persistent `wc3-journal` helpers, native files and rig as #26's integrity
-capture (smashcraft:ts/scripts/integrity/journey.ts). Use it for checks
+capture (makgora:ts/scripts/integrity/journey.ts). Use it for checks
 that need Warcraft itself: stall recovery, saved moments, controller rows
 and what each player sees with computer opponents.
 
@@ -67,7 +67,7 @@ The session has a match and a rematch:
   pages after its trace, so its presses can be reconciled like #26's.
 - `--bot-four` leaves the rematch undisturbed and types `-dev capture 1800`
   just after its automatic start. Both clients write raw frame costs to
-  `smashcraft-perf-capture-pSLOT-runRUN.txt` (development and integrity builds only).
+  `makgora-perf-capture-pSLOT-runRUN.txt` (development and integrity builds only).
 - `--bot-perf` does the same with the three fighters of `--bot`, so a
   session measures both the matches `bun wisp perf bot` and `perf bot-four`
   predict. `bun wisp perf native CAPTURE.txt RUN --samples HEADLESS.perf`
@@ -95,9 +95,9 @@ that failed isn't repeated: doctor heals its clients, and the next capture
 starts healthy.
 
 Before the first `bun wisp fresh` after a client starts, open Custom Games
-→ Create Game and the 00-Smashcraft folder once: fresh clicks the folder's
+→ Create Game and the 00-Makgora folder once: fresh clicks the folder's
 first map, and Warcraft keeps the open folder for the session. Fresh moves
-every other map in that folder to `smashcraft-replaced-maps`. Client A's
+every other map in that folder to `makgora-replaced-maps`. Client A's
 prefix also holds Tom's playtest map, so copy it back after a session.
 
 When every client has a menu page, `bun wisp fresh` needs no menu preparation:
@@ -124,9 +124,9 @@ before `--bot` adds its own. It then plays the game's next match and its rematch
 On a build with the dev console (development and integrity builds), a
 capture sets the match up by typing chat commands into client A, never by
 clicking the menus or reading their labels
-(smashcraft:ts/src/game/session/sessionSetup.ts). Each command applies the
+(makgora:ts/src/game/session/sessionSetup.ts). Each command applies the
 menus' own rule for player 1, and both clients write their developer receipt
-`smashcraft-dev-BUILD-pN.txt`: its `receipt=` count (the game's commands
+`makgora-dev-BUILD-pN.txt`: its `receipt=` count (the game's commands
 so far) and its `SETUP` line, the fighter-selection state after the command
 (`human-fighters`, `computers`, `characters`, `stocks`, `minutes`,
 `automatic-rematch`, `stage`). The capture takes a command as confirmed
@@ -150,7 +150,7 @@ receipt when the map refused the command. A bot session types, in order:
 ```
 
 The pads then pick both players' fighters and start, as in #26's journey.
-At each match start both clients write `smashcraft-stage-BUILD-pN.txt`
+At each match start both clients write `makgora-stage-BUILD-pN.txt`
 (`epoch`, `stage`, `decks`); the capture checks the player's view only
 after both name the match, and a bot match must name stage 0. #26's
 integrity capture sets its three stocks with `-dev stocks 3` and makes its
@@ -168,7 +168,7 @@ rematch, so it stops there before any input and asks for a new game.
 
 ## Reading a capture
 
-From smashcraft:ts/:
+From makgora:ts/:
 
 - `bun scripts/integrity/botResult.ts DIR [CUSTOM_MAP_DATA ...]` writes
   `bot-result.json`. It holds each stall's input delay before, at its peak
@@ -213,10 +213,10 @@ integrity and development builds give confirmed states.
 `bun wisp pad SCRIPT --helper HELPER --build BUILD --out DIR --app-id a=ID --app-id b=ID [--chat=TEXT]`
 plays a script of timed pad states on both clients' virtual pads through
 the real helpers, as the captures do. Only the helpers read those pads: on
-Tom's machine a udev rule (nixos-config:native/nix/smashcraft-test-pads.clause)
+Tom's machine a udev rule (nixos-config:native/nix/makgora-test-pads.clause)
 keeps their /dev/input nodes root-only, so Steam and the desktop never see a
 test pad appear or disappear, and the helpers open a twin node in
-/dev/smashcraft-pads instead. `--chat=TEXT` types a developer command
+/dev/makgora-pads instead. `--chat=TEXT` types a developer command
 into client A once the helpers run (for example `-dev quick hero lich`, or
 `-dev quick cpu wren expert` for a Wren Expert computer opponent, or
 `-dev quick cpu wren expert hero NAME` to select any roster fighter as that computer
@@ -233,7 +233,7 @@ meant for (or `+N` after the previous line), `a` or `b`, and
 (-1..1, up positive), `shield AMOUNT` (0..1) or `capture` (that
 client's whole frame). A capture waits until that client has drawn its
 frame: the integrity build writes the predicted frame it drew to
-`smashcraft-drawn-BUILD-pN.txt` in CustomMapData whenever it changes, and
+`makgora-drawn-BUILD-pN.txt` in CustomMapData whenever it changes, and
 under load the drawn match runs well behind the helper's clock (#156 on
 7 Oct: 6 to 88 frames, so captures on the clock showed the moment before
 the move). A capture passes only when both the initial and completion receipts
@@ -319,7 +319,7 @@ new game (`bun wisp fresh MAP --no-quick`) and reruns, up to `--retries N`
 times (3 by default). The native map must be
 the integrity build (`bun wisp map rebuild MAP.w3x --profile integrity`,
 `--build typescript-integrity`), since only that build writes the trace.
-Issue scripts live in smashcraft:ts/test/native/pads/, one folder per issue.
+Issue scripts live in makgora:ts/test/native/pads/, one folder per issue.
 
 Comparison preflight checks each script before any reference helper or native
 session starts. It requires the existing moment export: press and release
@@ -340,7 +340,7 @@ Headless pad checks replay every exported moment and completed match to its
 saved checksum, including every recorded intermediate checkpoint. A match that
 ends before its authored View hold finishes uses its complete match replay.
 The collector joins that replay's manifest and parts as
-`smashcraft-replay-pSLOT-SERIAL.txt`. Missing parts, unreadable exports, checksum
+`makgora-replay-pSLOT-SERIAL.txt`. Missing parts, unreadable exports, checksum
 differences, or no export fail the run. The result reports moments and complete
 matches separately, with their replayed frame counts. Native comparison still
 requires the authored View export.
@@ -377,7 +377,7 @@ stops the run so the pool owner can restart that pair.
 
 Native batch helpers and pads stay alive until their game ends. Before typing a
 selection command, the runner waits for the map's observed chat-open receipt in
-`smashcraft-chat-BUILD-pSLOT.txt`; a missed Return sends no command text. Between
+`makgora-chat-BUILD-pSLOT.txt`; a missed Return sends no command text. Between
 matches, reset waits for the journal's quiescence and chat handoff before typing.
 Fresh games also require the selected pair's new binding-ready files. The
 runner snapshots both developer receipts before a setup command and confirms
@@ -417,7 +417,7 @@ So a batch:
   started them (`startingSelection`: the players in the game, the boot's
   match seed and settings), so the script's own `#! chat` command (`-dev
   quick ...`) starts a match equal to a new game's first match.
-  smashcraft:ts/test/dev-reset.test.ts holds that: a match after a
+  makgora:ts/test/dev-reset.test.ts holds that: a match after a
   mid-match reset writes the same integrity-trace checksums and fighter
   lines as the first match, and its saved moments the same starting state,
   after a computer match and a camera match in between. Matches keep state
@@ -448,7 +448,7 @@ and the next match run the reloaded code. One game then serves a series of
 TypeScript-only changes (effects, timing, presentation values); imports,
 object data and art still need a rebuilt map. The compiler warms up while the
 first game loads. A reload neither client acknowledges within 10 s counts as
-a broken run: the script gets a new game. smashcraft:ts/test/dev-reset.test.ts
+a broken run: the script gets a new game. makgora:ts/test/dev-reset.test.ts
 holds that a match after a hot reload and a reset equals the game's first
 match (#312).
 
@@ -464,34 +464,34 @@ helper without any Warcraft client.
 
 Native boxes that a chat command, a capture and a rule can answer (#82's
 effect cases, #57's underside, #73's map load, each complete hero's match for
-#96) are declared in smashcraft:ts/scripts/wisp/acceptChecks.ts and run in
+#96) are declared in makgora:ts/scripts/wisp/acceptChecks.ts and run in
 one batch:
 
 ```sh
 bun wisp accept --dry-run          # the plan: sessions, steps, captures, rules
-bun wisp accept [--only 82-*]      # evidence in ~/.local/state/smashcraft/accept/RUN/
+bun wisp accept [--only 82-*]      # evidence in ~/.local/state/makgora/accept/RUN/
 ```
 
 Each check prints PASS, FAIL or NEEDS-LOOK with its folder; a needs-look
 check names what to look for in its cropped frames (wisp:docs/accept.md).
-The underside profile needs its map built first, as smashcraft:docs/player-view.md
+The underside profile needs its map built first, as makgora:docs/player-view.md
 describes. The bot captures below stay hand-run.
 
 ## One session for the native gates
 
-One run of each capture below, from smashcraft:ts/ of the checkout the
+One run of each capture below, from makgora:ts/ of the checkout the
 map's script is built from, answers every native check these captures
 feed. The checkers replay moments in this source, so build and check from
 the same checkout. Run each `botResult.ts` before the next capture: it
 copies every moment its clients saved since its capture began.
 
 ```sh
-S=~/.local/share/smashcraft-build-inputs/SESSION   # a new private folder
+S=~/.local/share/makgora-build-inputs/SESSION   # a new private folder
 HELPER=/absolute/path/to/wc3-journal               # release build of this checkout's companion/
-MAP="$S/Smashcraft integrity.w3x"                  # copy of an integrity map and its .w3x.base.lua
+MAP="$S/Makgora integrity.w3x"                  # copy of an integrity map and its .w3x.base.lua
 UNDERSIDE=/absolute/path/to/underside.w3x          # a dev map whose scenario is underside (#57)
-A_DATA="$(jq -r '.clients[0].documents' ~/.local/state/smashcraft/clients.json)/CustomMapData"
-B_DATA="$(jq -r '.clients[1].documents' ~/.local/state/smashcraft/clients.json)/CustomMapData"
+A_DATA="$(jq -r '.clients[0].documents' ~/.local/state/makgora/clients.json)/CustomMapData"
+B_DATA="$(jq -r '.clients[1].documents' ~/.local/state/makgora/clients.json)/CustomMapData"
 CAPTURE=(--helper "$HELPER" --build typescript-integrity --app-id a=GAME_APP_ID_A --app-id b=GAME_APP_ID_B)
 
 # Four fighters: three 2 s stops of B in match 1; overlay read through the rematch; four moments a client.
@@ -524,7 +524,7 @@ bun wisp perf bot-four --out "$S/perf-bot-four.json"
 # One saved moment replayed alone, to the checksum Warcraft recorded.
 bun wisp repro "$(ls "$S"/bot-four/moments/*.txt | head -1)"
 
-# The deck's underside: frames land in ~/.local/state/smashcraft/frames/.
+# The deck's underside: frames land in ~/.local/state/makgora/frames/.
 bun wisp fresh "$UNDERSIDE"
 ```
 
@@ -568,7 +568,7 @@ candidate regresses beyond the comparison threshold (5% by default). Each
 check reads saved files and starts no Warcraft client. `--json` gives the
 measured comparisons and their pass/fail summaries for a saved report.
 
-Smashcraft's retained #19 references were recorded on 7 October 2026 at
+Mak'gora's retained #19 references were recorded on 7 October 2026 at
 `4ec5b823`, with Wisp's current cost constants, on a quiet machine. They cover
 the integrity build's solo bot and four-fighter bot workloads, player 0,
 1,800 callbacks each. The 57 windows compare callback p50/p95, using the native
@@ -576,7 +576,7 @@ clock steps; this calibration does not cover GPU/render time, native RSS,
 or native p99. A candidate's computed p99 and worst prediction remain useful
 diagnostics, but #19's 20% guarantee applies to p50 and p95 at this scope.
 
-From Smashcraft's `ts/`, save `build/main.perf` the same way on main, then the current candidate:
+From Mak'gora's `ts/`, save `build/main.perf` the same way on main, then the current candidate:
 
 ```sh
 bun wisp perf playable-bot-four --samples --out build/frame-cost-candidate.perf
@@ -585,7 +585,7 @@ bun wisp perf playable-bot-four --samples --out build/frame-cost-candidate.perf
 Then accept it against the published baseline and unchanged retained inputs:
 
 ```sh
-cost_refs="$HOME/.local/state/smashcraft/wisp19-20261007/4ec5b823"
+cost_refs="$HOME/.local/state/makgora/wisp19-20261007/4ec5b823"
 bun wisp perf native "$cost_refs/exclusive-1791383217845/bot-native-p0.txt" \
   --samples "$cost_refs/bot.perf" --json &&
 bun wisp perf native "$cost_refs/exclusive-1791383217845/bot-four-native-p0.txt" \
@@ -616,7 +616,7 @@ The probe adds diagnostic work, so report its overhead separately from the
 ordinary release's cost. Use the integrity profile for journal diagnostics.
 
 Before a pixel-response trial, measure the acquisition cadence on its selected
-private desktop from smashcraft:ts/:
+private desktop from makgora:ts/:
 
 ```sh
 bun wisp integrity capture --screen --clients-file PRIVATE_CLIENTS.json --client lan3a --out /absolute/private/screen-trial --count 30
@@ -646,7 +646,7 @@ invalidate it.
 
 In a running match, type `-dev capture 18000`. Its confirmation names the run
 and starting match frame. Each client records the next 18,000 callbacks and
-then writes `smashcraft-perf-capture-pSLOT-runRUN.txt` in CustomMapData. Require a
+then writes `makgora-perf-capture-pSLOT-runRUN.txt` in CustomMapData. Require a
 fresh file from each client. The receipt records elapsed **clock** milliseconds;
 18,000 callbacks mean five minutes only at 60 callbacks per second. Retain
 actual native start/end times and gameplay phase for the five-minute gate.
@@ -661,10 +661,10 @@ reconcile and repair), `confirmed` (each `stepConfirmed`), `speculative`
 The sections only read `os.clock` while a capture runs and change no game
 state. The procedure:
 
-1. Build from smashcraft:ts/ at the commit under test:
+1. Build from makgora:ts/ at the commit under test:
 
    ```sh
-   bun wisp map build --profile native-perf --name "Smashcraft perf $(git rev-parse --short HEAD)" --out /absolute/private/native-perf.w3x
+   bun wisp map build --profile native-perf --name "Mak'gora perf $(git rev-parse --short HEAD)" --out /absolute/private/native-perf.w3x
    ```
 
 2. Host it on a LAN pair (or both signed-in clients) and, in the lobby's
@@ -688,15 +688,15 @@ state. The procedure:
 
 4. Type `-dev reset` once the capture is written: replay parts are written
    only once the match leaves play, so without it the pool stops before the
-   client writes `smashcraft-replay-REPLAY.txt`. Collect
-   `smashcraft-perf-capture-pSLOT-runRUN.txt` and the replay with its parts
+   client writes `makgora-replay-REPLAY.txt`. Collect
+   `makgora-perf-capture-pSLOT-runRUN.txt` and the replay with its parts
    from each client's `CustomMapData`, fresh from this run (a crash, desync
    or early result voids it).
 
-5. From smashcraft:ts/, print the per-section table of each receipt:
+5. From makgora:ts/, print the per-section table of each receipt:
 
    ```sh
-   bun wisp perf sections /absolute/private/smashcraft-perf-capture-p0-runRUN.txt
+   bun wisp perf sections /absolute/private/makgora-perf-capture-p0-runRUN.txt
    ```
 
    It prints each section's median, p95, p99 and worst milliseconds and its
@@ -705,7 +705,7 @@ state. The procedure:
    its sample, total milliseconds, catch-up, `frame` (confirmed simulation
    frame), `speculative` frame, `replay` (the match's replay serial) and
    section milliseconds; `--json` prints the same as one result. A spike's
-   `replay` names the client's `smashcraft-replay-REPLAY.txt`, and `bun wisp
+   `replay` names the client's `makgora-replay-REPLAY.txt`, and `bun wisp
    replay` of it reaches that `frame` headless. With
    `PERF_PROFILE_FRAMES=F,...` the 32-bit Lua replay prints every frame as
    `frame F US INSTRUCTIONS BYTES` (its microseconds, Lua instructions to

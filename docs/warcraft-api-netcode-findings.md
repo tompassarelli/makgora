@@ -2,7 +2,7 @@
 
 Historical record: the captures, trial tables and asset measurements below describe their named builds before the 9 October 2026 roster cut (#339). They are not the current roster or asset inventory.
 
-Reusable Warcraft API and netcode findings from Smashcraft trials, each with the build it was observed on. Status and open decisions live in roadmap [#16](https://github.com/tompassarelli/smashcraft/issues/16); raw trial records live in smashcraft:evidence/. General Warcraft guidance is in the warcraft-modding skill and its api-gotchas reference.
+Reusable Warcraft API and netcode findings from Mak'gora trials, each with the build it was observed on. Status and open decisions live in roadmap [#16](https://github.com/tompassarelli/makgora/issues/16); raw trial records live in makgora:evidence/. General Warcraft guidance is in the warcraft-modding skill and its api-gotchas reference.
 
 ## Earlier rejected ingress paths — 4 October
 
@@ -10,7 +10,7 @@ The serial keyboard/file-ACK replacement is rejected: native five-second trials
 confirmed only 36–50 frames, with median ACK waits of 81–92 ms. Its first
 original-frame tap does not establish usable throughput. Removing synchronized
 carrier-key registration did not fix the delay. Evidence:
-smashcraft:evidence/keyboard-mailbox-20261004/README.md.
+makgora:evidence/keyboard-mailbox-20261004/README.md.
 
 The earlier bounded one-packet read check showed delayed delivery rather than a
 permanently dead receiver: both clients received the packet and fixed markers,
@@ -18,7 +18,7 @@ confirming frame2, with own-receipt ages801.025/817.627ms. Sending on the next
 callback did not avoid the delay. Adding the normal preload start/end calls
 also failed to repair it (631.836/698.486ms). The same compiled Lua map was used
 for both checks; this does not establish eventual delivery for native JASS59.
-Evidence: smashcraft:evidence/journal-read-boundary-20261004/README.md. Its proposed
+Evidence: makgora:evidence/journal-read-boundary-20261004/README.md. Its proposed
 keyboard-state replacement subsequently failed the native throughput trials
 above; it is not the selected playable input path.
 
@@ -40,12 +40,12 @@ checksum/rollback test and allowed59 to complete both pre-read ready messages.
 helper stop), but both native clients sent32 packets/64rows and received none
 in the trace; confirmation remained0. Reject59 as the gameplay replacement.
 Keep the exact counterexample for the owning post-read delivery repair.
-Evidence is in smashcraft:evidence/journal0059-evidence-20261004/; controller
+Evidence is in makgora:evidence/journal0059-evidence-20261004/; controller
 latency, original-frame application and pause/stall guarantees are not proven.
 No alternative has beaten the delivered direct-sync baseline.
 
 **Populated preload-file ingestion reproduces the seconds-long backlog.**
-The same two Warcraft III 3.0 clients ran exact Smashcraft 0.0.24, build
+The same two Warcraft III 3.0 clients ran exact Mak'gora 0.0.24, build
 `netcode-0024`, SHA256
 `1aa3895cbc98919fe7c300d8e71863e79faae853322bcde3b027b0c05e4c6a0f`.
 Fresh readiness identified two human fighters in slots 0 and 2. Both were in
@@ -73,8 +73,8 @@ simulation frames differ; the exports do not prove paired terminal checksums.
 The result narrows the slow behavior to populated-file integration under these
 conditions. It does not yet identify which operation inside that path causes it.
 
-Evidence: `smashcraft:evidence/native-journal-packet-comparison-20261004/isolation0024/`.
-Details: `smashcraft:evidence/native-companion-landing-result-20261004.md`.
+Evidence: `makgora:evidence/native-journal-packet-comparison-20261004/isolation0024/`.
+Details: `makgora:evidence/native-companion-landing-result-20261004.md`.
 
 Earlier 0.0.23 missing-file trials delivered all 60 messages/arm/client with
 about 91–111 ms mean echo. Repeated missing-file reads alone did not reproduce
@@ -85,7 +85,7 @@ inside callbacks.
 
 ## Follow-up: fresh paths alone did not reproduce the backlog
 
-The same retained clients ran exact Smashcraft 0.0.28 / `netcode-0028`, SHA256
+The same retained clients ran exact Mak'gora 0.0.28 / `netcode-0028`, SHA256
 `38d3fd123d2818d0e16e14b58b23cebb467b0ef1cc79067d8ea8f78077646fae`, in
 MATCH with human slots 0 and 2 and spare slots closed. Ctrl+P offered 100
 messages/client/arm at 30 Hz through `SC_GP`. Every arm used the same 16-byte
@@ -111,7 +111,7 @@ contents and longer sustained runs remain deciding tests; do not diagnose
 Preloader, tooltip updates or an engine limit from these observations alone.
 No physical response, paired checksum or 60 Hz claim follows from this probe.
 
-Evidence: `smashcraft:evidence/native-journal-packet-comparison-20261004/fileio0028/`.
+Evidence: `makgora:evidence/native-journal-packet-comparison-20261004/fileio0028/`.
 
 ## Longer changing-content reproduction on 0.0.28
 
@@ -135,18 +135,18 @@ content from duration or diagnostic-driver behavior. The next discriminator
 uses 300 changing values and a shared 30 Hz driver for generated, tooltip-only
 and fresh-file arms.
 
-Evidence: `smashcraft:evidence/native-journal-packet-comparison-20261004/isolation0028/`.
+Evidence: `makgora:evidence/native-journal-packet-comparison-20261004/isolation0028/`.
 
 The 0.0.28 order ready receipts identify existing owned Footmen and enabled
 selection, but immediate selected flags were zero. Native details later showed
 a Footman. Neither a held Stop hotkey nor a real UI right-click produced an
 exact-carrier receipt. Selection/command UI usability remains unproved; this
 is a harness boundary, not a native-order latency or reliability verdict.
-Evidence: `smashcraft:evidence/native-journal-packet-comparison-20261004/order0028/`.
+Evidence: `makgora:evidence/native-journal-packet-comparison-20261004/order0028/`.
 
 ## Matched changing-content discriminator on 0.0.29
 
-Both retained clients ran exact Smashcraft 0.0.29 / `netcode-0029`, SHA256
+Both retained clients ran exact Mak'gora 0.0.29 / `netcode-0029`, SHA256
 `c151677f5decc8172a27c61fc39a3268c323ff68f5d24e9453aa599e8fe2591b`, in MATCH
 with slots 0/2 and other slots closed. Build passed with zero errors/18 warnings.
 All arms offered 300 changing 16-byte values/client at 30 Hz using a shared
@@ -174,13 +174,13 @@ trial. Native displayed read duration remains zero and does not measure wall
 blocking. These are sequential game-clock own-echo measurements; no physical
 response or full competitive acceptance follows.
 
-Evidence: `smashcraft:evidence/native-journal-packet-comparison-20261004/fileio0029/`.
+Evidence: `makgora:evidence/native-journal-packet-comparison-20261004/fileio0029/`.
 
 ## What the actual pinned libraries do
 
 The historical map used for these library observations was Wurst compiled to
 Lua for Warcraft III 3.0. Its recorded compiler and standard-library identities
-were declared in that revision's `smashcraft:wurst-toolchain.lock`:
+were declared in that revision's `makgora:wurst-toolchain.lock`:
 compiler `9913e1bd300c2053637d756a11bae8c3c8ed568f`, standard library
 `bb1e0458db5a372ba2a6928112452785e435d01a`.
 
@@ -219,7 +219,7 @@ Small-value tests cannot establish general 32-bit throughput.
 The 0.0.24 order probe wrote paired ready receipts, but the first real Stop
 attempt produced no order receipts. Selection/hotkey/command usability remains
 unproved; this is not evidence that native orders are slow or unreliable.
-Evidence: `smashcraft:evidence/native-journal-packet-comparison-20261004/order0024/`.
+Evidence: `makgora:evidence/native-journal-packet-comparison-20261004/order0024/`.
 
 ## Historical claims and their limits
 
@@ -265,7 +265,7 @@ vision/occlusion; it does not establish that every local fly-height change is
 safe or that every call desyncs.
 
 The scoped authored-source trace found one `GetLocationZ` call in
-`smashcraft:wurst/Melee.wurst`, initializing `floorHeight`. Its consumers position
+`makgora:wurst/Melee.wurst`, initializing `floorHeight`. Its consumers position
 effects and audio. The native fighter's fly height is independently calculated
 from `1800 + z`; authored fighting geometry is separate. This trace did not find
 the local terrain height feeding fighter collision/combat or native unit height.
@@ -301,7 +301,7 @@ rounded toward zero, and 23.123998641967773 on the host. A 32-bit Lua whose raw
 checksum, which no round-to-nearest runtime did. It still diverged on the others,
 so toward-zero is not the whole model. Wisp now compiles `f32(a + b)`,
 `f32(a - b)` and `f32(a * b)` to exact binary32 operations. Evidence:
-smashcraft:evidence/native-divergence-20261006/README.md.
+makgora:evidence/native-divergence-20261006/README.md.
 
 Raw division and literals still differed natively until Wisp 6c466bb. In the
 7 October Rifleman pad run (Wisp e74e784), every fighter line matched the
@@ -313,10 +313,10 @@ with the literal `0.016666667` read as 0x1.11111p-6, the binary32 below the
 nearest. Wisp now compiles `f32(a / b)` to the exact `divideFloat32` and
 prints literals as exact hexadecimal floats. Its toward-zero Lua32 also rounds
 `/` and decimal numerals toward zero, so tapes catch both. Evidence:
-smashcraft:evidence/native-camera-divergence-20261007/README.md.
+makgora:evidence/native-camera-divergence-20261007/README.md.
 
 `string.pack`, `load` and `math.type` are available to map code. Evidence:
-smashcraft:evidence/warcraft-lua-numbers-20261005/README.md.
+makgora:evidence/warcraft-lua-numbers-20261005/README.md.
 
 ## Preloader reads in the game
 
@@ -327,7 +327,7 @@ content. A path that was missing when probed is read once it appears. Anything
 the map reads more than once from a host-written file therefore needs a new
 name for new content. Hot reload numbers its manifests and names its chunk
 files by payload checksum. Evidence:
-smashcraft:evidence/warcraft-preloader-cache-20261005/README.md.
+makgora:evidence/warcraft-preloader-cache-20261005/README.md.
 
 ## Ending a Battle.net game from script
 
@@ -378,9 +378,9 @@ callback after its first: it goes out on any credit not below zero, so the
 two presses are the two-message burst, and credit may fall to one message
 below zero until the cadence refills it. No three messages go on
 consecutive callbacks (#215,
-smashcraft:ts/src/game/netcode/journal/transport.ts). A message carries
+makgora:ts/src/game/netcode/journal/transport.ts). A message carries
 every admitted frame not yet sent, in order, as an I5 message
-(smashcraft:ts/src/game/input/wire.ts): the first frame's row, then only rows
+(makgora:ts/src/game/input/wire.ts): the first frame's row, then only rows
 that differ from holding the row before them, each after a count of held
 frames. A hold keeps held buttons, stick and triggers and drops edges, press
 vectors and throw taps, exactly as remote prediction does, so holds cost no
@@ -408,7 +408,7 @@ The companion helper assigns each row by its own clock, `segment_frame +
 floor((t − epoch)·60/1e9)`, so it keeps journaling 60 frames a second whatever
 the game does. Each 60 Hz callback admits the local journal's rows, runs
 confirmed frames on accepted rows, reconciles, and runs speculative frames on
-local rows and predictions (smashcraft:ts/src/host/loop/rollback.ts).
+local rows and predictions (makgora:ts/src/host/loop/rollback.ts).
 When the game loses time — a stall, or a game clock behind real time, as
 saturated clients showed (wisp:docs/network-model.md) — the helper is ahead
 by the lost time, and only running more than one frame a callback brings the
@@ -423,7 +423,7 @@ reach the screen later and later until the helper's 120-record output queue
 fills (4 s), then stay that late, the lasting slowdown the 0.0.47 playtest
 reported (#48).
 
-Since #48, `CATCH_UP_FRAMES` (smashcraft:ts/src/game/session/playback.ts) bounds
+Since #48, `CATCH_UP_FRAMES` (makgora:ts/src/game/session/playback.ts) bounds
 every callback alike: at most 6 admitted rows, 6 confirmed and 6 speculative
 frames, the confirmed and speculative limits it had before. A sender may admit
 `FUTURE_LIMIT` = 128 frames past its confirmed frame (64 before): while catching
@@ -435,8 +435,8 @@ so every client accepts every admitted row alike. Measured from the
 receiver's own confirmed frame, a client that came out of three 2 s stalls
 behind refused rows its peer had already admitted (`tooFarAhead`), the ledgers
 parted, and the match froze on network seeds 11 and 14 of
-smashcraft:ts/test/local-start.test.ts.
-smashcraft:ts/test/lag-recovery.test.ts stalls both games, then one, for 2 s
+makgora:ts/test/local-start.test.ts.
+makgora:ts/test/lag-recovery.test.ts stalls both games, then one, for 2 s
 in a two-client playable match with a computer fighter and #26's dense taps:
 both clients are back to their pre-stall lag within 47 callbacks (0.78 s),
 no callback runs more than 6 frames of any kind, every confirmed frame ran
@@ -446,7 +446,7 @@ Over seeds 7, 11, 13 and 17 and three stall times the recovery took
 
 The helper's rows reach the map as text typed into its edit box, and
 Warcraft takes that text at a cost that grows with how much it takes at once.
-In 0.0.48's native bot session (smashcraft:evidence/bot-session-0048-native-20261006/),
+In 0.0.48's native bot session (makgora:evidence/bot-session-0048-native-20261006/),
 after each 2 s stop of client B its helper typed the 16 records its window
 allowed, 608 characters, in one go: B's receipts then came about 280 ms apart
 instead of 100, each time with all 16 records, and the helper's clock stayed
@@ -463,11 +463,11 @@ says arrived, and while a record waits untyped, contiguous row packets pack
 into the existing I5 message format (at most 64 frames). Holds omit repeated
 rows; every press and release remains on its original frame. A message joins
 the waiting record only when its complete envelope still fits 160 characters
-(smashcraft:controller/README.md). Dirty text receipts
+(makgora:controller/README.md). Dirty text receipts
 are written every two map ticks, at most 30 per client per second, so the
 smaller typing window drains within the recovery budget. The map admits a joined
 record's rows within the same per-callback budget, over as many callbacks as
-it takes. smashcraft:ts/test/lag-recovery.test.ts charges each frame's typed
+it takes. makgora:ts/test/lag-recovery.test.ts charges each frame's typed
 text as Warcraft's stop, 0.00003 frames per character squared, with the
 callbacks Warcraft owes then caught up 10 a frame: the old typing never
 recovers from a 2 s stall there and needs 0.8 s after a 0.5 s one, with late
@@ -519,7 +519,7 @@ four-fighter callback confirming a message allocated 571 KB at p50 and
 1.65 MB at p95, and callbacks in which the collector freed memory were the
 slowest of the run. Since Wisp 880e4e8 binary32 allocates nothing for a
 normal result, and replay copies only what it must
-(smashcraft:docs/typescript.md); the same callbacks allocate 18 and 26 KB,
+(makgora:docs/typescript.md); the same callbacks allocate 18 and 26 KB,
 a solo match 8.8 KB a callback instead of 45, and a callback in which the
 collector freed memory is no slower than the others. Measured interleaved
 with the build before on the same busy host, four fighters' confirming
@@ -529,7 +529,7 @@ Exact f32 arithmetic (#59) made every frame about a quarter costlier, and
 the worst four-fighter callbacks ran 21–31 frames: a message's 6 confirmed
 frames, a correction 15–24 frames deep replayed whole, and up to 6
 predicted. Every frame costs about the same, so each kind is now bounded
-(smashcraft:ts/src/game/session/playback.ts): a correction replays at most 6
+(makgora:ts/src/game/session/playback.ts): a correction replays at most 6
 frames a callback in the history's own state while the speculative match
 keeps running local rows, and replaces it once the replay reaches the
 present; a message's frames confirm 3 a callback, and only a backlog of
@@ -555,13 +555,13 @@ remote player's rows have arrived (`ShadowInputSchedule.remoteThrough`). It
 used to count from K, which also waits for the player's own rows to come back
 through Battle.net, though a row is final once the map captures it. In
 0.0.49's native bot session
-(smashcraft:evidence/bot-session-0049-native-20261006/), client B's own echo
+(makgora:evidence/bot-session-0049-native-20261006/), client B's own echo
 took 120 ms at p50 and 409 ms at p95, against 294 ms at p95 for A.
 Prediction then stopped 24 frames past B's own echo while A's rows had
 arrived further: of the presses more than a second from any stop, two of B's
 started their prediction 4 and 16 callbacks after capture.
 
-smashcraft:ts/test/local-start.test.ts plays that session's four-fighter
+makgora:ts/test/local-start.test.ts plays that session's four-fighter
 match headlessly, with B's messages 100 ms slower and B stopped for 2 s three
 times. Bounded by K, a press in steady play started 4 callbacks late, and
 the presses B's helper journaled while B was stopped started 48–125
@@ -576,12 +576,12 @@ assigned frame is more than R frames beyond the remote rows already received;
 a new row can cross that boundary before the callback runs prediction.
 The response probe writes a `held` row for each
 press captured meanwhile, and the reconcilers report those presses apart from
-#60's gate (smashcraft:ts/scripts/integrity/reconcile.ts, pressResult.ts).
+#60's gate (makgora:ts/scripts/integrity/reconcile.ts, pressResult.ts).
 In that session such a press of A's, made while B's game was stopped,
 started 66 callbacks after capture, and #26's re-run had one at 5 that
 waited for A's rows.
 
-## Hit sounds on predicted frames (smashcraft#30, 24 October 2026)
+## Hit sounds on predicted frames (makgora#30, 24 October 2026)
 
 The playable build draws the speculative match, but sounds started only on
 confirmed frames, and the local input delay of 2 keeps confirmation a frame
@@ -590,7 +590,7 @@ fb77ff639 heard 124 of 238 hit sounds on the drawn hitstop frame, 76 one
 frame late and 38 two late. A hit sound (the hit voice class) now starts as
 the speculative frame that lands the hit runs, and the confirmed frame and any
 re-run of that frame skip it by the fighter, frame and hit, shield and special
-serials (smashcraft:ts/src/game/render/combatEffects.ts, `presentPredicted`).
+serials (makgora:ts/src/game/render/combatEffects.ts, `presentPredicted`).
 Movement, special and KO sounds still start on confirmed frames, and the
 voice cap, priority and ducking are unchanged.
 
@@ -644,7 +644,7 @@ the rate a player sees is `spec`.
 Wisp's LAN host loses a further 0.03–0.1% in LAN games, because each turn's
 length is rounded to whole milliseconds and the remainder is dropped
 (wisp:host/lan/host.ts, `step`): host game time ran 0.999–0.9997 of wall time
-in 24 October action logs. Evidence: ~/.local/state/smashcraft/evidence/sc-18-fps/.
+in 24 October action logs. Evidence: ~/.local/state/makgora/evidence/sc-18-fps/.
 
 ## Stepping the simulation from real time
 
@@ -652,7 +652,7 @@ The playable build's keyboard loop used to run one extra frame in a callback
 only while its frame was at or under the epoch's callback count, so it
 simulated as many frames as Warcraft's game clock gave callbacks: 59.71 a real
 second by 512 game seconds and 58.82 past 1024 (above). It now takes its frame
-target from real time (smashcraft:ts/src/host/loop/realFrames.ts, c8482811a8).
+target from real time (makgora:ts/src/host/loop/realFrames.ts, c8482811a8).
 On the epoch's first unpaused match callback, and again on resume, it stores
 the current frame and `os.clock`; after that a frame is due when
 `anchorFrame + floor(60 × (os.clock − anchorSeconds))` reaches it, read as one
@@ -670,7 +670,7 @@ lands on a confirm-6 or repair callback; at most two speculative frames run a
 callback. Without `os.clock`, or from 65536 s of process uptime, where its
 binary32 step passes 4 ms, the target is the callback count again.
 
-A keyboard callback confirms at most 2 frames, not 3 (smashcraft#239). With a
+A keyboard callback confirms at most 2 frames, not 3 (makgora#239). With a
 repair pending, the repair also replays every frame the callback confirms, so
 a 3-confirmed callback ran about six frames of work: the 10–11 ms callbacks of
 the laptop native-perf capture. Confirmed frames make natives that must match on
@@ -686,7 +686,7 @@ predicted, and a 6-frame debt took 3.75 callbacks on average (at most 10)
 instead of 2.86 (at most 6).
 
 With 2 or fewer confirmable frames, every callback confirms 1, in both
-paths (smashcraft#239). Native rows arrive two frames every other callback:
+paths (makgora#239). Native rows arrive two frames every other callback:
 the laptop native-perf capture at 33ee5f809 confirmed exactly 0 or 2 frames in
 each of its 7,200 callbacks, half each, and the 2-frame half held 9 of the 10
 callbacks over 10 ms and 74 of the 81 over 8 ms (mean 5.96 ms against 4.68).
@@ -706,7 +706,7 @@ callbacks already run exactly 60 a game second, and a per-client period makes
 timer expiry, which is synchronized state, differ between clients.
 
 Headless checks, uncommitted scripts with the command and output on
-smashcraft#18 (issue comment 6388239655, 24 October 2026), since Smashcraft's
+makgora#18 (issue comment 6388239655, 24 October 2026), since Mak'gora's
 unit tests were removed on 2026-10-20:
 
 - The due-frame function in Bun and Lua32 for clock starts 8192–65474 s: `due`
@@ -721,7 +721,7 @@ unit tests were removed on 2026-10-20:
   1,482 checksums differed, 14,696 rows matched, `waitingFor` stayed 0, the
   lead peaked at 18 frames (R − 4 = 20) and the end gap was 0.
 
-Native check (smashcraft#18 box E, 24 October 2026): one offline LAN pool pair
+Native check (makgora#18 box E, 24 October 2026): one offline LAN pool pair
 on the laptop, Classic 3.0.0.24268, the playable build from d9e69a1617, one
 Endless quick match of 280 game seconds with 2 live clients throughout and CPU
 pressure at most 0.54. Over 128–280 s on clients a and b: game time ran 0.99683
@@ -734,7 +734,7 @@ checksums each differed. The worst callback per second was at most 10.009 ms in
 10.986 ms overall. Two earlier runs found the two pacing defects above: client
 a held the callback rate after a 2.86 s gap (negative debt never re-anchored,
 fixed in 53ef6d7938), then both clients overshot to 61.05 (fixed in
-d9e69a1617). Evidence: ~/.local/state/smashcraft/evidence/sc-18-realtime-laptop/.
+d9e69a1617). Evidence: ~/.local/state/makgora/evidence/sc-18-realtime-laptop/.
 
 ## Native 0.0.29 short transport comparison
 
@@ -769,7 +769,7 @@ one second at 60 Hz; these trials do not prove sustained capacity, fairness or
 a faster physical input path. No superior transport is established yet.
 
 Raw exports and host collection evidence:
-smashcraft:evidence/native-journal-packet-comparison-20261004/transports0029/.
+makgora:evidence/native-journal-packet-comparison-20261004/transports0029/.
 
 ## Native 0.0.29 order-command failure
 
@@ -783,16 +783,16 @@ reading address 0x2C58 on both clients. This
 association does not establish the exact cause or receipt timing. Native-order
 transport remains unproved. Crash reports, dumps and replay remain private;
 authored observation and numerical ready/selection exports are retained in
-smashcraft:evidence/native-journal-packet-comparison-20261004/order0029/.
+makgora:evidence/native-journal-packet-comparison-20261004/order0029/.
 
 ## Matched direct-Preloader and constant-content comparison on 0.0.31
 
-Both retained Warcraft III 3.0 clients ran exact Smashcraft 0.0.31,
+Both retained Warcraft III 3.0 clients ran exact Mak'gora 0.0.31,
 `netcode-0031`, SHA256
 `311214a2e6b4d1019be4f98c66e5cec2f8e136b3129f643b0f53de57ee88b9c9`.
 Source base was shared main 6884e987 plus the retained diagnostic edits in
-smashcraft:wurst/NativePreloadProbe.wurst and
-smashcraft:wurst/NativeTransportProbe.wurst. The build passed with zero errors
+makgora:wurst/NativePreloadProbe.wurst and
+makgora:wurst/NativeTransportProbe.wurst. The build passed with zero errors
 and 18 warnings. Native readiness confirmed human mask 5, slots 0/2 in MATCH;
 spare slots were closed. The same independent 30 Hz driver and SC_GP receiver
 sent 300 values/client/arm, each with a 22-byte envelope (6,600 bytes/arm).
@@ -821,7 +821,7 @@ OS scheduling cause, or repair. Sequential arm order remains a limitation.
 Native read durations display zero and do not measure blocking wall time.
 Own-echo ages are game-clock measurements, not physical button-to-pixel latency.
 
-Evidence: smashcraft:evidence/native-journal-packet-comparison-20261004/fileio0031/.
+Evidence: makgora:evidence/native-journal-packet-comparison-20261004/fileio0031/.
 
 ## Direct-sync serialization diagnostic on 0.0.31
 
@@ -858,7 +858,7 @@ protocol integrity. These one/two-second injection windows do not establish
 sustained capacity, harmless selection interaction, fairness or physical response.
 No alternative beats the direct-sync baseline on established usable evidence.
 
-Evidence: smashcraft:evidence/native-journal-packet-comparison-20261004/transports0031/.
+Evidence: makgora:evidence/native-journal-packet-comparison-20261004/transports0031/.
 
 
 ## Minimum-integer compiler repair activated
@@ -870,7 +870,7 @@ and serialized as scientific notation. Both focused upstream regressions passed
 (2 passed, 0 skipped), and the generated reproduction executed successfully.
 
 Compiler checkpoint `6b129956f6e7cf9582510f26b99d305526bf3ded` is published
-in the declared compiler repository and pinned by smashcraft:wurst-toolchain.lock.
+in the declared compiler repository and pinned by makgora:wurst-toolchain.lock.
 Compiler JAR SHA256 is
 `9495b1f3ad1f1baf53335934e9152874773e6c735b0e5db819b3e7f06c82ed15`.
 The consumer’s focused input-protocol checks pass 7/7 with zero errors and nine
@@ -908,7 +908,7 @@ No alternative has demonstrated a reliably faster path. These measurements
 are transport echoes, not physical controller-to-screen response. The collector
 captured all twelve receipts over 32.541 host seconds; it was started before
 the trigger, so that span includes setup. Evidence:
-smashcraft:evidence/native-journal-packet-comparison-20261004/transports0032/.
+makgora:evidence/native-journal-packet-comparison-20261004/transports0032/.
 
 Next diagnostic separates changing preload script execution from the origin of
 the value sent on the wire. Full responsive companion-to-fight acceptance remains
@@ -921,7 +921,7 @@ Candidate source4640a03, SHA256805fd31e96f35f1eff3bec65cb92a9db3a3370cc09e680a83
 zero build errors18warnings. Same two clients in one match, slots0/1 mask3,
 spare slots closed. Fresh4800 fixtures,128bytes each, source-slot0. All five
 arms send changing22-byte envelopes through the same receiver at30Hz,300/client.
-Arm definitions: smashcraft:evidence/preloader-source-discriminator.md.
+Arm definitions: makgora:evidence/preloader-source-discriminator.md.
 
 | Arm | A mean / maximum | B mean / maximum |
 | --- | ---: | ---: |
@@ -948,7 +948,7 @@ that a vocabulary decoder will sustain controller throughput. Sequential order,
 one tested build/topology,and own-echo timing remain limits. No physical latency
 or full gameplay acceptance follows.
 
-Evidence: smashcraft:evidence/native-journal-packet-comparison-20261004/fileio0034/.
+Evidence: makgora:evidence/native-journal-packet-comparison-20261004/fileio0034/.
 
 
 ## Vocabulary startup attempt: 0.0.36
@@ -962,7 +962,7 @@ This supplies no vocabulary throughput or latency result. The exact transition
 cause remains unresolved. Candidate0.0.38 adds probe-local request, synchronized
 entry, completed-reset markers and an F5 developer-exit marker before testing
 the same six arms. These startup writes precede the timed arms.
-Evidence: smashcraft:evidence/native-journal-packet-comparison-20261004/vocabulary0036/.
+Evidence: makgora:evidence/native-journal-packet-comparison-20261004/vocabulary0036/.
 
 ## Parallel physics and VFX checkpoint
 
@@ -978,8 +978,8 @@ is not a separately maintained normalized trajectory comparison. The native
 This establishes a scale-conversion defect and native arithmetic difference,
 without assigning all broad native35 mismatches to either. Explicit nearest
 operations accepting operands before arithmetic are being repaired upstream.
-Evidence: smashcraft:evidence/native-physics-precision-20261004/native0037.txt and
-smashcraft:evidence/native-physics-precision-20261004/native0037-analysis.json.
+Evidence: makgora:evidence/native-physics-precision-20261004/native0037.txt and
+makgora:evidence/native-physics-precision-20261004/native0037-analysis.json.
 
 Upstream test-harness R2SW formatting repair `0fe2efc959049b4ede2b86c66ae61c130eb04b55`
 is published; focused execution passed1/1 with zero skips. The diagnostic
@@ -1003,12 +1003,12 @@ timeout and heavy directory scans are retained as confounds; the collector now
 checks exact expected paths. Do not integrate a live vocabulary writer on this
 evidence. Existing separate-prefix transport control now distinguishes the
 SC_GP receive boundary from general synchronization failure.
-Evidence: smashcraft:evidence/native-journal-packet-comparison-20261004/vocabulary0038/.
+Evidence: makgora:evidence/native-journal-packet-comparison-20261004/vocabulary0038/.
 
 The operator clarified that intended input frames and responsive viable play
 are primary. Physical33/50/83ms percentiles guide measurement; they are not
 rigid substitutes for input correctness or playable acceptance. Comprehensive
-current state: smashcraft:evidence/smashcraft-delivery-state-20261004.md. Upstream
+current state: makgora:evidence/makgora-delivery-state-20261004.md. Upstream
 Binary32 explicit operand repair e3714f629113ee682353c3244065fee3e7d9ae16
 passed15/15 and is published; consumer/native integration remains pending.
 
@@ -1035,8 +1035,8 @@ claimed. No additional transport survey blocks this usable candidate.
 Map SHA256 13f0ba7f6a78eff1c7f71e14f2c398ebeb38c6f24b06aad9b2540f4f7eaa1f17,
 source fa681100fc429735720325bf479f5bcd6944f25d plus map-version 0.0.40.
 Build settings and usable instructions:
-smashcraft:evidence/smashcraft-delivery-state-20261004.md. Raw traces:
-smashcraft:evidence/native-playable-0040-evidence-20261004/.
+makgora:evidence/makgora-delivery-state-20261004.md. Raw traces:
+makgora:evidence/native-playable-0040-evidence-20261004/.
 Binary32 consumer migration is integrated and focused 22/22 passed; world-scale
 representation and full native physics fidelity remain separate open work.
 
@@ -1051,14 +1051,14 @@ physical event capture, actual raster presentation, or hardware-to-pixel latency
 The initial rapid-repeat sequence overlapped 15-frame shield-release recovery
 and is excluded from per-press timing conclusions. Clean native-game-clock
 probe data and host XTEST submission brackets are retained separately at
-smashcraft:evidence/native-playable-0040-evidence-20261004/response/.
+makgora:evidence/native-playable-0040-evidence-20261004/response/.
 
 The current SDL3/EventMapper/enigo companion also completed a native virtual-pad
 trial: movement and all three 100 ms attack presses appeared at both clients,
 with six matching confirmed checkpoints. Private foreground eligibility was
 observed before emission. This establishes the software mapper/game seam under
 the tested conditions, not physical hardware timing or short-stall retention.
-Evidence: smashcraft:evidence/native-playable-0040-evidence-20261004/controller-mapper/.
+Evidence: makgora:evidence/native-playable-0040-evidence-20261004/controller-mapper/.
 
 ## Journal pause publication boundary
 
@@ -1069,7 +1069,7 @@ for the preload function's closing line before parsing; the focused partial-writ
 regression and helper build passed. Final native pause/resume remains open.
 The digital mapper and its responsive native 0.0.40 result remain separate.
 Exact candidate, failure limits and recovery state:
-smashcraft:evidence/journal-pause-checkpoint-20261004.md.
+makgora:evidence/journal-pause-checkpoint-20261004.md.
 
 The corrected native retry retained both edges of a roughly 5.1 ms virtual-pad
 tap at original frame 19 in both helpers. They published through frame 2130
@@ -1079,7 +1079,7 @@ produced complete PAUSE requests on both clients at journal cursor 65 after
 the helpers were reaped. The driver never exercised resume or its planned
 helper stall. This remains an unfinished native integration check; helper
 edge retention does not establish intended-frame gameplay application.
-Evidence: smashcraft:evidence/journal-pause0041-evidence-20261004/.
+Evidence: makgora:evidence/journal-pause0041-evidence-20261004/.
 
 
 ## Native 0.0.42 journal decision
@@ -1098,8 +1098,8 @@ usable native journal ingress or original-frame gameplay application.
 Keep 0.0.40 as the playable keyboard/digital-mapper candidate. Do not reopen the
 transport survey or treat this incomplete analog-file experiment as evidence
 that its responsive digital input path regressed. Details and bounded logs:
-smashcraft:evidence/journal-pause-checkpoint-20261004.md and
-smashcraft:evidence/journal0042-evidence-20261004/.
+makgora:evidence/journal-pause-checkpoint-20261004.md and
+makgora:evidence/journal0042-evidence-20261004/.
 
 ## Native43: callbacks progress, confirmation does not
 
@@ -1117,8 +1117,8 @@ A subsequent generated-packet probe had no local-request receipt, so it gives
 no sync-performance verdict. Both signed-in clients then left normally and
 the playable 0.0.40 artifact was restored. The experiment remains unfinished;
 no general transport survey or repeated green checks block usable delivery.
-Details: smashcraft:evidence/journal-pause-checkpoint-20261004.md.
-Evidence: smashcraft:evidence/journal0043-evidence-20261004/.
+Details: makgora:evidence/journal-pause-checkpoint-20261004.md.
+Evidence: makgora:evidence/journal0043-evidence-20261004/.
 
 ### Journal44/45 integration checkpoint (4 October 2026)
 
@@ -1130,7 +1130,7 @@ tap captured during a 250 ms helper stop did not reach gameplay in either
 This establishes working startup and one original-frame application, while
 sustained journal input remains unusable. It does not change the playable40
 digital mapper verdict. Detailed results and exact artifact hashes:
-smashcraft:evidence/journal-pause-checkpoint-20261004.md.
+makgora:evidence/journal-pause-checkpoint-20261004.md.
 
 The next selected repair uses identical script text for every present file and
 encodes packet bits by file presence, preserving ready-last atomic publication.
@@ -1145,7 +1145,7 @@ reads. Helpers retainedtap19 andtap97 through a249.893ms stop. Both native
 traces then receivedzero production packets across300callbacks; confirmation
 stayed0. Both taps were unapplied. The failed source representation was retired
 and archived privately, with bounded evidence retained at
-smashcraft:evidence/journal0046-evidence-20261004/.
+makgora:evidence/journal0046-evidence-20261004/.
 
 Direct sync with the delivered keyboard/digital mapper remains the usable
 choice. Original-frame short-tap/stall retention through FileIO is not delivered.
@@ -1187,11 +1187,11 @@ do not identify the owning cause. 49 therefore provides no input-performance
 verdict and is rejected as a playable replacement.
 
 The experimental JASS source and raw failure records are retained privately at
-`~/.local/share/smashcraft-build-inputs/production-netcode-20261004/archive/native-jass49/`.
+`~/.local/share/makgora-build-inputs/production-netcode-20261004/archive/native-jass49/`.
 The published Lua source and exact compiler artifact were restored. Exact
 playable40 is reinstalled on both clients; its recovery journey is recorded
 separately. The general compiler metadata fix remains in its owned compiler
-branch. Native evidence: smashcraft:evidence/journal0049-evidence-20261004/.
+branch. Native evidence: makgora:evidence/journal0049-evidence-20261004/.
 
 Artifact49 SHA256:
 `d8fcbb8d614188b3047a87985711b6ee04fe372d4eba5cb816ea2313a5a06383`.
@@ -1210,7 +1210,7 @@ The generated JASS also exposed an owning lifecycle defect: destroying Fighter
 did not clear its removed unit reference. Candidate51 moves unit removal and
 reference clearing into Fighter's destructor. This is a concrete resource repair;
 its causal relationship to the desync is unproved pending the native check.
-Evidence: smashcraft:evidence/journal0050-evidence-20261004/.
+Evidence: makgora:evidence/journal0050-evidence-20261004/.
 
 Candidate51 compiled and initialized on both clients, but reproduced the
 disconnect immediately after A's selection, at native turn1281. Presence
@@ -1218,7 +1218,7 @@ tags3792 matched; birth tags5125/5127 differed again. Clearing the Fighter unit
 reference therefore does not close this desync. No helpers started and there is
 no controller-performance verdict. The candidate and source patch are archived
 privately; the published Lua source and exact compiler artifact are restored.
-Evidence: smashcraft:evidence/journal0051-evidence-20261004/.
+Evidence: makgora:evidence/journal0051-evidence-20261004/.
 
 ## Keyboard journal bridge: first native result
 
@@ -1228,7 +1228,7 @@ after5 native seconds. The helper retained later taps across helper/game stops;
 their application was not observed in that trace. This replacement is rejected
 for throughput pending the owning companion-emission repair. Source checks
 passed but did not establish native speed. See
-smashcraft:evidence/keyboard-mailbox-20261004/README.md.
+makgora:evidence/keyboard-mailbox-20261004/README.md.
 
 The timed native repeat measured about2.75ms median local emission but81–92ms
 median acknowledgment waits. Excluding all carrier keys from synchronized
@@ -1259,7 +1259,7 @@ physical response timing, complete pause/focus lifecycle, hardware/platform
 coverage or all original-frame guarantees. Playable 0.0.40 remains separate.
 The source pins, exact artifact identities, corpus, failed attempt, final
 reconciliation and raw logs are in
-smashcraft:evidence/editbox-ingress-native-20261005/README.md.
+makgora:evidence/editbox-ingress-native-20261005/README.md.
 
 ## Tempest-checksum desyncs: handles made at a per-client moment (#158)
 
@@ -1273,7 +1273,7 @@ function where a native takes `code` counts too: `TimerStart`,
 `TriggerAddAction`, `Condition`, `Filter`, `ForGroup`. So does starting,
 pausing or restarting a shared timer. Create these at setup or from a
 synchronized event, and on the local path only read them (`TimerGetElapsed`).
-The desync guard (smashcraft:ts/test/desync-guard.test.ts) pins the input
+The desync guard (makgora:ts/test/desync-guard.test.ts) pins the input
 trace's start this way. Its lockstep compare flags any synchronized native a
 one-client call makes.
 
@@ -1282,7 +1282,7 @@ its own `os.clock` and its own prediction. Chen's parasol was created and
 destroyed on presented frames, and two 0.2 Battle.net games desynced on the
 first match with Chen (#681). Make a presentation's effects with the fighter's
 renderers and only show and hide them afterwards.
-smashcraft:ts/test/online-handles.test.ts drifts one client's clock and compares
+makgora:ts/test/online-handles.test.ts drifts one client's clock and compares
 handle births and deaths per turn while Chen opens and folds his parasol.
 
 If one client creates a handle a turn earlier than the other, the two
@@ -1299,7 +1299,7 @@ presence ±4. Every other Desync.log section matches.
 
 **Handle ledger (#681).** A desync seen from one client's Desync.log alone
 can't say which call split the clients. Every online client therefore keeps a
-ledger (smashcraft:ts/src/host/loop/handleLedger.ts). At install it wraps each
+ledger (makgora:ts/src/host/loop/handleLedger.ts). At install it wraps each
 native in `LEDGER_NATIVES`: the effect, lightning, frame, sound, text tag,
 timer, trigger, event-registration and location natives the map calls. It
 counts each call against the game tick it ran in, which `shell.tick` advances.
@@ -1309,27 +1309,27 @@ Once every 60 ticks each human sends its count for the finished window, with
 up to 12 nonzero ticks and each tick's first native, as a ledger-only `SC_DY`
 message (`lWINDOW:TOTAL,OFFSET.COUNT.NATIVE,...`). Each client compares every
 other player's report with its own window. At the first difference it writes
-`smashcraft-handle-ledger-pSLOT-tTICK.txt` in CustomMapData, for example
+`makgora-handle-ledger-pSLOT-tTICK.txt` in CustomMapData, for example
 `handle ledger: p1 and p0 differ at tick 632: p1 made or freed 1 (CreateTimer)
 and p0 0 ()`. Both clients receive each other's reports, so both write the line,
 each naming its own natives for that tick. When the difference lies past the
 12 ticks a report carries, the line names the window's tick range and totals.
-smashcraft:ts/test/handleLedger.test.ts makes one of two online clients create
+makgora:ts/test/handleLedger.test.ts makes one of two online clients create
 one extra timer and checks that both name that tick and `CreateTimer`. Frame
 lookups (`BlzGetOriginFrame`, `BlzGetFrameByName`) aren't counted.
 ## Input sampling against the LAN host's turn interval (24 October 2026)
 
-Asked: can Smashcraft sample more than about 40 inputs a second if the host
+Asked: can Mak'gora sample more than about 40 inputs a second if the host
 sends turns faster than Battle.net's 25 ms? Measured on Warcraft III
 3.0.0.24268 (Classic, offline LAN pair 0 on gex45, 60 fps cap), integrity
 build from this commit's source, Rifleman mirror quick match with nine stocks.
 
 Method. `-dev callback-clock N` (development builds only,
-smashcraft:ts/src/host/loop/callbackClock.ts) records `os.clock` (1 ms
-resolution, smashcraft:docs/high-refresh.md) at every `shell.tick` callback
+makgora:ts/src/host/loop/callbackClock.ts) records `os.clock` (1 ms
+resolution, makgora:docs/high-refresh.md) at every `shell.tick` callback
 and whether `BlzIsKeyPressed` reports the attack key `c` down, plus the
 rollback counters every 600 callbacks, into
-`smashcraft-callback-clock-pSLOT-runN.txt`. A host-side driver pressed `c`
+`makgora-callback-clock-pSLOT-runN.txt`. A host-side driver pressed `c`
 on both clients through private-desktop XTEST every 280–520 ms for 50–90 ms,
 stamping each press on CLOCK_MONOTONIC (worst send lateness 0.7 ms); heavy
 runs added a random tap of `[ ] ; ' t v 1 2` every 30–80 ms on each client.
@@ -1338,7 +1338,7 @@ not made (no long native runs before 0.1.0). The host's action log gave turn
 times and each client's synchronized key actions. Host CPU pressure stayed
 under 1.3% (`/proc/pressure/cpu` avg10) in every run.
 
-**The key state we read follows the synchronized key events.** Smashcraft
+**The key state we read follows the synchronized key events.** Mak'gora
 registers every bound key with `BlzTriggerRegisterPlayerKeyEvent`, so each
 press and release also travels to the host as a `key` action. In every run,
 the probe-key presses that `BlzIsKeyPressed` never reported down at any
@@ -1421,8 +1421,8 @@ length), runs longer than 80–120 s, and renderer frame times.
 
 **Shorter turns (second session, wisp#31).** The rows marked "second
 session" ran later the same day on pair 0 in one pool session, after a
-discarded first match: the integrity build of smashcraft 3f765ea24 (before
-the smashcraft#218 tap fix), Wisp's deadline-paced host from wisp d04d0c5,
+discarded first match: the integrity build of makgora 3f765ea24 (before
+the makgora#218 tap fix), Wisp's deadline-paced host from wisp d04d0c5,
 the same driver and seed, 80 s per run. Client cores are both clients'
 CPU time over the run's wall time. At 10 ms and 8 ms the host held 100.0 and
 125.0 turns a second at game pace 1.000 with no host wait, the clients stayed
@@ -1443,14 +1443,14 @@ What mattered was steady turns: a deadline-paced host at 25 ms sampled as
 well as a 17/17/16 cycle and as a solo game, with every tap seen and a 1-frame
 spread. Keep Wisp's default at Battle.net's 25 ms, now deadline-paced, so
 native checks see the grid players get; `--turn-ms 17,17,16` stays available
-for one turn per frame. A relay Smashcraft runs itself should pace turns
+for one turn per frame. A relay Mak'gora runs itself should pace turns
 against deadlines; 17/17/16 bought no measured sampling gain over 25 ms here,
 only fewer frames per turn. The remaining lever is the dropped tap
-(smashcraft#218): a stalled client can send a tap's press and release
+(makgora#218): a stalled client can send a tap's press and release
 together, and in light-input runs exactly those taps never showed as held
 keys.
 
-## Taps a stalled client never polls (smashcraft#218, 24 October 2026)
+## Taps a stalled client never polls (makgora#218, 24 October 2026)
 
 Measured on Warcraft III 3.0.0.24268 (Classic, offline LAN pair 2 on gex45,
 Wisp's wall-measured 25 ms turns), integrity build, Rifleman quick match,
@@ -1475,7 +1475,7 @@ Warcraft III process (SIGSTOP, SIGCONT) for 120–250 ms every 0.9–1.6 s,
 alternating clients, about 170 stops per run.
 
 **Fix.** The local player's key-down events are reconciled with the polled
-state (smashcraft:ts/src/platform/osKeys.ts, per client in `ShellState`):
+state (makgora:ts/src/platform/osKeys.ts, per client in `ShellState`):
 each rise a poll observes is matched by the key-down event that follows it
 within 240 polls; a key-down event with no observed rise is a press the
 polls missed and is owed. A poll reports one owed press as held when the key
@@ -1517,7 +1517,7 @@ to a player's own input delay. Measured on Warcraft III 3.0.0.24268
 59824cc9b, Rifleman quick match, light scripted taps of `c` for
 50–90 ms every 280–520 ms on both clients through private-desktop XTEST,
 80 s per run, the host deadline-paced at `--turn-ms 17,17,16` (Wisp
-origin/main's LAN host, which Smashcraft's pinned Wisp does not have yet).
+origin/main's LAN host, which Mak'gora's pinned Wisp does not have yet).
 `wisp lan netem --pair 1 --rtt R` delayed every loopback send by R/2 for
 R = 0, 100 and 200 ms, no loss, then R = 0 again. The first match after the
 pool started was thrown away.
@@ -1553,14 +1553,14 @@ one 16.7 ms frame, while the key-down event moved by the full 200 ms and
 the press reached the host 100 ms later. By wisp#32's rule (the read waits
 for the echo if the median grows by at least half the added RTT, and is
 local if it moves by less than one frame), `BlzIsKeyPressed` reads the
-client's own input pump, as smashcraft#218 found at RTT 0. At 100 and
+client's own input pump, as makgora#218 found at RTT 0. At 100 and
 200 ms a 50–90 ms tap was already released when its event arrived, so the
 raw state read up inside every handler. A player's own pressed row
 therefore does not pay the relay's round trip or jitter-buffer depth; the
 opponent's view and rollback depth do (wisp:docs/relay.md, "How it meets
-Smashcraft's frame-stamped inputs and rollback").
+Mak'gora's frame-stamped inputs and rollback").
 
-## Callback silences in a two-human match with a CPU (smashcraft#416, 26 October 2026)
+## Callback silences in a two-human match with a CPU (makgora#416, 26 October 2026)
 
 Asked: in a native two-human match with one CPU, what does each client's
 Lua cost per callback, and what causes each silence over 25 ms between
@@ -1632,7 +1632,7 @@ against 34.24. It exits FAIL on its 20% median and p95 rule. The
 prediction comes from `perf bot`'s bot-only match, not from this two-human
 match with one CPU.
 
-## Remote key events against remote sync rows, and drawing at burst game time (smashcraft#419, 27 October 2026)
+## Remote key events against remote sync rows, and drawing at burst game time (makgora#419, 27 October 2026)
 
 Asked (#14, N3 and N4): does a client see the opponent's synchronized key
 event or the opponent's frame-stamped input row first, and how far does the
@@ -1647,12 +1647,12 @@ host relayed every turn with no desync. Other sessions' LAN pairs ran on the
 same host; `/proc/pressure/cpu` some avg60 read 37–53% around the captures,
 and both clients stalled for stretches of the match.
 
-Method. `-dev callback-clock` (v=3, smashcraft:ts/src/host/loop/callbackClock.ts)
+Method. `-dev callback-clock` (v=3, makgora:ts/src/host/loop/callbackClock.ts)
 now also records, on `os.clock`, every remote key-down and key-up of the probe
 key (`D`, `U`), every accepted remote input row that carries a press (`s`,
 with its frame), and one `b` token per turn burst: the burst's last Lua
 callback, the game time of a probe timer, the burst's frame phase
-(smashcraft:ts/src/host/loop/betweenFrames.ts `burstAlpha`), the drawn phase
+(makgora:ts/src/host/loop/betweenFrames.ts `burstAlpha`), the drawn phase
 (`drawnAlpha`), and the burst's draw and tick callbacks. A burst ends at a
 gap of 2 ms or more between Lua callbacks. N3 pairs taps exactly: the
 receiver's k-th remote key-down is the sender's k-th tap (both clients see the
@@ -1680,7 +1680,7 @@ receiver's speculative frame then runs 72–125 frames ahead of its confirmed
 frame (24–30 in steady stretches, the `r` checkpoints). The key event carries
 no frame, so it can tell rollback that a press is coming, not on which frame.
 Taps with no pressed row (21, 9, 0 and 9 of them) are the dropped taps of
-smashcraft#218: the stalled sender's pressed-row capture never saw them.
+makgora#218: the stalled sender's pressed-row capture never saw them.
 
 **N4: drawing at burst game time trades about 1.6 ms of median latency for
 even steps.** Game minus presented time per burst, and how far each burst's

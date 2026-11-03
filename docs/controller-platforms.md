@@ -2,11 +2,11 @@
 
 The keyboard is the baseline (#166): the published map reads Warcraft's own
 synchronized key events and needs nothing installed. The companion is an
-optional upgrade that turns a controller into the same keys (smashcraft:controller/README.md,
+optional upgrade that turns a controller into the same keys (makgora:controller/README.md,
 "Always-on controller service"); its journal path serves the integrity build's
 native tests.
 
-Implementation is tracked in [#18](https://github.com/tompassarelli/smashcraft/issues/18) (Linux) and [#34](https://github.com/tompassarelli/smashcraft/issues/34) (Windows/macOS) under roadmap [#16](https://github.com/tompassarelli/smashcraft/issues/16). The owner accepted this direction.
+Implementation is tracked in [#18](https://github.com/tompassarelli/makgora/issues/18) (Linux) and [#34](https://github.com/tompassarelli/makgora/issues/34) (Windows/macOS) under roadmap [#16](https://github.com/tompassarelli/makgora/issues/16). The owner accepted this direction.
 
 3 October 2026. This extends the [controller input research](controller-prior-art.md) for **macOS, Windows and Linux**. The recommendation is **Rust + SDL3 acquisition, enigo keyboard delivery, and small native adapters for foreground identity and launch discovery**. Tauri remains an optional settings/launcher UI. This revises the earlier Linux-only output recommendation: start with enigo's existing X11 backend instead of independently assembling XTest calls, while keeping XTest as the same underlying mechanism.
 
@@ -21,7 +21,7 @@ drivers use the hidden **script** preset (B/Y jump, X special, LB Mod X, both
 triggers shield). Holding both modifiers, or a pad's right-stick tilt, shortens the stick
 like a box controller's modifier: a full press sends x = ±0.6875, up 0.65 and
 down −0.675, just inside roll and spot dodge, tap jump and crouch (#282,
-smashcraft:docs/gameplay-design.md, "Stick zones"). Holding **Mod Y** (`;` on the keyboard, in every layout) with a side and up or down sends the box controller's shallow diagonal, x = ±0.7375 and up or down 0.3125 (about 23 degrees from horizontal, `MOD_Y_DIAGONAL` in `ts/src/game/sim/stick.ts`), and holding **Mod X** (`P`) with up and a side sends the steep mirror, x = ±0.3125 and up 0.7375 (`MOD_X_UP_DIAGONAL`); each otherwise reduces only its own axis to the tilt value, and both together reduce both (Tom's design, 2026-10-30; smashcraft:docs/gameplay-design.md, "Stick zones"). A pad's Mod Y is typed on `/`, held with Mod X by the right-stick tilt; a pad's stick already sends any angle, and its Up is typed on `=` so `;` stays free for Mod Y. A GameCube pad maps by its printed letters only in the SDL
+makgora:docs/gameplay-design.md, "Stick zones"). Holding **Mod Y** (`;` on the keyboard, in every layout) with a side and up or down sends the box controller's shallow diagonal, x = ±0.7375 and up or down 0.3125 (about 23 degrees from horizontal, `MOD_Y_DIAGONAL` in `ts/src/game/sim/stick.ts`), and holding **Mod X** (`P`) with up and a side sends the steep mirror, x = ±0.3125 and up 0.7375 (`MOD_X_UP_DIAGONAL`); each otherwise reduces only its own axis to the tilt value, and both together reduce both (Tom's design, 2026-10-30; makgora:docs/gameplay-design.md, "Stick zones"). A pad's Mod Y is typed on `/`, held with Mod X by the right-stick tilt; a pad's stick already sends any angle, and its Up is typed on `=` so `;` stays free for Mod Y. A GameCube pad maps by its printed letters only in the SDL
 helper; the service reads evdev and does not tell GameCube pads apart yet.
 
 ## 1. Controller acquisition
@@ -124,7 +124,7 @@ Simulated layer per runner:
   `--virtual-pad` feeds an SDL virtual gamepad inside the helper. Mapping,
   focus gating and CGEvent key output are real.
 
-Only a real-hardware tester ([#45](https://github.com/tompassarelli/smashcraft/issues/45))
+Only a real-hardware tester ([#45](https://github.com/tompassarelli/makgora/issues/45))
 can show: a physical pad (Xbox over XInput on Windows; any pad on macOS)
 detected and read in the background; Warcraft III itself accepting the keys
 and its real executable or app identity passing the foreground check;
@@ -149,7 +149,7 @@ strength; the active range is not expanded to start from zero.
 Eight active magnitudes retain a distinction between a half push (62) and a
 full push (127), while keeping the transport smaller than a full-resolution
 pad. Trigger 77 retains the existing light-shield setting; 166 adds a middle
-pressure and 255 is full pressure. These counts are Smashcraft's coarse
+pressure and 255 is full pressure. These counts are Mak'gora's coarse
 choice, informed by the following reference behavior.
 
 Melee clamps and scales its stick to 80 units and each analog trigger to 140
@@ -166,7 +166,7 @@ specific adapter path rather than a claim about every Ultimate controller.
 Source: [HDR's explanation](https://github.com/HDR-Development/hid-hdr/blob/d425dcebfe0cf5165d06e395573b6e8a5ef15197/README.md#curious-about-the-stick-changes).
 
 Ultimate uses a GameCube analog-trigger threshold of 79 as a digital press;
-Melee uses analog pressure for shield strength up to 140. Smashcraft keeps
+Melee uses analog pressure for shield strength up to 140. Mak'gora keeps
 four pressure readings because its existing shield simulation uses pressure.
 Source: [OpenGCC's trigger measurements](https://github.com/ZadenRB/OpenGCC_Firmware/wiki/Analog-and-Digital-Trigger-Values).
 
@@ -185,7 +185,7 @@ code is copied. The packet and its coarse levels are authored here.
 
 ## Source pins and reuse rights
 
-Reference downloads and API-page snapshots are under smashcraft:build/two-clients/controller-reuse-20261003/sources. Documentation pages were retrieved on 3 October 2026 for API facts; examples were not copied. Source pins below are research evidence, not a dependency installation. The prior report retains exact pins/licenses for gilrs, evdev, hidapi, rusb, AntiMicroX and the mapping database.
+Reference downloads and API-page snapshots are under makgora:build/two-clients/controller-reuse-20261003/sources. Documentation pages were retrieved on 3 October 2026 for API facts; examples were not copied. Source pins below are research evidence, not a dependency installation. The prior report retains exact pins/licenses for gilrs, evdev, hidapi, rusb, AntiMicroX and the mapping database.
 
 | Source | Exact revision | Rights boundary |
 | --- | --- | --- |

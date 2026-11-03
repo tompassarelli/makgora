@@ -17,12 +17,12 @@ map inputs, or rebuild an already packaged private candidate with:
 bun wisp map rebuild /absolute/path/to/candidate.w3x --profile integrity
 ```
 
-This selects `INTEGRITY_BUILD` in smashcraft:ts/src/game/session/currentBuild.ts,
+This selects `INTEGRITY_BUILD` in makgora:ts/src/game/session/currentBuild.ts,
 with build ID `typescript-integrity`. The default development profile uses
 keyboard input and cannot produce these receipts. Match `--build` to the actual
 map's build ID, not its display name.
 
-From smashcraft:ts/, with the matching helper binary and private-compositor
+From makgora:ts/, with the matching helper binary and private-compositor
 app IDs:
 
 ```sh
@@ -51,7 +51,7 @@ match; a longer match also gets a stationary result trace.
 
 At each match start, about a second in, the journey also checks what each
 player sees, and the scene report again at each result
-(smashcraft:docs/player-view.md); frames stay in
+(makgora:docs/player-view.md); frames stay in
 `OUT/player-view-EPOCH/CLIENT.ppm`. A map built before the scene recorder
 writes no report, so rebuild candidates before capturing.
 

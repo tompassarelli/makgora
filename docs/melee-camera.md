@@ -1,13 +1,13 @@
 # Melee's gameplay camera and ours
 
-How smashcraft:ts/src/game/sim/matchCamera.ts frames and follows the fighters.
+How makgora:ts/src/game/sim/matchCamera.ts frames and follows the fighters.
 Stage camera limits, blast zones and the off-screen magnifier are in
-smashcraft:docs/physics.md, "Camera limits, off-screen damage and blast zones".
+makgora:docs/physics.md, "Camera limits, off-screen damage and blast zones".
 
 Melee's camera keeps every fighter in view, zooming out as they spread apart
 and in as they close, and lets a launched fighter outrun the view into the
 off-screen magnifier. Its constants
-are not on a public page, so the values below are Smashcraft's own, tuned by
+are not on a public page, so the values below are Mak'gora's own, tuned by
 watching play and by `bun scripts/cameraFeel.ts`.
 
 Each frame matchCamera.ts gives every fighter a subject box around its body
@@ -18,7 +18,7 @@ into the view, keeps the view's corners inside the range, and then eases the
 view toward that goal. Hitlag does not move the camera; a launched fighter is
 followed like any movement until the camera range stops the box.
 
-## Smashcraft's camera
+## Mak'gora's camera
 
 matchCamera.ts runs these steps once per match frame in deterministic state,
 with Melee heights at six world units a Melee unit: box 198 forward, 54 back,
@@ -46,7 +46,7 @@ easing, so reaching a limit eases in. Deliberate differences:
   the same number of frames (871 vs 836).
 - **Final clamp.** After easing, the view is clamped into the camera range
   once more, so no eased frame ever shows past it (#80's blast-zone rule).
-- **No quakes.** Hits keep the camera steady (smashcraft:docs/gameplay-design.md).
+- **No quakes.** Hits keep the camera steady (makgora:docs/gameplay-design.md).
 
 ## Measuring camera movement
 
@@ -65,7 +65,7 @@ goal.
 
 ## Framing fighter bodies
 
-After localCamera, smashcraft:ts/src/game/presentation/fighterFraming.ts
+After localCamera, makgora:ts/src/game/presentation/fighterFraming.ts
 widens the shown view, never the deterministic camera, so each fighter's
 measured Stand body fits: 40 above the head, 60 below the feet and 15 at the
 sides, and no body taller than 55% of the view. Until 2026-10-30 the cap was

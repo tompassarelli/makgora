@@ -1,9 +1,9 @@
 # Online plan: real-path measurements
 
-## One match through the deployed Singapore relay (smashcraft#833, 2026-10-30)
+## One match through the deployed Singapore relay (makgora#833, 2026-10-30)
 
 The laptop hosted slot 0 and gex45 joined slot 1 through the sgp relay on Nexus
-(wisp afd5108e, unit started 8:13 PM UTC), at smashcraft 6afa76d173 with Wisp
+(wisp afd5108e, unit started 8:13 PM UTC), at makgora 6afa76d173 with Wisp
 ed0634aa. `bun wisp net host --relay sgp --frames 7200 --script PAD` ran on the
 laptop (37 ms from the relay) and `bun wisp net join CODE --frames 7200 --script
 PAD` on gex45 (187 ms from the relay). The pad is `net-accept`'s generator at

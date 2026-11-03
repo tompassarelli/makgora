@@ -1,4 +1,4 @@
-# TypeScript in Smashcraft
+# TypeScript in Mak'gora
 
 `bun scripts/cpuCeiling.ts --pairs a:b --depth a,b --json FILE` measures the
 Expert personality panel and final skill profiles. `--merge FILES --baseline
@@ -25,29 +25,29 @@ bun wisp soak --json | jq -c 'select(.kind != null) | {kind, frame, client, mess
 Use `--matches N --workers N` to select a smaller run. The human-readable
 output remains the default; timings and command errors go to stderr.
 
-Smashcraft's TypeScript compiles to Warcraft's Lua through TypeScriptToLua
-(smashcraft:ts/). This page is the style contract for the game code. Behavior is
+Mak'gora's TypeScript compiles to Warcraft's Lua through TypeScriptToLua
+(makgora:ts/). This page is the style contract for the game code. Behavior is
 checked by tests and recorded tapes
-(smashcraft:docs/warcraft-api-netcode-findings.md#lua-numbers-in-the-game
+(makgora:docs/warcraft-api-netcode-findings.md#lua-numbers-in-the-game
 explains why three runtimes are compared).
 
-Wisp is maintained in its own repository. smashcraft:ts/wisp.lock records
+Wisp is maintained in its own repository. makgora:ts/wisp.lock records
 the immutable source revision and generated archive consumed by Bun. A clean
-checkout needs only `bun install --frozen-lockfile` from smashcraft:ts/;
+checkout needs only `bun install --frozen-lockfile` from makgora:ts/;
 installing this dependency requires no private GitHub credentials. With
-`git config core.hooksPath .githooks`, smashcraft:.githooks/lane-dependencies.ts
+`git config core.hooksPath .githooks`, makgora:.githooks/lane-dependencies.ts
 runs that install after every branch checkout, merge and rebase, so a lane made
 by `git worktree add` has its own ts/node_modules, and a hand-made link there is
 replaced; never link another checkout's node_modules.
 
 Wisp owns compilation, numeric helpers and guards, reload and error
-reporting, host services, and archive packaging. Smashcraft owns the map
-declaration in smashcraft:ts/scripts/mapInfo.ts, imports and object data in
-smashcraft:ts/scripts/wisp/mapInputs.ts, project paths and naming in
-smashcraft:ts/scripts/wisp/project.ts, and game-specific commands, assets,
+reporting, host services, and archive packaging. Mak'gora owns the map
+declaration in makgora:ts/scripts/mapInfo.ts, imports and object data in
+makgora:ts/scripts/wisp/mapInputs.ts, project paths and naming in
+makgora:ts/scripts/wisp/project.ts, and game-specific commands, assets,
 replay corpora and native acceptance journeys.
 
-To update to Wisp's current published `main`, run from smashcraft:ts/:
+To update to Wisp's current published `main`, run from makgora:ts/:
 
 ```sh
 bun run update:wisp
@@ -55,14 +55,14 @@ bun run update:wisp
 
 The updater fetches private Wisp `main` using Git's configured credentials,
 resolves its commit, generates the Lua modules and declarations needed by TSTL,
-and updates the archive, smashcraft:ts/wisp.lock, package metadata and Bun
+and updates the archive, makgora:ts/wisp.lock, package metadata and Bun
 lockfile. An already-generated archive for that commit is reused. There is no
 manual SHA or archive-name selection. The dependency stays at that resolved
 commit until the next update; `bun install` does not follow the branch.
-Compiler versions remain separately pinned in smashcraft:typescript-toolchain.lock.
+Compiler versions remain separately pinned in makgora:typescript-toolchain.lock.
 To select an exact source revision explicitly, use
 `bun run update:wisp /absolute/path/to/wisp/checkout FULL_COMMIT`.
-Generated dependency output belongs in smashcraft:ts/vendor/; maintained
+Generated dependency output belongs in makgora:ts/vendor/; maintained
 framework implementations belong only in Wisp. Commit the new pin,
 package metadata, Bun lockfile and generated archive together after checking
 the affected consumer commands.
@@ -85,7 +85,7 @@ Map Lua has 32-bit integers that wrap silently and binary32 numbers whose raw
   operations (about 1 µs each in Lua32), so Warcraft gets the host's result;
   an operation nested inside one `f32()` stays raw. A product with, or a
   quotient by, a power-of-two literal stays raw, which is exact. A hot loop can test a raw
-  estimate with a margin first (smashcraft:ts/src/game/sim/surfaces.ts,
+  estimate with a margin first (makgora:ts/src/game/sim/surfaces.ts,
   `roughDistance`). The `wisp/src/sim/binary32` helpers add fused
   multiply-add, square root and Melee's operations.
 - Decimal literals are exact binary32 values (`0.10000000149011612`, not `0.1`)
@@ -113,7 +113,7 @@ Map Lua has 32-bit integers that wrap silently and binary32 numbers whose raw
 
 ### Host tools
 
-Bun-run code in smashcraft:ts/scripts/ that starts processes, waits, retries
+Bun-run code in makgora:ts/scripts/ that starts processes, waits, retries
 or reads outside data follows four rules (#240), so Ctrl-C, a killed run or a
 failed step stops every child and reports a typed error:
 
@@ -122,7 +122,7 @@ failed step stops every child and reports a typed error:
    `BunServices.layer` from `@effect/platform-bun`. When the scope closes, on
    success, failure or interrupt, it sends SIGTERM to the child's process group
    and waits up to 1 s (`forceKillAfter` escalates to SIGKILL). Run a program to
-   completion with `runProcess` (smashcraft:ts/scripts/hostProcess.ts): its
+   completion with `runProcess` (makgora:ts/scripts/hostProcess.ts): its
    trimmed stdout, or a `ProcessFailure` with the exit code and stderr. Wisp's
    `Command` type takes no services, so a command provides `BunServices.layer`
    itself. Anything else the run creates (a pushed branch, a lease, a virtual
@@ -141,18 +141,18 @@ failed step stops every child and reports a typed error:
    `Schema.decodeEffect(Schema.fromJsonString(S))`), never bare `JSON.parse`;
    fail with a `Schema.TaggedError`, never a thrown string.
 
-Examples: smashcraft:ts/scripts/wisp.ts (rule 2) and
-smashcraft:ts/scripts/hostProcess.ts (rule 1).
-smashcraft:ts/test/host-tools.test.ts checks both with stand-in programs: a
+Examples: makgora:ts/scripts/wisp.ts (rule 2) and
+makgora:ts/scripts/hostProcess.ts (rule 1).
+makgora:ts/test/host-tools.test.ts checks both with stand-in programs: a
 SIGTERM to `bun wisp` leaves no child running, and `runProcess` stopped by
 `Effect.timeoutOrElse` leaves none either. The host type-check allows the
-unstable `effect/process` (`allowedUnstableApis` in smashcraft:ts/tsconfig.json),
-and smashcraft:typescript-toolchain.lock pins `@effect/platform-bun` (its
+unstable `effect/process` (`allowedUnstableApis` in makgora:ts/tsconfig.json),
+and makgora:typescript-toolchain.lock pins `@effect/platform-bun` (its
 `@effect/platform-node-shared` overridden to the same version) with Effect.
 
 north's `effect-kit check` enforces these rules: CI clones north's main and
-runs it (smashcraft:.github/workflows/ci.yml), and the pre-push gate
-(smashcraft:ts/scripts/prePush.ts) runs the same script from the machine's
+runs it (makgora:.github/workflows/ci.yml), and the pre-push gate
+(makgora:ts/scripts/prePush.ts) runs the same script from the machine's
 north main checkout, `~/code/north/main/agent-machinery/scripts/effect-kit.mjs`,
 before every landing that touches `ts/`, `contracts/`, `repos/effect`,
 effect-kit.json or typescript-toolchain.lock. Both run north's main, so keep
@@ -163,12 +163,12 @@ command. Hosted runs of the hook skip it, since CI and Autoland's suite run it.
 
 Wisp's host tools use Effect for asynchronous orchestration: typed failures,
 boundary decoding with Schema, bounded client publication and scoped resource
-ownership. `smashcraft:ts/scripts/wisp.ts` is the single CLI entrypoint;
+ownership. `makgora:ts/scripts/wisp.ts` is the single CLI entrypoint;
 `bun wisp hot`, `build`, `rebuild`, `fresh`, `client`, `tapes` and `parity`
 are commands composed from shared GameFiles, Clients, MapBuild, HotReload and
 SourceErrors services. Each command prints its steps and elapsed time. Hot
 reload publishes every client's payload before any manifest, into each
-client's `CustomMapData/smashcraft-hot` folder, which every client polls 32
+client's `CustomMapData/makgora-hot` folder, which every client polls 32
 times a second ([Wisp hot reload](https://github.com/tompassarelli/wisp/blob/main/docs/hot-reload.md)).
 In `hot --watch`, each change's `vN running in 2 client(s)` line ends at the
 time from its save to both clients' acknowledgements. A failed or cancelled
@@ -181,7 +181,7 @@ failed step leaves the previous map in place, and archive entries are verified
 four at a time. `wisp parity numeric` compares the numeric corpus against
 Lua32; `wisp integrity capture` and `wisp integrity result` run and reconcile
 the native issue #26 input-integrity check through the same CLI; `wisp parity
-capture --bot` plays the native bot session (smashcraft:docs/native-bot-session.md). `wisp fresh
+capture --bot` plays the native bot session (makgora:docs/native-bot-session.md). `wisp fresh
 MAP.w3x [--rebuild]` rebuilds the map script when requested, starts a new
 match through every client's menu page, sends `-dev quick`, and waits for
 every client's typed receipt. Each client leaves its lobby or match through
@@ -190,7 +190,7 @@ the others join it by name and password; a client without a reporting page
 stops it first, since a game created by clicks is listed publicly. It waits
 for fresh ready files after loading. `-dev quick` is typed only once the host
 is in the match (wisp:docs/watch.md, "Typing only into a match"). It then checks what each player sees
-(smashcraft:docs/player-view.md).
+(makgora:docs/player-view.md).
 
 `bun wisp hot --data A --data B --watch` also prints each native desync:
 its turn and every Warcraft engine value that differs, with both clients'
@@ -203,16 +203,16 @@ registers no `-dev` command.
 
 The playable profile does not poll for hot reloads either (`MapBuild.hotReload`).
 Under Wine a lookup of a missing file reads its whole folder, and a client
-without a `smashcraft-hot` folder pays that for all of CustomMapData on every
+without a `makgora-hot` folder pays that for all of CustomMapData on every
 poll. Candidate 0.0.45 (`a5a0315`) polled 32 times a second while client A's
-CustomMapData held 94,057 files and no `smashcraft-hot` folder. Listing them
+CustomMapData held 94,057 files and no `makgora-hot` folder. Listing them
 takes 32–35 ms on this host, so the polls asked for about 1 s of lookups per
 second of game, and both clients nearly stopped at fighter selection.
-smashcraft:ts/test/selection-load.test.ts keeps file reads and effect
+makgora:ts/test/selection-load.test.ts keeps file reads and effect
 creation out of the playable entry's selection frames.
 
 The profiles that do poll can't stall alike: `bun wisp fresh` and `bun wisp hot`
-create each client's `smashcraft-hot` folder with Wisp's host marker before a
+create each client's `makgora-hot` folder with Wisp's host marker before a
 match starts or a reload publishes, and a map that has seen neither the marker
 nor a manifest looks for them twice a second, at most 70 ms of lookups per
 second of game even in that 94,057-file CustomMapData; the first reload to a
@@ -222,9 +222,9 @@ docs, "What polling costs".
 The playable profile displays no runtime error text (`MapBuild.errorsOnScreen`,
 Wisp's `errorsOnScreen`): a failing handler's `error in HANDLER: ...` line names
 handlers, TypeScript lines and Lua messages, which players never read. Every
-profile still writes the report to `smashcraft-error-p<slot>.txt`, which
+profile still writes the report to `makgora-error-p<slot>.txt`, which
 `bun wisp hot --watch` and the playable capture gates read.
-smashcraft:ts/test/player-text.test.ts keeps both halves.
+makgora:ts/test/player-text.test.ts keeps both halves.
 
 Without the clients, `bun wisp headless [quick-match|desync|cpu-expert|computer-match] [--clients N]`
 plays the development build (src/host/entries/devMain.ts) in Wisp's headless
@@ -240,7 +240,7 @@ seeded reaction draws run in every client (#354).
 `computer-match` plays 9,000 frames of an idle player against two computers,
 one of them Wren Expert, at 4 stocks, so the computers' seeded defence and
 spacing slips (DI, SDI, full hops, drift) run through every client.
-smashcraft:ts/scripts/wisp/headless.ts declares the natives Smashcraft calls
+makgora:ts/scripts/wisp/headless.ts declares the natives Mak'gora calls
 on one client only; the desync guard, visual-lifecycle, player-view and
 stack-trace tests run their clients with the same declaration. Its
 `PREDICTED_HEADLESS` also declares the effect poses and camera of the
@@ -253,7 +253,7 @@ prediction, and a spark lasts 9 frames. When the prediction misses a hit and
 the correction comes more than 9 frames later, the spark would never show.
 On 7 October 2026, the A+B batch's rifleman-aerials run had 200-350 ms of own-echo
 latency, and its up air hits showed no StampedeMissileDeath natively.
-smashcraft:ts/src/game/render/combatEffects.ts now shows such a spark from its
+makgora:ts/src/game/render/combatEffects.ts now shows such a spark from its
 start when the hit is confirmed, unless it already drew a spark of that kind
 emitted within 2 frames of the hit. The hit's sound already plays from the
 confirmed frame.
@@ -265,11 +265,11 @@ companion helper types into the journal's edit box as `JM1` and the epoch. -clip
 a chat command registered as -save is; F8, registered as a key, never reached the map's handler
 in the development build or 0.0.48 (6 October 2026), while View did. Every
 client keeps the last ten to twelve seconds of its confirmed match
-(smashcraft:ts/src/game/replay/moment.ts): a snapshot every 120 frames, six in
+(makgora:ts/src/game/replay/moment.ts): a snapshot every 120 frames, six in
 all, and each human's input row for every frame since the oldest. The asking
 player's client alone saves the latest snapshot at least 600 frames back,
 every row since and the checksums of the end, the start and each later
-snapshot, as `smashcraft-repro-p<slot>-f<frame>-<n>.txt` in CustomMapData,
+snapshot, as `makgora-repro-p<slot>-f<frame>-<n>.txt` in CustomMapData,
 then shows "Moment saved". The shell changes the confirmed match between
 frames only where a callback pause, a binding change or the match's end clears
 attack buffers, a player leaves, or practice/endless play ends: the record keeps the match
@@ -280,9 +280,9 @@ frame executor the build ran (rollback builds as stepConfirmed runs accepted
 rows, the development build as callbackMatchTick adapts keys and its
 scenario's computers choose) in two simulated clients, to the recorded
 checksum; `--test NAME` writes src/game/replay/repros/NAME.tests.ts, which
-replays it in Bun and 32-bit Lua. smashcraft:ts/test/repro.test.ts saves
+replays it in Bun and 32-bit Lua. makgora:ts/test/repro.test.ts saves
 moments in headless development and playable matches, and
-smashcraft:ts/src/game/replay/moment.tests.ts round-trips them in Lua32.
+makgora:ts/src/game/replay/moment.tests.ts round-trips them in Lua32.
 
 Measured in 32-bit Lua with two fighters (6 October 2026; Warcraft's own Lua
 ran the frame-cost workload at 299 µs a frame, evidence/native-frame-cost-20261005,
@@ -295,12 +295,12 @@ the snapshot's text). The file is about 36 KB.
 
 `bun wisp soak` is the automatic playtester ([Wisp soak](https://github.com/tompassarelli/wisp/blob/main/docs/soak.md)):
 200 headless matches of the playable build with the scene recorder
-(smashcraft:ts/test/soak/game.ts), every ordered fighter pair on every stage
+(makgora:ts/test/soak/game.ts), every ordered fighter pair on every stage
 eleven times over, in at most four worker processes. Each one-stock,
 one-minute match pairs two of: the fuzzed controller (`fuzz`), the game's
 computer (`cpu`, its human's helper typing neutral rows) and a human whose
 helper never runs (`absent`, #46). The players' helpers are the journal
-stand-in (smashcraft:ts/test/rematch/journalHelper.ts), sending two frames
+stand-in (makgora:ts/test/rematch/journalHelper.ts), sending two frames
 a packet as the companion does, on the soak's wall clock, so a lag spike or
 a quiet helper leaves input waiting as it does natively. It reports stalls,
 desyncs, error reports, scene problems, an invisible fighter, costly frames
@@ -324,12 +324,12 @@ fighter the computer played over every match, those departures,
 self-destructs, blocks, dodges and time-outs (and time-outs where a fighter
 took five or more jab resets), and how often each of its moves landed, naming
 any that never did. The computer has no randomness
-(smashcraft:docs/gameplay-design.md, "Computer opponent"), so its matches
+(makgora:docs/gameplay-design.md, "Computer opponent"), so its matches
 against itself repeat exactly whatever the seed, and the pair tables count
 identical results of one setup without a fuzzed player once.
 
 Victim agency (#68) is measured by replaying frames, not by reading state
-(smashcraft:ts/scripts/agency.ts). From a match state, the next frames run
+(makgora:ts/scripts/agency.ts). From a match state, the next frames run
 once as the players played them, then again for each frame with the victim's
 input on that frame changed by each input class: the stick moved in eight
 directions or to neutral, an SDI pulse in eight directions, the buttons
@@ -353,7 +353,7 @@ the frames of the cycle the victim could act on. Every replay runs through
 the frame executor from copies of replay state.
 
 The soak runs the lock-loop detector on the host client's confirmed match
-(smashcraft:ts/scripts/lockWatch.ts): it follows every confirmed frame,
+(makgora:ts/scripts/lockWatch.ts): it follows every confirmed frame,
 replaying the moment record's rows when a step confirms several, and, while
 a fighter is hit, held, knocked down or stunned, or free of that for fewer
 than 20 frames, remembers each situation under control it was in. When one
@@ -365,7 +365,7 @@ shell's own changes between frames (a pause or the match's end clears the
 attack buffers); the detector follows the match again from there.
 
 `bun wisp agency [--attacker NAME]... [--starter NAME]... [--victim NAME]... [--out FILE]` is the sweep
-(smashcraft:ts/scripts/agencySweep.ts): every fighter's grab and four
+(makgora:ts/scripts/agencySweep.ts): every fighter's grab and four
 throws, and a jab on a fighter lying after a missed tech, at 0-150% in
 steps of 10, its ground normals and specials at 0, 50, 100 and 150%, against
 every fighter, 40 units apart in the middle of stage 0. Once a starter
@@ -375,7 +375,7 @@ attacker repeats the starter whenever it can act and the victim is within
 holds the victim longest, or loops it with the fewest escape frames, is
 kept. A loop with at most three escape frames is played again with the
 victim holding each DI direction from the catch, against every plan. It
-also replays the move comparisons' bounded true links (smashcraft:docs/move-comparisons.md)
+also replays the move comparisons' bounded true links (makgora:docs/move-comparisons.md)
 through the frame executor, with and without each held DI direction. It
 prints every stretch longer than 20 frames, every loop and every link, and
 fails when a loop leaves at most three escape frames whatever direction the
@@ -389,7 +389,7 @@ core, so `.github/workflows/agency.yml` (`gh workflow run agency.yml -f ref=main
 -f attacker=Mrgl & Grgl`) runs every victim and starter group as its own hosted job.
 
 `bun wisp soak --helper BIN [--matches N] [--seconds S]` plays matches through
-the real input path instead (smashcraft:ts/test/soak/helper.ts): each player
+the real input path instead (makgora:ts/test/soak/helper.ts): each player
 a uinput pad the fuzzer drives about once a second, read by a persistent
 wc3-journal helper built with `--text-out`, into headless clients in real
 time, with the same detectors. It needs /dev/uinput, as `bun wisp parity
@@ -398,11 +398,11 @@ frame, so `bun wisp soak --repro FILE` replays them without the helpers or
 pads; the pads' edges stay in the file as evidence.
 
 The development and integrity builds measure what each frame costs
-(smashcraft:ts/src/platform/frameMeter.ts, [Wisp frame cost](https://github.com/tompassarelli/wisp/blob/main/docs/frame-cost.md)):
+(makgora:ts/src/platform/frameMeter.ts, [Wisp frame cost](https://github.com/tompassarelli/wisp/blob/main/docs/frame-cost.md)):
 Lua time, native calls and the confirmed frames each 60 Hz callback caught up.
 `-dev perf` shows the player who types it the medians, 95th percentiles and
 maxima of the last 120 frames. After each hot reload every client writes the
-120 frames before and after it to `smashcraft-perf-p<slot>.txt`, and
+120 frames before and after it to `makgora-perf-p<slot>.txt`, and
 `bun wisp hot --watch` and `bun wisp dev --data` print the change and flag a
 rise over 20%. The playable entry never imports the meter.
 
@@ -414,7 +414,7 @@ quick-match is the development build's headless quick match; bot and
 bot-four are the native bot session's match with the integrity build:
 both players' helpers journal the session's pad beats, computer Illidan (and
 Archer), Battle.net's measured sync latency, counted from the match's first
-frame (smashcraft:ts/scripts/wisp/botMatch.ts). playable-bot-four plays bot-four with the playable build, which has no
+frame (makgora:ts/scripts/wisp/botMatch.ts). playable-bot-four plays bot-four with the playable build, which has no
 input trace, scene report or frame meter; playable-human-four plays all four
 fighters from the same fixed key tape, with no computer deciding, and after
 each landing CI compares it with the previous landed main's run (#48, #54). `bun wisp perf compare A B`
@@ -423,14 +423,14 @@ stall rise beyond 5% (instructions and typing stall at their mean over the
 worst 1% of frames, never one worst frame, #394); `bun wisp headless --cost` adds the quick
 match's prediction to a headless run. The model was fitted to 0.0.49's
 four-fighter overlay and predicts 0.0.48's median frame within 15%
-(smashcraft:evidence/headless-native-cost-20261006/README.md).
+(makgora:evidence/headless-native-cost-20261006/README.md).
 On 2f29ab3 with Wisp 1fe6d71 the quick match's first client ran a median
 47,800 Lua instructions and 138 native calls a frame; the meter adds 2.0% to
 its mean instructions a frame, and the playable bundle is the same bytes as
-before the meter (smashcraft:ts/build/playable.lua SHA256 082a11b3).
+before the meter (makgora:ts/build/playable.lua SHA256 082a11b3).
 
 `bun wisp integrity headless --helper BIN --out DIR` runs issue #26's capture
-without Warcraft (smashcraft:ts/scripts/integrity/headless.ts): the
+without Warcraft (makgora:ts/scripts/integrity/headless.ts): the
 integrity build's TypeScript in two headless clients at 60 frames a second of
 wall time, with Battle.net's measured sync latency (Wisp's
 docs/network-model.md), the native capture's journey and reconciler, and the
@@ -439,11 +439,11 @@ persistent wc3-journal helper started with `--text-out FILE` instead of
 `--editbox-display`: the helper appends each typing to FILE, Wisp types it
 into that client's focused edit box (or, at menus, as key presses), and the
 helper reads the files the client writes in OUT/client-N/CustomMapData,
-written as Warcraft writes them. Build the helper from smashcraft:controller
+written as Warcraft writes them. Build the helper from makgora:controller
 (`cargo build --locked --bin wc3-journal`). A game stall holds the clients
 (no frame runs and the match loses the time); a helper stall stops the
 helper process. Pad edges are written from their own thread
-(smashcraft:ts/scripts/integrity/padWorker.ts): an edge is stamped just
+(makgora:ts/scripts/integrity/padWorker.ts): an edge is stamped just
 before its write, and a pause between the two lets the helper publish that
 frame first and stop on the late edge; it did once while the edges were
 written from the thread that runs the clients. The pool-predicted presentation poses
@@ -470,17 +470,17 @@ successful host check does not establish that a library can compile to Lua.
 Effect stays on the host. The installed package has no Lua module for TSTL to
 resolve, and compiling Effect 4.0.1's source with TSTL 1.37.1 crashes the
 compiler; past that, Effect's core creates BigInt values at module load, which
-TSTL's Lua library lacks. From smashcraft:ts/,
+TSTL's Lua library lacks. From makgora:ts/,
 `bun test/compatibility/probe-effect-tstl.ts` reproduces the resolution failure
 and the compiler crash. The map also has no suspended work for fibers to
 own: one frame timer advances explicit state, callbacks rebind by name after
 hot reload, and rollback snapshots hold all gameplay state
 ([wisp#1](https://github.com/tompassarelli/wisp/issues/1)).
 
-For APIs, read smashcraft:repos/effect/LLMS.md and its version-matched source
+For APIs, read makgora:repos/effect/LLMS.md and its version-matched source
 and tests. Application imports resolve installed packages, not vendor paths.
-The exact reference identity is smashcraft:repos/effect.json; `effect-kit`
-keeps it at the installed version (smashcraft:.agents/skills/effect/SKILL.md).
+The exact reference identity is makgora:repos/effect.json; `effect-kit`
+keeps it at the installed version (makgora:.agents/skills/effect/SKILL.md).
 
 ### Game modules
 
@@ -528,11 +528,11 @@ match's airborne decays repeat one already computed (#48).
 Native calls cost Warcraft more than Lua does. A renderer parks a pooled
 effect once, when it stops showing it, and keeps a flag per effect so it does
 not park it again until it has shown it (`parkOnce`,
-smashcraft:ts/src/game/render/effects.ts). Re-parking every hidden impact,
+makgora:ts/src/game/render/effects.ts). Re-parking every hidden impact,
 missile, trap and special effect on every frame was about 530 of a match
 frame's 766 native calls with two fighters.
 The fighter HUD likewise sets a plate's visibility, damage text and stock
-icons only when they change (smashcraft:ts/src/game/ui/matchHud.ts): setting
+icons only when they change (makgora:ts/src/game/ui/matchHud.ts): setting
 them on every callback was 60 of the 166–183 native calls of each callback in
 a solo match against a computer.
 
@@ -553,7 +553,7 @@ rollback the speculative match no longer matched the confirmed one. In
 their first prediction, two of them predicted with every row already known
 (#60). Bun cannot show such a difference: `GAME_SOAK=1` with
 scripts/lua-tests.ts runs
-smashcraft:ts/src/game/replay/fourFighterRollback.soak.ts, which compares the
+makgora:ts/src/game/replay/fourFighterRollback.soak.ts, which compares the
 speculative history with the confirmed match through late rows in Lua32.
 
 Such an array also cannot use `for…of`, spreads or array methods: `for…of`
@@ -562,7 +562,7 @@ unreliable length. Visit fixed slots or named fields, or push only defined
 values into a dense list. `Object.values` builds a dense list with `pairs`,
 which skips nil fields. A proc-only fighter's on-hit effect leaked every
 match because cleanup iterated `[ready, proc]` with no ready effect (#168).
-smashcraft:ts/test/lua-holes.test.ts checks every file compiled to Lua.
+makgora:ts/test/lua-holes.test.ts checks every file compiled to Lua.
 
 ## Tests
 
@@ -575,7 +575,7 @@ a source defect, named as such.
 
 ## Commands
 
-From smashcraft:ts/:
+From makgora:ts/:
 
 - `bun run test`: every host test file, in isolated Bun workers. The short-lived
   workers keep the baseline and DFG JIT tiers; the highest tier's compile cost
@@ -589,16 +589,16 @@ From smashcraft:ts/:
   rematch-load, missing-input, input-stall, tune, lag-recovery and
   local-start) and the
   whole `bun run check`, each timed from the save.
-  smashcraft:ts/scripts/wisp/commands/dev.ts declares the tests: the Bun test
+  makgora:ts/scripts/wisp/commands/dev.ts declares the tests: the Bun test
   files, the registry modules game.test.ts runs, the files a test reads at run
   time (a test that reads files without declaring them runs on every save),
   the journey tests and scripts/test.ts's isolated groups. Under `wisp dev`
   the source-shape audit checks only the saved files; `bun run test` and CI
-  check every file. Test processes share smashcraft:ts/scripts/testWorkers.ts's
+  check every file. Test processes share makgora:ts/scripts/testWorkers.ts's
   engine settings with the full suite.
 - `bun wisp tune --data A --data B [--port N] [--profile main|integrity]`: a
   panel at http://127.0.0.1:7341/ that changes, in the running match, the
-  values smashcraft:ts/scripts/wisp/tunables.ts declares: each fighter's run
+  values makgora:ts/scripts/wisp/tunables.ts declares: each fighter's run
   speed, full and short jump speeds, gravity, fall and fast-fall speeds and
   jump squat frames, and the ordinary hit's knockback growth, base knockback
   and hitstun frames per knockback
@@ -607,12 +607,12 @@ From smashcraft:ts/:
   `dev --data`, against a profile that polls for reloads (the playable
   profile doesn't). Fighters carry their tuning records, so every `install()`
   gives each fighter its authored tuning again
-  (smashcraft:ts/src/host/loop/tuning.ts): in the confirmed match and,
+  (makgora:ts/src/host/loop/tuning.ts): in the confirmed match and,
   under rollback, in the speculative match and every history snapshot, so a
   correction can't bring the old value back. Keep writes the running value
-  into smashcraft:ts/src/game/sim/tuning.ts or knockback.ts and prints the
+  into makgora:ts/src/game/sim/tuning.ts or knockback.ts and prints the
   diff; Reset puts back the session's starting value in the match and the
-  source. smashcraft:ts/test/tune.test.ts applies tuned gravity in two
+  source. makgora:ts/test/tune.test.ts applies tuned gravity in two
   headless clients: both install it on the same frame, and from that frame
   both matches change alike. The input helper's stick deadzone
   (`STICK_DEADZONE`, padbridge:src/stick.rs) is compiled into the
@@ -621,23 +621,23 @@ From smashcraft:ts/:
   replayed from its inputs alone.
 - `bun run check`: type-check the host tools and the game with TypeScript 7.
   The compiler keeps separate host and game dependency caches in
-  smashcraft:ts/build/typecheck-host.tsbuildinfo and
-  smashcraft:ts/build/typecheck-game.tsbuildinfo. It rechecks changed files and
+  makgora:ts/build/typecheck-host.tsbuildinfo and
+  makgora:ts/build/typecheck-game.tsbuildinfo. It rechecks changed files and
   their affected dependents, preserving cached diagnostics for unchanged files,
   including Effect diagnostics. A first check after removing these caches does
-  all the work again. Declaration-only output in smashcraft:ts/build/typecheck-host/
-  and smashcraft:ts/build/typecheck-game/ records export signatures during that
+  all the work again. Declaration-only output in makgora:ts/build/typecheck-host/
+  and makgora:ts/build/typecheck-game/ records export signatures during that
   first check, so implementation-only edits can stop at unchanged signatures.
   TypeScriptToLua needs the compiler API that only
   TypeScript 6.0 has, so it compiles with 6.0 and the two report the same errors.
   The check then runs Wisp's number rules (TS9300: non-binary32 literals, `%`,
   `>>>`, `Math.floor(a / b)`, `Math.random`, `Date`, `JSON`, `Intl` and type
   escapes) over tsconfig.game.json through TypeScript 7's API, caching each
-  file's findings in smashcraft:ts/build/number-rules.json. The editor reports
+  file's findings in makgora:ts/build/number-rules.json. The editor reports
   the same errors through the `wisp/plugins/number-rules-service.cjs` entry in
-  smashcraft:ts/tsconfig.json, only when it runs the workspace TypeScript 6
-  language service (smashcraft:ts/node_modules/typescript/lib); TypeScript 7's
-  language server, which smashcraft:.vscode/settings.json selects, loads no
+  makgora:ts/tsconfig.json, only when it runs the workspace TypeScript 6
+  language service (makgora:ts/node_modules/typescript/lib); TypeScript 7's
+  language server, which makgora:.vscode/settings.json selects, loads no
   plugins.
 - `bun scripts/typecheck-benchmark.ts`: CI's type-check latency gate. It reports
   a cold full check after removing both dependency caches, then changes the
@@ -662,13 +662,13 @@ From smashcraft:ts/:
   frame in Bun and emitted Lua32, in the stock Lua32 and the toward-zero one
   parity uses: results equal in both rely on no raw float `+ - *`, whatever
   Warcraft's exact rounding is (wisp:docs/headless.md, "Raw float rounding";
-  smashcraft:evidence/native-divergence-20261006/README.md). It reports the
+  makgora:evidence/native-divergence-20261006/README.md). It reports the
   first divergent frame and field; the TypeScript Lua compile is cached by
   input hash.
 - `bun scripts/unused-code.ts`: lists exports no other module uses,
-  smashcraft:ts/ files nothing imports or names, and smashcraft:tools/ files no
+  makgora:ts/ files nothing imports or names, and makgora:tools/ files no
   live document or source names, and exits 1 if any remain. Map bundle entries'
-  exports count as used; references from smashcraft:evidence/ do not. About 10 s.
+  exports count as used; references from makgora:evidence/ do not. About 10 s.
 - `bun scripts/cpuField.ts [--variants N | --per-pair N] [--seeds N]
   [--opponents A,B] [--tiers A,B] [--stocks N] [--minutes N] [--json FILE] [--fighters a,b]
   [--pairs a:b,c:d] [--merge a.json,b.json]`: the computer against the
@@ -677,7 +677,7 @@ From smashcraft:ts/:
   least N matches; the matchup matrix shows each win rate with its match
   count. The table ends with the balance gate's verdict (`BALANCE_GATE`:
   every fighter 45-55% against the field, Wren Expert, 400 a pair;
-  smashcraft:docs/design/roster.md, "Balance gate") and the matchup spread,
+  makgora:docs/design/roster.md, "Balance gate") and the matchup spread,
   reported but not gated.
   `--merge` summarizes earlier `--json` runs instead of playing, so a
   field can run as `--pairs` shards.
@@ -714,18 +714,18 @@ bun wisp map release --name NAME --out OUT.w3x
 bun wisp map build --profile NAME --name NAME --out OUT.w3x
 ```
 
-builds with the private inputs the checkout's smashcraft:build-inputs/
-names, after checking each against its hash (smashcraft:docs/build-inputs.md).
+builds with the private inputs the checkout's makgora:build-inputs/
+names, after checking each against its hash (makgora:docs/build-inputs.md).
 `--base BASE.w3m`, `--container ASSET_CONTAINER.w3x`, `--assets DIR` and
 `--summon DIR` override one input for an experiment.
 
 The map's script is
 the base map's script plus the TSTL bundle, whose entry is
-smashcraft:ts/src/host/entries/devMain.ts: smashcraft:ts/src/platform/main.ts,
+makgora:ts/src/host/entries/devMain.ts: makgora:ts/src/platform/main.ts,
 which every profile's entry shares, plus the scene recorder. Bun generates the fighter units
 (war3map.w3u), FileIO's `$wsl` ability (war3map.w3a), the map description
 (war3map.w3i), the map header and the matching `config()` from
-smashcraft:ts/src/game/objectData.ts and smashcraft:ts/scripts/mapInfo.ts through
+makgora:ts/src/game/objectData.ts and makgora:ts/scripts/mapInfo.ts through
 Wisp's generic encoders. For the
 same base map, these files are generated deterministically from the declared
 TypeScript data and the packaged map inputs.
@@ -740,35 +740,35 @@ container with the packager, from the repository root:
 `build/tools/map-pack replace CONTAINER.w3x FILE 'war3mapImported\NAME'`.
 
 Repository-authored models are generated: each generator writes the models,
-their textures and an import list under smashcraft:build/, and the models'
+their textures and an import list under makgora:build/, and the models'
 content-addressed import paths to a checked-in module under
-smashcraft:ts/src/game/, which the map compiles. Regenerate instead of editing
-those modules. smashcraft:ts/scripts/wisp/mapInputs.ts lists each family
+makgora:ts/src/game/, which the map compiles. Regenerate instead of editing
+those modules. makgora:ts/scripts/wisp/mapInputs.ts lists each family
 (`GENERATED_MODELS`) with its import list and generator; the stage decks come
-from smashcraft:tools/stage/package.ts, which draws the main deck from its
+from makgora:tools/stage/package.ts, which draws the main deck from its
 collision lines. The build fails unless each family's
 import list under `--assets` holds every model its module names, and unless the
-summon evidence lists the clips smashcraft:ts/src/game/presentation/summonClipInfo.ts
+summon evidence lists the clips makgora:ts/src/game/presentation/summonClipInfo.ts
 names; the archive check then verifies the map carries them. `rebuild` and
 `fresh --rebuild` keep the map's imports, so they fail unless the archive's file
 list names every imported model the new script names (`SCRIPT_MODELS`); build
 the map again after regenerating a model.
 
 Pooled fighters and their model sounds derive from the original fighter models.
-smashcraft:tools/animations/export-original-clips.ts reads them from
+makgora:tools/animations/export-original-clips.ts reads them from
 `--assets PRIVATE_ASSETS`, writes one clip model per original sequence, each
 fighter's static light and their evidence to `--out` outside the checkout, and
-writes each exported fighter's own smashcraft:ts/src/generated/clips/<slug>.ts (its
+writes each exported fighter's own makgora:ts/src/generated/clips/<slug>.ts (its
 index changes only when a fighter is added); with `--metadata-only` it checks retained clips against the current sources and
 writes only those files; with `--keep-unchanged` it keeps `--out`'s retained
-clips for fighters whose source and key bound (smashcraft:ts/scripts/keyThin.ts KEY_BOUND) are unchanged and
+clips for fighters whose source and key bound (makgora:ts/scripts/keyThin.ts KEY_BOUND) are unchanged and
 exports the rest; a change to thinKeys renames KEY_BOUND's tangent policy, or the kept
 clips no longer match what timeline-models makes. Heroes'
 sources are their stock classic models under `--assets`'s hero-models, which
 `--extractor CASC_EXTRACT --storage WARCRAFT_DIR` extracts when missing; a
-track on a global animation clock (the heroes' blinks) keeps all its keys. smashcraft:tools/animations/export-model-sounds.ts
+track on a global animation clock (the heroes' blinks) keeps all its keys. makgora:tools/animations/export-model-sounds.ts
 resolves each model sound event through the game's AnimSounds.slk (`--sounds`)
-and writes smashcraft:ts/src/generated/assets/modelSoundInfo.ts. The build fails
+and writes makgora:ts/src/generated/assets/modelSoundInfo.ts. The build fails
 unless the records in `--assets`'s original-clips-static-lights/original-clips-evidence/
 (one per fighter) list every clip and light the module names, and unless every sound cue names a
 stock label and keys a pooled clip. Sound labels are the game's own sounds, so
@@ -781,40 +781,40 @@ a node's ObjectId as written: Illidan's standalone light, written alone as
 ObjectId 155 beside his 276-entry pivot table, lit from the wrong place and
 lit exactly once numbered 0 (2 October). So the export numbers every clip's
 remaining nodes by their place in the file's node order, with parents, skin
-matrices and pivots following (smashcraft:ts/scripts/clipNodes.ts), and fails
+matrices and pivots following (makgora:ts/scripts/clipNodes.ts), and fails
 on a clip that does not.
 
 The build first checks the running Bun and the declared and installed packages
-against smashcraft:typescript-toolchain.lock.
+against makgora:typescript-toolchain.lock.
 
 `bun wisp map build --profile integrity` packages normal gameplay with the
 persistent helper's journal/editbox input, predicted fighter presentation and
 native response export. Rebuild it with
 `bun wisp map rebuild MAP.w3x --profile integrity`. Its build ID is
-`typescript-integrity`, as declared in smashcraft:ts/src/game/session/currentBuild.ts;
-the entry in smashcraft:ts/src/host/entries/integrityMain.ts shares the normal shell
+`typescript-integrity`, as declared in makgora:ts/src/game/session/currentBuild.ts;
+the entry in makgora:ts/src/host/entries/integrityMain.ts shares the normal shell
 and reload lifecycle. Use this profile for native input-integrity and
 four-fighter match/rematch captures.
 
 
 `bun wisp map build --profile frame-cost` packages the isolated 4096-frame
 TypeScript workload. It writes its bundle key and complete replay state to
-`smashcraft-frame-cost-KEY-p0-typescript.txt` in the client's CustomMapData.
-smashcraft:ts/scripts/frameCost.ts retains `read CUSTOM_MAP_DATA RUN_ID` for
+`makgora-frame-cost-KEY-p0-typescript.txt` in the client's CustomMapData.
+makgora:ts/scripts/frameCost.ts retains `read CUSTOM_MAP_DATA RUN_ID` for
 recorded paired results, including historical Wurst baselines. That reader
 still requires equal complete states and a TypeScript/Wurst time ratio at most
 one; new replay fields are never removed to fit an older baseline.
 
 `bun wisp map build --profile stack-trace` compiles the development build with
-Wisp's stack plugin (its row in smashcraft:ts/scripts/wisp/bundleConfigs.ts), so an in-game
+Wisp's stack plugin (its row in makgora:ts/scripts/wisp/bundleConfigs.ts), so an in-game
 error report lists each active TypeScript frame as `src/FILE.ts:LINE: in
 FUNCTION`, innermost first. Rebuild with
 `bun wisp map rebuild MAP.w3x --profile stack-trace`; `bun wisp hot --profile
 stack-trace --data DIR ... --watch` reloads and prints that bundle's reports.
 Its build ID is `typescript-stack-trace`, and its entry
-smashcraft:ts/src/host/entries/stackTraceMain.ts adds one command to the
+makgora:ts/src/host/entries/stackTraceMain.ts adds one command to the
 development build: `-dev stack-demo`, which throws three calls below its chat
-handler (smashcraft:ts/src/platform/stackDemo.ts). Only a build with a developer
+handler (makgora:ts/src/platform/stackDemo.ts). Only a build with a developer
 console registers it, and no other entry compiles it. The report is written
 only when its message differs from the previous one, so type
 `-dev stack-demo 2` for another. The instrumented bundle is about 2.2 times the
@@ -823,10 +823,10 @@ normal bundle's size and costs CPU
 measurement builds. Frames cover this repository's TypeScript; Wisp's
 precompiled dispatch and reporter, and Warcraft natives, add none.
 `bun scripts/lua-tests.ts` compiles
-smashcraft:ts/test/stack/entry.ts with the plugin and checks that the demo's
+makgora:ts/test/stack/entry.ts with the plugin and checks that the demo's
 report names its frames at the lines that executed them.
 
-The presentation modules smashcraft:ts/src/game/presentation/fighterAssetInfo.ts
+The presentation modules makgora:ts/src/game/presentation/fighterAssetInfo.ts
 and demonHunterAssetInfo.ts are generated by
-smashcraft:tools/animations/package.ts and package-illidan.ts; regenerate them
+makgora:tools/animations/package.ts and package-illidan.ts; regenerate them
 from the authored models.

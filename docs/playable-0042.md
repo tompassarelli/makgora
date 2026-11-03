@@ -1,13 +1,13 @@
-# Smashcraft 0.0.42: Linux controller startup
+# Mak'gora 0.0.42: Linux controller startup
 
-Install the map in each player's Warcraft `Maps/00-Smashcraft` folder:
-~/.local/share/smashcraft-build-inputs/input-integrity-delivery-20261005/build/Smashcraft 0.0.42.w3x
+Install the map in each player's Warcraft `Maps/00-Makgora` folder:
+~/.local/share/makgora-build-inputs/input-integrity-delivery-20261005/build/Makgora 0.0.42.w3x
 
 Use the matching helper:
-~/.local/share/smashcraft-build-inputs/input-integrity-delivery-20261005/build/wc3-journal-0.0.42
+~/.local/share/makgora-build-inputs/input-integrity-delivery-20261005/build/wc3-journal-0.0.42
 
 Open Warcraft through **Play** in the signed-in Battle.net launcher. Join the
-same online Custom Game and stop at Smashcraft's initial fighter selection.
+same online Custom Game and stop at Mak'gora's initial fighter selection.
 Start one helper per human before selecting fighters. Player 1 uses `--slot 0`,
 Player 2 uses `--slot 1`; use the actual player slot when there are empty slots.
 
@@ -27,7 +27,7 @@ For the normal Niri desktop, run `niri msg --json windows` and take the `id`
 of the Warcraft window. Start the helper from that desktop's terminal:
 
 ```sh
-~/.local/share/smashcraft-build-inputs/input-integrity-delivery-20261005/build/wc3-journal-0.0.42 \
+~/.local/share/makgora-build-inputs/input-integrity-delivery-20261005/build/wc3-journal-0.0.42 \
   --follow-matches --build playable-0042 --slot 0 \
   --device /dev/input/eventN --out '/absolute/Warcraft III/CustomMapData' \
   --editbox-display "$DISPLAY" --x11-window DECIMAL_XID --pid GAME_PID \
@@ -52,7 +52,7 @@ private_xauthority=$(cat "$private_run/xauthority")
 private_wayland=$(cat "$private_run/wayland-display")
 env XDG_RUNTIME_DIR="$private_run/runtime" WAYLAND_DISPLAY="$private_wayland" \
   DISPLAY="$private_display" XAUTHORITY="$private_xauthority" \
-  ~/.local/share/smashcraft-build-inputs/input-integrity-delivery-20261005/build/wc3-journal-0.0.42 \
+  ~/.local/share/makgora-build-inputs/input-integrity-delivery-20261005/build/wc3-journal-0.0.42 \
   --follow-matches --build playable-0042 --slot 0 \
   --device /dev/input/eventN --out '/absolute/Warcraft III/CustomMapData' \
   --editbox-display "$private_display" --x11-window DECIMAL_XID --pid GAME_PID \

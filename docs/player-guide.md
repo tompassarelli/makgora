@@ -1,11 +1,11 @@
 # Player guide
 
 Requires Warcraft III 3.0 and a keyboard; nothing else to install. Download
-the map from [Hive Workshop](https://www.hiveworkshop.com/threads/smashcraft-0-1-0.375492/),
+the map from [Hive Workshop](https://www.hiveworkshop.com/threads/makgora-0-1-0.375492/),
 put it in the Warcraft III Maps folder
 and open it from Custom Games. Public 0.1 uses the Classic look. Set Graphics
 to Classic and restart Warcraft III after changing it. A
-controller is optional: the Smashcraft controller helper turns its buttons
+controller is optional: the Mak'gora controller helper turns its buttons
 and sticks into its own pad keys, which work with any Controls layout, so
 pad players keep whichever layout they like (the Controls screen that opens each game, or F2, changes it; it saves straight away).
 The default Melee layout uses A to
@@ -136,7 +136,7 @@ each game says so.
 
 Saw something wrong? Type -clip in chat, or hold View on a controller for a second: the
 last ten seconds of the match are saved for a bug report on your computer, in
-Warcraft III's CustomMapData folder as smashcraft-repro-*.txt, and "Moment
+Warcraft III's CustomMapData folder as makgora-repro-*.txt, and "Moment
 saved" appears. The match goes on undisturbed.
 
 WASD, the default, uses A/D to move, W to aim up, S to fast-fall or drop

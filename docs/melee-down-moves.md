@@ -1,4 +1,4 @@
-# Melee down moves and Smashcraft
+# Melee down moves and Mak'gora
 
 Angles are degrees from facing; the next numbers are base knockback and
 growth. These are independently recorded numerical facts from the public
@@ -24,12 +24,12 @@ publisher's frame-data page for timing and visual context.
 
 ## Reference and pre-change values
 
-Smashcraft values were read from production fighter tuning at `8246fc6d`,
+Mak'gora values were read from production fighter tuning at `8246fc6d`,
 including the first active down-smash contact and released down throw.
 Other Melee contact rows are included so tips, inner hits and finishers are
 not conflated. Damage is shown on the Melee rows only to distinguish them.
 
-| Smashcraft fighter / Melee comparison | Melee down throw: damage, angle / base / growth | Melee down smash: damage, angle / base / growth | Melee outcome (throw; smash) | Smashcraft down throw angle / base / growth | Smashcraft down smash angle / base / growth |
+| Mak'gora fighter / Melee comparison | Melee down throw: damage, angle / base / growth | Melee down smash: damage, angle / base / growth | Melee outcome (throw; smash) | Mak'gora down throw angle / base / growth | Mak'gora down smash angle / base / growth |
 | --- | --- | --- | --- | --- | --- |
 | Rifleman / [Falco](https://meleeframedata.com/falco) ([DAT](https://melee.theshoemaker.de/dat-dumps/Falco.json)) | 1%: 270° / 37 / 40 | 16%: 25° / 20 / 70; 13%: 80° / 20 / 70 | tech chase; low tech chase / edgeguard | 70° / 75 / 40 | 45° / 20 / 100 |
 | Illidan / [Captain Falcon](https://meleeframedata.com/captainfalcon) ([DAT](https://melee.theshoemaker.de/dat-dumps/Captain%20Falcon.json)) | 7%: 65° / 18 / 34 | 18%: 361° / 30 / 100; 16%: 361° / 20 / 100 | DI mix-up / tech chase; tech chase / edgeguard | 70° / 75 / 40 | 75° / 22 / 95 |
@@ -44,12 +44,12 @@ not conflated. Damage is shown on the Melee rows only to distinguish them.
 | Beastmaster / [Donkey Kong](https://meleeframedata.com/donkeykong) ([DAT](https://melee.theshoemaker.de/dat-dumps/Donkey%20Kong.json)) | 7%: 361° / 15 / 45 | 16%: 115° / 35 / 100; 14%: 98° / 35 / 100 | tech chase / edgeguard; pop-up / edgeguard | 70° / 75 / 40 | 25° / 22 / 110 |
 | Lich King / [Roy](https://meleeframedata.com/roy) ([DAT](https://melee.theshoemaker.de/dat-dumps/Roy.json)) | 6%: 120° / 16 / 60 | 21%: 75° / 42 / 70; 14%: 361° / 15 / 100; 16%: 75° / 42 / 68; 8%: 361° / 15 / 100 | DI mix-up; tip pop-up / edgeguard | 70° / 75 / 40 | 30° / 22 / 95 |
 
-## Smashcraft decision
+## Mak'gora decision
 
 Every down move is a tech-chase starter. The victim chooses tech in place,
 tech toward, tech away or a missed tech, and the attacker can move before
 that defense ends. This uses Melee's shallow-launch relation rather than
-copying its values: Smashcraft's longer authored recoveries need enough
+copying its values: Mak'gora's longer authored recoveries need enough
 base knockback to tumble at low percent and enough hang time to keep the
 attacker's recovery from consuming the whole chase.
 
@@ -65,7 +65,7 @@ The tests run production contacts and movement at 20%, 40% and 60%, checking
 tech in place, both tech rolls and missed-tech stand, roll and attack getups,
 both facings, against Rifleman and Pit Lord.
 
-## Current Smashcraft values
+## Current Mak'gora values
 
 All rows are tech chase. Angle / base / growth are taken from production
 contact data. Timing is unchanged for throws; the down-smash recovery is the

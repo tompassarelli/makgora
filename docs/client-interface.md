@@ -1,23 +1,23 @@
 # Client interface
 
-The Smashcraft desktop client lives in
-[smashcraft-client](https://github.com/tompassarelli/smashcraft-client). It
-reads Smashcraft only through this interface, which this repository owns. A
+The Mak'gora desktop client lives in
+[makgora-client](https://github.com/tompassarelli/makgora-client). It
+reads Mak'gora only through this interface, which this repository owns. A
 change that breaks it bumps the kit number or the record's `v=`, and updates
 this page in the same commit.
 
 ## Client kit 1 (build time)
 
 From ts/, `bun scripts/clientKit.ts OUT` writes the kit into OUT
-(smashcraft:ts/scripts/clientKit.ts). The client pins a Smashcraft commit and
+(makgora:ts/scripts/clientKit.ts). The client pins a Mak'gora commit and
 builds against the kit that commit writes; it imports nothing else from this
 repository.
 
 | File | What it is |
 | --- | --- |
-| `kit.json` | `{"kit": 1, "version": SOURCE, "viewerApi": 1}`; `version` is the source version (smashcraft:ts/scripts/sourceVersion.ts) |
+| `kit.json` | `{"kit": 1, "version": SOURCE, "viewerApi": 1}`; `version` is the source version (makgora:ts/scripts/sourceVersion.ts) |
 | `sim.js` | ES module: the replay viewer, the replay files' format and `sourceVersion()`, stamped with `version` |
-| `sim.d.ts` | its types (smashcraft:ts/src/game/replay/clientKitApi.d.ts); `viewerBundle.ts` is checked against them |
+| `sim.d.ts` | its types (makgora:ts/src/game/replay/clientKitApi.d.ts); `viewerBundle.ts` is checked against them |
 | `viewer.lua` | the viewer's Lua modules, added to an older map's `war3map.lua` to play that version's replays |
 | `fixtures/tape-replay.json` | a recorded two-player replay of `version`: `serial`, the manifest's lines and each part's lines |
 | `fixtures/tape-replay.txt` | the same replay joined, as version `development`, which `fixtures/map.lua` plays |
@@ -32,30 +32,30 @@ version's replays.
 
 Each Warcraft III account's CustomMapData folder holds:
 
-- match records, `smashcraft-match-<serial>.txt`, format `v=1`
+- match records, `makgora-match-<serial>.txt`, format `v=1`
   ([client design](design/client.md#match-records-phase-2s-data));
-- replays, `smashcraft-replay-<serial>.txt` and their parts
-  `smashcraft-replay-<serial>-<part>.txt`
+- replays, `makgora-replay-<serial>.txt` and their parts
+  `makgora-replay-<serial>-<part>.txt`
   ([client design](design/client.md#full-match-replays-phase-3)).
 
 Both are Warcraft Preload files; each stored line is one `call Preload( "…" )`.
 
 ## Maps (run time)
 
-Maps/00-Smashcraft in the Warcraft III documents folder has, at its top level, the latest release `Smashcraft X.Y.Z.w3x` and the newest installed
-main build `Smashcraft X.Y.Z-dev.N.w3x`; older releases sit in old/ (smashcraft:docs/play.md).
-Installing a main build removes every older dev build. At most one lane or test build Tom asked to try (`Smashcraft
+Maps/00-Makgora in the Warcraft III documents folder has, at its top level, the latest release `Makgora X.Y.Z.w3x` and the newest installed
+main build `Makgora X.Y.Z-dev.N.w3x`; older releases sit in old/ (makgora:docs/play.md).
+Installing a main build removes every older dev build. At most one lane or test build Tom asked to try (`Mak'gora
 X.Y.Z-LANE.w3x`, or the map `play --lobby-only` was given) sits beside it; it
 replaces any earlier one and goes when the next main build installs. Test,
 integrity and diagnostic builds stay in private folders or pool clients. The map's file and title carry its release number (X.Y.Z, from the newest
-`vX.Y.Z` tag, smashcraft:docs/play.md). Each map's `war3map.lua` carries its
+`vX.Y.Z` tag, makgora:docs/play.md). Each map's `war3map.lua` carries its
 source version, a content hash and not that number, in the
 `game.shell.sourceVersion` module, so a client finds the map for a replay's
 version in any Maps folder (Download included).
 
-## Commands (Smashcraft tools)
+## Commands (Mak'gora tools)
 
-Online play runs Wisp's own window over its relay, so it needs Smashcraft's
+Online play runs Wisp's own window over its relay, so it needs Mak'gora's
 tools: a checkout's ts/ with its dependencies installed. The client runs, in
 that folder:
 
@@ -66,7 +66,7 @@ that folder:
   the client shows.
 
 The client never starts or drives Warcraft III for online play
-(smashcraft-client#28, 2026-10-31).
+(makgora-client#28, 2026-10-31).
 
 Without the tools the client's Online page says it isn't set up; History,
 Stats, Replays, the controller and Play need nothing from this repository at

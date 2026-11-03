@@ -1,16 +1,16 @@
-# Smashcraft 0.0.47: start guide
+# Mak'gora 0.0.47: start guide
 
 This is a private candidate. The preserved 0.0.41 and 0.0.42 maps remain separate.
 Use this map and its matching helper together:
 
-- Map: ~/.local/share/smashcraft-build-inputs/playable-0047/Smashcraft 0.0.47.w3x
-- Helper (Linux): ~/.local/share/smashcraft-build-inputs/playable-0047/wc3-journal-0.0.47
+- Map: ~/.local/share/makgora-build-inputs/playable-0047/Makgora 0.0.47.w3x
+- Helper (Linux): ~/.local/share/makgora-build-inputs/playable-0047/wc3-journal-0.0.47
 
 Windows and macOS use a different helper; see the section for them below.
 
 ## One command
 
-On Tom's desktop, from smashcraft:ts/:
+On Tom's desktop, from makgora:ts/:
 
 ```sh
 bun wisp play
@@ -19,33 +19,33 @@ bun wisp play
 It checks that nothing else runs in the Warcraft prefix, reuses or starts
 the signed-in launcher through the Steam shortcut "Warcraft III
 (Battle.net)", presses Play, waits until Warcraft III has signed in and read
-its ladder maps, hosts the declared map from Maps/00-Smashcraft (copied there
+its ladder maps, hosts the declared map from Maps/00-Makgora (copied there
 from its build when missing) through the menu page or the menus, starts the
 helper (`wc3-journal-0.0.47-fix1`) for the first Xbox controller at fighter
 selection, and has the map add a computer as Player 3 and start the match;
 then it leaves Warcraft III fullscreen. Each step prints a line; a problem
 stops it with what to do (wisp:docs/play.md). A map loaded before that scan
-ends loses its imported models (smashcraft#73), so play never loads it at
+ends loses its imported models (makgora#73), so play never loads it at
 startup, and it stops when Warcraft III's log shows any of the map's
 imported models failing.
 
 The map takes the request through two files in CustomMapData: play leaves
-`smashcraft-play.txt` (`PLAY v=1 computers=4`) before Warcraft starts, and
+`makgora-play.txt` (`PLAY v=1 computers=4`) before Warcraft starts, and
 the first human's client reads it once at map start; only then does it look
-for `smashcraft-play-go.txt`, which play writes once the helper runs. Once the first human
+for `makgora-play-go.txt`, which play writes once the helper runs. Once the first human
 reads that file it syncs a hold, on which both clients stop refreshing their
 menu files, and it asks for the start 30 callbacks later, so neither that
 read nor a menu write lands in the match's first second. Each client then adds the computers and starts the match on the default stage
-and writes `smashcraft-play-pN.txt` (`… started` or `… refused`). Maps built
+and writes `makgora-play-pN.txt` (`… started` or `… refused`). Maps built
 before this ignore the request. The helper keeps running after the command
-ends, with its output in ~/.local/state/smashcraft/play-helper.log; stop it
+ends, with its output in ~/.local/state/makgora/play-helper.log; stop it
 with `kill PID` (the pid the command printed) after leaving the map. play hosts the map as a private game through the
 Wisp menu page on Tom's install (port 47124) and stops when the page doesn't
-report (smashcraft:docs/wisp.md, "Menu control").
-smashcraft:ts/scripts/wisp/commands/play.ts declares the map, its helper and
+report (makgora:docs/wisp.md, "Menu control").
+makgora:ts/scripts/wisp/commands/play.ts declares the map, its helper and
 the computer's slot.
 
-Put the map in each player's Warcraft III `Maps/00-Smashcraft` folder. Join the
+Put the map in each player's Warcraft III `Maps/00-Makgora` folder. Join the
 same custom game and start it. At fighter selection, start one helper for each
 human player with that player's controller, Warcraft window and data folder.
 Keep it running through the match, results and rematches. After leaving or
@@ -54,7 +54,7 @@ reloading the map, stop the helper and start it again at fighter selection.
 For a private desktop, the helper command is:
 
 ```sh
-~/.local/share/smashcraft-build-inputs/playable-0047/wc3-journal-0.0.47 \
+~/.local/share/makgora-build-inputs/playable-0047/wc3-journal-0.0.47 \
   --follow-matches --build playable-0047 --slot 0 \
   --device /dev/input/eventN --out '/absolute/Warcraft III/CustomMapData' \
   --editbox-display :N --x11-window DECIMAL_XID --pid GAME_PID \
@@ -112,7 +112,7 @@ Line Tools on macOS.
 cargo build --release --locked
 ```
 
-Put the map in the Warcraft III `Maps/00-Smashcraft` folder, join the game,
+Put the map in the Warcraft III `Maps/00-Makgora` folder, join the game,
 plug in the controller, then start the helper from `companion`.
 
 Windows (PowerShell):
@@ -148,13 +148,13 @@ binary, renamed; copying it also creates the candidate's folder, which the
 map build needs. Built from ts/ with the private inputs:
 
 ```sh
-install -D -m 700 ~/.local/share/smashcraft-build-inputs/playable-0045/wc3-journal-0.0.45 \
-  ~/.local/share/smashcraft-build-inputs/playable-0047/wc3-journal-0.0.47
-bun wisp map build --profile playable --base ~/.local/share/smashcraft-build-inputs/physics-base.w3m \
-  --container ~/.local/share/smashcraft-build-inputs/native-delivery-20261005/'Smashcraft diagnostic four-fighters.w3x' \
-  --assets ~/.local/share/smashcraft-build-inputs/build-port-20261005 \
-  --summon ~/.local/share/smashcraft-build-inputs/build-port-20261005/summon-original-clips \
-  --name "Smashcraft 0.0.47" --out ~/.local/share/smashcraft-build-inputs/playable-0047/'Smashcraft 0.0.47.w3x'
+install -D -m 700 ~/.local/share/makgora-build-inputs/playable-0045/wc3-journal-0.0.45 \
+  ~/.local/share/makgora-build-inputs/playable-0047/wc3-journal-0.0.47
+bun wisp map build --profile playable --base ~/.local/share/makgora-build-inputs/physics-base.w3m \
+  --container ~/.local/share/makgora-build-inputs/native-delivery-20261005/'Mak'gora diagnostic four-fighters.w3x' \
+  --assets ~/.local/share/makgora-build-inputs/build-port-20261005 \
+  --summon ~/.local/share/makgora-build-inputs/build-port-20261005/summon-original-clips \
+  --name "Mak'gora 0.0.47" --out ~/.local/share/makgora-build-inputs/playable-0047/'Makgora 0.0.47.w3x'
 ```
 
 To reproduce this private build on current main, add `--edition full`.
@@ -167,7 +167,7 @@ To check a candidate on the two engineering clients, run
 and `bun wisp integrity result DIR`.
 
 The result gate takes each match's winner from the end receipts both clients
-write (`smashcraft-journal-end-BUILD-eN-sS.txt`, `winner=P1` to `P4` or
+write (`makgora-journal-end-BUILD-eN-sS.txt`, `winner=P1` to `P4` or
 `none`, from 0.0.46). It also reads each client's result announcement on its
 own; a screen that names another player fails the gate, a screen the reader
 cannot make out does not. The reader's "|", "l" or "I" in "Player 1 wins!"

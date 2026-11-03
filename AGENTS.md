@@ -1,4 +1,4 @@
-# Smashcraft
+# Mak'gora
 
 - Follow README's "Principles": if a task seems to need memory reads, disassembly, decompiled code or Blizzard's or Nintendo's files in the repo, stop and measure from outside instead.
 - Keep Wisp changes in Wisp; consume its published pin via the updater. Never edit installed dependencies or add a framework copy.
@@ -6,12 +6,12 @@
 - Classic models only: never add Definitive Edition support, code, assets, checks or docs (see docs/design/roster.md).
 - Every frame must sustain 60 fps; the map’s own work gates at p99 ≤ 10 ms and worst frame ≤ 14 ms (Warcraft draws inside 16.7 ms), and a gate miss remains unfinished work. A worst frame over 10 ms and up to 14 ms is a soft target: it lands with a `Target-debt:` trailer.
 - Keep every mutable gameplay field in deterministic snapshots/replay; local presentation stays separate and shared handles are created consistently.
-- Publish a release only when Tom decides; private builds keep the next release's version plus the count of first-parent commits since the last release tag (Smashcraft 0.2-dev.830), and release candidates are Smashcraft 0.2 RC-N from a v0.2-rc.N tag; releases are named X.Y with no patch (v0.1.5 was the last X.Y.Z). Diagnostics keep distinct run IDs and names; keep one current candidate under Maps/00-Smashcraft.
+- Publish a release only when Tom decides; private builds keep the next release's version plus the count of first-parent commits since the last release tag (Mak'gora 0.2-dev.830), and release candidates are Mak'gora 0.2 RC-N from a v0.2-rc.N tag; releases are named X.Y with no patch (v0.1.5 was the last X.Y.Z). Diagnostics keep distinct run IDs and names; keep one current candidate under Maps/00-Makgora.
 - Never touch Tom’s install; run account a solely as clone-a through its launch.sh, which yields to Tom’s game.
 - A visual box (stage, water, fog, lighting, portrait, VFX, animation, HUD) lands before its captures, per the next line, and its issue closes on a Wisp native window capture (docs/commands/native.md, "Look captures"); the Classic pool and Tom's profile capture only what Warcraft alone shows and a release candidate's acceptance pass (2026-11-01). A VFX, animation or move-readability box also needs a motion strip, not a still; the effect's footprint matching the hit regions on the active frames; and a cold reader new to the move, shown it on the strip's stage, naming what it does and where it hits. Wisp renders, 3.0.1 captures and "the effect spawns" are evidence, not acceptance (#277, #428, #433).
 - A change lands once: its regenerated records, re-recorded tests or goldens, doc lines and mutant names go into the lane before `safe-push`, which lands the lane as one commit, never as follow-up landings; a check that can only write its record after landing folds it into the next landing.
 - Never hold a landing for a native or visual capture: a box whose sim, headless and Lua32 checks pass lands at once (a `Verify: native` brief says `Lands-before: native`), then takes its Wisp window capture on main's build and fixes forward from what the capture shows, and its issue closes on that capture. Only a release candidate waits on native captures before it ships, and a `Category: native-check` box runs captures and has nothing to land (2026-10-30).
-- Run evidence (captures, logs, results) goes to the folder `north evidence start <run>` creates and prints (~/.local/state/smashcraft/evidence/<run>), never into the repo; that command first prunes the store to its 15 GB budget, oldest runs first, keeping any run under 24 h old, holding a `PINNED` file, or named as `evidence/<run>` in an open issue, so name a run you need kept in its issue; evidence/ is gitignored, and runs before this change are in git history as `smashcraft:evidence/<run>`.
+- Run evidence (captures, logs, results) goes to the folder `north evidence start <run>` creates and prints (~/.local/state/makgora/evidence/<run>), never into the repo; that command first prunes the store to its 15 GB budget, oldest runs first, keeping any run under 24 h old, holding a `PINNED` file, or named as `evidence/<run>` in an open issue, so name a run you need kept in its issue; evidence/ is gitignored, and runs before this change are in git history as `makgora:evidence/<run>`.
 - Every move and Tom-facing build meets [the finished-move bar](docs/design/finished-move.md) whether or not its issue says so; the Tom-facing gate refuses a build that misses a line.
 - Place every change by [docs/architecture.md](docs/architecture.md)'s "Where things live" table; sim code never imports presentation, render, ui, platform or shell.
 - Per-fighter data goes in that fighter's own files, never a new row or `character ===` branch in a shared all-fighter table or engine file.
@@ -22,14 +22,14 @@
 
 Commands: from ts/, run bun wisp help.
 Docs: [docs/README.md](docs/README.md), topic → file; source layout: [docs/architecture.md](docs/architecture.md).
-Issues: [0.1.1 root #66](https://github.com/tompassarelli/smashcraft/issues/66) and [After 0.1 #14](https://github.com/tompassarelli/smashcraft/issues/14); a box defines scope.
+Issues: [0.1.1 root #66](https://github.com/tompassarelli/makgora/issues/66) and [After 0.1 #14](https://github.com/tompassarelli/makgora/issues/14); a box defines scope.
 
 Read the relevant router before working, even when your cwd is the root:
 - Map/TypeScript: warcraft-modding and [ts/AGENTS.md](ts/AGENTS.md); [TypeScript](docs/commands/typescript.md).
 - Tests: the verification skill and [testing](docs/commands/testing.md).
 - Host commands: effect-development; [host tools](docs/typescript.md#host-tools); enforce via `effect-kit check` (effect-kit.json).
-- Fighter art: the smashcraft skill (references/animation.md) and [tools/animations/AGENTS.md](tools/animations/AGENTS.md); [animation help](docs/commands/animation.md).
-- Stage art: the smashcraft skill (references/stage-design.md); [stage help](docs/commands/stage.md).
+- Fighter art: the makgora skill (references/animation.md) and [tools/animations/AGENTS.md](tools/animations/AGENTS.md); [animation help](docs/commands/animation.md).
+- Stage art: the makgora skill (references/stage-design.md); [stage help](docs/commands/stage.md).
 - Native tools/clients: warcraft-modding and private-desktop-development; [native rules](ts/scripts/wisp/AGENTS.md) and [native help](docs/commands/native.md).
 - Builds/pins/private inputs, issue closure and pushes: [workflow](docs/commands/workflow.md).
 

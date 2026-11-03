@@ -1,11 +1,11 @@
-# Play current Smashcraft
+# Play current Mak'gora
 
-Players download the map from [Hive Workshop](https://www.hiveworkshop.com/threads/smashcraft-0-1-0.375492/).
+Players download the map from [Hive Workshop](https://www.hiveworkshop.com/threads/makgora-0-1-0.375492/).
 Put it
 in the Warcraft III Maps folder and open it from Custom Games. The GitHub
 repositories contain code only; maps are distributed on Hive Workshop.
 
-`bun wisp play --standalone` opens Smashcraft in Wisp's native window, and
+`bun wisp play --standalone` opens Mak'gora in Wisp's native window, and
 `--window chrome` in the Wisp browser player,
 with Illidan against a Wren Expert Rifleman over the normal three stocks and
 seven-minute clock. Keyboard controls and the browser's gamepad controls enter
@@ -14,7 +14,7 @@ camera, effects and HUD from the headless client and plays its sound cues.
 
 In the native window F12 saves the frame on screen with its full scene (every
 model, place, team colour, alpha and the active effects) and the window's facts
-to `~/.local/state/smashcraft/evidence/window-snapshot-<UTC time>/`, for a
+to `~/.local/state/makgora/evidence/window-snapshot-<UTC time>/`, for a
 glitch seen once in a playtest; `WISP_WINDOW_SNAPSHOTS=DIR` sends it elsewhere
 (wisp:docs/play.md, "Native window"). The game never hears F12.
 
@@ -38,7 +38,7 @@ extracted with `CASC_EXTRACTOR`), and neither the private build-input store nor 
 gpu machine-capacity lease is used. Reforged is required: a pre-Reforged 1.x
 install is refused, and Wisp checks that the install is present, not who owns it.
 
-`bun wisp parity standalone test/native/pads/cpu-expert.pad --presentation native,pool-predicted` (smashcraft#806)
+`bun wisp parity standalone test/native/pads/cpu-expert.pad --presentation native,pool-predicted` (makgora#806)
 plays the pad in the standalone window's headless session under each
 presentation and compares every frame's fighter digest with the native
 client's recording of the same pad under that presentation. A native recording
@@ -59,7 +59,7 @@ Record the native side on a LAN pair with the driver maps `bun wisp map build
 native-driver-predicted` (`pool-predicted`): `lan fresh MAP --pair K --turn-ms 60`,
 send the pad to both clients' data directories with `bun scripts/showcase.ts
 send DIR "$(cat PAD)"`, `resume 1100`, then `reset` once both clients pause at
-frame 1100, which writes each client's `smashcraft-replay-N.txt` manifest and
+frame 1100, which writes each client's `makgora-replay-N.txt` manifest and
 parts to copy into the recording's `a` and `b` folders.
 
 `bun wisp play --standalone --window chrome --four-fighters --frames 7200 --out DIR` is
@@ -95,23 +95,23 @@ defaults to `native` and keeps the same authored pad driver in every profile.
 Capture requests name logical match frames. Scene JSON also records the raw
 headless callback frame, which includes the 30 startup callbacks.
 
-From ~/code/smashcraft/main/ts, run `bun wisp play`. It builds current main,
+From ~/code/makgora/main/ts, run `bun wisp play`. It builds current main,
 points the always-on controller service at the matching helper, and hosts a match on Tom's main display
 against a computer. The match plays on the keyboard; a pad the service finds
 presses the same keys, and without one play says "keyboard" and goes on. It reuses the signed-in Battle.net launcher and never signs
 in, logs out or switches accounts.
 
-Maps/00-Smashcraft keeps at its top level the latest release `Smashcraft X.Y.w3x` (online hosting picks it) and the newest installed main build
-`Smashcraft X.Y-dev.N.w3x` (the file and in-game title carry the same name). Installing a main build (`play`, `playtest:build`,
+Maps/00-Makgora keeps at its top level the latest release `Makgora X.Y.w3x` (online hosting picks it) and the newest installed main build
+`Makgora X.Y-dev.N.w3x` (the file and in-game title carry the same name). Installing a main build (`play`, `playtest:build`,
 the Tom build watcher, `play --install-green`) removes every older dev build; every earlier release moves to old/, none is deleted. Only releases are public, so X.Y is the next release, never a build
 counter: the minor after the newest `vX.Y` tag reachable from the commit (`v0.1.5` makes 0.2, `v0.2` makes 0.3;
 tags up to v0.1.5 carry a patch, later releases do not)
 (`git describe --tags --match 'v[0-9]*.[0-9]*' --exclude 'v*-*'`),
 and N counts the first-parent commits on main since that tag
 (`git rev-list --first-parent --count vX.Y..COMMIT`), so it only grows along main and
-the newest build is the highest N: `Smashcraft 0.2-dev.830`. The map description names the full commit. When Tom calls a release candidate, a
-`v0.2-rc.N` tag on its commit names the build `Smashcraft 0.2 RC-N`
-(the highest N), and the `v0.2` release tag names it `Smashcraft 0.2`. At
+the newest build is the highest N: `Makgora 0.2-dev.830`. The map description names the full commit. When Tom calls a release candidate, a
+`v0.2-rc.N` tag on its commit names the build `Makgora 0.2 RC-N`
+(the highest N), and the `v0.2` release tag names it `Makgora 0.2`. At
 most one lane or test build for Tom to try sits beside the dev build (lane builds below,
 `play --lobby-only MAP.w3x`); it replaces any earlier one and goes when the next
 main build installs. Test, integrity, capture and diagnostic builds go to a
@@ -120,21 +120,21 @@ private folder or a pool client, never this one: `wisp map build` and
 refuses Tom's documents folder.
 
 The play build checks the build inputs, cue models, package and map size,
-and skips the Lua cost prediction; `bun run playtest:build --predict-cost` adds it (smashcraft:docs/commands/workflow.md).
+and skips the Lua cost prediction; `bun run playtest:build --predict-cost` adds it (makgora:docs/commands/workflow.md).
 
-Main's smashcraft:build-inputs/ names the private inputs: base map,
+Main's makgora:build-inputs/ names the private inputs: base map,
 container, assets and summon clips, each by the hash of its contents in the
-store (smashcraft:docs/build-inputs.md). Map builds check every input against
+store (makgora:docs/build-inputs.md). Map builds check every input against
 its hash and every imported file against the script and archive. Build outputs
 and proprietary assets stay outside source trees; dependency installation and
 compilation happen in the revision's own worktree, under the revision's lock,
 so plays started together build one map and share it. The controller helper is
-optional and cached by its controller source tree (smashcraft:controller); a failed helper build leaves
+optional and cached by its controller source tree (makgora:controller); a failed helper build leaves
 the keyboard and never blocks the map. A new source revision builds a new map;
 repeated runs reuse its map and helper.
 
 Helper compilation uses one Cargo target directory at
-`~/.local/share/smashcraft-build-inputs/play-helper-target`, shared across
+`~/.local/share/makgora-build-inputs/play-helper-target`, shared across
 revisions of the play-build worktree. Cargo locks its build output; the play launcher
 also holds a lock through copying the finished binaries into the controller
 source tree's `play-helpers/` directory, so concurrent revisions deliver their
@@ -144,58 +144,58 @@ the first shared-cache fill took 4m32s and a second worktree reused it in
 
 ## Every landing in Maps
 
-The Tom build watcher (smashcraft:tools/tom-build/) builds each new tip of
-main and installs it under Maps/00-Smashcraft, as `bun run playtest:build`
+The Tom build watcher (makgora:tools/tom-build/) builds each new tip of
+main and installs it under Maps/00-Makgora, as `bun run playtest:build`
 does, without opening the lobby. It fetches origin/main every 10 s; when main
 moved to a commit it has not built, it builds that commit with the same
 version numbering and revision locks as `play`, under `Nice=10` and idle I/O.
 Commits that land during a build are not built one by one: the next build is
 of the newest tip. A sha is built once, even after a failure or a restart
-(`~/.local/state/smashcraft/tom-build/attempted`). A new build gets a new
-`Smashcraft X.Y-dev.N` file at the top of Maps/00-Smashcraft and replaces the previous dev build and any
+(`~/.local/state/makgora/tom-build/attempted`). A new build gets a new
+`Makgora X.Y-dev.N` file at the top of Maps/00-Makgora and replaces the previous dev build and any
 lane build there; releases are left alone.
 While Warcraft III runs in Tom's prefix the watcher still builds and copies each new dev build, under its new
 file name, and moves or removes no file the game could have open; it logs that the
 tidy of older dev builds and releases (into old/) waits, and does the tidy within
 a poll after the game closes. Each install writes the same
 playtest notes as `bun wisp play --install-green`
-(smashcraft:docs/commands/play.md).
+(makgora:docs/commands/play.md).
 
 Each install is held to two speed budgets: the build within 20 s and the
 landed commit installed in Maps within 360 s. An install over either opens or
 comments on the one GitHub issue "Speed budget: a landing took too long to
 reach Tom's Maps folder" for an agent to find the stage that grew and what it
 recomputes whose inputs did not change; the next install within both closes
-it (smashcraft:ts/scripts/tomBuildWatch.ts).
+it (makgora:ts/scripts/tomBuildWatch.ts).
 
 Start it (once, from the main checkout):
 
     mkdir -p ~/.config/systemd/user
-    cp tools/tom-build/smashcraft-tom-build.service ~/.config/systemd/user/
+    cp tools/tom-build/makgora-tom-build.service ~/.config/systemd/user/
     systemctl --user daemon-reload
-    systemctl --user enable --now smashcraft-tom-build.service
+    systemctl --user enable --now makgora-tom-build.service
 
-Stop it with `systemctl --user disable --now smashcraft-tom-build.service`;
+Stop it with `systemctl --user disable --now makgora-tom-build.service`;
 `bun scripts/tomBuildWatch.ts` from ts/ runs it in the foreground. Each
 installed build appends one line to `~/.local/state/agents/handoffs/tom-build.log`:
 
     <utc> <sha> <version> <build_s> <land_to_installed_s> <land_to_main_s> <cpu_pressure_peak> <live_clients> <stages> <install path>
 
 `land_to_installed_s` counts from the commit's committer time; the other
-fields name the stage a slow landing spent its time in (smashcraft:tools/tom-build/README.md). Failed builds
-are in `journalctl --user -u smashcraft-tom-build`. A landing that moves the pinned Wisp's `window/` source also adds a `<utc> <sha> window-library <seconds> <hash> <library path>` line once the native window library is built, so `wisp play --window native` starts without a cargo build.
+fields name the stage a slow landing spent its time in (makgora:tools/tom-build/README.md). Failed builds
+are in `journalctl --user -u makgora-tom-build`. A landing that moves the pinned Wisp's `window/` source also adds a `<utc> <sha> window-library <seconds> <hash> <library path>` line once the native window library is built, so `wisp play --window native` starts without a cargo build.
 
 ## Lane builds before landing
 
 From a lane's worktree, `cd ts && bun scripts/laneBuild.ts` runs `bun run check`
 and the lane's own tests (test files changed since its merge base with
 origin/main, uncommitted ones included), then builds the lane's working tree
-with the play build (no Lua prediction) as `Smashcraft X.Y-LANE.w3x` in
-`~/.local/state/smashcraft/lane-builds/LANE/`, which holds only that lane's
-newest build. `--install` also installs it in Tom's Maps/00-Smashcraft for him
+with the play build (no Lua prediction) as `Makgora X.Y-LANE.w3x` in
+`~/.local/state/makgora/lane-builds/LANE/`, which holds only that lane's
+newest build. `--install` also installs it in Tom's Maps/00-Makgora for him
 to try. X.Y is the next release; LANE is the branch's last segment without `land-`
 (`claude/land-cairne-air-924c72aef489` installs
-`Smashcraft X.Y-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
+`Makgora X.Y-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
 explicitly. An installed lane map replaces any other lane or test map in the
 folder and leaves the main build alone; builds of one lane wait for each other.
 Main's numbering ignores lane maps, and the next main build to install removes
@@ -203,21 +203,21 @@ the lane map.
 
 ## The desktop client
 
-Players use [smashcraft-client](https://github.com/tompassarelli/smashcraft-client):
+Players use [makgora-client](https://github.com/tompassarelli/makgora-client):
 its release bundles the controller service, and its Play launches the current
-map in Maps/00-Smashcraft ([client interface](client-interface.md)). It needs no
+map in Maps/00-Makgora ([client interface](client-interface.md)). It needs no
 checkout of this repository.
 
 ## Controller without play
 
 The controller service ([padbridge](https://github.com/tompassarelli/padbridge)
-with Smashcraft's plug-in, smashcraft:controller/README.md) runs from Tom's
+with Mak'gora's plug-in, makgora:controller/README.md) runs from Tom's
 login as the systemd user unit padbridge.service, declared in
 nixos-config. It runs the launcher ~/.local/share/padbridge/bin/padbridge
-`--service --plugin` ~/.local/share/smashcraft-build-inputs/controller/wc3-journal;
+`--service --plugin` ~/.local/share/makgora-build-inputs/controller/wc3-journal;
 both are links to the pinned service and the plug-in built together under
 play-helpers/. It finds Warcraft III on :0 by itself, follows any
-Smashcraft session (one Tom opens from Custom Games included, and a reopened
+Mak'gora session (one Tom opens from Custom Games included, and a reopened
 map) and survives Warcraft restarts and pad replugs. `play` and
 `bun wisp controller` point the links at main's build and restart the unit
 when it changed; without the unit, `bun wisp controller` runs the service in

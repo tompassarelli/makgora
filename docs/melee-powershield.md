@@ -23,9 +23,9 @@ through the impact journal.
 
 ## Shield and reflector geometry
 
-Smashcraft fighters use an authored shield circle centred at local offset
+Mak'gora fighters use an authored shield circle centred at local offset
 `(0, 45)` with base radius `60` world units, scaled by shield health and
-pressure (smashcraft:docs/melee-analog-shield.md). These are Smashcraft tuning
+pressure (makgora:docs/melee-analog-shield.md). These are Mak'gora tuning
 values, not Melee character geometry. While the reflector is up, the whole
 shield circle reflects (#118): with a smaller reflector circle checked in the
 same swept step, a projectile met the bubble's outer ring a frame before the
@@ -49,9 +49,9 @@ blocked while shielding; shield coverage and exposed-body pokes are missing.
 
 ## Departures from Melee
 
-Smashcraft keeps the 4-frame counter, its consumption while guard stays held
+Mak'gora keeps the 4-frame counter, its consumption while guard stays held
 and the cleared minimum hold, but changes the reward (#102,
-smashcraft:docs/gameplay-design.md, "Powershield and parry"): a perfect
+makgora:docs/gameplay-design.md, "Powershield and parry"): a perfect
 contact causes no shieldstun, dropping the shield while the counter is positive
 has no release lag at all rather than admitting only attacks, and an option
 pressed during the contact's hitlag is buffered into its first actionable

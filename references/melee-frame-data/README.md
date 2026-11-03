@@ -1,6 +1,6 @@
 # Melee frame-data reference
 
-Smashcraft's one corpus of Melee frame data: a factual research reference, not a
+Mak'gora's one corpus of Melee frame data: a factual research reference, not a
 physics specification or an importable character definition. It has four
 inputs, each with its own provenance: meleeframedata.com's database
 (`records.jsonl`, below), libmelee's recorded per-frame table
@@ -11,7 +11,7 @@ FightCore's frame data with knockback values (`fightcore.csv`, with every
 fighter's per-phase hitboxes and knockdown thresholds in `fightcore-phases.jsonl`
 and `fightcore-thresholds.jsonl`, under "FightCore knockback and getup data").
 The public-source parity ledger built on it is
-smashcraft:docs/design/melee-parity-plan.md.
+makgora:docs/design/melee-parity-plan.md.
 
 The database intake contains 789 records: 502 attacks,
 52 grabs, 105 throws, 104 dodges, and 26 character-stat records. It covers all
@@ -43,7 +43,7 @@ The repository snapshot is not claimed to equal the entire deployed database.
 
 ## Record schema
 
-`smashcraft:references/melee-frame-data/records.jsonl` contains one JSON object
+`makgora:references/melee-frame-data/records.jsonl` contains one JSON object
 per line, identified by `(character, category, action)`:
 
 - `schema_version`: 1.
@@ -98,7 +98,7 @@ special-case behavior may exist only in the omitted notes.
 
 ## Coverage and observed check
 
-`smashcraft:references/melee-frame-data/coverage.json` records counts for every
+`makgora:references/melee-frame-data/coverage.json` records counts for every
 character and table and missing counts per scalar field. 584 records contain
 at least one null/missing/inapplicable value; 333 have excluded source notes.
 These counts do not mean 584 moves are broken: many aerial-only fields are
@@ -135,7 +135,7 @@ and representative site values rather than merely replacing the checksum.
 
 ## libmelee hitbox positions and dodge travel
 
-`smashcraft:references/melee-frame-data/libmelee.jsonl` reduces libmelee's
+`makgora:references/melee-frame-data/libmelee.jsonl` reduces libmelee's
 recorded frame table to what meleeframedata.com's database lacks: where each
 normal attack's and grab's hitboxes are, frame by frame, and how far each attack
 and ground dodge moves the fighter on each frame. It has 477 records, one per `(character, action)`,
@@ -144,7 +144,7 @@ for the 26 fighters (Popo stands for the Ice Climbers; Nana is left out).
 Source: https://github.com/altf4/libmelee at revision
 `ef679270ff95f0d42339dcdf1608282a35023349`, file `melee/framedata.csv`, SHA-256
 `8e0d811290b511902076c0011db1a0116356a7ddaa68dfa369ea4f5dcdc93777`, the same
-file smashcraft:docs/physics.md cites for roll travel. libmelee is licensed
+file makgora:docs/physics.md cites for roll travel. libmelee is licensed
 LGPL-3.0; only factual numbers recorded from the game are kept, renamed to this
 corpus's identifiers, and no libmelee code is used. The table was recorded by
 libmelee's authors from the running game; its disc revision is not stated.
@@ -202,7 +202,7 @@ checks the two representative records.
 
 ## Dash-attack travel from public replays
 
-`smashcraft:references/melee-frame-data/replay-dash-attacks.jsonl` gives the
+`makgora:references/melee-frame-data/replay-dash-attacks.jsonl` gives the
 per-frame forward travel of the seven dash attacks libmelee never recorded:
 Bowser, Donkey Kong, Jigglypuff, Luigi, Mario, Roy and Yoshi. It is measured
 from tournament replays as black-box observation of the running game: each
@@ -259,7 +259,7 @@ The tool checks every replay's hash and the control before writing.
 
 ## FightCore knockback and getup data
 
-`smashcraft:references/melee-frame-data/fightcore.csv` is FightCore's Melee frame
+`makgora:references/melee-frame-data/fightcore.csv` is FightCore's Melee frame
 data for all 26 fighters, 1215 rows, one per `(Character, Section, Move)`. It
 adds what the other two inputs lack: each move's launch angle, base knockback,
 knockback growth and set knockback, and the getup, tech, ledge and dodge
@@ -300,7 +300,7 @@ ssconvert -S fightcore_melee_frame_data.xlsx /tmp/fightcore.csv
 cp /tmp/fightcore.csv.0 references/melee-frame-data/fightcore.csv
 ```
 
-`smashcraft:references/melee-frame-data/fightcore.ts` reads the file into typed
+`makgora:references/melee-frame-data/fightcore.ts` reads the file into typed
 rows: frames as numbers or null for `-`, landing lag split into normal and
 L-cancelled, autocancel as its two frames, and Damage, Angle, Effect, Base
 Knockback, Knockback Growth and Set Knockback as per-hitbox arrays, empty for
@@ -405,7 +405,7 @@ keeps the fresh damage in the knockback term.
 `fightcore-thresholds.ts` reads both files. `bun wisp oracle` checks every
 threshold percent against our knockback formula (`ts/scripts/meleeThresholds.ts`):
 fresh percents through the shipped `ts/src/game/sim/knockback.ts`, stale ones
-through a Melee-only staling path, since Smashcraft has no staling. Two
+through a Melee-only staling path, since Mak'gora has no staling. Two
 kinds of FightCore percent are named ledger rows instead of disagreements:
 percents above Melee's 999% damage limit (`knockback-threshold-percent-limit`)
 and the "never" its rule gives a zero-growth hitbox whose base knockback
@@ -454,7 +454,7 @@ values, of which 307 disagree. The rule per field, from that run:
 
 ## Character attributes
 
-`smashcraft:references/melee-frame-data/character-attributes.csv` lists each of
+`makgora:references/melee-frame-data/character-attributes.csv` lists each of
 the 26 fighters' movement and body attributes, one row per fighter and 97
 named columns: walk, dash and run speeds and accelerations, ground friction,
 jump squat, jump and short-hop initial velocities, air jump multipliers,
@@ -477,7 +477,7 @@ Units are Melee units and frames. Representative check: Fox's jump squat is 3,
 as in `records.jsonl`, and his terminal velocity 2.8 is the value that file
 mislabels `gravity`; his gravity is 0.23 and fast-fall velocity 3.4.
 
-`smashcraft:references/melee-frame-data/character-attributes.ts` reads one row
+`makgora:references/melee-frame-data/character-attributes.ts` reads one row
 per fighter with the movement and body columns typed (weight, run velocity and
 air speed as `/`-separated lists, since some fighters carry two values; hex
 cells such as `0x02` as numbers) and every other named column kept as text.
@@ -485,7 +485,7 @@ cells such as `0x02` as numbers) and every other named column kept as text.
 
 ## SmashWiki attack intangibility
 
-`smashcraft:references/melee-frame-data/smashwiki-intangibility.csv` lists the
+`makgora:references/melee-frame-data/smashwiki-intangibility.csv` lists the
 Melee jabs, tilts, smashes and dash attacks that make part of the fighter
 intangible, one row per move: `character` and `action` in this corpus's
 identifiers, `body_part` (blank where the page gives none) and the

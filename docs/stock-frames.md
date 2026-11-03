@@ -20,9 +20,9 @@ the click first. A native bisect on gex45 on 2026-11-03 found the frames that
 did it at 3:2 (2880x1920): children 1, 5 and 7 of `ConsoleUI`, the stock
 command bar and two sibling bars, with every other stock group hidden.
 
-Rule: at startup `releaseStockClicks` (smashcraft:ts/src/game/ui/stockClicks.ts)
+Rule: at startup `releaseStockClicks` (makgora:ts/src/game/ui/stockClicks.ts)
 hides and disables those three subtrees, and `hideStockOriginFrames`
-(smashcraft:ts/src/host/loop/stockFrames.ts) hides and disables each stock
+(makgora:ts/src/host/loop/stockFrames.ts) hides and disables each stock
 command, item, hero, minimap and system-button origin frame by name, both
 beside `BlzHideOriginFrames(true)`. A new panel
 button is clicked natively across its width; headless tests cannot show this.
@@ -34,12 +34,12 @@ button is clicked natively across its width; headless tests cannot show this.
 | `ConsoleUIBackdrop` | our full-window backdrops, the pause screen, the fighter markers | removes all of them |
 | game UI (`ORIGIN_FRAME_GAME_UI`) | panel content in the 4:3 area, the status text | removes the panels |
 | world frame (`ORIGIN_FRAME_WORLD_FRAME`) | the 3D view | blacks the world |
-| chat box (`ORIGIN_FRAME_CHAT_MSG`) | Warcraft's chat lines and entry box | chat stops working; its level and place must not change either (smashcraft:ts/test/engineFrames.test.ts) |
+| chat box (`ORIGIN_FRAME_CHAT_MSG`) | Warcraft's chat lines and entry box | chat stops working; its level and place must not change either (makgora:ts/test/engineFrames.test.ts) |
 
 Rule: never hide, disable or destroy a stock frame as a group, only a named
 frame, and test the all-hidden state before shipping. The first draft of this
 fix hid every stock child; it would have broken chat and blacked the world,
 and was caught only because the worker tried it first.
 
-`smashcraft:ts/test/stockFrames.test.ts` pins the hide list and fails when a
+`makgora:ts/test/stockFrames.test.ts` pins the hide list and fails when a
 hidden stock frame is the parent of any frame the map made.

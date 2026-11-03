@@ -1,11 +1,11 @@
-# Smashcraft netcode proposal — implementation record
+# Mak'gora netcode proposal — implementation record
 
 Owner-supplied research and implementation brief, 30 September 2026. This is a
 condensed record of their decisions and acceptance requirements, not a claim
 that the cited APIs have passed native tests. The full gameplay goal remains in
-smashcraft:docs/delivery-goal.md; existing gameplay, controls, visuals and animation requirements
-in smashcraft:evidence/development-plan.md, smashcraft:docs/physics.md and smashcraft:docs/fighter-animation-work.md remain
-in scope. Native observations belong in smashcraft:evidence/native-capability-report.md.
+makgora:docs/delivery-goal.md; existing gameplay, controls, visuals and animation requirements
+in makgora:evidence/development-plan.md, makgora:docs/physics.md and makgora:docs/fighter-animation-work.md remain
+in scope. Native observations belong in makgora:evidence/native-capability-report.md.
 
 ## Decision and sequence
 
@@ -156,11 +156,11 @@ frames, smooth bodies through ledges/hitboxes, or mask a native capability gap.
 ## Acceptance and comparison
 
 Acceptance is the **Done when** list of the owning issue: input integrity
-[#26](https://github.com/tompassarelli/smashcraft/issues/26) for frame assignment,
+[#26](https://github.com/tompassarelli/makgora/issues/26) for frame assignment,
 retention and response; online play
-[#17](https://github.com/tompassarelli/smashcraft/issues/17) for matches and the
+[#17](https://github.com/tompassarelli/makgora/issues/17) for matches and the
 human playtest. Hosting comparisons are
-[#19](https://github.com/tompassarelli/smashcraft/issues/19). Response figures are
+[#19](https://github.com/tompassarelli/makgora/issues/19). Response figures are
 reported against advisory targets, not gated.
 
 The fairness promise is an equal measured schedule for conforming clients in a

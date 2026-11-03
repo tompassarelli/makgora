@@ -2,7 +2,7 @@
 
 ## Moving platforms
 
-Smashcraft's moving decks follow closed paths of timed linear legs, including
+Mak'gora's moving decks follow closed paths of timed linear legs, including
 stationary legs for waits. The match frame chooses a binary32 pose directly;
 rollback and prediction use that same frame, with no accumulated stage timer.
 The main deck stays fixed. Hidden test stages 3 and 4 provide a Smashville-style
@@ -17,24 +17,24 @@ catch rules. Path dimensions and schedules are authored
 here; they are inspired by Ultimate's layouts, without claiming Ultimate's
 exact timing.
 
-The live simulation is smashcraft:ts/src/game/sim/; native precision commands
-are in smashcraft:docs/native-physics-precision.md.
+The live simulation is makgora:ts/src/game/sim/; native precision commands
+are in makgora:docs/native-physics-precision.md.
 
 ## Launch, hitstun and stacking
 
 A launch's speed is its knockback × 0.03 Melee units a frame, and airborne it
 decays by 0.051 a frame (SmashWiki "Knockback"). Hitstun is knockback × 0.4
-frames (SmashWiki "Hitstun"; smashcraft:docs/melee-hitstun-boundaries.md), and a
+frames (SmashWiki "Hitstun"; makgora:docs/melee-hitstun-boundaries.md), and a
 hit that would give 32 frames of hitstun or more, 80 knockback, tumbles
 (SmashWiki "Tumble"). Hitlag follows SmashWiki "Hitlag"
-(smashcraft:docs/melee-hitlag-scalars.md). The simulation resumes physics,
+(makgora:docs/melee-hitlag-scalars.md). The simulation resumes physics,
 input gates and countdowns on the frame hitlag reaches zero; release DI and
 ASDI happen before that frame's physics.
 
 Two launches stack only when the second comes 10 or more frames after the
 first and leaves the fighter airborne; otherwise the second replaces the first,
 so a hit that keeps its target on the floor always replaces (SmashWiki
-"Knockback", In Melee; smashcraft#536). From frame ten Smashcraft merges each axis: opposite
+"Knockback", In Melee; makgora#536). From frame ten Mak'gora merges each axis: opposite
 components add and same-direction components keep the greater magnitude. The
 launch age freezes during hitlag. The contact batch first chooses its strongest
 launch, then merges it once with residual motion; hitstun and reaction level
@@ -45,10 +45,10 @@ A grounded hit below tumble strength that sends the fighter down or sideways
 keeps it on the floor and projects the launch onto it, and DI cannot steer it
 off; an upward or tumble-strength hit leaves the ground. Grounded knockback
 decays by the fighter's ground friction (Captain Falcon, Fox and Falco 0.08,
-Jigglypuff 0.09; smashcraft:references/melee-frame-data/character-attributes.csv)
+Jigglypuff 0.09; makgora:references/melee-frame-data/character-attributes.csv)
 and never reverses. A tumble-strength hit steeply into the floor bounces off it;
-the angle and the bounce's speed are Smashcraft's, in
-smashcraft:ts/src/game/sim/knockback.ts, as no public page states Melee's.
+the angle and the bounce's speed are Mak'gora's, in
+makgora:ts/src/game/sim/knockback.ts, as no public page states Melee's.
 
 DI rotates the actual launch vector by at most 18° (SmashWiki "Directional
 influence"), normalizing against the vector rather than the pre-direction
@@ -65,45 +65,45 @@ hitlag and resume on its zero frame; defender pushback decays by the fighter's
 ground friction. A later clean hit, shield break or respawn clears them, and
 replay snapshots copy and compare them with the shield-drain transition.
 Attacker recoil in the air keeps its own decaying vector
-(smashcraft:docs/melee-air-cutoff.md), and its direction uses the shared scalar
-approximation (smashcraft:docs/melee-scalar-math.md). The grounded recoil
+(makgora:docs/melee-air-cutoff.md), and its direction uses the shared scalar
+approximation (makgora:docs/melee-scalar-math.md). The grounded recoil
 friction factor, the airborne recoil decay and the airborne relative-motion
-weight are Smashcraft's, in smashcraft:ts/src/game/sim/shield.ts and
-smashcraft:ts/src/game/sim/motion.ts. A broken shield launches the fighter at
+weight are Mak'gora's, in makgora:ts/src/game/sim/shield.ts and
+makgora:ts/src/game/sim/motion.ts. A broken shield launches the fighter at
 its shield-break initial velocity: Rifleman's is Fox and Falco's 3.3 Melee
 units a frame (character-attributes.csv), Illidan keeps 24 world units.
 
-Analog pressure and powershields are in smashcraft:docs/melee-analog-shield.md
-and smashcraft:docs/melee-powershield.md.
+Analog pressure and powershields are in makgora:docs/melee-analog-shield.md
+and makgora:docs/melee-powershield.md.
 
 ## Arithmetic order
 
 Positions add self velocity, then launch, then attacker recoil, rounding each
 addition to binary32 in Melee units, on the ground
-(smashcraft:docs/melee-ground-motion.md) and in the air alike. Gravity
+(makgora:docs/melee-ground-motion.md) and in the air alike. Gravity
 subtraction rounds both operands and the result. Airborne launch converts its
 velocity to binary32 Melee units, rounds the vertical square, fuses the
 horizontal square-plus-sum, and compares the speed with the decay through the
-derived boundary of smashcraft:docs/melee-air-cutoff.md. Above the cutoff it
+derived boundary of makgora:docs/melee-air-cutoff.md. Above the cutoff it
 takes the direction from the shared scalar approximation and subtracts each
 decay component with one fused rounding, keeping tiny cardinal-axis residues
 rather than forcing those axes to zero. Zero displacement keeps authored
-stationary surface coordinates exactly. These orders are Smashcraft's
+stationary surface coordinates exactly. These orders are Mak'gora's
 determinism rules.
 
 ## Fighter parameters
 
-Smashcraft's fighters are original characters, and Melee verification concerns
-shared equations and state rules (smashcraft:docs/gameplay-design.md,
+Mak'gora's fighters are original characters, and Melee verification concerns
+shared equations and state rules (makgora:docs/gameplay-design.md,
 "Principles"). Each fighter carries its own weight, gravity, fall and fast-fall
 speeds, drift, friction and caps, ground speeds, jump parameters and
 shield-break speed; shared physics reads those, and replay snapshots copy and
 compare them. Reference fighters exist only as test rigs, assigned their
-values from smashcraft:references/melee-frame-data/character-attributes.csv.
+values from makgora:references/melee-frame-data/character-attributes.csv.
 Illidan keeps his original tuning; the digital dodge and fast-fall controls
 and the absence of stale moves are owner decisions in
-smashcraft:docs/gameplay-design.md. The frame-data corpus at
-smashcraft:references/melee-frame-data/README.md supports move research; it
+makgora:docs/gameplay-design.md. The frame-data corpus at
+makgora:references/melee-frame-data/README.md supports move research; it
 supplies no hitbox geometry beyond libmelee's recorded positions, its raw
 `gravity` field is not gravity and `stun` means shieldstun (its README has
 the traps).
@@ -111,11 +111,11 @@ the traps).
 ## Simultaneous damage contacts — 2026-10-02
 
 SmashWiki "Knockback" states that Melee's percent term is the floored pre-hit
-percent plus the sum of the hitbox damage dealt that frame. Smashcraft selects
+percent plus the sum of the hitbox damage dealt that frame. Mak'gora selects
 the greatest knockback among a frame's contacts, keeping the earlier entry on a
 tie, while attack power belongs to the individual hit.
 
-smashcraft:wurst/MatchStep.wurst now opens one synchronous contact batch before
+makgora:wurst/MatchStep.wurst now opens one synchronous contact batch before
 grab actions and resolves it after melee, specials, summons and projectiles.
 Every current damage path participates: throws, pummel, ordinary attacks,
 Illidan's direct special, bear swipes, hippogryph strikes, flinching lasers,
@@ -141,7 +141,7 @@ adds no persistent snapshot fields. Standalone pair operations also collect
 and resolve a complete batch when called outside the match step.
 
 The integrated `bash test.sh Tests` run passes 423/423 with zero compiler
-errors; evidence is smashcraft:build/two-clients/contact-batch-aggregate.log.
+errors; evidence is makgora:build/two-clients/contact-batch-aggregate.log.
 Six new tests exercise reversed collection order and fractional pre-hit
 percent, mixed projectile kinds, shield depletion, direct-special trades,
 both summons, throw/pummel damage, and exact match-step snapshot restoration.
@@ -155,11 +155,11 @@ this change has not been built into or installed as a map.
 This correction does not implement launch stacking across different frames,
 whose common-data time gate remains unverified. Ground launch/friction,
 bounce and shield pushback data gaps remain unchanged; fighter tuning and the
-decisions in smashcraft:docs/gameplay-design.md are unchanged.
+decisions in makgora:docs/gameplay-design.md are unchanged.
 
 ## Roll-facing correction — 2026-10-02
 
-The pinned libmelee empirical data in smashcraft:build/ref-libmelee-framedata.csv
+The pinned libmelee empirical data in makgora:build/ref-libmelee-framedata.csv
 matches SHA256 8e0d811290b511902076c0011db1a0116356a7ddaa68dfa369ea4f5dcdc93777
 at revision ef679270ff95f0d42339dcdf1608282a35023349. Fox (character 1) and
 Falco (22), forward roll (action 233), first report `facing_changed=True` on
@@ -178,7 +178,7 @@ completion-time turn and 128-unit travel. Durations and intangibility stay
 unchanged for all fighters, and backward rolls/spot dodges retain facing.
 
 The focused `bash test.sh rollFacing` run passes 5/5 with zero compiler errors;
-evidence is smashcraft:build/two-clients/roll-facing-tests.log. It exercises both
+evidence is makgora:build/two-clients/roll-facing-tests.log. It exercises both
 facings, frame 19/20, hitlag freeze, snapshot restore across the turn, canonical
 state sensitivity, travel totals, platform clamps, and unchanged backward/spot
 orientation. These numerical checks do not prove native clip playback. This
@@ -195,7 +195,7 @@ step's physics. Record the actual implemented rate with the simulation tests.
 The simulation uses 60 logical frames/second and six Warcraft world units per
 Melee distance unit. Movement, gravity, shield energy and ordinary knockback
 use the numerical baseline below. Ground-jump launch speeds use Fox and Falco's
-attributes (smashcraft:references/melee-frame-data/character-attributes.csv), and aerial jumps multiply the full-jump attribute by
+attributes (makgora:references/melee-frame-data/character-attributes.csv), and aerial jumps multiply the full-jump attribute by
 the published aerial multiplier. The first ground-jump tick preserves launch
 velocity; subsequent ticks apply gravity. The six reference-table apex targets
 remain checked below. Digital direction input, simplified collision shapes and
@@ -252,7 +252,7 @@ no article prose or implementation is reused. Cached pages are build artifacts.
 | Empty landing frames | 4 | 4 |
 
 The horizontal attributes agree with SuperCombo Wiki's table in
-smashcraft:references/melee-frame-data/character-attributes.csv. Ground takeoff scales prior
+makgora:references/melee-frame-data/character-attributes.csv. Ground takeoff scales prior
 self velocity, adds held-direction momentum, then caps it. Aerial jump replaces
 horizontal self velocity, including zero for neutral input. Countersteering
 preserves overspeed; matching input above the drift target brakes by air friction
@@ -300,7 +300,7 @@ is not proof that the entire table has been adopted or that feel matches.
 
 Production top-boundary death requires position strictly above the boundary
 and either grounded state, an active frozen state, or upward knockback above
-Smashcraft's launch threshold in smashcraft:ts/src/game/sim/, which no public
+Mak'gora's launch threshold in makgora:ts/src/game/sim/, which no public
 page states for Melee. Ordinary jump velocity does not meet it. Production tests
 cover jump-only ascent, the exact launch threshold, a qualifying launch, and
 contact exactly at the top boundary. Camera
@@ -319,7 +319,7 @@ that fighter's traction. Velocity below the target accelerates by the
 fighter-owned ground acceleration multiplier plus base, then clamps at the run
 target and ground speed cap. The original roster currently shares authored
 defaults of 0.1, 0.02 and 3 Melee units/frame for those three values; these are
-Smashcraft tuning choices and are not imported Falco/Fox character stats.
+Mak'gora tuning choices and are not imported Falco/Fox character stats.
 
 The test-only Falco rig injects Falco's dash and run accelerations 0.1 and
 0.02 and ground maximum 3 (character-attributes.csv). A frame-by-frame test checks the walk-to-dash entry, where the dash's initial
@@ -361,7 +361,7 @@ current frame. RunBrake ends when its clip ends or its fighter countdown
 expires, whichever comes first; Fox and Falco's countdown is 30 frames
 (character-attributes.csv, "Maximum RunBrake Frames"). TurnRun completion enters
 Run only while forward input remains held; otherwise it returns to Wait.
-Smashcraft fighters keep authored timing (currently 14/9/20/15). The command
+Mak'gora fighters keep authored timing (currently 14/9/20/15). The command
 frames of Melee's dash, run, turn and brake actions are not on a public page,
 so test rigs use the same authored timing. Replay capture and equality include
 all ground-action clocks, the RunBrake countdown and actor rule values.
@@ -380,7 +380,7 @@ The focused `initialDash` simulation filter passes 6/6 tests, the under-target
 acceleration/cap check passes 1/1, and the aggregate suite passes 430/430. The
 independent recorded-dash comparison passes on both host identities and the
 perturbed-input case fails at the expected first frame. The aggregate output is
-smashcraft:build/wurst-tests/shared-dash-full.log. Native dash-dance feel and
+makgora:build/wurst-tests/shared-dash-full.log. Native dash-dance feel and
 keyboard delivery timing have not been validated for this change.
 
 A later S/F short-tap report exposed an adapter loss: a press and release
@@ -446,16 +446,16 @@ hitlag and digital shieldstun. A 0.25-damage hit at 12.75 pre-hit percent on
 weight 80, growth 100 and base 20 produces 40.8583333333 knockback and two
 shieldstun ticks. Previously the zero-power conversion produced a different
 launch and only one shieldstun tick. The focused timing check passed **5/5**
-with zero compiler errors (smashcraft:build/physics-fractional-power.log).
+with zero compiler errors (makgora:build/physics-fractional-power.log).
 These checks establish the conversion and existing formula behavior, not
 independent frame-trace or native-game parity.
 
-Stale moves and freshness bonuses are omitted (smashcraft:docs/gameplay-design.md,
+Stale moves and freshness bonuses are omitted (makgora:docs/gameplay-design.md,
 “Stale moves and freshness bonuses”): there is no staling queue or projectile
 staleness snapshot.
 
 SmashWiki's Hitstun article identifies the unconditional subtraction of one
-frame with Ultimate, not Melee. Smashcraft keeps floor(0.4*K) and decrements
+frame with Ultimate, not Melee. Mak'gora keeps floor(0.4*K) and decrements
 the counter before the damage state's input transitions, so jump and attack
 become eligible on the same expiry tick. The focused test exposed
 and corrected our jump check occurring before the hitstun decrement.
@@ -485,7 +485,7 @@ cover direct/detached contacts, shield timing, crouch/electric truncation,
 strongest-element versus largest-damage selection, reversed batches and ties.
 The assembled aggregate with fractional-power correction passed **409/409**,
 zero compiler errors and one existing warning
-(smashcraft:build/physics-electric-aggregate.log). Numeric common-table
+(makgora:build/physics-electric-aggregate.log). Numeric common-table
 confirmation and original-game hitlag traces remain outstanding.
 
 ## Recorded neutral-fall comparison
@@ -515,7 +515,7 @@ intake tool. No parser implementation or binary recording is included in the
 map or these references; the retained excerpt is numerical telemetry.
 Both comparison tests passed, including first-frame detection of the deliberately
 perturbed velocity. The existing `recorded` filter passed **5/5**, with zero
-compiler errors and one existing warning (smashcraft:build/physics-slippi-fall.log).
+compiler errors and one existing warning (makgora:build/physics-slippi-fall.log).
 
 The second independent recording excerpt,
 the recorded design targets, captures
@@ -537,15 +537,15 @@ jump trajectories, short hops, dodge/landing and native Warcraft execution
 remain unverified by this excerpt.
 The `recorded` filter passed **7/7**, including the jump comparison and the
 delayed-input counterexample, with zero compiler errors and the existing
-unused-import warning (smashcraft:build/physics-slippi-jump.log).
+unused-import warning (makgora:build/physics-slippi-jump.log).
 
 Launch speed already uses 0.03*K, converted by the six-world-units scale.
 A hit tumbles when knockback × 0.4 reaches 32 frames of hitstun (SmashWiki
 "Tumble"), grounded or airborne. Only tumbling landings tech or knock down; a
 weaker airborne hit lands, or keeps its stun below launch speed 0.5 (SmashWiki
-"Hitstun"), because its launch never reaches Smashcraft's knockdown speed in
-smashcraft:ts/src/game/sim/knockback.ts.
-smashcraft:ts/src/game/sim/tumbleLandings.tests.ts checks every authored move
+"Hitstun"), because its launch never reaches Mak'gora's knockdown speed in
+makgora:ts/src/game/sim/knockback.ts.
+makgora:ts/src/game/sim/tumbleLandings.tests.ts checks every authored move
 of each fighter at 10, 50 and 100 percent, grounded and airborne.
 
 ## Frame-authored hit regions
@@ -617,8 +617,8 @@ The `SimulationTests` filter passes 146/146 tests, including nine added
 resolution tests for overlap priority, mirrored launch, early/late effects,
 frame/geometry boundaries, per-target contact memory, shield contact, re-hit
 windows and trades. The compiler reports zero errors and warnings. Evidence:
-smashcraft:build/wurst-tests/hit-regions-20260930-final.log. Integration passed
-211/211 tests in smashcraft:build/wurst-tests/hit-regions-integrated.log. Map build
+makgora:build/wurst-tests/hit-regions-20260930-final.log. Integration passed
+211/211 tests in makgora:build/wurst-tests/hit-regions-integrated.log. Map build
 `hit-regions` succeeded with the four existing warnings and was installed;
 the running client has not loaded it and native combat feel is unverified.
 
@@ -627,7 +627,7 @@ the running client has not loaded it and native combat feel is unverified.
 Our design target, from public frame data (SmashWiki "Get-up attack" and
 "Tech"), is separate bound, wait, down-damage, stand, get-up attack and
 directional-roll states. The input thresholds and the down-wait timeout below
-are Smashcraft's, held in smashcraft:ts/src/game/sim/down.ts; no public page
+are Mak'gora's, held in makgora:ts/src/game/sim/down.ts; no public page
 states Melee's.
 
 - DownBound's entry forgets earlier A/B presses. As the bound ends, a get-up
@@ -643,22 +643,22 @@ states Melee's.
   preferring it to the left stick. The roll is forward or back by the flick's
   side. The C-stick is digital here, so a press of its smash direction is the
   crossing; held through the wait it does nothing.
-- Smashcraft also stands on Jump and treats a sideways press released within
+- Mak'gora also stands on Jump and treats a sideways press released within
   its input row as a roll, for keyboards.
 
-smashcraft:ts/src/game/match/knockdownInputContracts.tests.ts drives these
+makgora:ts/src/game/match/knockdownInputContracts.tests.ts drives these
 through helper rows, journal packets and synchronized input messages after
 low-, medium- and high-percent knockdowns.
 
 FightCore gives Sheik 49 frames for each get-up attack and 35 for each
-directional get-up roll (smashcraft:references/melee-frame-data/fightcore.csv,
+directional get-up roll (makgora:references/melee-frame-data/fightcore.csv,
 "Getups/Techs"); other characters' lengths vary by one or more frames.
-Smashcraft uses one shared profile (smashcraft:docs/gameplay-design.md,
+Mak'gora uses one shared profile (makgora:docs/gameplay-design.md,
 "Controls"): 26 bound, 13 down-damage, 30 stand, 49 get-up attack and 35 get-up
 roll ticks. The bound, down-damage and stand lengths and the get-up
 intangibility (20 frames for stand and forward roll, 23 for a backward roll
 face-up, 20 face-down, 27 and 22 for the Up and Down get-up attacks) are
-Smashcraft's timing; no public page states Melee's. Animation frame 0 is shown
+Mak'gora's timing; no public page states Melee's. Animation frame 0 is shown
 on simulation recovery frame 1, so protection through animation frame N covers
 simulation frames 1 through N.
 
@@ -675,7 +675,7 @@ component. This stable approximation selects the two reference action families;
 it does not simulate Melee's joint rotation. The update pins downed fighters to
 their selected stage surface. The prototype omits physical rebound and uses an immediate grounded bound.
 
-Get-up attack damage, hit shape, knockback, and startup remain Smashcraft move
+Get-up attack damage, hit shape, knockback, and startup remain Mak'gora move
 tuning, not character move data from Melee. The implementation now records
 down-wait remainder and face selection in replay snapshots so jab-reset and
 recovery frames restore with the same future outcome.
@@ -686,8 +686,8 @@ Melee is the design target here, from public sources only:
 
 - A tumble-strength downward hit on a grounded target bounces it off the floor
   with 20% less knockback ([SmashWiki, Meteor smash](https://www.ssbwiki.com/Meteor_smash)).
-  Smashcraft reflects the vertical launch upward at 0.800000011920929 when the
-  hit points more than Smashcraft's 10° below the floor
+  Mak'gora reflects the vertical launch upward at 0.800000011920929 when the
+  hit points more than Mak'gora's 10° below the floor
   ("Launch, hitstun and stacking"); at high percent this carries the
   target off the top blast zone.
 - Meteor smashes on grounded targets cannot be teched up to Brawl
@@ -695,11 +695,11 @@ Melee is the design target here, from public sources only:
   at contact and a held tech does not stop it. The later landing techs as usual.
 - Before Smash 4 a midair target driven into the floor gets no bounce and stops
   its fall ([SmashWiki, Meteor smash](https://www.ssbwiki.com/Meteor_smash)).
-  Smashcraft instead follows Smash 4 and Ultimate, where floors "no longer halt
+  Mak'gora instead follows Smash 4 and Ultimate, where floors "no longer halt
   the momentum" and the fighter rebounds "much like a stage spike with the
   floor instead of a wall" ([SmashWiki, Floor](https://www.ssbwiki.com/Floor)),
   so a meteor can carry a midair target off the top blast zone (a deliberate
-  divergence, ledger row `floor-rebound` in smashcraft:docs/design/melee-parity.md).
+  divergence, ledger row `floor-rebound` in makgora:docs/design/melee-parity.md).
   A tumbling airborne fighter with no tech in the window whose downward
   knockback exceeds the wall reflect threshold (1 Melee unit a frame) rebounds:
   its knockback plus own velocity reflects upward at 0.800000011920929, it stays
@@ -713,7 +713,7 @@ knockback on a bound or lying fighter launches it. A reset hit with 13 or more
 frames of hitstun is a half-reset: after the 13-frame reaction, the remaining
 hitstun runs as a down wait with get-up options, then the forced stand.
 
-smashcraft:ts/src/game/sim/knockdownBounce.tests.ts checks these rules.
+makgora:ts/src/game/sim/knockdownBounce.tests.ts checks these rules.
 
 ## Directional influence
 
@@ -764,7 +764,7 @@ target airborne. Shield SDI is not implemented. Native held ASDI and tapped
 SDI were observed in build 003040. Native callback tracing subsequently showed
 short press/release pairs delivered together in roughly 100 ms batches. Retaining
 the pulse fixes loss between simulation ticks; it does not remove that engine
-delivery latency. See smashcraft:evidence/development-plan.md for the recorded input sequences.
+delivery latency. See makgora:evidence/development-plan.md for the recorded input sequences.
 
 ## Separated launch velocity
 
@@ -797,8 +797,8 @@ the same protection query used by hit detection.
 
 The frame sweep test checks both characters at each frame 1–30. Additional
 tests cover damage interrupting startup and landing ending dodge protection.
-Neutral and directional dodge force and its decay are Smashcraft's, in
-smashcraft:ts/src/game/sim/, since SmashWiki "Air dodge" gives no speed. The
+Neutral and directional dodge force and its decay are Mak'gora's, in
+makgora:ts/src/game/sim/, since SmashWiki "Air dodge" gives no speed. The
 simulation applies the decay for 29 moving ticks and ordinary gravity plus air
 drift from tick 30, inside the 49-frame animation of SmashWiki's table. Entry
 reaches animation frame one before the first physics step, so this is 29 decay
@@ -807,7 +807,7 @@ expiry; snapshot fields preserve the phase. Tests exercise neutral and both
 diagonal vertical directions, all three steering inputs, the exact 29/30
 boundary, hitlag, and restore/replay through the boundary. The original
 roster and the 18-degree horizontal air dodge
-(smashcraft:docs/gameplay-design.md) are unchanged.
+(makgora:docs/gameplay-design.md) are unchanged.
 
 An accepted air dodge replaces prior ordinary movement and clears both launch
 momentum components, including for neutral input. This follows the momentum
@@ -873,16 +873,16 @@ on 2026-10-30: it goes over and catches the ledge. History: before 2026-10-30 ev
 landing lag stopped at the edge in a teeter whatever the facing; c5b2c322e0 (0.3-dev.283)
 then carried every slide off the edge, so a forward wavedash with no input fell off, which is
 wrong for Melee. Tom corrected it on 2026-10-30 to the rule above (`teeters` in
-smashcraft:ts/src/game/sim/step.ts, `teeterAtEdge` in smashcraft:ts/src/game/sim/teeter.ts,
-`wavedashLedgeSide` in smashcraft:ts/src/game/sim/ledge.ts, tests in
-smashcraft:ts/src/game/sim/edgeSlide.tests.ts and smashcraft:ts/src/game/sim/teeter.tests.ts).
+makgora:ts/src/game/sim/step.ts, `teeterAtEdge` in makgora:ts/src/game/sim/teeter.ts,
+`wavedashLedgeSide` in makgora:ts/src/game/sim/ledge.ts, tests in
+makgora:ts/src/game/sim/edgeSlide.tests.ts and makgora:ts/src/game/sim/teeter.tests.ts).
 
 ### What a lagged landing flows into
 
 Every landing that sets landing lag (an aerial, an air dodge, an empty or helpless landing, a hatched
 egg or a landed air shot; a landing with no lag is unchanged) flows into a dash or a walk depending on
 whether the stick made a fresh press during the whole landing lag, the 10 ticks of an air dodge
-included (smashcraft:ts/src/game/sim/groundMovement.ts). The
+included (makgora:ts/src/game/sim/groundMovement.ts). The
 landing records the side the stick held as it touched down. Releasing that
 side, or crossing to the other, frees the stick; a press past the 0.8 dash
 threshold within three ticks of crossing the smash deadzone, at any tick of
@@ -920,7 +920,7 @@ including landing. Fox full/short vertical launch attributes are
 3.680000066757202 / 2.0999999046325684 Melee units per frame; Falco uses
 4.099999904632568 / 1.899999976158142. Aerial launch is the full-jump attribute
 times 1.2000000476837158 for Fox or 0.9399999976158142 for Falco. These values
-are SuperCombo Wiki's (smashcraft:references/melee-frame-data/character-attributes.csv).
+are SuperCombo Wiki's (makgora:references/melee-frame-data/character-attributes.csv).
 
 Historical fixture before #339: design targets set from public frame data
 (SmashWiki, Smashboards) for independently authored Wurst. Ground takeoff skips ordinary air
@@ -945,7 +945,7 @@ as described below. Those other movement gaps remain open.
 ## Fast-fall persistence
 
 The aggregate passed **404/404**, with zero compiler errors and one existing
-unused-import warning (smashcraft:build/physics-fastfall.log). Tests cover
+unused-import warning (makgora:build/physics-fastfall.log). Tests cover
 release, steering, aerial startup, landing, accepted jump/air dodge, self
 velocity versus knockback, and snapshot restoration. Native behavior remains
 unobserved.
@@ -961,8 +961,8 @@ These state rules, including preserving the fast-fall flag across motion states,
 are our own design targets from public frame data (SmashWiki, Smashboards). The
 Wurst implementation is independently authored.
 
-Fast fall needs neutral horizontal input (smashcraft:docs/gameplay-design.md,
-"Controls"). The downward stick threshold is 0.6625 and the press must be under four frames old; both are Smashcraft's, as no public page states Melee's. Digital Down has
+Fast fall needs neutral horizontal input (makgora:docs/gameplay-design.md,
+"Controls"). The downward stick threshold is 0.6625 and the press must be under four frames old; both are Mak'gora's, as no public page states Melee's. Digital Down has
 magnitude one. The input tick has age zero; three further held ticks remain
 eligible, while the fifth tick is too late. Freshness ages during hitlag and
 is tested on the expiry tick. A diagonal Down hold ages the same input, so
@@ -988,11 +988,11 @@ Gravity, terminal speeds, drift speed/acceleration/friction, ground traction,
 initial dash speed and aerial-jump horizontal velocity now retain the complete
 published binary32 values in source, alongside the already sourced jump and
 fast-fall values. Their source is
-smashcraft:references/melee-frame-data/character-attributes.csv. This avoids relying on shortened decimal spellings
+makgora:references/melee-frame-data/character-attributes.csv. This avoids relying on shortened decimal spellings
 when emitting Lua, whose number arithmetic differs from the Wurst headless
 interpreter's binary32 arithmetic. It does not establish complete movement transitions.
 The aggregate passed **404/404**, zero compiler errors and the existing
-unused-import warning (smashcraft:build/physics-raw-movement.log).
+unused-import warning (makgora:build/physics-raw-movement.log).
 
 ## Attack recovery checkpoint
 
@@ -1044,13 +1044,13 @@ remain required. The blaster is now a moving projectile emitted during its
 active frame, rather than an instantaneous long-range hit check.
 
 Neutral N is jab, N plus direction smash, and N plus direction while holding
-the walk modifier tilt: the owner's input scheme (smashcraft:docs/gameplay-design.md,
+the walk modifier tilt: the owner's input scheme (makgora:docs/gameplay-design.md,
 "Controls"). C-stick bindings request
 smashes directly. Walking uses the character baseline of 1.6/1.4 Melee units
 per frame (Rifleman), independently of run speed. Walking changes
 directly to the requested walk speed rather than modeling analog walk
 acceleration. Tilt damage is 10 side / 8 up / 8 down; Rifleman's down tilt
-deals 10 (smashcraft:docs/move-comparisons.md). These damage values
+deals 10 (makgora:docs/move-comparisons.md). These damage values
 and the ground/air blaster timing
 difference are provisional tuning. Blaster duration is captured at attack
 start, so landing cannot rewrite its recovery. Aerial normals are now separate
@@ -1073,8 +1073,8 @@ fighters. The factual tables at https://www.ssbwiki.com/Falco_(SSBM)/Neutral_aer
 (revision 1930482) and https://www.ssbwiki.com/Falco_(SSBM)/Back_aerial
 (revision 1651640), retrieved 2026-09-30, report clean contact on frames 4–7,
 late contact on 8–31 / 8–19, and interruption on 42 / 38. Cached pages are
-smashcraft:build/multiplayer-setup/falco-neutral-air.html and
-smashcraft:build/multiplayer-setup/falco-back-air.html. Only these factual numbers
+makgora:build/multiplayer-setup/falco-neutral-air.html and
+makgora:build/multiplayer-setup/falco-back-air.html. Only these factual numbers
 are used; no article prose is copied.
 
 The start tick is attackFrame 0, corresponding to reference frame 1. Thus both
@@ -1124,7 +1124,7 @@ with no library implementation copied or translated. Signed reversals are
 preserved. These are empirical paths, not binary-exact Melee parity. Get-up
 paths depend on face-up/down and forward/backward action. Actual displacement,
 both facings, stage-edge clamping, hitlag and replay are covered by
-smashcraft:wurst/PhysicsTests.wurst.
+makgora:wurst/PhysicsTests.wurst.
 
 While holding shield, a fresh left/right press requests a roll; a fresh down
 press requests a spot dodge. Input callbacks collect edges and the frame step
@@ -1132,17 +1132,17 @@ resolves them against held shield state, so shield/direction callback order
 within that frame does not change the result. Holding direction cannot repeat
 rolls; pressing shield while direction was already held does not roll. Two
 opposite horizontal press edges cancel, and down takes priority if several
-directions arrive in one frame. These are Smashcraft's digital-input rules.
+directions arrive in one frame. These are Mak'gora's digital-input rules.
 
 Melee's forward roll turns the fighter around partway through; our
 simulation owns that transition instead of Warcraft's animation. Ground-dodge
-frame counts are in smashcraft:references/melee-frame-data/records.jsonl
+frame counts are in makgora:references/melee-frame-data/records.jsonl
 (`dodges`); the initial ground-dodge parameters are provisional rather than a
 Melee parity claim.
 
 Historical fixture before #339: Roll lasts 31 frames and is intangible on frames 4–19 inclusive. Archer and
 Rifleman use character/action-specific per-frame translation samples from
-smashcraft:wurst/RollTravel.wurst, clamped to the platform edge. Ordinary roll
+makgora:wurst/RollTravel.wurst, clamped to the platform edge. Ordinary roll
 totals are approximately 201.6 and 231 world units respectively. Illidan keeps
 the original 8-unit travel on frames 4–19 (128 units). Spot dodge lasts 22 frames and is intangible on frames
 2–15 inclusive. The start tick is frame 1. Archer/Rifleman forward rolls reverse
@@ -1151,22 +1151,22 @@ rolls preserve facing. Neither move permits attacks, jumps, steering or shieldin
 during its recovery. Jump takes priority over a simultaneous dodge request.
 Spot dodge does not drop through a platform. Intangibility and recovery clocks
 pause in hitlag. Every character uses the owner's common dodge profile
-(ledger row `dodge-timing`, smashcraft:docs/design/melee-parity.md): spot dodge
+(ledger row `dodge-timing`, makgora:docs/design/melee-parity.md): spot dodge
 22 / protection 2–15, both rolls 31 / protection 4–19, and air dodge 49 /
 protection 4–29 with 10 landing frames for every character. Air dodge is
 available once per airtime and ends actionable after its 49-frame animation;
 landing, a ledge catch or a hit refreshes it (#100).
-Both fighters have authored ground-dodge clips. See smashcraft:docs/fighter-animation-work.md
+Both fighters have authored ground-dodge clips. See makgora:docs/fighter-animation-work.md
 for playback and art limits.
 
 ## Knockdown reference observations
 
 Melee distinguishes ground impact, down wait, stand-up, directional get-up
 rolls and get-up attack (SmashWiki "Get-up attack"). Timing values for our first
-recovery pass are provisional Smashcraft tuning.
+recovery pass are provisional Mak'gora tuning.
 
 Historical fixture before #339: Tumble starts at knockback 80 (damage level 3). After hitstun it ends on an
-accepted air jump, air dodge or attack, or on a sideways stick flick: at least 0.8 on the frame the stick crosses 0.25 (Smashcraft's thresholds).
+accepted air jump, air dodge or attack, or on a sideways stick flick: at least 0.8 on the frame the stick crosses 0.25 (Mak'gora's thresholds).
 A full keyboard diagonal reads 0.707 and does not flick. Landing while still
 tumbling techs or starts the 26-tick bound, then the 220-tick wait and its
 options listed under "Grounded knockdown and jab resets".
@@ -1201,7 +1201,7 @@ twelve-frame green/white floor burst plus thirty-two-frame spreading dust for
 missed techs. The latter stays at the landing point as the fighter recovers.
 These are original procedural models based on the owner's visual direction;
 their display lifetimes do not alter hitlag, tech windows, or recovery timing.
-smashcraft:wurst/ImpactEvents.wurst derives one frame's cues from numerical
+makgora:wurst/ImpactEvents.wurst derives one frame's cues from numerical
 before/after state, including both fighters in a trade. The live adapter uses
 40 preallocated effects and presents each completed frame once; headless
 replay creates no effects. Reconciliation of changed speculative journals is
@@ -1247,13 +1247,13 @@ An in-place tech lasts 26 ticks with intangibility on 1–20; a directional tech
 lasts 40 with intangibility on 1–34. These totals are shared chosen tuning;
 both leave six vulnerable recovery ticks. Rifleman use 39 empirical
 motion samples and a stationary final tick; Illidan retains the 128-unit path. Direction at
-contact chooses the roll when the stick is at least 0.2 sideways (Smashcraft's threshold); its movement is clamped to the current platform.
+contact chooses the roll when the stick is at least 0.2 sideways (Mak'gora's threshold); its movement is clamped to the current platform.
 A tech clears impact hitstun and consumes its input window. Early-hitlag versus
 last-hitlag inputs, repeated/grounded presses, window/lockout boundaries,
 recovery actions, interruption and reset are tested in the simulation the map
 runs. Wall and ceiling techs are in "Wall and ceiling techs and wall jumps"
 below; SDI and ASDI shifts meet the main deck's walls and underside as other
-movement does (smashcraft:ts/src/game/sim/smashDirectionalInfluence.ts).
+movement does (makgora:ts/src/game/sim/smashDirectionalInfluence.ts).
 
 ## Aerial landing lag
 
@@ -1261,8 +1261,8 @@ Landing ends an unfinished aerial and starts its landing lag: half the move's
 authored lag, at least one frame, which is Melee's L-cancelled lag (SmashWiki "L-canceling": halved,
 rounded down). Neutral, forward,
 back, up and down aerials land for 5/7/8/7/9 frames, from authored
-10/14/16/15/18. No input changes it: Smashcraft omits L-cancelling, see
-smashcraft:docs/gameplay-design.md. Empty landings (4 frames) and air-dodge
+10/14/16/15/18. No input changes it: Mak'gora omits L-cancelling, see
+makgora:docs/gameplay-design.md. Empty landings (4 frames) and air-dodge
 landings (10) keep their own lag.
 
 ## Smash charge
@@ -1284,7 +1284,7 @@ The extra hold is Tom's deviation from Melee (26 Oct 2026, #328), taken from
 Ultimate: SmashWiki's [Smash attack](https://www.ssbwiki.com/Smash_attack) and
 [Charge](https://www.ssbwiki.com/Charge) pages give Ultimate 60 frames of
 charge, then 120 more frames of hold that add no damage. It is ledger row `smash-charge-hold` in
-smashcraft:docs/design/melee-parity.md. Hitlag pauses charge accumulation;
+makgora:docs/design/melee-parity.md. Hitlag pauses charge accumulation;
 fighter steering and attack/cooldown clocks pause while ordinary world timers,
 gravity and platform motion continue. C-stick/direct smash commands are
 immediate. These state and input rules are prototype choices, not claims of
@@ -1298,8 +1298,8 @@ assigned frame. They execute once when the action becomes legal, or expire;
 this adds no delay to an already legal attack. During jump squat a C-stick
 command retains its direction and resolves against airborne state at takeoff,
 so an opposite-facing horizontal command begins back-air on the first airborne
-frame. Melee has no general input buffer; Smashcraft's six-frame window is
-adopted in smashcraft:docs/gameplay-design.md, "Execution and reaction windows".
+frame. Melee has no general input buffer; Mak'gora's six-frame window is
+adopted in makgora:docs/gameplay-design.md, "Execution and reaction windows".
 
 A current queued attack takes priority over voluntary platform dropping during
 the movement step. Action recovery also blocks the drop, so holding Down cannot
@@ -1319,19 +1319,19 @@ shield-drop technique; shielded fighters keep their existing escape choices.
 
 ## Melee behaviour oracle
 
-`bun wisp oracle` (from smashcraft:ts/) plays scripted Melee situations for
+`bun wisp oracle` (from makgora:ts/) plays scripted Melee situations for
 every fighter through the frame executor, from controller rows, and prints each
 outcome beside the design-target value cited from public frame data, with the constant and source path for each scenario, then the counts
-per area. The scenarios are in smashcraft:ts/scripts/meleeOracle.ts: jump squat
+per area. The scenarios are in makgora:ts/scripts/meleeOracle.ts: jump squat
 and hop heights, dash/run/walk speeds, fast-fall, landing lag, floor techs,
 get-up options and timings, the tumble threshold, pass-through platforms, the
 main deck's walls and underside (where launches meet them, the techs off them,
 the push-off and wall jumps), shield release and dodges, and ledge catches, one
 from against the wall.
-smashcraft:ts/test/melee-oracle.test.ts runs the table in the test suite and
+makgora:ts/test/melee-oracle.test.ts runs the table in the test suite and
 fails on any mismatch not listed in its `KNOWN_MISMATCHES`, and on a listed row
 that now passes. A difference from Melee recorded in the deviations table of
-smashcraft:docs/gameplay-design.md is reported as a departure under that row's
+makgora:docs/gameplay-design.md is reported as a departure under that row's
 name and still shows Melee's value; it fails the test only if it stops
 differing, and the test checks that every departure names a row of the table.
 The aerial landing lag without an L press is such a departure (L-cancelling).
@@ -1341,7 +1341,7 @@ Rifleman's movement, landing and action timings are Fox's and Falco's, and
 Illidan's are original, so those rows read n/a for him; Illidan's ledge catch
 box and wall data are Captain Falcon's, as Archer's and Rifleman's are Fox's
 and Falco's. Common rules (input windows, tech gates,
-knockback, platforms, ledge boxes) apply to all three. Where Smashcraft
+knockback, platforms, ledge boxes) apply to all three. Where Mak'gora
 authors a value, such as ground acceleration or aerial landing lag, the
 scenario checks Melee's rule applied to it, not the value.
 
@@ -1378,7 +1378,7 @@ contact lands; platforms still have no walls or underside.
 ## Ground traction by fighter
 
 Each hero grips the ground by its body type, in Melee units a frame
-(smashcraft:ts/src/game/sim/heroes/heroBodies.ts): Jaina 0.03, a slow runner
+(makgora:ts/src/game/sim/heroes/heroBodies.ts): Jaina 0.03, a slow runner
 on frost, is the roster's Luigi; the other robed casters 0.04-0.06
 (Malfurion 0.04, Medivh 0.05, Kael'thas 0.055, Lich 0.06); Sylvanas and Peon
 0.05; Mrgl & Grgl 0.055 on wet feet; the nimble fast runners 0.06 (Blademaster,
@@ -1387,13 +1387,13 @@ Warden, Shadow Hunter, Dreadlord, Grom); sturdy fighters 0.065
 Thrall 0.07; Pit Lord, Cairne and Anub'arak 0.08. Rifleman and Illidan keep
 Fox's and Captain Falcon's 0.08. Melee spans 0.025 (Luigi) to 0.1 (Peach,
 Link, Zelda, Pichu) and gives its low traction to slow runners
-(smashcraft:docs/design/melee/movement.md); so do we: no hero runs faster than
+(makgora:docs/design/melee/movement.md); so do we: no hero runs faster than
 2.2 with traction under 0.055, which keeps the longest run brake (Mrgl & Grgl's)
 at 47 units against Melee's longest, Luigi's 36, and the 32 every fast runner
 had before. Every hero is at or below the 0.08 all fighters shared before
 15 Oct, so run brakes, dash stops and moonwalks are as long or longer.
 The Lich is the light target of the advantage-state targets
-(smashcraft:docs/gameplay-design.md, "Advantage state"); below 0.06 it slides
+(makgora:docs/gameplay-design.md, "Advantage state"); below 0.06 it slides
 out of Dreadlord's tech chase and Rifleman's DI mix-up, so it stays at 0.06.
 Jaina, Malfurion, Medivh and Kael'thas slide further than the targets measure.
 
@@ -1402,9 +1402,9 @@ or waveland's air-dodge landing) brake by twice the traction while the fighter
 moves faster than its walk speed, then by traction, as in Melee
 (https://www.ssbwiki.com/Traction), so a shield raised out of a dash, run or
 landing slide stops no later than letting go of the stick (#188,
-smashcraft:ts/test/native/pads/issue-188-shield-brake/). Dash, run, run brake,
+makgora:ts/test/native/pads/issue-188-shield-brake/). Dash, run, run brake,
 turn-run, attacks, jump squat and knockback brake by traction alone
-(`restingTraction`, smashcraft:ts/src/game/sim/groundMovement.ts); shield
+(`restingTraction`, makgora:ts/src/game/sim/groundMovement.ts); shield
 pushback from a hit is its own channel and keeps decaying by traction. Only
 Jaina's wavedash is still faster than her walk when its landing lag ends, so
 hers is the one wavedash-into-shield slide that shortens: 251.1 units over 52
@@ -1429,7 +1429,7 @@ old length for the fast runners while the casters slide much further and
 the heaviest less. A test that reproduced Melee's Fox, Marth and Luigi wavedash
 lengths (31.0, 41.5, 83.8) with a 3.1 dodge was removed with the other unit
 tests on 2026-10-20. The computer's slide predictions
-(smashcraft:ts/src/game/match/botFooting.ts, botCorner.ts) brake landing and
+(makgora:ts/src/game/match/botFooting.ts, botCorner.ts) brake landing and
 standing slides by the same doubled rule.
 
 ## Every stage grips the same
@@ -1450,29 +1450,29 @@ modelled.
 
 Every stage's main deck has side walls and an underside, shaped after Final
 Destination's sides as a player sees them: below each ledge the side drops,
-slopes in under the ledge and meets a short sloped underside. Smashcraft's
-geometry is its own, in smashcraft:ts/src/game/sim/stage.ts: in world units
+slopes in under the ledge and meets a short sloped underside. Mak'gora's
+geometry is its own, in makgora:ts/src/game/sim/stage.ts: in world units
 the walls drop straight from each ledge (x ±600) to z -63, slope in to x ±481.4
 at z -122.7, and meet the underside at z -332.33, which spans x ±371.3. The
 face under the ledge slopes in but is a wall, so a launch into it can wall
 tech. The main deck's model is drawn from these lines on
-every stage: smashcraft:ts/scripts/stageDeck.ts extrudes the walking line,
+every stage: makgora:ts/scripts/stageDeck.ts extrudes the walking line,
 walls and underside 60 units to each side of the fighters' plane, and
-smashcraft:tools/stage/package.ts writes it at arena scale, named after its
-MDL text. smashcraft:ts/test/stage-model.test.ts checks that the shipped
+makgora:tools/stage/package.ts writes it at arena scale, named after its
+MDL text. makgora:ts/test/stage-model.test.ts checks that the shipped
 model is the one drawn from the current lines, that its front faces' outline
 is those lines on both shipped stages, and that its model facts' bounds reach
 each wall and the underside. Stage 1's raised decks keep the scaled slab.
 
-Historical fixture before #339: A fighter meets a wall with its flank. Smashcraft fighters use a 2-unit half-width
-(`BODY_HALF_WIDTH`, smashcraft:ts/src/game/sim/surfaces.ts), so a fighter
+Historical fixture before #339: A fighter meets a wall with its flank. Mak'gora fighters use a 2-unit half-width
+(`BODY_HALF_WIDTH`, makgora:ts/src/game/sim/surfaces.ts), so a fighter
 stopped against the wall below a ledge stands 12 world units outside it, and
 its ledge catch box (which adds the same half-width) still holds the ledge.
-Undersides and other ceilings stop the fighter's top, Smashcraft's body top of
+Undersides and other ceilings stop the fighter's top, Mak'gora's body top of
 11.16 Melee units for Archer, 13.75 for Rifleman and 18.78 for Illidan
-(`bodyTop`, smashcraft:ts/src/game/sim/surfaces.ts).
+(`bodyTop`, makgora:ts/src/game/sim/surfaces.ts).
 The contact, and the ceiling tech or bounce that starts from it, is on the
-ceiling; the fighter stands its top below it. Smashcraft keeps this top fixed through animation. Under the main deck's underside the bottom blast zone (-420) leaves
+ceiling; the fighter stands its top below it. Mak'gora keeps this top fixed through animation. Under the main deck's underside the bottom blast zone (-420) leaves
 Archer 20.7 world units and Rifleman 5.2, and Illidan none: his position
 would be past it (#80 lowers it). A wall moves the fighter but not its own velocity: launch velocity into the wall stops, or a
 tumbling launch rebounds at 0.8, and a fighter that rises past the wall's top
@@ -1485,10 +1485,10 @@ Ledge actions don't collide with the body. Climbs, rolls and ledge attacks pass 
 it onto the floor. A ledge jump starts beside the wall below the ledge, slides
 up its face and carries its inward speed onto the stage. Wall and ceiling
 contact tests on raised decks use `SOLID_DECK_TEST_STAGE`
-(smashcraft:ts/src/game/sim/stage.ts), stage 1's layout with solid raised
+(makgora:ts/src/game/sim/stage.ts), stage 1's layout with solid raised
 decks, which no match can select.
-smashcraft:ts/src/game/sim/surfaces.tests.ts checks the geometry against the
-table, smashcraft:ts/src/game/match/wallTechInputContracts.tests.ts launches
+makgora:ts/src/game/sim/surfaces.tests.ts checks the geometry against the
+table, makgora:ts/src/game/match/wallTechInputContracts.tests.ts launches
 each fighter into the side through helper journal rows and techs off it, and
 the oracle's wall/ceiling and ledge rows check where launches meet the side and
 underside, the techs off them and a catch from against the wall.
@@ -1501,21 +1501,21 @@ off-screen band where a fighter shows in a magnifying bubble at the screen
 edge and slowly takes damage (SmashWiki "Blast zone"). A fighter is KO'd off
 the top only when grounded, frozen or launched upward fast enough. Melee's
 stage coordinates and its off-screen damage rate are not on a public page, so
-Smashcraft's are its own, held in smashcraft:ts/src/game/sim/stageBounds.ts:
+Mak'gora's are its own, held in makgora:ts/src/game/sim/stageBounds.ts:
 on the flat-deck layouts its camera limits are x ±1106.6, z -480 to 684, and
 its blast zones x ±1562.6, z -840 and 1128 world units. Every KO comparison is
 strict, checked after each frame's movement. The off-screen rule deals 1% every
 60 consecutive frames out of view while the fighter is under 150%, resetting
 whenever it is back in view; at 150% or more the count neither runs nor resets.
-The camera's steps are in smashcraft:docs/melee-camera.md.
+The camera's steps are in makgora:docs/melee-camera.md.
 
-Smashcraft stores one **16:9 match view** and each fighter's magnifier timer
+Mak'gora stores one **16:9 match view** and each fighter's magnifier timer
 in deterministic snapshots. Its subject extents, eye-distance easing and
-interest rates are in smashcraft:docs/melee-camera.md. The camera remains a side
+interest rates are in makgora:docs/melee-camera.md. The camera remains a side
 view: Warcraft keeps the yaw at 90° and the downward pitch at 10°; the field
 of view eases its half-angle tangent between 30° and 38°
 by 10% each frame. This is the projection used by
-smashcraft:ts/src/game/sim/matchCamera.ts, not Melee's rotating 3D camera.
+makgora:ts/src/game/sim/matchCamera.ts, not Melee's rotating 3D camera.
 Local rendering reads that view, adapts it to the monitor's aspect, and never
 writes the resulting local view into gameplay. A fighter outside the
 canonical current view, including one that briefly outruns it inside the
@@ -1525,7 +1525,7 @@ that rule. At 150% the counter is retained, even on returning to view.
 The current flat deck and two-bridge layout use Final Destination's bounds;
 Frozen Throne's Battlefield-style layout has its own bounds. In world units its camera is
 x ±1389.6, z -354..1020, and its blast region x ±1869.6, z -816..1500.
-smashcraft:ts/src/game/sim/stageBounds.ts owns these conversions.
+makgora:ts/src/game/sim/stageBounds.ts owns these conversions.
 
 The unobscured fighting view stops at the camera limits. The part behind
 the HUD may extend below the bottom camera limit, but the whole raw frame
@@ -1553,7 +1553,7 @@ ends: it is actionable on frame 32, counting the wall contact as frame 1
 (Fox's Tech-Wall total of 31, fightcore.csv), while the wall tech's jump frees
 the fighter once the hang ends. Each fighter takes these from its Melee reference, in
 Melee units a frame, from SuperCombo Wiki's attributes
-(smashcraft:references/melee-frame-data/character-attributes.csv: "Wall Tech
+(makgora:references/melee-frame-data/character-attributes.csv: "Wall Tech
 Bounce Back", "Walljump H/V Velocity", "Ceiling Tech - X momentum"):
 
 | Fighter | Reference | Push-off | Wall jump sideways | Wall jump up | Ceiling impulse |
@@ -1565,14 +1565,14 @@ The table lists Captain Falcon's sideways wall jump as 0.4, not the 1.4
 Illidan uses; that is a parity question for the ledger. A fighter whose tuning
 lacks `canWallJump` never wall jumps. Every hero takes Fox's values (0.5, 1.3,
 3.3, 0.7), so every selectable fighter wall techs and wall jumps. The minimum
-approach speed of 0.5 is Smashcraft's.
+approach speed of 0.5 is Mak'gora's.
 
 **Intangibility.** The wall tech, the wall tech's jump and the plain wall jump
 make the fighter intangible for 14 frames, counted from the frame it meets the
 wall. The five-frame hang is inside that window, so the fighter leaves the
 wall on frame 6 still intangible through frame 14 and is hittable from frame
 15 (`SURFACE_TECH_WALL_COLLISION_GRACE_FRAMES`,
-smashcraft:ts/src/game/sim/surfaces.ts). The 14 frames are Smashcraft's; no
+makgora:ts/src/game/sim/surfaces.ts). The 14 frames are Mak'gora's; no
 public page states Melee's.
 
 A ceiling tech stops the fighter's motion and has no hang: gravity and air
@@ -1590,7 +1590,7 @@ Analog rows retain their raw horizontal axis for air drift, before the
 directional-influence stick is normalized diagonally. The target air speed
 scales by the horizontal stick magnitude, while acceleration adds the signed
 base to the stick times the multiplier. Fox, Falco and Captain Falcon share the
-base 0.02 Melee units/frame ("Air Mobility B", character-attributes.csv); Smashcraft's authored full-stick
+base 0.02 Melee units/frame ("Air Mobility B", character-attributes.csv); Mak'gora's authored full-stick
 acceleration stores base plus multiplier. Full horizontal keyboard rows,
 including keyboard diagonals, keep the existing full-rate drift. The
 input-row fixture is `ts/src/game/sim/analogAirDrift.tests.ts`.
@@ -1598,7 +1598,7 @@ input-row fixture is `ts/src/game/sim/analogAirDrift.tests.ts`.
 After the frame's collision, a fighter that is falling, jumping, tumbling
 past hitstun, or in a wall or ceiling recovery past its hang checks it;
 aerials, specials, air dodges, special fall and hitstun don't. Meeting a wall
-faster sideways than the minimum approach speed opens a window (Smashcraft's 130 frames) while the fighter stays against that wall, and pushing the
+faster sideways than the minimum approach speed opens a window (Mak'gora's 130 frames) while the fighter stays against that wall, and pushing the
 stick at least 0.8 away from it within 3 frames of the stick leaving
 the horizontal smash deadzone starts the jump. It enters the wall
 tech's state: motion stops, the fighter turns away, it is
@@ -1607,7 +1607,7 @@ earlier wall jump since the fighter last stood on the ground scales the rise
 by 0.96 ([SmashWiki, Wall jump](https://www.ssbwiki.com/Wall_jump)). A fighter moved out of the deck's body (see above) counts
 as against that wall.
 
-smashcraft:ts/src/game/match/wallTechInputContracts.tests.ts checks the
+makgora:ts/src/game/match/wallTechInputContracts.tests.ts checks the
 push-off, the wall tech's jump, a drift-and-flick wall jump, their 14
 intangible frames (an overlapping strike passes through until the 15th) and
 the ceiling tech's impulse for every selectable fighter through helper journal rows, and the oracle's
@@ -1626,7 +1626,7 @@ and the Warcraft spell shell are presentation choices, not reference parameters.
 ## Shield-break recovery
 
 Shield depletion from holding guard, melee contact, and projectile contact now
-uses one independently authored forced sequence in smashcraft:wurst/Simulation.wurst:
+uses one independently authored forced sequence in makgora:wurst/Simulation.wurst:
 upward pop, landing, standing up, then dizziness. It replaces the former
 40-frame hitstun placeholder. The design targets, from SmashWiki's Shield break
 page, are upward launch, forced landing/stand, unavailable normal
@@ -1635,7 +1635,7 @@ shield health held fixed while dizzy. The sequence is expressed in our existing 
 simulation with our existing collision query.
 
 The factual page https://www.ssbwiki.com/Shield, already cached in
-smashcraft:build/ref-Shield.txt, independently reports the pop/landing/stand/dizzy
+makgora:build/ref-Shield.txt, independently reports the pop/landing/stand/dizzy
 sequence, percent dependence, mashing, termination by flinching attacks, and
 30 HP after a Melee shield break. The cached page was consulted for facts only;
 no article prose is reused. It does not verify our timings or launch strength.
@@ -1647,11 +1647,11 @@ power. Shieldstun is `(integerDamage * 0.45 + 2) * 200 / 201`, truncated to
 action ticks; defender pushback is `min(2, (integerDamage * 0.09 + 0.4) * shield)`
 and grounded direct-attacker recoil `integerDamage * 0.07 + 0.02` (SmashWiki
 "Shield"). The grounded recoil-friction multiplier and the airborne recoil decay
-are Smashcraft's ("Shield contact motion" above).
+are Mak'gora's ("Shield contact motion" above).
 
 SmashWiki "Shield break" says the dizzy lasts longer at lower percent and that
-mashing shortens it, without numbers; Smashcraft's real-valued duration and
-mash step are in smashcraft:ts/src/game/sim/shieldBreak.ts, sampled on entry.
+mashing shortens it, without numbers; Mak'gora's real-valued duration and
+mash step are in makgora:ts/src/game/sim/shieldBreak.ts, sampled on entry.
 Each unfrozen action tick removes 1. The fractional remainder stays in replayed
 state. InputSnapshot.mashPressed admits at most one such edge per tick; held
 inputs alone are not mash edges. Mash edges before dizziness or during hitlag
@@ -1663,7 +1663,7 @@ Shield regeneration runs once after input transitions and contact collection,
 before contact damage resolves. An active fighter without guard gains 0.07 per
 tick (SmashWiki "Shield"), capped at 60, including hitlag, ledges, grabs, down states and wall-tech
 startup. A guard-to-grab input or capture clearing guard therefore permits
-regeneration that tick. Continuing guard does not. Smashcraft's custom trap
+regeneration that tick. Continuing guard does not. Mak'gora's custom trap
 freeze also retains regeneration; that extension has no Melee counterpart.
 
 Shield-break pop/landing/stand use the same regeneration phase. Dizzy entry and
@@ -1691,7 +1691,7 @@ Ordinary guard input entry initializes guard without draining on that tick;
 the following active animation tick supplies its first held drain. Hitlag
 pauses drain. Shieldstun and its return-to-guard completion tick do not drain;
 guard inputs become available on that completion tick, with drain resuming on
-the following tick if guard remains active. These orderings are Smashcraft's. Powershield
+the following tick if guard remains active. These orderings are Mak'gora's. Powershield
 and analog light-shield state transitions remain outside this digital-guard
 model.
 
@@ -1732,7 +1732,7 @@ two clients, and numerical Melee parity are separate unproven claims.
 Only the two outer endpoints of solid main surface 0 can be caught. Upper
 pass-through platforms have no catchable ledges. Melee's ledge options (climb, jump, roll, attack, drop, with quick and slow
 variants by percent) are described on SmashWiki "Ledge"; the rules below are
-Smashcraft's.
+Mak'gora's.
 
 - **Who catches.** Falling and jumping fighters, every helpless fall
   (special fall) whichever move or status ended in it: up-specials, side and
@@ -1746,8 +1746,8 @@ Smashcraft's.
   hitstun ends, and fighters recovering from a tech or grab release. Aerial
   attacks (AttackAir), air dodges (EscapeAir), hitstun (Damage/DamageFly),
   shield-break flight, grabs and frozen fighters never catch. Melee's specials
-  choose per move; Smashcraft's original specials have no catch window.
-- **When.** Only after a frame whose movement went down , never while down is held (Smashcraft's down is the
+  choose per move; Mak'gora's original specials have no catch window.
+- **When.** Only after a frame whose movement went down , never while down is held (Mak'gora's down is the
   digital direction, which the helper raises at about a fifth of stick
   travel), and never during the regrab lock.
 - **Which ledge.** Only the ledge ahead of the fighter's facing. A catch turns
@@ -1757,12 +1757,12 @@ Smashcraft's.
   catch set grab masks that keep a hanging fighter out of grabs, and changing
   action clears the mask, so climbs, rolls, ledge attacks
   and drops are catchable again. `hangsOnLedge` in
-  smashcraft:ts/src/game/sim/ledge.ts applies it.
+  makgora:ts/src/game/sim/ledge.ts applies it.
 - **The box.** Each fighter's ledge snap x, y and height place it: the
   ledge vertex must lie strictly beyond the fighter's position and strictly
   less than its collision half-width plus snap x ahead, and strictly between
   snap y minus and plus half the height above its feet. Both ranges sweep the
-  frame's start and end positions, so a fast fall can't pass through. Smashcraft fighters use a half-width of 2, the flank they also meet
+  frame's start and end positions, so a fast fall can't pass through. Mak'gora fighters use a half-width of 2, the flank they also meet
   walls with (see "Main deck walls and underside").
 
 | Fighter | Reach (world) | Ledge above feet (world) |
@@ -1770,10 +1770,10 @@ Smashcraft's.
 | Rifleman | 78 | 51–105 |
 | Illidan | 66 | 69–135 |
 
-These boxes are Smashcraft's, in smashcraft:ts/src/game/sim/ledge.ts; no
+These boxes are Mak'gora's, in makgora:ts/src/game/sim/ledge.ts; no
 public page states Melee's ledge snap boxes.
 
-smashcraft:ts/src/game/match/step.ts resolves catches at the start of each
+makgora:ts/src/game/match/step.ts resolves catches at the start of each
 match tick, before any fighter moves, from each fighter's stored last movement
 (`motion.deltaX`/`deltaZ`), so both ledges resolve from one shared snapshot.
 A free ledge goes to the nearer eligible fighter by squared distance to the
@@ -1786,9 +1786,9 @@ movement and launch velocity, ends a helpless fall or air dodge, and restores
 one air jump. Melee anchors the fighter at the ledge vertex plus its
 CliffCatch animation's TransN offset, scaled by model scaling: Fox 4.8
 outside and 13.44 below on the catch frame, settling to 1.92 and 14.4 while
-hanging; Falco 5.5 and 15.4, then 2.2 and 16.5 (Melee units). Smashcraft's
+hanging; Falco 5.5 and 15.4, then 2.2 and 16.5 (Melee units). Mak'gora's
 24/90 world units (4/15 Melee units) is that rule with an offset fitted to
-these fighters' rigs, which smashcraft:tools/animations/ledges.py bakes into
+these fighters' rigs, which makgora:tools/animations/ledges.py bakes into
 the hang clips. A catch does not reset percent, shield energy, stocks or
 respawn protection. Catch protection lasts 30 unfrozen ticks (including the
 catch tick); hanging afterward is vulnerable. Choosing an option never
@@ -1825,16 +1825,16 @@ is a fresh Up (+1) or Down (-1) edge. The simulation reuses jumpPressed,
 getupDirectionPressed/getupDirection, airDodgePressed and getupAttackPressed
 for the other options. Standalone simulation consumers resolve pair catches
 before advancing either fighter, as the match step does.
-smashcraft:ts/src/game/sim/ledge.tests.ts covers every fighter and side, the
+makgora:ts/src/game/sim/ledge.tests.ts covers every fighter and side, the
 reference boxes and their strict edges, the swept movement, eligibility,
 upper platform exclusion, contention/ownership, option timing and locks,
 attack contact, protection expiry, regrab timing, hit/grab interruption and
 reset. None of these establish native animation alignment.
 
 The hang dimensions now fit the measured reach of both fighter rigs.
-smashcraft:tools/animations/ledges.py reads the simulation's hang offset, depth,
+makgora:tools/animations/ledges.py reads the simulation's hang offset, depth,
 mount duration, climb duration and climb inset directly when baking wrist
-contact. smashcraft:wurst/FighterAssets.wurst fixes both model scales at one so
+contact. makgora:wurst/FighterAssets.wurst fixes both model scales at one so
 model coordinates and simulation world units agree. The animation adds no
 root travel. Packaged-model wrist checks establish contact at the hang point
 and through the first five climb ticks; native visual alignment remains a
@@ -1843,7 +1843,7 @@ measured Melee values.
 
 ## Default digital wavedash and fast-fall directions
 
-The owner's digital controls (smashcraft:docs/gameplay-design.md, "Controls"):
+The owner's digital controls (makgora:docs/gameplay-design.md, "Controls"):
 a horizontal-only air dodge uses an angle
 of 18 degrees below horizontal for either fighter, mirrored for left/right.
 Its initial vector uses Melee's 3.1 Melee units (18.6 world units); #347's
@@ -1853,14 +1853,14 @@ with no modifier or toggle. Explicit up/down/diagonal input retains its
 previous direction and normalized speed; neutral retains zero initial velocity.
 A dodge started too high may still expire before reaching the ground. The angle
 is not the one for Melee's longest wavedash
-(smashcraft:docs/design/melee/movement.md).
+(makgora:docs/design/melee/movement.md).
 
 Fast-fall now requires down with neutral horizontal input. Down-left/down-right
 continue air drift without selecting fast-fall speed. Down held with the tilt
 modifier is a tilt input: it neither crouches nor fast-falls, and A gives the
 down tilt or down aerial (#187). The modifier also shortens the stick to
 x = ±0.6875, up 0.65 and down −0.675, so the platform drop at −0.6875 never
-fires either (#282, smashcraft:docs/gameplay-design.md, "Stick zones"). Shield dodges, DI, down
+fires either (#282, makgora:docs/gameplay-design.md, "Stick zones"). Shield dodges, DI, down
 attacks and platform-drop handling retain their separate inputs. Existing
 fast-fall descent/actionability rules remain; native feel needs the new build.
 
@@ -1934,10 +1934,10 @@ native multiplayer behavior require a loaded Warcraft build to validate.
 ## Grab, pummel, throw and escape
 
 The capture timer is `floor(90 + 1.75 * damage_at_capture)` frames in integer
-math (`grabHoldFrames` in smashcraft:ts/src/game/sim/moves.ts), Ultimate's
+math (`grabHoldFrames` in makgora:ts/src/game/sim/moves.ts), Ultimate's
 formula rather than Melee's equal-ranking `floor(76 + 1.6 * damage)`
 (https://www.ssbwiki.com/Grab); Tom chose it on 2026-10-14, and the
-`grab-hold` row of smashcraft:docs/design/melee-parity.md records the
+`grab-hold` row of makgora:docs/design/melee-parity.md records the
 deviation. Damage during a hold does not recalculate its initial timer.
 
 The input behavior is our own design target. Any fresh Attack/Special/Jump/Grab/
@@ -1961,7 +1961,7 @@ Ordinary attack requests are cleared throughout both ends of the grab context,
 including its final tick. Special input cannot leak through on release.
 
 Contact/release and total frame counts are one-based and owned by
-smashcraft:ts/src/game/sim/moves.ts (`grabContactFrame`, `grabActionDuration`).
+makgora:ts/src/game/sim/moves.ts (`grabContactFrame`, `grabActionDuration`).
 A pummel lasts 7 frames and connects on frame 3 unless a kit authors its own,
 dealing three damage without launch and spending 3 frames of the victim's
 remaining hold, never the last one; it freezes both clips and the hold timer
@@ -1980,7 +1980,7 @@ capture contract; successful capture now exits grab startup into the explicit
 hold action rather than retaining the whiff cooldown.
 
 Both fighters have pummel and four throw clips plus matched victim clips in
-smashcraft:tools/animations/grab_animations.py. The animation boundary consumes
+makgora:tools/animations/grab_animations.py. The animation boundary consumes
 timing from Wurst; canonical pair state owns translation and release. Native
 pose alignment, real-button use and interruption readability require the
 installed-build check and are not proved by the numerical tests.
@@ -2023,8 +2023,8 @@ their active volumes overlap on the same tick; changing argument/slot order
 does not let the first hit cancel the second contact. The regression failed
 before this change and passes for both grounded and airborne mirror contacts.
 The focused character suite passes 12/12:
-smashcraft:build/wurst-tests/illidan-trade-after-r2.log. Earlier failing evidence:
-smashcraft:build/wurst-tests/illidan-trade-before.log.
+makgora:build/wurst-tests/illidan-trade-after-r2.log. Earlier failing evidence:
+makgora:build/wurst-tests/illidan-trade-before.log.
 
 ### Binary32 arithmetic boundary
 
@@ -2034,7 +2034,7 @@ rounds grounded knockback decay in Melee units and rounds shield-health updates
 to binary32. A generated-Lua production probe, not just the binary32 compiler
 interpreter, verifies the recorded first traction subtraction and regeneration
 from 20 to 20.06999969482422. These production checks now live in
-smashcraft:ts/src/game/sim/physicsPrecisionState.tests.ts.
+makgora:ts/src/game/sim/physicsPrecisionState.tests.ts.
 
 This is partial precision coverage. Other formulas and their operation
 ordering still require migration and comparison. The probe does not establish
@@ -2048,7 +2048,7 @@ input is preserved, and projectile powershield timing/reflection is implemented
 separately. Melee perfect contacts now preserve shield health and use the
 unmodified defender pushback; post-contact action timing and native verification
 remain open. Digital formula precision does not establish those behaviors. See
-smashcraft:docs/melee-powershield.md.
+makgora:docs/melee-powershield.md.
 
 ## Directional influence arithmetic
 
@@ -2057,22 +2057,22 @@ with a signed squared cross-product rotation capped by the supplied unit stick
 and the 18-degree maximum (SmashWiki "Directional influence"). It rounds to binary32 and uses the shared
 independently authored trig approximations. Nonzero parallel input still passes
 through polar reconstruction; neutral input and sufficiently small launch vectors
-retain their components. Grounded eligibility is Smashcraft's rule.
+retain their components. Grounded eligibility is Mak'gora's rule.
 
 The focused directionalInfluence filter passes 5/5 tests, including adapter
 magnitude through hitlag release, replay snapshot independence and correction
-equality, and existing discrete DI behavior (smashcraft:build/di-connected.log).
+equality, and existing discrete DI behavior (makgora:build/di-connected.log).
 
 Network input preserves DI magnitude by dividing each captured signed byte axis
 by 127, then normalizing radially only when length exceeds one. This is
-Smashcraft's input boundary, not a claim about original GameCube polling or
+Mak'gora's input boundary, not a claim about original GameCube polling or
 quantization. Full keyboard diagonals retain unit length. Explicit DI components
 and their validity flag travel with frame snapshots and participate in replay
 input equality; directly constructed snapshots retain discrete direction fallback.
 No new persistent fighter state is introduced. Movement, SDI and tilt capture
 keep their existing input rules. Original Warcraft characters retain authored
 statistics; stale moves and freshness bonuses stay omitted
-(smashcraft:docs/gameplay-design.md).
+(makgora:docs/gameplay-design.md).
 
 Stratholme (6) uses a three-segment main floor: flat from x −420 to 420 at
 21 world units, sloping down to its ledges at x ±600, z 0. Ground speed is

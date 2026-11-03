@@ -2,7 +2,7 @@
 
 A fighter's body is a short list of authored capsules, chosen each frame from
 its state and attack frame. The drawn model informs the authoring and never
-decides contact. Source: smashcraft:ts/src/game/sim/hurtboxes.ts.
+decides contact. Source: makgora:ts/src/game/sim/hurtboxes.ts.
 
 ## Authoring types
 
@@ -24,12 +24,12 @@ decides contact. Source: smashcraft:ts/src/game/sim/hurtboxes.ts.
   attacks.
 
 Whole-body intangibility (dodges, ledge, techs, respawn) stays in
-`isIntangible` (smashcraft:ts/src/game/sim/conditions.ts) and is checked first.
+`isIntangible` (makgora:ts/src/game/sim/conditions.ts) and is checked first.
 
 ## Hero kits
 
 A kit puts its bodies in `FighterMoves.hurtboxes`
-(smashcraft:ts/src/game/sim/heroMoves.ts). `heroHurtPose(first, last, parts)`
+(makgora:ts/src/game/sim/heroMoves.ts). `heroHurtPose(first, last, parts)`
 takes the roster brief's frames, counting the entry tick as frame one like
 `heroRegion`; `hurtPart(x1, z1, x2, z2, radius, state?)` builds a part. A kit
 without `hurtboxes` keeps its character's standing capsule in every state.
@@ -37,8 +37,8 @@ The shipped fighters' bodies live in the same file's `CHARACTER_HURTBOXES`.
 
 Rules for authored bodies (the measurable ones, held poses of at least 3
 frames, steps of at most 60 units, connected parts, no intangible or
-invincible parts in attack poses and no part past a limb's reach, are in smashcraft:docs/gameplay-design.md, "Legible
-hurtboxes", and smashcraft:ts/src/game/sim/hurtboxLegibility.tests.ts checks
+invincible parts in attack poses and no part past a limb's reach, are in makgora:docs/gameplay-design.md, "Legible
+hurtboxes", and makgora:ts/src/game/sim/hurtboxLegibility.tests.ts checks
 them on every fighter and registered hero):
 
 - Weapons are disjoint (owner decision, 6 Oct 2026): a held weapon is never
@@ -55,7 +55,7 @@ them on every fighter and registered hero):
 
 ## Contact
 
-Hit selection (smashcraft:ts/src/game/sim/attacks.ts) places each part with
+Hit selection (makgora:ts/src/game/sim/attacks.ts) places each part with
 the target's pose facing and tests it against the strike capsule:
 `strikeHurtContact` returns a hit on any normal part, otherwise "spent" when
 only invincible parts touch. Grabs take any part that is not intangible. A
@@ -67,12 +67,12 @@ and the hero reference height keep reading the standing capsule.
 Bodies are immutable data selected from rollback state (character, kit,
 attack style and frame, crouch, pose facing), so a restored snapshot selects
 the same parts. A kit's `hurtboxes` are part of its canonical record
-(smashcraft:ts/src/game/replay/canonical.ts), so changing them changes the
+(makgora:ts/src/game/replay/canonical.ts), so changing them changes the
 state checksum, and a tape of a kit without them is unchanged.
 
 ## Checking against the drawn pose
 
-`bun wisp view hurtboxes --assets DIR --out OUT` (from smashcraft:ts/) plays
+`bun wisp view hurtboxes --assets DIR --out OUT` (from makgora:ts/) plays
 each shipped fighter's sampled moves through the production step and pose
 selection, skins the packaged model at the clip time the fighter pool shows,
 flattens it onto the stage plane and draws the volumes over it: yellow normal,
@@ -89,8 +89,8 @@ normals, heroes on their stock models under `hero-models/`) draws toward its
 strike: every frame of the move through
 the same pose path, the opaque silhouette projected onto the direction from the
 chest (z 50) to the far end of the first active strike capsule. It rewrites
-smashcraft:ts/scripts/wisp/drawnReachInfo.ts, and
-smashcraft:ts/test/drawn-reach.test.ts requires each swing to travel at least
+makgora:ts/scripts/wisp/drawnReachInfo.ts, and
+makgora:ts/test/drawn-reach.test.ts requires each swing to travel at least
 30 units toward its strike and peak within two frames of its active window.
 
 ## Shipped fighters

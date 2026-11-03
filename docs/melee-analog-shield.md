@@ -19,7 +19,7 @@ Authored Warcraft shield scale and fighter parameters are unchanged.
 Still open: geometric shield coverage, pokes and tilt, ordinary melee
 powershield contacts, physical analog controller capture and native Warcraft
 verification. Projectile powershield timing and reflection are in
-smashcraft:docs/melee-powershield.md. Melee contacts still use the
+makgora:docs/melee-powershield.md. Melee contacts still use the
 whole-fighter guard rule; visual size does not establish collision coverage.
 Keyboard producer rows use digital guard and full trigger bytes. A future
 physical analog producer must keep the digital-click bits and pressure bytes

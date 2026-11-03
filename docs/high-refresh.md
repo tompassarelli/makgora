@@ -1,13 +1,13 @@
 # Presentation cadence in Warcraft III
 
-Smashcraft executes its deterministic simulation at 60 Hz. A faster display
+Mak'gora executes its deterministic simulation at 60 Hz. A faster display
 can only show additional fighter positions if Warcraft calls map Lua between
 those simulation updates. A high timer callback count alone does not establish
 that: multiple timer expirations can execute together before one frame is drawn.
 
 ## API and prior art
 
-The declarations consumed by Smashcraft's Wisp pin
+The declarations consumed by Mak'gora's Wisp pin
 `2d04060f674e8280b4791e37b962da382b42da00` expose timers and UI events but no
 general render-frame callback. The independently pinned
 [jassdoc common.j at d49b2ba](https://github.com/lep/jassdoc/blob/d49b2ba47c72ad757aa17abdfa9ccd55a7493fd5/common.j)
@@ -38,7 +38,7 @@ the measurement; the discussion does not establish a render hook or a cause.
 
 Development builds expose `-dev render-clock`. It runs zero-period and
 1/1024-second periodic timers together for four game seconds, writing each
-client's `smashcraft-render-clock-pSLOT-runN.txt` in CustomMapData. All timer
+client's `makgora-render-clock-pSLOT-runN.txt` in CustomMapData. All timer
 handles and callback registrations are created and freed at synchronized times.
 Clock samples and reports remain local and never change simulation state.
 
@@ -116,7 +116,7 @@ about 139 fps; the renderer ran above that. Players' builds therefore keep
 presentation at the 60 Hz simulation update, and the optional interpolation
 stays disabled. Raw reports, HUD captures, mode read-backs and pressure logs
 are retained at
-`~/.local/state/smashcraft/evidence/sc-18-realtime-laptop/h229/`.
+`~/.local/state/makgora/evidence/sc-18-realtime-laptop/h229/`.
 
 For a high-refresh private run, verify the compositor output as well as the
 game's FPS cap. The private-desktop launcher creates its output at 60 Hz;
@@ -125,7 +125,7 @@ owned private runtime, `wlr-randr --output HEADLESS-1 --custom-mode
 1320x760@144Hz` changed that output to 144 Hz. Confirm the resulting mode and
 retain actual renderer samples, such as `DXVK_HUD=fps,frametimes`, before
 interpreting timer cadence. Raw reports and renderer samples are retained at
-`~/.local/state/smashcraft/accept/codex-native-render-clock-20261007/`.
+`~/.local/state/makgora/accept/codex-native-render-clock-20261007/`.
 
 ## Presentation interpolation
 
@@ -168,7 +168,7 @@ camera measurement unset: callback camera fields alone cannot establish it.
 
 `bun scripts/stepEvenness.ts --video PRIVATE.mkv --pages DATA_DIR --out PRIVATE_DIR
 --viewport X,Y,W,H [--run N --fighters 0,1 --projection FILE]` measures fighter
-steps in pixels on the same join (smashcraft:ts/scripts/stepEvenness.ts). With
+steps in pixels on the same join (makgora:ts/scripts/stepEvenness.ts). With
 `-dev view far` holding the camera still, it subtracts a temporal-median
 background, takes each fighter's foreground centroid near its projected `P`
 position and divides each rendered frame's step by that fighter's projected
@@ -190,18 +190,18 @@ rate. Set and read back the output's 120 Hz mode and the game's cap separately;
 the captured intervals decide the observed recording cadence.
 
 Renderers place moving effects (fighters, their lights, projectiles and pooled
-effects) through `placeEffect` (smashcraft:ts/src/game/render/effects.ts). By
+effects) through `placeEffect` (makgora:ts/src/game/render/effects.ts). By
 default it only sets the position. `-dev smooth-draw on` starts a 1/1024 s
-draw timer (smashcraft:ts/src/host/loop/betweenFrames.ts). Warcraft runs Lua
+draw timer (makgora:ts/src/host/loop/betweenFrames.ts). Warcraft runs Lua
 only in turn bursts, so the timer's last callback in each burst places each
 effect at the burst's game time, between where the last two simulation frames
-put it (smashcraft:ts/src/game/render/motion.ts): every burst then advances
+put it (makgora:ts/src/game/render/motion.ts): every burst then advances
 the picture by the same game time, trailing the simulation by at most one
 frame and snapping on teleports. `-dev smooth-draw off` places effects at the
 simulation frame again; the timer keeps running. The rates line's `dru` is the
 draw callbacks' os.clock microseconds per second, and the rates report prints
 `draw us/burst`. Drawing never reads or writes simulation state:
-smashcraft:ts/test/high-refresh.test.ts checks that every confirmed checksum
+makgora:ts/test/high-refresh.test.ts checks that every confirmed checksum
 of a quick match played in one- and two-frame bursts matches with drawing on
 and off. Players' builds keep it off until a native capture shows even
 fighter steps within 0.5 ms a burst and one frame of added latency.

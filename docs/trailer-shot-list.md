@@ -1,7 +1,7 @@
 # Trailer shot list
 
 The shots the trailer capture (#363) records, each reproducible from a pad
-script in smashcraft:ts/test/native/pads/trailer/. A shot is a pad script's
+script in makgora:ts/test/native/pads/trailer/. A shot is a pad script's
 setup chat plus its timed inputs; the match it starts is deterministic, so the
 same script draws the same frames headless and natively. The order follows
 the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
@@ -15,7 +15,7 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 - **Frames**: the match frames to keep, first to last. Frame 1 is the first
   match frame after the setup chat; `-dev quick` matches start at frame 1.
 - **Camera**: every shot uses the match camera
-  (smashcraft:ts/src/game/sim/matchCamera.ts, [Melee camera](melee-camera.md)),
+  (makgora:ts/src/game/sim/matchCamera.ts, [Melee camera](melee-camera.md)),
   which is deterministic match state, seen from client a. Promo shots hide
   the HUD, hints and developer receipts (`-dev quick promo`); scripted
   shots keep the HUD, so crop or cover its band in the edit. Cropping and
@@ -43,7 +43,7 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 
 ## Coverage
 
-- Stages: all ten selectable stages (smashcraft:ts/src/game/menu/stageCatalog.ts)
+- Stages: all ten selectable stages (makgora:ts/src/game/menu/stageCatalog.ts)
   appear at least once, each as a promo shot.
 - Roster: all 26 selectable fighters appear; the six without a promo shot
   (Kael'thas Sunstrider, Grom Hellscream, Gazlowe, Shadow Hunter,
@@ -55,7 +55,7 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 
 ## Replaying a shot headless
 
-From ts/, with the journal helper built from smashcraft:controller/
+From ts/, with the journal helper built from makgora:controller/
 (`cargo build --release --bin wc3-journal`):
 
 ```sh

@@ -1,4 +1,4 @@
-# Smashcraft delivery goal
+# Mak'gora delivery goal
 
 Deliver a complete, responsive, readable Warcraft III platform fighter in TypeScript:
 a fully playable roster, including Rifleman and Demon Hunter
@@ -9,7 +9,7 @@ not have to research basic rules or repeatedly discover omissions.
 
 ## Delivery order
 
-Roadmap [#16](https://github.com/tompassarelli/smashcraft/issues/16) orders the
+Roadmap [#16](https://github.com/tompassarelli/makgora/issues/16) orders the
 current work. The standing product sequence: verify the shared Melee physics
 foundation before asserting move-category balance or tuning matchups, and add
 visual cues as their owning mechanics are verified. Approved custom mechanics
@@ -36,7 +36,7 @@ Extract factual mechanics; do not copy or translate unlicensed implementation.
 
 Resolve each system's connected behavior before declaring it complete. Use
 focused tests for rules and native checks for controls, poses and interactions.
-Separate verified reference facts, deliberate Smashcraft choices and unresolved
+Separate verified reference facts, deliberate Mak'gora choices and unresolved
 gaps in the existing physics documentation. Never turn an unverified number
 into a default or label a passing provisional test Melee parity. If a datum is
 absent locally, obtain the exact missing data through an authorized source or
@@ -67,7 +67,7 @@ Keep intentional choices explicit:
 
 - No stale-move penalties or freshness bonuses. Discourage spam through move
   design, commitment, spacing, recovery and counterplay; see intentional
-  omissions in smashcraft:README.md.
+  omissions in makgora:README.md.
 - Straight horizontal air dodge uses the agreed shallow downward direction
   for convenient wavedashing. Diagonal Down does not trigger fast-fall, and
   C-stick down-air does not inject movement Down or force fast-fall.
@@ -99,22 +99,22 @@ laser;
 five-second freezing trap with visible ice entombment and defined release rules;
 aimed recoil-shot recovery: the stick picks up, diagonally up or level and the
 shot fires the opposite way, with one second shot to change route and early
-protection ending at frame 10 (#127, smashcraft:docs/design/kit-review-1.md).
+protection ending at frame 10 (#127, makgora:docs/design/kit-review-1.md).
 Finish readable kicks with cape clearance and canonical blue portraits with
 the gun fully visible. Repair material/import causes rather than recoloring
 around an unresolved asset defect.
 
 Demon Hunter: neutral-special Mana Burn; side-special Fel Rush (a Phantasm-style dash, shortened by a second press), and mana drained by every hit he
-lands (#147, smashcraft:docs/design/illidan.md);
+lands (#147, makgora:docs/design/illidan.md);
 up-special visible animated wings and a rising recovery aimed by the stick on
 its 7th frame (#519), with a backflip into an 8-way aimed dive that starts by itself on frame 19 when the stick has changed zone from the launch's (#279); down-special Immolate with shine-like horizontal ground knockback and
 downward air spike, jump-cancellable from its first active frame (#128,
-smashcraft:docs/design/kit-review-1.md). Do not infer reflection or final
+makgora:docs/design/kit-review-1.md). Do not infer reflection or final
 tuning from move names alone. Deliver
 his full normals, aerials, grabs/throws, shared actions, effects, portraits,
 selection and replay coverage, not just his specials or model.
 
-Apply the smashcraft skill (references/character-creation.md) to every completed/new fighter.
+Apply the makgora skill (references/character-creation.md) to every completed/new fighter.
 Author distinct startup, contact and recovery poses in the existing Blender
 pipeline, preserving interpolation and existing clips. Include grounded and
 airborne hitstun reactions, contact-pose hitlag freezing, prone/getup poses,
@@ -142,7 +142,7 @@ Fix Enter/chat interference and restart disconnects at their owning causes.
 Retain four-slot presentation; actual three/four-player combat is a later
 expansion, not something to imply from four visible cards.
 
-Finish Smashcraft/Tompas branding, readable white text with black shadow,
+Finish Makgora/Tompas branding, readable white text with black shadow,
 larger percentages, restrained menu accents and normalized portrait framing.
 Preserve a locked, stable camera, hidden native healthbars/blast zones and
 useful off-screen indicators. Verify the Space camera fix through real use.
@@ -153,17 +153,17 @@ Keep one deterministic, snapshot-capable simulation with immutable per-frame
 inputs, stable interaction order, complete gameplay state and replay without
 native side effects. Local presentation stays separate from combat.
 Multiplayer acceptance is the **Done when** list of input integrity
-[#26](https://github.com/tompassarelli/smashcraft/issues/26) and online play
-[#17](https://github.com/tompassarelli/smashcraft/issues/17). Headless tests do
+[#26](https://github.com/tompassarelli/makgora/issues/26) and online play
+[#17](https://github.com/tompassarelli/makgora/issues/17). Headless tests do
 not prove working multiplayer or physical latency.
 
 ## Completion and reporting
 
 Each part of this goal is tracked by a GitHub issue under roadmap
-[#16](https://github.com/tompassarelli/smashcraft/issues/16). A part is complete
+[#16](https://github.com/tompassarelli/makgora/issues/16). A part is complete
 when its issue's Done-when boxes pass, and its Not-required list says what
 completion does not include. Report what passed, on which build, with one line
 of residual risk. Owner playtests decide feel; the agent prepares them and
 fixes what they find. Keep the public repository current. Mechanics and
-intentional differences live in smashcraft:docs/physics.md, and the build loop
-in smashcraft:docs/development-loop.md.
+intentional differences live in makgora:docs/physics.md, and the build loop
+in makgora:docs/development-loop.md.

@@ -5,27 +5,27 @@ asset container, the summon clips and the folders of `--assets` (fighter
 models, clip pools, stage and impact models, imported community models,
 selection art, fighter renders, stage-select pictures, hero models, model sounds). Each is a
 *family*, stored once under the hash of its contents and never changed.
-smashcraft:build-inputs/ names the hash of every family a revision builds
+makgora:build-inputs/ names the hash of every family a revision builds
 with, one file per family, so a commit fixes its art exactly as it fixes its code.
 
 ## How it works
 
-- **Store.** ~/.local/share/smashcraft-build-inputs/store/FAMILY/HASH/ holds
+- **Store.** ~/.local/share/makgora-build-inputs/store/FAMILY/HASH/ holds
   one family. HASH is the SHA-256 of the folder's sorted file list, each
   line a relative path and that file's SHA-256 (base and container are folders
   holding `base.w3m` and `container.w3x`). `bun wisp inputs add` copies the
   source into a private staging folder, hashes the copy, makes it read-only
   and publishes it by one rename; a second writer of the same contents finds
   it there. Nothing writes into a published folder.
-- **Manifest.** smashcraft:build-inputs/FAMILY holds the hash of each family named in
-  smashcraft:ts/scripts/wisp/buildInputs.ts (`FAMILIES`), one file per family so
+- **Manifest.** makgora:build-inputs/FAMILY holds the hash of each family named in
+  makgora:ts/scripts/wisp/buildInputs.ts (`FAMILIES`), one file per family so
   two lanes that store different families never edit the same file (#401). There is
   no global pointer: a lane's manifest is its own, and main's is main's.
 - **Shards.** The families a fighter repack writes (hero-models,
   original-clips-static-lights, impact-assets) are sharded: build-inputs/FAMILY/ holds
   one pin per fighter slug and one for `shared`, and each shard is stored like a
   family under store/FAMILY/HASH/. `bun wisp inputs add` splits the folder by owner
-  (smashcraft:ts/scripts/wisp/inputShards.ts): a fighter's source model, every file
+  (makgora:ts/scripts/wisp/inputShards.ts): a fighter's source model, every file
   named after the fighter (`MurlocTimelineBody-…`, `original-clips-evidence/Murloc.json`,
   `white-flash-imports/Murloc.txt`) and every texture its white list names; the rest is
   `shared`. The clip pool keeps one evidence record per fighter and impact-assets one
@@ -46,17 +46,17 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   manifest's for experiments.
 - **Hosts.** Each host keeps its own store, and `inputs add` and `inputs derive`
   write only the local one, so a pin landed from one host names entries the others
-  lack until they copy them. `bun wisp inputs fetch HOST...` (from smashcraft:ts/)
+  lack until they copy them. `bun wisp inputs fetch HOST...` (from makgora:ts/)
   copies every entry the checkout pins and this store lacks from the first named host
   that holds it, over ssh with rsync into a staging folder beside the store, hard-linking
   every file whose bytes match one in the family's 20 newest stored entries so a re-pinned
   entry moves only what changed,
   rehashes the copy, seals it and publishes it by one rename like `inputs add`
-  (smashcraft:ts/scripts/wisp/inputsFetch.ts). A copy that hashes otherwise is
+  (makgora:ts/scripts/wisp/inputsFetch.ts). A copy that hashes otherwise is
   refused. `map build`, `inputs check` and `inputs derive` name this command when
   a pinned entry is missing. gex45 builds and lands from its own store and cannot
   reach the other hosts, so a landing that changes any pin runs
-  `bun wisp inputs publish gex45` before it lands (smashcraft:ts/scripts/wisp/inputsPublish.ts):
+  `bun wisp inputs publish gex45` before it lands (makgora:ts/scripts/wisp/inputsPublish.ts):
   every pinned entry gex45 lacks is copied from this store over ssh with rsync into a
   staging folder beside gex45's store, hard-linking files that match its 20 newest
   entries of the family, rehashed there, sealed and renamed into place; a pin whose
@@ -64,7 +64,7 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   On gex45 itself the private map-build inputs check already reads the store. The store is licensed art: it moves only between
   your own hosts over ssh, never through Git or a public service.
 - **Play.** `bun wisp play` builds main from main's manifest. Builders of a
-  revision share the lock ~/.local/share/smashcraft-build-inputs/locks/play-REVISION.lock
+  revision share the lock ~/.local/share/makgora-build-inputs/locks/play-REVISION.lock
   (flock(2), released by the kernel when its holder exits): the first builds
   in the one worktrees/play-build checkout (moved to the revision under
   locks/play-build-checkout.lock, kept between builds so a landing that
@@ -100,11 +100,11 @@ code:
    build/FAMILY; `bun wisp inputs path assets` prints the current `--assets`
    for tools that read it). Fighter clips, bodies and white flashes are derived
    instead: step 2's `bun wisp inputs derive` rebuilds them from the pinned sources.
-2. `bun wisp inputs add FAMILY DIR` (from smashcraft:ts/) stores it and writes
+2. `bun wisp inputs add FAMILY DIR` (from makgora:ts/) stores it and writes
    its hash into your checkout's build-inputs/FAMILY.
-   `bun wisp inputs derive [--fighter NAME]...` (from smashcraft:ts/) runs each
+   `bun wisp inputs derive [--fighter NAME]...` (from makgora:ts/) runs each
    fighter's clip export, timeline bodies and white flashes
-   (smashcraft:ts/scripts/wisp/fighterArt.ts), fighters in parallel under one
+   (makgora:ts/scripts/wisp/fighterArt.ts), fighters in parallel under one
    machine-capacity lease, and pins the fighters' original-clips-static-lights
    and impact-assets shards and generated files. It first regenerates each
    fighter's rules (victory pose, flash clips, Warden's blade timing) into
@@ -132,26 +132,26 @@ code:
    whites, model facts or source family a landing changes,
    and for every fighter when it changes code the derive steps import or the
    hero-models or imported-models pins, which feed every fighter's step keys
-   (smashcraft:ts/scripts/wisp/fighterArtChanges.ts). It also measures each
+   (makgora:ts/scripts/wisp/fighterArtChanges.ts). It also measures each
    checked fighter's strike moments from its committed model and fails when
    his `fighters/<folder>/strikeMoments.ts` holds different rows; regenerate them with
    `bun wisp view strikes --assets "$(bun wisp inputs path assets)"`. Pre-push also
    runs `bun wisp view strikes --check` over every fighter when a landing changes a
    pin, the measurement's imports (move data, clip tables, looks) or the tables themselves
-   (smashcraft:ts/scripts/prePush.ts, `strikeInputs`).
+   (makgora:ts/scripts/prePush.ts, `strikeInputs`).
    A derive that fails keeps its step logs in derive/run-*/ beside the store;
    `bun wisp inputs prune [--scratch NAME]...` removes the runs older than the
    derive lease, and each named scratch folder under the build-inputs root,
    skipping any folder a process has open or a git worktree lives in and never
-   touching the store (smashcraft:ts/scripts/wisp/inputsPrune.ts).
+   touching the store (makgora:ts/scripts/wisp/inputsPrune.ts).
 3. `bun wisp map build --profile playable --edition full --name NAME --out OUT.w3x` from the lane
    checks the change; commit build-inputs/FAMILY with the code that needs it and
    land it. Lanes that changed different families, or different fighters' shards
    of a sharded family, touch different files and merge cleanly; two lanes that
-   changed the same family (or fighter) conflict on that one file. Model facts are one file per model (smashcraft:ts/scripts/wisp/model-facts/),
+   changed the same family (or fighter) conflict on that one file. Model facts are one file per model (makgora:ts/scripts/wisp/model-facts/),
    the move list and the anim-score tables are generated and untracked, and
-   smashcraft:.gitattributes merges the map size and Bun test cost baselines per row
-   through smashcraft:ts/scripts/mergeGenerated.ts, which `bun install` (from ts/)
+   makgora:.gitattributes merges the map size and Bun test cost baselines per row
+   through makgora:ts/scripts/mergeGenerated.ts, which `bun install` (from ts/)
    registers in the repository's git config (#401).
 
 `bun wisp map build --profile playable --edition classic --inputs-only` runs
@@ -218,17 +218,17 @@ restore the previous cursor state when it closes.
 - The LAN pool's ~/.local/state/wisp/lan/ and each client's CustomMapData
   belong to the agent running those clients; Wisp writes game files through
   per-process temporaries.
-- The controller launcher link and the owner's Maps/00-Smashcraft are replaced
+- The controller launcher link and the owner's Maps/00-Makgora are replaced
   through per-process temporaries (`NAME.PID.next`), renamed in. Installing a
   main build removes every other file in its dev/ folder, so dev/ holds one main
-  build and at most one lane build to try, and releases/ keeps every release (smashcraft:docs/play.md).
+  build and at most one lane build to try, and releases/ keeps every release (makgora:docs/play.md).
 - Lane, test, integrity and diagnostic builds go to a private folder: a
   per-run temporary removed after the run, a new folder under
-  ~/.local/share/smashcraft-build-inputs/, or the lane cache
-  ~/.local/state/smashcraft/lane-builds/ (one build per lane). `wisp map build`
-  and `wisp map rebuild` refuse a path inside the owner's Maps/00-Smashcraft.
+  ~/.local/share/makgora-build-inputs/, or the lane cache
+  ~/.local/state/makgora/lane-builds/ (one build per lane). `wisp map build`
+  and `wisp map rebuild` refuse a path inside the owner's Maps/00-Makgora.
 - The LAN pool's pool.json and clients.json have one writer, the running
   `wisp lan pool`.
 - ts/build/ and build/ are per checkout: run one build at a time in a lane.
-- Dated folders under ~/.local/share/smashcraft-build-inputs/ are lanes'
+- Dated folders under ~/.local/share/makgora-build-inputs/ are lanes'
   scratch and evidence inputs. A build reads only the store.

@@ -247,7 +247,7 @@ hunched silhouette, the round body the jabs' exception already names. Earlier
 takes stopped at body share 0.287; a shallower windup dip passed it, the take
 limit is spent, and the take ships under the box's line 5 exception.
 
-Mrgl & Grgl's neutral air ships with line 5 below 4 (smashcraft#816). A Blender take
+Mrgl & Grgl's neutral air ships with line 5 below 4 (makgora#816). A Blender take
 (`tools/animations/murloc-stabs.py neutralAir`) draws the spear up behind him
 over the 3-frame startup, drives the point down and forward into the hit
 region's far end on the first active frame and carries it through, then
@@ -265,7 +265,7 @@ weight, anticipation, follow-through and character are 4, 4, 3, 3 and 3, and
 lines 1 to 4 pass (#344). The take limit is spent; take B and the later
 cold-judge lane did not beat the shipped clip's medians, so it is the best
 judged. Tom's standing delegation of pending decisions to the recommendation
-(2026-10-26) was applied on 2026-10-27 by the smashcraft triage lead, which
+(2026-10-26) was applied on 2026-10-27 by the makgora triage lead, which
 recommended shipping it as a named exception.
 
 Mrgl & Grgl's dash attack ships with line 5 at 3: the judge medians on readability,

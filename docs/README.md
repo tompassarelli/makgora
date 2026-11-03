@@ -1,11 +1,11 @@
 # Project documentation
 
-[Smashcraft project home](../README.md)
+[Mak'gora project home](../README.md)
 
 Docs hold durable knowledge: how the game and its systems work, design
 decisions and their reasons, reference data, and procedures. Anything that
 changes, such as status, progress, plans, priorities or claim tables, lives in
-GitHub issues under roadmap [#16](https://github.com/tompassarelli/smashcraft/issues/16).
+GitHub issues under roadmap [#16](https://github.com/tompassarelli/makgora/issues/16).
 Status, plans, measured results and run links live in the owning issue.
 
 ## Help topics
@@ -59,7 +59,7 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 
 - [Player guide](player-guide.md): controls, menus and match flow.
 - [Move list](move-list.md): every fighter's specials and ultimate by official name, generated from the kit data by `bun install` (from ts/; untracked).
-- [Gameplay design decisions](gameplay-design.md): the owner's principles and decisions and open questions; each deviation from Melee is a row of the [Melee parity ledger](design/melee-parity.md). The only place Smashcraft's stance is written.
+- [Gameplay design decisions](gameplay-design.md): the owner's principles and decisions and open questions; each deviation from Melee is a row of the [Melee parity ledger](design/melee-parity.md). The only place Mak'gora's stance is written.
 - [Melee case study](design/melee/README.md): Melee's movement, attacks, defence, archetypes, techniques and jank, described with numbers computed from the reference data.
 - [Fighting-game design language](design/fighting-games.md): frame advantage, highs and lows, footsies, okizeme, strike/throw, hitboxes and hurtboxes, archetypes, with sources.
 - [Platform-fighter design language](design/platform-fighters.md): how platform fighters change that language: shield, aerials on shield, ledge, DI and SDI, tech chases, edgeguarding, the interaction graph.
@@ -81,19 +81,19 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 - [Onyxia](design/onyxia.md): Lady Katrana Prestor and her dragon form, swapped on down special; both kits, the swap and its cost, and the models.
 - [Costumes](design/skins.md): up to eight per fighter, tint costumes from data, the synced select choice, how team colour stays readable, and why fel Grom waits on a decision.
 - [Finished move](design/finished-move.md): the bar every move and Tom-facing build meets without an issue saying so, and the gate check that enforces each line.
-- [Move legibility](design/move-legibility.md): how platform fighters make specials readable (effect restraint, colour per element, victim element effects) and the startup cue, active spell, missile and element each Smashcraft special shows.
+- [Move legibility](design/move-legibility.md): how platform fighters make specials readable (effect restraint, colour per element, victim element effects) and the startup cue, active spell, missile and element each Mak'gora special shows.
 - [Animation reference library](design/animation-reference.md): sourced references for silhouettes, anticipation/contact/recovery, drills, dodges and techs, grabs and throws, the nine damage reactions, and ledge hang, crouch and per-fighter double-jump styles, with verified timestamps, rights and the private-pixel rule.
 - [Hurtbox legibility](design/hurtbox-legibility.md): why Ultimate players report losing with correct spacing (hurtbox shapes per animation, interpolation, hit-pose shifts, glancing blows, randomness) and Melee's comparable cases, with sources.
-- [Projectiles](design/projectiles.md): Ultimate's projectile properties players blame, Melee's powershield and laser answers, other platform fighters, and Smashcraft's current projectiles.
+- [Projectiles](design/projectiles.md): Ultimate's projectile properties players blame, Melee's powershield and laser answers, other platform fighters, and Mak'gora's current projectiles.
 - [Kit review 1](design/kit-review-1.md): Blademaster, Mountain King, Warden, Rifleman's recovery and Illidan scored for decisions, mixups, reads and counterplay, with redesigned specials, frame data and counterplay.
 - [The ultimate meter](design/mana.md): every fighter's one ultimate meter, filled only by centre-stage orbs every 30 s; pickup and tie rules; ready signal; drains; open questions.
 - [Tilts and dash attacks](design/tilts.md): each fighter's jab, forward/up/down tilt and dash attack by identity, Melee's timing distribution, Ultimate's angled forward-tilt rule (straight strikes angle, vertical swings do not) and the down-tilt and dash-attack roles.
-- [Interaction graph](design/interaction-graph.md): for each situation, Smashcraft's options, what beats what by how many frames, and the punish windows, computed per fighter from its move data.
+- [Interaction graph](design/interaction-graph.md): for each situation, Mak'gora's options, what beats what by how many frames, and the punish windows, computed per fighter from its move data.
 - [Match flow](design/match-flow.md): match rules, endless play and automatic rematch, with Slippi and other platform-fighter prior art.
 - [Language-model playtest](design/text-playtest.md): what playing a match through the text view found, what it costs, and the decision not to run it nightly.
 - [Computer opponent profiles](design/cpu-profiles.md): six named opponents with individually authored five-tier growth, blended competencies and persistent openings; Opponent + Difficulty selection and deterministic calibration contract.
-- [Client interface](client-interface.md): what the desktop client ([smashcraft-client](https://github.com/tompassarelli/smashcraft-client)) reads from Smashcraft: the client kit, the records and replays the map writes, the Maps folder and the online commands.
-- [Smashcraft client](design/client.md): the Slippi-style companion app: Slippi, Rivals, Ultimate and W3Champions prior art, the match record format the map writes, full-match replay design and the phased roadmap.
+- [Client interface](client-interface.md): what the desktop client ([makgora-client](https://github.com/tompassarelli/makgora-client)) reads from Mak'gora: the client kit, the records and replays the map writes, the Maps folder and the online commands.
+- [Mak'gora client](design/client.md): the Slippi-style companion app: Slippi, Rivals, Ultimate and W3Champions prior art, the match record format the map writes, full-match replay design and the phased roadmap.
 - [Delivery goal](delivery-goal.md): what the finished game contains.
 - [Trailer shot list](trailer-shot-list.md): the trailer's shots, each a pad script that replays headless to its frames, with fighters, stage, camera and what it shows.
 - [Current release](playable-0041.md): files, startup and controls for 0.0.41.
@@ -124,7 +124,7 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 - [Development setup and loop](development-loop.md): build, reload and test workflow.
 - [CI](ci.md): the workflows, and how a cloud worker's `claude/**` branch lands on main by itself (autoland).
 - [TypeScript workflow](typescript.md): source rules, build and test commands.
-- [Graphics settings](graphics-settings.md): which Warcraft III graphics settings Smashcraft reads, the LAN pool profiles and recommended player settings.
+- [Graphics settings](graphics-settings.md): which Warcraft III graphics settings Mak'gora reads, the LAN pool profiles and recommended player settings.
 - [What a player sees](player-view.md): scene report and frame probe checks, their expectations and thresholds.
 - [Fighter animation work](fighter-animation-work.md): asset authoring and native pose checks.
 - [Dash attacks](dash-attacks.md): the coil, contact, drive, recoil and settle poses a dash attack needs to read at judge-tile size, with the scorecard constraints they must keep.

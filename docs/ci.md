@@ -2,17 +2,17 @@
 
 | Workflow | Runs | Does |
 | --- | --- | --- |
-| CI (smashcraft:.github/workflows/ci.yml) | every push except `farm/**` and `claude/**`, pull requests, dispatch | development loop, perf gate, Lua32 suites, the sweeps the suites skip (Sweeps (Bun), Lua32 (sweeps)), and the code-health gate (new structural debt against structure.toml, north:harness/code-health; Autoland and local `safe-push` also run it before every landing); every landing on main, pushed by `safe-push` or dispatched by Autoland, also runs the smoke job (the Classic frame budget, the same budget on the four-fighter 7-frame `rollback-four` run, the 5% frame-cost compare of the fixed-tape `playable-human-four` run against the previous landed main's `main-perf` artifact, and commit metrics) and the farm job, which calls Farm test (smashcraft:.github/workflows/farm-test.yml) with `full=1` on `ubuntu-latest` for every group but boot, perf and rollback (smoke runs those; a push off main adds perf), so main gets the full suite after each landing while a group whose inputs already passed is reused (see Landing) |
-| Main is red (smashcraft:.github/workflows/main-red.yml) | after each CI or Background sweeps run on main, or run-ID dispatch | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (smashcraft:AGENTS.md) |
-| Revert red main (smashcraft:.github/workflows/revert-red.yml) | dispatch by Main is red with the failed run's ID | reverts a landing whose parent was green when no green run of that workflow follows within 15 minutes (see Sheriff) |
-| Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | the landing checks (smashcraft:ts/scripts/landingChecks.ts) in the jobs CI's checks fall into (boot, perf, rollback, parity-0 to parity-3, lua, corpus, computer-0 and computer-1, types, clean-room, static), each only when the `checks` input names it or, without one, when a changed path reaches one of its checks, which then run when a changed path reaches them (see Landing; safe-push's landing runs it with the groups it selects, see Landing); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
-| Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on hosted runners, at most two jobs at once: the host test suite (`bun run test` in ts/, every ts/test file outside the sweeps), every sweep outside the gate allowlist (Bun, and Lua32 in three partitions), and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs' worst frames must stay within 10% of the nearest first-parent main commit's successful Background run artifact measured by the same instrument (Wisp's Lua32 build and profiler, hashed into the artifact name); the prior is searched through every green Background run on main within the 30-day artifact retention, and a run whose instrument has green artifacts but none still live on main fails with `NoPrior` until a `rebaseline` dispatch decides it, while an instrument with no artifact at all (a new Wisp build) warns and passes drift comparison while roster coverage and absolute frame budgets still apply; a decided rise rebaselines through the dispatch input `rebaseline` (smashcraft:docs/commands/perf.md); a landing's red run goes to the sheriff (see Sheriff) |
-| Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and comments each finding kind on its epic, or on the After 0.1 issue when no epic matches (smashcraft:docs/commands/soak.md) |
-| Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, dispatch with `branch` | the cloud workers' landing queue: tests each waiting tip alone at once and lands it from its test run, or in a train of tips that passed when main moved on its paths |
-| Reports (smashcraft:.github/workflows/reports.yml) | push to main, dispatch | regenerates the advantage-state reports and the Melee parity page on main after a `safe-push` landing and pushes them when they changed (see Landing) |
-| Auto-close (smashcraft:.github/workflows/autoclose.yml) | each landing (a push to main, or Autoland's dispatch with the landed SHA and the main before it) | reruns the declared Done-when checks of each issue the landed commits reference, ticks the passing boxes, closes an issue whose boxes are all ticked (see Auto-close) |
-| Autoland sweep (smashcraft:.github/workflows/autoland-sweep.yml) | every 5 minutes from Autoland heartbeat while Autoland has work, every finished Autoland or Farm test run, dispatch with `dry-run` or `landed` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
-| Effect upgrade (smashcraft:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
+| CI (makgora:.github/workflows/ci.yml) | every push except `farm/**` and `claude/**`, pull requests, dispatch | development loop, perf gate, Lua32 suites, the sweeps the suites skip (Sweeps (Bun), Lua32 (sweeps)), and the code-health gate (new structural debt against structure.toml, north:harness/code-health; Autoland and local `safe-push` also run it before every landing); every landing on main, pushed by `safe-push` or dispatched by Autoland, also runs the smoke job (the Classic frame budget, the same budget on the four-fighter 7-frame `rollback-four` run, the 5% frame-cost compare of the fixed-tape `playable-human-four` run against the previous landed main's `main-perf` artifact, and commit metrics) and the farm job, which calls Farm test (makgora:.github/workflows/farm-test.yml) with `full=1` on `ubuntu-latest` for every group but boot, perf and rollback (smoke runs those; a push off main adds perf), so main gets the full suite after each landing while a group whose inputs already passed is reused (see Landing) |
+| Main is red (makgora:.github/workflows/main-red.yml) | after each CI or Background sweeps run on main, or run-ID dispatch | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (makgora:AGENTS.md) |
+| Revert red main (makgora:.github/workflows/revert-red.yml) | dispatch by Main is red with the failed run's ID | reverts a landing whose parent was green when no green run of that workflow follows within 15 minutes (see Sheriff) |
+| Farm test (makgora:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | the landing checks (makgora:ts/scripts/landingChecks.ts) in the jobs CI's checks fall into (boot, perf, rollback, parity-0 to parity-3, lua, corpus, computer-0 and computer-1, types, clean-room, static), each only when the `checks` input names it or, without one, when a changed path reaches one of its checks, which then run when a changed path reaches them (see Landing; safe-push's landing runs it with the groups it selects, see Landing); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
+| Background sweeps (makgora:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on hosted runners, at most two jobs at once: the host test suite (`bun run test` in ts/, every ts/test file outside the sweeps), every sweep outside the gate allowlist (Bun, and Lua32 in three partitions), and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs' worst frames must stay within 10% of the nearest first-parent main commit's successful Background run artifact measured by the same instrument (Wisp's Lua32 build and profiler, hashed into the artifact name); the prior is searched through every green Background run on main within the 30-day artifact retention, and a run whose instrument has green artifacts but none still live on main fails with `NoPrior` until a `rebaseline` dispatch decides it, while an instrument with no artifact at all (a new Wisp build) warns and passes drift comparison while roster coverage and absolute frame budgets still apply; a decided rise rebaselines through the dispatch input `rebaseline` (makgora:docs/commands/perf.md); a landing's red run goes to the sheriff (see Sheriff) |
+| Playtest (makgora:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and comments each finding kind on its epic, or on the After 0.1 issue when no epic matches (makgora:docs/commands/soak.md) |
+| Autoland (makgora:.github/workflows/autoland.yml) | push to `claude/**`, dispatch with `branch` | the cloud workers' landing queue: tests each waiting tip alone at once and lands it from its test run, or in a train of tips that passed when main moved on its paths |
+| Reports (makgora:.github/workflows/reports.yml) | push to main, dispatch | regenerates the advantage-state reports and the Melee parity page on main after a `safe-push` landing and pushes them when they changed (see Landing) |
+| Auto-close (makgora:.github/workflows/autoclose.yml) | each landing (a push to main, or Autoland's dispatch with the landed SHA and the main before it) | reruns the declared Done-when checks of each issue the landed commits reference, ticks the passing boxes, closes an issue whose boxes are all ticked (see Auto-close) |
+| Autoland sweep (makgora:.github/workflows/autoland-sweep.yml) | every 5 minutes from Autoland heartbeat while Autoland has work, every finished Autoland or Farm test run, dispatch with `dry-run` or `landed` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
+| Effect upgrade (makgora:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
 
 The census measures allocation with automatic Lua collection stopped throughout
 the workload, including between client callbacks: Wisp explicitly collects at
@@ -40,9 +40,9 @@ fetch, rebase, scan and push:
 
 1. **Before landing.** `safe-push --to main` runs the repository's one
    `land.check` (.safe-push) before it takes the landing lock, in place of the
-   pre-push hook: smashcraft:ts/scripts/landingFarm.ts picks the farm-test.yml
+   pre-push hook: makgora:ts/scripts/landingFarm.ts picks the farm-test.yml
    groups the lane's diff against main reaches (`landingGroups` in
-   smashcraft:ts/scripts/landingChecks.ts, which names every check, its command
+   makgora:ts/scripts/landingChecks.ts, which names every check, its command
    and the paths that reach it; the Lua parity checks and the frame budgets wait
    for main's CI unless a shared root reaches them), dispatches Farm test with the groups and the
    base on the `farm/SHA` branch safe-push published after its secret scan
@@ -56,7 +56,7 @@ fetch, rebase, scan and push:
    run; the log names each with the reason (`landing local:`), and each farm
    result with its groups and run (`landing farm:`). A failing check refuses
    the landing, printing the summary's failing tests and checks. A group that
-   passed is remembered by the hash of its inputs (smashcraft:ts/scripts/landingInputs.ts:
+   passed is remembered by the hash of its inputs (makgora:ts/scripts/landingInputs.ts:
    the group, the checks it runs and the blob of every tracked file their reach
    rules match), in the pre-push cache here and as a `farm-pass-GROUP-HASH`
    Actions cache entry and artifact kept 7 days that every Farm test job looks up first (the cache first, since it spends no REST quota and main's entries reach every ref; the artifact for passes on farm/ scratch refs, whose cache entries only that ref sees; a failed lookup warns and runs the group) (so Autoland's
@@ -68,7 +68,7 @@ fetch, rebase, scan and push:
    the rebased tree, up to three times, then under the lock; a move on other
    files keeps the verdict, since main's full suite runs after each landing. A
    raw `git push` to main, which skips safe-push, still runs the pre-push hook's
-   local gate (`landingSelection`, smashcraft:ts/scripts/landingRun.ts `here`).
+   local gate (`landingSelection`, makgora:ts/scripts/landingRun.ts `here`).
    `LAND_FULL_SUITE=1 safe-push --to main` forces every group.
    The landing's `checks` input starts a farm job only for the groups it names. With all ten started, 120 of 140 check jobs across 14 concurrent gate runs (2026-10-30, 01:20 to 01:34 UTC) were filtered-out groups that ran only setup (17 s each), hosted runners started about 15 jobs a minute, and the account held at most 16 running in that window (Pro allows 40), so one run's corpus and static jobs waited 113 s and 226 s behind other runs' idle jobs.
    `cd /tmp && bun LANE/ts/scripts/landingCpu.ts run OUT.json -- bash -c "cd LANE && exec safe-push --to main"`
@@ -84,14 +84,14 @@ fetch, rebase, scan and push:
    landing. `bun scripts/landingCpu.ts report OUT.json 20` lists the 20 heaviest processes of a recorded run.
    After that, the heaviest process of a docs-only landing was landingFarm.ts at
    2.7 CPU s of 12.4 (2026-10-30), 2.2 s of it start-up loading the check selection's modules;
-   the selection now reads its inputs from smashcraft:ts/scripts/wisp/cueInputs.ts
-   and smashcraft:ts/scripts/wisp/fighterArtCode.ts, which load neither the effect
+   the selection now reads its inputs from makgora:ts/scripts/wisp/cueInputs.ts
+   and makgora:ts/scripts/wisp/fighterArtCode.ts, which load neither the effect
    models nor the fighter-art derivation, and a landing whose groups are all reused
    takes 1.4 CPU s there instead of 2.6.
 2. **After landing.** The push to main runs CI's smoke, farm and
    code-health jobs, one run per landed commit (CI's
    concurrency is per SHA on main), plus Background sweeps, Auto-close and
-   Reports (smashcraft:.github/workflows/reports.yml, which regenerates the
+   Reports (makgora:.github/workflows/reports.yml, which regenerates the
    advantage-state reports and the Melee parity page and pushes them as one
    "Regenerate reports" commit when they changed). A red CI run goes to the
    sheriff and the "main is red" issue (see Sheriff); the lane whose
@@ -144,7 +144,7 @@ orbs (5180 frames with a computer player), simulates in about 3 s of its 41 s.
 Canonical numbers are built from whole-number text rather than one byte per
 call, each field's text is built in one expression, and each bot observation
 sample's text is built once while a history holds it
-(smashcraft:ts/src/game/replay/canonical.ts), which brings orbs to about 12 s
+(makgora:ts/src/game/replay/canonical.ts), which brings orbs to about 12 s
 with every tape's records unchanged.
 
 Farm test (farm-test.yml) runs the same checks for Autoland and `bun wisp farm
@@ -169,11 +169,11 @@ repository's .safe-push set `landing.queue = autoland`, `safe-push --to main`
 also checked a local lane, pushed it to `claude/land-LANE-SHA` and waited for
 its verdict; its pre-push gate runs no farm suite for that hand-off, since
 Autoland's suite covers every farm-test job
-(smashcraft:ts/scripts/suiteParity.ts). For that hand-off the gate also runs
+(makgora:ts/scripts/suiteParity.ts). For that hand-off the gate also runs
 locally only the checks that need private or local inputs (generated models
 stored, animation jitter, and effect-kit check from the machine's north
-checkout, smashcraft:docs/typescript.md#host-tools); every hosted check it selects (`hosted` in
-smashcraft:ts/scripts/prePush.ts: clean room, kind tags and type-check, suite
+checkout, makgora:docs/typescript.md#host-tools); every hosted check it selects (`hosted` in
+makgora:ts/scripts/prePush.ts: clean room, kind tags and type-check, suite
 parity, cue models) runs instead in this same hook when Autoland's build
 pushes the rebased candidate to `farm/autoland-SHA`, and a refusal there fails
 the lane. A hosted check whose fix needs this machine (`localFix`: cue models
@@ -183,7 +183,7 @@ Autoland as "local refresh required". Suite parity fails when that push skips th
 local is skipped when it passed before on the same key: its name, the git tree
 of its input paths (the whole tree when it names none, and only while they are
 clean) and the hash of ts/bun.lock, recorded under
-~/.local/state/smashcraft/prepush-cache; a failure is never recorded. Nobody
+~/.local/state/makgora/prepush-cache; a failure is never recorded. Nobody
 else pushes main, so no landing restarts another's suites.
 
 1. **Queue.** A push marks the branch tip with a pending `autoland` commit
@@ -195,11 +195,11 @@ else pushes main, so no landing restarts another's suites.
    dispatching `-f branch=` for that branch; a failure refuses the lane
    ("deny-list refused: reword and push again") and a missing or pending one
    holds it as "waiting for the deny-list attestation" (`attestation` in
-   smashcraft:ts/scripts/autolandCore.ts, re-checked before every push to main).
+   makgora:ts/scripts/autolandCore.ts, re-checked before every push to main).
 2. **Test alone.** A plan run gives each idle test slot the next waiting
    tip (priority, then arrival); the other tips keep "queued" until a plan
    finds a slot free, so no run waits on a busy slot. A test run is: the tip rebased onto main, the pre-push gate
-   (smashcraft:ts/scripts/prePush.ts) on a scratch `farm/autoland-SHA`
+   (makgora:ts/scripts/prePush.ts) on a scratch `farm/autoland-SHA`
    branch and the farm test workflow, which runs every check main's CI runs.
    Tests run in five slots of one farm run each, outside the landing queue, so
    the job budget rather than the slot count bounds how many run at once;
@@ -221,7 +221,7 @@ else pushes main, so no landing restarts another's suites.
    token can't push those), is refused. A green tip lands straight from its
    test run (step 4) when main is still the tested base or moved only on
    paths `pastMain` proves disjoint (`landing` in
-   smashcraft:ts/scripts/autolandCore.ts), so a lone lane goes "queued",
+   makgora:ts/scripts/autolandCore.ts), so a lone lane goes "queued",
    "testing alone on MAIN", "landed as SHA" with no train run. When main
    moved on its paths, or its push to main is rejected, it becomes "passed
    alone on MAIN as tree TREE" for the next train.
@@ -244,12 +244,12 @@ else pushes main, so no landing restarts another's suites.
    the rebased tree is exactly the tested tree plus main's changes; a main
    commit touching a train path, `.github/workflows/` or
    `ts/scripts/autoland*` sends the tips to the next train (`pastMain` in
-   smashcraft:ts/scripts/autolandCore.ts). Pushes made with
+   makgora:ts/scripts/autolandCore.ts). Pushes made with
    the workflow token start no workflows, so the run dispatches main's CI,
    which runs only its smoke and farm jobs for a landed commit.
 5. **Red.** A red lone tip gets a failed status, and its run fails with a
    job summary and annotation saying "Autoland didn't land" and naming the
-   files or tests. Each plan run dry-merges every pending lane with main (`git merge-tree`), so a conflict is flagged within one plan after main moves (the sweep plans every 5 minutes while a test slot is free), and a conflicting rebase comments once on each issue the lane's commits reference (Refs/Fixes #N) and raises the "Autoland stalled" alarm; when every conflict is a generated report (taken from main, then regenerated) or a build-inputs pin whose families merge file by file in a reachable store (`resolveConflicts` in smashcraft:ts/scripts/autolandCore.ts), it resolves them and the lane goes on, and source conflicts are never resolved (#513). A conflict in a table `bun run generate` writes from tracked source (`ts/src/generated/state/`, `fighterArtData.ts`, `fighter-art/`) is resolved the same way once no source file conflicts beside it: the rebase (`rebaseLane` in smashcraft:ts/scripts/autolandRebase.ts) takes main's copy, then regenerates the tables after it and commits them, because two lanes that add state for different heroes put their rows side by side in the one state file (#764). The per-hero asset files (`white-facts/`, `white-models/`, `clips/`) already merge across heroes; a same-hero conflict there rides with a build-inputs pin conflict and stays flagged, since regenerating them needs private models. The Classic effect record (smashcraft:ts/scripts/wisp/cue-models.tsv) is neither: it needs the private Classic cache, so a conflict in it refuses the lane with the re-record command instead of keeping either side, and the suite's corpus checks run `bun scripts/cueModels.ts` so a candidate tree whose record is stale never lands. A stale record reported by the candidate's checks or final push returns `local refresh required: Classic effect record` to the local safe-push waiter, which exits 75 and retains the source lane and queue branch for local repair and requeue. The alarm stays open until each flagged lane is pushed again, lands or is deleted. A lane failure that measured nothing (the sheriff's `unmeasured` rule in smashcraft:ts/scripts/autolandCore.ts, with no failing test) instead keeps the lane pending as "rerunning run N", and the next sweep reruns that run's failed jobs once; a second such failure or any measured one fails the lane. Every other failure (a red suite, a workflow change, a test loop) comments "lane failed: REASON" once on the same issues, and `threads unowned` (north) lists an issue whose lane failed after its claim as UNOWNED with that reason, so the next tick restaffs it. Each sweep deletes a lane as superseded, and comments so once on its issues, when its clean `git merge-tree --write-tree` with current main equals main's tree, regardless of its last conclusion; it also keeps the separate rule deleting a failed lane when a newer live lane pushed after the failure refs the same issue. An unfinished Autoland run holds its named lanes, and an active unnamed train holds every lane. Read outcomes with
+   files or tests. Each plan run dry-merges every pending lane with main (`git merge-tree`), so a conflict is flagged within one plan after main moves (the sweep plans every 5 minutes while a test slot is free), and a conflicting rebase comments once on each issue the lane's commits reference (Refs/Fixes #N) and raises the "Autoland stalled" alarm; when every conflict is a generated report (taken from main, then regenerated) or a build-inputs pin whose families merge file by file in a reachable store (`resolveConflicts` in makgora:ts/scripts/autolandCore.ts), it resolves them and the lane goes on, and source conflicts are never resolved (#513). A conflict in a table `bun run generate` writes from tracked source (`ts/src/generated/state/`, `fighterArtData.ts`, `fighter-art/`) is resolved the same way once no source file conflicts beside it: the rebase (`rebaseLane` in makgora:ts/scripts/autolandRebase.ts) takes main's copy, then regenerates the tables after it and commits them, because two lanes that add state for different heroes put their rows side by side in the one state file (#764). The per-hero asset files (`white-facts/`, `white-models/`, `clips/`) already merge across heroes; a same-hero conflict there rides with a build-inputs pin conflict and stays flagged, since regenerating them needs private models. The Classic effect record (makgora:ts/scripts/wisp/cue-models.tsv) is neither: it needs the private Classic cache, so a conflict in it refuses the lane with the re-record command instead of keeping either side, and the suite's corpus checks run `bun scripts/cueModels.ts` so a candidate tree whose record is stale never lands. A stale record reported by the candidate's checks or final push returns `local refresh required: Classic effect record` to the local safe-push waiter, which exits 75 and retains the source lane and queue branch for local repair and requeue. The alarm stays open until each flagged lane is pushed again, lands or is deleted. A lane failure that measured nothing (the sheriff's `unmeasured` rule in makgora:ts/scripts/autolandCore.ts, with no failing test) instead keeps the lane pending as "rerunning run N", and the next sweep reruns that run's failed jobs once; a second such failure or any measured one fails the lane. Every other failure (a red suite, a workflow change, a test loop) comments "lane failed: REASON" once on the same issues, and `threads unowned` (north) lists an issue whose lane failed after its claim as UNOWNED with that reason, so the next tick restaffs it. Each sweep deletes a lane as superseded, and comments so once on its issues, when its clean `git merge-tree --write-tree` with current main equals main's tree, regardless of its last conclusion; it also keeps the separate rule deleting a failed lane when a newer live lane pushed after the failure refs the same issue. An unfinished Autoland run holds its named lanes, and an active unnamed train holds every lane. Read outcomes with
    `gh run list --workflow autoland.yml` and `gh run view RUN_ID`, or the
    tip's `autoland` commit status. The branch stays; push a fix to it and it queues
    again. A red train of several tips sends each back to testing alone; the
@@ -279,7 +279,7 @@ without `structure.toml`.
 
 Every dispatched run ends with a plan unless it was cancelled, and a plan tests
 again any pending tip that no unfinished run holds, so a later plan rediscovers a cancelled tip. The scheduling decisions are a pure function
-(smashcraft:ts/scripts/autolandCore.ts). The
+(makgora:ts/scripts/autolandCore.ts). The
 run's own status is red whenever a suite shard fails; its `land` job and
 summary say what landed. To test a refused branch again without a new
 commit: `gh workflow run autoland.yml -f branch=claude/NAME`.
@@ -316,8 +316,8 @@ and `/dev/uinput` jobs stay hosted because the farm image has none of them. The 
 dispatch input on Autoland, Farm test and Balance names the runner label for the
 trusted jobs in place of the choice: `-f farm-runner=ubuntu-latest` forces
 hosted runners, which is how to exercise the fallback. Background sweeps on main coalesce, whether pushed, dispatched or scheduled: a running sweep finishes, and a newer main replaces only the queued one, so the next run covers the newest main; runs on other refs never coalesce. Keep `capacity` equal to the number of
-smashcraft runners registered on gex45 (11); the two on whiterabbit
-(paused while Tom's game runs, smashcraft:docs/commands/farm.md) take overflow
+makgora runners registered on gex45 (11); the two on whiterabbit
+(paused while Tom's game runs, makgora:docs/commands/farm.md) take overflow
 and are not counted, so a paused laptop never leaves a planned job waiting.
 No workflow trigger an outsider controls can reach a `farm-big` runner: every
 farm-labelled job's `runs-on` either comes from a route job that `push`,
@@ -346,14 +346,14 @@ unchecked and is never guessed. Its comment names the commit as "Ticked by
 auto-close after SHA landed" or "Closed by auto-close after SHA landed" (the
 `land_to_close_minutes` flow metric reads it), and lists the boxes left for a
 person or without a check. An unchanged list isn't commented twice. The parser
-and decisions are `boxes` and `autoclose` in smashcraft:ts/scripts/autolandCore.ts
+and decisions are `boxes` and `autoclose` in makgora:ts/scripts/autolandCore.ts
 (#536).
 
 ## Autoland sweep
 
 No laptop service is on the landing path. While any `claude/` tip has a
 pending `autoland` status or an Autoland run is unfinished, Autoland heartbeat
-(smashcraft:.github/workflows/autoland-heartbeat.yml), one hosted job, starts
+(makgora:.github/workflows/autoland-heartbeat.yml), one hosted job, starts
 the sweep every 5 minutes; it stops after 10 empty minutes and hands off to a
 successor after 5.5 hours. Every Autoland plan and every sweep starts a
 heartbeat when none is running or queued, so a push restarts it. Each finished
@@ -363,7 +363,7 @@ ago, and only a full sweep runs the superseded-lane job, on its run list. GitHub
 schedules run about 6.5 hours late (#513). Stop the heartbeat with
 `gh variable set AUTOLAND_HEARTBEAT --body off`, then cancel its run. The sweep lists
 the unfinished Autoland runs with their jobs, and `stuckRuns` in
-smashcraft:ts/scripts/autolandCore.ts cancels (force-cancels after 60 min)
+makgora:ts/scripts/autolandCore.ts cancels (force-cancels after 60 min)
 any run where:
 
 - a job waited more than 5 minutes for a self-hosted runner (no runner, or
@@ -388,12 +388,12 @@ every 30 minutes, and closes it once main moves. Prove the alarm without a
 real stall with `gh workflow run autoland-sweep.yml -f landed=ISO_TIME`, which
 treats main as last moved then; inject a stuck run with
 `gh workflow run autoland.yml -f test="BRANCH SHA" -f slot=N -f farm-runner=LABEL`
-(smashcraft#513).
+(makgora#513).
 
 ## Sheriff
 
 Main's last landing doesn't stay on main red. After each CI run on main,
-"Main is red" first runs the sheriff (smashcraft:ts/scripts/sheriff.ts) on it.
+"Main is red" first runs the sheriff (makgora:ts/scripts/sheriff.ts) on it.
 The same holds for each Background sweeps run Autoland dispatches for a
 landing: its `main-red` job waits for the sweeps and the census, then
 dispatches the sheriff on that run. Supported suite failures follow the same
@@ -444,8 +444,8 @@ newer finished run exists:
 - **Timed revert.** A failed CI or Background sweeps run the sheriff left alone
   (an unsupported step, a multi-step failure, a lane the sheriff could not
   confirm) also starts "Revert red main"
-  (smashcraft:.github/workflows/revert-red.yml, which runs
-  smashcraft:ts/scripts/revertRed.ts). It reverts only when the run before it
+  (makgora:.github/workflows/revert-red.yml, which runs
+  makgora:ts/scripts/revertRed.ts). It reverts only when the run before it
   that finished was green, belonged to an ancestor and exactly one commit
   landed since (a red parent or several unverified commits revert nothing),
   the landing is not a revert or merge and changes nothing under
@@ -465,5 +465,5 @@ the failing run's commit.
 
 The lane walk and bisect are checked over generated 1-6-lane trains, every
 culprit position, no culprit and two culprits, including reports parents
-(smashcraft:ts/test/sheriff.test.ts). Rerun it on a run:
+(makgora:ts/test/sheriff.test.ts). Rerun it on a run:
 `gh workflow run main-red.yml -f run=RUN_ID`.

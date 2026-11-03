@@ -5,8 +5,8 @@ and timed lift (13). They are exercised by controller rows, replay tapes and
 the headless soak. Their schedules use the match frame, reset each match and
 replay with the fighters; none uses randomness or changes its path in response
 to a fighter. Hazards show no text during play (#336); wind, platforms, the cannon and
-the lava warn on the stage itself. The loop and lift use smashcraft:ts/src/game/sim/stage.ts's moving
-platform paths, with the carry and landing rules in smashcraft:docs/physics.md.
+the lava warn on the stage itself. The loop and lift use makgora:ts/src/game/sim/stage.ts's moving
+platform paths, with the carry and landing rules in makgora:docs/physics.md.
 
 Nordrassil's wind is our own schedule, after SmashWiki's description of
 Whispy Woods as a weak, occasional stream that does not weaken with distance
@@ -64,7 +64,7 @@ Kongo Jungle's barrel (catch on touch, fire on a press or after a wait) with
 its forced aim removed on purpose.
 The cannon can assist recovery but changes the
 route and timing; predictable hazards alone do not establish competitive
-legality (smashcraft:docs/design/stages.md).
+legality (makgora:docs/design/stages.md).
 
 The stage menu's **Hazards: On/Off** button is synchronized match state.
 Off holds all moving platforms at their frame-zero rest poses and removes
@@ -77,7 +77,7 @@ frames) retains all three stocks at 0% and replays to its full checksum.
 Blackrock's lava is one patch, 140 wide, centred 180 to one side of the
 stage's centre (x 110…250, or −250…−110), so it is 350 from the near ledge:
 more than two of any fighter's initial dashes, so it shapes neutral rather
-than edge-guards. It follows the stage clock (smashcraft:ts/src/game/sim/lava.ts):
+than edge-guards. It follows the stage clock (makgora:ts/src/game/sim/lava.ts):
 a 2,400-frame cycle of a right turn then a left turn, each 300 calm frames,
 300 warning frames and 600 erupting frames. The right patch warns on frames
 301–600 and erupts on 601–1,200; the left warns on 1,501–1,800 and erupts on
@@ -95,10 +95,10 @@ while frozen and the upward launch leaves it.
 
 ## The Tomb of Sargeras sea (#277)
 
-smashcraft:docs/design/water-stage.md has the references and the design;
-smashcraft:ts/src/game/sim/stageHazards.ts (tide) and
-smashcraft:ts/src/game/sim/water.ts (floating, swimming, the water jump and
-the hydra) implement it, pinned by smashcraft:ts/src/game/sim/water.tests.ts.
+makgora:docs/design/water-stage.md has the references and the design;
+makgora:ts/src/game/sim/stageHazards.ts (tide) and
+makgora:ts/src/game/sim/water.ts (floating, swimming, the water jump and
+the hydra) implement it, pinned by makgora:ts/src/game/sim/water.tests.ts.
 
 - **The sea** fills the stage from blast line to blast line (±1,562.6) below
   its surface at z −360, 60 below the deck's deepest underside. A position

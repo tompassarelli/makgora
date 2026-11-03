@@ -41,7 +41,7 @@ form, an optional `air` form and an optional `free` form; a form the design
 names on its own (Image Swap, Hammerfall) carries its own `name`. Names are
 written only there (and in `sim/originalKits.ts` for the original three);
 `sim/moveNames.ts` reads them for [the move list](move-list.md), which
-`bun run test` and `wisp map build` generate (untracked, cached by a hash of its sources: smashcraft:ts/scripts/generated.ts), the Moves page and training's readout.
+`bun run test` and `wisp map build` generate (untracked, cached by a hash of its sources: makgora:ts/scripts/generated.ts), the Moves page and training's readout.
 Normals have no official name; an optional `inspiredBy` on a move is a
 docs-only design reference. Each `AuthoredSpecial` uses the roster's frame numbering: the entry
 tick is frame 1, windows are inclusive and `endFrame` N means the fighter
@@ -174,7 +174,7 @@ added to `AuthoredSpecial` and executed here, with a focused test.
 ## Meters
 
 Every fighter has one meter, the ultimate meter (`sim/meter.ts`), filled only by centre-stage orbs; its rules, numbers
-and display are in smashcraft:docs/design/mana.md. An ultimate press
+and display are in makgora:docs/design/mana.md. An ultimate press
 without its full meter starts the ordinary free special. The entry form and aim,
 airtime uses, armor, each hero projectile's record and the placed object are
 fighter state: rollback copies them, replay difference compares them, and the
@@ -188,11 +188,11 @@ The shared contracts are in `ts/src/game/sim/heroSpecials.tests.ts`.
 - In the playable build (pooled presentation) a hero draws from its clip
   pool like the original fighters: one model per sequence of its stock
   classic model, so a clip index selects that exact sequence.
-  smashcraft:tools/animations/export-original-clips.ts exports a pool for
+  makgora:tools/animations/export-original-clips.ts exports a pool for
   every hero in `HERO_ROSTER` (extracting the stock model from the game's
   archives with `--extractor`/`--storage`) and regenerates
   its `generated/clips/<fighter-slug>.ts`; rerun it when a hero is added.
-  smashcraft:ts/src/game/render/fighterPool.tests.ts fails a selectable
+  makgora:ts/src/game/render/fighterPool.tests.ts fails a selectable
   fighter without a pool, or whose table names a sequence its pool lacks.
 - Without a pool a hero draws with its fighter unit, made from its own object
   (base `earc`, like the original fighters, so no hero icon or experience bar

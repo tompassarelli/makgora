@@ -1,17 +1,17 @@
 # Native arithmetic comparison
 
 The TypeScript diagnostic uses the same production simulation fixtures as the
-Bun and Lua32 checks: smashcraft:ts/src/game/sim/physicsPrecisionState.tests.ts,
-smashcraft:ts/src/game/sim/physicsPrecisionScalar.tests.ts and
-smashcraft:ts/src/game/sim/physicsPrecisionMotion.tests.ts.
-Its entry is smashcraft:ts/src/host/entries/physicsProbeMain.ts, selected by its row
-in smashcraft:ts/scripts/wisp/bundleConfigs.ts. The report's `SOURCE` value is the
+Bun and Lua32 checks: makgora:ts/src/game/sim/physicsPrecisionState.tests.ts,
+makgora:ts/src/game/sim/physicsPrecisionScalar.tests.ts and
+makgora:ts/src/game/sim/physicsPrecisionMotion.tests.ts.
+Its entry is makgora:ts/src/host/entries/physicsProbeMain.ts, selected by its row
+in makgora:ts/scripts/wisp/bundleConfigs.ts. The report's `SOURCE` value is the
 compiled bundle key passed by the packaged map's entry.
 
-From smashcraft:ts/, build with `bun wisp map build --profile physics-probe`
+From makgora:ts/, build with `bun wisp map build --profile physics-probe`
 and the normal `--base`, `--container`, `--assets`, `--summon`, `--name` and
-`--out` arguments documented in smashcraft:docs/typescript.md. Use a distinct
-`Smashcraft diagnostic RUN_ID` name and a private output directory outside the
+`--out` arguments documented in makgora:docs/typescript.md. Use a distinct
+`Makgora diagnostic RUN_ID` name and a private output directory outside the
 checkout. `bun wisp map rebuild MAP.w3x --profile physics-probe` replaces only
 that diagnostic's script. Neither command installs a map or controls a client.
 
@@ -26,9 +26,9 @@ sixteen groups, the three zero mismatch counts, `MESSAGES 19`, and
 The following Wurst candidate records and measurements describe their recorded
 revisions. Their source paths and builders are historical.
 
-The historical candidate is a one-player diagnostic map, Smashcraft 0.0.13,
+The historical candidate is a one-player diagnostic map, Mak'gora 0.0.13,
 simulation source 98cb2dff36e204d4c2af287731f4116602320fe5:
-~/code/smashcraft/worktrees/melee-physics-public/build/physics-probe/native.xTRUdu/Smashcraft 0.0.13.w3x.
+~/code/makgora/worktrees/melee-physics-public/build/physics-probe/native.xTRUdu/Makgora 0.0.13.w3x.
 SHA-256: a5ab1dd839cf3cda65052dd38de67c47298a611eb83e233a0b6cb4ef00709bc0.
 The build reports zero errors and four existing standard-library warnings;
 packaged Lua syntax and script roundtrip pass. The candidate includes the current
@@ -47,7 +47,7 @@ candidate adds no comparison cases and does not claim native acceptance.
 On map initialization, the same authored comparisons used by the emitted-Lua
 precision check execute in Warcraft. Each report is a short independent Preload
 record. A timer closes the report after initialization, exporting
-Warcraft III/CustomMapData/smashcraft-native-physics-precision.txt in that
+Warcraft III/CustomMapData/makgora-native-physics-precision.txt in that
 client's documents directory. The source marker identifies the simulation
 commit, not a claim about native equivalence. NATIVE_PHYSICS_COMPLETED means
 the report finished; acceptance also requires all expected comparison results.
@@ -96,10 +96,10 @@ vectors; see the recorded design targets for the
 original execution boundary and limitations.
 
 
-The current-source arithmetic candidate is Smashcraft 0.0.33, source
+The current-source arithmetic candidate is Mak'gora 0.0.33, source
 `7fd7c9debc50fa455167587a98aa6c0b48cb54fa`, built with compiler
 `6b129956f6e7cf9582510f26b99d305526bf3ded`. Candidate:
-~/.local/share/smashcraft-build-inputs/native-physics-activation-20261004/native.A4CCF6/Smashcraft 0.0.33.w3x.
+~/.local/share/makgora-build-inputs/native-physics-activation-20261004/native.A4CCF6/Makgora 0.0.33.w3x.
 SHA256: `197e0d4148c0f0680bc5b6b6513b836fbdc90505a36eea3a2f24d4e86e28036c`.
 Compilation reports zero errors and four warnings; Lua syntax and packaged-script
 comparison pass. Native execution failed on the retained Warcraft client. Both stale diagnostic contact
@@ -117,8 +117,8 @@ failures for frames -54 through -50, and SIGNED_ZERO_SIGN_1_angle_FAIL. Some
 fixture groups print PASS even after individual FAIL messages, so those banners
 do not establish passing groups. No arithmetic/native fidelity acceptance.
 
-Evidence: smashcraft:evidence/native-physics-precision-20261004/native0033.txt and
-smashcraft:evidence/native-physics-precision-20261004/native0033-screen.txt.
+Evidence: makgora:evidence/native-physics-precision-20261004/native0033.txt and
+makgora:evidence/native-physics-precision-20261004/native0033-screen.txt.
 The next diagnostic buffers results and starts/writes/closes its export together in the timer; native execution must verify retained individual results and truthful group verdicts,
 then separate fixture expectations from production/Lua32 arithmetic failures.
 A scoped child owns that repair and a 0.0.35 candidate; this root owns native
@@ -141,7 +141,7 @@ discrete DI mismatch count 15. These are comparison-case counts, not a whole-gam
 fidelity percentage.
 
 Full authored numerical evidence:
-smashcraft:evidence/native-physics-precision-20261004/native0035.txt.
+makgora:evidence/native-physics-precision-20261004/native0035.txt.
 The reporting repair succeeds; production arithmetic acceptance fails.
 Local IEEE Lua32 reproduces a subset of failures from non-reversible world-unit
 scaling by six and back. The compiler repository also records Warcraft 3.0
@@ -170,14 +170,14 @@ and zero warnings. It used compiler `6b129956f6e7cf9582510f26b99d305526bf3ded`,
 stdlib `e3714f629113ee682353c3244065fee3e7d9ae16`, and test shim
 `1f36fff43a4987bc133c676072ee396f15294aa0` from the unchanged lock. The local
 invocation and result are retained at
-~/code/smashcraft/worktrees/physics-scale-20261005/build/physics-probe/check-capsule.sh
+~/code/makgora/worktrees/physics-scale-20261005/build/physics-probe/check-capsule.sh
 and
-~/code/smashcraft/worktrees/physics-scale-20261005/build/physics-probe/capsule-compile.log.
+~/code/makgora/worktrees/physics-scale-20261005/build/physics-probe/capsule-compile.log.
 
 This is a bounded capsule/shield calculation repair. Native re-execution of
 the existing 508 authored comparisons remains required; the generated inputs
 are unchanged. It does not repair the separate motion representation gap:
-smashcraft:evidence/native-physics-precision-20261004/native0037-analysis.json retains
+makgora:evidence/native-physics-precision-20261004/native0037-analysis.json retains
 frame 6's stored world velocity `-7.1399993896484375`, versus the direct sum
 `-7.139999866485596` of the same operands. That observation does not measure
 an independently maintained trajectory in original units. Repeated scaling
@@ -222,16 +222,16 @@ action calculations still have their existing world-valued interfaces.
 Native execution of the repaired trajectory and those remaining ingress and
 scalar boundaries are not established by source checks.
 
-Validation: `bash ~/code/smashcraft/worktrees/physics-scale-20261005/test.sh PhysicsTests 90`
+Validation: `bash ~/code/makgora/worktrees/physics-scale-20261005/test.sh PhysicsTests 90`
 passed 71/71 tests with zero compiler errors and nine warnings. This includes
 the ten exact recorded positions, adoption of world-coordinate edits, reset,
 and replay restored after six fall steps; changing one retained position ULP
 is visible to first-difference and canonical-state comparison. The initial
 69/71 run exposed the two old aerial-dodge position expectations above; both
 pass with original-unit expectations and unchanged tolerances. Logs are
-~/code/smashcraft/worktrees/physics-scale-20261005/build/wurst-tests/canonical-motion.log
+~/code/makgora/worktrees/physics-scale-20261005/build/wurst-tests/canonical-motion.log
 and
-~/code/smashcraft/worktrees/physics-scale-20261005/build/wurst-tests/canonical-motion-repaired.log.
+~/code/makgora/worktrees/physics-scale-20261005/build/wurst-tests/canonical-motion-repaired.log.
 The locked compiler and standard library are unchanged. No map build or native
 client was run for this repair.
 
@@ -244,5 +244,5 @@ evaluated native subtraction can lose the step and raise the squared cutoff
 by one binary32 value. For launch decay, the intended cutoff is
 `11171209 * 2^-32`; a vector exactly at it retains the small fused residual.
 The native counterexample and repaired fixture results are preserved in
-smashcraft:evidence/native-physics-repair-20261005/README.md, tested at source
+makgora:evidence/native-physics-repair-20261005/README.md, tested at source
 `fb3632e15bb3555d6415101476c53e8021ef7425`.

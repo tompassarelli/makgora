@@ -2,21 +2,21 @@
 
 Historical record: the captures, trial tables and asset measurements below describe their named builds before the 9 October 2026 roster cut (#339). They are not the current roster or asset inventory.
 
-smashcraft:tools/move-data/reference-join.jsonl joins the existing production
+makgora:tools/move-data/reference-join.jsonl joins the existing production
 move export to the independently recorded Melee frame-data corpus by **action
 family**, keeping both identities. Archer, Rifleman and Demon Hunter are never
 equated with Fox, Marth or another Melee fighter. The result supports factual
 comparison, not a parity or balance claim.
 
-Run `~/code/smashcraft/worktrees/playable-integration-20261005/tools/move-data/reference.sh`
+Run `~/code/makgora/worktrees/playable-integration-20261005/tools/move-data/reference.sh`
 from the current owned checkout. It uses pinned Bun to join the existing move,
 comparison and Melee reference JSONL inputs and writes
-smashcraft:build/move-reference/reference-join.jsonl. `--check` compares it
+makgora:build/move-reference/reference-join.jsonl. `--check` compares it
 with the checked-in snapshot at 12-decimal numeric precision. It consumes the
 existing exports and does not rerun the contact sweep or change gameplay.
 
 The family mapping, clock conversion, missing-record detection and trade-off
-rules are implemented in smashcraft:ts/scripts/moveData.ts. The result retains
+rules are implemented in makgora:ts/scripts/moveData.ts. The result retains
 the input facts and nulls for unsupported comparisons; it does not infer
 fighter equivalence or fill missing reference data.
 
@@ -60,27 +60,27 @@ not a multihit sum. `end` does not establish continuous active intervals, and
 `total - end` is not an established recovery calculation. Reference game
 revision is unknown. Null can mean missing or inapplicable; zero is never
 substituted. Excluded notes may contain conditions and multihit gaps.
-Smashcraft omits L-cancelling (smashcraft:docs/gameplay-design.md): a
+Mak'gora omits L-cancelling (makgora:docs/gameplay-design.md): a
 production aerial's `landingLag` is already the cancelled lag, comparable with
 a reference's L-cancel lag rather than its landing lag.
-Smashcraft also omits stale moves and freshness bonuses
-(smashcraft:docs/gameplay-design.md): a Melee comparison of repeated damage
+Mak'gora also omits stale moves and freshness bonuses
+(makgora:docs/gameplay-design.md): a Melee comparison of repeated damage
 or knockback must not apply Melee's staling multiplier.
 
 The reference has no established hit/hurtbox geometry, launch angle, knockback
 or hitstun data. The join deliberately does not invent corresponding fields.
 Production contact regions, damage/launch fields and motion samples remain
-queryable in smashcraft:tools/move-data/moves.jsonl using
+queryable in makgora:tools/move-data/moves.jsonl using
 `(character, style, chargeFrames)`. A reported reference maximum/weak damage
 cannot be matched to an exact production hit region without additional evidence.
 The reference intake's scope and rights are recorded in
-smashcraft:references/melee-frame-data/README.md; no authored source notes,
+makgora:references/melee-frame-data/README.md; no authored source notes,
 artwork or outside implementation are copied into this join.
 
 ## Bounded trade-off finding
 
 The 54 unordered fighter pairs reuse
-smashcraft:tools/move-data/comparisons.jsonl. Pairing requires the same category,
+makgora:tools/move-data/comparisons.jsonl. Pairing requires the same category,
 spacing, starting percent and shield/body condition, with the same Rifleman
 defender and the export's fixed stage/contact/DI/landing conditions. Complete
 input rows are retained, including separation and hitlag. These are contact
@@ -117,7 +117,7 @@ trade earlier readiness against lower damage/earlier defender response; there
 is no unsupported universal speed-versus-power score.
 
 The projection is a fact about these snapshots, not a tuning target: it does
-not show an overall trade-off, and the Melee corpus maps no Smashcraft fighter
+not show an overall trade-off, and the Melee corpus maps no Mak'gora fighter
 to a Melee one and leaves its recovery arithmetic unresolved. Balance
 proposals and their evidence belong to issue #12.
 
@@ -130,7 +130,7 @@ gameplay tuning, native trial or before/after playable acceptance is claimed.
 
 ```sh
 jq 'select(.kind == "reference-join" and .declared.production.character == 0 and .declared.production.style == 0 and .declared.reference.character == "fox")' \
-  ~/code/smashcraft/worktrees/playable-integration-20261005/tools/move-data/reference-join.jsonl
+  ~/code/makgora/worktrees/playable-integration-20261005/tools/move-data/reference-join.jsonl
 jq 'select(.kind == "tradeoff" and .derived.verdict == "a-dominates-projection")' \
-  ~/code/smashcraft/worktrees/playable-integration-20261005/tools/move-data/reference-join.jsonl
+  ~/code/makgora/worktrees/playable-integration-20261005/tools/move-data/reference-join.jsonl
 ```

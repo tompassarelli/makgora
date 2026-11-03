@@ -3,15 +3,15 @@
 Historical record: the captures, trial tables and asset measurements below describe their named builds before the 9 October 2026 roster cut (#339). They are not the current roster or asset inventory.
 
 For executable contact, punish and follow-up comparisons under named conditions,
-see smashcraft:docs/move-comparisons.md.
+see makgora:docs/move-comparisons.md.
 
 Run `tools/move-data/export.sh` from a checkout to run the pinned Bun
-toolchain over Smashcraft's TypeScript simulation and write
-smashcraft:build/move-export/moves.jsonl. The script reads timing, hit-region,
+toolchain over Mak'gora's TypeScript simulation and write
+makgora:build/move-export/moves.jsonl. The script reads timing, hit-region,
 capsule, contact-math and motion facts directly from the game modules; it does
 not import them into a second data table.
 
-smashcraft:tools/move-data/moves.jsonl is the checked-in snapshot. `--check`
+makgora:tools/move-data/moves.jsonl is the checked-in snapshot. `--check`
 regenerates the export and compares every row to that snapshot at 12-decimal
 numeric precision. A production-value change fails until it is inspected and
 the snapshot is explicitly regenerated. The snapshot is generated output,
@@ -19,14 +19,14 @@ never tuning input. Do not edit numerical values in the snapshot.
 
 ```sh
 jq 'select(.kind == "move" and .character == 0 and .move == "down-air")' \
-  ~/code/smashcraft/worktrees/playable-integration-20261005/tools/move-data/moves.jsonl
+  ~/code/makgora/worktrees/playable-integration-20261005/tools/move-data/moves.jsonl
 jq 'select(.kind == "contact" and .move == "forward-tilt" and .character == 1) | {frame,region,damage,hitCapsule}' \
-  ~/code/smashcraft/worktrees/playable-integration-20261005/tools/move-data/moves.jsonl
+  ~/code/makgora/worktrees/playable-integration-20261005/tools/move-data/moves.jsonl
 ```
 
-The offline emitter is smashcraft:ts/scripts/moveData.ts. It calls the
+The offline emitter is makgora:ts/scripts/moveData.ts. It calls the
 production timing, hit-region, capsule, knockback, shield and motion functions;
-smashcraft:tools/move-data/export.sh is a small Bun launcher. The generated
+makgora:tools/move-data/export.sh is a small Bun launcher. The generated
 facts are not game input and do not change the map build.
 
 Each JSONL row has `kind`: `context`, `move`, `contact`, or `motion`. The join key
@@ -74,13 +74,13 @@ advances. Aerial gravity and any landing are included; this is not an animation
 root-motion curve or all possible steering. The observed landing lag is obtained
 by advancing an aerial from z=1, vz=-2 onto stage 0; aerials land with half
 their authored lag, as L-cancelling is omitted
-(smashcraft:docs/gameplay-design.md). Ground moves report zero landing lag.
+(makgora:docs/gameplay-design.md). Ground moves report zero landing lag.
 
 Unrepresented autocancel windows and animation hurtboxes are explicitly `null`.
-smashcraft:docs/move-reference-join.md records the factual action-family joins
+makgora:docs/move-reference-join.md records the factual action-family joins
 and bounded trade-off analysis; it establishes no fighter equivalence.
 Matchup-wide outcomes remain unknown; bounded reachable options are recorded
-separately in smashcraft:docs/move-comparisons.md.
+separately in makgora:docs/move-comparisons.md.
 These are headless production observations, not native timing, physics-parity,
 matchup or balance acceptance. Issue #12 remains open for the remaining work.
 
@@ -99,8 +99,8 @@ inside its class range. They never exempt invalid frame structure.
 
 Non-hit specials (movement, guards, buffs, recalls and commands without a hit effect) are outside the genre envelope.
 
-The envelope is smashcraft:tools/move-data/genre-envelope.json plus the Melee
-corpus in smashcraft:references/melee-frame-data/. For each move class (jab,
+The envelope is makgora:tools/move-data/genre-envelope.json plus the Melee
+corpus in makgora:references/melee-frame-data/. For each move class (jab,
 tilt, dash attack, smash, aerial, special, grab, throw, get-up/ledge attack,
 spot dodge, roll, shield drop, jump squat), each game's 5th–95th percentile
 is computed per field, and the envelope is the union across games. That way
@@ -121,7 +121,7 @@ public frame data recorded as facts on 10 October 2026:
 Our values use production code. Startup is `attackStartupFrames + 1` (the
 first active frame counted from 1). End lag is the frames after the last
 active frame, and landing lag is the lag actually taken. Shield advantage
-and kill percent are the balance feel measurements (smashcraft:ts/scripts/balanceFeel.ts).
+and kill percent are the balance feel measurements (makgora:ts/scripts/balanceFeel.ts).
 The tolerance outside the range is ±3 frames, ±3 on shield and ±15% kill
 percent, matching #355's kit bounds. Specials get ±10 / ±10 / ±30%, because
 genre specials vary most and ours carry mana. A smash that
@@ -135,9 +135,9 @@ KO direction share (top, side, bottom), average KO percent, off-stage deaths
 a stock (edge-guard kills taken plus self-destructs), edge-guard kills a
 match and their conversion from edge-guard hits, and spacing (median hit
 distance, plus ranged damage share). It compares these with each fighter's
-intended strengths in smashcraft:tools/move-data/fighter-strengths.json.
+intended strengths in makgora:tools/move-data/fighter-strengths.json.
 Those come from the fighter's design doc, or are drafted (`drafted: true`)
-from its smashcraft:docs/design/roster.md entry. A contradiction is a
+from its makgora:docs/design/roster.md entry. A contradiction is a
 measured roster third opposite to the intent: for example, "strong"
 edge-guarding in the bottom third, or a "hard" recovery in the top third of
 off-stage deaths.
@@ -160,7 +160,7 @@ and its bounding box over those frames is the drawn swept area. The value is
 the hit capsules' furthest reach past that box on any side, in world units,
 then in body heights (H = 132 units), then the side. Negative values stay
 inside the drawn area. The margin is 0.15 H (20 units), the same one
-`view reachcues` uses for reach flares (#481); smashcraft:docs/disjoint-legibility.md
+`view reachcues` uses for reach flares (#481); makgora:docs/disjoint-legibility.md
 sets no tighter one. No aerial is past the margin since #223 (21 fighters refitted to their drawn
 models, no disjoint cited). Cairne's down air belongs to #96.
 
