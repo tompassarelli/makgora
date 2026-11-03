@@ -1,6 +1,9 @@
 import { expect, test } from "bun:test";
-import { effectRecordProblem, formatEffectRecord } from "../scripts/wisp/cueModels";
-import { judgeUse, projectileUse, type EffectUse, type ModelFacts } from "../scripts/wisp/effectVisibility";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { effectRecordProblem, formatEffectRecord, recordedFacts } from "../scripts/wisp/cueModels";
+import { CUE_MODEL_RECORD } from "../scripts/wisp/cueInputs";
+import { EFFECT_CALIBRATION, judgeUse, modelFactsKey, projectileUse, type EffectUse, type ModelFacts } from "../scripts/wisp/effectVisibility";
 import { Character } from "../src/game/sim/codes";
 import { projectileModelScale } from "../src/game/presentation/projectilePose";
 import { FLAME_STRIKE_BURST } from "../src/game/fighters/kaelthas/specials";
@@ -19,7 +22,7 @@ test("the cue gate refuses a use whose model the record lacks and a use whose re
 const birthOnly: ModelFacts = {
   sequences: [{ name: "Birth", start: 0, end: 2000, looping: false, rarity: 0 }, { name: "Stand", start: 3000, end: 4000, looping: true, rarity: 0 }],
   particles: 0, legacyParticles: false, emitters: [], ribbons: [],
-  geosets: [{ faces: true, supported: true, invalid: false, area: true, alpha: { line: 0, global: false, keys: [[3000, 0]] }, layers: [{ alpha: { line: 1, global: false, keys: [[0, 0], [900, 0], [1000, 1], [2000, 1]] }, texture: true }] }],
+  geosets: [{ faces: true, supported: true, invalid: false, area: true, flat: false, alpha: { line: 0, global: false, keys: [[3000, 0]] }, layers: [{ alpha: { line: 1, global: false, keys: [[0, 0], [900, 0], [1000, 1], [2000, 1]] }, texture: true }] }],
 };
 
 test("a fixed-radius projectile is judged at its radius over model radius, and a column that draws only in birth reads only while its model animation holds birth [k2 property]", () => {
@@ -29,4 +32,18 @@ test("a fixed-radius projectile is judged at its radius over model radius, and a
   const { modelAnimation: _held, ...standing } = FLAME_STRIKE_BURST;
   const stood = projectileUse(Character.kaelthas, "fixture", "pillar", standing);
   expect(stood === undefined ? undefined : judgeUse(stood, birthOnly).status).toBe("invisible");
+});
+
+test("the Classic check flags Flame Strike's gathering fire, whose only output is flat ground particles, and passes the burning fire, Doom fire tower and fire jet a Warcraft capture showed standing [k1 scenario]", () => {
+  const recorded = recordedFacts(readFileSync(join(import.meta.dir, "../..", CUE_MODEL_RECORD), "utf8"));
+  if ("problem" in recorded) throw new Error(recorded.problem);
+  const judged = (model: string) => {
+    const reference = EFFECT_CALIBRATION.find(({ use }) => use.model.endsWith(model));
+    if (reference === undefined) throw new Error(`no calibration case for ${model}`);
+    return judgeUse(reference.use, recorded.facts.get(modelFactsKey(reference.use.model)) ?? null);
+  };
+  const gathering = judged("FlameStrikeTarget.mdx");
+  expect(gathering.status).toBe("invisible");
+  expect(gathering.reason).toContain("only flat ground output (emitter BlizParticle01, emitter BlizParticleShockWave1)");
+  for (const model of ["TownBurningFireEmitter.mdx", "DoomDeath.mdx", "FireTrapUp.mdx"]) expect(`${model} ${judged(model).status}`).toBe(`${model} visible`);
 });

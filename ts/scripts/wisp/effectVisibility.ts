@@ -78,9 +78,9 @@ export interface ModelFacts {
   readonly sequences: readonly { readonly name: string; readonly start: number; readonly end: number; readonly looping: boolean; readonly rarity: number }[];
   readonly particles: number;
   readonly legacyParticles: boolean;
-  readonly emitters: readonly { readonly name: string; readonly supported: boolean; readonly shows: boolean; readonly visibility: TrackFacts; readonly emission: TrackFacts; readonly texture: boolean }[];
+  readonly emitters: readonly { readonly name: string; readonly supported: boolean; readonly shows: boolean; readonly flat: boolean; readonly visibility: TrackFacts; readonly emission: TrackFacts; readonly texture: boolean }[];
   readonly ribbons: readonly { readonly name: string; readonly geometry: boolean; readonly extent: boolean; readonly supported: boolean; readonly visibility: TrackFacts; readonly emission: TrackFacts; readonly alpha: TrackFacts; readonly layers: readonly LayerFacts[] }[];
-  readonly geosets: readonly { readonly faces: boolean; readonly supported: boolean; readonly invalid: boolean; readonly area: boolean; readonly alpha: TrackFacts; readonly layers: readonly LayerFacts[] }[];
+  readonly geosets: readonly { readonly faces: boolean; readonly supported: boolean; readonly invalid: boolean; readonly area: boolean; readonly flat: boolean; readonly alpha: TrackFacts; readonly layers: readonly LayerFacts[] }[];
 }
 
 const scalar = (vector: unknown): number => (vector as ArrayLike<number> | undefined)?.[0] ?? 0;
@@ -108,7 +108,10 @@ export function simultaneousPositive(tracks: readonly TrackFacts[], sequence: Wi
   return samples.some((frame) => tracks.every((track, index) => at(track, index, frame) > 0));
 }
 
-export const FACTS_VERSION = 2;
+export const FACTS_VERSION = 3;
+// MDX ParticleEmitter2 flag bits: XYQuad lays a head particle in the ground plane instead of facing the camera; a tail always faces it.
+const XY_QUAD = 0x100000, TAIL = 2;
+const FLAT_NORMAL = 0.99;
 
 /** Extracts the judge's model facts; a texture counts only when it is not replaceable and the cache resolves it. */
 export function classicModelFacts(model: mdx.Model, textureResolves: (path: string) => boolean | undefined): ModelFacts {
@@ -140,19 +143,25 @@ export function classicModelFacts(model: mdx.Model, textureResolves: (path: stri
     if (!supportedScale(node.Scaling)) return false;
     return node.Parent == null || node.Parent === -1 || node.Parent === 0xffffffff || supportedNode(model.Nodes[node.Parent], seen);
   };
+  const rotates = (node: mdx.Model["Nodes"][number] | undefined, seen = new Set<number>()): boolean => {
+    if (node === undefined || seen.has(node.ObjectId)) return true;
+    seen.add(node.ObjectId);
+    if ((node.Rotation?.Keys.length ?? 0) > 0) return true;
+    return !(node.Parent == null || node.Parent === -1 || node.Parent === 0xffffffff) && rotates(model.Nodes[node.Parent], seen);
+  };
   const layers = (materialId: number | undefined): LayerFacts[] => ((materialId === undefined ? undefined : model.Materials[materialId])?.Layers ?? []).map((layer) => ({ alpha: trackFacts(layer.Alpha), texture: texture(typeof layer.TextureID === "number" ? layer.TextureID : undefined) }));
   return {
     sequences: model.Sequences.map((sequence) => ({ name: sequence.Name, start: sequence.Interval[0] ?? 0, end: sequence.Interval[1] ?? 0, looping: !sequence.NonLooping, rarity: sequence.Rarity })),
     particles: model.ParticleEmitters2.length + model.RibbonEmitters.length + model.ParticleEmitters.length + (model.ParticleEmitterPopcorns?.length ?? 0),
     legacyParticles: model.ParticleEmitters.length + (model.ParticleEmitterPopcorns?.length ?? 0) > 0,
-    emitters: model.ParticleEmitters2.map((emitter) => ({ name: emitter.Name, supported: supportedNode(emitter), shows: Math.max(0, ...(emitter.Alpha ?? [])) > 0 && Math.max(0, ...(emitter.ParticleScaling ?? [])) > 0 && (emitter.LifeSpan ?? 0) > 0, visibility: trackFacts(emitter.Visibility), emission: trackFacts(emitter.EmissionRate), texture: texture(emitter.TextureID, emitter.ReplaceableId) })),
+    emitters: model.ParticleEmitters2.map((emitter) => ({ name: emitter.Name, supported: supportedNode(emitter), flat: (emitter.Flags & XY_QUAD) !== 0 && (emitter.FrameFlags & TAIL) === 0, shows: Math.max(0, ...(emitter.Alpha ?? [])) > 0 && Math.max(0, ...(emitter.ParticleScaling ?? [])) > 0 && (emitter.LifeSpan ?? 0) > 0, visibility: trackFacts(emitter.Visibility), emission: trackFacts(emitter.EmissionRate), texture: texture(emitter.TextureID, emitter.ReplaceableId) })),
     ribbons: model.RibbonEmitters.map((emitter) => {
       const geometry = typeof emitter.HeightAbove === "number" && typeof emitter.HeightBelow === "number" && Number.isFinite(emitter.HeightAbove + emitter.HeightBelow);
       return { name: emitter.Name, geometry, extent: geometry && (emitter.HeightAbove as number) + (emitter.HeightBelow as number) > 0 && (emitter.LifeSpan ?? 0) > 0, supported: supportedNode(emitter), visibility: trackFacts(emitter.Visibility), emission: trackFacts(emitter.EmissionRate), alpha: trackFacts(emitter.Alpha), layers: layers(emitter.MaterialID) };
     }),
     geosets: model.Geosets.map((geoset, index) => {
       const supported = !((geoset.SkinWeights?.length ?? 0) > 0 || (geoset.Groups ?? []).some((group) => group.some((id) => !supportedNode(model.Nodes[id]))));
-      let area = false, invalid = false;
+      let area = false, invalid = false, upright = false;
       for (let face = 0; face + 2 < geoset.Faces.length; face += 3) {
         const vertices = [0, 1, 2].map((offset) => {
           const vertex = geoset.Faces[face + offset];
@@ -162,9 +171,14 @@ export function classicModelFacts(model: mdx.Model, textureResolves: (path: stri
         const [a, b, c] = vertices;
         const ab = [0, 1, 2].map((axis) => (b?.[axis] ?? 0) - (a?.[axis] ?? 0));
         const ac = [0, 1, 2].map((axis) => (c?.[axis] ?? 0) - (a?.[axis] ?? 0));
-        area ||= [0, 1, 2].some((axis) => (ab[(axis + 1) % 3] ?? 0) * (ac[(axis + 2) % 3] ?? 0) - (ab[(axis + 2) % 3] ?? 0) * (ac[(axis + 1) % 3] ?? 0) !== 0);
+        const normal = [0, 1, 2].map((axis) => (ab[(axis + 1) % 3] ?? 0) * (ac[(axis + 2) % 3] ?? 0) - (ab[(axis + 2) % 3] ?? 0) * (ac[(axis + 1) % 3] ?? 0));
+        const length = Math.hypot(...normal);
+        if (length === 0) continue;
+        area = true;
+        upright ||= Math.abs(normal[2] ?? 0) / length < FLAT_NORMAL;
       }
-      return { faces: geoset.Faces.length >= 3, supported, invalid, area, alpha: trackFacts(model.GeosetAnims.find((entry) => entry.GeosetId === index)?.Alpha), layers: layers(geoset.MaterialID) };
+      const flat = area && !upright && !(geoset.Groups ?? []).some((group) => group.some((id) => rotates(model.Nodes[id])));
+      return { faces: geoset.Faces.length >= 3, supported, invalid, area, flat, alpha: trackFacts(model.GeosetAnims.find((entry) => entry.GeosetId === index)?.Alpha), layers: layers(geoset.MaterialID) };
     }),
   };
 }
@@ -189,6 +203,7 @@ export function effectVerdict(model: ModelFacts, use: Pick<EffectUse, "sequence"
     return { sequence: [start, end] as Window, window: [at, use.timeScale > 0 ? Math.min(end, at + (use.lifetime ?? Infinity) * use.timeScale * 1000) : at] as Window, name };
   });
   const unknown: string[] = [];
+  const flat: string[] = [];
   const draws = (tracks: readonly TrackFacts[], fallbacks: readonly number[], sequence: Window, window: Window, resolved: boolean, label: string) => {
     const positive = simultaneousPositive(tracks, sequence, window, fallbacks);
     if (positive === undefined) unknown.push(`${label}: global or nonlinear track is unverified`);
@@ -198,6 +213,7 @@ export function effectVerdict(model: ModelFacts, use: Pick<EffectUse, "sequence"
   for (const { sequence, window, name } of windows) {
     if (use.timeScale > 0) {
       for (const emitter of model.emitters) {
+        if (emitter.flat) { if (emitter.shows) flat.push(`emitter ${emitter.name}`); continue; }
         if (!emitter.supported) { unknown.push(`emitter ${emitter.name}: node transforms are unverified`); continue; }
         if (emitter.shows && draws([emitter.visibility, emitter.emission], [1, 0], sequence, window, emitter.texture, `emitter ${emitter.name}`)) return verdict("visible", `MODEL-DATA: emitter ${emitter.name} emits in ${name}`);
       }
@@ -214,10 +230,15 @@ export function effectVerdict(model: ModelFacts, use: Pick<EffectUse, "sequence"
       if (!geoset.supported) { unknown.push(`geoset ${index}: skinning or node transforms are unverified`); continue; }
       if (geoset.invalid) unknown.push(`geoset ${index}: invalid triangle vertices`);
       if (!geoset.area) continue;
-      for (const layer of geoset.layers) if (draws([geoset.alpha, layer.alpha], [1, 1], sequence, window, layer.texture, `geoset ${index}`)) return verdict("visible", `MODEL-DATA: geoset ${index} draws in ${name}`);
+      for (const layer of geoset.layers) if (draws([geoset.alpha, layer.alpha], [1, 1], sequence, window, layer.texture, `geoset ${index}`)) {
+        if (geoset.flat) { flat.push(`geoset ${index}`); continue; }
+        return verdict("visible", `MODEL-DATA: geoset ${index} draws in ${name}`);
+      }
     }
   }
-  return unknown.length > 0 ? verdict("unknown", [...new Set(unknown)].join("; ")) : verdict("invisible", `nothing emits or draws in ${windows.map(({ name }) => name).join("/")}${use.timeScale > 0 ? "" : " at time scale 0"}`);
+  const edgeOn = flat.length === 0 ? undefined : `nothing upright draws, only flat ground output (${[...new Set(flat)].join(", ")}), edge-on to the side camera (FlameStrikeTarget, 2026-11-03 Warcraft capture)`;
+  if (unknown.length > 0) return verdict("unknown", [...new Set(unknown), ...(edgeOn === undefined ? [] : [edgeOn])].join("; "));
+  return edgeOn !== undefined ? verdict("invisible", edgeOn) : verdict("invisible", `nothing emits or draws in ${windows.map(({ name }) => name).join("/")}${use.timeScale > 0 ? "" : " at time scale 0"}`);
 }
 
 export const effectVisibility = (model: mdx.Model, use: Parameters<typeof effectVerdict>[1], textureResolves: (path: string) => boolean | undefined): EffectVerdict => effectVerdict(classicModelFacts(model, textureResolves), use);
@@ -248,11 +269,11 @@ export function projectileUse(character: Character, fighter: string, move: strin
   return { ...base, sequence, seconds: 0, timeScale: 1 };
 }
 
+const bossTell = (name: string): number => (bossDefinition(BossKind.archimonde)?.strikes ?? []).find((strike) => strike.name === name)?.tell ?? 0;
+const bossUse = (move: string, model: string, scale: number, frames: number): EffectUse => ({ fighter: "archimonde-boss", move, kind: "presentation effect", model, sequence: undefined, seconds: 0, timeScale: 1, travels: false, anchored: "fighter", scale, lifetime: frames / 60 });
 /** Archimonde's three strikes, each a fresh effect created on its frame and destroyed after its lifetime; a growing effect is judged at its smallest scale. */
 export function bossSpellUses(): EffectUse[] {
-  const strikes = bossDefinition(BossKind.archimonde)?.strikes ?? [];
-  const tell = (name: string): number => strikes.find((strike) => strike.name === name)?.tell ?? 0;
-  const use = (move: string, model: string, scale: number, frames: number): EffectUse => ({ fighter: "archimonde-boss", move, kind: "presentation effect", model, sequence: undefined, seconds: 0, timeScale: 1, travels: false, anchored: "fighter", scale, lifetime: frames / 60 });
+  const tell = bossTell, use = bossUse;
   return [
     use("Rain of Fire column fire tell", COLUMN_FIRE_MODEL, COLUMN_FIRE_SCALE.from, tell("Rain of Fire")),
     use("Rain of Fire meteors", RAIN_OF_FIRE_MODEL, RAIN_OF_FIRE_SCALE, RAIN_OF_FIRE_FRAMES),
@@ -352,6 +373,10 @@ export const EFFECT_CALIBRATION: readonly CalibrationCase[] = [
   { expect: "visible", evidence: "native Classic 3.0.1.24371 capture effects-native-24371-20261022 blademaster-cues frame 278", use: { fighter: "blademaster", move: "neutral-special Wind Cutter projectile", kind: "projectile", model: "Abilities\\Weapons\\WingedSerpentMissile\\WingedSerpentMissile.mdx", travels: true, anchored: "projectile", scale: 1, lifetime: 0.4, anchor: "projectile", sequence: "stand", seconds: 0, timeScale: 1 } },
   { expect: "visible", evidence: "native Classic 3.0.1.24371 capture effects-native-24371-20261022 blademaster-cues frame 362", use: cueUse("blademaster", "down-special Mirror Image startup", "special cue", { model: "Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", anchor: "body", scale: 1, sequence: "birth", seconds: Math.fround(0.2) }) },
   { expect: "visible", evidence: "native Classic 3.0.1.24371 capture effects-native-24371-20261022 blademaster-cues frames 452 and 457, blademaster-late-cues frame 682", use: cueUse("blademaster", "up-special Rising Whirlwind active", "special cue", { model: "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx", anchor: "body", scale: Math.fround(0.6), sequence: "stand", seconds: Math.fround(0.2) }) },
+  { expect: "flagged", cause: "only flat ground output", evidence: "the 2026-11-03 Warcraft-client capture of Archimonde's rework drew nothing on the Rain of Fire columns while FlameStrikeTarget stood there (95debe28dd^)", use: bossUse("Rain of Fire column fire tell (95debe28dd^)", "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx", Math.fround(0.5), bossTell("Rain of Fire")) },
+  { expect: "visible", evidence: "the Warcraft-client capture of 95debe28dd showed a burning fire on each Rain of Fire column", use: bossUse("Rain of Fire column fire tell (95debe28dd)", "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx", Math.fround(0.3), bossTell("Rain of Fire")) },
+  { expect: "visible", evidence: "the Warcraft-client capture of 95debe28dd showed a Doom fire tower on each Rain of Fire column at the hit", use: bossUse("Rain of Fire impact (95debe28dd)", "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", Math.fround(0.7), 40) },
+  { expect: "visible", evidence: "the Warcraft-client capture of 95debe28dd showed a fire jet at each Doom's Shockwave trail point", use: bossUse("Doom's Shockwave fire pillars (95debe28dd)", "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx", Math.fround(1.2), 60) },
 ];
 
 /** Refuses a judge that passes a reported-invisible reference, flags it for another cause, or flags a captured-visible one. */
@@ -381,11 +406,16 @@ export async function readModelFacts(read: (path: string) => Promise<Uint8Array 
   return facts;
 }
 
+/** Uses main shipped before the flat check that it judges edge-on; each stays Unknown until a Warcraft capture confirms it or a replacement model lands. */
+const EDGE_ON_PENDING: ReadonlySet<string> = new Set(["uther/side-special Devotion Aura startup", "uther/side-special Devotion Aura active", "dreadlord/up-special Bat Ascension active", "cairne-bloodhoof/ultimate projectile", "kael'thas-sunstrider/side-special Flame Strike startup", "kael'thas-sunstrider/up-special Phoenix startup", "kael'thas-sunstrider/ultimate projectile", "archimonde/side-special Rain of Fire active", "firelord/down-special projectile", "sylvanas-windrunner/ultimate burst", "archimonde/neutral-special Finger of Death projectile", "archimonde/side-special Rain of Fire projectile"]);
+
 /** Judges one use: a missing Classic model, a travelling effect held at a fighter anchor, or its model facts. */
 export function judgeUse(use: EffectUse, facts: ModelFacts | null): EffectFinding {
   if (facts === null) return { ...use, status: "unknown", reason: "model missing from the selected Classic cache or unparseable" };
   if (use.playbackUnknown === undefined && use.travels && use.anchored === "fighter") return { ...use, status: "invisible", reason: "travelling effect drawn at a fixed fighter anchor, not with its projectile" };
-  return { ...use, ...effectVerdict(facts, use) };
+  const judged = effectVerdict(facts, use);
+  if (judged.status === "invisible" && judged.reason.startsWith("nothing upright draws") && EDGE_ON_PENDING.has(`${use.fighter}/${use.move}`)) return { ...use, status: "unknown", reason: `${judged.reason}; pending a Warcraft capture or a replacement model (flat check, 2026-11-04)` };
+  return { ...use, ...judged };
 }
 
 export async function checkEffects(read: (path: string) => Promise<Uint8Array | undefined>, uses: readonly EffectUse[] = effectUses(), reads = new Map<string, readonly string[]>()): Promise<EffectFinding[]> {
