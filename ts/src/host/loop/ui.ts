@@ -471,7 +471,6 @@ export function pauseEffects(s: ShellState, paused: boolean): void {
   ui.combat.setPaused(paused);
   ui.special.setPaused(paused);
   ui.elements.setPaused(paused);
-  ui.classic?.setPaused(paused);
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.projectiles.setPaused(paused);
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.cues?.setPaused(paused);
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.meter?.setPaused(paused);

@@ -138,11 +138,6 @@ export class ClassicPresentation {
   }
 
 
-  setPaused(paused: boolean): void {
-    this.spells?.setPaused(paused);
-  }
-
-
   endMatch(): void {
     if (this.body !== undefined) destroyEffect(this.body);
     for (const art of this.tells) destroyEffect(art);
