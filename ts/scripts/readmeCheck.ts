@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const FORMERLY = /formerly called Smashcraft/g;
-const OLD_NAME = /smashcraft(?!-client\b)/i;
+const OLD_NAME = /smashcraft/i;
 const LINK = /\]\(([^)\s]+)\)/g;
 
 export const readmeProblems = (text: string, exists: (path: string) => boolean): string[] => {

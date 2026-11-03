@@ -8,7 +8,7 @@ test("refuses a README that still names the game Smashcraft, except for one hist
   expect(readmeProblems("# Smashcraft\n", exists)).toHaveLength(1);
   expect(readmeProblems("[x](https://github.com/tompassarelli/smashcraft/issues)\n", exists)).toHaveLength(1);
   expect(readmeProblems("It was formerly called Smashcraft.\n", exists)).toEqual([]);
-  expect(readmeProblems("[client](https://github.com/tompassarelli/smashcraft-client)\n", exists)).toEqual([]);
+  expect(readmeProblems("[client](https://github.com/tompassarelli/smashcraft-client)\n", exists)).toHaveLength(1);
 });
 
 test("refuses a relative link to a path missing from the tree and ignores URLs and anchors [k2 property]", () => {

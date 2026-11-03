@@ -15,7 +15,7 @@ depth to Warcraft III's heroes, with the rollback netcode that online play needs
 - **Games, questions and bug reports:** [Discord](https://discord.gg/JQGZs2UJR) and
   [issues](https://github.com/tompassarelli/makgora/issues), where status and next work live.
 - **Desktop client** (controller, play, history, stats, replays, online):
-  [smashcraft-client](https://github.com/tompassarelli/smashcraft-client), which
+  [makgora-client](https://github.com/tompassarelli/makgora-client), which
   reads Mak'gora through the [client interface](docs/client-interface.md).
 - **Design and systems:** the [documentation index](docs/README.md).
 
