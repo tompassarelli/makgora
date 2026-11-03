@@ -181,7 +181,7 @@ export function mainDeckMdl(faces: readonly DeckFace[], textureName: string): st
   const radius = Math.ceil(Math.max(...points.map(([x, y, z]) => Math.hypot(x, y, z))));
   const extent = `MinimumExtent ${vector(low)}, MaximumExtent ${vector(high)}, BoundsRadius ${radius},`;
   return `Version { FormatVersion 800, }
-Model "Smashcraft main deck" { NumGeosets 1, NumBones 1, BlendTime 0, ${extent} }
+Model "Makgora main deck" { NumGeosets 1, NumBones 1, BlendTime 0, ${extent} }
 Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${extent} } }
 Textures 1 { Bitmap { Image "war3mapImported\\${textureName}", } }
 Materials 1 { Material { Layer { FilterMode None, Unshaded, static TextureID 0, static Alpha 1, } } }

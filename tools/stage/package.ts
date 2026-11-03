@@ -50,7 +50,7 @@ slab(-7,-11,50,60,50,60,1);
 slab(-11,-46,50,60,46,44,2);
 slab(-46,-54,46,44,44,40,3);
 const slabMdl = (textureName: string) => `Version { FormatVersion 800, }
-Model "Smashcraft floating deck" { NumGeosets ${count}, NumBones 1, BlendTime 0, ${extent} }
+Model "Makgora floating deck" { NumGeosets ${count}, NumBones 1, BlendTime 0, ${extent} }
 Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${extent} } }
 Textures 1 { Bitmap { Image "war3mapImported\\${textureName}", } }
 Materials 1 { Material { Layer { FilterMode None, Unshaded, static TextureID 0, static Alpha 1, } } }
@@ -130,7 +130,7 @@ writeModelFacts(deckFacts);
 
 const snowExtent = 'MinimumExtent { -1600, -200, -1500 }, MaximumExtent { 1600, 200, 2800 }, BoundsRadius 3500,';
 const snowMdl = `Version { FormatVersion 800, }
-Model "Smashcraft drifting snow" { BlendTime 0, ${snowExtent} }
+Model "Makgora drifting snow" { BlendTime 0, ${snowExtent} }
 Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${snowExtent} } }
 Textures 1 { Bitmap { Image "Textures\\snowflake2.blp", } }
 ${[700, 1700, 2700].map((height, index) => `ParticleEmitter2 "Snow${index}" {

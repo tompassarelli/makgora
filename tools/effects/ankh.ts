@@ -105,7 +105,7 @@ for (const { name, parts, interval, extent, scaling, looping } of effects) {
         }`;
     }).join("\n");
     const mdl = `Version { FormatVersion 800, }
-        Model "Smashcraft ${name}" { NumGeosets ${parts.length}, NumBones ${scaling.length}, BlendTime 0, ${extent} }
+        Model "Makgora ${name}" { NumGeosets ${parts.length}, NumBones ${scaling.length}, BlendTime 0, ${extent} }
         Sequences 1 { Anim "Stand" { Interval { 0, ${interval} }, ${looping ? "" : "NonLooping,"} ${extent} } }
         Textures 1 { Bitmap { Image "war3mapImported\\${textureName}", } }
         Materials 2 {

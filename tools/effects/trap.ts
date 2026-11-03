@@ -57,7 +57,7 @@ for (const [index,[name,faces]] of ([['Trap',trap],['Ice',shell]] as [string,Fac
         }`;
     }).join("\n");
     const mdl = `Version { FormatVersion 800, }
-        Model "Smashcraft Frost ${name}" { NumGeosets ${faces.length}, NumBones 1, BlendTime 0, ${extent} }
+        Model "Makgora Frost ${name}" { NumGeosets ${faces.length}, NumBones 1, BlendTime 0, ${extent} }
         Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${extent} } }
         Textures 1 { Bitmap { Image "war3mapImported\\${textureName}", } }
         Materials 2 {

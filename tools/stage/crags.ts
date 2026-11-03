@@ -66,7 +66,7 @@ export function cragMdl(crag: Crag): string {
   const count = points.length;
   const extent = `MinimumExtent { ${min.map(fmt).join(", ")} }, MaximumExtent { ${max.map(fmt).join(", ")} }, BoundsRadius ${fmt(Math.hypot(...max.map((m, k) => Math.max(m, -min[k]!))))},`;
   return `Version { FormatVersion 800, }
-Model "Smashcraft ${crag.name}" { NumGeosets 1, NumBones 1, BlendTime 0, ${extent} }
+Model "Makgora ${crag.name}" { NumGeosets 1, NumBones 1, BlendTime 0, ${extent} }
 Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${extent} } }
 Textures 1 { Bitmap { Image "${TEXTURE}", } }
 Materials 1 { Material { Layer { FilterMode None, TwoSided, static TextureID 0, static Alpha 1, } } }

@@ -53,7 +53,7 @@ export function stageSkyMdl(texture: string) {
   const vec = (v: readonly number[]) => `{ ${v.join(", ")} }`;
   const extent = 'MinimumExtent { -2000, -2000, -2000 }, MaximumExtent { 2000, 2000, 2000 }, BoundsRadius 2000,';
   return `Version { FormatVersion 800, }
-Model "Smashcraft atmospheric sky" { NumGeosets 1, NumBones 1, BlendTime 0, ${extent} }
+Model "Makgora atmospheric sky" { NumGeosets 1, NumBones 1, BlendTime 0, ${extent} }
 Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${extent} } }
 Textures 1 { Bitmap { Image "war3mapImported\\${texture}", } }
 Materials 1 { Material { Layer { FilterMode None, Unshaded, Unfogged, TwoSided, NoDepthTest, NoDepthSet, static TextureID 0, static Alpha 1, } } }

@@ -86,7 +86,7 @@ const portraitLightMdl = (pass: LightPass) => {
   const colour = (rgb: readonly number[]) => `{ ${rgb.map((channel) => Number((channel / 255).toFixed(4))).join(", ")} }`;
   const extent = "MinimumExtent { -1, -1, -1 }, MaximumExtent { 1, 1, 1 }, BoundsRadius 1,";
   return `Version { FormatVersion 800, }
-Model "Smashcraft portrait light" { BlendTime 150, ${extent} }
+Model "Makgora portrait light" { BlendTime 150, ${extent} }
 Sequences 1 { Anim "Stand" { Interval { 333, 60333 }, ${extent} } }
 Light "PortraitLight" {
   ObjectId 0,

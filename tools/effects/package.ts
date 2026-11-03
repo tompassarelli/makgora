@@ -115,7 +115,7 @@ for (const [index,[name,shapes]] of models.entries()) {
     }).join("\n");
     const light = contactLights[name];
     const mdl = `Version { FormatVersion 800, }
-        Model "Smashcraft ${name}" { NumGeosets ${parts.length}, NumBones 1, BlendTime 0, ${extent} }
+        Model "Makgora ${name}" { NumGeosets ${parts.length}, NumBones 1, BlendTime 0, ${extent} }
         Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${extent} } }
         Textures 1 { Bitmap { Image "war3mapImported\\${textureName}", } }
         Materials ${name === "Defile" ? 3 : 2} {

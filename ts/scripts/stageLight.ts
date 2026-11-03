@@ -11,7 +11,7 @@ export function stagePointLightMdl({ color, intensity, flicker, loopMs, radius }
   const low = Number((intensity * (1 - flicker)).toFixed(4));
   const high = Number((intensity * (1 + flicker)).toFixed(4));
   return `Version { FormatVersion 800, }
-Model "Smashcraft stage point light" { BlendTime 0, ${extent} }
+Model "Makgora stage point light" { BlendTime 0, ${extent} }
 Sequences 1 { Anim "Stand" { Interval { 0, ${loopMs} }, ${extent} } }
 Light "ForgeFire" {
   ObjectId 0,

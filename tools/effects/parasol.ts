@@ -86,7 +86,7 @@ const folded = "{ 0.12, 0.12, 1 }", open = "{ 1, 1, 1 }";
 const held = (keys: [number, string][]) => keys.map(([at, value]) => `${at}: ${value},`).join(" ");
 
 const mdl = `Version { FormatVersion 800, }
-Model "Smashcraft Parasol" { NumGeosets 2, NumBones 2, BlendTime 0, ${extent} }
+Model "Makgora Parasol" { NumGeosets 2, NumBones 2, BlendTime 0, ${extent} }
 Sequences 3 {
     Anim "Birth" { Interval { 0, ${OPEN} }, NonLooping, ${extent} }
     Anim "Stand" { Interval { ${STAND.join(", ")} }, ${extent} }

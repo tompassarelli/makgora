@@ -34,7 +34,7 @@ const extent = "MinimumExtent { -60, -60, -60 }, MaximumExtent { 60, 60, 60 }, B
 const shown = (keys: [number, number][]) => `Visibility ${keys.length} { DontInterp, ${keys.map(([at, on]) => `${at}: ${on},`).join(" ")} }`;
 
 const mdl = `Version { FormatVersion 800, }
-Model "Smashcraft Fel Crescent" { BlendTime 0, ${extent} }
+Model "Makgora Fel Crescent" { BlendTime 0, ${extent} }
 Sequences 1 {
     Anim "Stand" { Interval { ${STAND.join(", ")} }, NonLooping, ${extent} }
 }

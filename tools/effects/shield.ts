@@ -59,7 +59,7 @@ for (const [slot, color] of colors.entries()) {
     }
     const textureName = `ShieldP${slot + 1}-${hash(texture)}.tga`;
     const mdl = `Version { FormatVersion 800, }
-        Model "Smashcraft Shield P${slot + 1}" { NumGeosets 2, NumBones 1, BlendTime 0, ${extent} }
+        Model "Makgora Shield P${slot + 1}" { NumGeosets 2, NumBones 1, BlendTime 0, ${extent} }
         Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${extent} } }
         Textures 1 { Bitmap { Image "war3mapImported\\${textureName}", } }
         Materials 2 {

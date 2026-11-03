@@ -61,7 +61,7 @@ Groups 1 1 { Matrices { 0 }, } ${extent} Anim { ${extent} } MaterialID ${materia
       [5.1, 16.5, 5.4, 0.8], [11.7, 11.9, 5.1, 0.7],
     ].map(([x = 0, y = 0, width = 1, depth = 1], index) => quad([[x, y, 0.03], [x + width, y, 0.03], [x + width, y + depth, 0.03], [x, y + depth, 0.03]], [[0, 0], [1, 0], [1, 1], [0, 1]], 1, bands.length - 1 + index)).join("\n") : "";
     const mdl = `Version { FormatVersion 800, }
-Model "Smashcraft ${kind}" { ${sea ? "NumGeosets 17, NumGeosetAnims 7," : "NumGeosets 1,"} NumBones 1, BlendTime 0, ${extent} }
+Model "Makgora ${kind}" { ${sea ? "NumGeosets 17, NumGeosetAnims 7," : "NumGeosets 1,"} NumBones 1, BlendTime 0, ${extent} }
 Sequences 1 { Anim "Stand" { Interval { 0, 12000 }, ${extent} } }
 ${framed ? `GlobalSequences 2 { Duration 240000, Duration ${WATER_SEQUENCE}, }` : tomb ? "GlobalSequences 1 { Duration 240000, }" : ""}
 Textures ${framed ? 1 + (glowName === undefined ? 0 : 1) + (highlightsName === undefined ? 0 : 1) + (sea ? 1 : 0) + WATER_FRAMES : glowName === undefined && highlightsName === undefined ? 1 : 2} { Bitmap { Image "war3mapImported\\${textureName}", WrapWidth, WrapHeight, } ${glowName === undefined ? "" : `Bitmap { Image "war3mapImported\\${glowName}", WrapWidth, WrapHeight, }`} ${highlightsName === undefined ? "" : `Bitmap { Image "war3mapImported\\${highlightsName}", WrapWidth, WrapHeight, }`} ${framed ? `Bitmap { Image "ReplaceableTextures\\Water\\Water00.blp", WrapWidth, WrapHeight, } ${sea ? 'Bitmap { Image "Textures\\White_64_Foam1.blp", }' : ""} ${WATER_BITMAPS}` : ""} }
@@ -103,7 +103,7 @@ PivotPoints 1 { { 0, 0, 0 }, }
   const groundTextureName = `StageGround-${hash(groundTexture)}.tga`;
   const groundExtent = 'MinimumExtent { -50, -60, 0 }, MaximumExtent { 50, 60, 0 }, BoundsRadius 80,';
   const groundMdl = `Version { FormatVersion 800, }
-Model "Smashcraft Ground" { NumGeosets 1, NumBones 1, BlendTime 0, ${groundExtent} }
+Model "Makgora Ground" { NumGeosets 1, NumBones 1, BlendTime 0, ${groundExtent} }
 Sequences 1 { Anim "Stand" { Interval { 0, 12000 }, ${groundExtent} } }
 Textures 1 { Bitmap { Image "war3mapImported\\${groundTextureName}", WrapWidth, WrapHeight, } }
 Materials 1 { Material { Layer { FilterMode None, Unshaded, TwoSided, static TextureID 0, static Alpha 1, } } }
@@ -130,7 +130,7 @@ PivotPoints 1 { { 0, 0, 0 }, }
   const plagueGlow = liquidTga(plagueGlowTexel, PLAGUE_TEXTURE_SIZE);
   const plagueGlowName = `StagePlagueGlow-${hash(plagueGlow)}.tga`;
   const plagueMdl = `Version { FormatVersion 800, }
-Model "Smashcraft Plague" { NumGeosets 1, NumBones 1, BlendTime 0, ${groundExtent} }
+Model "Makgora Plague" { NumGeosets 1, NumBones 1, BlendTime 0, ${groundExtent} }
 Sequences 1 { Anim "Stand" { Interval { 0, 12000 }, ${groundExtent} } }
 GlobalSequences 2 { Duration 120000, Duration ${WATER_SEQUENCE}, }
 Textures ${2 + WATER_FRAMES} { Bitmap { Image "war3mapImported\\${plagueTextureName}", WrapWidth, WrapHeight, } Bitmap { Image "war3mapImported\\${plagueGlowName}", WrapWidth, WrapHeight, } Bitmap { Image "ReplaceableTextures\\Water\\Water00.blp", WrapWidth, WrapHeight, } ${WATER_BITMAPS} }

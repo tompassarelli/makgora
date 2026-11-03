@@ -82,7 +82,7 @@ export function texturedDeckMdl(faces: readonly DeckFace[], materials: PlatformM
     GeosetAnim { static Alpha 1, static Color ${vec([...tint].reverse().map(v=>v/255))}, GeosetId ${material}, }`;
   });
   return `Version { FormatVersion 800, }
-Model "Smashcraft textured deck" { NumGeosets 4, NumGeosetAnims 4, NumBones 1, BlendTime 0, ${extent} }
+Model "Makgora textured deck" { NumGeosets 4, NumGeosetAnims 4, NumBones 1, BlendTime 0, ${extent} }
 Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${extent} } }
 Textures 4 { ${textures.map(({texture})=>`Bitmap { Image "${texture}", }`).join("\n")} }
 Materials 4 { ${parts.map((_,i)=>`Material { Layer { FilterMode None, Unshaded, static TextureID ${i}, static Alpha 1, } }`).join("\n")} }

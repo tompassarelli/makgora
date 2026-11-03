@@ -38,7 +38,7 @@ export interface MakgoraMapProfile {
 
 
 const PRESENTATION = newestPresentation(inputs);
-const LIGHTING = join(inputs, "visuals-170-20261007/Smashcraft diagnostic stage lighting.w3x");
+const LIGHTING = join(inputs, "visuals-170-20261007/Makgora diagnostic stage lighting.w3x");
 
 const heroes = HERO_ROSTER.filter(({ complete }) => complete);
 const rankedStages = STAGE_CATALOG.filter(({ id }) => id !== 0);
@@ -50,7 +50,7 @@ export const CURRENT_CANDIDATE = "current-candidate";
 
 export const MAP_PROFILES: Readonly<Record<string, MakgoraMapProfile>> = {
   "gate-playable": { describe: "exact playable candidate, with ordinary selection and input", path: CURRENT_CANDIDATE, quick: "" },
-  outfits: { describe: "four-colour portrait candidate, red Illidan and blue Rifleman", path: join(inputs, "slot-outfits-161-20261007/Smashcraft diagnostic slot portrait outfits.w3x"), quick: "-dev quick" },
+  outfits: { describe: "four-colour portrait candidate, red Illidan and blue Rifleman", path: join(inputs, "slot-outfits-161-20261007/Makgora diagnostic slot portrait outfits.w3x"), quick: "-dev quick" },
   ...STAGE_COMPOSITION_MAPS,
   ...STAGE_ENTRY_MAPS,
   ...FLOATING_STAGE_MAPS,
@@ -63,7 +63,7 @@ export const MAP_PROFILES: Readonly<Record<string, MakgoraMapProfile>> = {
 
 
   keyboard: { describe: "playable input (native-perf profile) rebuilt from this checkout, `-dev quick cpu wren expert` (Wren Expert, three stocks)", path: join(inputs, "keyboard-native-166-20261007/keyboard-native.w3x"), rebuild: "native-perf", quick: `${QUICK_CPU_COMMAND}wren expert` },
-  underside: { describe: "development map built with scenario underside (makgora:docs/player-view.md), `-dev quick`", path: join(inputs, "stage-model-20261006/Smashcraft diagnostic underside.w3x"), quick: "-dev quick" },
+  underside: { describe: "development map built with scenario underside (makgora:docs/player-view.md), `-dev quick`", path: join(inputs, "stage-model-20261006/Makgora diagnostic underside.w3x"), quick: "-dev quick" },
   "cpu-startup": { describe: "development map rebuilt from this checkout, hosted with one lobby computer and left on fighter select", path: PRESENTATION, rebuild: "main", quick: "", computers: 1 },
   "fighter-select": { describe: "development map rebuilt from this checkout, two players left on fighter select", path: PRESENTATION, rebuild: "main", quick: "" },
   "candidate-dev": { describe: "development map rebuilt from this checkout, the candidate's own commit, left at the first-run Controls screen; a given --map does not replace it, because its dev console instruments the same panels and stock-frame startup the candidate ships", path: PRESENTATION, rebuild: "main", quick: "", keptWithMap: true },
