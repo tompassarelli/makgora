@@ -84,7 +84,7 @@ export class FighterMarker {
     this.root = createFrameByType("FRAME", `FighterMarker${suffix}`, consoleUi(), "", context);
     setFrameSize(this.root, MARKER_WIDTH, MARKER_HEIGHT);
     setFrameLevel(this.root, LEVEL);
-    this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", this.root, context + 1, LEVEL, NUMBER_SCALE);
+    this.damageOutline = createTemplateOutline("MakgoraDamageOutline", this.root, context + 1, LEVEL, NUMBER_SCALE);
     this.percentOutline = createOutline(`FighterMarkerPercent${suffix}`, this.root, context + 2, MENU_FONT, PERCENT_FONT, LEVEL);
     this.damage = this.number(markerNumberContext(slot));
     this.percent = this.text(`FighterMarkerPercent${suffix}`, context + 4, PERCENT_FONT, PERCENT_WIDTH_PX, PERCENT_HEIGHT_PX);
@@ -173,7 +173,7 @@ export class FighterMarker {
   }
 
   private number(context: number): Frame {
-    const frame = createFrame("SmashcraftDamage", this.root, 0, context);
+    const frame = createFrame("MakgoraDamage", this.root, 0, context);
     setFrameScale(frame, NUMBER_SCALE);
     setFrameSize(frame, unitsForPixels(NUMBER_WIDTH_PX) / NUMBER_SCALE, unitsForPixels(NUMBER_HEIGHT_PX) / NUMBER_SCALE);
     setFrameEnabled(frame, false);

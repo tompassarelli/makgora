@@ -22,18 +22,18 @@ const CHUNK = PLAYER_FILE_CHUNK;
 const BINDINGS_FILE = "MeleePrototypeBindings.pld";
 
 declare global {
-  var __smashcraftPlayerFiles: PlayerFileQueue | undefined;
-  var __smashcraftSavedBindings: string | undefined;
-  var __smashcraftLobbyCounter: number | undefined;
+  var __makgoraPlayerFiles: PlayerFileQueue | undefined;
+  var __makgoraSavedBindings: string | undefined;
+  var __makgoraLobbyCounter: number | undefined;
 }
 
 function files(): PlayerFileQueue {
-  return (globalThis.__smashcraftPlayerFiles ??= { queue: [] });
+  return (globalThis.__makgoraPlayerFiles ??= { queue: [] });
 }
 
 
 // Engine: Preloader replays the first content it read from a path for the whole session, so a file saved this session is resent from memory.
-const localBindingsText = (): string => globalThis.__smashcraftSavedBindings ?? readChunks(BINDINGS_FILE).join("");
+const localBindingsText = (): string => globalThis.__makgoraSavedBindings ?? readChunks(BINDINGS_FILE).join("");
 
 function sendFile(owner: number): void {
   if (localPlayer() !== player(owner)) return;
@@ -43,7 +43,7 @@ function sendFile(owner: number): void {
     sendSync(MORE_PREFIX, text.substring(offset, offset + CHUNK));
     offset += CHUNK;
   }
-  sendSync(LAST_PREFIX, `${globalThis.__smashcraftLobbyCounter ?? 0}${COUNTER_END}${text.substring(offset)}`);
+  sendSync(LAST_PREFIX, `${globalThis.__makgoraLobbyCounter ?? 0}${COUNTER_END}${text.substring(offset)}`);
 }
 
 
@@ -68,8 +68,8 @@ export const receivedLobbyCounter = (owner: number): number => lobbyCounter(file
 
 // Engine: Preloader replays the first counter it read for the whole process, so the latest counter written is kept in memory.
 function takeLobbyCounter(): void {
-  const counter = (globalThis.__smashcraftLobbyCounter ?? parseInt(readChunk(LOBBY_COUNTER_FILE) ?? "")) + 1;
-  globalThis.__smashcraftLobbyCounter = counter;
+  const counter = (globalThis.__makgoraLobbyCounter ?? parseInt(readChunk(LOBBY_COUNTER_FILE) ?? "")) + 1;
+  globalThis.__makgoraLobbyCounter = counter;
   writeChunks(LOBBY_COUNTER_FILE, [`${counter}`]);
 }
 
@@ -104,6 +104,6 @@ export const bindingFiles: BindingPersistence = {
     return text === "" ? { kind: "empty" } : { kind: "loaded", encoded: text };
   },
   save(owner, encoded) {
-    if (localPlayer() === player(owner) && writeChunks(BINDINGS_FILE, chunks(encoded))) globalThis.__smashcraftSavedBindings = encoded;
+    if (localPlayer() === player(owner) && writeChunks(BINDINGS_FILE, chunks(encoded))) globalThis.__makgoraSavedBindings = encoded;
   },
 };

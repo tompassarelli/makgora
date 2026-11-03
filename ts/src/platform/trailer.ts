@@ -25,10 +25,10 @@ interface Trailer {
   readonly lines: string[];
 }
 
-declare global { var __smashcraftTrailer: Trailer | undefined; }
+declare global { var __makgoraTrailer: Trailer | undefined; }
 
 export function armTrailer(): void {
-  globalThis.__smashcraftTrailer = { shot: 0, playing: false, opened: false, stocks: [0, 0, 0, 0], lines: ["TRAILER START"] };
+  globalThis.__makgoraTrailer = { shot: 0, playing: false, opened: false, stocks: [0, 0, 0, 0], lines: ["TRAILER START"] };
   installTickProbe({ before: beforeTrailerTick, after: afterTrailerTick, soundPlayed: () => undefined });
 }
 
@@ -50,7 +50,7 @@ function startShot(s: ShellState, trailer: Trailer, shot: TrailerShot): void {
 }
 
 function beforeTrailerTick(s: ShellState): void {
-  const trailer = globalThis.__smashcraftTrailer;
+  const trailer = globalThis.__makgoraTrailer;
   if (trailer === undefined || trailer.playing || s.game.phase !== Phase.characterMenu) return;
   const shot = TRAILER_SHOTS[trailer.shot];
   if (shot !== undefined) startShot(s, trailer, shot);
@@ -67,7 +67,7 @@ function finishShot(s: ShellState, trailer: Trailer, frame: number): void {
 }
 
 function afterTrailerTick(s: ShellState): void {
-  const trailer = globalThis.__smashcraftTrailer;
+  const trailer = globalThis.__makgoraTrailer;
   const shot = trailer === undefined ? undefined : TRAILER_SHOTS[trailer.shot];
   if (trailer === undefined || shot === undefined || !trailer.playing) return;
   const frame = s.runtime.simulationFrame;

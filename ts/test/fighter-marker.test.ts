@@ -103,7 +103,7 @@ function expectMarkerText(client: HeadlessClient, slot: ParticipantSlot): void {
     human = humanFighterActive(s.game, slot);
   });
   const named = (name: string) => client.frames.snapshot({ visibleOnly: true }).find(frame => frame.name === `${name}${slot}`);
-  expect(client.frames.named("SmashcraftDamage", markerNumberContext(slot))?.text).toBe(damageText(damage));
+  expect(client.frames.named("MakgoraDamage", markerNumberContext(slot))?.text).toBe(damageText(damage));
   expect(named("FighterMarkerPercent")?.text).toBe(percentText(damage));
   expect(named("FighterMarkerName")?.text).toBe(`${colourCode(slotColor(color).rgb)}${human ? "Player 1" : "CPU"}|r`);
   expect(named("FighterMarkerArrow")?.texture).toBe(`war3mapImported\\MarkerArrow${color}.tga`);

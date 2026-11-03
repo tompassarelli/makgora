@@ -112,7 +112,7 @@ interface Shell {
 const isShell = (value: unknown): value is Shell => typeof value === "object" && value !== null && "game" in value && "world" in value;
 
 function shellOf(clients: Lockstep): Shell {
-  const shell = clients.client(0).natives.__smashcraftShell;
+  const shell = clients.client(0).natives.__makgoraShell;
   if (!isShell(shell)) throw new Error("p0 has no shell");
   return shell;
 }
@@ -134,7 +134,7 @@ function startTraining(clients: Lockstep, measure: PerfMeasure, fighter: Charact
   clients.press(0, KEY.right);
   clients.frames(5);
   for (const client of clients.clients) {
-    const shell = client.natives.__smashcraftShell;
+    const shell = client.natives.__makgoraShell;
     if (!isShell(shell)) throw new Error(`p${client.slot} has no shell`);
     const game = shell.game;
     game.characterChoices[0] = fighter;
@@ -148,7 +148,7 @@ function startTraining(clients: Lockstep, measure: PerfMeasure, fighter: Charact
   clients.press(0, 0x59);
   until("stage selection", () => shellOf(clients).game.phase === Phase.stageMenu);
   for (const client of clients.clients) {
-    const shell = client.natives.__smashcraftShell;
+    const shell = client.natives.__makgoraShell;
     if (!isShell(shell)) throw new Error(`p${client.slot} has no shell`);
     shell.game.stageChoice = stage;
   }

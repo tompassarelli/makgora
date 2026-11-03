@@ -383,7 +383,7 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
   releaseStockClicks();
   hideStockOriginFrames();
 
-  if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(localPlayer(), 0.0, 0.0, "The game's menus could not load. Restart the game.");
+  if (!loadFrameFile("war3mapImported\\MakgoraHUD.toc")) displayText(localPlayer(), 0.0, 0.0, "The game's menus could not load. Restart the game.");
   enableSelections(false, false);
   enableUserControl(true);
   enableFog(false);

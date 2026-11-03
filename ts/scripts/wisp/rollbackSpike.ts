@@ -39,8 +39,8 @@ interface DepthShell {
 const hasRollback = (shell: unknown): shell is DepthShell => typeof shell === "object" && shell !== null && "rollback" in shell;
 
 function rollbackOf(client: HeadlessClient): DepthShell["rollback"] {
-  let shell: unknown = client.natives.__smashcraftShell;
-  if (!hasRollback(shell)) client.run(() => { shell = globalThis.__smashcraftShell; });
+  let shell: unknown = client.natives.__makgoraShell;
+  if (!hasRollback(shell)) client.run(() => { shell = globalThis.__makgoraShell; });
   return hasRollback(shell) ? shell.rollback : undefined;
 }
 

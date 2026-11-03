@@ -25,7 +25,7 @@ test("every frame the map creates draws below the select cursor, the chat box in
   const frames = client.frames.snapshot().filter(frame => frame.type !== "SIMPLEFRAME");
   const cursor = frames.filter(frame => CURSOR.test(frame.name));
   expect(cursor.length).toBeGreaterThan(0);
-  expect(frames.some(frame => frame.name.startsWith("SmashcraftChat") && frame.visible)).toBe(true);
+  expect(frames.some(frame => frame.name.startsWith("MakgoraChat") && frame.visible)).toBe(true);
   const floor = Math.min(...cursor.map(frame => frame.level));
   expect(frames.filter(frame => !CURSOR.test(frame.name) && frame.level >= floor).map(frame => `${frame.name} ${frame.level}`)).toEqual([]);
   expect(client.errors).toEqual([]);

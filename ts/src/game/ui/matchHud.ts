@@ -41,8 +41,8 @@ class ClockDigits {
 
   constructor(context: number, size: number, box: ClockBox, left: number, top: number, horizontal: TextAlignment) {
     const scale = f32(size / CLOCK_TEMPLATE_SIZE);
-    this.rim = createTemplateOutline("SmashcraftDamageOutline", gameUi(), context, CLOCK_LEVEL, scale);
-    this.label = createFrame("SmashcraftDamage", gameUi(), 0, context);
+    this.rim = createTemplateOutline("MakgoraDamageOutline", gameUi(), context, CLOCK_LEVEL, scale);
+    this.label = createFrame("MakgoraDamage", gameUi(), 0, context);
     setFrameScale(this.label, scale);
     setFrameSize(this.label, f32(box.width / scale), f32(box.height / scale));
     placeTopLeft(this.label, left, top);
@@ -154,9 +154,9 @@ export class FighterHud {
     const parent = gameUi();
     this.raceFrames = RACES.map((race, index) => createRaceFrame(race, 1600 + slot * 8 + index));
     this.namePlate = createBackdrop(`FighterHUDNamePlate${suffix}`, parent, context);
-    this.damageOutline = createTemplateOutline("SmashcraftDamageOutline", parent, context + 2, HUD_LEVEL, 1.0);
+    this.damageOutline = createTemplateOutline("MakgoraDamageOutline", parent, context + 2, HUD_LEVEL, 1.0);
     this.percentOutline = createOutline(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN, MENU_FONT, PERCENT_FONT, HUD_LEVEL);
-    this.damage = createFrame("SmashcraftDamage", parent, 0, context + 2);
+    this.damage = createFrame("MakgoraDamage", parent, 0, context + 2);
     this.percent = createText(`FighterHUDPercent${suffix}`, parent, context + 7 + STOCK_ICONS_SHOWN);
     setFrameFont(this.percent, MENU_FONT, PERCENT_FONT, 1);
     setFrameTextAlignment(this.percent, TextAlignment.bottom, TextAlignment.left);

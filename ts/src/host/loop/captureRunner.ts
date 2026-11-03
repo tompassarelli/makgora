@@ -37,11 +37,11 @@ interface Runner {
   stampTick?: number;
   view?: number[];
 }
-declare global { var __smashcraftCaptureRunner: Runner | undefined; }
+declare global { var __makgoraCaptureRunner: Runner | undefined; }
 const freshRunner = (ticks: number): Runner => ({ ticks, script: -1, stage: "opening", frame: 0, held: 0, tail: 0, hidden: false });
-const runner = (): Runner => globalThis.__smashcraftCaptureRunner ??= freshRunner(0);
+const runner = (): Runner => globalThis.__makgoraCaptureRunner ??= freshRunner(0);
 
-export function restartCapture(): void { globalThis.__smashcraftCaptureRunner = freshRunner(WARMUP_TICKS - 1); }
+export function restartCapture(): void { globalThis.__makgoraCaptureRunner = freshRunner(WARMUP_TICKS - 1); }
 
 function status(line: string): void { writeLines(CAPTURE_STATUS_FILE, [line]); }
 
@@ -90,7 +90,7 @@ function beginHold(s: ShellState, r: Runner, fixture: CaptureFixture, target: nu
     if (silhouette.conceal === "cues" && !r.hidden) recordScreenBoxes(s, fixture, silhouette.slot, target);
   }
   if (silhouette !== undefined && r.hidden && r.held === (silhouette.conceal === "cues" ? CUE_SETTLE_TICKS : 0)) {
-    paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
+    paintDrawnStamp(globalThis.__makgoraDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
     r.stampTick = r.ticks;
   }
   holdAgeSeekedEffects(s);

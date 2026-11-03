@@ -1,4 +1,4 @@
-// Client kit 1's sim.js (smashcraft:docs/client-interface.md): copied into the kit as sim.d.ts, so it imports nothing.
+// Client kit 1's sim.js (makgora:docs/client-interface.md): copied into the kit as sim.d.ts, so it imports nothing.
 
 export interface ReplayRepro {
   readonly build: string;

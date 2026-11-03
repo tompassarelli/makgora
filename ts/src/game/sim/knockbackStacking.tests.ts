@@ -13,7 +13,7 @@ function secondHitLaunch(grounded: boolean): { readonly x: number; readonly z: n
   return { x: f.launch.knockbackX, z: f.launch.knockbackZ, grounded: f.motion.grounded };
 }
 
-test("A second hit 12 frames after the first replaces the launch of a victim it leaves grounded and merges with the launch of an airborne victim, as Melee does (smashcraft#536) [k4 reference melee]", () => {
+test("A second hit 12 frames after the first replaces the launch of a victim it leaves grounded and merges with the launch of an airborne victim, as Melee does (makgora#536) [k4 reference melee]", () => {
   const grounded = secondHitLaunch(true);
   assertTrue(grounded.grounded);
   assertEquals(grounded.x, -5.399999618530273);

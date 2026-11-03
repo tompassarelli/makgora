@@ -8,14 +8,14 @@ export interface TickProbe {
   readonly soundPlayed: (this: void, frame: number, fighter: number) => SoundPlayed | undefined;
 }
 
-declare global { var __smashcraftTickProbe: TickProbe | undefined; }
+declare global { var __makgoraTickProbe: TickProbe | undefined; }
 
 export function installTickProbe(probe: TickProbe): void {
-  globalThis.__smashcraftTickProbe = probe;
+  globalThis.__makgoraTickProbe = probe;
 }
 
-export const beforeProbedTick = (s: ShellState): void => globalThis.__smashcraftTickProbe?.before(s);
+export const beforeProbedTick = (s: ShellState): void => globalThis.__makgoraTickProbe?.before(s);
 
-export const afterProbedTick = (s: ShellState): void => globalThis.__smashcraftTickProbe?.after(s);
+export const afterProbedTick = (s: ShellState): void => globalThis.__makgoraTickProbe?.after(s);
 
-export const probedSound = (frame: number, fighter: number): SoundPlayed | undefined => globalThis.__smashcraftTickProbe?.soundPlayed(frame, fighter);
+export const probedSound = (frame: number, fighter: number): SoundPlayed | undefined => globalThis.__makgoraTickProbe?.soundPlayed(frame, fighter);

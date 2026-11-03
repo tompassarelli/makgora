@@ -21,11 +21,11 @@ export class PauseMenu {
 
   constructor(select: (choice: number, clicker: Player) => void) {
     this.clicks = new ButtonClicks("ui.pause.click", select, choice => this.highlight(choice !== undefined));
-    this.root = createBackdrop("SmashcraftPause", consoleUi(), 1800);
+    this.root = createBackdrop("MakgoraPause", consoleUi(), 1800);
     placeTopLeft(this.root, f32(0.08), f32(0.53));
     setFrameSize(this.root, f32(0.64), f32(0.53));
     setFrameLevel(this.root, 20);
-    styleMenuPanel(this.root, "SmashcraftPause");
+    styleMenuPanel(this.root, "MakgoraPause");
     const label = (name: string, y: number, height: number, size: number, parent = this.root) => {
       const frame = createText(name, parent, 1801);
       placeTopLeft(frame, ROW_LEFT, y);
@@ -35,13 +35,13 @@ export class PauseMenu {
       if (parent === this.root) setFrameLevel(frame, 21);
       return frame;
     };
-    setFrameText(label("SmashcraftPauseHeading", f32(0.42), f32(0.04), MENU_STYLE.titleSize), `${MENU_STYLE.gold}${GAME_TITLE}|r`);
-    const button = createFrameByType("BUTTON", "SmashcraftPauseOption0", this.root, "", 1801);
+    setFrameText(label("MakgoraPauseHeading", f32(0.42), f32(0.04), MENU_STYLE.titleSize), `${MENU_STYLE.gold}${GAME_TITLE}|r`);
+    const button = createFrameByType("BUTTON", "MakgoraPauseOption0", this.root, "", 1801);
     placeTopLeft(button, ROW_LEFT, ROW_TOP);
     setFrameSize(button, ROW_WIDTH, ROW_HEIGHT);
     this.clicks.add(button, 0);
-    this.option = label("SmashcraftPauseOptions0", ROW_TOP, ROW_HEIGHT, MENU_STYLE.headerSize, button);
-    setFrameText(label("SmashcraftPauseHelp", f32(0.245), f32(0.045), MENU_STYLE.bodySize), `${MENU_STYLE.text}A / Start / Click: Play|r`);
+    this.option = label("MakgoraPauseOptions0", ROW_TOP, ROW_HEIGHT, MENU_STYLE.headerSize, button);
+    setFrameText(label("MakgoraPauseHelp", f32(0.245), f32(0.045), MENU_STYLE.bodySize), `${MENU_STYLE.text}A / Start / Click: Play|r`);
     this.highlight(false);
     setFrameVisible(this.root, false);
   }

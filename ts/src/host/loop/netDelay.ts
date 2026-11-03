@@ -356,7 +356,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   if (inMatch && held) net.second.held++;
   if (floorMod(net.ticks, SECOND) !== 0) return;
   if (net.indicator === undefined) {
-    net.indicator = createText("SmashcraftNetIndicator", gameUi(), 0);
+    net.indicator = createText("MakgoraNetIndicator", gameUi(), 0);
     placeTopLeft(net.indicator, f32(0.01), NET_INDICATOR_TOP);
     setFrameSize(net.indicator, f32(0.5), f32(0.016));
     setFrameVisible(net.indicator, false);

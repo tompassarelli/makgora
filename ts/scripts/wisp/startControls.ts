@@ -22,8 +22,8 @@ const greetedMask = (shell: unknown): number =>
   typeof shell === "object" && shell !== null && "controlsGreeted" in shell && typeof shell.controlsGreeted === "number" ? shell.controlsGreeted : 0;
 
 function shellOf(client: StartClient): unknown {
-  let shell = client.natives["__smashcraftShell"];
-  client.run?.(() => { shell ??= globalThis.__smashcraftShell; });
+  let shell = client.natives["__makgoraShell"];
+  client.run?.(() => { shell ??= globalThis.__makgoraShell; });
   return shell;
 }
 

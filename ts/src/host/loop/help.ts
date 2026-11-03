@@ -13,7 +13,7 @@ export const HELP_EVENT = "shell.help";
 const HELP_SECONDS = 30.0;
 
 declare global {
-  var __smashcraftHelpQuests: { readonly controls: Quest; revision: number } | undefined;
+  var __makgoraHelpQuests: { readonly controls: Quest; revision: number } | undefined;
 }
 
 function addQuest(title: string, description: string, icon: string, required: boolean): Quest {
@@ -34,17 +34,17 @@ export function startHelp(s: ShellState): void {
     addChatEvent(chat, player(slot), COMMANDS_COMMAND, true);
   }
   onEvents(chat, trampoline(HELP_EVENT));
-  if (globalThis.__smashcraftHelpQuests === undefined) {
+  if (globalThis.__makgoraHelpQuests === undefined) {
     const controls = addQuest(CONTROLS_TITLE, "", "ReplaceableTextures\\CommandButtons\\BTNSpellBookBLS.blp", true);
     addQuest(HOW_TO_PLAY_TITLE, HOW_TO_PLAY, "ReplaceableTextures\\CommandButtons\\BTNTomeOfRetraining.blp", true);
     addQuest(COMMANDS_TITLE, COMMANDS_DESCRIPTION, "ReplaceableTextures\\CommandButtons\\BTNSnazzyScroll.blp", false);
-    globalThis.__smashcraftHelpQuests = { controls, revision: -1 };
+    globalThis.__makgoraHelpQuests = { controls, revision: -1 };
   }
   serviceHelp(s);
 }
 
 export function serviceHelp(s: ShellState): void {
-  const quests = globalThis.__smashcraftHelpQuests;
+  const quests = globalThis.__makgoraHelpQuests;
   const local = localParticipantSlot(s);
   if (quests === undefined || local === undefined) return;
   const settings = s.participants[local].bindings;

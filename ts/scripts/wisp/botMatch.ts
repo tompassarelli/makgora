@@ -114,8 +114,8 @@ const hasGame = (shell: unknown): shell is { readonly game: Game } => typeof she
 
 
 export function gameOf(client: HeadlessClient): Game {
-  let shell: unknown = client.natives.__smashcraftShell;
-  if (!hasGame(shell)) client.run(() => { shell = globalThis.__smashcraftShell; });
+  let shell: unknown = client.natives.__makgoraShell;
+  if (!hasGame(shell)) client.run(() => { shell = globalThis.__makgoraShell; });
   if (!hasGame(shell)) throw new Error(`p${client.slot} has no shell`);
   return shell.game;
 }

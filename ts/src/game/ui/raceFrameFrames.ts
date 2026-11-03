@@ -1,9 +1,9 @@
 import { type Frame, namedFrame } from "wisp/game/frames";
 import type { Race } from "../roster/races";
-import { createSmashcraftRaceFrameHuman } from "./raceFrameHumanFrames";
-import { createSmashcraftRaceFrameNightElf } from "./raceFrameNightElfFrames";
-import { createSmashcraftRaceFrameOrc } from "./raceFrameOrcFrames";
-import { createSmashcraftRaceFrameUndead } from "./raceFrameUndeadFrames";
+import { createMakgoraRaceFrameHuman } from "./raceFrameHumanFrames";
+import { createMakgoraRaceFrameNightElf } from "./raceFrameNightElfFrames";
+import { createMakgoraRaceFrameOrc } from "./raceFrameOrcFrames";
+import { createMakgoraRaceFrameUndead } from "./raceFrameUndeadFrames";
 
 export interface RaceFrameFrames {
   readonly root: Frame;
@@ -11,10 +11,10 @@ export interface RaceFrameFrames {
 }
 
 const CREATE: { readonly [R in Race]: (parent: Frame, context: number) => RaceFrameFrames | undefined } = {
-  Human: createSmashcraftRaceFrameHuman,
-  NightElf: createSmashcraftRaceFrameNightElf,
-  Orc: createSmashcraftRaceFrameOrc,
-  Undead: createSmashcraftRaceFrameUndead,
+  Human: createMakgoraRaceFrameHuman,
+  NightElf: createMakgoraRaceFrameNightElf,
+  Orc: createMakgoraRaceFrameOrc,
+  Undead: createMakgoraRaceFrameUndead,
 };
 
 // Engine: a SIMPLEFRAME needs a simple parent, and ConsoleUI stays shown when the map hides the origin frames.

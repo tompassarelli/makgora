@@ -119,11 +119,11 @@ export async function createStandaloneSession(options: StandaloneSessionOptions 
     const { createForcedReplay, replayLatest }: { createForcedReplay(depth: number): object; replayLatest(replay: object, state: State): number } = await import("../../src/host/loop/forcedReplay");
     const build = { ...PLAYABLE_BUILD, devConsole: true, ...(presentation === undefined ? {} : { presentation }) };
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import("../../src/platform/main");
-    const driverApi: { nativeDriverCommand(text: string): void; installSmashcraftNativeDriver(): void; startSmashcraftNativeDriver(): void } | undefined = !driven ? undefined : await import("../../src/platform/nativeDriver");
+    const driverApi: { nativeDriverCommand(text: string): void; installMakgoraNativeDriver(): void; startMakgoraNativeDriver(): void } | undefined = !driven ? undefined : await import("../../src/platform/nativeDriver");
     const driverBuild = { ...NATIVE_DRIVER_BUILD, ...(presentation === undefined ? {} : { presentation }) };
     const driver: MapEntry | undefined = !driven ? undefined : presentation === undefined ? await import("../../src/host/entries/nativeDriverMain") : {
-      install() { main.install(driverBuild); driverApi?.installSmashcraftNativeDriver(); },
-      start() { main.startBuild(driverBuild); driverApi?.installSmashcraftNativeDriver(); driverApi?.startSmashcraftNativeDriver(); },
+      install() { main.install(driverBuild); driverApi?.installMakgoraNativeDriver(); },
+      start() { main.startBuild(driverBuild); driverApi?.installMakgoraNativeDriver(); driverApi?.startMakgoraNativeDriver(); },
     };
     const driverCommand = driverApi?.nativeDriverCommand;
     const clients = runtime.clients(driver ?? { install: () => main.install(build), start: () => main.startBuild(build) }, !driven ? [0] : [0, 1], clientOptions(savedFiles));

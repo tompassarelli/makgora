@@ -169,7 +169,7 @@ const ordinary = (minX: number, maxX: number, minZ: number, maxZ: number, damage
 function reachRegion(style: AttackStyle): Readonly<HitRegion> {
   const verticalOffset = style === AttackStyle.forwardTiltUp ? 65.0 : style === AttackStyle.forwardTiltDown ? -65.0 : 0.0;
   const [minZ, maxZ] = [f32(verticalOffset - 130), f32(verticalOffset + 130)];
-  // An angled forward tilt launches along its angle (smashcraft:docs/design/tilts.md): 55 degrees up, 20 down.
+  // An angled forward tilt launches along its angle (makgora:docs/design/tilts.md): 55 degrees up, 20 down.
   if (style === AttackStyle.downSmash) {
     const row = ordinary(0.0, attackReach(style), minZ, maxZ, attackDamage(style));
     return { ...row, effect: downSmashHit(row.effect) };

@@ -555,7 +555,7 @@ export class SelectionPanel {
     if (this.ownsLocalClient()) this.handChannel.receive(sender, data, this.now);
   }
 
-  // The menu pointer: every Smashcraft menu with a pointer draws this hand, and a panel over the select screen keeps it local, off the shared hands and off stage select's bullseye.
+  // The menu pointer: every Mak'gora menu with a pointer draws this hand, and a panel over the select screen keeps it local, off the shared hands and off stage select's bullseye.
   private showHand(pointed: boolean, carried: number | undefined, x: number, y: number, panel: boolean, restOpen = panel): void {
     const drawn = pointed && this.menuCursorAllowed;
     const over = overAny(x, y, [this.clicks, this.credits, this.community, this.bar, this.controlHit]);

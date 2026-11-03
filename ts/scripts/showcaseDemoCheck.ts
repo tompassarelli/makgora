@@ -43,7 +43,7 @@ export async function playDemo(slug: string): Promise<{ readonly holds: Held[]; 
     const status = () => client.files.get(CAPTURE_STATUS_FILE)?.[0] ?? "";
     const stamp = () => {
       const cells: (StampCell | "unclear")[] = [];
-      for (let index = 0; index < STAMP_CELLS; index++) cells.push(TEXTURE_CELLS[client.frames.named("SmashcraftDrawnStamp", index)?.texture ?? ""] ?? "unclear");
+      for (let index = 0; index < STAMP_CELLS; index++) cells.push(TEXTURE_CELLS[client.frames.named("MakgoraDrawnStamp", index)?.texture ?? ""] ?? "unclear");
       return readStamp(cells);
     };
     const runs: { held: Held; ticks: number }[] = [];

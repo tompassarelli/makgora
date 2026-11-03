@@ -39,11 +39,11 @@ export const SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES = 2;
 export const FAST_FALL_INPUT_WINDOW = 4;
 /** a platform drop needs down pressed fewer input frames ago than this. */
 export const PLATFORM_DROP_INPUT_WINDOW = 6;
-/** Frames after platform contact whose stick still chooses stand or drop (smashcraft:docs/gameplay-design.md, "Platforms"). */
+/** Frames after platform contact whose stick still chooses stand or drop (makgora:docs/gameplay-design.md, "Platforms"). */
 export const WALL_TECH_JUMP_INPUT_WINDOW_FRAMES = 20;
 /** a wall jump needs the stick to have crossed the horizontal smash deadzone fewer input frames ago than this. */
 export const WALL_JUMP_FLICK_FRAMES = 3;
-/** A neutral special faces the side the stick last pressed at most this many input frames before it (smashcraft:docs/gameplay-design.md, "Turnaround specials"). */
+/** A neutral special faces the side the stick last pressed at most this many input frames before it (makgora:docs/gameplay-design.md, "Turnaround specials"). */
 export const TURNAROUND_SPECIAL_WINDOW_FRAMES = 8;
 export const RESPAWN_FRAMES = 60;
 export const RESPAWN_HEIGHT = 280.0;

@@ -1,4 +1,4 @@
-Frame "TEXT" "SmashcraftDamage" {
+Frame "TEXT" "MakgoraDamage" {
     DecorateFileNames,
     FrameFont "MasterFont", 0.036, "OUTLINE",
     FontColor 1.0 1.0 1.0 1.0,
@@ -9,7 +9,7 @@ Frame "TEXT" "SmashcraftDamage" {
     Text "0.0%",
 }
 
-Frame "TEXT" "SmashcraftDamageOutline" {
+Frame "TEXT" "MakgoraDamageOutline" {
     DecorateFileNames,
     FrameFont "MasterFont", 0.036, "",
     FontColor 1.0 1.0 1.0 1.0,

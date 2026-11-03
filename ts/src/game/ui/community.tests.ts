@@ -6,7 +6,7 @@ test("The Community panel text holds the GitHub page and Discord invite read fro
   const body = communityBody();
   assertTrue(body.includes(GITHUB_PAGE));
   assertTrue(body.includes(DISCORD_INVITE));
-  assertEquals(GITHUB_PAGE, "github.com/tompassarelli/smashcraft");
+  assertEquals(GITHUB_PAGE, "github.com/tompassarelli/makgora");
   assertEquals(DISCORD_INVITE, "discord.gg/JQGZs2UJR");
   assertTrue(body.includes("find games, report bugs and contribute"));
   assertTrue(discordInviteLine().includes(`https://${DISCORD_INVITE}`));

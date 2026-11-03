@@ -10,7 +10,7 @@ import { CHAT_SLOT } from "../core/selectScreenLayout";
 import { SELECT_LEVELS } from "./selectLevels";
 
 export const CHAT_STYLE: ChatStyle = {
-  name: "SmashcraftChat",
+  name: "MakgoraChat",
   font: MENU_FONT,
   fontSize: f32(0.008),
   rowHeight: f32(0.0112),

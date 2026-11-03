@@ -8,8 +8,8 @@ export function install(this: void): void {
 }
 
 export function start(this: void): void {
-  globalThis.__smashcraftNativeSoak = undefined;
-  globalThis.__smashcraftNativeSoakStart = true;
+  globalThis.__makgoraNativeSoak = undefined;
+  globalThis.__makgoraNativeSoakStart = true;
   installSoakHandles();
   startBuild(SOAK_PLAYABLE_BUILD);
 }

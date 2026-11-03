@@ -62,13 +62,13 @@ interface Driver {
   readonly pads: readonly Pad[];
 }
 declare global {
-  var __smashcraftNativeDriver: Driver | undefined;
+  var __makgoraNativeDriver: Driver | undefined;
 
-  var __smashcraftDriverScripts: number | undefined;
+  var __makgoraDriverScripts: number | undefined;
 }
 
 const neutralPad = (): Pad => ({ buttons: 0, x: 0.0, z: 0.0, cx: 0.0, cz: 0.0, shield: 0.0, viewSince: undefined, viewSaved: false, capture: keyboardCapture() });
-const state = (): Driver => globalThis.__smashcraftNativeDriver ??= { edges: [], next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };
+const state = (): Driver => globalThis.__makgoraNativeDriver ??= { edges: [], next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };
 const PAD_LETTERS: readonly string[] = ["a", "b", "c", "d"];
 const BUTTONS: Readonly<Record<string, number>> ={ A: 1, B: 2, X: 4, Y: 8, LB: 16, TL: 16, RB: 32, TR: 32, START: 64, VIEW: 128 };
 const SHOWCASE_BRACE_FRAMES = 120;
@@ -179,7 +179,7 @@ function saveFrame(s: ShellState): void {
 }
 function publish(s: ShellState): void {
   publishNativeDriverStatus(s.runtime.simulationFrame, confirmedChecksum(s), state().paused);
-  paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, s.runtime.simulationFrame);
+  paintDrawnStamp(globalThis.__makgoraDriverScripts ?? 0, s.runtime.simulationFrame);
 }
 
 
@@ -216,7 +216,7 @@ export function nativeDriverCommand(text: string): void {
   const command = text.trim();
   if (command === "reset") {
     applyDeveloperCommand(s, 0, "-dev reset");
-    globalThis.__smashcraftNativeDriver = { edges: [], next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };
+    globalThis.__makgoraNativeDriver = { edges: [], next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };
     publish(s);
     return;
   }
@@ -229,9 +229,9 @@ export function nativeDriverCommand(text: string): void {
 
   setHumanCount(s.game, 2);
   applyDeveloperCommand(s, 0, script.setup);
-  globalThis.__smashcraftDriverScripts = (globalThis.__smashcraftDriverScripts ?? 0) + 1;
+  globalThis.__makgoraDriverScripts = (globalThis.__makgoraDriverScripts ?? 0) + 1;
   if (s.game.phase !== Phase.match || s.runtime.simulationFrame !== 0) throw new Error("native driver: pad setup did not start a new match");
-  globalThis.__smashcraftNativeDriver = { edges: script.edges, next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };
+  globalThis.__makgoraNativeDriver = { edges: script.edges, next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };
   startInputTrace(s);
   publish(s);
 }
@@ -376,7 +376,7 @@ export function afterNativeDriverTick(s: ShellState): void {
     freeze(s, driver, true);
     saveFrame(s);
     publish(s);
-  } else paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, s.runtime.simulationFrame);
+  } else paintDrawnStamp(globalThis.__makgoraDriverScripts ?? 0, s.runtime.simulationFrame);
 }
-export function installSmashcraftNativeDriver(): void { installNativeDriver(nativeDriverCommand); }
-export function startSmashcraftNativeDriver(players: readonly number[] = [0, 1]): void { state(); startNativeDriver(players); }
+export function installMakgoraNativeDriver(): void { installNativeDriver(nativeDriverCommand); }
+export function startMakgoraNativeDriver(players: readonly number[] = [0, 1]): void { state(); startNativeDriver(players); }

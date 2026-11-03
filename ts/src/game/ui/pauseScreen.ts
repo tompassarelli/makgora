@@ -46,7 +46,7 @@ interface Part {
   readonly place: Place;
 }
 
-const NAME = "SmashcraftPauseScreen";
+const NAME = "MakgoraPauseScreen";
 const RESET_WIDTH = f32(0.33);
 const RESET_HEIGHT = f32(0.092);
 const NAME_WIDTH = f32(0.27);

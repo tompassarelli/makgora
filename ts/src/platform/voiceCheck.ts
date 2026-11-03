@@ -20,10 +20,10 @@ interface VoiceCheck {
   readonly pending: string[];
 }
 
-declare global { var __smashcraftVoiceCheck: VoiceCheck | undefined; }
+declare global { var __makgoraVoiceCheck: VoiceCheck | undefined; }
 
 export function armVoiceCheck(): void {
-  globalThis.__smashcraftVoiceCheck = { started: false, written: false, lines: [], pending: [] };
+  globalThis.__makgoraVoiceCheck = { started: false, written: false, lines: [], pending: [] };
   installTickProbe({ before: beforeVoiceCheckTick, after: afterVoiceCheckTick, soundPlayed: voicePlayed });
 }
 
@@ -43,12 +43,12 @@ function startMatch(s: ShellState, check: VoiceCheck): void {
 }
 
 function beforeVoiceCheckTick(s: ShellState): void {
-  const check = globalThis.__smashcraftVoiceCheck;
+  const check = globalThis.__makgoraVoiceCheck;
   if (check !== undefined && !check.started && s.game.phase === Phase.characterMenu) startMatch(s, check);
 }
 
 function voicePlayed(frame: number, fighter: number): SoundPlayed | undefined {
-  const check = globalThis.__smashcraftVoiceCheck;
+  const check = globalThis.__makgoraVoiceCheck;
   if (check === undefined || check.written) return undefined;
   return (sound, volume, _pitch, cls, slot, live) => {
     check.pending.push(`${frame} ${fighter} ${cls} ${slot} ${live} ${volume} ${sound}`);
@@ -56,7 +56,7 @@ function voicePlayed(frame: number, fighter: number): SoundPlayed | undefined {
 }
 
 function afterVoiceCheckTick(s: ShellState): void {
-  const check = globalThis.__smashcraftVoiceCheck;
+  const check = globalThis.__makgoraVoiceCheck;
   if (check === undefined || !check.started || check.written) return;
   const drawn = presentedFrame(s);
   for (const line of check.pending) check.lines.push(`${drawn} ${line}`);

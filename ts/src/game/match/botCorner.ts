@@ -1,4 +1,4 @@
-// Corner play (#386, smashcraft:docs/gameplay-design.md, "The corner belongs
+// Corner play (#386, makgora:docs/gameplay-design.md, "The corner belongs
 // to the attacker"): at Advanced and Expert the computer carries an aerial's
 // landing off the lip the opponent is cornered at, so the edge cancel frees it
 // at once; it presses a cornered opponent instead of resetting to neutral; and

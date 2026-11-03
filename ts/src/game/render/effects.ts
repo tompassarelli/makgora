@@ -79,12 +79,12 @@ export function parkCue(model: Effect, origin: Readonly<WorldOrigin>, parked: Pa
 
 declare global {
 
-  var __smashcraftEffectMotion: EffectMotion<Effect> | undefined;
+  var __makgoraEffectMotion: EffectMotion<Effect> | undefined;
 }
 
 
 export function effectMotion(): EffectMotion<Effect> {
-  return (globalThis.__smashcraftEffectMotion ??= new EffectMotion<Effect>((model, x, y, z) => setEffectPosition(model, x, y, z)));
+  return (globalThis.__makgoraEffectMotion ??= new EffectMotion<Effect>((model, x, y, z) => setEffectPosition(model, x, y, z)));
 }
 
 

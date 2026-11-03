@@ -15,7 +15,7 @@ import { prepareKitDigests } from "../game/replay/canonical";
 
 
 export function install(this: void, build: MapBuild = CURRENT_BUILD): void {
-  configureRuntime({ filePrefix: "smashcraft", globalPrefix: "__smashcraft", readyPrefix: "SC_HRR", errorsOnScreen: build.errorsOnScreen });
+  configureRuntime({ filePrefix: "smashcraft", globalPrefix: "__makgora", readyPrefix: "SC_HRR", errorsOnScreen: build.errorsOnScreen });
   installDispatch();
   installShell();
   installObjectData();

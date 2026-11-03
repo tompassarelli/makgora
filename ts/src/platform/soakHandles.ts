@@ -4,10 +4,10 @@ interface Handles {
 }
 
 declare global {
-  var __smashcraftSoakHandles: Handles | undefined;
+  var __makgoraSoakHandles: Handles | undefined;
 }
 
-const state = (): Handles => globalThis.__smashcraftSoakHandles ??= { live: new Map(), installed: false };
+const state = (): Handles => globalThis.__makgoraSoakHandles ??= { live: new Map(), installed: false };
 
 function made<T extends handle>(value: T, parent?: framehandle): T {
   if (GetHandleId(value) !== 0) state().live.set(GetHandleId(value), parent === undefined ? 0 : GetHandleId(parent));

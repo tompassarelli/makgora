@@ -142,7 +142,7 @@ function finish(probe: CallbackClock): void {
 
 export function probeCallbackClock(key: number, callbacks: number): boolean {
   const clock = typeof os === "object" && os !== null && typeof os.clock === "function" ? os.clock : undefined;
-  const table = globalThis.__smashcraftDispatch;
+  const table = globalThis.__makgoraDispatch;
   if (clock === undefined || table === undefined || active !== undefined) return false;
   runs++;
   const gameClock = createTimer();

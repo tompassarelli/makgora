@@ -104,8 +104,8 @@ interface SessionRates {
 }
 
 declare global {
-  var __smashcraftSessionRates: SessionRates | undefined;
-  var __smashcraftDispatch: { run: (this: void, name: string) => void } | undefined;
+  var __makgoraSessionRates: SessionRates | undefined;
+  var __makgoraDispatch: { run: (this: void, name: string) => void } | undefined;
 }
 
 const emptySecond = (): Second => ({
@@ -410,7 +410,7 @@ function liveLines(rates: SessionRates, now: number): readonly string[] {
 
 function flush(rates: SessionRates, now: number): void {
   rates.lines.push(countLine(rates, now), eventLine(rates, now), ...liveLines(rates, now));
-  const load = rates.load ??= `${globalThis.__smashcraftMatchSerial ?? 0}-${microseconds(rates.started)}`;
+  const load = rates.load ??= `${globalThis.__makgoraMatchSerial ?? 0}-${microseconds(rates.started)}`;
   if (!rates.headed) rates.lines.unshift(sessionRatesHeader(load, rates.file, rates.build, sourceVersion(), rates.clock !== undefined));
   rates.headed = true;
   writeLines(sessionRatesFile(load, rates.file), rates.lines);
@@ -462,7 +462,7 @@ function account(rates: SessionRates, name: string, spent: number, now: number):
 export function installSessionRates(build: string): void {
   const clock = findClock();
   const started = clock === undefined ? 0 : clock();
-  const rates = globalThis.__smashcraftSessionRates ??= {
+  const rates = globalThis.__makgoraSessionRates ??= {
     clock, started, secondStarted: started, seconds: 0, load: undefined, build, second: emptySecond(), lines: [], headed: false, file: 0, named: {},
     epoch: -1, lastSpec: 0, lastConf: 0, lastSim: 0, created: zeroKinds(), destroyed: zeroKinds(),
     keyRegistrations: 0, registrations: 0, actions: 0, sends: 0, handleMax: 0, wrapped: false, wasPaused: false, wasMenu: false, lastTick: started,
@@ -472,7 +472,7 @@ export function installSessionRates(build: string): void {
   };
   wrapNatives(rates);
   startGameClock(rates);
-  const table = globalThis.__smashcraftDispatch;
+  const table = globalThis.__makgoraDispatch;
   if (table === undefined) return;
   const plain = table.run;
   const read = rates.clock;

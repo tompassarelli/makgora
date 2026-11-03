@@ -222,7 +222,7 @@ export function authoredPhysics(character: Character): FighterPhysics {
 
 
 export const REFERENCE_WEIGHT = 75.0;
-/** What a hero's 1.00 air multiplier means: Ultimate's median air speed (#190; smashcraft:docs/gameplay-design.md, "Air drift and jump momentum"). */
+/** What a hero's 1.00 air multiplier means: Ultimate's median air speed (#190; makgora:docs/gameplay-design.md, "Air drift and jump momentum"). */
 export const REFERENCE_AIR_SPEED = melee(1.0);
 
 const heroPhysicsRecords: (FighterPhysics | undefined)[] = [];
@@ -231,7 +231,7 @@ const heroPhysicsRecords: (FighterPhysics | undefined)[] = [];
 
 
 
-/** Melee's roster spread in Melee units a frame (smashcraft:docs/design/melee/movement.md, "Ground movement"). */
+/** Melee's roster spread in Melee units a frame (makgora:docs/design/melee/movement.md, "Ground movement"). */
 export const MELEE_WALK_SPEED_SPREAD: readonly [number, number] = [melee(0.6499999761581421), melee(1.600000023841858)];
 export const MELEE_DASH_SPEED_SPREAD: readonly [number, number] = [melee(1.0), melee(2.0)];
 export const MELEE_RUN_SPEED_SPREAD: readonly [number, number] = [melee(1.100000023841858), melee(2.299999952316284)];

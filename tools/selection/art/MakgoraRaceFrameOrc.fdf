@@ -1,8 +1,8 @@
-Frame "SIMPLEFRAME" "SmashcraftRaceFrameNightElf" {
+Frame "SIMPLEFRAME" "MakgoraRaceFrameOrc" {
     Width 0.06625,
     Height 0.085,
     Layer "BACKGROUND" {
-        Texture "SmashcraftRaceFrameNightElfPortrait" {
+        Texture "MakgoraRaceFrameOrcPortrait" {
             TexCoord 0.125, 0.875, 0, 1,
             AlphaMode "BLEND",
             Width 0.04875,

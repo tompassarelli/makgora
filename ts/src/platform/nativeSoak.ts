@@ -21,8 +21,8 @@ interface Soak {
 }
 
 declare global {
-  var __smashcraftNativeSoak: Soak | undefined;
-  var __smashcraftNativeSoakStart: boolean | undefined;
+  var __makgoraNativeSoak: Soak | undefined;
+  var __makgoraNativeSoakStart: boolean | undefined;
 }
 declare const collectgarbage: ((this: void, option: "count") => number) | undefined;
 
@@ -34,8 +34,8 @@ function lineup(s: ShellState, match: number): void {
 
 export function startNativeSoak(s: ShellState): boolean {
   const actor = firstHumanSlot(s.game);
-  if (actor === undefined || s.game.phase !== Phase.characterMenu || globalThis.__smashcraftSoakHandles === undefined) {
-    writeLines(NATIVE_SOAK_FILE, [`dev: native soak requires a soak ledger at selection; phase=${s.game.phase} actor=${actor ?? "none"} ledger=${globalThis.__smashcraftSoakHandles === undefined ? "missing" : "installed"}`]);
+  if (actor === undefined || s.game.phase !== Phase.characterMenu || globalThis.__makgoraSoakHandles === undefined) {
+    writeLines(NATIVE_SOAK_FILE, [`dev: native soak requires a soak ledger at selection; phase=${s.game.phase} actor=${actor ?? "none"} ledger=${globalThis.__makgoraSoakHandles === undefined ? "missing" : "installed"}`]);
     return false;
   }
   for (const slot of PARTICIPANT_SLOTS) {
@@ -47,18 +47,18 @@ export function startNativeSoak(s: ShellState): boolean {
   setTimeLimit(s.game, actor, 1);
   s.game.automaticRematch = true;
   s.dev.rematchSeconds = 1;
-  globalThis.__smashcraftNativeSoak = { callbacks: 0, frames: 0, matches: 1, results: 0, previousPhase: Phase.match, before: 0, phaseBefore: Phase.match };
+  globalThis.__makgoraNativeSoak = { callbacks: 0, frames: 0, matches: 1, results: 0, previousPhase: Phase.match, before: 0, phaseBefore: Phase.match };
   startQuickMatch(s, 0, s.build.scenario, undefined, 1);
   sample(s);
   return true;
 }
 
 export function beforeNativeSoakTick(s: ShellState): void {
-  if (globalThis.__smashcraftNativeSoakStart && s.game.phase === Phase.characterMenu) {
-    globalThis.__smashcraftNativeSoakStart = false;
+  if (globalThis.__makgoraNativeSoakStart && s.game.phase === Phase.characterMenu) {
+    globalThis.__makgoraNativeSoakStart = false;
     startNativeSoak(s);
   }
-  const soak = globalThis.__smashcraftNativeSoak;
+  const soak = globalThis.__makgoraNativeSoak;
   if (soak === undefined) return;
   if (s.game.phase === Phase.result && soak.previousPhase !== Phase.result) {
     soak.results++;
@@ -70,14 +70,14 @@ export function beforeNativeSoakTick(s: ShellState): void {
 }
 
 function sample(s: ShellState): void {
-  const soak = globalThis.__smashcraftNativeSoak;
+  const soak = globalThis.__makgoraNativeSoak;
   if (soak === undefined) return;
   const heap = typeof collectgarbage === "function" ? `heapKb=${truncate(collectgarbage("count"))}` : "heapKbAbsent=no-collectgarbage";
   writeLines(NATIVE_SOAK_FILE, ["dev: native soak four CPUs", `soak callbacks=${soak.callbacks} frames=${soak.frames} matches=${soak.matches} results=${soak.results} phase=${s.game.phase} stage=${s.game.stageChoice} characters=${s.game.characterChoices.join(",")} cpu=${s.game.computerMask} ${heap} handles=${liveSoakHandles()}`]);
 }
 
 export function afterNativeSoakTick(s: ShellState): void {
-  const soak = globalThis.__smashcraftNativeSoak;
+  const soak = globalThis.__makgoraNativeSoak;
   if (soak === undefined) return;
   soak.callbacks++;
   if (soak.phaseBefore === Phase.match) {

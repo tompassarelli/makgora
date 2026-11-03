@@ -42,8 +42,8 @@ interface Observed {
 }
 
 const shellOf = (client: HeadlessClient): ShellState & Observed => {
-  let shell: unknown = client.natives.__smashcraftShell;
-  if (shell === undefined) client.run(() => { shell = globalThis.__smashcraftShell; });
+  let shell: unknown = client.natives.__makgoraShell;
+  if (shell === undefined) client.run(() => { shell = globalThis.__makgoraShell; });
   if (shell === undefined) throw new Error(`p${client.slot} has no shell`);
   return shell as ShellState & Observed;
 };

@@ -347,7 +347,7 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
     ...(yield* mapArtImports(assets)),
 
     ...(yield* stageCardImports),
-    ...["SmashcraftHUD.fdf", "SmashcraftHUD.toc", ...UI_FRAME_FILES].map((file) => imported(join(PROJECT, "tools/selection/art"), file)),
+    ...["MakgoraHUD.fdf", "MakgoraHUD.toc", ...UI_FRAME_FILES].map((file) => imported(join(PROJECT, "tools/selection/art"), file)),
 
     ...[...IMPORTED_MUSIC, ...IMPORTED_VOICES].map(({ path, file }) => ({ entry: path, source: join(assets, "imported-models", file) })),
     ...IMPORTED_MODEL_FILES.map(({ entry, file }) => ({ entry, source: join(assets, "imported-models", file) })),

@@ -14,7 +14,7 @@ import { player, playerName } from "wisp/game/players";
 
 declare global {
 
-  var __smashcraftMatchSerial: number | undefined;
+  var __makgoraMatchSerial: number | undefined;
 }
 
 
@@ -22,13 +22,13 @@ declare global {
 
 
 export function readMatchIndex(): void {
-  globalThis.__smashcraftMatchSerial ??= nextSerial(readChunk(MATCH_RECORD_INDEX_FILE));
+  globalThis.__makgoraMatchSerial ??= nextSerial(readChunk(MATCH_RECORD_INDEX_FILE));
 }
 
 
 function takeMatchSerial(): number {
-  const serial = globalThis.__smashcraftMatchSerial ?? nextSerial(readChunk(MATCH_RECORD_INDEX_FILE));
-  globalThis.__smashcraftMatchSerial = serial + 1;
+  const serial = globalThis.__makgoraMatchSerial ?? nextSerial(readChunk(MATCH_RECORD_INDEX_FILE));
+  globalThis.__makgoraMatchSerial = serial + 1;
   writeChunks(MATCH_RECORD_INDEX_FILE, [`${serial + 1}`]);
   return serial;
 }

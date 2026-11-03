@@ -2,16 +2,16 @@
 # PATH<TAB>ORIGIN (original, generated, or stock-path: names stock assets by in-game path, holds none)<TAB>HOW it was made
 tools/selection/art/OpponentSettings.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock textures and fonts by in-game path
 tools/selection/art/OpponentSettings.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
-tools/selection/art/SmashcraftHUD.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/)
-tools/selection/art/SmashcraftHUD.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
-tools/selection/art/SmashcraftRaceFrameHuman.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock console textures by in-game path
-tools/selection/art/SmashcraftRaceFrameHuman.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
-tools/selection/art/SmashcraftRaceFrameNightElf.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock console textures by in-game path
-tools/selection/art/SmashcraftRaceFrameNightElf.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
-tools/selection/art/SmashcraftRaceFrameOrc.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock console textures by in-game path
-tools/selection/art/SmashcraftRaceFrameOrc.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
-tools/selection/art/SmashcraftRaceFrameUndead.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock console textures by in-game path
-tools/selection/art/SmashcraftRaceFrameUndead.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
+tools/selection/art/MakgoraHUD.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/)
+tools/selection/art/MakgoraHUD.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
+tools/selection/art/MakgoraRaceFrameHuman.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock console textures by in-game path
+tools/selection/art/MakgoraRaceFrameHuman.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
+tools/selection/art/MakgoraRaceFrameNightElf.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock console textures by in-game path
+tools/selection/art/MakgoraRaceFrameNightElf.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
+tools/selection/art/MakgoraRaceFrameOrc.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock console textures by in-game path
+tools/selection/art/MakgoraRaceFrameOrc.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
+tools/selection/art/MakgoraRaceFrameUndead.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock console textures by in-game path
+tools/selection/art/MakgoraRaceFrameUndead.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
 tools/selection/art/wc3-hand-point.png	original	Tom authored with AI (Gemini, made for this game: a dark-iron, brass-trimmed gauntlet pointing up-left) and approved public shipping (re-made 2026-11-01, replacing the steel gauntlet of 2026-10-30); keyed from his makgora-hand-default.jpeg by tools/selection/key-hand-states.ts.
 tools/selection/art/wc3-hand-fan.png	original	Tom authored with AI (Gemini, made for this game: a dark-iron, brass-trimmed gauntlet pointing up-left) and approved public shipping (re-made 2026-11-01, replacing the steel gauntlet of 2026-10-30); keyed from his makgora-hand-over-character-not-pinching.jpeg by tools/selection/key-hand-states.ts.
 tools/selection/art/wc3-hand-pinch.png	original	Tom authored with AI (Gemini, made for this game: a dark-iron, brass-trimmed gauntlet pointing up-left) and approved public shipping (re-made 2026-11-01, replacing the steel gauntlet of 2026-10-30); keyed from his makgora-hand-pinching.jpeg by tools/selection/key-hand-states.ts.

@@ -376,11 +376,11 @@ export interface ShellState {
 }
 
 declare global {
-  var __smashcraftShell: ShellState | undefined;
-  var __smashcraftPlaytest: { request: string | undefined; looked: number; starting: boolean; sent: boolean; cancelled: boolean } | undefined;
+  var __makgoraShell: ShellState | undefined;
+  var __makgoraPlaytest: { request: string | undefined; looked: number; starting: boolean; sent: boolean; cancelled: boolean } | undefined;
 }
 
-export const playtestProgress = () => (globalThis.__smashcraftPlaytest ??= { request: undefined, looked: 0, starting: false, sent: false, cancelled: false });
+export const playtestProgress = () => (globalThis.__makgoraPlaytest ??= { request: undefined, looked: 0, starting: false, sent: false, cancelled: false });
 
 
 export function cancelPendingPlaytest(): void {
@@ -388,11 +388,11 @@ export function cancelPendingPlaytest(): void {
 }
 
 export function shellState(): ShellState | undefined {
-  return globalThis.__smashcraftShell;
+  return globalThis.__makgoraShell;
 }
 
 export function shell(): ShellState {
-  const state = globalThis.__smashcraftShell;
+  const state = globalThis.__makgoraShell;
   if (state === undefined) throw new Error("shell used before start");
   return state;
 }
@@ -473,7 +473,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
   const moments = state.moment.recorder;
   reserveBotObservations(state.runtime.botMemory,
     BOT_HISTORY_FRAMES * (moments.snapshots.length + 4) + REPLAY_HISTORY_CAPACITY + 2 * REPLAY_MAX_CORRECTION_FRAMES);
-  globalThis.__smashcraftShell = state;
+  globalThis.__makgoraShell = state;
   return state;
 }
 

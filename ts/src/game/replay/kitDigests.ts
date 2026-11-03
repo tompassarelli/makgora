@@ -10,7 +10,7 @@ const SPECIALS_DIGESTS = new Map<Readonly<FighterSpecials>, string>();
 const PLACEMENT_DIGESTS = new Map<Readonly<SpecialPlacement>, string>();
 const placedSpecCanonical = (spec: Readonly<SpecialPlacement>): string => specialPlacementCanonical(spec, "placedSpec");
 declare global {
-  var __smashcraftKitDigests: Record<string, string | undefined> | undefined;
+  var __makgoraKitDigests: Record<string, string | undefined> | undefined;
 }
 
 
@@ -21,7 +21,7 @@ function kitDigestField<K>(name: string, kit: K | undefined, digests: Map<K, str
   let digest = digests.get(kit);
   if (digest === undefined) {
     const canonical = text(kit);
-    digest = retainedKitDigests[canonical] ?? globalThis.__smashcraftKitDigests?.[canonical];
+    digest = retainedKitDigests[canonical] ?? globalThis.__makgoraKitDigests?.[canonical];
     if (digest === undefined) digest = canonicalChecksum(canonical);
     retainedKitDigests[canonical] = digest;
     digests.set(kit, digest);
@@ -39,5 +39,5 @@ export function observedOpponentKitCanonical(fighter: Readonly<Fighter>): string
 }
 
 export function publishKitDigests(): void {
-  globalThis.__smashcraftKitDigests = retainedKitDigests;
+  globalThis.__makgoraKitDigests = retainedKitDigests;
 }

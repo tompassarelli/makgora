@@ -9,17 +9,17 @@ import { MAKGORA_NOOPS, makgoraNativeBehavior } from "./headlessNatives";
 
 
 const MAKGORA_DAMAGE_TEMPLATE = {
-  name: "SmashcraftDamage", type: "TEXT", width: 0, height: 0, text: "0.0%", children: [],
+  name: "MakgoraDamage", type: "TEXT", width: 0, height: 0, text: "0.0%", children: [],
   font: { file: "MasterFont", size: 0.036, flags: 1 }, justify: { horizontal: "LEFT", vertical: "MIDDLE" },
 } as const;
 
 const MAKGORA_DAMAGE_OUTLINE_TEMPLATE = {
-  ...MAKGORA_DAMAGE_TEMPLATE, name: "SmashcraftDamageOutline", text: "0", font: { file: "MasterFont", size: 0.036, flags: 0 },
+  ...MAKGORA_DAMAGE_TEMPLATE, name: "MakgoraDamageOutline", text: "0", font: { file: "MasterFont", size: 0.036, flags: 0 },
 } as const;
 
 export const MAKGORA_HEADLESS: HeadlessMap = {
   filePrefix: "smashcraft",
-  globalPrefixes: ["__smashcraft"],
+  globalPrefixes: ["__makgora"],
   localNatives: MAKGORA_LOCAL_NATIVES,
   intentionalNoops: MAKGORA_NOOPS,
   natives: makgoraNativeBehavior,

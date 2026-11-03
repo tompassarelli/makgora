@@ -25,11 +25,11 @@ interface BetweenFrames {
 }
 
 declare global {
-  var __smashcraftBetweenFrames: BetweenFrames | undefined;
+  var __makgoraBetweenFrames: BetweenFrames | undefined;
 }
 
 function state(): BetweenFrames {
-  return (globalThis.__smashcraftBetweenFrames ??= { tick: undefined, drawing: false, drawsSinceTick: 0, drawsPerTick: 0.0, drawnAlpha: -1.0 });
+  return (globalThis.__makgoraBetweenFrames ??= { tick: undefined, drawing: false, drawsSinceTick: 0, drawsPerTick: 0.0, drawnAlpha: -1.0 });
 }
 
 

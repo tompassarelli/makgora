@@ -18,21 +18,21 @@ interface Stamp {
   readonly shown: (StampCell | undefined)[];
 }
 
-declare global { var __smashcraftDrawnStamp: Stamp | undefined; }
+declare global { var __makgoraDrawnStamp: Stamp | undefined; }
 
 function stamp(): Stamp {
-  const existing = globalThis.__smashcraftDrawnStamp;
+  const existing = globalThis.__makgoraDrawnStamp;
   if (existing !== undefined) return existing;
   const cells: Frame[] = [];
   for (let index = 0; index < 2 * STAMP_CELLS; index++) {
-    const cell = createBackdrop("SmashcraftDrawnStamp", gameUi(), index);
+    const cell = createBackdrop("MakgoraDrawnStamp", gameUi(), index);
     setFrameSize(cell, STAMP_CELL, STAMP_CELL);
     placeTopLeft(cell, f32(floorMod(index, STAMP_CELLS) * STAMP_CELL), index < STAMP_CELLS ? f32(0.6) : f32(STAMP_CELL));
     setFrameLevel(cell, 9);
     cells.push(cell);
   }
   const created: Stamp = { cells, shown: cells.map(() => undefined) };
-  globalThis.__smashcraftDrawnStamp = created;
+  globalThis.__makgoraDrawnStamp = created;
   return created;
 }
 

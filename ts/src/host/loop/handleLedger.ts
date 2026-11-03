@@ -47,11 +47,11 @@ export interface LedgerReport {
 }
 
 declare global {
-  var __smashcraftHandleLedger: HandleLedger | undefined;
+  var __makgoraHandleLedger: HandleLedger | undefined;
 }
 
 export function handleLedger(): HandleLedger {
-  return globalThis.__smashcraftHandleLedger ??= { tick: 0, wrapped: false, sentWindow: -1, windows: [], reported: [false, false, false, false], lines: [] };
+  return globalThis.__makgoraHandleLedger ??= { tick: 0, wrapped: false, sentWindow: -1, windows: [], reported: [false, false, false, false], lines: [] };
 }
 
 function windowAt(ledger: HandleLedger, window: number): LedgerWindow {

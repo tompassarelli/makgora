@@ -37,7 +37,7 @@ export function partScale(part: FramePart): { readonly x: number; readonly y: nu
   return { x: part.width / (Math.abs(right - left) * part.texels), y: part.height / ((bottom - top) * part.texels) };
 }
 
-export const raceFrameName = (race: Race): string => `SmashcraftRaceFrame${race}`;
+export const raceFrameName = (race: Race): string => `MakgoraRaceFrame${race}`;
 
 export const namePlateTexture = (mirrored: boolean): string => `war3mapImported\\NamePlate${mirrored ? "Mirror" : ""}.tga`;
 export const STOCK_SHADOW_TEXTURE = "war3mapImported\\StockShadow.tga";
