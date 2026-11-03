@@ -12,7 +12,7 @@ const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-stock-frames" };
 
 test("the startup hide list names these stock frame groups and counts, none of them the game UI, world, simple UI parent or chat [k2 property]", () => {
   expect(STOCK_FRAME_COUNTS).toEqual({
-    command: 12, item: 6, heroBar: 1, heroButton: 7, heroHealthBar: 7, heroManaBar: 7, heroButtonIndicator: 7, minimap: 1, minimapButton: 5, systemButton: 4,
+    command: 12, item: 6, heroBar: 1, heroButton: 7, heroHealthBar: 7, heroManaBar: 7, heroButtonIndicator: 7, minimap: 1, minimapButton: 5,
   });
 });
 
@@ -28,4 +28,16 @@ test("startup hides and disables every listed stock frame, and none of them is a
   expect(stock.length).toBeGreaterThanOrEqual(expected);
   expect(stock.filter(frame => parents.has(frame.handle.id))).toEqual([]);
   expect(frames.find(frame => frame.name === "ConsoleUIBackdrop")?.visible ?? true).toBe(true);
+});
+
+// Engine: F9 to F12 are the hotkeys of the stock system buttons, and a disabled system button drops its key, so F10 would not open the Game Menu.
+test("startup leaves Warcraft's four system buttons enabled, so F10 still opens the Game Menu [k2 property]", () => {
+  const clients = headless.clients({ install, start: () => startBuild(BUILD) }, [0]);
+  clients.start();
+  clients.frames(120);
+  const enabled: boolean[] = [];
+  clients.client(0).run(() => {
+    for (let index = 0; index < 4; index++) enabled.push(BlzFrameGetEnable(BlzGetOriginFrame(ORIGIN_FRAME_SYSTEM_BUTTON, index)));
+  });
+  expect(enabled).toEqual([true, true, true, true]);
 });

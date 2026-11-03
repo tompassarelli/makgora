@@ -9,7 +9,6 @@ export const STOCK_FRAME_COUNTS = {
   heroButtonIndicator: 7,
   minimap: 1,
   minimapButton: 5,
-  systemButton: 4,
 } as const;
 
 export type StockFrameGroup = keyof typeof STOCK_FRAME_COUNTS;
@@ -26,7 +25,6 @@ function origin(group: StockFrameGroup): originframetype {
     case "heroButtonIndicator": return ORIGIN_FRAME_HERO_BUTTON_INDICATOR;
     case "minimap": return ORIGIN_FRAME_MINIMAP;
     case "minimapButton": return ORIGIN_FRAME_MINIMAP_BUTTON;
-    case "systemButton": return ORIGIN_FRAME_SYSTEM_BUTTON;
   }
 }
 

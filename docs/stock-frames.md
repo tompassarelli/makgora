@@ -23,8 +23,10 @@ command bar and two sibling bars, with every other stock group hidden.
 Rule: at startup `releaseStockClicks` (makgora:ts/src/game/ui/stockClicks.ts)
 hides and disables those three subtrees, and `hideStockOriginFrames`
 (makgora:ts/src/host/loop/stockFrames.ts) hides and disables each stock
-command, item, hero, minimap and system-button origin frame by name, both
-beside `BlzHideOriginFrames(true)`. A new panel
+command, item, hero and minimap origin frame by name, both beside
+`BlzHideOriginFrames(true)`. It leaves the four system buttons (Quests, Menu,
+Allies, Log) alone: F9 to F12 are their hotkeys, and a disabled Menu button
+drops F10, so the Game Menu would not open (makgora#1081). A new panel
 button is clicked natively across its width; headless tests cannot show this.
 
 ## The frame tree our frames hang off
