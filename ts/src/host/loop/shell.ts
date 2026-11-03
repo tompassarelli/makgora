@@ -56,6 +56,7 @@ import { endReplaySegment, serviceReplay } from "./replays";
 import { CONTROL_ACK_PREFIX, PAUSE_REQUEST_PREFIX } from "../../game/session/pauseBarrier";
 import { clearMatchEffects, createUi, recreateUi, views } from "./ui";
 import { findWarcraftMenuFrames } from "./warcraftMenu";
+import { hideStockOriginFrames } from "./stockFrames";
 import { registerChatEvents, registerChatHistoryKey } from "wisp/src/ui/chatPanel";
 import { resultsView } from "../../game/presentation/matchCues";
 import * as view from "./view";
@@ -380,6 +381,7 @@ function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: nu
   if (shellState() !== undefined) return;
   hideOriginFrames(true);
   releaseStockClicks();
+  hideStockOriginFrames();
 
   if (!loadFrameFile("war3mapImported\\SmashcraftHUD.toc")) displayText(localPlayer(), 0.0, 0.0, "The game's menus could not load. Restart the game.");
   enableSelections(false, false);
