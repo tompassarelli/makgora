@@ -85,7 +85,7 @@ can hold Esc for one second to fill it and return to fighter selection with no o
 keys; an Esc still held after leaving does nothing at fighter selection until it is
 released. Releasing early empties the bar and resumes, so a tap still resumes. Start,
 Esc or Backspace alone resumes. Leaving a match always goes to fighter selection. The title screen opens from fighter selection with
-the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). F2 on the pause screen is reserved for the Show keyboard in game toggle; G hides the HUD for a clean screenshot.
+the < MENU button at the top left, Esc, or by moving the menu focus down to it and pressing Attack (the pad's A). F2 on the pause screen is reserved for the Show controls in game toggle; G hides the HUD for a clean screenshot.
 
 At fighter selection, up/down (W/S on WASD, P/E on Box, Space/E on Custom) moves focus
 between fighter cards and CPU Opponent settings. Left/right changes the focused
@@ -99,9 +99,8 @@ Every game opens on the Controls screen, one for each player, before fighter
 select. The top row holds WASD (recommended if you're new), Box (the leverless
 controller style, with P as up and Space as Walk) and your selected Custom slot, shown by its
 name and lit gold while selected; picking one saves it as your profile. WASD and
-Box never change: rebinding a key on either copies that layout into the selected
-Custom slot with your edit, selects it and saves it. Click the Custom button again
-while it is selected to open the list of all three Custom slots, each by its name
+Box never change: rebinding a key on either copies that layout into a new Custom profile (WASD - custom1, Box - custom1, and so on) without overwriting an existing Custom profile, selects it and saves it. Click the Custom button again
+while it is selected to open the list of all Custom slots, each by its name
 (an unused slot says empty); pick one to load it, or press Escape or click
 elsewhere to close the list. Below, the keyboard lights every bound key with its
 action; click a lit key, press the key you want instead, then Save. While a Custom
@@ -113,7 +112,7 @@ captures one for it. Escape cancels a rebind. Rename turns the Custom button int
 text field for the slot's name: Enter, OK or a click elsewhere keeps it and Escape puts
 the old name back.
 Reset brings back the Custom defaults, and Delete empties the slot back to the
-Custom defaults with no name; all three are greyed out on WASD and Box. The bottom row holds Show keyboard in game on the left and Save and Done on the right, with Stick Jump (off by default; when on, pressing Up jumps with full cardinal up unless Mod Y or Shield + Mod X is held) and C-Stick Tilt Attack (on by default; when off, the C-stick keys give uncharged smashes on the ground and aerials in the air) just above the status line.
+Custom defaults with no name; all three are greyed out on WASD and Box. The bottom row holds Show controls in game on the left and Save and Done on the right, with Stick Jump (off by default; when on, pressing Up jumps with full cardinal up unless Mod Y or Shield + Mod X is held) and C-Stick Tilt Attack (on by default; when off, the C-stick keys give uncharged smashes on the ground and aerials in the air) just above the status line.
 Done (or Escape) closes the screen and goes on to fighter
 select; each player confirms their own. F1 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to
@@ -121,11 +120,11 @@ bring back your saved ones. Y binds to any action and stays Start on fighter and
 remain reserved for Warcraft shortcuts. Pressing a reserved key during a rebind
 is refused and the screen names what it is reserved for.
 
-Show keyboard in game is on for a new player and off for anyone who saved controls before it
+Show controls in game is on for a new player and off for anyone who saved controls before it
 existed. In a match a CONTROLS panel sits in the bottom row between the player panels (they move to the screen's edges, and shrink a little with three or four players, to give it room) and lists
 every action with the key you bound to it (- when unbound): movement, Mod-X (Walk), then
 A (Atk), B (Spc), X (Jmp) and Y (Jmp, the short hop) on the left; the C-stick, Mod-Y (Tilt), then
-Shield (both trigger keys), Lightshield, Strong (Smash) and Grab on the right. A row lights while you hold its key (your controller's buttons on a pad). Press F2 in a match or click "Show keyboard in
+Shield (both trigger keys), Lightshield, Strong (Smash) and Grab on the right. A row lights while you hold its key (your controller's buttons on a pad). Press F2 in a match or click "Show controls in
 game" on the Controls screen to hide or show it, and the choice is saved with your controls. If you
 F2 is fixed like F1 and cannot be bound to an action; the panel title reads "Controls - F2 to toggle". Ctrl+T starts a developer input trace.
 
@@ -142,9 +141,9 @@ saved" appears. The match goes on undisturbed.
 
 WASD, the default, uses A/D to move, W to aim up, S to fast-fall or drop
 through platforms, 8 to jump, Q to shield or air-dodge, E for light
-shield, O to grab, I to short hop, 9 for Strong, N to attack, and U for a special. Every layout puts the C-stick on Y (up), J (left), K (down) and L (right) (Tom, 2026-11-01). Walk is P on WASD and Custom and Space on Box (Tom, 2026-11-02). Box moves with W/R,
+shield, O to grab, I to short hop, 9 for Strong, N to attack, and U for a special. Every layout puts the C-stick on Y (up), J (left), K (down) and L (right) (Tom, 2026-11-01). Walk is Space and Mod Y is C on WASD and Box (P and ; on Custom). Box moves with W/R,
 aims up with P and down with E, jumps with 8 and shields with Q (light
-shield A, Strong 9). Custom is Box with Space to aim up, P to walk, 9 to jump, Q/8 to shield, A for light shield and 0 for Strong. Shield + N or O
+shield A, Strong 9). Custom is Box with Space to aim up, P to walk, ; for Mod Y, 9 to jump, Q/8 to shield, A for light shield and 0 for Strong. Shield + N or O
 grabs. While holding an
 opponent, tap N to pummel once or a movement/C-stick direction to throw forward,
 backward, up, or down; after the pummel, throw or the opponent goes free. Mash

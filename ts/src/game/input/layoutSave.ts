@@ -5,7 +5,8 @@ const DIGITS = "0123456789";
 export type LayoutBindings = Record<BindingPreset, KeyBindings>;
 
 export const CUSTOM_SLOT_COUNT = 3;
-export const SLOT_NAME_LIMIT = 12;
+export const MAX_CUSTOM_SLOTS = 9;
+export const SLOT_NAME_LIMIT = 16;
 const NAME_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -_.";
 
 export interface CustomSlot {
@@ -16,7 +17,7 @@ export interface CustomSlot {
 export interface LayoutSave {
   readonly layouts: LayoutBindings;
   readonly active: BindingPreset;
-  readonly customs: readonly CustomSlot[];
+  readonly customs: CustomSlot[];
   readonly slot: number;
   readonly keyboard: boolean;
   readonly stickJump: boolean;
@@ -104,7 +105,7 @@ function decodeOneCustom(saved: string, active: BindingPreset): LayoutSave | und
 
 function decodeCustomSlots(saved: string, active: BindingPreset, withFlag: boolean, withKeyboard: boolean): LayoutSave | undefined {
   const slot = DIGITS.indexOf(saved.charAt(3));
-  if (slot < 0 || slot >= CUSTOM_SLOT_COUNT) return undefined;
+  if (slot < 0 || slot >= MAX_CUSTOM_SLOTS) return undefined;
   const flags = withFlag ? DIGITS.indexOf(saved.charAt(4)) : 0;
   if (flags < 0 || flags > (withKeyboard ? 7 : 1)) return undefined;
   const layouts = presetLayouts();
@@ -115,12 +116,13 @@ function decodeCustomSlots(saved: string, active: BindingPreset, withFlag: boole
     layouts[preset] = bindings;
   }
   const customs: CustomSlot[] = [];
-  for (let index = 0; index < CUSTOM_SLOT_COUNT; index++) {
+  while (cursor.at < saved.length && customs.length < MAX_CUSTOM_SLOTS) {
     const bindings = readBindings(cursor, "custom");
     const name = bindings === undefined ? undefined : readName(cursor);
     if (bindings === undefined || name === undefined) return undefined;
     customs.push({ bindings, name });
   }
+  if (customs.length < CUSTOM_SLOT_COUNT) return undefined;
   const chosen = customs[slot];
   if (chosen === undefined || cursor.at !== saved.length) return undefined;
   layouts.custom = chosen.bindings;

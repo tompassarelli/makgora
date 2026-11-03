@@ -1169,7 +1169,7 @@ four specials on the ground and in the air.
   between the groups, centred where they leave room. Everything stays inside
   the 4:3 area. With the preview off the plates close up evenly spaced and
   centred at full size. It shows only
-  in matches. The Controls screen's "Show keyboard in game" button and F2 toggle
+  in matches. The Controls screen's "Show controls in game" button and F2 toggle
   it. F2 is fixed like F1: no action can be bound to it, it never enters the sim's input mask or the wire, and the panel title always reads "Controls - F2 to toggle". It is saved with the controls (`encodeLayouts`, save version KO). A
   new player starts with it on; a save from before it (KN, KM or KL) loads with
   it off, so existing players keep today's HUD.

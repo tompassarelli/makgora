@@ -92,18 +92,20 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.cRight, code("L"));
   bind(Action.cUp, START_KEY);
   bind(Action.cDown, code("K"));
-  bind(Action.modX, preset === "standard" ? SPACE : code("P"));
+  bind(Action.modX, custom ? code("P") : SPACE);
   bind(Action.lightShield, code(wasd ? "E" : "A"));
   bind(Action.shortHop, code("I"));
   if (custom) bind(Action.strong, code("0"));
   else bind(Action.strong, code("9"));
-  bind(Action.modY, MOD_Y_KEY);
+  bind(Action.modY, custom ? MOD_Y_KEY : code("C"));
   return { keys };
 }
 
 type KeyChange = readonly [action: Action, first: number, second?: number];
 
-const SPACE_UP_BOX: readonly KeyChange[] = [[Action.moveUp, SPACE], [Action.modX, code("P")]];
+const SEMICOLON_WASD: readonly KeyChange[] = [[Action.modX, code("P")], [Action.modY, MOD_Y_KEY]];
+const SEMICOLON_BOX: readonly KeyChange[] = [[Action.modY, MOD_Y_KEY]];
+const SPACE_UP_BOX: readonly KeyChange[] = [[Action.moveUp, SPACE], [Action.modX, code("P")], [Action.modY, MOD_Y_KEY]];
 
 const applyKeys = (keys: number[], changes: readonly KeyChange[]): number[] => {
   for (const [action, first, second = EMPTY] of changes) {
@@ -113,6 +115,8 @@ const applyKeys = (keys: number[], changes: readonly KeyChange[]): number[] => {
   return keys;
 };
 
+export const semicolonWasdKeys = (): number[] => applyKeys(presetBindings("wasd").keys.slice(), SEMICOLON_WASD);
+export const semicolonBoxKeys = (): number[] => applyKeys(presetBindings("standard").keys.slice(), SEMICOLON_BOX);
 export const spaceUpBoxKeys = (): number[] => applyKeys(presetBindings("standard").keys.slice(), SPACE_UP_BOX);
 
 export function previousStandardKeys(): number[] {
@@ -136,7 +140,7 @@ export function previousStandardKeys(): number[] {
 
 type StockPreset = "wasd" | "standard";
 
-const earlierBase = (preset: BindingPreset): number[] => preset === "standard" ? spaceUpBoxKeys() : presetBindings(preset).keys.slice();
+const earlierBase = (preset: BindingPreset): number[] => preset === "standard" ? spaceUpBoxKeys() : preset === "wasd" ? semicolonWasdKeys() : presetBindings(preset).keys.slice();
 
 const previousCStickKeys = (preset: BindingPreset): readonly KeyChange[] => [[Action.cUp, preset === "custom" ? MINUS : code("0")], [Action.cDown, code("P")], [Action.modX, code("K")]];
 
@@ -163,7 +167,7 @@ const earlierStockKeys = (preset: StockPreset, changes: readonly KeyChange[]): n
 
 function earlierDefaults(preset: BindingPreset): number[][] {
   if (preset === "custom") return [withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), withKeys(preset, EARLIER_CUSTOM_JUMP)];
-  const earlier = [...(preset === "standard" ? [spaceUpBoxKeys()] : []), withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), previousDefaultKeys(preset), withKeys(preset, [...previousCStickKeys(preset), ...previousDefaultChanges(preset)]), ...EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes))];
+  const earlier = [...(preset === "standard" ? [semicolonBoxKeys(), spaceUpBoxKeys()] : [semicolonWasdKeys()]), withKeys(preset, []), withKeys(preset, previousCStickKeys(preset)), previousDefaultKeys(preset), withKeys(preset, [...previousCStickKeys(preset), ...previousDefaultChanges(preset)]), ...EARLIER_STOCK_CHANGES.map((changes) => earlierStockKeys(preset, changes))];
   return preset === "wasd" ? [...earlier, earlierStockKeys(preset, PREVIOUS_STOCK_CHANGES)] : earlier;
 }
 
@@ -204,7 +208,8 @@ const MENU_ACTIONS: readonly Action[] = [Action.moveLeft, Action.moveRight, Acti
 export function menuAction(bindings: Readonly<KeyBindings>, key: number): Action | undefined {
   const arrow = ARROWS.find(([arrowKey]) => arrowKey === key);
   if (arrow !== undefined) return arrow[1];
-  const action = inputAction(bindings, key);
+  const bound = actionFor(bindings, key);
+  const action = bound !== undefined && MENU_ACTIONS.includes(bound) ? bound : padLayerAction(key);
   return action !== undefined && MENU_ACTIONS.includes(action) ? action : undefined;
 }
 

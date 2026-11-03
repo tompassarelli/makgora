@@ -24,9 +24,12 @@ import {
   unboundActions,
 } from "../input/keyBindings";
 import {
+  CUSTOM_SLOT_COUNT,
   type LayoutBindings,
   type LayoutSave,
+  MAX_CUSTOM_SLOTS,
   type CustomSlot,
+  customSlotEmpty,
   customSlotLabel,
   layoutSave,
   slotName,
@@ -61,7 +64,7 @@ export interface BindingSettings {
   readonly owner: number;
   readonly persistence: BindingPersistence;
   layouts: LayoutBindings;
-  customs: readonly CustomSlot[];
+  customs: CustomSlot[];
   slot: number;
   keyboard: boolean;
   stickJump: boolean;
@@ -209,6 +212,32 @@ function selectCustom(settings: BindingSettings, bindings: KeyBindings): void {
   settings.bindings = bindings;
 }
 
+function nextCustomName(customs: readonly CustomSlot[], from: string): string {
+  for (let index = 1; index <= customs.length + 1; index++) {
+    const candidate = `${from} - custom${index}`;
+    if (!customs.some(custom => custom.name === candidate)) return candidate;
+  }
+  return `${from} - custom1`;
+}
+
+function forkCustomSlot(settings: BindingSettings, from: string, bindings: KeyBindings): void {
+  const name = nextCustomName(settings.customs, from);
+  const empty = settings.customs.findIndex((_, index) => customSlotEmpty(settings.customs, index));
+  if (empty >= 0) {
+    settings.slot = empty;
+    const custom = settings.customs[empty];
+    if (custom !== undefined) custom.name = name;
+  } else if (settings.customs.length < MAX_CUSTOM_SLOTS) {
+    settings.slot = settings.customs.length;
+    settings.customs.push({ bindings, name });
+  } else {
+    settings.slot = settings.slot + 1 < settings.customs.length ? settings.slot + 1 : 0;
+    const custom = settings.customs[settings.slot];
+    if (custom !== undefined) custom.name = name;
+  }
+  selectCustom(settings, bindings);
+}
+
 const editableBindings = (settings: Readonly<BindingSettings>): KeyBindings => settings.layout === "custom" ? settings.bindings : { keys: settings.bindings.keys.slice() };
 
 function finishEdit(settings: BindingSettings, target: KeyBindings, message: string): void {
@@ -217,10 +246,10 @@ function finishEdit(settings: BindingSettings, target: KeyBindings, message: str
     return;
   }
   const from = PRESET_NAMES[settings.layout];
-  selectCustom(settings, target);
+  forkCustomSlot(settings, from, target);
   edited(settings, message);
   saveBindingSettings(settings);
-  settings.message = `${message} ${from} stays as it was; your keys are in Custom and saved.`;
+  settings.message = `${message} ${from} stays as it was; your keys are in ${slotLabel(settings)} and saved.`;
 }
 
 function clearedMessage(bindings: Readonly<KeyBindings>, action: Action, key: number | undefined): string {
@@ -280,7 +309,7 @@ export function toggleKeyboardPreview(settings: BindingSettings): void {
   if (!settings.ready) return;
   settings.keyboard = !settings.keyboard;
   saveBindingSettings(settings);
-  settings.message = settings.keyboard ? "The keyboard shows in game." : "The keyboard is hidden in game.";
+  settings.message = settings.keyboard ? "Controls show in game." : "Controls are hidden in game.";
 }
 
 export function toggleStickJump(settings: BindingSettings): void {
@@ -396,8 +425,14 @@ export function deleteProfile(settings: BindingSettings): void {
   endNaming(settings);
   settings.picking = false;
   const deleted = slotLabel(settings);
-  custom.name = "";
-  selectCustom(settings, presetBindings("custom"));
+  if (settings.customs.length > CUSTOM_SLOT_COUNT) {
+    settings.customs.splice(settings.slot, 1);
+    if (settings.slot >= settings.customs.length) settings.slot = settings.customs.length - 1;
+    selectCustom(settings, settings.customs[settings.slot]?.bindings ?? presetBindings("custom"));
+  } else {
+    custom.name = "";
+    selectCustom(settings, presetBindings("custom"));
+  }
   edited(settings, `${deleted} deleted.`);
   saveBindingSettings(settings);
   settings.message = `${deleted} deleted. ${slotLabel(settings)} is back on the Custom defaults.`;

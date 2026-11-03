@@ -1,6 +1,6 @@
 import { Action, bit } from "./actions";
-import { type KeyBindings, actionFor, inputAction, keyFor, keyNames } from "./keyBindings";
-import { padLayerKey } from "./padKeys";
+import { type KeyBindings, actionFor, keyFor, keyNames } from "./keyBindings";
+import { padLayerAction, padLayerKey } from "./padKeys";
 
 const SHIELDS: readonly Action[] = [Action.leftTrigger, Action.rightTrigger, Action.lightShield];
 const CHORD_ACTIONS: readonly Action[] = [...SHIELDS, Action.attack];
@@ -13,7 +13,8 @@ export type ChordKeys = boolean[];
 export const chordKeys = (): ChordKeys => Array.from({ length: KEY_CODES }, () => false);
 
 export function chordAction(bindings: Readonly<KeyBindings>, key: number): Action | undefined {
-  const action = inputAction(bindings, key);
+  const bound = actionFor(bindings, key);
+  const action = bound !== undefined && CHORD_ACTIONS.includes(bound) ? bound : padLayerAction(key);
   return action !== undefined && CHORD_ACTIONS.includes(action) ? action : undefined;
 }
 

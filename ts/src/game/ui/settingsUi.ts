@@ -2,7 +2,7 @@ import { on, trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
 import { bindPrototype } from "../../platform/rebind";
 import { ACTION_KEY_LABELS, BINDING_PRESETS, type BindingPreset, PRESET_NAMES, actionFor, encodeBindings, keyLabel, unboundActions } from "../input/keyBindings";
-import { CUSTOM_SLOT_COUNT, SLOT_NAME_LIMIT, customSlotEmpty } from "../input/layoutSave";
+import { MAX_CUSTOM_SLOTS, SLOT_NAME_LIMIT, customSlotEmpty } from "../input/layoutSave";
 import {
   type BindingSettings,
   beginKeyCapture,
@@ -238,7 +238,7 @@ export class SettingsPanel {
     this.dismiss = createDismiss(root, `MeleeSettingsDismiss${suffix}`, participantId);
     this.clicks.add(this.dismiss, { kind: "dismiss" }, undefined, "native");
     const slotButtons: PanelButton[] = [];
-    for (let slot = 0; slot < CUSTOM_SLOT_COUNT; slot++) slotButtons.push(button(`MeleeSettingsSlot${formatInt(slot)}`, slotOption(slot), "", { kind: "slot", slot }, 37));
+    for (let slot = 0; slot < MAX_CUSTOM_SLOTS; slot++) slotButtons.push(button(`MeleeSettingsSlot${formatInt(slot)}`, slotOption(slot), "", { kind: "slot", slot }, 37));
     this.slotButtons = slotButtons;
     setFrameVisible(root, false);
   }
@@ -385,7 +385,7 @@ export class SettingsPanel {
 
   private renderHeader(settings: Readonly<BindingSettings>): void {
     this.renderLayouts(settings);
-    setMenuText(this.keyboardButton, `Show keyboard in game: ${settings.keyboard ? `${MENU_STYLE.gold}On|r` : "Off"}`);
+    setMenuText(this.keyboardButton, `Show controls in game: ${settings.keyboard ? `${MENU_STYLE.gold}On|r` : "Off"}`);
     setMenuText(this.stickJumpButton, `Stick Jump: ${settings.stickJump ? `${MENU_STYLE.gold}On|r` : "Off"}`);
     setMenuText(this.cStickTiltButton, `C-Stick Tilt Attack: ${settings.cStickTilt ? `${MENU_STYLE.gold}On|r` : "Off"}`);
     setFrameText(this.hint, settings.capture === undefined ? HINT : `${MENU_STYLE.gold}${CAPTURE_HINT}|r`);
@@ -405,7 +405,9 @@ export class SettingsPanel {
     setMenuText(this.custom.label, settings.naming ? "" : custom ? `${DARK}${name}|r` : name);
     setFrameVisible(this.dismiss, settings.picking || settings.naming);
     this.slotButtons.forEach(({ art, label }, slot) => {
-      setFrameVisible(art, settings.picking);
+      const exists = slot < settings.customs.length;
+      setFrameVisible(art, settings.picking && exists);
+      if (!exists) return;
       const name = customSlotEmpty(settings.customs, slot) ? `${slotLabel(settings, slot)} ${MUTED}(empty)|r` : slotLabel(settings, slot);
       setMenuText(label, slot === settings.slot ? `${MENU_STYLE.gold}${name}|r` : name);
     });

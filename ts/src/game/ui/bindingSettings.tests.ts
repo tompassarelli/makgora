@@ -168,22 +168,41 @@ test("each layout keeps its own edits when switching, and only Reset to layout r
 
 const stockKeys = (preset: BindingPreset) => presetBindings(preset).keys.join(",");
 
-test("editing a key on WASD or Box copies that layout into Custom with the edit applied, selects Custom and saves it, and WASD and Box stay stock [k2 property]", () => {
+test("editing a key on WASD or Box copies that layout into a new Custom profile named WASD/Box - custom(1..n) without overwriting an existing custom profile, selects it and saves it, and WASD and Box stay stock [k2 property]", () => {
   for (const preset of ["wasd", "standard"] as const) {
     const stored = { encoded: undefined as string | undefined };
     const settings = persistedSettings(stored);
     applyBindingPreset(settings, preset);
     bindAttack(settings, code("B"));
     assertEquals(settings.layout, "custom", `${preset} edit selects Custom`);
+    assertEquals(slotLabel(settings), `${PRESET_NAMES[preset]} - custom1`, `${preset} edit names the new custom profile`);
     assertEquals(slots(settings, Action.attack), "B —", `${preset} edit applied`);
     assertEquals(keyFor(settings.bindings, Action.jump, 0), keyFor(presetBindings(preset), Action.jump, 0), `${preset} rest copied`);
     assertEquals(settings.layouts[preset].keys.join(","), stockKeys(preset), `${preset} stays stock in memory`);
     const reopened = persistedSettings(stored);
     assertEquals(reopened.layout, "custom", `${preset} saved as the active layout`);
+    assertEquals(slotLabel(reopened), `${PRESET_NAMES[preset]} - custom1`, `${preset} saved custom name`);
     assertEquals(slots(reopened, Action.attack), "B —", `${preset} saved edit`);
     applyBindingPreset(reopened, preset);
     assertEquals(reopened.bindings.keys.join(","), stockKeys(preset), `${preset} stays stock when reopened`);
   }
+  const multi = persistedSettings({ encoded: undefined });
+  pickCustomSlot(multi, 0);
+  bindAttack(multi, code("B"));
+  pickBindingPreset(multi, "wasd");
+  bindAttack(multi, code("M"));
+  assertEquals(multi.slot, 1, "does not overwrite slot 0");
+  assertEquals(slotLabel(multi, 1), "WASD - custom1");
+  assertEquals(keyLabel(keyFor(multi.customs[0]?.bindings ?? multi.bindings, Action.attack, 0)), "B", "slot 0 keeps its keys");
+  pickBindingPreset(multi, "wasd");
+  bindAttack(multi, code("V"));
+  assertEquals(multi.slot, 2, "next edit creates slot 2");
+  assertEquals(slotLabel(multi, 2), "WASD - custom2");
+  pickBindingPreset(multi, "standard");
+  bindAttack(multi, code("F"));
+  assertEquals(multi.slot, 3, "creates slot 3 when the first three are full");
+  assertEquals(slotLabel(multi, 3), "Box - custom1");
+
   const swapped = persistedSettings({ encoded: undefined });
   beginBindingCapture(swapped, Action.attack, 0);
   captureBinding(swapped, code("Q"));
@@ -293,9 +312,9 @@ test("three Custom slots each keep their own keys and name through a save, and t
     bindAttack(settings, key);
   });
   beginNaming(settings);
-  nameSlot(settings, "Box \"tour\\ney\" kit");
+  nameSlot(settings, "Box \"tour\\ney\" layout");
   endNaming(settings);
-  assertEquals(slotLabel(settings), "Box tourney", "a name keeps its storable characters up to the limit");
+  assertEquals(slotLabel(settings), "Box tourney layo", "a name keeps its storable characters up to the limit");
   pickCustomSlot(settings, 1);
 
   const reopened = persistedSettings(stored);
@@ -305,7 +324,7 @@ test("three Custom slots each keep their own keys and name through a save, and t
     pickCustomSlot(reopened, slot);
     assertEquals(keyFor(reopened.bindings, Action.attack, 0), key, `slot ${slot + 1} keys`);
   });
-  assertEquals([0, 1, 2].map(slot => slotLabel(reopened, slot)).join(","), "Custom 1,Custom 2,Box tourney", "names");
+  assertEquals([0, 1, 2].map(slot => slotLabel(reopened, slot)).join(","), "Custom 1,Custom 2,Box tourney layo", "names");
   applyBindingPreset(reopened, "wasd");
   assertEquals(slots(reopened, Action.attack), "N —", "WASD stays stock");
 

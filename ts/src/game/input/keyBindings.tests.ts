@@ -1,14 +1,14 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { Action, ACTION_ORDER } from "./actions";
 import { PAD_LAYER, padLayerAction } from "./padKeys";
-import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, LEFT_SHIFT, RIGHT_SHIFT, SHIFT, actionFor, assignKey, decodeBindings, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, rebind, reservedReason, slotIndex, spaceUpBoxKeys } from "./keyBindings";
+import { BINDING_PRESETS, type BindingPreset, ACTION_KEY_LABELS, ACTION_LABELS, LEFT_SHIFT, RIGHT_SHIFT, SHIFT, actionFor, assignKey, decodeBindings, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, rebind, reservedReason, semicolonWasdKeys, slotIndex, spaceUpBoxKeys } from "./keyBindings";
 import { type LayoutBindings, layoutSave, decodeLayouts, encodeLayouts, presetLayouts } from "./layoutSave";
 
 const code = (character: string) => character.charCodeAt(0);
 const encodeSlots = (save: { layouts: LayoutBindings; active: BindingPreset }) => encodeLayouts(layoutSave(save.layouts, save.active));
 const slots = (preset: BindingPreset, action: Action) => `${keyLabel(keyFor(presetBindings(preset), action, 0))} ${keyLabel(keyFor(presetBindings(preset), action, 1))}`;
 
-test("every preset binds U special, I short hop, O grab, Y C-up, J C-left, K C-down, L C-right, Walk on P (Space on Box), and Strong to 9 alone (0 on Custom) [k2 property]", () => {
+test("every preset binds U special, I short hop, O grab, Y C-up, J C-left, K C-down, L C-right, Walk on Space (P on Custom), Mod Y on C (; on Custom), and Strong to 9 alone (0 on Custom) [k2 property]", () => {
   for (const preset of BINDING_PRESETS) {
     assertEquals(slots(preset, Action.cLeft), "J —", `${preset} C-left`);
     assertEquals(slots(preset, Action.cRight), "L —", `${preset} C-right`);
@@ -17,7 +17,8 @@ test("every preset binds U special, I short hop, O grab, Y C-up, J C-left, K C-d
     assertEquals(slots(preset, Action.special), "U —", `${preset} special`);
     assertEquals(slots(preset, Action.shortHop), "I —", `${preset} short hop`);
     assertEquals(slots(preset, Action.grab), "O —", `${preset} grab`);
-    assertEquals(slots(preset, Action.modX), preset === "standard" ? "SPACE —" : "P —", `${preset} Walk`);
+    assertEquals(slots(preset, Action.modX), preset === "custom" ? "P —" : "SPACE —", `${preset} Walk`);
+    assertEquals(slots(preset, Action.modY), preset === "custom" ? "; —" : "C —", `${preset} Mod Y`);
   }
   assertEquals(slots("wasd", Action.strong), "9 —");
   assertEquals(slots("standard", Action.strong), "9 —");
@@ -114,15 +115,18 @@ test("Custom binds 9 to jump, 8 to Shield R, 0 to Strong and A to light shield, 
   }
 });
 
-test("WASD binds Up to W and Walk to P, Box binds Up to P and Walk to Space, Custom keeps Space as Up and P as Walk, and WASD and Box jump with 8 alone [k2 property]", () => {
+test("WASD binds Up to W, Box binds Up to P, both bind Walk to Space and Mod Y to C, Custom keeps Space as Up, P as Walk and ; as Mod Y, and WASD and Box jump with 8 alone [k2 property]", () => {
   assertEquals(slots("wasd", Action.moveUp), "W —");
-  assertEquals(slots("wasd", Action.modX), "P —");
+  assertEquals(slots("wasd", Action.modX), "SPACE —");
+  assertEquals(slots("wasd", Action.modY), "C —");
   assertEquals(slots("wasd", Action.jump), "8 —");
   assertEquals(slots("standard", Action.moveUp), "P —");
   assertEquals(slots("standard", Action.modX), "SPACE —");
+  assertEquals(slots("standard", Action.modY), "C —");
   assertEquals(slots("standard", Action.jump), "8 —");
   assertEquals(slots("custom", Action.moveUp), "SPACE —");
   assertEquals(slots("custom", Action.modX), "P —");
+  assertEquals(slots("custom", Action.modY), "; —");
 });
 
 const SAVED_IN_0_2 = {
@@ -195,7 +199,7 @@ test("a saved Custom layout still on the old defaults (Z/9 jump, G second on Shi
 });
 
 test("a saved WASD layout still on the earlier defaults (Space and 8 on Jump) moves to the new one, and an edited one stays [k2 property]", () => {
-  const earlier = presetBindings("wasd").keys.slice();
+  const earlier = semicolonWasdKeys();
   earlier[slotIndex(Action.cUp, 0)] = code("H");
   earlier[slotIndex(Action.strong, 1)] = code("Y");
   earlier[slotIndex(Action.moveUp, 0)] = code("W");
@@ -209,12 +213,12 @@ test("a saved WASD layout still on the earlier defaults (Space and 8 on Jump) mo
   assertEquals(kept?.layouts.wasd.keys.join(","), earlier.join(","));
 });
 
-test("the pad layer keeps its own keys, and a layout binds a pad key only to the action the pad gives it [k2 property]", () => {
+test("the pad layer keeps its own keys, and a layout binds a pad key only to the action the pad gives it or C on Mod Y [k2 property]", () => {
   assertEquals(PAD_LAYER.map(({ key }) => key).join(""), "cvt123456/`[]='," + ".-\\");
   for (const preset of BINDING_PRESETS) {
     for (const { code: padCode, action } of PAD_LAYER) {
       const bound = actionFor(presetBindings(preset), padCode);
-      assertEquals(bound === undefined || bound === action, true, `${preset} binds pad key ${padCode} to another action`);
+      assertEquals(bound === undefined || bound === action || (padCode === code("C") && bound === Action.modY), true, `${preset} binds pad key ${padCode} to another action`);
     }
   }
   for (const character of ["Z", "X", "G"]) assertEquals(padLayerAction(code(character)), undefined, `${character} is no pad key`);
@@ -226,15 +230,13 @@ const OLD_WALK_SLOT = 28;
 const OLD_MOD_X_SLOT = 36;
 const OLD_SLOTS = (Action.strong + 1) * 2;
 const oldSave = (version: string, keys: readonly number[]) => version + keys.slice(0, OLD_SLOTS).map((key) => String(key).padStart(3, "0")).join("");
-const earlierStock = (preset: BindingPreset) => preset === "standard" ? spaceUpBoxKeys() : presetBindings(preset).keys.slice();
+const earlierStock = (preset: BindingPreset) => preset === "standard" ? spaceUpBoxKeys() : preset === "wasd" ? semicolonWasdKeys() : presetBindings(preset).keys.slice();
 const withoutModY = (preset: BindingPreset) => earlierStock(preset).slice(0, OLD_SLOTS);
 
-test("every preset binds Mod Y to ; alone, which is no key the pad layer presses, and labels both modifiers on the controls screen [k2 property]", () => {
-  const padKeys = PAD_LAYER.map(({ code: padCode }) => padCode);
-  for (const preset of BINDING_PRESETS) {
-    assertEquals(slots(preset, Action.modY), "; —", `${preset} Mod Y`);
-    assertEquals(padKeys.includes(keyFor(presetBindings(preset), Action.modY, 0) ?? 0), false, `${preset} Mod Y is a pad key`);
-  }
+test("WASD and Box bind Mod Y to C while Custom binds it to ;, and the controls screen labels both modifiers [k2 property]", () => {
+  assertEquals(slots("wasd", Action.modY), "C —", "wasd Mod Y");
+  assertEquals(slots("standard", Action.modY), "C —", "standard Mod Y");
+  assertEquals(slots("custom", Action.modY), "; —", "custom Mod Y");
   assertEquals(ACTION_LABELS[Action.modX], "Walk (and steep angles)");
   assertEquals(ACTION_KEY_LABELS[Action.modX], "Walk");
   assertEquals(ACTION_LABELS[Action.modY], "Mod Y (shallow angles, wall ride)");
