@@ -49,7 +49,7 @@ import { BTN_SELECT, PAD_BUTTONS } from "../../integrity/linuxInput";
 import { MATCH_REPLAY_NAME, REPRO_NAME, TRACE_FILE, checkHeadlessRun, compareRuns, comparisonSteps, scriptChat, scriptPreset, padTraceCommand, padTraceLength } from "../../integrity/padParity";
 import type { Schedule, ScheduleReply, ScheduledEdge } from "../../integrity/padScheduleWorker";
 import { type PadStep, type SentEdge, deadlineOrder, frameWriteNs, landEdges, matchStart, padScriptPreset, parsePadScript, ruleFrame } from "../../integrity/padScript";
-import { SLOTS } from "../../integrity/reconcile";
+import { SLOTS } from "../../integrity/slots";
 import { captureWhenDrawn, drawnFrom, visualCaptureCommand, visualCaptureToken } from "../../integrity/drawnCapture";
 import { visualReleaseFile } from "../../../src/game/session/visualCapture";
 import { drawnFrameFile, nativeChatFile, responsePageFile } from "../../../src/game/core/gameFiles";

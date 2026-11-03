@@ -11,13 +11,13 @@ import type { Fighter } from "../sim/fighter";
 import { attackStartupFrames } from "../sim/moves";
 import type { Controls } from "../sim/roster";
 import { VARIETY_STARTS, moveReachAhead, moveReaches } from "./botMoves";
+import type { BotStrategy } from "./botStrategyState";
 import { botChance } from "./botRandom";
 import { steerOnGround, slideStaysOnDeck } from "./botFooting";
 import type { CpuDecisionPolicy } from "./cpuDecisionPolicy";
 import { HABIT_FIELDS, HabitChoice, habitContext } from "./botHabits";
 import { gameplanOf } from "./botGameplan";
 import { heroStanceFits, heroStanceSlot, pressHeroStance } from "./botHeroKit";
-import type { MotionCast } from "./botMotionCast";
 
 const HISTORY_LIMIT = 128;
 export const BURN_MEMORY_FRAMES = 150;
@@ -49,38 +49,6 @@ interface SavedBotRead {
   actionSerial: number;
   actionStyle: number;
   actionFacing: Direction;
-}
-
-export interface BotStrategy extends MotionCast {
-  // Lua arrays keep their peak capacity, so snapshots share each history instead of copying it; replace it, never mutate it.
-  history: readonly number[];
-  observedFrame: number;
-  opponent: number;
-  lastChoice: HabitChoice;
-  lastContext: number;
-  lastSerial: number;
-  events: number;
-  readActive: boolean;
-  readChoice: HabitChoice;
-  readContext: number;
-  readExpectedFrame: number;
-  readExpires: number;
-  readConfidence: number;
-  readActed: boolean;
-  readActionFrame: number;
-  readActionSerial: number;
-  readActionStyle: number;
-  readActionFacing: Direction;
-  lastOption: number;
-  burnHurt: boolean;
-  burnStyle: AttackStyle | -1;
-  burnCharacter: number;
-  burnFrame: number;
-  burnCount: number;
-  burnGap: number;
-  blockFrame: number;
-
-  readonly recentOptions: number[];
 }
 
 const NO_HABITS: readonly number[] = [];

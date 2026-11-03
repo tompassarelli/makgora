@@ -15,7 +15,7 @@ import { IntegrityFailure, tryIntegrity, tryIntegrityPromise } from "./evidence"
 import { type JourneyOptions, type JourneyRecord, Rig, nextMatchEpoch, runJourney } from "./journey";
 import { type Observer, type Pad, observeDevice, openPad, realtimeNs } from "./linux";
 import { BTN_SELECT, PAD_BUTTONS } from "./linuxInput";
-import { SLOTS, type Slot } from "./reconcile";
+import { SLOTS, type Slot } from "./slots";
 import { archiveFiles, liveRig } from "./rig";
 import { padScriptPreset } from "./padScript";
 

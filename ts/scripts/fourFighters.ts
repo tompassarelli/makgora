@@ -3,7 +3,8 @@
 import { join } from "node:path";
 import { Effect } from "effect";
 import { readEvidence, readMetadata, tryIntegrityPromise } from "./integrity/evidence";
-import { type CaptureEvidence, type SlotMode, SLOTS, capturePair } from "./integrity/reconcile";
+import { type CaptureEvidence, type SlotMode, capturePair } from "./integrity/reconcile";
+import { SLOTS } from "./integrity/slots";
 
 interface FinalChecksum {
   readonly frame: number;

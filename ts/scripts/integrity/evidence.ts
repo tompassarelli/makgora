@@ -9,8 +9,9 @@ import { at } from "wisp/src/runtime/lookup";
 import type { Injection, KernelEvent, SourceEdge } from "./linuxInput";
 import {
   type CaptureEvidence, type CaptureMetadata, type ClientExport, type EpochPair, type IntegrityResult, type JourneyEvent,
-  SLOTS, SWEEP_HEADER, capturePair, integrityResult, integrityTable, summaryJson, sweepPairs, sweepRow,
+  SWEEP_HEADER, capturePair, integrityResult, integrityTable, summaryJson, sweepPairs, sweepRow,
 } from "./reconcile";
+import { SLOTS } from "./slots";
 
 export class IntegrityFailure extends Schema.TaggedError<IntegrityFailure, { readonly brand: unique symbol }>()("IntegrityFailure", {
   operation: Schema.String,

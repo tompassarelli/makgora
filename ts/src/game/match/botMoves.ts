@@ -25,7 +25,7 @@ import { SPACE_PLAN, avoids, gameplanOf, moveWeight, spacedAt, toGameplanMove } 
 import type { FighterGameplan, GameplanMove } from "../sim/gameplan";
 import { type CpuSkill, FULL_SKILL } from "./cpuSkill";
 import { type AttackDecision, familiarOption, moveValueMultiplier } from "./botMoveValue";
-import type { BotStrategy } from "./botStrategy";
+import type { BotStrategy } from "./botStrategyState";
 import { pressMotionCast } from "./botMotionCast";
 
 const GROUND_MOVES = [

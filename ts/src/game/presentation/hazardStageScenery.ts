@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import type { StageScenery } from "./stageScenery";
+import type { StageScenery } from "./sceneryDefinition";
 import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
 import { STAGE_GROUND_MODEL, STAGE_LAVA_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { STAGE_CRAG_CRAG_MODEL, STAGE_CRAG_KNOLL_MODEL, STAGE_CRAG_PEAK_MODEL } from "../../generated/stages/cragAssetInfo";

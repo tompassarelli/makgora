@@ -13,7 +13,8 @@ import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
 import { IntegrityFailure, readEvidence, readMetadata, tryIntegrity, tryIntegrityPromise } from "./integrity/evidence";
-import { type CaptureEvidence, SLOTS, capturePair } from "./integrity/reconcile";
+import { type CaptureEvidence, capturePair } from "./integrity/reconcile";
+import { SLOTS } from "./integrity/slots";
 
 
 interface ResultScreens {

@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 
 import { STAGE_GROUND_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
-import type { StageScenery } from "./stageScenery";
+import type { StageScenery } from "./sceneryDefinition";
 
 const HILL = "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock3.mdx";
 const TOWN_FIRE = "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx";

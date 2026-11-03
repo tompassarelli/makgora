@@ -7,7 +7,8 @@ import { clearFighterPose, copyFighterPoseInto, createFighterPose, type FighterP
 import type { Roster } from "../sim/roster";
 import { type Controls, copyControls, isActive, neutralControls } from "../sim/roster";
 import { type BotMemory, clearBotMemory, copyBotMemory, createBotMemory } from "./botPerception";
-import { type BotStrategy, createBotStrategy, copyBotStrategy, clearBotStrategy } from "./botStrategy";
+import { createBotStrategy, copyBotStrategy, clearBotStrategy } from "./botStrategy";
+import type { BotStrategy } from "./botStrategyState";
 import { type AttackBuffer, attackBuffer, copyAttackBuffer } from "../input/attackBuffer";
 
 

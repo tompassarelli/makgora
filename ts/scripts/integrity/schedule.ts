@@ -3,7 +3,7 @@
 
 
 import { ABS_RZ, ABS_X, ABS_Y, ABS_Z, BTN_A, BTN_B, BTN_TL, BTN_TR, BTN_X, BTN_Y, EV_ABS, EV_KEY, type SourceEdge } from "./linuxInput";
-import type { Slot } from "./reconcile";
+import type { Slot } from "./slots";
 
 interface Binding extends SourceEdge {
   readonly name: string;

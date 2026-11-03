@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { STAGE_SNOW_MODEL } from "../src/generated/stages/stageAssetInfo";
-import { placedPieces, stageScenery, type SceneryPiece } from "../src/game/presentation/stageScenery";
+import { placedPieces, stageScenery } from "../src/game/presentation/stageScenery";
+import type { SceneryPiece } from "../src/game/presentation/sceneryDefinition";
 import { platformParts } from "../src/game/presentation/stockPlatforms";
 import { FROZEN_THRONE_STAGE, surfaceCount, surfaceLeft, surfaceRight } from "../src/game/sim/stage";
 import { MAIN_DECK_HALF_DEPTH } from "../scripts/stageDeck";

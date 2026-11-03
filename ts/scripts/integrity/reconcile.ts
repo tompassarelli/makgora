@@ -6,9 +6,8 @@
 
 import type { KernelEvent, SourceEdge } from "./linuxInput";
 import type { PadLayout } from "./schedule";
+import { SLOTS, type Slot } from "./slots";
 
-export type Slot = 0 | 1;
-export const SLOTS = [0, 1] as const satisfies readonly Slot[];
 export type EpochPair = readonly [number, number];
 
 

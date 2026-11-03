@@ -27,7 +27,7 @@ import { IntegrityFailure, producerLine, tryIntegrity, tryIntegrityPromise } fro
 import { type JourneyRecord, Rig, type RigShape, type Stopped, runJourney } from "./journey";
 import { type Observer, type Pad, continueProcess, observeDevice, openPad, realtimeNs } from "./linux";
 import { type Injection, PAD_BUTTONS, type SourceEdge } from "./linuxInput";
-import { SLOTS, type Slot } from "./reconcile";
+import { SLOTS, type Slot } from "./slots";
 import { archiveFiles, fileRig, stopHelperProcess, uiLogger } from "./rig";
 import { padScriptPreset } from "./padScript";
 

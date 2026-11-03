@@ -3,7 +3,7 @@ import { STAGE_SNOW_MODEL } from "../../generated/stages/stageAssetInfo";
 import { luma, type DeckPalette } from "../assets/stagePalette";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { PATTERNED_DECKS_STAGE } from "../sim/stage";
-import type { SceneryPiece, StageScenery } from "./stageScenery";
+import type { SceneryPiece, StageScenery } from "./sceneryDefinition";
 
 export const FOG_START_MINIMUM = 3300;
 

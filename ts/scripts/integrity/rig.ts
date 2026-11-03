@@ -13,7 +13,7 @@ import { IntegrityFailure, producerLine, tryIntegrity } from "./evidence";
 import type { GameFile, JourneyRecord, PublicationRecord, RigShape, Stopped } from "./journey";
 import type { StallTarget } from "./schedule";
 import { type Observer, type Pad, continueProcess, inject, monotonicNs, realtimeNs, stopProcess } from "./linux";
-import { SLOTS, type Slot } from "./reconcile";
+import { SLOTS, type Slot } from "./slots";
 import { pollUntil } from "../hostPoll";
 import { INPUT_TRACE_FILE, responsePageFile, decodeWrittenGameFile } from "../wisp/boundary";
 import { smashcraftPlayerView } from "../wisp/playerView";

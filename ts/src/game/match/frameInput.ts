@@ -17,7 +17,8 @@ import { type EarlierFrame, type StepScope, observedFrameLegalActions, observedF
 import { latchPresses, releasePresses } from "./training";
 import { type ReplayState, copyReplayState } from "../replay/snapshot";
 import { type BotMemory, clearBotMemory, copyBotMemory, createBotMemory, firstBotMemoryDifference } from "./botPerception";
-import { type BotStrategy, copyBotStrategy, createBotStrategy, botStrategyValues } from "./botStrategy";
+import { copyBotStrategy, createBotStrategy, botStrategyValues } from "./botStrategy";
+import type { BotStrategy } from "./botStrategyState";
 
 
 export interface MatchFrameInput {

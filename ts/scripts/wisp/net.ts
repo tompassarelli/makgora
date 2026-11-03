@@ -12,7 +12,7 @@ import { nativeDeclarations } from "./nativeDeclarations";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { PREDICTED_HEADLESS } from "./headless";
-import { heldKeys } from "./standalone";
+import { heldKeys } from "./standaloneKeys";
 import { DONE_X, DONE_Y, controlsGreeted } from "./startControls";
 import { DEFAULT_PRESET, actionFor, presetBindings } from "../../src/game/input/keyBindings";
 

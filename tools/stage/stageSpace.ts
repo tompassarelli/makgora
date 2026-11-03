@@ -1,6 +1,7 @@
 import type { StageLight } from "../../ts/src/game/assets/stageLighting";
 import type { DeckPalette } from "../../ts/src/game/assets/stagePalette";
-import { hiddenBelow, moodColor, type SceneryPiece, type StageScenery } from "../../ts/src/game/presentation/stageScenery";
+import { hiddenBelow, moodColor } from "../../ts/src/game/presentation/stageScenery";
+import type { SceneryPiece, StageScenery } from "../../ts/src/game/presentation/sceneryDefinition";
 import { deckProblems, fogProblems, groundProblems, intensityProblems, landmarkProblems, lightProblems, mirrorProblems } from "../../ts/src/game/presentation/stageRules";
 import { MODEL_FACTS } from "../../ts/scripts/wisp/modelFacts";
 import { behindProblems, clearingProblems, floatingProblems, worldProblems } from "../../ts/scripts/stageViewRules";

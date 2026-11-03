@@ -10,7 +10,8 @@ import { steerOnGround } from "./botFooting";
 import { SHIELD_RESERVE } from "./botDefense";
 import { moveReachAhead } from "./botMoves";
 import { PunishKind, type PunishWindow, punishWindow } from "./botPunish";
-import { BURN_MEMORY_FRAMES, BURN_REPEATS, type BotStrategy } from "./botStrategy";
+import { BURN_MEMORY_FRAMES, BURN_REPEATS } from "./botStrategy";
+import type { BotStrategy } from "./botStrategyState";
 
 const BURN_MARGIN = 30.0;
 const BLOCK_PUNISH_FRAMES = 40;

@@ -9,7 +9,7 @@
 
 
 import { ABS_RX, ABS_RY, ABS_X, ABS_Y, ABS_Z, BTN_A, BTN_B, BTN_SELECT, BTN_START, BTN_TL, BTN_TR, BTN_X, BTN_Y, EV_ABS, EV_KEY, type SourceEdge } from "./linuxInput";
-import type { Slot } from "./reconcile";
+import type { Slot } from "./slots";
 
 /** Recorded pad scripts and test drivers speak padbridge's hidden `script` preset; a script's `#! preset NAME` line, else WC3_PAD_PRESET, picks another. */
 export const padPreset = (named?: string): string => named ?? process.env.WC3_PAD_PRESET ?? "script";

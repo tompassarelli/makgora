@@ -1,5 +1,6 @@
 import { preloadModels, preloadSkies } from "../../game/presentation/stagePreload";
-import { drawnScale, driftingPieces, pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery, type SceneryPiece, type StageSkyLook } from "../../game/presentation/stageScenery";
+import { drawnScale, driftingPieces, pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery } from "../../game/presentation/stageScenery";
+import type { SceneryPiece, StageSkyLook } from "../../game/presentation/sceneryDefinition";
 import { driftPose, type DriftingPiece } from "../../game/presentation/driftingScenery";
 import { hideEffect } from "../../game/render/effects";
 import type { ShellState, StageDrifter } from "./state";

@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
-import type { StageScenery } from "./stageScenery";
+import type { StageScenery } from "./sceneryDefinition";
 import { STAGE_GROUND_MODEL, STAGE_PLAGUE_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { SCOURGE_WALL_MODEL } from "../assets/importedModelInfo";
 

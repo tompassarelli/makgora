@@ -28,7 +28,7 @@ import { gameplanOf } from "./botGameplan";
 import { aheadX, aheadZ, moveReachAhead, moveReaches } from "./botMoves";
 import { botChance } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
-import type { BotStrategy } from "./botStrategy";
+import type { BotStrategy } from "./botStrategyState";
 import { pressMotionPunish } from "./botMotionCast";
 
 

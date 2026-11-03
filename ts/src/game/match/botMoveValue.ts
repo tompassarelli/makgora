@@ -12,7 +12,7 @@ import { stageBounds } from "../sim/stageBounds";
 import type { MatchState } from "../lobby/lobbyState";
 import { botChance, botChoice } from "./botRandom";
 import { startableForm } from "./botHeroKit";
-import type { BotStrategy } from "./botStrategy";
+import type { BotStrategy } from "./botStrategyState";
 import { HABIT_FIELDS, HabitChoice, habitContext } from "./botHabits";
 import type { CpuDecisionPolicy } from "./cpuDecisionPolicy";
 import { knockbackWeight } from "../sim/itemBuffs";

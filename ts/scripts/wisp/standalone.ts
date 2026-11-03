@@ -12,7 +12,6 @@ import { nativeDeclarations } from "./nativeDeclarations";
 import { customMapData } from "wisp/scripts/wisp/headlessInput";
 import { describeDigestDifference, digestDifference, frameDigest } from "../../src/game/replay/frameDigest";
 import { Action } from "../../src/game/input/actions";
-import { DEFAULT_PRESET, keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
 import { Phase, cycleSlotMode, selectCharacter, selectCpuCharacter, setCpuOpponent, setCpuTier, setStocks } from "../../src/game/lobby/lobbyState";
 import { fighterAt, isActive } from "../../src/game/sim/roster";
@@ -32,26 +31,10 @@ import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "./headless";
 import { deliverKey } from "./deliverKey";
 import { headlessRender, playerRender } from "./headlessRender";
 import { createNetStandalone, smashcraftMapHash } from "./net";
-import { ACTIONS, CPU_OPPONENT, SELECTION_SCRIPT, selectionPointer, selectionPresses } from "./selectionScript";
+import { CPU_OPPONENT, SELECTION_SCRIPT, selectionPointer, selectionPresses } from "./selectionScript";
+import { heldKeys } from "./standaloneKeys";
 
-const BINDINGS = presetBindings(DEFAULT_PRESET);
-const ESCAPE_KEY = 0x1b;
 export const NEUTRAL_INPUT: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
-
-export function heldKeys(input: StandaloneInput): Set<number> {
-  const buttons = new Set(input.buttons);
-  if (input.axisX < -0.28) buttons.add("left");
-  if (input.axisX > 0.28) buttons.add("right");
-  if (input.axisY < -0.28) buttons.add("down");
-  if (input.axisY > 0.28) buttons.add("up");
-  const held = new Set<number>();
-  for (const button of buttons) {
-    const action = ACTIONS[button];
-    const key = button === "start" ? 89 : button === "view" ? 75 : button === "back" ? ESCAPE_KEY : action === undefined ? undefined : keyFor(BINDINGS, action, 0);
-    if (key !== undefined) held.add(key);
-  }
-  return held;
-}
 
 
 
