@@ -6,6 +6,7 @@ const root = `${import.meta.dir}/..`;
 const STEPS: readonly (readonly string[])[] = [
   ["bun", "codegen/run.ts", "--check"],
   ["bun", "scripts/oracleTagsCheck.ts"],
+  ["bun", "scripts/readmeCheck.ts"],
   ["bun", "scripts/luaCostRecordsCheck.ts"],
   ["bun", "wisp", "ledger", "--check"],
   ["bun", "scripts/clipBindingsCheck.ts"],

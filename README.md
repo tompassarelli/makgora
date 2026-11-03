@@ -1,26 +1,27 @@
-# Smashcraft
+# Mak'gora
 
-Smashcraft is an in-development platform fighter for Warcraft III, inspired by
-Super Smash Bros. Melee. Warcraft heroes fight on floating stages with jumps,
-air dodges, shields, hitstun, knockback and stocks, over rollback netcode.
+Mak'gora, formerly called Smashcraft, is a platform fighter for Warcraft III,
+inspired by Super Smash Bros. Melee. Warcraft heroes fight on floating stages
+with jumps, air dodges, shields, hitstun, knockback and stocks, over rollback
+netcode.
 
 Warcraft III is still a great platform for custom games, and Melee's movement and
-combat remain the model for the platform fighter. Smashcraft brings that
+combat remain the model for the platform fighter. Mak'gora brings that
 depth to Warcraft III's heroes, with the rollback netcode that online play needs.
 
-Download the map from [Hive Workshop](https://www.hiveworkshop.com/threads/smashcraft-0-1-0.375492/).
-How to play: [player guide](docs/player-guide.md).
-Find games, ask questions and report bugs on [Discord](https://discord.gg/JQGZs2UJR).
-The GitHub repositories contain code only; maps are distributed on Hive Workshop,
-not committed to Git or attached to GitHub releases.
-The desktop client (controller, play, history, stats, replays, online) is
-[smashcraft-client](https://github.com/tompassarelli/smashcraft-client); it
-reads Smashcraft through the [client interface](docs/client-interface.md).
-Status and next work: [roadmap #16](https://github.com/tompassarelli/smashcraft/issues/16).
+- **Download and release notes:** [latest GitHub release](https://github.com/tompassarelli/makgora/releases/latest).
+  The map is attached to each release; Git holds code only.
+- **How to play and controls:** [player guide](docs/player-guide.md).
+- **Games, questions and bug reports:** [Discord](https://discord.gg/JQGZs2UJR) and
+  [issues](https://github.com/tompassarelli/makgora/issues), where status and next work live.
+- **Desktop client** (controller, play, history, stats, replays, online):
+  [smashcraft-client](https://github.com/tompassarelli/smashcraft-client), which
+  reads Mak'gora through the [client interface](docs/client-interface.md).
+- **Design and systems:** the [documentation index](docs/README.md).
 
 ## Principles
 
-Smashcraft is an independent fan game inspired by Super Smash Bros. Melee, not
+Mak'gora is an independent fan game inspired by Super Smash Bros. Melee, not
 affiliated with or endorsed by Blizzard Entertainment or Nintendo. It is
 built with our own code and animations on Warcraft III's unit models, alongside
 the community models credited below. The map plays only inside your own copy of
@@ -30,7 +31,7 @@ Warcraft III; it never replaces the game.
   models with animations we authored. The repositories contain no extracted
   Blizzard files: models, textures, sounds, data, scripts or in-game text.
   Build inputs stay private, outside Git, and Nintendo's code and assets are
-  neither in the repositories nor shipped with Smashcraft.
+  neither in the repositories nor shipped with Mak'gora.
 - **Learn by observation.** Behaviour is measured from the outside: what
   Warcraft III shows, plays, logs and writes, and the traffic of LAN games we
   host, plus public documentation. Melee's feel comes from public frame data
@@ -48,8 +49,8 @@ is Wisp's [clean-room rules](https://github.com/tompassarelli/wisp/blob/main/doc
 
 ## Develop
 
-Smashcraft is written in TypeScript on [Wisp](https://github.com/tompassarelli/wisp),
-which compiles it to Warcraft III's Lua. From [smashcraft:ts/](ts/):
+Mak'gora is written in TypeScript on [Wisp](https://github.com/tompassarelli/wisp),
+which compiles it to Warcraft III's Lua. From [ts/](ts/):
 
 ```sh
 bun install --frozen-lockfile
@@ -57,9 +58,10 @@ bun wisp dev
 ```
 
 Keep `bun wisp dev` running: every save reports type errors, affected tests
-and simulated matches. Building the playable map also needs a locally
-installed Warcraft III and private game assets, which are not in this
-repository.
+and simulated matches. `bun run check` checks types and the repository's
+records. Building the playable map also needs a locally installed Warcraft III
+and private game assets, which are not in this repository
+([build inputs](docs/build-inputs.md)).
 
 Where to look next:
 
@@ -70,44 +72,14 @@ Where to look next:
 
 ## Credits
 
-- Design & Programming: Tom Passarelli (Tompas)
-- Animation & Stages: Tom Passarelli (Tompas)
-- Music: Tom Passarelli (with Google Lyria)
-- Cursors, wordmark & stage-select art: Smashcraft originals (the pinching-hand cursor made with AI assistance)
-- Mrgl & Grgl sound: World of Warcraft, Blizzard Entertainment
-
-Lich King model: [The Lich King by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-king.154837/)
-(Hive Workshop), used with credit as the author permits. Kwaliti's
-[usage terms](https://www.hiveworkshop.com/profile-posts/951524/) allow free use
-and require credit to Kwaliti and Hive Workshop as the original source.
-[Model credits and source terms](docs/design/roster.md#credits) record the details.
-
-Thrall model: [Warchief Thrall Dismounted by johnwar](https://www.hiveworkshop.com/threads/warchief-thrall-dismounted-re-classic.332006/)
-(Hive Workshop), built on Ujimasa Hojo's Grom Hellscream, reanimated for
-Smashcraft and used with credit to both authors and Hive Workshop.
-
-Naxxramas wall model:
-[Undead Walls Pack by Kuzakani](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/)
-(Hive Workshop), an original model tagged open source, used with credit to
-Kuzakani and Hive Workshop.
-
-Onyxia model (Lady Katrana Prestor): [Katrana Prestor by Footman16](https://www.hiveworkshop.com/threads/katrana-prestor.362851/)
-(Hive Workshop), an edit of AndrewOverload519's Female Human Mage with kangyun's
-Sally Whitemane staff, both used with their authors' permission and credited
-here as the page asks.
-
-Onyxia model (the dragon): [Onyxia by Symphoneum](https://www.hiveworkshop.com/threads/onyxia.348925/)
-(Hive Workshop), built from Warcraft III Reforged models and used with credit to
-Symphoneum, converted to a Classic model for Smashcraft.
-
-Tyrande model: [Tyrande Whisperwind (Re-Classic) by johnwar](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/)
-(Hive Workshop), built on Ujimasa Hojo's Archer, Dark Ranger and Sylvanas
-models and kangyun's Tyrande, used with kangyun's permission, reanimated for
-Smashcraft and used with credit to every author and Hive Workshop.
+The credits are written once, in [ts/src/game/ui/credits.ts](ts/src/game/ui/credits.ts):
+the in-game Credits screen shows it, a test holds the release post's credits equal to it, and
+it names every author of the community models the map imports. The source terms
+behind each model are in [model credits](docs/design/roster.md#credits).
 
 ## License
 
-Smashcraft is released under the [MIT License](LICENSE). The vendored Effect
+Mak'gora is released under the [MIT License](LICENSE). The vendored Effect
 source under repos/effect/ keeps its own MIT license. Warcraft III, Super Smash
 Bros. Melee and their assets belong to their owners and are not part of this
 repository; reference values cite their sources.
