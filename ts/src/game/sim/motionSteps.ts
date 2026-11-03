@@ -49,7 +49,6 @@ import {
 import { observeActionDecision, observeActionStart } from "./observations";
 import * as platforms from "./platformMoves";
 import { type Controls, type Roster } from "./roster";
-import { canTeeter, grabHoldsEdge, shieldPressed, stopGrabAtEdge, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
 import { beginCarryJump, limitCarrySpeed } from "./cargoCarry";
 import {
   SHIELD_MIN_HOLD_FRAMES,

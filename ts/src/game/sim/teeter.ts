@@ -48,11 +48,12 @@ export function teeterShieldAtEdge(f: Fighter, stage: number, matchFrame: number
   return true;
 }
 
-export function grabHoldsEdge(f: Readonly<Fighter>): boolean {
-  return f.motion.grounded && f.attack.style === AttackStyle.grab;
+export function attackHoldsEdge(f: Readonly<Fighter>): boolean {
+  const style = f.attack.style;
+  return f.motion.grounded && (style === AttackStyle.grab || style === AttackStyle.dashAttack || style === AttackStyle.demonHunterDashAttack);
 }
 
-export function stopGrabAtEdge(f: Fighter, stage: number, matchFrame: number): void {
+export function stopAttackAtEdge(f: Fighter, stage: number, matchFrame: number): void {
   const side = edgeSide(f, stage, matchFrame);
   if (side !== 0) stopAtEdge(f, stage, matchFrame, side);
 }

@@ -850,6 +850,13 @@ facing away from the ledge, and a wavedash's speed (about 12 units a frame) woul
 the catch box before he dropped into it, so a wavedash off the main deck with his back to the
 ledge snaps to the ledge on the frame it leaves the deck unless down is held.
 
+A grounded grab and every fighter's dash attack stop at the edge of their surface whatever the
+stick holds: the move plays its whole animation and its momentum ends at the ledge, so the
+fighter stays on stage (Tom's rule from a playtest on 2026-11-03, #1075). Before this only grabs
+held the edge; a dash attack counted as an attack, which never teeters, so its slide carried
+the fighter off. `attackHoldsEdge` in makgora:ts/src/game/sim/teeter.ts decides it, and
+makgora:ts/src/game/sim/dashAttackLedge.tests.ts covers the roster at both ledges.
+
 Public sources. [Ledge Cancel](https://tasvideos.org/Forum/Posts/360045) (TASVideos Melee
 notes): sliding into the ledge after a wavedash or aerial landing, "any remaining lag will be
 immediately canceled and you'll either fall off the edge or enter the topple animation"

@@ -24,7 +24,7 @@ import { addMeleeWorldValues, moveMeleeX, totalVelocityX } from "./motion";
 import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
 import { travelBeforeBodies, travelBeforeLedge } from "./travelStop";
-import { canTeeter, grabHoldsEdge, shieldPressed, stopGrabAtEdge, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
+import { canTeeter, attackHoldsEdge, shieldPressed, stopAttackAtEdge, teeterAtEdge, teeterShieldAtEdge } from "./teeter";
 import { isCarrying } from "./cargoCarry";
 import { moveTravelStep } from "./heroMoves";
 import { advanceGuard, regenerateShield, clearPowershield } from "./shield";
@@ -246,9 +246,9 @@ export function tickRecoveryClocks(f: Fighter): void {
 export function moveAlongSurface(f: Fighter, stage: number, matchFrame: number, horizontalStick: number, dashEntry: number, canSteer: boolean, wantsShield: boolean, groundTakeoff: boolean): void {
   const teeters = !wantsShield && !groundTakeoff && !isGroundDodging(f) && canTeeter(f, canSteer);
   const pushedOnShield = shieldPressed(f);
-  const grabHolds = grabHoldsEdge(f);
+  const attackHolds = attackHoldsEdge(f);
   moveHorizontally(f, stage, matchFrame, dashEntry);
-  if (grabHolds) stopGrabAtEdge(f, stage, matchFrame);
+  if (attackHolds) stopAttackAtEdge(f, stage, matchFrame);
   else if (teeters) teeterAtEdge(f, stage, matchFrame, horizontalStick, canSteer);
   else if (pushedOnShield) teeterShieldAtEdge(f, stage, matchFrame);
 }
