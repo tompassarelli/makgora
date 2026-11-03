@@ -32,6 +32,12 @@ import { headlessRender } from "./headlessRender";
 import { locateStorage, readStockBuild, type RenderAssetOptions } from "./renderAssetStore";
 import { heroLook } from "../../src/game/roster/looks";
 import { meterCueFit, meterCueMoves } from "../../src/game/presentation/meterCues";
+import {
+  COLUMN_FIRE_MODEL, COLUMN_FIRE_SCALE, FINGER_CHARGE_MODEL, FINGER_CHARGE_SCALE, FINGER_IMPACT_FRAMES, FINGER_IMPACT_MODEL, FINGER_IMPACT_SCALE, FIRE_BURST_FRAMES, FIRE_BURST_MODEL,
+  RAIN_OF_FIRE_FRAMES, RAIN_OF_FIRE_MODEL, RAIN_OF_FIRE_SCALE, SHOCKWAVE_FRAMES, SHOCKWAVE_MODEL, SHOCKWAVE_STOMP_SCALE, SHOCKWAVE_SWEEP, SHOCKWAVE_TRAIL_MODEL, SHOCKWAVE_TRAIL_SCALE,
+} from "../../src/game/presentation/bossSpellArt";
+import { bossDefinition } from "../../src/game/classic/bosses";
+import { BossKind } from "../../src/game/classic/runState";
 
 /** How one move shows one model in Classic: the sequence and seek it plays, its time scale, and whether its anchor travels. */
 export interface EffectUse {
@@ -242,6 +248,22 @@ export function projectileUse(character: Character, fighter: string, move: strin
   return { ...base, sequence, seconds: 0, timeScale: 1 };
 }
 
+/** Archimonde's three strikes, each a fresh effect created on its frame and destroyed after its lifetime; a growing effect is judged at its smallest scale. */
+export function bossSpellUses(): EffectUse[] {
+  const strikes = bossDefinition(BossKind.archimonde)?.strikes ?? [];
+  const tell = (name: string): number => strikes.find((strike) => strike.name === name)?.tell ?? 0;
+  const use = (move: string, model: string, scale: number, frames: number): EffectUse => ({ fighter: "archimonde-boss", move, kind: "presentation effect", model, sequence: undefined, seconds: 0, timeScale: 1, travels: false, anchored: "fighter", scale, lifetime: frames / 60 });
+  return [
+    use("Rain of Fire column fire tell", COLUMN_FIRE_MODEL, COLUMN_FIRE_SCALE.from, tell("Rain of Fire")),
+    use("Rain of Fire meteors", RAIN_OF_FIRE_MODEL, RAIN_OF_FIRE_SCALE, RAIN_OF_FIRE_FRAMES),
+    use("Rain of Fire impact", FIRE_BURST_MODEL, 90 / 70, FIRE_BURST_FRAMES),
+    use("Finger of Death charge tell", FINGER_CHARGE_MODEL, FINGER_CHARGE_SCALE.from, tell("Finger of Death")),
+    use("Finger of Death impact", FINGER_IMPACT_MODEL, FINGER_IMPACT_SCALE, FINGER_IMPACT_FRAMES),
+    use("Doom's Shockwave path tell", SHOCKWAVE_TRAIL_MODEL, SHOCKWAVE_TRAIL_SCALE.from, Math.ceil(tell("Doom's Shockwave") * (1 - SHOCKWAVE_SWEEP))),
+    use("Doom's Shockwave stomp", SHOCKWAVE_MODEL, SHOCKWAVE_STOMP_SCALE, SHOCKWAVE_FRAMES),
+  ];
+}
+
 /** Every effect any fighter's move shows in Classic. */
 export function effectUses(): EffectUse[] {
   const uses: EffectUse[] = [];
@@ -306,6 +328,7 @@ export function effectUses(): EffectUse[] {
   for (const [move, model] of [["Howl of Terror fear", HOWL_TARGET_MODEL], ["Howl of Terror resist", RESIST_FLASH_MODEL]] as const) uses.push(supplemental(fighterSlug(Character.pitLord), move, model, "terrorPresentation playback requires an observed frame trace"));
   for (const [move, model] of [["raised skeleton", "Units\\Undead\\Skeleton\\Skeleton.mdx"], ["raised burst", "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx"], ["Defile boundary", IMPACT_DEFILE_MODEL], ["Defile frost", "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx"]] as const) uses.push(supplemental(fighterSlug(Character.lichKing), move, model, "projectilePresentation supplemental playback is unmodeled"));
   uses.push(supplemental(fighterSlug(Character.lich), "Death and Decay ground", IMPACT_DEFILE_MODEL, "projectilePresentation supplemental playback is unmodeled"));
+  uses.push(...bossSpellUses());
   const seen = new Set<string>();
   return uses.filter((use) => {
     const key = JSON.stringify(use);

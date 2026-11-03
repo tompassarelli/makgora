@@ -381,8 +381,12 @@ function rebindMatchPanels(s: ShellState, ui: UiObjects): void {
     ui.elements.destroy();
     ui.elements = new ElementEffects(s.origin);
   } else bindPrototype(ui.elements, ElementEffects.prototype);
+  const retainedClassic: { readonly classic?: { readonly plate?: unknown } } = ui;
   if (ui.classic === undefined) ui.classic = new ClassicPresentation(s.origin);
-  else bindPrototype(ui.classic, ClassicPresentation.prototype);
+  else if (retainedClassic.classic?.plate === undefined) {
+    ui.classic.destroy();
+    ui.classic = new ClassicPresentation(s.origin);
+  } else bindPrototype(ui.classic, ClassicPresentation.prototype);
 }
 
 function rebindFighterRenderers(renderers: FighterRenderers): void {

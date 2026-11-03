@@ -112,11 +112,18 @@ at one of them.
   has health instead of stocks: 210 (Lich King), 240 (Archimonde) or 270
   (Kil'jaeden) at Rookie, plus 30 for each tier above. The player has two
   stocks and five minutes; the boss wins if either runs out.
+- **Boss plate.** A plate in the top-left corner, clear of the clock and
+  the player plates, shows the boss's portrait, name, remaining health as a
+  number and a red bar, counting down to 0 as Master Hand's HP does in
+  Melee's Classic. Each hit shakes and reddens the number, leaves a yellow
+  trail on the bar that drains after a moment, flashes the boss red, knocks
+  him back a step and floats the damage dealt beside him (Tom's playtest,
+  2026-11-03, found no sign that hits landed).
 - **Deterministic pattern** (stage rule 13, #274, in
   makgora:docs/design/stage-art.md). Each boss repeats a fixed timetable of
   strikes, starting 1.5 s after GO!. Every strike has a tell (35 to 55
-  frames: the boss's spell animation, a warning mark on each area and its
-  name in the notice line), then its active frames, then a rest. Timing is a
+  frames: the boss's cast animation and that spell's own art building up on
+  each area), then its active frames, then a rest. Timing is a
   function of the match clock alone; an aimed strike takes the player's x on
   its tell's first frame and never follows afterwards. Nothing reads a random
   draw. Shields block strikes; dodges pass through them.
@@ -207,7 +214,29 @@ differ in order, team fight, arch-rival and boss.
 
 ## Boss attack warnings
 
-Every attack gives at least 20 displayed frames to react (#330). Its stock
+Every attack gives at least 20 displayed frames to react (#330).
+
+Archimonde's strikes show their own stock spell art instead of the outline
+below (Tom's playtest, 2026-11-03, could not read the outline as a spell);
+each grows toward its hit frame, and nothing is written on screen:
+
+- **Rain of Fire**: Flame Strike's gathering fire
+  (`FlameStrikeTarget.mdx`) grows on each column through the tell, and Rain
+  of Fire's own meteors (`RainOfFireTarget.mdx`) start falling on each column
+  46 frames before the hit so they land on its first active frame, with an
+  Incinerate burst (`FireLordDeathExplode.mdx`) as they land. He casts with
+  Spell, then Attack.
+- **Finger of Death**: a fel orb (`GreenDragonMissile.mdx`) charges on the
+  player's locked spot, growing through the tell, while Finger of Death's
+  lightning (`AFOD`) runs from his hand to it, brightening; on the hit the
+  bolt strikes down the whole column with Demon Bolt's impact
+  (`DemonBoltImpact.mdx`). Spell, then Attack.
+- **Doom's Shockwave**: fire (`BreathOfFireDamage.mdx`) runs along the deck
+  from under him to both edges over the first 60% of the tell and swells,
+  then War Stomp (`WarStompCaster.mdx`) bursts at six points across the
+  deck. He plays Spell Slam.
+
+The Lich King's and Kil'jaeden's strikes keep the outline: their stock
 spell wind-up runs alongside a yellow rectangular area outline from Warcraft's
 building selection square (`UI\Feedback\SelectionCircle\SelectionCircle.mdx`,
 `Neutral Big`). The square is held on a visible animation frame and stretched

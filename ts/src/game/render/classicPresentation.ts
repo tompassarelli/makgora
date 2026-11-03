@@ -3,7 +3,12 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { BossPhase, bossClock, bossDefinition, bossMoment, bossPosition, zoneCenter, type BossDefinition, type BossMoment } from "../classic/bosses";
+import { BODY_CAST, bossSpell } from "../presentation/bossSpellArt";
+import { BossPlate } from "../ui/bossPlate";
+import { BossSpells, type SpellCast, spellCast } from "./bossSpells";
+import { formatInt } from "wisp/game/text";
+import { idiv } from "wisp/src/sim/intMath";
+import { BOSS_FLASH_FRAMES, BossPhase, bossClock, bossDefinition, bossMoment, bossPosition, zoneCenter, type BossDefinition, type BossMoment } from "../classic/bosses";
 import { classicEnding } from "../classic/classicText";
 import { BossKind } from "../classic/runState";
 import { type MatchState, Phase } from "../lobby/lobbyState";
@@ -11,7 +16,7 @@ import { fighterPortrait } from "../roster/looks";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "../ui/frames";
 import { MENU_FONT, PANEL_TEXTURE } from "../ui/hudLayout";
 import { type ParkedFlags, type WorldOrigin, parkOnce } from "./effects";
-import { createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
+import { createFloatingText, FloatingText, setFloatingText, setFloatingTextColor, setFloatingTextPermanent, setFloatingTextPosition, setFloatingTextVisible, createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, resetEffectMatrix, setEffectAlpha, setEffectAnimation, setEffectBlendTime, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectRoll, setEffectScale, setEffectTime, setEffectTimeScale, setEffectYaw } from "wisp/game/effects";
 import { destroyFrame, Frame, setFrameEnabled, setFrameFont, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 
 
@@ -20,6 +25,12 @@ export const BOSS_TELEGRAPH_MODEL = "UI\\Feedback\\SelectionCircle\\SelectionCir
 
 const MARKER_HALF = f32(38.168);
 const QUARTER_TURN = f32(1.5707963);
+
+const FLINCH_UNITS = 40.0;
+const DAMAGE_FRAMES = 45;
+const DAMAGE_RISE = f32(1.5);
+const DAMAGE_SIDE = 140.0;
+const DAMAGE_TEXT_HEIGHT = f32(0.034);
 
 const moment: BossMoment = { strike: -1, index: 0, phase: BossPhase.opening, frame: 0 };
 
@@ -37,6 +48,14 @@ export class ClassicPresentation {
   private readonly lines: Frame;
   private readonly results: Frame;
   private cardText = "";
+  private spells: BossSpells | undefined;
+  private readonly cast: SpellCast = spellCast();
+  private shownHealth = -1;
+  private readonly damage: FloatingText;
+  private damageAge = DAMAGE_FRAMES;
+  private damageX = 0.0;
+  private damageZ = 0.0;
+  readonly plate: BossPlate;
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
     this.card = createBackdrop("ClassicEndingCard", gameUi(), 893);
@@ -61,6 +80,33 @@ export class ClassicPresentation {
     this.lines = text("ClassicEndingLines", 896, f32(0.43), f32(0.1), f32(0.011));
     this.results = text("ClassicEndingResults", 897, f32(0.32), f32(0.04), f32(0.0095));
     setFrameVisible(this.card, false);
+    this.plate = new BossPlate();
+    this.damage = createFloatingText();
+    setFloatingTextPermanent(this.damage, true);
+    setFloatingTextVisible(this.damage, false);
+  }
+
+  updatePlate(game: Readonly<MatchState>, showMatch: boolean): void {
+    const { boss } = this;
+    const shown = showMatch && boss !== undefined && game.phase === Phase.match && game.run.active && game.run.boss.kind !== BossKind.none;
+    this.plate.update(shown, boss?.name ?? "", boss?.portrait ?? "", game.run.boss.health, game.run.boss.maxHealth);
+  }
+
+  private showDamage(x: number, z: number, amount: number): void {
+    this.damageAge = 0;
+    this.damageX = x;
+    this.damageZ = z;
+    setFloatingText(this.damage, `-${formatInt(amount)}`, DAMAGE_TEXT_HEIGHT);
+    setFloatingTextVisible(this.damage, true);
+  }
+
+  private tickDamage(): void {
+    if (this.damageAge >= DAMAGE_FRAMES) return;
+    const { origin } = this;
+    setFloatingTextPosition(this.damage, origin.x + this.damageX + DAMAGE_SIDE, origin.y, origin.z + this.damageZ + f32(this.damageAge * DAMAGE_RISE));
+    setFloatingTextColor(this.damage, 255, 220, 60, this.damageAge < DAMAGE_FRAMES / 2 ? 255 : idiv(510 * (DAMAGE_FRAMES - this.damageAge), DAMAGE_FRAMES));
+    this.damageAge++;
+    if (this.damageAge >= DAMAGE_FRAMES) setFloatingTextVisible(this.damage, false);
   }
 
 
@@ -87,6 +133,8 @@ export class ClassicPresentation {
     for (let index = 0; index < ZONE_EFFECTS * 2; index++) this.parked[index] = false;
     this.lastStrike = -1;
     this.lastPhase = BossPhase.opening;
+    this.shownHealth = -1;
+    this.spells = new BossSpells(this.origin);
     setEffectPosition(this.body, x, y + boss.depth, z + boss.standZ);
   }
 
@@ -95,6 +143,10 @@ export class ClassicPresentation {
     if (this.body !== undefined) destroyEffect(this.body);
     for (const art of this.tells) destroyEffect(art);
     for (const art of this.hits) destroyEffect(art);
+    this.spells?.destroy();
+    this.spells = undefined;
+    this.damageAge = DAMAGE_FRAMES;
+    setFloatingTextVisible(this.damage, false);
     this.body = undefined;
     this.tells = [];
     this.hits = [];
@@ -104,24 +156,54 @@ export class ClassicPresentation {
 
   present(game: Readonly<MatchState>): void {
     const { boss, body } = this;
-    if (boss === undefined || body === undefined || game.phase !== Phase.match || game.run.boss.kind === BossKind.none) return;
+    if (boss === undefined || body === undefined || game.phase !== Phase.match || game.run.boss.kind === BossKind.none) {
+      this.spells?.present(undefined);
+      return;
+    }
     const clock = bossClock(game.matchFrame, game.startHold);
     const { origin } = this;
-
-    setEffectPosition(body, origin.x + bossPosition(boss, clock).x, origin.y + boss.depth, origin.z + boss.standZ);
-    const flash = game.run.boss.flash > 0;
+    const state = game.run.boss;
+    const at = bossPosition(boss, clock);
+    if (this.shownHealth >= 0 && state.health < this.shownHealth) this.showDamage(at.x, at.z, this.shownHealth - state.health);
+    this.shownHealth = state.health;
+    this.tickDamage();
+    const flinch = state.flash > 0 ? f32(FLINCH_UNITS * f32(state.flash / BOSS_FLASH_FRAMES)) : 0.0;
+    setEffectPosition(body, origin.x + at.x, origin.y + boss.depth + flinch, origin.z + boss.standZ);
+    const flash = state.flash > 0;
     setEffectColor(body, flash ? 255 : boss.tint[0], flash ? 90 : boss.tint[1], flash ? 90 : boss.tint[2]);
     const now = bossMoment(boss, clock, moment);
     const strike = boss.strikes[now.index];
+    const spell = strike === undefined ? undefined : bossSpell(strike.name);
     if (now.strike !== this.lastStrike || now.phase !== this.lastPhase) {
-      if (now.phase === BossPhase.tell) playEffectAnimation(body, EffectAnimation.spell);
-      else if (now.phase === BossPhase.active) playEffectAnimation(body, EffectAnimation.attack);
-      else if (now.phase === BossPhase.rest) playEffectAnimation(body, EffectAnimation.stand);
+      const cast = spell === undefined ? undefined : BODY_CAST[spell];
+      if (now.phase === BossPhase.tell) {
+        if (cast === undefined) playEffectAnimation(body, EffectAnimation.spell);
+        else setEffectAnimation(body, cast.tell);
+      } else if (now.phase === BossPhase.active) {
+        if (cast === undefined) playEffectAnimation(body, EffectAnimation.attack);
+        else if (cast.active !== undefined) setEffectAnimation(body, cast.active);
+      } else if (now.phase === BossPhase.rest) playEffectAnimation(body, EffectAnimation.stand);
       this.lastStrike = now.strike;
       this.lastPhase = now.phase;
     }
+    if (spell === undefined || strike === undefined || now.strike < 0) this.spells?.present(undefined);
+    else {
+      const { cast } = this;
+      cast.spell = spell;
+      cast.strike = now.strike;
+      cast.tell = strike.tell;
+      cast.active = strike.active;
+      cast.into = now.phase === BossPhase.tell ? now.frame : now.phase === BossPhase.active ? strike.tell + now.frame : strike.tell + strike.active + now.frame;
+      cast.zones = strike.zones;
+      cast.aimed = strike.aimed;
+      cast.aimX = state.aimX;
+      cast.bossX = at.x;
+      cast.bossY = origin.y + boss.depth;
+      cast.bossZ = origin.z + boss.standZ;
+      this.spells?.present(cast);
+    }
     for (let index = 0; index < ZONE_EFFECTS; index++) {
-      const zone = strike?.zones[index];
+      const zone = spell === undefined ? strike?.zones[index] : undefined;
       const tell = this.tells[index];
       const hit = this.hits[index];
       if (tell === undefined || hit === undefined) continue;
@@ -164,6 +246,7 @@ export class ClassicPresentation {
 
   destroy(): void {
     this.endMatch();
+    this.plate.destroy();
     destroyFrame(this.card);
   }
 }

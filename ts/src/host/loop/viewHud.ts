@@ -38,6 +38,7 @@ export function presentMatchPanels(s: ShellState, game: MatchState, ui: UiObject
   const keys = s.participants[local ?? 0].keys;
   ui.preview.update(showMatch && preview && game.phase === Phase.match && local !== undefined, s.participants[local ?? 0].bindings, localDevice(s), key => keyDown(keys, key));
   ui.classic?.updateCard(game);
+  ui.classic?.updatePlate(game, showMatch);
 }
 
 export function markLoreClear(game: MatchState): void {

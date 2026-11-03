@@ -63,6 +63,7 @@ export interface BossDefinition {
   readonly strikes: readonly BossStrike[];
 
   readonly hitArt: string;
+  readonly portrait: string;
   readonly intro: string;
 }
 
@@ -73,6 +74,7 @@ const LICH_KING_DRAWN = { min: [-35.0, -45.0, 0.0], max: [143.0, 45.0, 161.0] } 
 
 
 export const BOSS_OPENING_FRAMES = 90;
+export const BOSS_FLASH_FRAMES = 12;
 const BOSS_HEALTH_PER_TIER = 30;
 
 const BOSS_PROJECTILE_DAMAGE = 6;
@@ -87,7 +89,7 @@ const band = (left: number, right: number, bottom: number, top: number): BossZon
 const LICH_KING: BossDefinition = {
   kind: BossKind.lichKing, name: "The Lich King", stage: 2,
   model: "war3mapImported\\LichKing2.mdx", scale: f32(2.6), tint: [190, 220, 255], drawn: LICH_KING_DRAWN, depth: 480.0, standZ: -20.0,
-  health: 210, radius: 120.0, hitArt: "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx",
+  health: 210, radius: 120.0, hitArt: "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx", portrait: "ReplaceableTextures\\CommandButtons\\BTNLichKing.blp",
   intro: "Champions of Azeroth. Kneel before the Frozen Throne.",
   strikes: [
     { name: "Howling Blast", tell: 45, active: 10, rest: 35, aimed: true, zones: [column(0.0, 75.0)], away: false, effect: effect(12, 60, 70, 0.0, 1.0, HitElement.ice), x: 0.0, z: 330.0 },
@@ -102,7 +104,7 @@ const LICH_KING: BossDefinition = {
 const ARCHIMONDE: BossDefinition = {
   kind: BossKind.archimonde, name: "Archimonde", stage: 10,
   model: "Units\\Demon\\Warlock\\Warlock.mdx", scale: f32(2.2), tint: [255, 255, 255], drawn: WARLOCK_DRAWN, depth: 400.0, standZ: -60.0,
-  health: 240, radius: 130.0, hitArt: "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx",
+  health: 240, radius: 130.0, hitArt: "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", portrait: "ReplaceableTextures\\CommandButtons\\BTNArchimonde.blp",
   intro: "The World Tree will burn, and your little tournament with it.",
   strikes: [
     { name: "Rain of Fire", tell: 50, active: 14, rest: 20, aimed: false, zones: [column(-450.0, 90.0), column(-150.0, 90.0), column(150.0, 90.0), column(450.0, 90.0)], away: false, effect: effect(9, 50, 70, 0.0, 1.0, HitElement.fire), x: 0.0, z: 360.0 },
@@ -116,7 +118,7 @@ const ARCHIMONDE: BossDefinition = {
 const KILJAEDEN: BossDefinition = {
   kind: BossKind.kiljaeden, name: "Kil'jaeden", stage: 7,
   model: "Units\\Demon\\Warlock\\Warlock.mdx", scale: f32(2.4), tint: [255, 120, 150], drawn: WARLOCK_DRAWN, depth: 420.0, standZ: -60.0,
-  health: 270, radius: 130.0, hitArt: "Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx",
+  health: 270, radius: 130.0, hitArt: "Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", portrait: "ReplaceableTextures\\CommandButtons\\BTNArchimonde.blp",
   intro: "Illidan failed me. You will not even be a disappointment.",
   strikes: [
     { name: "Shadow Spike", tell: 40, active: 8, rest: 12, aimed: true, zones: [column(0.0, 65.0)], away: false, effect: effect(10, 60, 70, 0.0, 1.0, HitElement.dark), x: -200.0, z: 320.0 },
@@ -287,5 +289,5 @@ export function strikeBoss(state: BossState, world: Roster, clock: number, slot:
 
 function hurtBoss(state: BossState, damage: number): void {
   state.health = Math.max(0, state.health - Math.max(1, Math.floor(damage)));
-  state.flash = 12;
+  state.flash = BOSS_FLASH_FRAMES;
 }

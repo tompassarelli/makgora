@@ -3,7 +3,7 @@
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { MATCH_TICKS_PER_SECOND, type MatchState } from "../lobby/lobbyState";
 import { fighterName } from "../roster/kits";
-import { BossPhase, bossClock, bossDefinition, bossMoment } from "./bosses";
+import { bossDefinition } from "./bosses";
 import { CLASSIC_FIGHTS } from "./classic";
 import { classicRoute } from "./routes";
 import { RunOutcome } from "./runState";
@@ -63,13 +63,3 @@ export function classicResultHelp(game: Readonly<MatchState>, confirm: string): 
 }
 
 
-export function bossNotice(game: Readonly<MatchState>): string {
-  const { boss } = game.run;
-  const definition = bossDefinition(boss.kind);
-  if (definition === undefined) return "";
-  const health = `${definition.name}: ${boss.health} / ${boss.maxHealth}`;
-  const now = bossMoment(definition, bossClock(game.matchFrame, game.startHold));
-  const strike = definition.strikes[now.index];
-  if (now.strike < 0 || strike === undefined || now.phase !== BossPhase.tell) return health;
-  return `${health}\n${strike.name}!`;
-}
