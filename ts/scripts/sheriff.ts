@@ -147,7 +147,7 @@ export function suiteProbe(workflow: string, step: string): { readonly args: rea
 export function referencedIssues(commits: readonly Commit[]): number[] {
   const issues = new Set<number>();
   for (const { message } of commits) {
-    for (const match of message.matchAll(/(?:refs|fixes|closes) (?:smashcraft)?#(\d+)/gi)) issues.add(Number(match[1]));
+    for (const match of message.matchAll(/(?:refs|fixes|closes) (?:makgora)?#(\d+)/gi)) issues.add(Number(match[1]));
     for (const match of (message.split("\n")[0] ?? "").matchAll(/\(#(\d+)\)/g)) issues.add(Number(match[1]));
   }
   return [...issues].toSorted((a, b) => a - b);
@@ -230,7 +230,7 @@ const confirmLane = (lanes: readonly LandedLane[], main: string, suite: NonNulla
 
 const revertOnMain = (verdict: Extract<Verdict, { kind: "revert" }>, lane: LandedLane, main: string, runUrl: string) => Effect.gen(function*() {
   const message = [`Revert Autoland lane ${lane.branch}`, "", `Main went red after a green parent: ${verdict.step}`, `CI run: ${runUrl}`, "",
-    ...lane.issues.map((issue) => `Refs smashcraft#${issue}`), `${REVERT_TRAILER} ${verdict.shas.join(" ")}`].join("\n");
+    ...lane.issues.map((issue) => `Refs makgora#${issue}`), `${REVERT_TRAILER} ${verdict.shas.join(" ")}`].join("\n");
   yield* git("fetch", "-q", "origin", "main");
   if ((yield* git("rev-parse", "origin/main")).trim() !== main) return yield* new SheriffFailure({ command: "git revert", problem: "main moved after lane confirmation; reverts nothing" });
   yield* git("checkout", "-q", "-B", "sheriff", main);

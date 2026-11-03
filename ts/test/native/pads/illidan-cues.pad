@@ -1,5 +1,5 @@
 # #144 special cues: every Illidan special form shows its Warcraft spell.
-# Illidan a against Illidan b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Illidan a against Illidan b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero illidan
 # Eye Beam: the beam hits a standing b.
 60 a tap X 2

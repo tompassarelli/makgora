@@ -21,7 +21,7 @@ const BUTTONS: Readonly<Record<string, string>> = { A: "attack", X: "special", B
 
 interface PadEdge { readonly frame: number; readonly slot: number; readonly action: string; readonly args: readonly string[] }
 
-/** A pad script's setup command and edges (smashcraft:docs/native-bot-session.md), read the way the native driver reads them. */
+/** A pad script's setup command and edges (makgora:docs/native-bot-session.md), read the way the native driver reads them. */
 export function padEdges(script: string): { readonly setup: string; readonly edges: readonly PadEdge[] } {
   let setup = "-dev quick", previous = 0;
   const edges: PadEdge[] = [];
@@ -69,7 +69,7 @@ export function padNetGame(script: string): NetGame {
 declare const PLAYER_COMMIT: string | undefined;
 
 /** sha256 over every map source file, path and content in path order, or over the commit a packaged player was built from: two players with different sources get different hashes. */
-export async function smashcraftMapHash(): Promise<string> {
+export async function makgoraMapHash(): Promise<string> {
   if (typeof PLAYER_COMMIT === "string") return new Bun.CryptoHasher("sha256").update(PLAYER_COMMIT).digest("hex");
   const root = join(import.meta.dir, "../../src");
   const paths = [...new Bun.Glob("**/*").scanSync({ cwd: root })].sort();

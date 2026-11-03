@@ -7,8 +7,8 @@ import type { HeadlessProject } from "wisp/scripts/wisp/headless";
 import type { Journey } from "wisp/src/headless/journey";
 import { DESYNC_COMMAND, FROZEN_THRONE_QUICK_COMMAND, QUICK_CPU_COMMAND } from "../../src/game/session/devSettings";
 import { SLOTS_COMMAND, STOCKS_COMMAND } from "../../src/game/session/sessionSetup";
-import { SMASHCRAFT_HEADLESS } from "./headless";
-import { SMASHCRAFT_SCENE } from "./playerView";
+import { MAKGORA_HEADLESS } from "./headless";
+import { MAKGORA_SCENE } from "./playerView";
 import { QUICK_MATCH } from "./quickMatch";
 
 
@@ -44,9 +44,9 @@ const COMPUTER_MATCH: Journey = {
 
 export const TEXT_JOURNEYS: readonly string[] = ["text-match"];
 
-export const SMASHCRAFT_JOURNEYS: HeadlessProject = {
-  map: SMASHCRAFT_HEADLESS,
+export const MAKGORA_JOURNEYS: HeadlessProject = {
+  map: MAKGORA_HEADLESS,
   entry: join(import.meta.dir, "../../src/host/entries/devMain.ts"),
   journeys: { "quick-match": QUICK_MATCH, desync: DESYNC, "cpu-expert": CPU_EXPERT, "computer-match": COMPUTER_MATCH, "frozen-throne": { ...QUICK_MATCH, events: QUICK_MATCH.events.map((event) => "chat" in event && event.frame === 30 ? { ...event, chat: FROZEN_THRONE_QUICK_COMMAND } : event) } },
-  scene: SMASHCRAFT_SCENE,
+  scene: MAKGORA_SCENE,
 };

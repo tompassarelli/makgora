@@ -196,7 +196,7 @@ const requireListed = (path: string, imports: readonly string[], models: readonl
 const carriedModels = (map: string, packager: string, models: readonly string[] = [...SCRIPT_MODELS, ...mapCueModels().filter(model => model.toLowerCase().startsWith("war3mapimported\\"))]) => Effect.scoped(Effect.gen(function*() {
   if (models.includes("")) return yield* new MapBuildFailure({ operation: "check script models", path: map, cause: EMPTY_MODEL });
   const scratch = yield* Effect.acquireRelease(
-    tryMapSync("create scratch directory", tmpdir(), () => mkdtempSync(join(tmpdir(), "smashcraft-models."))),
+    tryMapSync("create scratch directory", tmpdir(), () => mkdtempSync(join(tmpdir(), "makgora-models."))),
     (directory) => Effect.sync(() => rmSync(directory, { recursive: true, force: true })),
   );
   const listPath = join(scratch, "listfile");
@@ -234,7 +234,7 @@ export const rebuildMap = (map: string) => Effect.gen(function*() {
 const imported = (directory: string, file: string): ArchiveEntry => ({ entry: `war3mapImported\\${file}`, source: join(directory, file) });
 
 
-const PORTRAIT_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "smashcraft/blp-portraits");
+const PORTRAIT_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "makgora/blp-portraits");
 
 export const MAP_PORTRAITS: readonly string[] = PORTRAIT_FIGHTERS.flatMap((character) => portraitCostumes(character).flatMap((costume) => PORTRAIT_KINDS.flatMap((kind) =>
   [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot) => fighterPortrait(character, kind, slot, costume)))));
@@ -335,7 +335,7 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
     `this assets folder's clip pool predates the checkout's clips. From the repository root, export a new pool from ${assets} ` +
     "with animation-assets and illidan-animation holding the packaged models fighterAssetInfo.ts and demonHunterAssetInfo.ts name: " +
     `cp -rL ${clipDirectory} NEW && chmod -R u+w NEW && bun tools/animations/export-original-clips.ts --assets ${assets} --out NEW --keep-unchanged; ` +
-    "then `bun wisp inputs add original-clips-static-lights NEW` and commit build-inputs/original-clips-static-lights (smashcraft:docs/build-inputs.md)");
+    "then `bun wisp inputs add original-clips-static-lights NEW` and commit build-inputs/original-clips-static-lights (makgora:docs/build-inputs.md)");
   const soundProblem = soundTableProblem(MODEL_SOUND_TABLE);
   if (soundProblem !== undefined) {
     return yield* new MapBuildFailure({ operation: "check model sounds", path: "ts/src/generated/assets/modelSoundInfo.ts", cause: `${soundProblem}; export them with tools/animations/export-model-sounds.ts` });
@@ -374,7 +374,7 @@ function importProblem(entries: readonly ArchiveEntry[], exists: (path: string) 
     const earlier = seen.get(key);
     if (earlier !== undefined) return `${entry} is imported twice, from ${earlier} and ${source}`;
     seen.set(key, source);
-    if (!exists(source)) return `${entry}'s file ${source} is missing; a regenerated asset family must keep it (smashcraft:docs/build-inputs.md)`;
+    if (!exists(source)) return `${entry}'s file ${source} is missing; a regenerated asset family must keep it (makgora:docs/build-inputs.md)`;
   }
   return undefined;
 }

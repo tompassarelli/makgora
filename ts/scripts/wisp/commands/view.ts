@@ -20,7 +20,7 @@ import { describeScene, sceneProblems } from "wisp/scripts/wisp/scene";
 import { importedAssets } from "../mapInputs";
 import { heroModelSource, importedModelFile, stockModelPath } from "../../heroModelSource";
 import { gameFilesLayer, tsDirectory } from "../project";
-import { SMASHCRAFT_FRAME, SMASHCRAFT_SCENE } from "../playerView";
+import { MAKGORA_FRAME, MAKGORA_SCENE } from "../playerView";
 import { DrawnModel } from "../drawnModel";
 import { CHARACTER_NAMES, FIGHTER_MODELS, STYLE_NAMES, loadDrawnModel, sampleAttack, sampleState, sheet } from "../hurtboxView";
 import { characterModelScale } from "../../../src/game/presentation/modelScale";
@@ -45,8 +45,8 @@ const scenes = (directories: readonly string[]) => Effect.forEach(directories, (
   });
   const newest = reports.flat().sort((a, b) => b.modified - a.modified)[0];
   if (newest === undefined) return yield* new UsageFailure({ problem: `${directory} holds no scene report` });
-  yield* Console.log(`${newest.path}: ${describeScene(newest.value, SMASHCRAFT_SCENE)}`);
-  const problems = sceneProblems(newest.value, SMASHCRAFT_SCENE);
+  yield* Console.log(`${newest.path}: ${describeScene(newest.value, MAKGORA_SCENE)}`);
+  const problems = sceneProblems(newest.value, MAKGORA_SCENE);
   if (problems.length > 0) return yield* new PlayerViewFailure({ client: directory, source: newest.path, problems });
 }), { discard: true }).pipe(Effect.provide(gameFilesLayer));
 
@@ -54,7 +54,7 @@ const scenes = (directories: readonly string[]) => Effect.forEach(directories, (
 const frames = (paths: readonly string[]) => Effect.gen(function*() {
   const absent = new Map<string, string[]>();
   for (const path of paths) {
-    const results = measureFrame(yield* readFrame(path), SMASHCRAFT_FRAME);
+    const results = measureFrame(yield* readFrame(path), MAKGORA_FRAME);
     yield* Console.log(`${path}: ${results.map(({ feature, present, measured }) => `${feature.name} ${present ? "present" : "absent"} (${measured})`).join("; ")}`);
     for (const { seen } of frameProblems(results)) absent.set(seen, [...(absent.get(seen) ?? []), path]);
   }
@@ -79,7 +79,7 @@ const MODEL_TABLE = MODEL_FACTS_DIRECTORY;
 
 const models = (args: readonly string[]) => Effect.scoped(Effect.gen(function*() {
   if (args.length === 1 && (args[0] === "--prune" || args[0] === "--check")) {
-    const named = new Set(SMASHCRAFT_SCENE.kinds.flatMap(kind => kind.models).filter(model => model !== ""));
+    const named = new Set(MAKGORA_SCENE.kinds.flatMap(kind => kind.models).filter(model => model !== ""));
     const missing = [...named].filter(model => MODEL_FACTS[model] === undefined).sort();
     if (missing.length > 0) return yield* new UsageFailure({ problem: `${missing.length} scene models have no facts; measure them with bun wisp view models --assets "$(bun wisp inputs path assets)" --summon "$(bun wisp inputs path summon)" --extractor CASC_EXTRACT --storage WARCRAFT_DIR --only "${missing.join(",")}"` });
     if (args[0] === "--check") {
@@ -98,11 +98,11 @@ const models = (args: readonly string[]) => Effect.scoped(Effect.gen(function*()
   }
   const imports = new Map((yield* importedAssets(assets, summon)).map(({ entry, source }) => [entry.toLowerCase(), source]));
   const scratch = yield* Effect.acquireRelease(
-    Effect.sync(() => mkdtempSync(join(tmpdir(), "smashcraft-stock-models."))),
+    Effect.sync(() => mkdtempSync(join(tmpdir(), "makgora-stock-models."))),
     (directory) => Effect.sync(() => rmSync(directory, { recursive: true, force: true })),
   );
   const selected = only?.split(",");
-  const named = [...new Set(SMASHCRAFT_SCENE.kinds.flatMap((kind) => kind.models))].filter((model) => model !== "" && (selected === undefined || selected.includes(model))).sort();
+  const named = [...new Set(MAKGORA_SCENE.kinds.flatMap((kind) => kind.models))].filter((model) => model !== "" && (selected === undefined || selected.includes(model))).sort();
   const lines = yield* Effect.forEach(named, (model, index) => Effect.gen(function*() {
     let file = imports.get(model.toLowerCase());
     if (file === undefined) {
@@ -186,7 +186,7 @@ const strikes = (args: readonly string[]) => Effect.scoped(Effect.gen(function*(
     return yield* new UsageFailure({ problem: "view strikes takes --check, --assets DIR or --extractor CASC_EXTRACT --storage WARCRAFT_DIR [--assets DIR]" });
   }
   const scratch = yield* Effect.acquireRelease(
-    Effect.sync(() => mkdtempSync(join(tmpdir(), "smashcraft-strikes."))),
+    Effect.sync(() => mkdtempSync(join(tmpdir(), "makgora-strikes."))),
     (directory) => Effect.sync(() => rmSync(directory, { recursive: true, force: true })),
   );
   const files = new Map<string, string>();

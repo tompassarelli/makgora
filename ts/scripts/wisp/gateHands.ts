@@ -79,7 +79,7 @@ export const measureHandsGate = (clientsFile: string, directory: string, teams: 
     try: () => {
       const pin = readFileSync(join(projectRoot, "build-inputs/selection-assets"), "utf8").trim();
       mkdirSync(directory, { recursive: true, mode: 0o700 });
-      const assets = join(homedir(), ".local/share/smashcraft-build-inputs/store/selection-assets", pin);
+      const assets = join(homedir(), ".local/share/makgora-build-inputs/store/selection-assets", pin);
       const read = (name: string) => readTga(readFileSync(join(assets, `${name}.tga`)));
       return { point: read("SelectionHandPoint"), fan: read("SelectionHandFan"), pinch: read("SelectionHandPinch"), chip: read("SelectionChipP1") } as Record<HandState | "chip", Rgba>;
     },

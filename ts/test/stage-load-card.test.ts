@@ -6,10 +6,10 @@ import { STAGE_CARD_DELAY_FRAMES } from "../src/game/session/stageLoad";
 import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
 import { passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const CARD = ["StageLoadingCover", "StageLoadingArt", "StageLoadingName"];
 const SELECT = ["MeleeStageBackdrop", "MeleeStageBand", "MeleeStagePreviewBoxPanel", "MeleeStagePreviewPicture", "MeleeStageListBoxPanel"];

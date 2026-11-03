@@ -27,10 +27,10 @@ import { preloadMenuTextures } from "../../src/game/ui/menuPreload";
 import { SELECTABLE_CHARACTERS } from "../../src/game/roster/kits";
 import { cueModels } from "./cueModels";
 import { preloadModels, preloadSkies } from "../../src/game/presentation/stagePreload";
-import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "./headless";
+import { PREDICTED_HEADLESS, MAKGORA_HEADLESS } from "./headless";
 import { deliverKey } from "./deliverKey";
 import { headlessRender, playerRender } from "./headlessRender";
-import { createNetStandalone, smashcraftMapHash } from "./net";
+import { createNetStandalone, makgoraMapHash } from "./net";
 import { CPU_OPPONENT, SELECTION_SCRIPT, selectionPointer, selectionPresses } from "./selectionScript";
 import { heldKeys } from "./standaloneKeys";
 
@@ -99,7 +99,7 @@ export async function createStandaloneSession(options: StandaloneSessionOptions 
   const presses = scripted ? selectionPresses(script) : [];
   const pointer = scripted ? selectionPointer(script) : undefined;
   let steps = 0;
-  const runtime = installHeadless(!driven || presentation === "pool-confirmed" || presentation === "pool-predicted" ? PREDICTED_HEADLESS : SMASHCRAFT_HEADLESS, nativeDeclarations());
+  const runtime = installHeadless(!driven || presentation === "pool-confirmed" || presentation === "pool-predicted" ? PREDICTED_HEADLESS : MAKGORA_HEADLESS, nativeDeclarations());
   let restoreTutorialOffers = (): void => {};
   const release = (): void => { restoreTutorialOffers(); runtime.restore(); };
   try {
@@ -224,11 +224,11 @@ export const standalonePreload = () => ({
   preloadTextures: [...new Set([...preloadHudTextures(), ...preloadMenuTextures(), ...preloadFighterTextures()])],
 });
 
-export const smashcraftStandalone = (render: StandaloneGame["render"]): StandaloneGame => ({
-  title: "Smashcraft",
+export const makgoraStandalone = (render: StandaloneGame["render"]): StandaloneGame => ({
+  title: "Mak'gora",
   render: { ...render, ...standalonePreload() },
   create: createStandaloneSession,
-  net: { mapHash: smashcraftMapHash, create: createNetStandalone },
+  net: { mapHash: makgoraMapHash, create: createNetStandalone },
 });
 
 const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only", "--no-tutorial-offer"]);
@@ -308,7 +308,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const options = yield* Effect.try({ try: () => standaloneArguments(counted.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
   const { playerAssets, start, chosen, digests, storage, stage, rollback, fourFighters, noTutorialOffer, ...run } = options;
   const match = { ...(fourFighters === true ? { fourFighters } : {}), ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }) };
-  const game = smashcraftStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
+  const game = makgoraStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
   const query = new URLSearchParams();
   if (playerAssets !== undefined) query.set("map", playerAssets.map);
   if (options.start !== undefined) query.set("start", options.start);
@@ -321,8 +321,8 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   if (options.rollback !== undefined) query.set("rollback", String(options.rollback));
   if (digests !== undefined) query.set("digests", digests);
   const compiled = !import.meta.path.endsWith(".ts");
-  if (compiled) process.env.SMASHCRAFT_NATIVE_QUERY = query.toString();
-  if (windowed.window === "native") process.env.WISP_WINDOW_SNAPSHOTS ??= join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "smashcraft/evidence");
+  if (compiled) process.env.MAKGORA_NATIVE_QUERY = query.toString();
+  if (windowed.window === "native") process.env.WISP_WINDOW_SNAPSHOTS ??= join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "makgora/evidence");
   const nativeModule = query.size === 0 || compiled ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
   return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...match, ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }), ...(noTutorialOffer === true ? { tutorialOffer: false } : {}) }) }, {
     ...run,
@@ -331,6 +331,6 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
     ...(counted.emulatedCalls === undefined ? {} : { emulatedCalls: counted.emulatedCalls }),
     ...(net.net === undefined ? {} : { net: net.net }),
     window: windowed.window,
-    ...(windowed.window === "native" ? { nativeGame: { module: nativeModule, export: "SMASHCRAFT_NATIVE_GAME" } } : {}),
+    ...(windowed.window === "native" ? { nativeGame: { module: nativeModule, export: "MAKGORA_NATIVE_GAME" } } : {}),
   });
 });

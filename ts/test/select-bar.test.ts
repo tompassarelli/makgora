@@ -6,11 +6,11 @@ import { type BarBox, DRAWER_ROWS, GUIDE_ROWS, MODE_ROWS, SELECT_BAR } from "../
 import { shell } from "../src/host/loop/state";
 import { views } from "../src/host/loop/ui";
 import { passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { NEUTRAL_INPUT, createStandaloneSession } from "../scripts/wisp/standalone";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 const HUMANS = [0, 1];
 const centre = (box: BarBox) => [f32(box.x + f32(box.width / 2)), f32(box.y - f32(box.height / 2))] as const;
 const DRAWER_TITLE = "Match Rules";

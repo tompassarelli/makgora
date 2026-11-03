@@ -3,10 +3,10 @@ import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { STOCK_FRAME_COUNTS } from "../src/host/loop/stockFrames";
 import { install, startBuild } from "../src/platform/main";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-stock-frames" };
 

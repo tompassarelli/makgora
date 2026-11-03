@@ -1,6 +1,6 @@
 # #167 Lich King Defile: a shadow pool ahead of him on frame 20 that strikes b standing in it and
 # grows with each hit; b jumps out. lich-king-defile.pad covers the recast wait and facings.
-# Lich King a against Lich King b. Syntax and checks: smashcraft:docs/native-bot-session.md.
+# Lich King a against Lich King b. Syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero lich king
 # Input starts after frame 500: on a loaded host the helpers first see a quick match up to ~400 frames in.
 # b dashes in, then walks 22 frames toward a, to where the pool lands.

@@ -71,39 +71,39 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const fighterArt = changedFighters(paths, derivedStepCode());
   const locomotion = fighterArt.includes("illidan") || paths.some((path) => LOCOMOTION_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   return [
-    ...(ts ? [{ name: "balance baseline holds the kit", directory: "ts", args: ["test", "test/balanceBaseline.test.ts"], fix: "keep the listed values inside the fixed bounds, or for an intended kit change re-freeze with bun scripts/balanceFreeze.ts from ts/ and name the change in the commit (smashcraft:docs/design/balance.md).", hosted: false }] : []),
+    ...(ts ? [{ name: "balance baseline holds the kit", directory: "ts", args: ["test", "test/balanceBaseline.test.ts"], fix: "keep the listed values inside the fixed bounds, or for an intended kit change re-freeze with bun scripts/balanceFreeze.ts from ts/ and name the change in the commit (makgora:docs/design/balance.md).", hosted: false }] : []),
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true, readsOnly: true }] : []),
     ...(ts ? [
       { name: "kind tags, parity ledger and type-check ts", directory: "ts", args: ["run", "check"], fix: "end each refused test title with its kind tag (listed above) or delete the test; for a ledger row, regenerate docs/design/melee-parity.md with bun wisp ledger or give the named row the status it now needs (docs/design/melee-parity-plan.md, \"Ledger\"); fix each type error.", hosted: true },
-      { name: "every scene model has facts", directory: "ts", args: ["scripts/wisp.ts", "view", "models", "--check"], fix: "measure the listed models with the command above and commit their shards (smashcraft:docs/player-view.md).", hosted: false, readsOnly: true },
+      { name: "every scene model has facts", directory: "ts", args: ["scripts/wisp.ts", "view", "models", "--check"], fix: "measure the listed models with the command above and commit their shards (makgora:docs/player-view.md).", hosted: false, readsOnly: true },
     ] : []),
     ...(effectKit ? [
-      { name: "effect-kit check", directory: ".", args: [EFFECT_KIT, "check"], fix: `CI runs north's effect-kit check (smashcraft:.github/workflows/ci.yml); fix each problem above, or if ${EFFECT_KIT} is missing, git clone https://github.com/tompassarelli/north ${NORTH} (git -C ${NORTH} pull keeps it on the main CI clones).`, hosted: false, machineTool: true },
+      { name: "effect-kit check", directory: ".", args: [EFFECT_KIT, "check"], fix: `CI runs north's effect-kit check (makgora:.github/workflows/ci.yml); fix each problem above, or if ${EFFECT_KIT} is missing, git clone https://github.com/tompassarelli/north ${NORTH} (git -C ${NORTH} pull keeps it on the main CI clones).`, hosted: false, machineTool: true },
     ] : []),
     ...(suites ? [
-      { name: "Autoland suite covers the farm suite", directory: "ts", args: ["scripts/suiteParity.ts"], fix: "give Autoland's suite every farm-test job and input, since safe-push hands a lane to Autoland without its own farm run (smashcraft:docs/ci.md, \"Autoland\").", hosted: true },
+      { name: "Autoland suite covers the farm suite", directory: "ts", args: ["scripts/suiteParity.ts"], fix: "give Autoland's suite every farm-test job and input, since safe-push hands a lane to Autoland without its own farm run (makgora:docs/ci.md, \"Autoland\").", hosted: true },
     ] : []),
-    ...(mapInputs ? [{ name: "private map-build inputs", directory: "ts", args: ["scripts/wisp.ts", "map", "build", "--profile", "playable", "--edition", "classic", "--inputs-only"], fix: "regenerate and store the missing inputs before landing (smashcraft:docs/build-inputs.md).", hosted: false, privateStore: true }] : []),
-    ...(pins ? [{ name: `pinned build inputs stored on ${PIN_HOST}`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "publish", PIN_HOST], fix: `${PIN_HOST} builds and lands from its own store and cannot fetch from this host, so a pin lands only once its entry is there: make ${PIN_HOST} reachable over ssh and push again, and produce again any entry this host lacks (smashcraft:docs/build-inputs.md, "Hosts").`, hosted: false, privateStore: true }] : []),
+    ...(mapInputs ? [{ name: "private map-build inputs", directory: "ts", args: ["scripts/wisp.ts", "map", "build", "--profile", "playable", "--edition", "classic", "--inputs-only"], fix: "regenerate and store the missing inputs before landing (makgora:docs/build-inputs.md).", hosted: false, privateStore: true }] : []),
+    ...(pins ? [{ name: `pinned build inputs stored on ${PIN_HOST}`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "publish", PIN_HOST], fix: `${PIN_HOST} builds and lands from its own store and cannot fetch from this host, so a pin lands only once its entry is there: make ${PIN_HOST} reachable over ssh and push again, and produce again any entry this host lacks (makgora:docs/build-inputs.md, "Hosts").`, hosted: false, privateStore: true }] : []),
     ...(models ? [
-      { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
-      { name: "stored portraits match their models", directory: "ts", args: ["test", "test/portraitSources.test.ts"], fix: "re-render the listed fighters with bun scripts/fighterPortraits.ts PRIVATE_OUTPUT --only NAME and store the result as fighter-renders (smashcraft:docs/design/fighter-portraits.md).", hosted: false, privateStore: true },
-      { name: "body-fade record names the bodies the clip table plays", directory: "ts", args: ["test", "test/bodyFades.test.ts"], fix: "re-record it with bun scripts/bodyFades.ts --record from ts/ and check that no down action newly fades (smashcraft:docs/commands/animation.md).", hosted: false },
+      { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (makgora:docs/build-inputs.md, \"Change art\").", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
+      { name: "stored portraits match their models", directory: "ts", args: ["test", "test/portraitSources.test.ts"], fix: "re-render the listed fighters with bun scripts/fighterPortraits.ts PRIVATE_OUTPUT --only NAME and store the result as fighter-renders (makgora:docs/design/fighter-portraits.md).", hosted: false, privateStore: true },
+      { name: "body-fade record names the bodies the clip table plays", directory: "ts", args: ["test", "test/bodyFades.test.ts"], fix: "re-record it with bun scripts/bodyFades.ts --record from ts/ and check that no down action newly fades (makgora:docs/commands/animation.md).", hosted: false },
     ] : []),
     ...(cueModels ? [
-      { name: "cue models and Classic effect record", directory: "ts", args: ["scripts/cueModels.ts"], fix: `record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).`, hosted: true, localFix: true },
+      { name: "cue models and Classic effect record", directory: "ts", args: ["scripts/cueModels.ts"], fix: `record new models with ${RECORD_COMMAND} from ts/ (makgora:docs/commands/workflow.md).`, hosted: true, localFix: true },
     ] : []),
     ...(fighterArt.length > 0 ? [
-      { name: `fighter art reproduces (${fighterArt.join(", ")})`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "derive", "--check", ...fighterArt.flatMap((slug) => ["--fighter", slug])], fix: "derive the listed fighters from this landing's producers and commit their pins and generated files (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
+      { name: `fighter art reproduces (${fighterArt.join(", ")})`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "derive", "--check", ...fighterArt.flatMap((slug) => ["--fighter", slug])], fix: "derive the listed fighters from this landing's producers and commit their pins and generated files (makgora:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
     ] : []),
     ...(locomotion ? [
-      { name: "Illidan's walk and run match their locomotion lock", directory: "ts", args: ["scripts/locomotionLock.ts"], fix: `regenerate the model from the current pinned input so the walk and run keep their keys; only an intended walk or run change re-records with bun scripts/locomotionLock.ts --record and a ${LOCOMOTION_TRAILER} trailer naming it (smashcraft:docs/fighter-animation-work.md).`, hosted: false, privateStore: true },
+      { name: "Illidan's walk and run match their locomotion lock", directory: "ts", args: ["scripts/locomotionLock.ts"], fix: `regenerate the model from the current pinned input so the walk and run keep their keys; only an intended walk or run change re-records with bun scripts/locomotionLock.ts --record and a ${LOCOMOTION_TRAILER} trailer naming it (makgora:docs/fighter-animation-work.md).`, hosted: false, privateStore: true },
     ] : []),
     ...(strikeMoments ? [
-      { name: "strike moments match the committed models", directory: "ts", args: ["scripts/wisp.ts", "view", "strikes", "--check"], fix: "regenerate the tables with bun wisp view strikes --assets \"$(bun wisp inputs path assets)\" from ts/ and commit them (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
+      { name: "strike moments match the committed models", directory: "ts", args: ["scripts/wisp.ts", "view", "strikes", "--check"], fix: "regenerate the tables with bun wisp view strikes --assets \"$(bun wisp inputs path assets)\" from ts/ and commit them (makgora:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
     ] : []),
     ...(animation ? [
-      { name: "animation jitter [k3 measure #479]", directory: "ts", args: ["scripts/wisp.ts", "anim", "jitter"], fix: "regenerate the clip pool through thinKeys so close Hermite keys carry slopes (smashcraft:docs/commands/animation.md).", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
+      { name: "animation jitter [k3 measure #479]", directory: "ts", args: ["scripts/wisp.ts", "anim", "jitter"], fix: "regenerate the clip pool through thinKeys so close Hermite keys carry slopes (makgora:docs/commands/animation.md).", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
     ] : []),
   ];
 }
@@ -145,7 +145,7 @@ export interface Local {
   readonly cache: { readonly has: (key: string) => Effect.Effect<boolean>; readonly record: (key: string) => Effect.Effect<void> };
 }
 
-export const PREPUSH_CACHE = join(homedir(), ".local/state/smashcraft/prepush-cache");
+export const PREPUSH_CACHE = join(homedir(), ".local/state/makgora/prepush-cache");
 
 export const checkKey = (repo: string, check: Check) => Effect.gen(function*() {
   const scope = check.inputs ?? [];
@@ -247,7 +247,7 @@ const mainCi: MainCi = (pushed) => Effect.gen(function*() {
   return runs.map(({ conclusion }) => conclusion ?? "pending");
 });
 
-/** A release or release-candidate tag goes only on a commit main's CI passed, since the parity tapes run there after landing (smashcraft:docs/ci.md, "Landing"). */
+/** A release or release-candidate tag goes only on a commit main's CI passed, since the parity tapes run there after landing (makgora:docs/ci.md, "Landing"). */
 const releaseGreen = (tag: string, commit: string, ci: MainCi) => Effect.gen(function*() {
   const conclusions = yield* ci(commit);
   if (conclusions.includes("success")) return;

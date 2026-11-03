@@ -7,7 +7,7 @@ import { showcaseRows } from "../src/game/session/showcaseTimeline";
 import { fighterKey, selectableCharacterBySlug } from "../src/game/roster/kits";
 import { SHOWCASE_HOLD_TICKS } from "../src/platform/captureFixtures";
 import type { Character } from "../src/game/sim/codes";
-import { SMASHCRAFT_HEADLESS } from "./wisp/headless";
+import { MAKGORA_HEADLESS } from "./wisp/headless";
 
 const TEXTURE_CELLS: Readonly<Record<string, StampCell>> = {
   "ReplaceableTextures\\TeamColor\\TeamColor06.blp": "guard",
@@ -31,7 +31,7 @@ export function expectedHolds(slug: string): string[] {
 
 export async function playDemo(slug: string): Promise<{ readonly holds: Held[]; readonly ticks: number; readonly done: string }> {
   const character = characterOf(slug);
-  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  const runtime = installHeadless(MAKGORA_HEADLESS);
   try {
     const { nativeDriverCommand }: { nativeDriverCommand(text: string): void } = await import(join(import.meta.dir, "../src/platform/nativeDriver.ts"));
     const entry: MapEntry = await import(join(import.meta.dir, "../src/host/entries/showcaseMain.ts"));

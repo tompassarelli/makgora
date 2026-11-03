@@ -9,7 +9,7 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE cursor frames=\\d+ visible=\\d+ sweepMs=\\d+ picked=1 dropped=1 parked=1 pinch=1 states=1 pass=1$", min: 1 }],
   },
   {
-    id: "gate-select-hands", closes: "smashcraft#744 native check", map: "gate-playable", session: "gate-hands",
+    id: "gate-select-hands", closes: "makgora#744 native check", map: "gate-playable", session: "gate-hands",
     setup: [{ chat: "gate:hands", client: "a" }],
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE hands samples=(?:12|16) own=(?:6|8) remote=(?:6|8) badges=(?:12|16) chips=2 pass=1$", min: 1 }],
   },
@@ -24,7 +24,7 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE start trials=3 started=3 distinct=3 offButton=3 pass=1$", min: 1 }],
   },
   {
-    id: "gate-start-rest", closes: "smashcraft#427", map: "gate-playable", session: "gate-start-rest",
+    id: "gate-start-rest", closes: "makgora#427", map: "gate-playable", session: "gate-start-rest",
     setup: [{ chat: "gate:start-rest", client: "a" }],
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE start-rest frames=(\\d+) character=\\1 stage=\\1 .* pass=1$", min: 1 }],
   },
@@ -39,12 +39,12 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE bindings labels=\\d+ samples=(\\d+) passed=\\1 pass=1 remaps=none$", min: 1 }],
   },
   {
-    id: "gate-results-rematch", closes: "smashcraft#106", map: "gate-playable", session: "gate-results",
+    id: "gate-results-rematch", closes: "makgora#106", map: "gate-playable", session: "gate-results",
     setup: [{ chat: "gate:results", client: "a" }],
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE results stocks=1 epoch=\\d+ result=1 cursor=1 held=1 rematch=1 pass=1$", min: 1 }],
   },
   {
-    id: "gate-stages", closes: "smashcraft#430", map: "gate-playable", session: "gate-stages",
+    id: "gate-stages", closes: "makgora#430", map: "gate-playable", session: "gate-stages",
     setup: [{ chat: "gate:stages", client: "a" }],
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE stages stages=(\\d+) started=\\1 pass=1$", min: 1 }],
     look: "Each stage's match start on the candidate: no goo or splat decals under either fighter, no squiggly line art under the platforms, and no gray rocks on the Frozen Throne platforms.",
@@ -54,12 +54,12 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
     const fighters = new Set(smokePairs()[shard]).size;
     return [
       {
-        id: movesShardId(shard), closes: "smashcraft#32", map: "gate-playable", session: movesShardId(shard),
+        id: movesShardId(shard), closes: "makgora#32", map: "gate-playable", session: movesShardId(shard),
         setup: [{ chat: `gate:moves:${smokeShardLabel(shard)}`, client: "a" }],
         pass: [noErrors, { kind: "receipt", client: "a", pattern: `^SMASHCRAFT GATE moves fighters=${fighters} moves=(\\d+) started=\\1 keys=(\\d+) live=\\2 replayed=1 pass=1$`, min: 1 }],
       },
       {
-        id: specialsShardId(shard), after: movesShardId(shard), closes: "smashcraft#32", map: "gate-playable", session: movesShardId(shard),
+        id: specialsShardId(shard), after: movesShardId(shard), closes: "makgora#32", map: "gate-playable", session: movesShardId(shard),
         setup: [{ chat: `gate:specials:${smokeShardLabel(shard)}`, client: "a" }],
         pass: [noErrors, { kind: "receipt", client: "a", pattern: `^SMASHCRAFT GATE specials fighters=${fighters} checked=([1-9]\\d*) clear=\\1 pass=1$`, min: 1 }],
       },

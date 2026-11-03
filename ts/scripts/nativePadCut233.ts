@@ -238,6 +238,6 @@ class PadCutFailure extends Schema.TaggedError<PadCutFailure, { readonly brand: 
 const padCutFailure = (cause: unknown) => new PadCutFailure({ problem: cause instanceof Error ? cause.message : String(cause) });
 
 if (import.meta.main) {
-  const program = Bun.argv.includes("--plan") ? padCut : withQuietNativeCapacity("smashcraft-nativePadCut233", padCut);
+  const program = Bun.argv.includes("--plan") ? padCut : withQuietNativeCapacity("makgora-nativePadCut233", padCut);
   BunRuntime.runMain(Effect.scoped(program).pipe(Effect.catchDefect(cause => Effect.fail(padCutFailure(cause))), Effect.provide(Layer.merge(BunServices.layer, platformLayer()))));
 }

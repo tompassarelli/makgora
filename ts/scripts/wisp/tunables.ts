@@ -33,7 +33,7 @@ function movement(character: Character, group: string): Tunable[] {
   ];
 }
 
-export const SMASHCRAFT_TUNABLES: readonly Tunable[] = [
+export const MAKGORA_TUNABLES: readonly Tunable[] = [
   ...movement("rifleman", "Rifleman"),
   ...movement("demonHunter", "Demon Hunter"),
   real("Knockback", "Knockback growth (percent)", ["ORDINARY_HIT_GROWTH_PERCENT"], 25.0, 300.0, 1.0, KNOCKBACK),

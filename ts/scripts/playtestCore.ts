@@ -130,7 +130,7 @@ export interface Config {
   readonly minMoveKos: number;
   readonly minStageMatches: number;
   readonly stuckSeconds: number;
-  /** The agency rule's numbers, defaulting to smashcraft#63's: the escape floor E, the longest time without control T, the longest true chain, and the repeats that make a loop. */
+  /** The agency rule's numbers, defaulting to makgora#63's: the escape floor E, the longest time without control T, the longest true chain, and the repeats that make a loop. */
   readonly escapeFloor: number;
   readonly controlSeconds: number;
   readonly chainMax: number;
@@ -390,7 +390,7 @@ export function renderReport(runs: readonly Run[], findings: readonly Finding[],
     `Wall time ${(s.wallMs / 1000).toFixed(1)} s, ${s.msPerMatch.toFixed(0)} ms a match (both runs), slowest ${s.slowestMs.toFixed(0)} ms.`,
     "",
     `Bands: fighter win rate ${(100 * config.winLow).toFixed(0)}-${(100 * config.winHigh).toFixed(0)}% over at least ${config.minDecisive} decisive matches; a move at most ${(100 * config.moveShareMax).toFixed(0)}% of its fighter's KOs over at least ${config.minMoveKos}; a zero-to-death string is ${config.minStringHits} or more hits with no actionable frame between them; a stage with no KOs needs ${config.minStageMatches} matches; frame cap ${config.frameCap}.`,
-    `Stuck: no damage or stock change for ${config.stuckSeconds} s. Agency (smashcraft#10 C12), over up to ${config.agencyStrings} true strings a match branched over every victim option: true-chain is more than ${config.chainMax} follow-ups in a row that no victim option escapes; low-agency-link is a later follow-up escaped by under ${(100 * config.escapeFloor).toFixed(0)}% of options; long-no-control is more than ${config.controlSeconds} s of links each under that floor; loop is a block of moves repeated ${config.loopRepeats} times without the escape rising. The defaults are the rule chosen on smashcraft#63. Dominant move: a move whose KO share passes the band above, or whose usage share passes its fighter's Tukey fence (Q3 + ${config.usageFence} IQR) and ${(100 * config.usageShareMin).toFixed(0)}% over at least ${config.minMoveUses} starts.`,
+    `Stuck: no damage or stock change for ${config.stuckSeconds} s. Agency (makgora#10 C12), over up to ${config.agencyStrings} true strings a match branched over every victim option: true-chain is more than ${config.chainMax} follow-ups in a row that no victim option escapes; low-agency-link is a later follow-up escaped by under ${(100 * config.escapeFloor).toFixed(0)}% of options; long-no-control is more than ${config.controlSeconds} s of links each under that floor; loop is a block of moves repeated ${config.loopRepeats} times without the escape rising. The defaults are the rule chosen on makgora#63. Dominant move: a move whose KO share passes the band above, or whose usage share passes its fighter's Tukey fence (Q3 + ${config.usageFence} IQR) and ${(100 * config.usageShareMin).toFixed(0)}% over at least ${config.minMoveUses} starts.`,
     "",
     "| Finding | Count |",
     "| --- | --- |",

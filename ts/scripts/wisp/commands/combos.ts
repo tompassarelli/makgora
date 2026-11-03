@@ -421,7 +421,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
     const refusals = parsed.links === true ? parsed.melee.flatMap((row) => meleeSwitchRefusal(row) ?? []) : ["--melee ROW takes --links"];
     if (refusals.length > 0) return yield* new UsageFailure({ problem: refusals.join("\n") });
   }
-  const code = yield* admit("heavy", "smashcraft:combos", 3600);
+  const code = yield* admit("heavy", "makgora:combos", 3600);
   if (code !== undefined) {
     if (code !== 0) return yield* new CombosFailure({ problem: `the admitted run exited ${code}` });
     return;

@@ -1,6 +1,6 @@
 # #167 Lich King Frost Wyrm, facing left: the wyrm rises under him and he rides it seated, the
 # stick held up and to the left, so he faces left and each breath (frames 14, 26, 38) flies up-left.
-# Lich King a against Lich King b. Syntax and checks: smashcraft:docs/native-bot-session.md.
+# Lich King a against Lich King b. Syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero lich king
 # Input starts after frame 500: on a loaded host the helpers first see a quick match up to ~400 frames in.
 660 a stick -1 1

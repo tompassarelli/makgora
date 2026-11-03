@@ -6,7 +6,7 @@ import { type Command } from "wisp/scripts/wisp/command";
 import { NATIVE_OUTER_PID } from "./pairGuard";
 import { privateDesktopUnitEnv } from "./privateDesktopUnitEnv";
 
-export const NATIVE_IN_UNIT = "SMASHCRAFT_NATIVE_IN_UNIT";
+export const NATIVE_IN_UNIT = "MAKGORA_NATIVE_IN_UNIT";
 const WISP_PROGRAM = join(import.meta.dir, "../../wisp.ts");
 
 export type NativeCommand = "accept" | "pad";
@@ -25,7 +25,7 @@ export const userSessionEnv = (uid: number) => ({ XDG_RUNTIME_DIR: `/run/user/${
 
 /** Pool clients' processes are only readable from the user manager's own namespace, so a native run executes there as a transient service on the private desktop's display, in the caller's directory so relative paths resolve as typed. */
 export const nativeUnitCommand = (command: NativeCommand, args: readonly string[], path: string, pid: number, uid: number, cwd: string, runtime = process.execPath, env = process.env, readDisplay?: (run: string) => string): readonly string[] => [
-  "systemd-run", "--user", "--wait", "--pipe", "--collect", `--unit=smashcraft-${command}-${pid}`,
+  "systemd-run", "--user", "--wait", "--pipe", "--collect", `--unit=makgora-${command}-${pid}`,
   `--working-directory=${cwd}`, `--setenv=PATH=${path}`, `--setenv=${NATIVE_IN_UNIT}=1`, `--setenv=${NATIVE_OUTER_PID}=${pid}`,
   ...Object.entries(userSessionEnv(uid)).map(([name, value]) => `--setenv=${name}=${value}`),
   ...(env["NORTH_FLEET_SESSION"] === undefined ? [] : [`--setenv=NORTH_FLEET_SESSION=${env["NORTH_FLEET_SESSION"]}`]),

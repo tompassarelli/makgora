@@ -25,7 +25,7 @@ import { ClientWatch, inState, unlessLost, waitFor as waitForState } from "wisp/
 import { rebuildMap } from "../mapInputs";
 import { profileOption, sceneProfiles } from "../project";
 import { clientArguments } from "./client";
-import { freshFrames, smashcraftPlayerView } from "../playerView";
+import { freshFrames, makgoraPlayerView } from "../playerView";
 import { profileOptions } from "./map";
 import { onHealthyClients } from "../doctor";
 import { verifyNativeInput } from "../nativeInput";
@@ -53,7 +53,7 @@ export const fresh: Command = (rawArgs) => Effect.gen(function*() {
     }
     const since = yield* Clock.currentTimeMillis;
     yield* sendQuickMatchCommand.pipe(step("quick match and client receipts"));
-    yield* checkPlayerView(smashcraftPlayerView({ frame: true, scene: sceneProfiles.has(profile) }), since, freshFrames).pipe(step("player view"));
+    yield* checkPlayerView(makgoraPlayerView({ frame: true, scene: sceneProfiles.has(profile) }), since, freshFrames).pipe(step("player view"));
   }).pipe(Effect.provide(Layer.merge(options.services.pipe(Layer.provideMerge(Clients.layer(clientsFile))), ClientWatch.layer({ filePrefix: "smashcraft" })))), { clientsFile });
 });
 
@@ -71,7 +71,7 @@ export const freshMatch = (map: string) => Effect.scoped(Effect.gen(function*() 
   const menus = new Map(reported);
   const missing = clients.all.filter((client) => !menus.has(client.name)).map((client) => client.name);
   if (missing.length > 0) {
-    return yield* new UsageFailure({ problem: `fresh hosts only private games, through every client's menu page; none reported for ${missing.join(", ")} (\`bun wisp online setup\`, smashcraft:docs/wisp.md "Menu control")` });
+    return yield* new UsageFailure({ problem: `fresh hosts only private games, through every client's menu page; none reported for ${missing.join(", ")} (\`bun wisp online setup\`, makgora:docs/wisp.md "Menu control")` });
   }
   const page = (client: Client) => {
     const socket = menus.get(client.name);

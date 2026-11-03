@@ -23,7 +23,7 @@ import { lan } from "wisp/scripts/wisp/commands/lan";
 import { step } from "wisp/scripts/wisp/timings";
 import { GameFiles, dataDirectory, readGameFile } from "wisp/scripts/wisp/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
-import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile, mapProfilesFor } from "../acceptChecks";
+import { MAP_PROFILES, MAKGORA_ACCEPT, type MakgoraMapProfile, mapProfilesFor } from "../acceptChecks";
 import { currentPlaytest } from "../currentPlaytest";
 import { readClientEntries, readyPackager, resolveTools, validateClients } from "../nativeTools";
 import { DevCommandReceipt, MeleeReady } from "../boundary";
@@ -34,7 +34,7 @@ import { clientState, gameFilesLayer, projectRoot } from "../project";
 import { clientArguments } from "./client";
 import { freshMatch, readyAfter, sendDevCommand } from "./fresh";
 import { profileOptions } from "./map";
-import { checkClients, onHealthyClients, readClientsFile, smashcraftWatch } from "../doctor";
+import { checkClients, onHealthyClients, readClientsFile, makgoraWatch } from "../doctor";
 import { droppedPair, pairDropText, restartDroppedPairInto } from "./lanPoolUnit";
 import { withNativeUnit } from "./nativeUnit";
 import { liveProcesses, ownPids, pairHolders } from "./pairGuard";
@@ -211,7 +211,7 @@ export const withSmokeCapture = (driver: AcceptDriver["Service"], settle: Durati
 
 
 
-const PREBUILT = "SMASHCRAFT_ACCEPT_PREBUILT";
+const PREBUILT = "MAKGORA_ACCEPT_PREBUILT";
 
 
 const selectedPairs = (args: readonly string[]) => Effect.try({
@@ -230,7 +230,7 @@ const selectedPairs = (args: readonly string[]) => Effect.try({
 const withoutPairFlags = (args: readonly string[]) => args.filter((arg, index) => !["--pair", "--pairs"].includes(arg) && !arg.startsWith("--pair=") && !arg.startsWith("--pairs=") && !["--pair", "--pairs"].includes(args[index - 1] ?? ""));
 
 
-const prebuild = (maps: readonly string[], profiles: Readonly<Record<string, SmashcraftMapProfile>>) => Effect.forEach([...new Map(maps.flatMap((map) => {
+const prebuild = (maps: readonly string[], profiles: Readonly<Record<string, MakgoraMapProfile>>) => Effect.forEach([...new Map(maps.flatMap((map) => {
   const profile = profiles[map];
   return profile?.rebuild === undefined ? [] : [[profile.path, profile.rebuild] as const];
 }))], ([path, rebuild]) => Effect.gen(function*() {
@@ -272,7 +272,7 @@ const prepareCandidate = (args: readonly string[], only: readonly string[], dryR
   if (given !== undefined && !existsSync(given)) return yield* new UsageFailure({ problem: `no built map ${given}` });
   const tools = dryRun ? undefined : yield* resolveTools().pipe(Effect.mapError(nativeProblem));
   if (!dryRun) yield* readyPackager().pipe(Effect.mapError(cause => new UsageFailure({ problem: describeCause(cause) })));
-  const building = given === undefined && !dryRun && needsCandidate({ ...SMASHCRAFT_ACCEPT, maps: MAP_PROFILES }, only);
+  const building = given === undefined && !dryRun && needsCandidate({ ...MAKGORA_ACCEPT, maps: MAP_PROFILES }, only);
   const candidate = given ?? (building ? yield* headCandidate.pipe(Effect.mapError(cause => new UsageFailure({ problem: describeCause(cause) }))) : undefined);
   const profiles = mapProfilesFor(MAP_PROFILES, given, candidate);
   return { given, tools, candidate, profiles };
@@ -280,7 +280,7 @@ const prepareCandidate = (args: readonly string[], only: readonly string[], dryR
 
 const usableClients = (args: readonly string[], tools: Readonly<Record<string, string>> | undefined, clientsFrom: string, pooled: boolean) => Effect.gen(function*() {
   if (tools === undefined) return clientsFrom;
-  const selected = pooled ? clientsFrom : withTools({ name: "clients", clients: clientsFrom, appIds: new Map() }, tools, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "clients")).clients;
+  const selected = pooled ? clientsFrom : withTools({ name: "clients", clients: clientsFrom, appIds: new Map() }, tools, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/makgora/accept"), "clients")).clients;
   const entries = yield* Effect.try({ try: () => readClientEntries(selected), catch: cause => new UsageFailure({ problem: `can't read ${selected}: ${describeCause(cause)}` }) });
   yield* validateClients(entries).pipe(Effect.mapError(nativeProblem));
   return selected;
@@ -292,7 +292,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   const dryRun = args.includes("--dry-run");
   const only = flagValues(args, "only").flatMap(value => value.split(/[,\s]+/));
   const { given, tools, candidate, profiles } = yield* prepareCandidate(args, only, dryRun);
-  const suite = { ...SMASHCRAFT_ACCEPT, maps: profiles };
+  const suite = { ...MAKGORA_ACCEPT, maps: profiles };
   const requested = yield* selectedPairs(args);
   if (!dryRun) {
     const rows = liveProcesses();
@@ -306,7 +306,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
     try: () => {
       const selected = lanPairs(LAN_POOL_FILE, { ids: [id] })[0];
       if (selected === undefined) throw new Error(`no offline pair ${id}`);
-      return tools === undefined ? selected : withTools(selected, tools, flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept", `pair-${id}`));
+      return tools === undefined ? selected : withTools(selected, tools, flagValues(args, "out")[0] ?? join(homedir(), ".local/state/makgora/accept", `pair-${id}`));
     },
     catch: cause => new UsageFailure({ problem: describeCause(cause) }),
   });
@@ -335,7 +335,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
         yield* Effect.forEach(clients.all, client => readyAfter(client, started), { concurrency: "unbounded" });
       }
       if (profile.quick !== "") yield* (solo ? sendSoloDevCommand(profile.quick) : sendDevCommand(profile.quick)).pipe(step(profile.quick));
-    }).pipe(Effect.provide(Layer.merge(options.services.pipe(Layer.provideMerge(Clients.layer(selectedClients))), smashcraftWatch)));
+    }).pipe(Effect.provide(Layer.merge(options.services.pipe(Layer.provideMerge(Clients.layer(selectedClients))), makgoraWatch)));
   });
   const checked = checkClients(() => undefined, selectedClients).pipe(Effect.orElseSucceed(() => undefined));
   const lanId = pair?.lan;
@@ -347,14 +347,14 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   const liveDriver = liveAcceptDriver({
     start,
     receipt: (name) => name.startsWith("smashcraft-dev-") || name.startsWith("smashcraft-stage-") || name.startsWith("smashcraft-error-") || name.startsWith("smashcraft-render-clock-") || name.startsWith("smashcraft-replay-") || name.startsWith("smashcraft-match-"),
-  }).pipe(Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, ...(solo ? [] : [smashcraftWatch]))));
+  }).pipe(Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, ...(solo ? [] : [makgoraWatch]))));
   let smoke: ReturnType<typeof withSmokeCapture> | undefined;
   const driver = Layer.effect(AcceptDriver, Effect.gen(function*() {
     const live = yield* AcceptDriver;
     const context = yield* Effect.context<Clients | GameFiles>();
     const measurements = new Map<string, ReceiptFile[]>();
     const specials = new Map<string, ReceiptFile>();
-    const evidence = (check: string, name: string) => join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), check, name);
+    const evidence = (check: string, name: string) => join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/makgora/accept"), check, name);
     const receiptGates = {
       "gate:cursor": (name: string) => measureCursorGate(selectedClients, name, evidence("gate-cursor-visible", name)),
       "gate:hands": () => measureHandsGate(selectedClients, evidence("gate-select-hands", "pair"), undefined),
@@ -373,9 +373,9 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
         const gate = receiptGate(text);
         return gate !== undefined ? gate(name).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
-      ) : text === "gate:neutral-thrall" || text === "gate:neutral-jaina" || text === "gate:neutral-both" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), `c4-${text.slice("gate:neutral-".length)}-neutral-special`, name), text === "gate:neutral-thrall" ? 0 : text === "gate:neutral-jaina" ? 1 : "both").pipe(
+      ) : text === "gate:neutral-thrall" || text === "gate:neutral-jaina" || text === "gate:neutral-both" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/makgora/accept"), `c4-${text.slice("gate:neutral-".length)}-neutral-special`, name), text === "gate:neutral-thrall" ? 0 : text === "gate:neutral-jaina" ? 1 : "both").pipe(
         Effect.tap(receipts => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipts.specials]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
-      ) : parseShardChat(text, "moves") !== undefined ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), movesShardId(parseShardChat(text, "moves") ?? 0), name), undefined, parseShardChat(text, "moves")).pipe(
+      ) : parseShardChat(text, "moves") !== undefined ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/makgora/accept"), movesShardId(parseShardChat(text, "moves") ?? 0), name), undefined, parseShardChat(text, "moves")).pipe(
         Effect.tap(receipts => Effect.sync(() => { measurements.set(name, [...(measurements.get(name) ?? []), receipts.moves]); specials.set(name, receipts.specials); })), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : parseShardChat(text, "specials") !== undefined ? Effect.gen(function*() {
         const measured = specials.get(name);
@@ -389,14 +389,14 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
     smoke = validated;
     if (gate) return validated.driver;
     return withShieldEnergyCapture(smoke.driver);
-  })).pipe(Layer.provide(liveDriver), Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, ...(solo ? [] : [smashcraftWatch]))), Layer.provide(platformLayer()));
+  })).pipe(Layer.provide(liveDriver), Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, ...(solo ? [] : [makgoraWatch]))), Layer.provide(platformLayer()));
   const shards = {
     flags: ["--pair", "--pairs"],
     select: () => Effect.succeed(requested),
     prepare: (sessions: readonly { readonly map: string }[]) => prebuild(sessions.map(({ map }) => map), profiles),
     run: (pair: string, ids: readonly string[], directory: string) => runShard(pair, ids, directory, given),
   };
-  const accepted = makeAccept({ suite: solo ? acceptForSoloClients(suite, names) : acceptForClients(suite, names), evidenceRoot: join(homedir(), ".local/state/smashcraft/accept"), driver, clients: names, shards })(forwarded);
+  const accepted = makeAccept({ suite: solo ? acceptForSoloClients(suite, names) : acceptForClients(suite, names), evidenceRoot: join(homedir(), ".local/state/makgora/accept"), driver, clients: names, shards })(forwarded);
 
   const smokeStop = () => {
     const failed = smoke?.failed();

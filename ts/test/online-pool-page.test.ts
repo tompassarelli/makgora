@@ -31,7 +31,7 @@ const fixture = () => {
     pages.set(name, page);
     prefixes.set(name, prefix);
   }
-  const state = join(home, ".local/state/smashcraft");
+  const state = join(home, ".local/state/makgora");
   mkdirSync(state, { recursive: true });
   const client = (name: string) => ({ name, run: "true", documents: join(prefixes.get(name)!, DOCUMENTS_IN_PREFIX), menuReportPort: 47124 });
   writeFileSync(join(state, "clients.json"), JSON.stringify({ clients: [...prefixes.keys()].map(client) }));

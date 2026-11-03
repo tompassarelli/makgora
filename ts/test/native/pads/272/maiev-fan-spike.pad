@@ -1,6 +1,6 @@
 # #272: Maiev's Fan of Knives in the air after the swap with Immolate: Immolate's box below her spikes an airborne b
 # downward, and her fall nearly stops (vertical speed held at zero, one frame of gravity a frame) until it ends.
-# Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Warden a against Warden b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero warden
 # b dashes in, then a dashes to about 46 short of b.
 40 b stick -1 0

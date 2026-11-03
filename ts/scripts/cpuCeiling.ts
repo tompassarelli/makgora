@@ -68,7 +68,7 @@ if (import.meta.main) await Effect.runPromise(Effect.gen(function*() {
       const unplanned=unplannedFighters();const table=ceilingTable(ceilingRows(data),data.cpuSeconds)+(unplanned.length===0?"":`\nLeft out, no ceiling plan yet: ${unplanned.join(", ")}.`);console.log(table);if(values.report!==undefined)writeFileSync(values.report,table+"\n");
     },catch:cause=>new CeilingFailure({problem:String(cause)})});
   } else {
-    yield* Effect.promise(()=>runAdmitted("moderate","smashcraft:cpuCeiling",3600));
+    yield* Effect.promise(()=>runAdmitted("moderate","makgora:cpuCeiling",3600));
     yield* Effect.try({try:()=>{
       const before=process.cpuUsage();
       const owns=partitionWork(values.partition);

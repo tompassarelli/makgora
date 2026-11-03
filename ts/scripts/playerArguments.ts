@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 export const PRODUCT = "Mak'gora";
 
-export const PLAYER_USAGE = `${PRODUCT} player\nusage: smashcraft-play [MAP.w3x] [--host [--relay REGION] | --join CODE] [--storage WARCRAFT_DIR]\n       smashcraft-play --version`;
+export const PLAYER_USAGE = `${PRODUCT} player\nusage: makgora-play [MAP.w3x] [--host [--relay REGION] | --join CODE] [--storage WARCRAFT_DIR]\n       makgora-play --version`;
 
 /** The map to play: the first `.w3x` argument, else the only `.w3x` in the first folder that holds exactly one. */
 export function playerMap(args: readonly string[], folders: readonly string[]): { readonly map: string; readonly rest: readonly string[] } | string {
@@ -24,11 +24,11 @@ export const playerVersion = (stamped: string | undefined) => stamped ?? `${PROD
 
 export const playerReadme = (name: string, exe: string) => `${name}
 
-Run smashcraft-play${exe} with the .w3x map you downloaded:
+Run makgora-play${exe} with the .w3x map you downloaded:
 
-  smashcraft-play${exe} Makgora.w3x                         play offline against the computer
-  smashcraft-play${exe} Makgora.w3x --host --relay REGION   host an online match through the relay
-  smashcraft-play${exe} Makgora.w3x --join CODE             join a match by its code
+  makgora-play${exe} Makgora.w3x                         play offline against the computer
+  makgora-play${exe} Makgora.w3x --host --relay REGION   host an online match through the relay
+  makgora-play${exe} Makgora.w3x --join CODE             join a match by its code
 
 The art comes from your own Warcraft III: Reforged install (add --storage DIR if it is not found) and the map you give it.
 Controllers work through SDL3. Nothing else needs installing.

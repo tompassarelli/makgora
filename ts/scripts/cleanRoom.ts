@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { Console, Effect } from "effect";
 import { type Policy, cleanRoom } from "wisp/scripts/cleanRoom";
 
-export const SMASHCRAFT_POLICY: Policy = { origins: ["original", "generated", "stock-path"] };
+export const MAKGORA_POLICY: Policy = { origins: ["original", "generated", "stock-path"] };
 
 export const REACH_EXEMPT = ["ts/scripts/cleanRoom.ts", "ts/test/clean-room.test.ts"];
 
@@ -51,7 +51,7 @@ const reach = (root: string) => Effect.promise(async () => {
 });
 
 const check = (root: string) => Effect.gen(function*() {
-  const problems = [...yield* cleanRoom(root, SMASHCRAFT_POLICY), ...yield* reach(root)];
+  const problems = [...yield* cleanRoom(root, MAKGORA_POLICY), ...yield* reach(root)];
   if (problems.length === 0) return yield* Console.log("clean room: no game files, copied game scripts, memory access, game addresses, offset-named fields, retail-file sources or decompiled symbols outside the allowlist");
   yield* Effect.forEach(problems, (problem) => Console.error(problem), { discard: true });
   process.exit(1);

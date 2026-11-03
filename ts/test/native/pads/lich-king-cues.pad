@@ -1,5 +1,5 @@
 # #144 special cues: every Lich King special form shows its Warcraft spell.
-# Lich King a against Lich King b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Lich King a against Lich King b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero lich king
 # #144: Harvest Soul.
 40 a stick 0 -1

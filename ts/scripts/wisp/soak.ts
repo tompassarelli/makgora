@@ -11,13 +11,13 @@ import { TYPED_AHEAD_CHARACTERS } from "../../src/game/netcode/journal/text";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/roster/kits";
 import { SOAK_CONTROLLER } from "../../test/soak/controller";
 import { PREDICTED_HEADLESS } from "./headless";
-import { SMASHCRAFT_SCENE } from "./playerView";
+import { MAKGORA_SCENE } from "./playerView";
 
 export default defineSoak({
-  name: "smashcraft",
+  name: "makgora",
   map: PREDICTED_HEADLESS,
   game: join(import.meta.dir, "../../test/soak/game.ts"),
-  scene: SMASHCRAFT_SCENE,
+  scene: MAKGORA_SCENE,
   roster: {
     fighters: SELECTABLE_CHARACTERS.map(fighterSlug),
     stages: ["sky-deck", "three-bridges", "frozen-throne", "drifting-deck", "patterned-decks", "wind", "carried", "cannon", "timed-lift", "hellfire", "stratholme", "tomb-of-sargeras"],
@@ -34,4 +34,4 @@ export default defineSoak({
 });
 
 
-export const SOAK_OUT = join(homedir(), ".local/state/smashcraft/soak");
+export const SOAK_OUT = join(homedir(), ".local/state/makgora/soak");

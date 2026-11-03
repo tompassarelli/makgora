@@ -10,7 +10,7 @@ const MURLOC = { x: 0, y: 230, width: 360, height: 200 };
 
 export const murlocStabChecks = (map: string, pass: readonly Rule[]): NativeCheck[] =>
   MOVES.map(([name, waitMs, keys, move]) => ({
-    id: `497-murloc-${name}`, closes: "smashcraft#497", map, session: "497-murloc",
+    id: `497-murloc-${name}`, closes: "makgora#497", map, session: "497-murloc",
     setup: [{ waitMs }],
     capture: [{ kind: "frames", name, client: "a", region: MURLOC, count: 24, everyMs: 33, press: { keys, holdMs: 60 } }],
     pass,

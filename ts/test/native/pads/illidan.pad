@@ -1,5 +1,5 @@
 # Illidan's native checks by parity: Eye Beam (2026-10-28), #128 Immolate, #147 Fel Rush, #279 Wing Dive.
-# Illidan a against Illidan b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Illidan a against Illidan b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero illidan
 # Eye Beam: the beam hits a standing b and makes it flinch.
 60 a tap X 2

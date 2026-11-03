@@ -16,7 +16,7 @@ import { type Observer, type Pad, continueProcess, inject, monotonicNs, realtime
 import { SLOTS, type Slot } from "./slots";
 import { pollUntil } from "../hostPoll";
 import { INPUT_TRACE_FILE, responsePageFile, decodeWrittenGameFile } from "../wisp/boundary";
-import { smashcraftPlayerView } from "../wisp/playerView";
+import { makgoraPlayerView } from "../wisp/playerView";
 import { gameFilesLayer } from "../wisp/project";
 import { platformLayer } from "wisp/scripts/platform/layer";
 
@@ -219,7 +219,7 @@ export function liveRig(parts: LiveRigParts): RigShape {
     click: (client, x, y) => click(clients[client], x, y).pipe(Effect.mapError(fromDesktop), Effect.andThen(logUi(client, "click", `${x} ${y}`)), Effect.provide(platformLayer())),
     key: (client, key) => keys(clients[client], key).pipe(Effect.mapError(fromDesktop), Effect.provide(platformLayer())),
     type: (client, text) => typeText(clients[client], text, 35).pipe(Effect.mapError(fromDesktop), Effect.provide(platformLayer())),
-    playerView: (epoch, checks) => Effect.suspend(() => checkPlayerView(smashcraftPlayerView(checks), Date.now(), join(out, `player-view-${epoch}`))).pipe(
+    playerView: (epoch, checks) => Effect.suspend(() => checkPlayerView(makgoraPlayerView(checks), Date.now(), join(out, `player-view-${epoch}`))).pipe(
       Effect.provide(Layer.merge(Clients.layer(parts.clientsFile), gameFilesLayer).pipe(Layer.provideMerge(platformLayer()))),
       Effect.mapError((failure) => new IntegrityFailure({ operation: `check player view in match ${epoch}`, path: out, cause: failure.message })),
     ),

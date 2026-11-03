@@ -2,11 +2,11 @@ import { expect, test } from "bun:test";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { controlsGreeted, passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { CHAT_SLOT } from "../src/game/core/selectScreenLayout";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const CURSOR = /^Melee(Hand|Bullseye)/;
 

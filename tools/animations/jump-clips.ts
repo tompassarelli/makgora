@@ -37,7 +37,7 @@ const legacy = [
   { character: Character.dreadlord, poses: ["jump", "doubleJump"], flip: false },
   { character: Character.shadowHunter, poses: ["jump", "doubleJump"], flip: false },
 ] as const;
-// Each fighter's double-jump style from smashcraft:docs/design/animation-reference.md;
+// Each fighter's double-jump style from makgora:docs/design/animation-reference.md;
 // Blademaster keeps the #230 front flip authored by blademaster-clips.ts.
 const STYLES: Readonly<Record<number, string>> = {
   [Character.rifleman]: "cannonball", [Character.demonHunter]: "wing beat", [Character.mountainKing]: "cannonball",

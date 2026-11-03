@@ -4,12 +4,12 @@ const PAIRS = ["Shadow Hunter / Chen Stormstout", "Chen Stormstout / Shadow Hunt
 const EXTREMES = ["near", "far"] as const;
 
 export async function headlessSeparation(args: readonly string[]): Promise<number> {
-  const out = args[0] === "--out" ? args[1] ?? "" : `${process.env.XDG_STATE_HOME ?? `${process.env.HOME}/.local/state`}/smashcraft/stage-separation`;
+  const out = args[0] === "--out" ? args[1] ?? "" : `${process.env.XDG_STATE_HOME ?? `${process.env.HOME}/.local/state`}/makgora/stage-separation`;
   const stages = (args[0] === "--out" ? args.slice(2) : args).map(Number);
   const { Effect } = await import("../../ts/node_modules/effect/dist/index.js");
   const { installHeadless } = await import("../../ts/node_modules/wisp/host/headless/headless");
   const { captureScene, renderScenes } = await import("../../ts/node_modules/wisp/host/render/headlessRender");
-  const { SMASHCRAFT_HEADLESS } = await import("../../ts/scripts/wisp/headless");
+  const { MAKGORA_HEADLESS } = await import("../../ts/scripts/wisp/headless");
   const { headlessRender } = await import("../../ts/scripts/wisp/headlessRender");
   const { start, install } = await import("../../ts/src/host/entries/devMain");
   const { stageModels } = await import("../../ts/src/game/presentation/stagePreload");
@@ -17,7 +17,7 @@ export async function headlessSeparation(args: readonly string[]): Promise<numbe
   console.log("stage\tpair\tview\tclient\tfighter\tpixels\tfighter L* P25-P75\tbackdrop L* P25-P75\tgap");
   let worst = Infinity;
   for (const stage of stages) for (const [pairIndex, pair] of PAIRS.entries()) {
-    const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+    const runtime = installHeadless(MAKGORA_HEADLESS);
     const clients = runtime.clients({ start, install });
     clients.start(); clients.frames(20); clients.chat(0, "-dev items off"); clients.frames(10); clients.chat(0, `-dev quick stage ${stage} pair ${pair}`); clients.frames(15);
     for (const client of clients.clients) clients.chat(client.slot, "-dev view near");

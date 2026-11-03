@@ -15,11 +15,11 @@ import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { install, startBuild } from "../src/platform/main";
 import { installSessionRates } from "../src/host/loop/sessionRates";
 import { shellState } from "../src/host/loop/state";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { type Fields, parseSessionRates } from "../scripts/wisp/sessionRates";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 type Lockstep = ReturnType<typeof headless.clients>;
 
 const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-online-rollback", devConsole: true };

@@ -1,6 +1,6 @@
 # Beastmaster's native cue check, updated for the accepted #215 pack kit.
 # Design 8423ac38, kit fa500819, damage a7fdfa77; full pack forms: 215/pack.pad.
-# Beastmaster a against Beastmaster b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Beastmaster a against Beastmaster b; syntax and checks: makgora:docs/native-bot-session.md.
 # A side special from standing starts a dash too, so each one slides its caster about 151 (7bc2877cdb).
 #! chat -dev quick hero beastmaster
 # b dashes right and summons its bear, then commands it right; the command's 360-frame cooldown

@@ -1,4 +1,4 @@
-# #152 drills and multi-hit aerials: Warden's up air (3 kicks) and Falling Knives. Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# #152 drills and multi-hit aerials: Warden's up air (3 kicks) and Falling Knives. Warden a against Warden b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero warden
 # Both dash in, close; eda5e178f2 made Maiev grippier, so both hold the dash 3 frames (variant run 39025737993).
 40 b stick -1 0

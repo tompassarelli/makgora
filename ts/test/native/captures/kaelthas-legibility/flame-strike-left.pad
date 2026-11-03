@@ -1,4 +1,4 @@
-# smashcraft#495: Kael'thas turns away from the Mountain King and holds Flame Strike, so the rune slides out, and
+# makgora#495: Kael'thas turns away from the Mountain King and holds Flame Strike, so the rune slides out, and
 # releases on frame 272; the ring over the rune stays small while held, then grows and heats onto
 # the pillar's hit area until the burst on 304, with the wind-up sound 15 frames before it.
 #! chat -dev quick pair kael'thas sunstrider / mountain king

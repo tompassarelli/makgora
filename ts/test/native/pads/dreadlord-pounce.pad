@@ -1,6 +1,6 @@
 # #132 Dreadlord's hit-wake and Vampiric Pounce, native check by parity: a hit wakes a sleeper; the
 # corkscrew closes in with bats trailing; the bite heals him 4. Sleep's lengths are dreadlord.pad.
-# Dreadlord a against Dreadlord b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Dreadlord a against Dreadlord b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero dreadlord
 # a dashes in, inside Sleep's reach.
 40 a stick 1 0

@@ -120,7 +120,7 @@ BunRuntime.runMain(Effect.gen(function*() {
     yield* run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
   }
   const extractor = findExtractor();
-  if (extractor === undefined || extractor === null) return yield* Effect.fail(ioFailure('SelectionRandom needs CASC_EXTRACTOR (smashcraft-tools extract-animation-assets builds it)'));
+  if (extractor === undefined || extractor === null) return yield* Effect.fail(ioFailure('SelectionRandom needs CASC_EXTRACTOR (makgora-tools extract-animation-assets builds it)'));
   const randomIcon = join(output, 'BTNSelectHeroOn.dds');
   yield* run([extractor, process.env.WC3_STORAGE ?? reforgedStorage(), 'war3.w3mod:replaceabletextures/commandbuttons/btnselectheroon.dds', randomIcon]);
   // The stock 64 px icon bevels its outer 4 px; the tile keeps only the "?" inside it, inset on the backdrop behind every fighter tile.

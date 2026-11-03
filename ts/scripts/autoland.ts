@@ -150,9 +150,9 @@ if (import.meta.main) {
     console.log(lateLane(readList(values.lanes, isLane), now, branch, (values.retry ?? "").split(/\s+/).filter(Boolean), actual, readTree(base), readTree(tested), main.map(readTree), values.rebased === undefined ? undefined : readTree(values.rebased), values.green === undefined ? undefined : values.green === "true"));
   } else if (command === "resolve") {
     if (values.conflicts === undefined) throw new Error("resolve needs --conflicts FILE");
-    await resolveCommand(values.conflicts, values.store ?? join(process.env.HOME ?? "", ".local/share/smashcraft-build-inputs/store"));
+    await resolveCommand(values.conflicts, values.store ?? join(process.env.HOME ?? "", ".local/share/makgora-build-inputs/store"));
   } else if (command === "rebase") {
-    const store = values.store ?? join(process.env.HOME ?? "", ".local/share/smashcraft-build-inputs/store");
+    const store = values.store ?? join(process.env.HOME ?? "", ".local/share/makgora-build-inputs/store");
     console.log(JSON.stringify(await rebaseLane({ repo: process.cwd(), onto: values.onto ?? "autoland", resolve: (stages) => resolveStages(stages, store), regenerate: regenerateCode })));
   } else if (command === "train-step") {
     console.log(trainStep(positionals.slice(1).map((flag) => flag === "land")));

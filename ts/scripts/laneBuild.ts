@@ -14,8 +14,8 @@ import { withLock } from "./wisp/fileLock";
 import { installLaneMap, laneMapTitle, laneSlug } from "./wisp/laneMaps";
 import { tsDirectory } from "./wisp/project";
 
-const inputsRoot = join(homedir(), ".local/share/smashcraft-build-inputs");
-const laneCache = join(homedir(), ".local/state/smashcraft/lane-builds");
+const inputsRoot = join(homedir(), ".local/share/makgora-build-inputs");
+const laneCache = join(homedir(), ".local/state/makgora/lane-builds");
 
 export interface LaneSteps<R> {
   readonly check: Effect.Effect<void, PlayProblem, R>;

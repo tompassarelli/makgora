@@ -10,7 +10,7 @@ import { ChildProcess } from "effect/process";
 import { runProcess } from "../hostProcess";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { captureScene, renderScenes, type DrawnPose, type RenderScene } from "wisp/scripts/wisp/headlessRender";
-import { SMASHCRAFT_HEADLESS } from "./headless";
+import { MAKGORA_HEADLESS } from "./headless";
 import { headlessRender } from "./headlessRender";
 import { DISJOINT_CUES, disjointNormals } from "../../src/game/presentation/disjointCues";
 import { ATTACK_CUES } from "../../src/game/presentation/attackCues";
@@ -60,7 +60,7 @@ export const CUE_COVERAGE_LIMIT = 0.04;
 const DRAWN_DELTA = 24;
 const SHOWN_SHARE = 0.0005;
 const WIDTH = 640, HEIGHT = 360;
-export const CUE_FRAMES = process.env.CUE_FRAMES ?? join(homedir(), ".local/state/smashcraft/cue-budget");
+export const CUE_FRAMES = process.env.CUE_FRAMES ?? join(homedir(), ".local/state/makgora/cue-budget");
 const AFTER_FRAMES = 40;
 const RENDER_BATCH = 600;
 const LIMIT = 300;
@@ -212,7 +212,7 @@ export function sparkScenes(move: CueMove): { readonly scenes: RenderScene[]; re
   const sounds: string[] = [];
   presentFighterSounds(events, (sound, _x, _z, volume) => { sounds.push(`${sound.split("\\").at(-1)} volume ${volume}`); });
   const feedback = `damage ${effect.damage.toFixed(1)}%, hitlag ${victim.launch.hitlagFrames} victim/${attacker.launch.hitlag} attacker, tier ${events.tier}, sound ${sounds.join(" + ") || "none"}`;
-  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  const runtime = installHeadless(MAKGORA_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);
     const client = clients.client(0);
@@ -291,7 +291,7 @@ function aimNear(x: number, z: number): void {
 }
 
 function orbScenes(): ReturnType<typeof cueScenes> {
-  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  const runtime = installHeadless(MAKGORA_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);
     const client = clients.client(0);
@@ -326,7 +326,7 @@ function orbScenes(): ReturnType<typeof cueScenes> {
 export function cueScenes(move: CueMove): { readonly scenes: RenderScene[]; readonly poses: (readonly ParkPose[])[]; readonly lastDanger: number; readonly empty: RenderScene; readonly feedback?: string; readonly expected?: readonly string[] } {
   if (move.orb === true) return orbScenes();
   if (move.spark !== undefined) return sparkScenes(move);
-  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  const runtime = installHeadless(MAKGORA_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);
     const client = clients.client(0);

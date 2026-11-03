@@ -50,7 +50,7 @@ export function calibrationReport(revision: string, trials = 10) {
     .map(row => `${row.opponent}/${row.tier}: controlled counterplay did not expose the enduring flaw`);
   const failures = [...collectionFailures, ...growthFailures, ...flawFailures];
   const lines = ["# Named opponent calibration", "", `Revision: ${revision}. Seeds: ${CALIBRATION_SEEDS.join(", ")}. ${trials} controlled decisions per seed and measure.`,
-    "Authored Smashcraft strength; no human rating, real-player imitation or matchmaking-rank claim.", "",
+    "Authored Mak'gora strength; no human rating, real-player imitation or matchmaking-rank claim.", "",
     "Counts are actual policy calls in controlled eligible situations. A declined action is counted separately. Collection fails below 100 eligible decisions per measure/row.",
     "Read forecasts face the learned strike or a switched grab in the real simulation; outcomes count blocked strikes, hits and punished wrong reads. Close conversions play the queued punish for 60 simulation frames and count actual connections. Adaptation counts new observed shield events after 20 repeated strikes, including held-read expiry. Spacing checks queued normals against authored reach. Risk reports the actual move value under a public lead/stock-clock deficit.", "",
     "| Opponent | Tier | Measure | Eligible | Distribution |", "| --- | --- | --- | ---: | --- |"];

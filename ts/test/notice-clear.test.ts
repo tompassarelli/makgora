@@ -7,10 +7,10 @@ import { clearNoticePlace } from "../src/game/ui/noticeLayout";
 import { quickMatchCpuHero, quickMatchCpuHold, quickMatchCpuProfile, quickMatchCpuStage } from "../src/game/session/devSettings";
 import { install, startBuild } from "../src/platform/main";
 import { shellState } from "../src/host/loop/state";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const SPAWN_FRAMES = 40;
 

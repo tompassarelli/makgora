@@ -13,7 +13,7 @@ export function teamGlowGeosets(model: mdx.Model): Set<number> {
 
 const HERO_GLOW_FLOOR_AREA = 2000;
 
-// A fighter drawn as a special effect shows its hero glow's floor quads as white planes, while weapon team glow keeps its colour (#477, smashcraft#3).
+// A fighter drawn as a special effect shows its hero glow's floor quads as white planes, while weapon team glow keeps its colour (#477, makgora#3).
 export function heroGlowGeosets(model: mdx.Model): Set<number> {
     const glow = teamGlowGeosets(model);
     return new Set(model.Geosets.flatMap((geoset, index) => {

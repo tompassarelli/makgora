@@ -1,4 +1,4 @@
-// Writes client kit 1 (smashcraft:docs/client-interface.md) into OUT: `bun scripts/clientKit.ts OUT`.
+// Writes client kit 1 (makgora:docs/client-interface.md) into OUT: `bun scripts/clientKit.ts OUT`.
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
@@ -39,7 +39,7 @@ export const writeClientKit = Effect.fn("writeClientKit")(function*(out: string)
   }
   writeFileSync(join(out, "fixtures/tape-replay.txt"), `${joinReplay(header, parts).join("\n")}\n`);
   const bundle = readFileSync(join(ts, "build/viewer-lua/viewer.lua"), "utf8");
-  writeFileSync(join(out, "fixtures/map.lua"), `function main() end\nsmashcraftTs = assert(load([=[\n${bundle}\n]=], "=map-test"))()\n`);
+  writeFileSync(join(out, "fixtures/map.lua"), `function main() end\nmakgoraTs = assert(load([=[\n${bundle}\n]=], "=map-test"))()\n`);
   writeFileSync(join(out, "kit.json"), `${JSON.stringify({ kit: CLIENT_KIT, version, viewerApi: 1 }, null, 2)}\n`);
   console.log(`client kit ${CLIENT_KIT}, version ${version}: ${out}`);
 });

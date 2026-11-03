@@ -2,7 +2,7 @@
 # grounded Sleep lasts its full length unmashed; mashing wakes the sleeper early, never before frame
 # 24. Each Sleep lands as the 240 frames of immunity from the one before run out. A hit waking the
 # sleeper and Vampiric Pounce are dreadlord-pounce.pad. Dreadlord a against Dreadlord b; syntax and
-# checks: smashcraft:docs/native-bot-session.md.
+# checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero dreadlord
 # a dashes in, inside Sleep's reach.
 40 a stick 1 0

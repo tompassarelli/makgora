@@ -18,7 +18,7 @@ export interface JoinCode {
 const fromCharacters = (characters: string): JoinCode => {
   const name = characters.slice(0, HALF);
   const password = characters.slice(HALF);
-  return { text: `${name}-${password}`, gameName: `Smashcraft ${name}`, password };
+  return { text: `${name}-${password}`, gameName: `Mak'gora ${name}`, password };
 };
 
 

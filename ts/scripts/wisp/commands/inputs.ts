@@ -70,7 +70,7 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
     const steps = plans.reduce((sum, plan) => sum + plan.steps - plan.cached, 0);
     const admission = deriveAdmission(plans);
     console.log(`${plans.length} fighters: ${steps} steps to run, ${plans.reduce((sum, plan) => sum + plan.cached, 0)} reused`);
-    if (admission !== undefined) yield* Effect.promise(() => runAdmitted(admission.class, "smashcraft:inputs-derive", DERIVE_LEASE_SECONDS));
+    if (admission !== undefined) yield* Effect.promise(() => runAdmitted(admission.class, "makgora:inputs-derive", DERIVE_LEASE_SECONDS));
     return { plans, differing: yield* buildFighterArt(plans, manifest, assets, admission?.jobs ?? 2, !check) };
   }));
   if (!check) return;

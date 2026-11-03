@@ -3,11 +3,11 @@
   "baselineRevision": "d1971253475797b591a8c8af4ec138692c05d98c",
   "units": "world units; frames at 60 Hz; damage in percent points",
   "sources": {
-    "moves": "smashcraft:tools/move-data/moves.jsonl at 931ddc8c",
-    "graph": "smashcraft:tools/move-data/interactions/interactions.jsonl at 3d40e321",
-    "comparisons": "smashcraft:tools/move-data/comparisons.jsonl at 931ddc8c",
-    "physics": "smashcraft:ts/src/game/sim/tuning.ts at d1971253",
-    "bots": "smashcraft:evidence/rifleman-down-tilt-20261006/outcomes-cpu-after.jsonl; 540 matches, 563 records deduplicated by seed/index/stage/fighters/policies"
+    "moves": "makgora:tools/move-data/moves.jsonl at 931ddc8c",
+    "graph": "makgora:tools/move-data/interactions/interactions.jsonl at 3d40e321",
+    "comparisons": "makgora:tools/move-data/comparisons.jsonl at 931ddc8c",
+    "physics": "makgora:ts/src/game/sim/tuning.ts at d1971253",
+    "bots": "makgora:evidence/rifleman-down-tilt-20261006/outcomes-cpu-after.jsonl; 540 matches, 563 records deduplicated by seed/index/stage/fighters/policies"
   },
   "conditions": {
     "neutral": "mirror, stage 0, 0%, distance 60 or 120; first successful contact or both actionable; signatures include winner, contact kind, blocked and exclude frame differences",

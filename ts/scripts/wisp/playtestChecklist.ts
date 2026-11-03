@@ -30,7 +30,7 @@ export interface ChecklistInput {
   readonly issues: readonly ChecklistIssue[];
 }
 
-const refsIn = (text: string) => [...text.matchAll(/(?:^|[\s,(])(?:smashcraft)?#(\d+)\b/g)].map(([, n]) => Number(n));
+const refsIn = (text: string) => [...text.matchAll(/(?:^|[\s,(])(?:makgora)?#(\d+)\b/g)].map(([, n]) => Number(n));
 
 export function issueRefs({ subject, body }: ChecklistCommit): number[] {
   const trailers = [...body.matchAll(/^(?:Refs|Fixes|Closes)\b(.*)$/gim)].flatMap(([, rest = ""]) => refsIn(rest));

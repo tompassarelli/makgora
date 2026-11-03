@@ -1,6 +1,6 @@
 # #272: Illidan's Immolate after the swap with Fan of Knives: a frame-one burst on both sides that pops foes upward,
 # a jump cancel from its frame 4, and in the air it holds him in place.
-# Illidan a against Illidan b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Illidan a against Illidan b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero illidan
 # Both dash in, b ending about 80 in front of a.
 40 b stick -1 0

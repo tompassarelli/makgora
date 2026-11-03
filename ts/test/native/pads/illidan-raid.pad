@@ -1,5 +1,5 @@
 # Illidan's air Immolate, roundhouse kick forward smash and Flames of Azzinoth, each
-# hitting b. Illidan a against Illidan b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# hitting b. Illidan a against Illidan b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero illidan
 # Both dash in and pass each other, b ending about 50 behind a.
 40 b stick -1 0

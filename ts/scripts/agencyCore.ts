@@ -70,7 +70,7 @@ export const KILL_CONFIRMS: readonly KillConfirm[] = [];
 export const FLAG_KINDS = ["true-chain", "low-agency-link", "long-no-control", "loop"] as const;
 export type FlagKind = (typeof FLAG_KINDS)[number];
 
-/** The agency rule's numbers: E and T as chosen on smashcraft#63; chainMax and loopRepeats name the rest of the rule's shape. */
+/** The agency rule's numbers: E and T as chosen on makgora#63; chainMax and loopRepeats name the rest of the rule's shape. */
 export interface AgencyRule {
   /** A link keeps the victim a real chance when at least this share of weighted options escape it. */
   readonly escapeFloor: number;

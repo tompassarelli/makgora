@@ -8,7 +8,7 @@ import { ChildProcess } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
 import { currentPlaytest, devBuild, playName } from "./currentPlaytest";
-import { SMASHCRAFT_ACCEPT } from "./acceptChecks";
+import { MAKGORA_ACCEPT } from "./acceptChecks";
 import { GREEN_GATE_LOOKS, greenGateFailures, greenInstallDecision, smokeBlocks, type GreenGateReport, type SmokeReport, type Candidate, type RunSummary, buildLabel, farmVerdict, greenStep, isGreen, parseInstalled, verdictOf } from "./greenBuilds";
 import { installLatest, installedMaps } from "./mapLibrary";
 import { checklistPath, writePlaytestChecklist } from "./playtestChecklist";
@@ -49,7 +49,7 @@ const SmokeResult = Schema.Struct({
   shards: Schema.Array(Schema.Struct({ shard: Schema.String, run: Schema.String, crash: Schema.Boolean, deadBindings: Schema.Array(Schema.String), movesNotStarted: Schema.Array(Schema.String), restart: Schema.optionalKey(Schema.String) })),
 });
 const decodeSmokeResult = Schema.decodeUnknownEffect(Schema.fromJsonString(SmokeResult));
-export const greenState = join(homedir(), ".local/state/smashcraft/green-builds");
+export const greenState = join(homedir(), ".local/state/makgora/green-builds");
 
 export const smokeShardFile = (mapSha256: string, shard: number, stateDirectory = greenState): string => join(stateDirectory, "accept", mapSha256, "classic", movesShardId(shard), "smoke.json");
 
@@ -107,7 +107,7 @@ function previousInstalled(documents: string, considered: readonly Candidate[]):
   return considered.find(({ build }) => build === newest)?.sha;
 }
 
-export const installAcceptedGreen = (documents: string, map: string, revision: string, declared: readonly string[], stateDirectory = greenState, enforce = process.env.SMASHCRAFT_GREEN_GATE === "enforce") => Effect.gen(function*() {
+export const installAcceptedGreen = (documents: string, map: string, revision: string, declared: readonly string[], stateDirectory = greenState, enforce = process.env.MAKGORA_GREEN_GATE === "enforce") => Effect.gen(function*() {
   const mapSha256 = yield* Effect.try({
     try: () => createHash("sha256").update(readFileSync(map)).digest("hex"), catch: (cause) => new PlayProblem({ problem: String(cause) }),
   });
@@ -143,7 +143,7 @@ export const greenMain = Effect.gen(function*() {
   const laneShas = autolandRuns.flatMap(({ headSha, displayTitle }) => [headSha, ...displayTitle.match(/\b[a-f0-9]{40}\b/g) ?? []]);
   const evidenceShas = [...new Set([...shas, ...farmShas, ...laneShas])];
   const fields = evidenceShas.map((sha, i) => `c${i}:object(expression:"${sha}"){... on Commit{oid tree{oid} status{contexts{context state description}}}}`).join(" ");
-  const evidence = yield* host("gh", ["api", "graphql", "-f", `query={repository(owner:"tompassarelli",name:"smashcraft"){${fields}}}`, "--jq", "[.data.repository[] | select(. != null)]"]).pipe(
+  const evidence = yield* host("gh", ["api", "graphql", "-f", `query={repository(owner:"tompassarelli",name:"makgora"){${fields}}}`, "--jq", "[.data.repository[] | select(. != null)]"]).pipe(
     Effect.flatMap((text) => decodeEvidence(text).pipe(Effect.mapError(problem))),
   );
   const statuses = evidence.flatMap(({ status }) => (status?.contexts ?? [])
@@ -168,7 +168,7 @@ export const installGreen = <E, R, SE extends { readonly message: string }, SR>(
   const installed = installedNumbers(documents);
   const step = greenStep(considered, installed, yield* clientHold(documents));
   if (dryRun) {
-    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${step.kind === "none" ? "no install (already installed, newer installed, or no green commit)" : step.kind === "hold" ? `would hold ${step.candidate.sha}: ${step.reason}` : `would stage ${step.candidate.sha}, ${smoke === undefined ? "read its existing smoke.json" : "run the move smoke on it"} and refuse a smoke crash, dead binding or move that fails to start; other gate-* failures ${process.env.SMASHCRAFT_GREEN_GATE === "enforce" ? "block" : "are recorded"}`}`);
+    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${step.kind === "none" ? "no install (already installed, newer installed, or no green commit)" : step.kind === "hold" ? `would hold ${step.candidate.sha}: ${step.reason}` : `would stage ${step.candidate.sha}, ${smoke === undefined ? "read its existing smoke.json" : "run the move smoke on it"} and refuse a smoke crash, dead binding or move that fails to start; other gate-* failures ${process.env.MAKGORA_GREEN_GATE === "enforce" ? "block" : "are recorded"}`}`);
     if (step.kind === "install") console.log(`Dry run: would write playtest notes ${checklistPath(buildLabel(`${yield* playName(step.candidate.sha)}.w3x`) ?? step.candidate.sha)} for ${previousInstalled(documents, considered) ?? `${step.candidate.sha.slice(0, 7)}^`}..${step.candidate.sha.slice(0, 7)}`);
     return;
   }
@@ -189,7 +189,7 @@ export const installGreen = <E, R, SE extends { readonly message: string }, SR>(
   if (late.kind === "none") return console.log(`${pick.sha.slice(0, 7)} was installed while it built`);
   console.log(`Controller helper: ${yield* controller}`);
   if (smoke !== undefined) yield* smoke(map.source).pipe(Effect.mapError(problem));
-  yield* installAcceptedGreen(documents, map.source, pick.sha, SMASHCRAFT_ACCEPT.checks.filter(({ id }) => id.startsWith("gate-")).map(({ id }) => id));
+  yield* installAcceptedGreen(documents, map.source, pick.sha, MAKGORA_ACCEPT.checks.filter(({ id }) => id.startsWith("gate-")).map(({ id }) => id));
   console.log(`Installed ${map.title} under Maps/${map.folder}`);
   const label = buildLabel(map.file);
   if (label !== undefined) {

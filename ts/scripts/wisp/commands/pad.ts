@@ -53,7 +53,7 @@ import { SLOTS } from "../../integrity/slots";
 import { captureWhenDrawn, drawnFrom, visualCaptureCommand, visualCaptureToken } from "../../integrity/drawnCapture";
 import { visualReleaseFile } from "../../../src/game/session/visualCapture";
 import { drawnFrameFile, nativeChatFile, responsePageFile } from "../../../src/game/core/gameFiles";
-import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "../headless";
+import { PREDICTED_HEADLESS, MAKGORA_HEADLESS } from "../headless";
 type HeadlessClient = ReturnType<HeadlessRuntime["clients"]>["clients"][number];
 import { sceneFile } from "wisp/src/runtime/scene";
 import { clientState } from "../project";
@@ -206,7 +206,7 @@ const collect = (data: readonly [string, string], out: string, sinceMs: number, 
       const trace = join(dir, TRACE_FILE);
       if (fresh(trace)) copyFileSync(trace, join(out, `trace-${"ab"[slot]}.txt`));
       else console.error(`client ${"ab"[slot]}: no input trace written since the run began (${trace})`);
-      const scene = join(dir, sceneFile(slot, SMASHCRAFT_HEADLESS.filePrefix));
+      const scene = join(dir, sceneFile(slot, MAKGORA_HEADLESS.filePrefix));
       if (fresh(scene)) copyFileSync(scene, join(out, `scene-${"ab"[slot]}.txt`));
       for (const name of readdirSync(dir)) {
         if (!fresh(join(dir, name))) continue;
@@ -638,7 +638,7 @@ const pad: Command = (args) => Effect.gen(function*() {
       Effect.retry({ schedule: EffectSchedule.recurs(map === undefined ? 0 : Math.max(0, Math.ceil(retries))), while: (failure) => failure instanceof InvalidNativeRun }),
       Effect.catchIf((failure): failure is InvalidNativeRun => failure instanceof InvalidNativeRun, (failure) => Effect.fail(new IntegrityFailure({ operation: INVALID_RUN, path: out, cause: `desynced, rerun (${failure.attempts} attempt${failure.attempts === 1 ? "" : "s"}${map === undefined ? "; --map MAP.w3x reruns it automatically" : ""})` }))),
     );
-    return yield* inQuietNativeWindow("smashcraft-pad", nativeRun);
+    return yield* inQuietNativeWindow("makgora-pad", nativeRun);
   }
   const ran = yield* Effect.exit(headless(options).pipe(step("headless pad script")));
   if (compare !== undefined) {
@@ -691,7 +691,7 @@ const scriptBatch = (values: { readonly [name: string]: string | boolean | reado
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const scripts = yield* Effect.try({ try: () => batchScripts(positionals), catch: (cause) => new UsageFailure({ problem: describeCause(cause) }) });
-  return yield* inQuietNativeWindow("smashcraft-pad", padBatch({
+  return yield* inQuietNativeWindow("makgora-pad", padBatch({
     scripts, pairs, helper, build, out, map,
     retries: Number(text("retries") ?? "2"), freshEach: values["fresh-each"] === true, hot: values.hot === true, headlessJobs,
   }));

@@ -6,7 +6,7 @@ import { admitted } from "../heavyCapacity";
 import { withLock } from "./fileLock";
 import { tsDirectory } from "./projectRoot";
 
-const inputsRoot = join(homedir(), ".local/share/smashcraft-build-inputs");
+const inputsRoot = join(homedir(), ".local/share/makgora-build-inputs");
 export const WINDOW_SOURCE_COPY = join(inputsRoot, "window-source");
 export const WINDOW_LOCK = join(inputsRoot, "locks/window-library.lock");
 export const WINDOW_OWNER = "smashcraft:tom-build-window";

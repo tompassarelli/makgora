@@ -1,7 +1,7 @@
 {
   "settings": {
-    "binary": "/home/tom/.local/share/smashcraft-build-inputs/playable-0045/wc3-journal-0.0.45",
-    "out": "/home/tom/.local/share/smashcraft-build-inputs/playable-0045/capture",
+    "binary": "/home/tom/.local/share/makgora-build-inputs/playable-0045/wc3-journal-0.0.45",
+    "out": "/home/tom/.local/share/makgora-build-inputs/playable-0045/capture",
     "build": "playable-0045",
     "clients": [
       {

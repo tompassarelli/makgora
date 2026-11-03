@@ -1,5 +1,5 @@
 # #237 Vampiric Pounce and #144 special cues: the caught bite heals Dreadlord up to 4 percent; every special form shows its Warcraft spell.
-# Dreadlord a against Dreadlord b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Dreadlord a against Dreadlord b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero dreadlord
 # #144: Bat Ascension, paid.
 40 a stick 0 1

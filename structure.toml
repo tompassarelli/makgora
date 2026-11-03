@@ -1,5 +1,5 @@
-# smashcraft structure.toml (structure-architect planner, 15 Oct 2026). Lands at repo root as structure.toml.
-# Modules name the TARGET layers (smashcraft-design.md section 1) and map today's paths onto them, so existing
+# makgora structure.toml (structure-architect planner, 15 Oct 2026). Lands at repo root as structure.toml.
+# Modules name the TARGET layers (makgora-design.md section 1) and map today's paths onto them, so existing
 # edges are frozen debt and new edges must follow the target DAG. Each refactor slice moves paths here in the same change.
 # First matching module wins: specific globs come before their directory's catch-all.
 
@@ -178,8 +178,8 @@ may_use = ["host", "classic", "session", "ui", "render", "presentation", "fighte
 
 [[module]]
 name = "host-tools"
-paths = ["tools/smashcraft-tools/**"]
-responsibility = "smashcraft-tools (Rust): Warcraft III menu observation and input procedures, and the animation asset extractors."
+paths = ["tools/makgora-tools/**"]
+responsibility = "makgora-tools (Rust): Warcraft III menu observation and input procedures, and the animation asset extractors."
 may_use = []
 
 [[module]]
@@ -339,4 +339,4 @@ producer = "ts/scripts/wisp/commands/ledger.ts"
 
 [ignore]
 paths = ["repos/**", "evidence/**", "ts/vendor/**", "ts/node_modules/**", "**/fixtures/**", "ts/test/corpus/**", "ts/test/native/pads/**",
-         "ts/scripts/wisp/model-facts/**", "controller/target/**", "tools/smashcraft-tools/target/**", "tools/slippi/node_modules/**", "ts/src/game/ui/opponentSettingsFrames.ts"]
+         "ts/scripts/wisp/model-facts/**", "controller/target/**", "tools/makgora-tools/target/**", "tools/slippi/node_modules/**", "ts/src/game/ui/opponentSettingsFrames.ts"]

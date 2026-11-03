@@ -1,4 +1,4 @@
-# Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Warden a against Warden b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero warden
 # Both dash in, close; eda5e178f2 made Maiev grippier, so b holds the dash 6 frames (variant run 39025469042).
 40 b stick -1 0

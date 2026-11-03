@@ -8,7 +8,7 @@ import { MAIN_DECK_BODY_SURFACES, solidSurfaceAt } from "../src/game/sim/stage";
 import { stageBounds } from "../src/game/sim/stageBounds";
 import { MATCH_CAMERA_ASPECT, createMatchCamera } from "../src/game/sim/matchCamera";
 import { MODEL_FACTS } from "./wisp/modelFacts";
-import { SMASHCRAFT_SCENE } from "./wisp/playerView";
+import { MAKGORA_SCENE } from "./wisp/playerView";
 import { MAIN_DECK_HALF_DEPTH, mainDeckOutlineStage } from "./stageDeck";
 
 type Box = { readonly min: readonly [number, number, number]; readonly max: readonly [number, number, number] };
@@ -29,7 +29,7 @@ export function worldProblems(name: string, origin: { readonly x: number; readon
 }
 
 export function behindProblems(stage: number, name: string, scenery: Pick<StageScenery, "fog" | "pieces">): readonly string[] {
-  const visibility = SMASHCRAFT_SCENE.visibility;
+  const visibility = MAKGORA_SCENE.visibility;
   if (visibility === undefined) throw new Error("missing visibility");
   const problems: string[] = [];
   const corners = (box: { min: readonly [number, number, number]; max: readonly [number, number, number] }) =>

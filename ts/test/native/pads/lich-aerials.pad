@@ -1,4 +1,4 @@
-# #152 drills and multi-hit aerials: Lich's neutral air (rehitting halo, 4 hits). Lich a against Lich b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# #152 drills and multi-hit aerials: Lich's neutral air (rehitting halo, 4 hits). Lich a against Lich b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero lich
 # Both dash in, close.
 40 b stick -1 0

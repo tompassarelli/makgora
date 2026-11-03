@@ -10,7 +10,7 @@ import { originalClip, originalClipCount } from "../src/generated/clips/fighterO
 export const DOWN_ACTIONS = ["knockdown", "downDamage", "getUp", "getUpAttack", "rollForward", "rollBackward", "wallTech", "damageGround"] as const;
 export type BodyFadeRecord = Record<string, { readonly body: string; readonly fading: readonly number[] }>;
 
-const STORE = join(homedir(), ".local/share/smashcraft-build-inputs/store");
+const STORE = join(homedir(), ".local/share/makgora-build-inputs/store");
 const FRAME_MILLISECONDS = 1000 / 60;
 const FULL = 1 - 1e-3;
 

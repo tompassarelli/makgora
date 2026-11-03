@@ -1,4 +1,4 @@
-# Rifleman a against an idle Rifleman b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Rifleman a against an idle Rifleman b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero rifleman
 60 a tap X 2
 62 a capture

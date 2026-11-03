@@ -122,7 +122,7 @@ export interface RigShape {
   readonly progress: (message: string) => Effect.Effect<void>;
 }
 
-export class Rig extends Context.Service<Rig, RigShape>()("smashcraft/integrity/Rig") {}
+export class Rig extends Context.Service<Rig, RigShape>()("makgora/integrity/Rig") {}
 
 export interface JourneyOptions {
   readonly build: string;

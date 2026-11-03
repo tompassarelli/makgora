@@ -11,7 +11,7 @@ import { withLock } from "./fileLock";
 import { shardFiles } from "./inputShards";
 import { projectRoot } from "./projectRoot";
 
-export const INPUTS_STORE = join(homedir(), ".local/share/smashcraft-build-inputs/store");
+export const INPUTS_STORE = join(homedir(), ".local/share/makgora-build-inputs/store");
 /** One pin file per family (build-inputs/FAMILY holds its store hash), so two lanes that store different families never edit the same file (#401); a sharded family pins each fighter's files apart (build-inputs/FAMILY/SHARD), so two lanes that repack different fighters never edit the same file either. */
 export const MANIFEST = join(projectRoot, "build-inputs");
 
@@ -59,18 +59,18 @@ export const FAMILY_NAMES = ["base", "container", "summon", "animation-assets", 
   "stage-assets", "impact-assets", "imported-models", "original-clips-static-lights", "hero-models", "model-sounds"] as const;
 export type Family = (typeof FAMILY_NAMES)[number];
 export const FAMILIES = {
-  base: { file: "base.w3m", produce: "the private base map Melee_Prototype_Base.w3m (smashcraft:docs/development-loop.md)" },
-  container: { file: "container.w3x", produce: "the private asset container map (a built Smashcraft map carrying the stock imports)" },
+  base: { file: "base.w3m", produce: "the private base map Melee_Prototype_Base.w3m (makgora:docs/development-loop.md)" },
+  container: { file: "container.w3x", produce: "the private asset container map (a built Mak'gora map carrying the stock imports)" },
   summon: { produce: "the private summon clip export (summon-clips-evidence.json and imports/war3mapImported/)" },
-  "animation-assets": { produce: "tools/smashcraft-tools/target/release/smashcraft-tools build-animation-assets (writes build/animation-assets)" },
+  "animation-assets": { produce: "tools/makgora-tools/target/release/makgora-tools build-animation-assets (writes build/animation-assets)" },
   "illidan-animation": { produce: "bun tools/animations/package-illidan.ts (writes build/illidan-animation)" },
   "selection-assets": { produce: "bun tools/selection/build-art.ts (writes build/selection-assets)" },
   "fighter-renders": { produce: "bun scripts/fighterPortraits.ts PRIVATE_OUTPUT (from ts/; stores PRIVATE_OUTPUT/fighter-renders)" },
   "stage-assets": { produce: "bun tools/stage/package.ts (writes build/stage-assets)" },
   "impact-assets": { produce: "bun tools/effects/package.ts, trap.ts, shield.ts, ankh.ts, felCrescent.ts and parasol.ts (write build/impact-assets); fighter white flashes come from bun wisp inputs derive, which stores and pins them", sharded: true },
-  "imported-models": { produce: "the community models smashcraft:ts/src/game/assets/importedModelInfo.ts lists, from their authors' downloads" },
+  "imported-models": { produce: "the community models makgora:ts/src/game/assets/importedModelInfo.ts lists, from their authors' downloads" },
   "original-clips-static-lights": { produce: "bun wisp inputs derive, which stores and pins it (after adding the new fighter models' animation-assets or illidan-animation)", sharded: true },
-  "hero-models": { produce: "the stock hero models extracted from the game's archives (smashcraft:ts/scripts/heroModelSource.ts)", sharded: true },
+  "hero-models": { produce: "the stock hero models extracted from the game's archives (makgora:ts/scripts/heroModelSource.ts)", sharded: true },
   "model-sounds": { produce: "bun tools/animations/export-model-sounds.ts --assets \"$(bun wisp inputs path assets)\" --sounds AnimSounds.slk --out NEW" },
 } as const satisfies Record<Family, { readonly file?: string; readonly produce: string; readonly sharded?: true }>;
 

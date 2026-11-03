@@ -15,7 +15,7 @@ import { PREDICTED_HEADLESS } from "./wisp/headless";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import * as platformMain from "../src/platform/main";
 import { headlessRender } from "./wisp/headlessRender";
-import { smashcraftNativeBehavior } from "./wisp/headlessNatives";
+import { makgoraNativeBehavior } from "./wisp/headlessNatives";
 import { RETURNING_PLAYER_FILES } from "./selectStrip";
 import { runProcess } from "./hostProcess";
 import { shellState } from "../src/host/loop/state";
@@ -47,7 +47,7 @@ export function playerBuildEntry(): MapEntry {
 }
 
 export function painShots(entry: MapEntry, characters: readonly number[], screen: { readonly width: number; readonly height: number }): PainShot[] {
-  const runtime = installHeadless({ ...PREDICTED_HEADLESS, natives: smashcraftNativeBehavior });
+  const runtime = installHeadless({ ...PREDICTED_HEADLESS, natives: makgoraNativeBehavior });
   const files = { read: (name: string) => RETURNING_PLAYER_FILES[name], written: () => undefined };
   const shots: PainShot[] = [];
   const frames = Array.from({ length: LAST_OBSERVED - FIRST_OBSERVED + 1 }, (_, step) => FIRST_OBSERVED + step);

@@ -8,7 +8,7 @@ import type { LocalNatives } from "wisp/src/headless/client";
 
 
 
-export const SMASHCRAFT_LOCAL_NATIVES: LocalNatives = {
+export const MAKGORA_LOCAL_NATIVES: LocalNatives = {
   BlzGetLocalClientWidth: "local screen size, for layout",
   BlzGetLocalClientHeight: "local screen size, for layout",
   SetCameraBounds: "frames this client's camera for its screen aspect",
@@ -79,4 +79,4 @@ const PREDICTED_PRESENTATION: LocalNatives = {
 };
 
 
-export const PREDICTED_LOCAL_NATIVES: LocalNatives = { ...SMASHCRAFT_LOCAL_NATIVES, ...PREDICTED_PRESENTATION };
+export const PREDICTED_LOCAL_NATIVES: LocalNatives = { ...MAKGORA_LOCAL_NATIVES, ...PREDICTED_PRESENTATION };

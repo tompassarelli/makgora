@@ -11,7 +11,7 @@ use crate::process::{exit_code, output, spawn_failure, substituted};
 use crate::screen_state::ScreenState;
 use crate::stop::{Outcome, Stop};
 
-const USAGE: &str = "Usage: smashcraft-tools wc3-wait-state RUN_DIR EXPECTED_STATE TIMEOUT_SECONDS";
+const USAGE: &str = "Usage: makgora-tools wc3-wait-state RUN_DIR EXPECTED_STATE TIMEOUT_SECONDS";
 const TIMED_OUT: u8 = 124;
 const PAUSE: Duration = Duration::from_millis(100);
 
@@ -283,7 +283,7 @@ mod tests {
 
     fn frames(name: &str) -> PathBuf {
         let directory = std::env::temp_dir().join(format!(
-            "smashcraft-tools-wait-{name}-{}",
+            "makgora-tools-wait-{name}-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&directory);
@@ -366,12 +366,12 @@ mod tests {
 
     #[test]
     fn a_missing_run_directory_resolves_like_realpath() {
-        let missing = std::env::temp_dir().join("smashcraft-tools-absent-run");
+        let missing = std::env::temp_dir().join("makgora-tools-absent-run");
         assert_eq!(
             resolved(&missing).unwrap(),
             fs::canonicalize(std::env::temp_dir())
                 .unwrap()
-                .join("smashcraft-tools-absent-run")
+                .join("makgora-tools-absent-run")
         );
         assert!(resolved(&missing.join("deeper")).is_err());
     }

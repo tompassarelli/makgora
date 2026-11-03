@@ -20,7 +20,7 @@ import { FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";
 import { encodeBlp } from "./blp";
 import { runProcess } from "./hostProcess";
 import { headlessRender } from "./wisp/headlessRender";
-import { SMASHCRAFT_JOURNEYS } from "./wisp/journeys";
+import { MAKGORA_JOURNEYS } from "./wisp/journeys";
 import { storeStageCard } from "./wisp/buildInputs";
 import { CARD, HERO_CAMERAS, RENDERED_STAGES, type ThumbnailManifest, stageInputHash, stageNamed, thumbnailFile } from "./stageThumbnailSpec";
 import { platformLayer } from "wisp/scripts/platform/layer";
@@ -48,7 +48,7 @@ const SceneShape = Schema.Struct({
 const isScene = (value: unknown): value is RenderScene => Schema.is(SceneShape)(value);
 
 const outIndex = process.argv.indexOf("--out");
-const work = outIndex < 0 ? join(homedir(), ".local/share/smashcraft-build-inputs/stage-thumbnails-work") : resolve(process.argv[outIndex + 1] ?? "");
+const work = outIndex < 0 ? join(homedir(), ".local/share/makgora-build-inputs/stage-thumbnails-work") : resolve(process.argv[outIndex + 1] ?? "");
 
 const stageIndex = process.argv.indexOf("--stage");
 const stageName = stageIndex < 0 ? undefined : process.argv[stageIndex + 1] ?? "";
@@ -63,7 +63,7 @@ const captureStage = (stage: StageTile) => Effect.gen(function*() {
     { frame: 20, player: 0, chat: "-dev items off" }, { frame: 30, player: 0, chat: `-dev quick stage ${stage}` }, { frame: 40, player: 0, chat: "-dev view far" },
   ] })));
 
-  yield* makeHeadless(async () => ({ ...SMASHCRAFT_JOURNEYS, render: renderer }))(["--journey", journey, "--render", directory, "--frames", String(FRAME)])
+  yield* makeHeadless(async () => ({ ...MAKGORA_JOURNEYS, render: renderer }))(["--journey", journey, "--render", directory, "--frames", String(FRAME)])
     .pipe(Effect.ignore);
   const raw = yield* attempt(`read stage ${stage}'s captured scene`, () => Bun.file(join(directory, `p0-frame-${FRAME}.json`)).json());
   if (!isScene(raw)) return yield* new ThumbnailFailure({ problem: `stage ${stage}'s captured scene isn't a render scene` });

@@ -1,7 +1,7 @@
 # #272: Maiev's Fan of Knives after the swap with Immolate: a front-only burst on frames 4-7 that pushes foes back
 # along a low angle with a set knockback that never knocks them down (Tom, 26 Oct),
 # and a jump cancel from its frame 4; maiev-fan-spike.pad checks the air spike and stall.
-# Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Warden a against Warden b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero warden
 # b dashes in, then a dashes to about 46 short of b.
 40 b stick -1 0

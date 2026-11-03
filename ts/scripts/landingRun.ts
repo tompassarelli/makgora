@@ -7,7 +7,7 @@ import { type Finished, runGroup } from "./processGroups";
 
 const ts = join(import.meta.dir, "..");
 const TAIL_LINES = 40;
-// Edit-loop timings are reported, not gated, wherever a landing check runs, as on main's CI (smashcraft:docs/ci.md).
+// Edit-loop timings are reported, not gated, wherever a landing check runs, as on main's CI (makgora:docs/ci.md).
 const CHECK_ENVIRONMENT = { CI_TIMING: "report" };
 
 const outputOf = ({ stdout, stderr }: Finished) => `${stdout}${stderr}`;

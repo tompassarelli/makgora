@@ -28,7 +28,7 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
   if (!existsSync(library)) throw new Error(`no window library at ${library}`);
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
-  yield* runProcess(ChildProcess.make("bun", ["build", "--compile", "--external", "pnpapi", "--entry-naming", "[name].[ext]", "--define", `PLAYER_COMMIT=${JSON.stringify(commit)}`, "--define", `PLAYER_VERSION=${JSON.stringify(version)}`, ...ENTRYPOINTS, "--outfile", join(out, `smashcraft-play${EXE}`)], { stdout: "pipe", stderr: "pipe" }));
+  yield* runProcess(ChildProcess.make("bun", ["build", "--compile", "--external", "pnpapi", "--entry-naming", "[name].[ext]", "--define", `PLAYER_COMMIT=${JSON.stringify(commit)}`, "--define", `PLAYER_VERSION=${JSON.stringify(version)}`, ...ENTRYPOINTS, "--outfile", join(out, `makgora-play${EXE}`)], { stdout: "pipe", stderr: "pipe" }));
   copyFileSync(library, join(out, basename(library)));
   for (const tool of readdirSync(tools)) {
     copyFileSync(join(tools, tool), join(out, tool));

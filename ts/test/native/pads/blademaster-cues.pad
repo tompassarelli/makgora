@@ -1,4 +1,4 @@
-# Blademaster a against Blademaster b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Blademaster a against Blademaster b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero blademaster
 # Both dash in; a walks up to jab range.
 40 b stick -1 0

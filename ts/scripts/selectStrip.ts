@@ -3,9 +3,9 @@ import { installHeadless, loadMapEntry, playHeadless } from "wisp/scripts/wisp/h
 import { type RenderScene, captureScene, renderScenes } from "wisp/scripts/wisp/headlessRender";
 import type { Journey } from "wisp/src/headless/journey";
 import type { MapEntry } from "wisp/src/headless/client";
-import { SMASHCRAFT_JOURNEYS } from "./wisp/journeys";
+import { MAKGORA_JOURNEYS } from "./wisp/journeys";
 import { headlessRender } from "./wisp/headlessRender";
-import { smashcraftNativeBehavior } from "./wisp/headlessNatives";
+import { makgoraNativeBehavior } from "./wisp/headlessNatives";
 
 export const RETURNING_PLAYER_FILES: Readonly<Record<string, readonly string[]>> = { "SmashcraftTutorial.pld": ["seen"] };
 
@@ -14,7 +14,7 @@ class SelectStripFailure extends Schema.TaggedError<SelectStripFailure, { readon
 const USAGE = "usage: bun scripts/selectStrip.ts JOURNEY.json OUT_DIR --frames N... [--resolution WxH]";
 
 export function selectScenes(entry: MapEntry, journey: Journey, frames: readonly number[], screen: { readonly width: number; readonly height: number }): RenderScene[] {
-  const runtime = installHeadless({ ...SMASHCRAFT_JOURNEYS.map, natives: smashcraftNativeBehavior });
+  const runtime = installHeadless({ ...MAKGORA_JOURNEYS.map, natives: makgoraNativeBehavior });
   const scenes: RenderScene[] = [];
   try {
     const files = { read: (name: string) => RETURNING_PLAYER_FILES[name], written: () => undefined };
@@ -38,7 +38,7 @@ export const selectStrip = (args: readonly string[]) => Effect.gen(function*() {
   const [width = 1280, height = 720] = (flag("--resolution") ?? "1280x720").split("x").map(Number);
   const screen = { width, height };
   const journey = (yield* Effect.promise(() => Bun.file(journeyPath).json())) as Journey;
-  const entry = yield* Effect.promise(() => loadMapEntry(SMASHCRAFT_JOURNEYS.entry));
+  const entry = yield* Effect.promise(() => loadMapEntry(MAKGORA_JOURNEYS.entry));
   const scenes = selectScenes(entry, journey, frames, screen);
   const rendered = yield* renderScenes({ ...headlessRender(), ...screen }, scenes, out, "classic");
   yield* Effect.log(`${rendered.length} frames rendered to ${out}`);

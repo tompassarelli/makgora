@@ -52,7 +52,7 @@ if (import.meta.main) {
     options: { matches: { type: "string" }, top: { type: "string" }, stocks: { type: "string" }, minutes: { type: "string" } },
     strict: true,
   });
-  await runAdmitted("moderate", "smashcraft:cpuTiers", 3600);
+  await runAdmitted("moderate", "makgora:cpuTiers", 3600);
   const matches = Number(values.matches ?? 20);
   const topMatches = Number(values.top ?? 100);
   const rules = { stocks: Number(values.stocks ?? 3), minutes: Number(values.minutes ?? 4) };

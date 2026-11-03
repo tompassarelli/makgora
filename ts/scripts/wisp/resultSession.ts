@@ -6,7 +6,7 @@ import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { type Character } from "../../src/game/sim/codes";
 import { fighterKey, fighterName } from "../../src/game/roster/kits";
-import { SMASHCRAFT_HEADLESS } from "./headless";
+import { MAKGORA_HEADLESS } from "./headless";
 
 type HeadlessClient = Parameters<typeof captureScene>[0];
 
@@ -21,7 +21,7 @@ export interface ResultSession {
 }
 
 export async function createResultSession(winner: Character, loser: Character): Promise<ResultSession> {
-  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  const runtime = installHeadless(MAKGORA_HEADLESS);
   try {
     const loop = join(import.meta.dir, "../../src/host/loop");
     interface State { readonly game: { readonly phase: number }; readonly world: unknown }

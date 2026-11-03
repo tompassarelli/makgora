@@ -9,12 +9,12 @@ import { Key } from "../src/host/loop/keyEvents";
 import { panelActions } from "../src/host/loop/menus";
 import { shell } from "../src/host/loop/state";
 import { passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
 const NINE = 0x39;
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 test("Y starts from fighter and stage select and is not Strong once the match begins, held or as a tap between polls, while 9 is [k1 scenario]", () => {
   const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, [0]);

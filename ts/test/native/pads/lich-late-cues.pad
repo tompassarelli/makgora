@@ -1,4 +1,4 @@
-# Lich a against Lich b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Lich a against Lich b; syntax and checks: makgora:docs/native-bot-session.md.
 # The captures and checks from frame 570 of lich-cues.pad, on its inputs: one file's capture schedule exceeds Warcraft's 127-character chat command.
 #! chat -dev quick hero lich
 40 b press LB

@@ -19,8 +19,8 @@ import { readSceneLines, sceneProblems } from "wisp/scripts/wisp/scene";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { pollUntil } from "../hostPoll";
-import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "../wisp/headless";
-import { SMASHCRAFT_SCENE } from "../wisp/playerView";
+import { PREDICTED_HEADLESS, MAKGORA_HEADLESS } from "../wisp/headless";
+import { MAKGORA_SCENE } from "../wisp/playerView";
 import { tsDirectory } from "../wisp/project";
 import { json, startHelper } from "./capture";
 import { IntegrityFailure, producerLine, tryIntegrity, tryIntegrityPromise } from "./evidence";
@@ -241,11 +241,11 @@ export const captureHeadless = (options: HeadlessCaptureOptions) =>
           Effect.forEach(SLOTS, (client) =>
             Effect.gen(function*() {
               if (!checks.scene) return;
-              const lines = clients.client(client).files.get(sceneFile(client, SMASHCRAFT_HEADLESS.filePrefix));
+              const lines = clients.client(client).files.get(sceneFile(client, MAKGORA_HEADLESS.filePrefix));
               const report = lines === undefined ? undefined : readSceneLines(lines);
               const problems = report === undefined ? ["no scene report"]
                 : "problem" in report ? [`scene report line ${report.line}: ${report.problem}`]
-                : sceneProblems(report, SMASHCRAFT_SCENE).map(({ seen, evidence }) => `would see ${seen} (${evidence})`);
+                : sceneProblems(report, MAKGORA_SCENE).map(({ seen, evidence }) => `would see ${seen} (${evidence})`);
               if (problems.length === 0) return;
               const path = join(out, `player-view-${epoch}.txt`);
               yield* tryIntegrity("record player view", path, () => appendFileSync(path, problems.map((problem) => `${names[client]} ${problem}\n`).join("")));

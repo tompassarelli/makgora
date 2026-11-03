@@ -6,7 +6,7 @@ const TWO_WINS_AT_FIGHTER_SELECT = "^SETUP phase=0 .* wins=0,2,0,0 $";
 
 export const winCountChecks = (noErrors: Rule, noImportFailures: Rule): NativeCheck[] => [
   {
-    id: "c46-second-match", closes: "smashcraft#7 C46 setup: the first Wren match ends and the rematch starts", map: "presentation", session: "c46-win-counts",
+    id: "c46-second-match", closes: "makgora#7 C46 setup: the first Wren match ends and the rematch starts", map: "presentation", session: "c46-win-counts",
     setup: [
       { chat: "-dev reset" }, { chat: "-dev slots 1 0" }, { chat: "-dev auto-rematch on" }, { chat: `${QUICK_CPU_COMMAND}wren expert` },
       { receipt: "^SETUP phase=\\d+ human-fighters=1 computers=[1-9]\\d* .* stocks=3 ", client: "a", seconds: 10 },
@@ -15,7 +15,7 @@ export const winCountChecks = (noErrors: Rule, noImportFailures: Rule): NativeCh
     pass: [noErrors],
   },
   {
-    id: "c46-win-counts", closes: "smashcraft#7 C46", map: "presentation", session: "c46-win-counts", after: "c46-second-match",
+    id: "c46-win-counts", closes: "makgora#7 C46", map: "presentation", session: "c46-win-counts", after: "c46-second-match",
     setup: [
       { receipt: COMPUTER_WON, client: "a", seconds: 600 },
       { waitMs: 2500 }, { keys: ["n"], client: "a" }, { waitMs: 300 }, { keys: ["right"], client: "a" }, { waitMs: 300 }, { keys: ["n"], client: "a" }, { waitMs: 3000 },

@@ -1,4 +1,4 @@
-# Lich a against Lich b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Lich a against Lich b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero lich
 40 b press LB
 40 b stick -1 0

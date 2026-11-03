@@ -1,4 +1,4 @@
-# Blademaster a against Blademaster b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Blademaster a against Blademaster b; syntax and checks: makgora:docs/native-bot-session.md.
 # The captures and checks from frame 570 of blademaster-cues.pad, on its inputs: one file's capture schedule exceeds Warcraft's 127-character chat command.
 #! chat -dev quick hero blademaster
 # Both dash in; a walks up to jab range.

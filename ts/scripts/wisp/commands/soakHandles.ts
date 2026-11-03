@@ -35,7 +35,7 @@ const run = (name: string, command: string, args: readonly string[]) => Effect.s
 // handleBaseline.ts's SOAK_MATCHES; that module is map code, so the host command restates it.
 const SOAK_MATCHES = 21;
 
-// smashcraft:ts/scripts/wisp/handleBaseline.ts's scenario, the first match and 20 rematches, in Bun and on the
+// makgora:ts/scripts/wisp/handleBaseline.ts's scenario, the first match and 20 rematches, in Bun and on the
 // compiled integrity build in 32-bit Lua: over the suites' per-test ceilings, so it runs here (#409).
 export const soakHandles: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({

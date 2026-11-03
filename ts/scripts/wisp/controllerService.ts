@@ -16,7 +16,7 @@ import { PlayProblem } from "wisp/scripts/wisp/play";
 import { pollUntil } from "../hostPoll";
 import { currentHelper } from "./currentPlaytest";
 
-export const CONTROLLER_LAUNCHER = join(homedir(), ".local/share/smashcraft-build-inputs/controller/wc3-journal");
+export const CONTROLLER_LAUNCHER = join(homedir(), ".local/share/makgora-build-inputs/controller/wc3-journal");
 export const SERVICE_LAUNCHER = join(homedir(), ".local/share/padbridge/bin/padbridge");
 export const SERVICE_ARGS = ["--service", "--plugin", CONTROLLER_LAUNCHER];
 export const CONTROLLER_UNIT = "padbridge.service";
@@ -77,7 +77,7 @@ const alive = (pid: string | undefined) => pid !== undefined && /^\d+$/.test(pid
 const fail = (problem: string) => new PlayProblem({ problem });
 
 
-/** The pinned padbridge service built beside the Smashcraft plug-in (currentPlaytest.ts). */
+/** The pinned padbridge service built beside the Mak'gora plug-in (currentPlaytest.ts). */
 export const pointLaunchers = (helper: string) => [pointLauncher(helper), pointLauncher(join(dirname(helper), "padbridge"), SERVICE_LAUNCHER)].some(Boolean);
 
 function serviceBuildAction(running: string | undefined, wanted: string): "keep" | "relink+restart" {

@@ -16,7 +16,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { describeCause } from "wisp/scripts/wisp/command";
 import { readRepro, replayInClients, reproReport } from "wisp/scripts/wisp/commands/repro";
-import { SMASHCRAFT_HEADLESS } from "../wisp/headless";
+import { MAKGORA_HEADLESS } from "../wisp/headless";
 import { frameCostOverlay, readEvents, readGamePids } from "./botFiles";
 
 interface Receipt {
@@ -161,7 +161,7 @@ const momentReplays = momentFiles.map((name) => {
   const file = join(momentsDirectory, name);
   try {
     const { repro } = Effect.runSync(readRepro(file));
-    const report = reproReport(file, repro, replayInClients(SMASHCRAFT_HEADLESS, replayRepro, repro));
+    const report = reproReport(file, repro, replayInClients(MAKGORA_HEADLESS, replayRepro, repro));
     return { moment: name, build: repro.build, frame: repro.frame, recorded_checksum: repro.checksum, passed: report.landed, replay: report.lines.slice(1) };
   } catch (cause) {
     return { moment: name, passed: false, replay: [`the replay stopped: ${describeCause(cause)}`] };

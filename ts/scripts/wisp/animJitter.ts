@@ -189,10 +189,10 @@ export class JitterReport {
 
   problem(): string | undefined {
     const staleBobs = [...BOB_EXEMPTIONS.keys()].filter((clip) => !this.bobExempt.has(clip) && this.bodies.has(`classic:${clip.split("/")[0]}`));
-    if (staleBobs.length > 0) return `${staleBobs.join(", ")} no longer bob; remove their entries from BOB_EXEMPTIONS in smashcraft:ts/scripts/wisp/animJitter.ts`;
+    if (staleBobs.length > 0) return `${staleBobs.join(", ")} no longer bob; remove their entries from BOB_EXEMPTIONS in makgora:ts/scripts/wisp/animJitter.ts`;
     if (this.bobbing.length > 0) return `${this.bobbing.length} clips bob their root back and forth between frames; ground every frame from a pose measured before the root keys are rewritten`;
     const stale = [...JITTER_EXEMPTIONS.keys()].filter((body) => !this.exempt.has(body) && this.bodies.has(body));
-    if (stale.length > 0) return `${stale.join(", ")} no longer jitter; remove their entries from JITTER_EXEMPTIONS in smashcraft:ts/scripts/wisp/animJitter.ts`;
+    if (stale.length > 0) return `${stale.join(", ")} no longer jitter; remove their entries from JITTER_EXEMPTIONS in makgora:ts/scripts/wisp/animJitter.ts`;
     if (this.offenders.length > 0) return `${this.offenders.length} clips leave their keys between frames; write curved tangents as slopes (zero for a hold) or use Linear keys`;
     return undefined;
   }

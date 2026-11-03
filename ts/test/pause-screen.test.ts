@@ -9,13 +9,13 @@ import { panelActions } from "../src/host/loop/menus";
 import { shell } from "../src/host/loop/state";
 import { pauseMatchPresentation } from "../src/host/loop/view";
 import { declineTutorial, passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 import { GUIDE_ROWS, SELECT_BAR } from "../src/game/core/selectBarLayout";
 import { resetPlateBox, windowEdges } from "../src/game/ui/pauseScreen";
 import { f32 } from "wisp/src/sim/f32";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const HUMANS = [0, 1];
 const START_TUTORIAL = { x: f32(0.23), y: f32(0.315), width: f32(0.16), height: f32(0.035) };

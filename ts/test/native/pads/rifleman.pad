@@ -1,5 +1,5 @@
 # Rifleman's native checks by parity: #111 Summon Bear, #117 Blaster, #127 Recoil Shot.
-# Rifleman a against an idle Rifleman b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Rifleman a against an idle Rifleman b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero rifleman
 # #111: the bear toward b, cast frames 1-42; it reaches b.
 60 a stick 1 0

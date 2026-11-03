@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { join } from "node:path";
 import { installHeadless } from "wisp/scripts/wisp/headless";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 import { AttackStyle } from "../src/game/sim/codes";
 import type { MoveRegion } from "../src/game/sim/heroMoves";
@@ -43,7 +43,7 @@ test("a crossed row strikes the foe from the front, then from behind, in the hea
     const row = showcaseRows(character).find(({ move, facing }) => move.kind === "normal" && move.code === AttackStyle.downSmash && facing === "right");
     const fixture = showcaseFixtures(character).find(({ name }) => name === `${fighterSlug(character)}-${row?.row}`);
     expect(fixture).toBeDefined();
-    const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+    const runtime = installHeadless(MAKGORA_HEADLESS);
     try {
       const clients = runtime.clients(entry, [0]);
       const client = clients.client(0);

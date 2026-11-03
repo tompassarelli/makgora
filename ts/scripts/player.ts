@@ -32,7 +32,7 @@ globalThis.Worker = class extends SourceWorker {
 };
 
 const EXE = process.platform === "win32" ? ".exe" : "";
-for (const [variable, tool] of [["SMASHCRAFT_PACKAGER", "map-pack"], ["CASC_EXTRACTOR", "casc-extract"]] as const) {
+for (const [variable, tool] of [["MAKGORA_PACKAGER", "map-pack"], ["CASC_EXTRACTOR", "casc-extract"]] as const) {
   const beside = join(dirname(process.execPath), `${tool}${EXE}`);
   if (process.env[variable] === undefined && existsSync(beside)) process.env[variable] = beside;
 }

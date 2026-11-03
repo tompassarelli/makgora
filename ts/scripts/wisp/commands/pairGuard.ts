@@ -6,7 +6,7 @@ export interface ProcessRow {
   readonly args: readonly string[];
 }
 
-export const NATIVE_OUTER_PID = "SMASHCRAFT_NATIVE_OUTER_PID";
+export const NATIVE_OUTER_PID = "MAKGORA_NATIVE_OUTER_PID";
 
 const pairsOf = (args: readonly string[]): readonly string[] => args.flatMap((arg, index) =>
   arg === "--pair" ? [args[index + 1] ?? ""] : arg.startsWith("--pair=") ? [arg.slice("--pair=".length)] : []);

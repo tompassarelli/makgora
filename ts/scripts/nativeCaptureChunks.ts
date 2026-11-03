@@ -26,7 +26,7 @@ export const nativeCaptureChunks = <A, E, R>(args: readonly string[], build: (ar
   for (const pad of pads) {
     const fixture = yield* Effect.try({ try: () => fixtureOf(pad, readFileSync(pad, "utf8")), catch: cause => new CaptureChunkFailure({ problem: `read ${pad}: ${String(cause)}` }) });
     const map = join(out, `${fixture.name}.w3x`);
-    yield* build(["--out", map, "--name", `Smashcraft native capture ${fixture.name}`, pad]);
+    yield* build(["--out", map, "--name", `Makgora native capture ${fixture.name}`, pad]);
     const manifest = `${map.replace(/\.w3x$/, "")}.captures.json`;
     const mapSha256 = yield* Effect.try({ try: () => createHash("sha256").update(readFileSync(map)).digest("hex"), catch: cause => new CaptureChunkFailure({ problem: `hash ${map}: ${String(cause)}` }) });
     rows.push({ name: fixture.name, map, manifest, mapSha256, frames: fixture.frames });

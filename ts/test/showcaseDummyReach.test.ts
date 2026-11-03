@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { join } from "node:path";
 import { installHeadless } from "wisp/scripts/wisp/headless";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { fighterSlug } from "../src/game/roster/kits";
 import { AttackStyle, Character } from "../src/game/sim/codes";
 import { hurtCapsule } from "../src/game/sim/geometry/contactGeometry";
@@ -40,7 +40,7 @@ async function stagedReport(character: Character, staged: readonly ShowcaseRow[]
   for (const row of staged) {
     const fixture = fixtures.find(({ name }) => name === `${fighterSlug(character)}-${row.row}`);
     expect(fixture).toBeDefined();
-    const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+    const runtime = installHeadless(MAKGORA_HEADLESS);
     try {
       const clients = runtime.clients(entry, [0]);
       const client = clients.client(0);

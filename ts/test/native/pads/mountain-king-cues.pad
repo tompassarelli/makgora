@@ -1,4 +1,4 @@
-# Mountain King a against Mountain King b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Mountain King a against Mountain King b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero mountain king
 # b dashes in; a dashes in and attacks short of it, then runs back left and turns to face b.
 40 b stick -1 0

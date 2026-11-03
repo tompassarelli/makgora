@@ -5,7 +5,7 @@ import { mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const DATASET = "https://huggingface.co/datasets/erickfm/melee-ranked-replays/resolve/main";
-export const ROOT = process.env.SLIPPI_DATA ?? join(process.env.HOME!, ".local/share/smashcraft-slippi");
+export const ROOT = process.env.SLIPPI_DATA ?? join(process.env.HOME!, ".local/share/makgora-slippi");
 export const CHARS = ["FOX", "FALCO", "MARTH", "SHEIK", "JIGGLYPUFF", "CPTFALCON", "PEACH"];
 export const RANKS = ["master-master", "diamond-diamond", "platinum-platinum"];
 const PER_CHAR: Record<string, number> = {

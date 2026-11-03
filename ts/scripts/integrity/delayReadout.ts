@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import { type Distribution, distribution, integer, integrityHeader, integrityRows } from "./reconcile";
 
-// #396: the quantities are defined in smashcraft:docs/commands/integrity.md ("Delay readout").
+// #396: the quantities are defined in makgora:docs/commands/integrity.md ("Delay readout").
 
 export interface ClientPages {
   readonly client: string;

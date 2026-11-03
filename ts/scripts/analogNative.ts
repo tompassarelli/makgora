@@ -158,6 +158,6 @@ class AnalogFailure extends Schema.TaggedError<AnalogFailure, { readonly brand: 
 }
 const analogFailure = (cause: unknown) => new AnalogFailure({ problem: cause instanceof Error ? cause.message : String(cause) });
 if (import.meta.main) {
-  const program = Bun.argv.includes("--plan") ? analogNative : withQuietNativeCapacity("smashcraft-analogNative", analogNative);
+  const program = Bun.argv.includes("--plan") ? analogNative : withQuietNativeCapacity("makgora-analogNative", analogNative);
   BunRuntime.runMain(Effect.scoped(program).pipe(Effect.catchDefect(cause => Effect.fail(analogFailure(cause))), Effect.provide(Layer.merge(BunServices.layer, platformLayer()))));
 }

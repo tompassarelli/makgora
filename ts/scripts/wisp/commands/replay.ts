@@ -94,7 +94,7 @@ export const replay: Command = (args) => Effect.gen(function*() {
   if (typeof lines === "string") return yield* new ReplayFailure({ problem: lines });
   const header = parseReplayHeader(lines);
   if (typeof header === "string") return yield* new ReplayFailure({ problem: header });
-  const joined = out ?? join(tmpdir(), `smashcraft-replay-${process.pid}-${basename(file)}`);
+  const joined = out ?? join(tmpdir(), `makgora-replay-${process.pid}-${basename(file)}`);
   yield* Effect.try({
     try: () => {
       if (out !== undefined) mkdirSync(dirname(out), { recursive: true });

@@ -7,7 +7,7 @@ import { GameFiles, readGameFile } from "wisp/scripts/wisp/gameFiles";
 import { FrameCost, frameCostFile } from "./wisp/boundary";
 
 const [command, directory, runId] = process.argv.slice(2);
-if (directory === undefined) throw new Error("usage: bun smashcraft:ts/scripts/frameCost.ts read CUSTOM_MAP_DATA RUN_ID");
+if (directory === undefined) throw new Error("usage: bun makgora:ts/scripts/frameCost.ts read CUSTOM_MAP_DATA RUN_ID");
 if (runId === undefined || !/^[a-z0-9][a-z0-9-]*$/.test(runId)) throw new Error("supply a distinct lowercase diagnostic run ID");
 
 if (command === "read") {

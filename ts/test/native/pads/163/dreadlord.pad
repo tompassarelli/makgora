@@ -1,6 +1,6 @@
 # #163 Dreadlord: three jab presses play the jab chain, then a forward tilt
 # plays once. Dreadlord a against Dreadlord b, which runs in to about 60 away and
-# stands. Syntax and checks: smashcraft:docs/native-bot-session.md.
+# stands. Syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero dreadlord
 40 b stick -1 0
 56 b stick 0 0

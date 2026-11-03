@@ -12,7 +12,7 @@ export class CaptureQueueFailure extends Schema.TaggedError<CaptureQueueFailure,
   override get message(): string { return this.problem; }
 }
 
-export const queueRoot = (): string => process.env.SMASHCRAFT_CAPTURE_QUEUE ?? join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "smashcraft/capture-queue");
+export const queueRoot = (): string => process.env.MAKGORA_CAPTURE_QUEUE ?? join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "makgora/capture-queue");
 export const queueDirectory = (part: "pending" | "taken" | "results" | "batches" | "serve") => join(queueRoot(), part);
 
 export const Job = Schema.Struct({

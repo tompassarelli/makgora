@@ -1,11 +1,11 @@
-# smashcraft#82 box 2, the looks `-dev effects` can't show because it draws no fighter: Mountain
+# makgora#82 box 2, the looks `-dev effects` can't show because it draws no fighter: Mountain
 # King a against Mountain King b in a real match. a dashes and runs (footsteps), brakes (its walk
 # footstep), hits b's shield (shield spark, struck bubble), hits b (normal spark, damage tint,
 # hitlag shake), then grabs, pummels and throws b. Each event is held on its own frame and a
 # few frames later. The frames come from `bun scripts/nativeCapture.ts plan` on this file, which
 # checks every `#! cue` line; native captures only, as 82-effects.pad.
 # A steady walk makes no footstep: only run, brake and turn frames advance the footstep clock
-# (smashcraft:ts/src/game/sim/groundMovement.ts), so the walk footstep is the brake's.
+# (makgora:ts/src/game/sim/groundMovement.ts), so the walk footstep is the brake's.
 #! chat -dev quick hero mountain king
 #! cue 30-32 dash footstep: sound=DeepFootstep2 effect=ImpactDust-
 #! cue 38-40 run footstep: sound=DeepFootstep2 effect=ImpactDust-

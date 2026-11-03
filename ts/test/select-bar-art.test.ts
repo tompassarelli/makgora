@@ -3,10 +3,10 @@ import { install, startBuild } from "../src/platform/main";
 import { barArtNames } from "../src/game/core/selectBarLayout";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { declineTutorial, passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 const BAR_ART = "war3mapImported\\SelectBar";
 const REST = `${BAR_ART}Frame`;
 

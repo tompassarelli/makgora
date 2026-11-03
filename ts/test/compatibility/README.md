@@ -1,6 +1,6 @@
 # Effect and TSTL probe
 
-Run from smashcraft:ts/ with Bun installed:
+Run from makgora:ts/ with Bun installed:
 
 ```sh
 bun test/compatibility/probe-effect-tstl.ts

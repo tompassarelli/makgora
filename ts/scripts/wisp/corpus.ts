@@ -134,7 +134,7 @@ export function assembleReplays(recordings: readonly Recording[]): { readonly re
 
 
 export function joinedLines(replay: Replay): string[] | string {
-  const folder = join(tmpdir(), `smashcraft-corpus-${process.pid}-${replay.recording.id}-${replay.client}-${basename(replay.manifest, ".txt")}`);
+  const folder = join(tmpdir(), `makgora-corpus-${process.pid}-${replay.recording.id}-${replay.client}-${basename(replay.manifest, ".txt")}`);
   mkdirSync(folder, { recursive: true });
   try {
     cpSync(replay.manifest, join(folder, basename(replay.manifest)));
@@ -162,7 +162,7 @@ const passed = (result: MatchReplayResult | undefined) => result !== undefined &
 
 
 const replayHere = (recording: Recording, client: string, file: string, lines: readonly string[], version: string, frames: number) => Effect.gen(function*() {
-  const joined = join(tmpdir(), `smashcraft-corpus-${process.pid}-${recording.id}-${client}-${basename(file)}.joined`);
+  const joined = join(tmpdir(), `makgora-corpus-${process.pid}-${recording.id}-${client}-${basename(file)}.joined`);
   writeFileSync(joined, `${lines.join("\n")}\n`);
   const [bun, lua] = yield* Effect.all([
     Effect.try({ try: () => replayMatch(lines), catch: (cause) => new CorpusFailure({ problem: `${file}: the replay stopped in Bun: ${describeCause(cause)}` }) }),
@@ -189,7 +189,7 @@ const replayAll = (replays: readonly Replay[], here: string) => Effect.forEach(r
   return yield* replayHere(recording, client, manifest, lines, header.version, header.repro.frame);
 }), { concurrency: 1 });
 
-const cacheRoot = () => join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "smashcraft/corpus-sources");
+const cacheRoot = () => join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "makgora/corpus-sources");
 
 function environment(extra: Record<string, string>): Record<string, string> {
   const env: Record<string, string> = {};
@@ -245,16 +245,17 @@ const replayElsewhere = (skipped: readonly ReplayOutcome[], replays: readonly Re
     byCommit.set(commit, [...(byCommit.get(commit) ?? []), { outcome, replay }]);
   }
   for (const [commit, group] of byCommit) {
-    const result = join(tmpdir(), `smashcraft-corpus-${process.pid}-${commit}.json`);
+    const result = join(tmpdir(), `makgora-corpus-${process.pid}-${commit}.json`);
+    // External format: a recording's own commit reads the SMASHCRAFT_ names if it predates the makgora rename.
     const played = yield* sourceAt(commit).pipe(
-      Effect.flatMap((source) => run(`replay at ${commit.slice(0, 12)}`, source, [process.execPath, join(source, "scripts/wisp.ts"), "parity", "corpus", ...roots], { SMASHCRAFT_CORPUS_RESULT: result, SMASHCRAFT_CORPUS_HERE: "1" })),
+      Effect.flatMap((source) => run(`replay at ${commit.slice(0, 12)}`, source, [process.execPath, join(source, "scripts/wisp.ts"), "parity", "corpus", ...roots], { MAKGORA_CORPUS_RESULT: result, MAKGORA_CORPUS_HERE: "1", SMASHCRAFT_CORPUS_RESULT: result, SMASHCRAFT_CORPUS_HERE: "1" })),
       Effect.flatMap(() => Effect.try({ try: (): unknown => JSON.parse(readFileSync(result, "utf8")), catch: (cause) => new CorpusFailure({ problem: `reading ${result}: ${describeCause(cause)}` }) })),
       Effect.flatMap((parsed) => Schema.decodeUnknownEffect(ReplayOutcomes)(parsed).pipe(Effect.mapError((cause) => new CorpusFailure({ problem: `${result}: ${String(cause)}` })))),
       Effect.map((theirs) => group.map(({ outcome }) => theirs.find((other) => other.file === outcome.file)
         ?? { ...outcome, skipped: `at its commit ${commit.slice(0, 12)}: that source's replayer didn't find it` })),
       Effect.catch((failure: CorpusFailure) => Effect.succeed(group.map(({ outcome, replay }): ReplayOutcome => ({
         ...outcome,
-        skipped: `at its commit ${commit.slice(0, 12)}: ${/parity takes numeric or tapes/.test(failure.problem) ? "that commit predates `parity corpus` (smashcraft 88644ee8), so its replays have no frame digests" : failure.problem}${replay.recording.session.dirty === true ? " (its checkout had uncommitted changes)" : ""}`,
+        skipped: `at its commit ${commit.slice(0, 12)}: ${/parity takes numeric or tapes/.test(failure.problem) ? "that commit predates `parity corpus` (makgora 88644ee8), so its replays have no frame digests" : failure.problem}${replay.recording.session.dirty === true ? " (its checkout had uncommitted changes)" : ""}`,
       })))),
       Effect.ensuring(Effect.sync(() => rmSync(result, { force: true }))),
     );
@@ -310,8 +311,8 @@ export const corpus = (args: readonly string[]) => Effect.gen(function*() {
   const open = found.reduce((count, { open: some }) => count + some, 0);
   const here = sourceVersion(tsDirectory);
   const local = yield* replayAll(replays, here);
-  const resultFile = process.env.SMASHCRAFT_CORPUS_RESULT;
-  if (resultFile !== undefined && process.env.SMASHCRAFT_CORPUS_HERE === "1") {
+  const resultFile = process.env.MAKGORA_CORPUS_RESULT;
+  if (resultFile !== undefined && process.env.MAKGORA_CORPUS_HERE === "1") {
 
     writeFileSync(resultFile, JSON.stringify(local));
     return;

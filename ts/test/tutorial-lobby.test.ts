@@ -8,10 +8,10 @@ import { GUIDE_ROWS, SELECT_BAR } from "../src/game/core/selectBarLayout";
 import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
 import { passStartControls, tutorialPrompted } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { RIGHT_KEY, testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const HUMANS = [0, 1];
 const START_TUTORIAL = { x: f32(0.23), y: f32(0.315), width: f32(0.16), height: f32(0.035) };

@@ -1,7 +1,7 @@
 # #130 Lich's native check by parity: Death and Decay strikes twice and walking out avoids the second,
 # Frost Armor chills a jabber, Dark Ritual shatters a shell for 30 mana, Frost Nova stopped by a
 # shield, and the orb burst on the second press chills. Lich a against Lich b, a melee partner (b
-# never casts, so nothing of b's interrupts a's orb); syntax and checks: smashcraft:docs/native-bot-session.md.
+# never casts, so nothing of b's interrupts a's orb); syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero lich
 # b dashes in, inside Death and Decay's reach.
 40 b stick -1 0

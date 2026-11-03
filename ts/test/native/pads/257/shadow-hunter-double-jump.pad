@@ -1,4 +1,4 @@
-# #257: Shadow Hunter's double jump is a forward somersault in both facings; syntax and checks: smashcraft:docs/native-bot-session.md.
+# #257: Shadow Hunter's double jump is a forward somersault in both facings; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero shadow hunter
 # Both full-hop facing each other, then jump again in midair.
 40 a press Y

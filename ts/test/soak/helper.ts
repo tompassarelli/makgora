@@ -24,7 +24,7 @@ import { IntegrityFailure, tryIntegrity } from "../../scripts/integrity/evidence
 import { type Pad, openPad } from "../../scripts/integrity/linux";
 import { ABS_RZ, ABS_X, ABS_Y, ABS_Z, EV_ABS, EV_KEY, PAD_BUTTONS, type SourceEdge } from "../../scripts/integrity/linuxInput";
 import project from "../../scripts/wisp/soak";
-import { SMASHCRAFT_SCENE } from "../../scripts/wisp/playerView";
+import { MAKGORA_SCENE } from "../../scripts/wisp/playerView";
 import { PREDICTED_HEADLESS } from "../../scripts/wisp/headless";
 import { SOAK_ENTRY, beginMatch, matchView } from "./game";
 import { padScriptPreset } from "../../scripts/integrity/padScript";
@@ -106,7 +106,7 @@ const playMatch = (runtime: ReturnType<typeof installHeadless>, match: SoakMatch
       keepCalls: 64,
       cost: cpuMillis,
     });
-    const watching = new SoakMonitor(clients, { input: () => undefined, ...matchView(() => undefined) }, SOAK_LIMITS, SMASHCRAFT_SCENE, PREDICTED_HEADLESS.filePrefix);
+    const watching = new SoakMonitor(clients, { input: () => undefined, ...matchView(() => undefined) }, SOAK_LIMITS, MAKGORA_SCENE, PREDICTED_HEADLESS.filePrefix);
     let began = 0;
     const noQuiet: ReadonlySet<number> = new Set();
     const realtime = new RealtimeClients(clients, typed, undefined, () => watching.afterFrame(performance.now() - began, noQuiet));

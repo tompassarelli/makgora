@@ -4,7 +4,7 @@ use std::process::Command;
 use crate::process::{output, substituted};
 use crate::stop::{Outcome, Stop};
 
-const USAGE: &str = "Usage: smashcraft-tools wc3-auth-transport LAUNCHER_PID";
+const USAGE: &str = "Usage: makgora-tools wc3-auth-transport LAUNCHER_PID";
 const LAUNCHER: &str = "CrBrowserMain";
 const PRESENT: &str =
     "transport-source-present: authentication still requires explicit launcher evidence";

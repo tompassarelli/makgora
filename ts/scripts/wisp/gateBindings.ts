@@ -81,8 +81,8 @@ export const measureBindingsGate = (clientsFile: string, name: string, directory
   const contract = yield* Schema.decodeEffect(Contract)(contractText).pipe(Effect.mapError(fail("bindings gate contract")));
   const labels = Object.keys(contract.map_actions);
   if (labels.some(label => !samples.some(sample => sample[0] === label)) || samples.some(sample => contract.map_actions[sample[0]] === undefined)) return yield* new AcceptFailure({ operation: "bindings gate contract", problem: "native samples and shipped contract labels differ" });
-  const helper = Bun.env.SMASHCRAFT_BINDINGS_HELPER ?? SERVICE_LAUNCHER;
-  const remaps = Bun.env.SMASHCRAFT_BINDINGS_REMAPPINGS;
+  const helper = Bun.env.MAKGORA_BINDINGS_HELPER ?? SERVICE_LAUNCHER;
+  const remaps = Bun.env.MAKGORA_BINDINGS_REMAPPINGS;
   const helperSha256 = yield* Effect.try({ try: () => createHash("sha256").update(readFileSync(helper)).digest("hex"), catch: cause => new AcceptFailure({ operation: "bindings gate helper", problem: String(cause) }) });
   if (helperSha256 !== QUALIFIED_HELPER_SHA256) return yield* new AcceptFailure({ operation: "bindings gate helper", problem: `unqualified SHA256 ${helperSha256}` });
   yield* Effect.try({ try: () => mkdirSync(directory, { recursive: true, mode: 0o700 }), catch: cause => new AcceptFailure({ operation: "bindings gate evidence", problem: String(cause) }) });

@@ -89,7 +89,7 @@ const quietLease = (owner: string) => Effect.gen(function*() {
 
 const restartPair = (pair: string, directory: string) => restartDroppedPairInto(Number(pair), directory).pipe(Effect.mapError(cause => new NativeSmokeFailure({ problem: `restart pair ${pair}: ${cause.message}` })));
 
-const runShard = (shard: number, pair: string, map: string, directory: string) => Effect.scoped(restartPair(pair, directory).pipe(Effect.andThen(quietLease(`smashcraft-smoke-${smokeShardLabel(shard)}`)), Effect.andThen(Effect.acquireUseRelease(
+const runShard = (shard: number, pair: string, map: string, directory: string) => Effect.scoped(restartPair(pair, directory).pipe(Effect.andThen(quietLease(`makgora-smoke-${smokeShardLabel(shard)}`)), Effect.andThen(Effect.acquireUseRelease(
   Effect.try({
     try: () => {
       mkdirSync(directory, { recursive: true, mode: 0o700 });
@@ -101,7 +101,7 @@ const runShard = (shard: number, pair: string, map: string, directory: string) =
     Effect.timeoutOption(`${SHARD_RUN_SECONDS} seconds`),
     Effect.map(exited => outcome(shard, directory, exited._tag === "Some" ? exited.value : "timeout", Math.round((performance.now() - started) / 1000), since)),
   ),
-  ({ child }) => stopBunProcess(child).pipe(Effect.andThen(Effect.promise(() => Bun.spawn(["systemctl", "--user", "stop", `smashcraft-accept-${child.pid}.service`], { env: managerEnv(), stdout: "ignore", stderr: "ignore" }).exited))),
+  ({ child }) => stopBunProcess(child).pipe(Effect.andThen(Effect.promise(() => Bun.spawn(["systemctl", "--user", "stop", `makgora-accept-${child.pid}.service`], { env: managerEnv(), stdout: "ignore", stderr: "ignore" }).exited))),
 )))).pipe(
   Effect.catchTag("NativeSmokeFailure", ({ problem }) => Effect.succeed<ShardOutcome>({ shard, code: "error", problem, verdicts: [], rows: [], failures: undefined, seconds: 0 })),
 );

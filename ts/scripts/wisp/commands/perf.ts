@@ -28,17 +28,17 @@ const censusBuild = buildProject("census");
 const censusMap = { config: censusBuild.configPath, bundle: censusBuild.bundlePath };
 
 
-export const SMASHCRAFT_PERF: PerfProject = {
+export const MAKGORA_PERF: PerfProject = {
   map: { config: main.configPath, bundle: main.bundlePath },
   program: { config: bundleConfig("perf"), bundle: join(tsDirectory, "build/perf.lua") },
   defaultRun: "quick-match",
   runs: { bot: integrityMap, "bot-four": integrityMap, "playable-bot-four": playableMap, "playable-duel": playableMap, "playable-human-four": playableMap, "rollback-four": playableMap, "native-perf-four": { config: nativePerf.configPath, bundle: nativePerf.bundlePath }, ...Object.fromEntries(SELECTABLE_CHARACTERS.map((character) => [`bot-${fighterSlug(character)}`, integrityMap])) },
 };
 
-const measure = makePerf(SMASHCRAFT_PERF);
-const spikeCensus = census({ map: censusMap, program: SMASHCRAFT_PERF.program });
+const measure = makePerf(MAKGORA_PERF);
+const spikeCensus = census({ map: censusMap, program: MAKGORA_PERF.program });
 
-const runProfile = profile(SMASHCRAFT_PERF);
+const runProfile = profile(MAKGORA_PERF);
 const compare = comparePairRuns(measure);
 
 export const perf: typeof measure = (args) =>

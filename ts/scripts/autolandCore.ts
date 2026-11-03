@@ -285,7 +285,7 @@ export const flaggedLanes = (bodies: readonly string[], lanes: readonly Lane[]):
   return [...marked.values()].filter(({ branch, tip }) => lanes.some((lane) => lane.branch === branch && lane.tip === tip && lane.status?.state !== "success"));
 };
 
-const ISSUE_REF = /\b(?:refs|fixes|closes)[: ]+(?:(?:tompassarelli\/)?smashcraft)?#(\d+)/gi;
+const ISSUE_REF = /\b(?:refs|fixes|closes)[: ]+(?:(?:tompassarelli\/)?makgora)?#(\d+)/gi;
 export const issueRefs = (messages: string): readonly number[] => [...new Set([...messages.matchAll(ISSUE_REF)].map(([, number = ""]) => Number(number)))].toSorted((a, b) => a - b);
 
 export interface RunSummary { readonly head_branch: string | null; readonly title: string; readonly status: string }

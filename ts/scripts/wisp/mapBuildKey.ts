@@ -15,7 +15,7 @@ const git = (cwd: string, args: readonly string[], env: Record<string, string> =
 
 /** The tree of the checkout as it is on disk (tracked and untracked files, ignored ones left out), the same whether or not it is committed; it holds ts/wisp.lock, the build-input pins and the sources. */
 const workingTree = (cwd: string) => Effect.acquireUseRelease(
-  Effect.try({ try: () => mkdtempSync(join(tmpdir(), "smashcraft-key-")), catch: (cause) => new MapBuildFailure({ operation: "make the key's scratch index", path: tmpdir(), cause }) }),
+  Effect.try({ try: () => mkdtempSync(join(tmpdir(), "makgora-key-")), catch: (cause) => new MapBuildFailure({ operation: "make the key's scratch index", path: tmpdir(), cause }) }),
   (scratch) => Effect.gen(function*() {
     const index = join(scratch, "index");
     // An index dated 1970 makes git treat every entry as racily clean and hash its file, so a same-size edit within one timestamp tick is still seen.

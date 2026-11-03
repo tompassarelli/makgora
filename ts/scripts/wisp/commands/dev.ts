@@ -7,7 +7,7 @@ import { type DevProject, makeDev } from "wisp/scripts/wisp/commands/dev";
 import { ISOLATED_TEST_GROUPS, TEST_TIMEOUT_MS, TEST_WORKER_ENV, testWorkerEnvironment } from "../../testWorkers";
 import { buildProject, sourceMapDirectory, tsDirectory } from "../project";
 
-export const SMASHCRAFT_DEV: DevProject = {
+export const MAKGORA_DEV: DevProject = {
   root: tsDirectory,
   sources: ["src", "scripts", "test"],
   typeCheck: { projects: ["tsconfig.json", "tsconfig.game.json"], command: [process.execPath, "run", "check"] },
@@ -45,8 +45,8 @@ export const SMASHCRAFT_DEV: DevProject = {
     env: TEST_WORKER_ENV,
     envForFiles: testWorkerEnvironment,
   },
-  journey: { module: "scripts/wisp/journeys.ts", export: "SMASHCRAFT_JOURNEYS", name: "quick-match" },
+  journey: { module: "scripts/wisp/journeys.ts", export: "MAKGORA_JOURNEYS", name: "quick-match" },
   hot: { project: buildProject("main"), sourceDirectory: join(tsDirectory, "src"), sourceMapDirectory, filePrefix: "smashcraft" },
 };
 
-export const dev = makeDev(SMASHCRAFT_DEV);
+export const dev = makeDev(MAKGORA_DEV);

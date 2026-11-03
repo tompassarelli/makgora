@@ -3,7 +3,7 @@ import type { IntentionalNoops } from "wisp/src/headless/client";
 declare const SetCameraPosition: (x: number, y: number) => void;
 
 
-export const SMASHCRAFT_NOOPS: IntentionalNoops = {
+export const MAKGORA_NOOPS: IntentionalNoops = {
   SetGameSpeed: "headless frames advance one per simulated callback; there is no game clock to slow",
   SetMapFlag: "the only flag the map sets locks the game speed, which headless clients do not model",
   GetPlayableMapRect: "stage initialization only uses this rectangle to obtain the declared zero-centered map origin",
@@ -82,7 +82,7 @@ function questEntry(client: unknown, entry: unknown): QuestEntry | undefined {
   return found;
 }
 
-export const smashcraftNativeBehavior = (client?: unknown) => ({
+export const makgoraNativeBehavior = (client?: unknown) => ({
   QuestSetTitle: (entry: unknown, title: string) => { const found = questEntry(client, entry); if (found !== undefined) found.title = title; },
   QuestSetDescription: (entry: unknown, description: string) => { const found = questEntry(client, entry); if (found !== undefined) found.description = description; },
   PanCameraToTimed: (x: number, y: number) => SetCameraPosition(x, y),

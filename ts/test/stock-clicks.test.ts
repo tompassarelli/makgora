@@ -5,10 +5,10 @@ import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { STOCK_CLICK_BLOCKERS } from "../src/game/ui/stockClicks";
 import { controlsGreeted } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 const STOCK = "StockConsoleBar";
 
 function seedStockConsole(): void {

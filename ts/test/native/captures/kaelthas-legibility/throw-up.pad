@@ -1,4 +1,4 @@
-# smashcraft#495: Kael'thas walks up, catches the Mountain King with Siphon Mana and throws him up.
+# makgora#495: Kael'thas walks up, catches the Mountain King with Siphon Mana and throws him up.
 # The throw releases on 445 and he is actionable on 458, 13 frames later; the frames run from the
 # release past his end lag, which should read as a clear return to stance.
 #! chat -dev quick pair kael'thas sunstrider / mountain king

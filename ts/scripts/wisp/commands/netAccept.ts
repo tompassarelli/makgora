@@ -6,7 +6,7 @@ import { admit } from "../../heavyCapacity";
 import { usableCpus } from "../../usableCpus";
 import { NetAcceptFailure, acceptanceSummary, runAcceptance, runFourFighters } from "../netAcceptance";
 
-/** `net-accept`: wisp#112's online acceptance, full matches between two processes through Wisp's delay and loss proxy, direct or through a relay on this machine (smashcraft#808). */
+/** `net-accept`: wisp#112's online acceptance, full matches between two processes through Wisp's delay and loss proxy, direct or through a relay on this machine (makgora#808). */
 export const netAccept: Command = (args) => Effect.gen(function*() {
   const value = (name: string, fallback: number) => Number(flagValues(args, name)[0] ?? fallback);
   const out = flagValues(args, "out")[0];
@@ -26,7 +26,7 @@ export const netAccept: Command = (args) => Effect.gen(function*() {
     return;
   }
   const rounds = Math.ceil(options.matches / options.jobs);
-  const leased = yield* admit(options.jobs <= 1 ? "moderate" : "heavy", "smashcraft:net-accept", Math.min(3600, rounds * Math.ceil(options.frames / 30 + 60)));
+  const leased = yield* admit(options.jobs <= 1 ? "moderate" : "heavy", "makgora:net-accept", Math.min(3600, rounds * Math.ceil(options.frames / 30 + 60)));
   if (leased !== undefined) return leased === 0 ? undefined : yield* new NetAcceptFailure({ problem: `net-accept exited ${leased} in its capacity lease` });
   const jobs = Math.min(options.jobs, Math.max(1, Math.floor(usableCpus() / 2)));
   if (jobs < options.jobs) yield* Console.log(`net-accept: --jobs ${options.jobs} capped to ${jobs}, one match per two CPUs of ${usableCpus()}`);

@@ -54,14 +54,14 @@ const say = (line: string) => Console.log(line);
 
 export function playerProblem(failure: MenuFailure): string {
   const { operation, problem } = failure;
-  if (operation === "find the menus") return "Warcraft III isn't open, or its menus aren't set up for Smashcraft. Open Warcraft III, sign in and try again; after setting up, restart Warcraft III once.";
+  if (operation === "find the menus") return "Warcraft III isn't open, or its menus aren't set up for Mak'gora. Open Warcraft III, sign in and try again; after setting up, restart Warcraft III once.";
   if (operation.startsWith("host ") || operation === "find the map" || operation === "list maps") return "Warcraft III didn't create the game. Go to Warcraft III's main menu and try again.";
   if (operation.startsWith("join ")) return "Couldn't join that game. Check the code with your opponent; their game may have closed.";
   if (operation === "wait for the opponent") return problem === "the lobby closed" ? "The game closed before your opponent joined." : "Your opponent didn't join in time.";
   if (operation === "wait for the host to start") return problem === "the lobby closed" ? "The host closed the game." : "The host didn't start the match in time.";
   if (operation === "start the game") return "The match didn't start. Your opponent may still be getting the map; press Start again.";
   if (operation === "reach fighter selection") return "The match didn't reach fighter selection.";
-  if (operation === "set Allow Local Files" || operation === "install the menu page") return "Smashcraft couldn't set up Warcraft III's menus.";
+  if (operation === "set Allow Local Files" || operation === "install the menu page") return "Mak'gora couldn't set up Warcraft III's menus.";
   return "Something went wrong; the client's log has the details.";
 }
 
@@ -99,7 +99,7 @@ export const online: Command = ([action, ...args]) => Effect.gen(function*() {
     case "setup": {
       const result = yield* explained(setUpMenuPage(install.prefix, install.menuReportPort));
       if (result === "ready") {
-        yield* say("Warcraft III's menus are set up for Smashcraft. Restart Warcraft III if it is open.");
+        yield* say("Warcraft III's menus are set up for Mak'gora. Restart Warcraft III if it is open.");
         return;
       }
       yield* say("Almost done: close Warcraft III and Battle.net, then press Set up again.");
@@ -108,7 +108,7 @@ export const online: Command = ([action, ...args]) => Effect.gen(function*() {
     case "host": {
       const map = newestPlayable(install.documents);
       if (map === undefined) {
-        yield* say("Smashcraft isn't in Warcraft III's maps yet. Press Play once to add it.");
+        yield* say("Mak'gora isn't in Warcraft III's maps yet. Press Play once to add it.");
         return yield* new UsageFailure({ problem: `no Smashcraft X.Y.Z.w3x in ${install.documents}/Maps/00-Smashcraft` });
       }
       yield* explained(Effect.scoped(Effect.gen(function*() {

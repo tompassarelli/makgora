@@ -119,6 +119,6 @@ const run = (args: readonly string[]) => Effect.gen(function*() {
 
 if (import.meta.main) {
   const args = Bun.argv.slice(2);
-  const program = args.includes("--observe") ? run(args) : withQuietNativeCapacity("smashcraft-nativeKeyboardPad", run(args));
+  const program = args.includes("--observe") ? run(args) : withQuietNativeCapacity("makgora-nativeKeyboardPad", run(args));
   BunRuntime.runMain(Effect.scoped(program).pipe(Effect.provide(platformLayer())));
 }

@@ -5,7 +5,7 @@ on:
   push:
     branches-ignore: ["farm/**"]
     paths:
-      - "tools/smashcraft-tools/**"
+      - "tools/makgora-tools/**"
       - "tools/wc3-procedures/**"
       - ".github/workflows/tools.yml"
 
@@ -25,13 +25,13 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
-        working-directory: tools/smashcraft-tools
+        working-directory: tools/makgora-tools
     steps:
       - uses: actions/checkout@v5
       - name: Pinned Rust toolchain
         run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: tools/smashcraft-tools
+          workspaces: tools/makgora-tools
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --locked

@@ -7,7 +7,7 @@ export const CONTROL_SECONDS: readonly number[] = [1.5, 2, 2.5, 3];
 
 const percent = (share: number): string => `${(100 * share).toFixed(0)}%`;
 
-/** Markdown for the strings' per-link escape and flags under `rule` (smashcraft#63's by default), how many strings it flags, then the (E, T) table of how many strings each pair flags. */
+/** Markdown for the strings' per-link escape and flags under `rule` (makgora#63's by default), how many strings it flags, then the (E, T) table of how many strings each pair flags. */
 export function renderAgencyTable(strings: readonly AgencyString[], label: (string: AgencyString) => string = () => "", rule: AgencyRule = DEFAULT_RULE): string {
   const named = `E ${percent(rule.escapeFloor)}, T ${rule.controlFrames / TICKS_PER_SECOND} s`;
   const lines = [`| String | Moves | Escape per follow-up | Conversion | Flags (${named}) |`, "| --- | --- | --- | --- | --- |"];
@@ -29,7 +29,7 @@ export function renderAgencyTable(strings: readonly AgencyString[], label: (stri
     lines.push(`| ${percent(floor)} | ${row.map((cell) => `${cell.strings} (${cell.byKind["true-chain"]}/${cell.byKind["low-agency-link"]}/${cell.byKind["long-no-control"]}/${cell.byKind.loop})`).join(" | ")} |`);
   }
   const frames = strings.flatMap((string) => string.links.filter((link) => !link.within).map((link) => link.nextFrame - link.frame));
-  lines.push("", `${strings.reduce((sum, string) => sum + string.links.length, 0)} links, ${frames.length} between moves; true-chain and loop do not depend on E or T; smashcraft#63's rule is E ${percent(DEFAULT_RULE.escapeFloor)}, T ${DEFAULT_RULE.controlFrames / TICKS_PER_SECOND} s.`);
+  lines.push("", `${strings.reduce((sum, string) => sum + string.links.length, 0)} links, ${frames.length} between moves; true-chain and loop do not depend on E or T; makgora#63's rule is E ${percent(DEFAULT_RULE.escapeFloor)}, T ${DEFAULT_RULE.controlFrames / TICKS_PER_SECOND} s.`);
   return lines.join("\n");
 }
 

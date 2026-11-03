@@ -1,5 +1,5 @@
 # Warden's native checks by parity: #126 the mark and Shadow Pursuit.
-# Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Warden a against Warden b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero warden
 # b dashes in to about 280 away, within Shadow Pursuit's reach; eda5e178f2 made Maiev grippier, so b holds the dash 3 frames (variant run 39025469042).
 40 b stick -1 0

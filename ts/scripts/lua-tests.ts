@@ -43,7 +43,7 @@ if (!Number.isInteger(partition) || !Number.isInteger(partitions) || partition <
 }
 const only = process.env.LUA_TESTS_STEP;
 const savedCosts = process.env.LUA_TEST_COST_DIR;
-const costDirectory = savedCosts ?? mkdtempSync(join(tmpdir(), "smashcraft-lua-cost-"));
+const costDirectory = savedCosts ?? mkdtempSync(join(tmpdir(), "makgora-lua-cost-"));
 const costFile = (shard: number) => join(costDirectory, `${shard}.tsv`);
 const runSharded = (bundle: string) => Effect.forEach(Array.from({ length: jobs }, (_, shard) => shard), (shard) =>
   processCode(lua, [bundle], { ...process.env, ...(jobs * partitions === 1 ? {} : { LUA_SHARD: `${partition * jobs + shard}/${jobs * partitions}` }), LUA_TEST_COST: costFile(shard) }),
@@ -91,7 +91,7 @@ if (modules.length === 0 && only !== "stack") throw new Error("No Lua test modul
 
 const loaded = modules;
 refuseUntagged(".", loaded);
-await runAdmitted("moderate", "smashcraft:lua-tests", 1800);
+await runAdmitted("moderate", "makgora:lua-tests", 1800);
 const lua = await Effect.runPromise(stockLua);
 await Bun.write("test/lua/index.ts", luaTestIndex(loaded));
 const steps = only === "compile" ? [compile("tsconfig.lua-tests.json")]

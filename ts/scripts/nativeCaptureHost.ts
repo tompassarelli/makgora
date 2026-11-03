@@ -8,7 +8,7 @@ import { runProcess } from "./hostProcess";
 
 export const NATIVE_CAPTURE_HOST = "gex45";
 
-const REMOTE_RUNS = "$HOME/.local/state/smashcraft/remote-runs";
+const REMOTE_RUNS = "$HOME/.local/state/makgora/remote-runs";
 
 export class NativeCaptureHostFailure extends Schema.TaggedError<NativeCaptureHostFailure, { readonly brand: unique symbol }>()("NativeCaptureHostFailure", { problem: Schema.String }) {
   override get message(): string {

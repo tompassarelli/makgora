@@ -20,7 +20,7 @@ import { type Edition, playableBuildArgs } from "./greenBuilds";
 import { MAP_FOLDER } from "./mapLibrary";
 import { projectRoot } from "./project";
 
-const inputsRoot = join(homedir(), ".local/share/smashcraft-build-inputs");
+const inputsRoot = join(homedir(), ".local/share/makgora-build-inputs");
 const builds = join(inputsRoot, "play-current");
 const locks = join(inputsRoot, "locks");
 const playProblem = (cause: unknown) => new PlayProblem({ problem: String(cause) });

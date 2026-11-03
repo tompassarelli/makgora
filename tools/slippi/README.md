@@ -6,7 +6,7 @@ results in docs/design/human-input-consistency.md.
 
 Source: [erickfm/melee-ranked-replays](https://huggingface.co/datasets/erickfm/melee-ranked-replays)
 (MIT, anonymized Slippi ranked games, no account needed). Replays stay outside
-the repository, under `~/.local/share/smashcraft-slippi/` (`SLIPPI_DATA`
+the repository, under `~/.local/share/makgora-slippi/` (`SLIPPI_DATA`
 overrides it).
 
 ```sh

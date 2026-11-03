@@ -12,7 +12,7 @@ import { type Profile, profiles } from "./profiles";
 import { projectRoot, tsDirectory } from "./projectRoot";
 
 export { projectRoot, tsDirectory };
-export const clientState = join(homedir(), ".local/state/smashcraft/clients.json");
+export const clientState = join(homedir(), ".local/state/makgora/clients.json");
 export const PLAYTEST_PREFIX = join(homedir(), ".local/share/Steam/steamapps/compatdata/3516115571/pfx");
 export const sourceMapDirectory = join(tsDirectory, "build/source-maps");
 
@@ -29,7 +29,7 @@ export const buildProject = (profile: Profile = "main"): BuildProject => ({
   packager: join(projectRoot, "build/tools/map-pack"),
   toolchainLockPath: join(projectRoot, "typescript-toolchain.lock"),
   packageDirectory: tsDirectory,
-  entryGlobal: "smashcraftTs",
+  entryGlobal: "makgoraTs",
 });
 
 

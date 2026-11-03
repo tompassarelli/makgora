@@ -12,7 +12,7 @@ import { resolveRenderAsset, type Graphics, type ResolvedRenderAsset } from "wis
 import { discoverInstall, ReforgedRequired } from "wisp/scripts/wisp/reforgedInstall";
 
 export const key = (path: string) => path.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx");
-const PRIVATE = join(homedir(), ".local/share/smashcraft-render-assets");
+const PRIVATE = join(homedir(), ".local/share/makgora-render-assets");
 const NOT_IN_STORAGE = "open asset failed: 2";
 const ABSENT_SUFFIX = ".absent";
 const EXTRACT_TIMEOUT = "60 seconds";
@@ -159,7 +159,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
     const cached = yield* read(cache);
     if (cached !== undefined) return cached;
     const extractor = findExtractor(options);
-    if (extractor === null || extractor === undefined) return yield* new RenderAssetFailure({ problem: `stock asset ${path} needs CASC_EXTRACTOR (smashcraft-tools extract-animation-assets builds it)` });
+    if (extractor === null || extractor === undefined) return yield* new RenderAssetFailure({ problem: `stock asset ${path} needs CASC_EXTRACTOR (makgora-tools extract-animation-assets builds it)` });
     mkdirSync(dirname(cache), { recursive: true });
     if (yield* succeeds(extractor, [storage, `war3.w3mod:${normalized}`, cache])) return yield* read(cache);
     if (/\.(flac|wav|ogg|mp3)$/.test(normalized)) {

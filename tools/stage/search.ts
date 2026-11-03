@@ -8,7 +8,7 @@ const DEFAULT_SPEC: SearchSpec = { fogEnd: [5500, 6000, 7000, 9000], tintScale: 
 
 const args = Bun.argv.slice(2);
 const outAt = args.indexOf("--out");
-const out = outAt >= 0 ? args[outAt + 1] ?? "" : `${process.env.XDG_STATE_HOME ?? `${process.env.HOME}/.local/state`}/smashcraft/stage-search`;
+const out = outAt >= 0 ? args[outAt + 1] ?? "" : `${process.env.XDG_STATE_HOME ?? `${process.env.HOME}/.local/state`}/makgora/stage-search`;
 const positional = args.filter((_, index) => outAt < 0 || (index !== outAt && index !== outAt + 1));
 const stageId = Number(positional[0]);
 if (!Number.isInteger(stageId) || out === "") throw new Error(USAGE);
@@ -19,7 +19,7 @@ const t0 = clock();
 const { Effect } = await import("../../ts/node_modules/effect/dist/index.js");
 const { installHeadless } = await import("../../ts/node_modules/wisp/host/headless/headless");
 const { captureScene, renderScenes } = await import("../../ts/node_modules/wisp/host/render/headlessRender");
-const { SMASHCRAFT_HEADLESS } = await import("../../ts/scripts/wisp/headless");
+const { MAKGORA_HEADLESS } = await import("../../ts/scripts/wisp/headless");
 const { headlessRender } = await import("../../ts/scripts/wisp/headlessRender");
 const { start, install } = await import("../../ts/src/host/entries/devMain");
 const { stageScenery } = await import("../../ts/src/game/presentation/stageScenery");
@@ -27,7 +27,7 @@ const { STAGE_LIGHTS } = await import("../../ts/src/game/assets/stageLighting");
 const { STAGE_DECK_PALETTES } = await import("../../ts/src/game/assets/stagePalette");
 const { STAGE_CATALOG } = await import("../../ts/src/game/menu/stageCatalog");
 
-const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+const runtime = installHeadless(MAKGORA_HEADLESS);
 const clients = runtime.clients({ start, install });
 clients.start(); clients.frames(20); clients.chat(0, "-dev items off"); clients.frames(10); clients.chat(0, `-dev quick stage ${stageId}`); clients.frames(15);
 for (const client of clients.clients) clients.chat(client.slot, "-dev view near");

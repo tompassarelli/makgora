@@ -11,7 +11,7 @@ Each run smokes every move of the candidate natively on the pool pair named by
 `Environment=SMOKE_PAIR=K`); without it the install refuses. A smoke crash, a
 dead binding or a move that fails to start always keeps the last installed
 build; every other native gate failure blocks only with
-`SMASHCRAFT_GREEN_GATE=enforce` and otherwise installs as
+`MAKGORA_GREEN_GATE=enforce` and otherwise installs as
 `installed-unverified`. The 13 shards take about an hour, so the unit allows
 150 minutes.
 

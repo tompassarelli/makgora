@@ -23,7 +23,7 @@ const extract = option('--extract');
 if (extract === undefined) throw new Error('usage: bun tools/presentation/stock-sounds.ts --extract CASC_EXTRACT [--storage WARCRAFT_DIR]');
 const storage = option('--storage') ?? `${process.env.HOME}/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/Program Files (x86)/Warcraft III`;
 const project = resolve(import.meta.dir, '../..');
-const scratch = mkdtempSync(join(tmpdir(), 'smashcraft-sounds.'));
+const scratch = mkdtempSync(join(tmpdir(), 'makgora-sounds.'));
 
 
 function storedNames(path: string): string[] {

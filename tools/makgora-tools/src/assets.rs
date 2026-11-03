@@ -247,7 +247,7 @@ fn no_arguments(tool: &str, arguments: &[String]) -> Outcome {
     if arguments.is_empty() {
         Ok(())
     } else {
-        Err(Stop::err(2, format!("Usage: smashcraft-tools {tool}")))
+        Err(Stop::err(2, format!("Usage: makgora-tools {tool}")))
     }
 }
 
@@ -307,7 +307,7 @@ pub fn build_lichking_cli(arguments: &[String]) -> Outcome {
     let inputs = given(0).map_or_else(
         || {
             PathBuf::from(env::var_os("HOME").unwrap_or_default())
-                .join(".local/share/smashcraft-build-inputs/lich-king-20261007")
+                .join(".local/share/makgora-build-inputs/lich-king-20261007")
         },
         PathBuf::from,
     );

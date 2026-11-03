@@ -10,7 +10,7 @@ test("a released map's script names the commit its description was stamped with 
 });
 
 test("--player-assets-only refuses a map built from another commit than the checkout, naming both [k2 property]", () => {
-  expect(commitMismatch("676.w3x", MAP, CHECKOUT)).toBe("676.w3x was built from Smashcraft 5fe9a1b32f and this checkout is at dedc036192; play a map built from dedc036192, or check out 5fe9a1b32f");
+  expect(commitMismatch("676.w3x", MAP, CHECKOUT)).toBe("676.w3x was built from Mak'gora 5fe9a1b32f and this checkout is at dedc036192; play a map built from dedc036192, or check out 5fe9a1b32f");
   expect(commitMismatch("676.w3x", MAP, MAP)).toBeUndefined();
   expect(commitMismatch("local.w3x", undefined, CHECKOUT)).toBeUndefined();
   expect(commitMismatch("676.w3x", MAP, undefined)).toBeUndefined();

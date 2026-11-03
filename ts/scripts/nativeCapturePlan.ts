@@ -19,7 +19,7 @@ import { fighterAt } from "../src/game/sim/roster";
 import { damageTint, hitlagShake } from "../src/game/presentation/hitPresentation";
 import { teeterSide } from "../src/game/presentation/teeterLean";
 import { type MatchState, stageClock } from "../src/game/lobby/lobbyState";
-import { SMASHCRAFT_HEADLESS } from "./wisp/headless";
+import { MAKGORA_HEADLESS } from "./wisp/headless";
 import { type CaptureFixture, SHOWCASE_HOLD_TICKS, showcaseFixtures } from "../src/platform/captureFixtures";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 
@@ -79,7 +79,7 @@ interface Held {
 
 
 function play({ shell, nativeDriverCommand, entry }: Platform, fixture: CaptureFixture) {
-  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  const runtime = installHeadless(MAKGORA_HEADLESS);
   try {
     const clients = runtime.clients(entry, [0]);
     const client = clients.client(0);

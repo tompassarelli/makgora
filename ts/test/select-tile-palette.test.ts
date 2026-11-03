@@ -8,10 +8,10 @@ import { RULE_BUTTONS, teamSettingsBox } from "../src/game/ui/ruleButtons";
 import { RANDOM_FIGHTER_TEXTURE, characterOfTile } from "../src/game/ui/selectionFrames";
 import { shell } from "../src/host/loop/state";
 import { passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const HUMANS = [0, 1, 2, 3];
 const centre = (box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number }) => [f32(box.x + f32(box.width / 2)), f32(box.y - f32(box.height / 2))] as const;

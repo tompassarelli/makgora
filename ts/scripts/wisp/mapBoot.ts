@@ -81,7 +81,7 @@ const runBoot = (bundle: string) => Effect.forEach(BOOT_SLOTS, (slot) => runSlot
 
 export const bootCheck = (map: string | undefined) => Effect.scoped(Effect.gen(function*() {
   const scratch = yield* Effect.acquireRelease(
-    Effect.sync(() => mkdtempSync(join(tmpdir(), "smashcraft-boot."))),
+    Effect.sync(() => mkdtempSync(join(tmpdir(), "makgora-boot."))),
     (directory) => Effect.sync(() => rmSync(directory, { recursive: true, force: true })),
   );
   const bundle = map === undefined

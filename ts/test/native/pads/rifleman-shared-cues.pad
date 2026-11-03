@@ -1,5 +1,5 @@
 # #144 special cues: every Rifleman special form shows its Warcraft spell.
-# Rifleman a against an idle Rifleman b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Rifleman a against an idle Rifleman b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero rifleman
 # Four ground blaster shots.
 60 a tap X 2

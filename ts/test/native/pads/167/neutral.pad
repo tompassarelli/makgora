@@ -1,7 +1,7 @@
 # #167 Lich King Death Grip, his neutral special since Tom moved it there on 1 Nov: the coil catches b, pulls it
 # to just in front of him and stuns it 18 frames from arrival; b's buffered jab comes out on the first free frame.
 # Captured in flight, mid-pull and in the stun. Lich King a against Lich King b. Syntax and checks:
-# smashcraft:docs/native-bot-session.md.
+# makgora:docs/native-bot-session.md.
 #! chat -dev quick hero lich king
 # Input starts after frame 500: on a loaded host the helpers first see a quick match up to ~400 frames in.
 540 b stick -1 0

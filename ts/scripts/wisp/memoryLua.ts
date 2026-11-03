@@ -11,7 +11,7 @@ import { passStartControls } from "./startControls";
 import { parseNativeDeclarations } from "wisp/src/headless/declarations";
 import { type HeadlessClient } from "wisp/src/headless/client";
 import { luaLockstep, readFile } from "wisp/src/headless/lua";
-import { SMASHCRAFT_NOOPS, smashcraftNativeBehavior } from "./headlessNatives";
+import { MAKGORA_NOOPS, makgoraNativeBehavior } from "./headlessNatives";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { Phase } from "../../src/game/lobby/lobbyState";
@@ -35,7 +35,7 @@ const nativeSequence = matchesText === "native";
 const releaseMatches = matchesText === undefined || nativeSequence ? undefined : Number(matchesText);
 const declarationsText = readFile(declarationsPath);
 const { functions } = parseNativeDeclarations(declarationsText);
-const clients = luaLockstep({ filePrefix: "smashcraft", localNatives: PREDICTED_LOCAL_NATIVES, intentionalNoops: SMASHCRAFT_NOOPS, natives: smashcraftNativeBehavior }, readFile(bundlePath), declarationsText, undefined, syncDelivery(MEASURED_BATTLE_NET, 7));
+const clients = luaLockstep({ filePrefix: "smashcraft", localNatives: PREDICTED_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: makgoraNativeBehavior }, readFile(bundlePath), declarationsText, undefined, syncDelivery(MEASURED_BATTLE_NET, 7));
 const host = clients.client(0);
 const censuses = clients.clients.map((client) => new HandleCensus(client, functions));
 

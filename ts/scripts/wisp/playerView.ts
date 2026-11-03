@@ -106,7 +106,7 @@ const ARENA_CAMERAS: readonly CameraView[] = STAGE_CATALOG.flatMap(({ id }) => s
 
 
 
-export const SMASHCRAFT_SCENE: SceneExpectations & { readonly settledFrame: number } = {
+export const MAKGORA_SCENE: SceneExpectations & { readonly settledFrame: number } = {
   framesPerSecond: FRAMES_PER_SECOND,
   stage: { kind: "stage deck", pieces: 1 },
 
@@ -200,7 +200,7 @@ for (const sky of STAGE_SKIES) {
 export const isArenaSkyColor = (red: number, green: number, blue: number): boolean =>
   SKY_COLORS.has(skyColorKey(red, green, blue)) || (red <= 16 && green >= 20 && blue >= 8 && green >= blue);
 
-export const SMASHCRAFT_FRAME: readonly FrameFeature[] = [
+export const MAKGORA_FRAME: readonly FrameFeature[] = [
   {
     name: "arena sky",
     absent: "no match on screen: the frame shows no sky",
@@ -221,11 +221,11 @@ export const SMASHCRAFT_FRAME: readonly FrameFeature[] = [
 ];
 
 
-export const smashcraftPlayerView = ({ frame, scene }: { readonly frame: boolean; readonly scene: boolean }): PlayerViewExpectations => ({
+export const makgoraPlayerView = ({ frame, scene }: { readonly frame: boolean; readonly scene: boolean }): PlayerViewExpectations => ({
   filePrefix: "smashcraft",
-  ...(frame ? { frame: SMASHCRAFT_FRAME } : {}),
-  ...(scene ? { scene: SMASHCRAFT_SCENE } : {}),
+  ...(frame ? { frame: MAKGORA_FRAME } : {}),
+  ...(scene ? { scene: MAKGORA_SCENE } : {}),
 });
 
 
-export const freshFrames = join(homedir(), ".local/state/smashcraft/frames");
+export const freshFrames = join(homedir(), ".local/state/makgora/frames");

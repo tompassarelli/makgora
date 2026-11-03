@@ -5,7 +5,7 @@ const RESULT = "^result frames=\\d+ winner=P2 timed-out=0 interrupted=0$";
 const slug = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
 
 export const loserPoseChecks = (pass: readonly Rule[]): readonly NativeCheck[] => LOSERS.map((loser): NativeCheck => ({
-  id: `372-loser-${slug(loser)}`, closes: "smashcraft#372", map: "presentation", session: `372-loser-${slug(loser)}`,
+  id: `372-loser-${slug(loser)}`, closes: "makgora#372", map: "presentation", session: `372-loser-${slug(loser)}`,
   setup: [
     { chat: "-dev reset" }, { chat: "-dev slots 1 2" }, { chat: "-dev fighter 2 Blademaster" },
     { chat: "-dev auto-rematch off" }, { chat: "-dev time 10" }, { chat: `-dev quick pair ${loser} / Blademaster` },

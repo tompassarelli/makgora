@@ -1,7 +1,7 @@
 # #133 Shadow Hunter's native check by parity: Hex refuses b's attacks, grabs and specials while b
 # mashes, which shortens it but never below its floor; immunity and a shield stop the next Hex; a hexed
 # b still jumps and uses up special; a fifth Hex casts with no mana to spend; Spirit Glaive hits b
-# after its dodge ends. Shadow Hunter a against Shadow Hunter b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# after its dodge ends. Shadow Hunter a against Shadow Hunter b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero shadow hunter
 # Both dash in, close.
 40 a stick 1 0

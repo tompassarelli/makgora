@@ -88,7 +88,7 @@ export const setUpMenuPage = (prefix: string, reportPort: number) => Effect.gen(
   if (prefixInUse(prefix)) return "page written; close Warcraft III and Battle.net once to finish" satisfies SetupResult;
   yield* Effect.try({
     try: () => {
-      const backup = `${userReg}.before-smashcraft`;
+      const backup = `${userReg}.before-makgora`;
       if (!existsSync(backup)) copyFileSync(userReg, backup);
       writeFileSync(`${userReg}.next`, next);
       renameSync(`${userReg}.next`, userReg);

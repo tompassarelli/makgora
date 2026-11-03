@@ -3,7 +3,7 @@
 # one full trigger press. A reflection sends back a's own projectile: same family (a's fighter
 # code), kind and model, half damage, turned around and owned by b (the `reflect` line on b's
 # trace), and it strikes a, never b. Frames are read from this script's headless farm trace.
-# Syntax and checks: smashcraft:docs/native-bot-session.md.
+# Syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick pair rifleman / jaina proudmoore
 600 a tap X 2
 616 b shield 1

@@ -1,5 +1,5 @@
 # Mountain King's native checks by parity: #125 Storm Bolt, Thunder Clap, Hammerfall.
-# Mountain King a against Mountain King b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Mountain King a against Mountain King b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero mountain king
 # Storm Bolt flies straight out and hits b; it never comes back.
 60 a tap X 2

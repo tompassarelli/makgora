@@ -49,7 +49,7 @@ const fetchRunState = (repo: string, id: number, token: string) => Effect.tryPro
   try: async () => {
     const read = async (path: string) => {
       const response = await fetch(`https://api.github.com/repos/${repo}/actions/runs/${id}${path}`, {
-        headers: { authorization: `Bearer ${token}`, accept: "application/vnd.github+json", "user-agent": "smashcraft-landing-farm" },
+        headers: { authorization: `Bearer ${token}`, accept: "application/vnd.github+json", "user-agent": "makgora-landing-farm" },
         signal: AbortSignal.timeout(30_000),
       });
       if (!response.ok) throw new Error(`HTTP ${response.status} for run ${id}${path}`);

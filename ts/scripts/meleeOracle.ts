@@ -255,7 +255,7 @@ function walkSettles(character: Character, maximum: number): number {
   return melee(f.motion.vx);
 }
 
-const SETTLES = "over the target, friction brings the speed down to it; acceleration below it is Smashcraft's authored tuning";
+const SETTLES = "over the target, friction brings the speed down to it; acceleration below it is Mak'gora's authored tuning";
 
 const GROUND: readonly Scenario[] = [
   {
@@ -1370,7 +1370,7 @@ function grabHold(character: Character, percent: number, mashOn?: number): numbe
   return held;
 }
 
-const GRAB_RULE = "the escape timer starts at 76 + 1.6 frames per percent and falls 1 a frame plus 6 per mash input: smashcraft:docs/design/melee/defense.md#grabs";
+const GRAB_RULE = "the escape timer starts at 76 + 1.6 frames per percent and falls 1 a frame plus 6 per mash input: makgora:docs/design/melee/defense.md#grabs";
 
 const GRABS: readonly Scenario[] = [
   {
@@ -1391,7 +1391,7 @@ const GRABS: readonly Scenario[] = [
 
 const windowBound = (name: string, lower: number, upper: number, actual: (character: Character) => number): Scenario => ({
   area: "execution bounds", name: `${name}: ${lower}..${upper} frames`,
-  cite: "smashcraft:docs/gameplay-design.md, Execution and reaction windows (#69), adopted 6 Oct 2026",
+  cite: "makgora:docs/gameplay-design.md, Execution and reaction windows (#69), adopted 6 Oct 2026",
   run: (character) => {
     const frames = actual(character);
     return { expected: `within ${lower}..${upper}`, actual: frames >= lower && frames <= upper ? `within ${lower}..${upper}` : `${frames} frames` };
@@ -1428,7 +1428,7 @@ function sdiMash(character: Character): { readonly travel: number; readonly step
   return { travel, step };
 }
 
-const SDI_RULE = "a stick at least 0.70 from centre that newly moved within 4 frames shifts the fighter by  = 6 units on each hitlag frame, and ASDI shifts 3 once on release: smashcraft:docs/design/melee/defense.md#influence-on-knockback";
+const SDI_RULE = "a stick at least 0.70 from centre that newly moved within 4 frames shifts the fighter by  = 6 units on each hitlag frame, and ASDI shifts 3 once on release: makgora:docs/design/melee/defense.md#influence-on-knockback";
 
 const SMASH_DI: readonly Scenario[] = [
   {

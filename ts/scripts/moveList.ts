@@ -41,14 +41,14 @@ export function moveListMarkdown(): string {
     "# Move list",
     "",
     "Generated from the fighters' kit data by `bun scripts/generated.ts` (from",
-    "smashcraft:ts/); edit the names there, never here. Specials and",
+    "makgora:ts/); edit the names there, never here. Specials and",
     "ultimates have official names, and so does each jab chain; the other",
     "normals are named by their input (forward tilt, forward air, down smash,",
     "pummel, up throw). A normal's",
     "\"inspired by\" note is a design reference, not a name. An ultimate is",
     "Attack + Special together at a full ultimate meter (docs/design/ultimates.md), unless",
     "the match's Ultimates rule is off. Ground movement is in Melee units a frame,",
-    "inside Melee's roster spread (smashcraft:docs/gameplay-design.md,",
+    "inside Melee's roster spread (makgora:docs/gameplay-design.md,",
     "\"Ground states and the stick map\").",
   ];
   const units = (value: number) => (value / WORLD_UNITS_PER_MELEE_UNIT).toFixed(2);

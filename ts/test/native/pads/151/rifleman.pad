@@ -1,6 +1,6 @@
 # #151 Rifleman: jab, forward tilt (plain, up- and down-angled), up tilt, down tilt and dash
 # attack on client a, each captured on its first active frame (kit startup) and the next.
-# Syntax and checks: smashcraft:docs/native-bot-session.md.
+# Syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero rifleman
 # Input starts after frame 500: on a loaded host the helpers first see a quick match up to ~400 frames in.
 540 a tap A 2

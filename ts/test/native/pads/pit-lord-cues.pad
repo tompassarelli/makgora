@@ -1,4 +1,4 @@
-# Pit Lord a against Pit Lord b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Pit Lord a against Pit Lord b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero pit lord
 # b dashes in and raises its shield; a's Ruin Charge stops at it.
 40 b stick -1 0

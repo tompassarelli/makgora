@@ -4,14 +4,14 @@ const SETUP = [{ chat: "-dev reset" }, { chat: "-dev quick pair Kael'thas Sunstr
 
 export const kaelFireArcaneChecks = (pass: readonly Rule[]): NativeCheck[] => [
   {
-    id: "360-kael-arcane-normal", closes: "smashcraft#360 (arcane normals)", map: "presentation", session: "360-kael-fire-arcane",
+    id: "360-kael-arcane-normal", closes: "makgora#360 (arcane normals)", map: "presentation", session: "360-kael-fire-arcane",
     setup: [...SETUP, { keys: ["n"], client: "a" }, { waitMs: 60 }],
     capture: [{ kind: "frames", name: "jab", client: "a", count: 12, everyMs: 50 }],
     pass,
     look: "Kael'thas jabs player 2's Dreadlord at match size: three green spheres orbit him and one flies out to the jab's hit area, with a violet spark on contact; no red or gold fire anywhere in the frames.",
   },
   {
-    id: "360-kael-fire-special", closes: "smashcraft#360 (fire specials)", map: "presentation", session: "360-kael-fire-arcane",
+    id: "360-kael-fire-special", closes: "makgora#360 (fire specials)", map: "presentation", session: "360-kael-fire-arcane",
     setup: [...SETUP, { keys: ["d+u"], client: "a" }, { waitMs: 400 }],
     capture: [{ kind: "frames", name: "flame-strike", client: "a", count: 14, everyMs: 120 }],
     pass,

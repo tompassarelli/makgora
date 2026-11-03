@@ -31,7 +31,7 @@ export const cloneLauncher = (clone: string, run: string) => ({
 });
 
 /** The launcher and account follow each client's own Wine prefix, never its name, so a client called a or b can't start another prefix. */
-export const smashcraftDoctor = (clientsFile = clientState): DoctorDeclaration => {
+export const makgoraDoctor = (clientsFile = clientState): DoctorDeclaration => {
   const file = readClientsFile(clientsFile);
   const start: Record<string, DoctorDeclaration["start"][string]> = {};
   const accounts: Record<string, NonNullable<DoctorDeclaration["accounts"]>[string]> = {};
@@ -46,12 +46,12 @@ export const smashcraftDoctor = (clientsFile = clientState): DoctorDeclaration =
   return { clientsFile, start, ...(Object.keys(accounts).length === 0 ? {} : { accounts }) };
 };
 
-export const smashcraftWatch = ClientWatch.layer({ filePrefix: "smashcraft" });
+export const makgoraWatch = ClientWatch.layer({ filePrefix: "smashcraft" });
 
 export const checkClients = (print: (line: string) => void = console.log, clientsFile = clientState) =>
-  Effect.try({ try: () => smashcraftDoctor(clientsFile), catch: (cause) => new DoctorStop({ problem: `can't read the clients from ${clientsFile}: ${String(cause)}` }) }).pipe(
+  Effect.try({ try: () => makgoraDoctor(clientsFile), catch: (cause) => new DoctorStop({ problem: `can't read the clients from ${clientsFile}: ${String(cause)}` }) }).pipe(
     Effect.flatMap((declaration) => clientsDoctor(declaration, [], print)),
-    Effect.provide(smashcraftWatch),
+    Effect.provide(makgoraWatch),
   );
 
 export const onHealthyClients = <A, E, R>(run: Effect.Effect<A, E, R>, options: { readonly retry?: boolean; readonly clientsFile?: string } = {}) =>

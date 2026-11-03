@@ -21,7 +21,7 @@ import { playtestRequest } from "../../../src/game/session/playtest";
 import { MeleeReady, PLAYTEST_GO_FILE, PLAYTEST_REQUEST_FILE, playtestReceiptFile } from "../boundary";
 import { MELEE_READY_FILE } from "../../../src/game/core/gameFiles";
 import { PLAYTEST_PREFIX, clientState, gameFilesLayer } from "../project";
-import { accountField, smashcraftWatch } from "../doctor";
+import { accountField, makgoraWatch } from "../doctor";
 import { currentPlaytest } from "../currentPlaytest";
 import { lobbyController, optionalController } from "../controllerService";
 import { pollUntil } from "../../hostPoll";
@@ -102,7 +102,7 @@ export function playtest({ build, map, helper, computerSlot, computerOpponent, c
     display: ":0",
     shortcut: { appId: 3775098022, name: "Warcraft III (Battle.net)" },
     map,
-    gameName: "Smashcraft",
+    gameName: "Mak'gora",
     menuReportPort,
     displaySettings: { ...TOM_DISPLAY, assao: "0" },
     graphicsMode: "reforged",
@@ -120,7 +120,7 @@ export function playtest({ build, map, helper, computerSlot, computerOpponent, c
       for (const path of Object.values(files(documents))) if ((yield* gameFiles.read(path)) !== undefined) yield* gameFiles.remove(path);
     }).pipe(Effect.mapError(problem)),
     started: (game, since) => until(LOAD_SECONDS, ready(game).pipe(Effect.map((file) => (file !== undefined && file.modified > since && file.value.build === build ? true : undefined))),
-      `Smashcraft didn't reach fighter selection within ${LOAD_SECONDS} s (no new ${MELEE_READY_FILE} for ${build})`),
+      `Mak'gora didn't reach fighter selection within ${LOAD_SECONDS} s (no new ${MELEE_READY_FILE} for ${build})`),
 
     match: (game) => Effect.gen(function*() {
       const gameFiles = yield* GameFiles;
@@ -128,10 +128,10 @@ export function playtest({ build, map, helper, computerSlot, computerOpponent, c
       const since = yield* Clock.currentTimeMillis;
       yield* gameFiles.write(go, linePreloadFile("GO")).pipe(Effect.mapError(problem));
       const answer = yield* until(MATCH_SECONDS, gameFiles.read(receipt).pipe(Effect.mapError(problem), Effect.map((file) => (file !== undefined && file.modified >= since ? file.text : undefined))),
-        `Smashcraft didn't take the playtest request within ${MATCH_SECONDS} s; a map built before it read requests ignores them`);
+        `Mak'gora didn't take the playtest request within ${MATCH_SECONDS} s; a map built before it read requests ignores them`);
 
       for (const path of [requestFile, go]) if ((yield* gameFiles.read(path).pipe(Effect.mapError(problem))) !== undefined) yield* gameFiles.remove(path).pipe(Effect.mapError(problem));
-      if (!answer.includes(`${request} started`)) return yield* new PlayProblem({ problem: `Smashcraft refused the playtest request "${request}": fighter selection had moved on or a human holds Player ${computerSlot + 1}` });
+      if (!answer.includes(`${request} started`)) return yield* new PlayProblem({ problem: `Mak'gora refused the playtest request "${request}": fighter selection had moved on or a human holds Player ${computerSlot + 1}` });
       return `${computerOpponent} ${computerTier} computer as Player ${computerSlot + 1}, match started`;
     }),
 
@@ -247,7 +247,7 @@ export const play: Command = (args) => Effect.gen(function*() {
       helper: { service: (game) => lobbyController(game.pid) },
       lobbyReady: () => reserveStatus,
     };
-    return yield* makePlay(declaration, gameFilesLayer, tools, smashcraftWatch.pipe(Layer.provide(platformLayer())))(args);
+    return yield* makePlay(declaration, gameFilesLayer, tools, makgoraWatch.pipe(Layer.provide(platformLayer())))(args);
   }
   if (args.includes("--standalone")) {
     const { standalonePlay } = yield* Effect.tryPromise({ try: () => import("../standalone"), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
@@ -263,5 +263,5 @@ export const play: Command = (args) => Effect.gen(function*() {
   const current = yield* currentPlaytest();
   const declaration = playtest({ ...PLAYTEST, ...current });
   yield* Effect.try({ try: () => installLatest(documentsFolder(declaration.prefix), current.map.source), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
-  return yield* makePlay(declaration, gameFilesLayer, tools, smashcraftWatch.pipe(Layer.provide(platformLayer())))(args);
+  return yield* makePlay(declaration, gameFilesLayer, tools, makgoraWatch.pipe(Layer.provide(platformLayer())))(args);
 });

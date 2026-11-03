@@ -15,7 +15,7 @@ const FACINGS: readonly Facing[] = [
 export const winnerPoseChecks = (pass: readonly Rule[]): readonly NativeCheck[] => FACINGS.map(({ facing, winner, timedOut, setup }): NativeCheck => {
   const result = `^result frames=\\d+ winner=${winner} timed-out=${timedOut} interrupted=0$`;
   return {
-    id: `murlocs-win-${facing}`, closes: "smashcraft#murlocs-cheer", map: "presentation", session: `murlocs-win-${facing}`,
+    id: `murlocs-win-${facing}`, closes: "makgora#murlocs-cheer", map: "presentation", session: `murlocs-win-${facing}`,
     setup: [
       { chat: "-dev reset" }, { chat: "-dev slots 1 2" }, { chat: "-dev auto-rematch off" },
       ...setup.map((chat) => ({ chat })),

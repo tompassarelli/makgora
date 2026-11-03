@@ -7,11 +7,11 @@ const fail = (problem: string) => new CaptureQueueFailure({ problem });
 
 export const LAPTOP_PLACEMENT = "laptop";
 const POLL_SECONDS = 5;
-const REMOTE_CHECKOUT = "code/smashcraft/main";
+const REMOTE_CHECKOUT = "code/makgora/main";
 
 /** The job command the laptop's runner takes: it pulls `job` from its origin and runs the batch on the laptop's pair, from the laptop's own checkout. */
 export const pullCommand = (job: Pull): readonly string[] => [
-  "sh", "-c", `cd "$HOME"/${quote(process.env.SMASHCRAFT_REMOTE_CHECKOUT ?? REMOTE_CHECKOUT)}/ts && exec bun scripts/captureQueuePull.ts "$@"`, "pull",
+  "sh", "-c", `cd "$HOME"/${quote(process.env.MAKGORA_REMOTE_CHECKOUT ?? REMOTE_CHECKOUT)}/ts && exec bun scripts/captureQueuePull.ts "$@"`, "pull",
   "--origin", job.origin, "--origin-store", job.originStore, "--key", job.key, "--plan", job.plan, "--manifest", job.manifest, "--out", job.out,
   "--work", job.work, "--pair", String(job.pair), "--client", job.client, "--minutes", String(job.minutes),
 ];

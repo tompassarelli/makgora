@@ -5,17 +5,17 @@ import { install, startBuild } from "../../src/platform/main";
 import { shell } from "../../src/host/loop/state";
 import type { Game } from "../../scripts/wisp/botMatch";
 import { type HandleBaseline, SOAK_MATCHES, frameLine, handleLine, handleProblems, playHandleBaseline } from "../../scripts/wisp/handleBaseline";
-import { SMASHCRAFT_HEADLESS } from "../../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../../scripts/wisp/headless";
 
 export interface BunBaseline extends HandleBaseline {
   readonly slots: readonly number[];
   readonly errors: readonly string[];
 }
 
-/** Plays smashcraft:ts/scripts/wisp/handleBaseline.ts's scenario for `matches` matches on the integrity build in Bun. */
+/** Plays makgora:ts/scripts/wisp/handleBaseline.ts's scenario for `matches` matches on the integrity build in Bun. */
 export function playBunHandleBaseline(matches: number, matchFrames?: number): BunBaseline {
   const declarations = readNativeDeclarations();
-  const headless = installHeadless(SMASHCRAFT_HEADLESS, declarations);
+  const headless = installHeadless(MAKGORA_HEADLESS, declarations);
   try {
     const clients = headless.clients({ start: () => startBuild(INTEGRITY_BUILD), install }, [0, 1], { delivery: syncDelivery(MEASURED_BATTLE_NET, 7) });
     const baseline = playHandleBaseline(clients, declarations.functions, matches, (client) => {

@@ -6,7 +6,7 @@ import { poolStart, poolStop } from "./lanPoolUnit";
 
 export const lan: Command = (args) => {
   switch (args[0]) {
-    case "soak": return withQuietNativeCapacity("smashcraft-lan-soak", lanSoak(args.slice(1)));
+    case "soak": return withQuietNativeCapacity("makgora-lan-soak", lanSoak(args.slice(1)));
     case "pool": return poolStart(args.slice(1));
     case "stop": return poolStop(args.slice(1));
     default: return frameworkLan(args);

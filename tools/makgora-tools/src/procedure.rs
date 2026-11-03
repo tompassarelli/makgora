@@ -8,8 +8,8 @@ use crate::process::{exit_code, find_program, project_root, spawn_failure, subst
 use crate::stop::{Outcome, Stop};
 
 const USAGE: &str = "\
-Usage: smashcraft-tools wc3-procedure RUN_DIR STATE RECIPE
-       smashcraft-tools wc3-procedure --validate STATE RECIPE
+Usage: makgora-tools wc3-procedure RUN_DIR STATE RECIPE
+       makgora-tools wc3-procedure --validate STATE RECIPE
 RUN_DIR is the exact private-desktop run directory. STATE is the caller's
 asserted current game state. Procedures are short, named input chains. A sent
 chain is never reported as game success; verify the resulting state yourself.";

@@ -10,10 +10,10 @@ import { slotColor } from "../src/game/ui/slotColors";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { install, startBuild } from "../src/platform/main";
 import { shellState } from "../src/host/loop/state";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 type HeadlessClient = ReturnType<ReturnType<typeof headless.clients>["client"]>;
 type Rectangle = NonNullable<ReturnType<HeadlessClient["frames"]["snapshot"]>[number]["rectangle"]>;

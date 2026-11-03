@@ -6,8 +6,8 @@ use std::time::Instant;
 use crate::process::{exit_code, output, spawn_failure};
 use crate::stop::{Outcome, Stop};
 
-const USAGE: &str = "Usage: smashcraft-tools wc3-screen-state IMAGE [compact|full]";
-const BENCH_USAGE: &str = "Usage: smashcraft-tools bench-wc3-screen-state FIXTURE_DIR";
+const USAGE: &str = "Usage: makgora-tools wc3-screen-state IMAGE [compact|full]";
+const BENCH_USAGE: &str = "Usage: makgora-tools bench-wc3-screen-state FIXTURE_DIR";
 const GEOMETRY: &str = "2560x1440";
 const BRIGHT_TEXT: &str = "(r>0.667 && g>0.588)?0:1";
 const LABEL_REGIONS: [&str; 3] = ["450x260+1850+490", "500x90+90+140", "700x80+950+370"];

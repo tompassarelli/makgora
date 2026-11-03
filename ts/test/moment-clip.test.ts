@@ -4,10 +4,10 @@ import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { shellState } from "../src/host/loop/state";
 import { install, startBuild } from "../src/platform/main";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-moment-clip", devConsole: true };
 const LOBBY_FRAMES = 600;

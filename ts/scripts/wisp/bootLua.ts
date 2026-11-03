@@ -1,8 +1,8 @@
 import { luaLockstep, readFile } from "wisp/src/headless/lua";
 import { Phase } from "../../src/game/lobby/lobbyState";
 import { gameOf } from "./botMatch";
-import { SMASHCRAFT_NOOPS, smashcraftNativeBehavior } from "./headlessNatives";
-import { SMASHCRAFT_LOCAL_NATIVES } from "./localNatives";
+import { MAKGORA_NOOPS, makgoraNativeBehavior } from "./headlessNatives";
+import { MAKGORA_LOCAL_NATIVES } from "./localNatives";
 import { DONE_X, DONE_Y, controlsGreeted } from "./startControls";
 
 declare const arg: Readonly<Record<number, string | undefined>>;
@@ -16,7 +16,7 @@ const START_FRAMES = 240;
 const [bundlePath, declarationsPath, slotText] = [arg[1], arg[2], arg[3]];
 const slot = Number(slotText);
 if (bundlePath === undefined || declarationsPath === undefined || !Number.isInteger(slot)) throw new Error("usage: lua boot.lua MAP_LUA WARCRAFT_D_TS SLOT");
-const clients = luaLockstep({ players: [slot], filePrefix: "smashcraft", localNatives: SMASHCRAFT_LOCAL_NATIVES, intentionalNoops: SMASHCRAFT_NOOPS, natives: smashcraftNativeBehavior }, readFile(bundlePath), readFile(declarationsPath));
+const clients = luaLockstep({ players: [slot], filePrefix: "smashcraft", localNatives: MAKGORA_LOCAL_NATIVES, intentionalNoops: MAKGORA_NOOPS, natives: makgoraNativeBehavior }, readFile(bundlePath), readFile(declarationsPath));
 const problems: string[] = [];
 const [booted, failure] = pcall(() => {
   clients.start();

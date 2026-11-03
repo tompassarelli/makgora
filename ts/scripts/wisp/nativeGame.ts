@@ -6,12 +6,12 @@ import { headlessRender, playerRender } from "./headlessRender";
 import { livePortraits } from "../../src/game/ui/liveCard";
 import type { MapBuild } from "../../src/game/session/build";
 import type { StageTile } from "../../src/game/menu/stageCatalog";
-import { type StandaloneStart, createStandaloneSession, smashcraftStandalone } from "./standalone";
+import { type StandaloneStart, createStandaloneSession, makgoraStandalone } from "./standalone";
 
 livePortraits.enabled = true;
 
 // a compiled player cannot import a module path with a query, so its options travel in the environment
-const query = import.meta.url.includes("?") ? new URL(import.meta.url).searchParams : new URLSearchParams(process.env.SMASHCRAFT_NATIVE_QUERY ?? "");
+const query = import.meta.url.includes("?") ? new URL(import.meta.url).searchParams : new URLSearchParams(process.env.MAKGORA_NATIVE_QUERY ?? "");
 const playerMap = query.get("map");
 const start = (query.get("start") ?? "match") as StandaloneStart;
 const chosen = query.get("chosen") ?? undefined;
@@ -20,10 +20,10 @@ const presentation = (query.get("presentation") ?? undefined) as MapBuild["prese
 const digestFile = query.get("digests") ?? undefined;
 const stage = query.get("stage"), rollback = query.get("rollback");
 const match = { ...(query.get("fourFighters") === null ? {} : { fourFighters: true }), ...(stage === null ? {} : { stage: Number(stage) as StageTile }), ...(rollback === null ? {} : { rollback: Number(rollback) }) };
-const savedFiles = query.get("save") === null ? undefined : join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "smashcraft/native-files");
+const savedFiles = query.get("save") === null ? undefined : join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "makgora/native-files");
 
-export const SMASHCRAFT_NATIVE_GAME = {
-  ...smashcraftStandalone(playerMap === null ? headlessRender() : await Effect.runPromise(playerRender(playerMap))),
+export const MAKGORA_NATIVE_GAME = {
+  ...makgoraStandalone(playerMap === null ? headlessRender() : await Effect.runPromise(playerRender(playerMap))),
   create: async (session: Parameters<typeof createStandaloneSession>[0]) => {
     const created = await createStandaloneSession({ ...session, ...match, start, ...(presentation === undefined ? {} : { presentation }), ...(savedFiles === undefined ? {} : { savedFiles }), ...(chosen === undefined ? {} : { chosen }), ...(tutorialOffer ? {} : { tutorialOffer }) });
     if (digestFile === undefined) return created;

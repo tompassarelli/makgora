@@ -7,7 +7,7 @@ const MORPHS = [
 
 export const meterRimChecks = (rules: readonly Rule[]): NativeCheck[] => MORPHS.map(({ id, hero, keys, look }): NativeCheck => ({
   id: `499-${id}`,
-  closes: "smashcraft#499 box 2",
+  closes: "makgora#499 box 2",
   map: hero,
   session: `499-${id}`,
   setup: [{ waitMs: 3000 }, { chat: "-dev meter 100" }, { waitMs: 1200 }, { keys: [keys], client: "a" }],

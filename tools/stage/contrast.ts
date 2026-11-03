@@ -135,13 +135,13 @@ const MINIMAL_STAGES = new Set([0, 2]);
 async function stockLightCheck(args: readonly string[]): Promise<number> {
   const half = args.includes("--half");
   const rest = args.filter(arg => arg !== "--half");
-  const out = rest[0] === "--out" ? rest[1] ?? "" : `${process.env.XDG_STATE_HOME ?? `${process.env.HOME}/.local/state`}/smashcraft/stock-light`;
+  const out = rest[0] === "--out" ? rest[1] ?? "" : `${process.env.XDG_STATE_HOME ?? `${process.env.HOME}/.local/state`}/makgora/stock-light`;
   const named = (rest[0] === "--out" ? rest.slice(2) : rest).map(Number);
   const scale = half ? 2 : 1;
   const { Effect } = await import("../../ts/node_modules/effect/dist/index.js");
   const { installHeadless } = await import("../../ts/node_modules/wisp/host/headless/headless");
   const { captureScene, renderScenes } = await import("../../ts/node_modules/wisp/host/render/headlessRender");
-  const { SMASHCRAFT_HEADLESS } = await import("../../ts/scripts/wisp/headless");
+  const { MAKGORA_HEADLESS } = await import("../../ts/scripts/wisp/headless");
   const { headlessRender } = await import("../../ts/scripts/wisp/headlessRender");
   const { start, install } = await import("../../ts/src/host/entries/devMain");
   const { stageModels } = await import("../../ts/src/game/presentation/stagePreload");
@@ -156,7 +156,7 @@ async function stockLightCheck(args: readonly string[]): Promise<number> {
   let failed = 0, empty = 0;
   const { emptyBackdropShare, EMPTY_BACKDROP_LIMIT } = await import("./layout");
   for (const stage of stages) {
-    const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+    const runtime = installHeadless(MAKGORA_HEADLESS);
     const clients = runtime.clients({ start, install });
     clients.start(); clients.frames(20); clients.chat(0, "-dev items off"); clients.frames(10); clients.chat(0, `-dev quick stage ${stage}`); clients.frames(15);
     for (const client of clients.clients) clients.chat(client.slot, "-dev view near");

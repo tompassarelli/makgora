@@ -13,7 +13,7 @@ const git = (repo: string, ...args: string[]) => {
 };
 
 const checkout = () => {
-  const repo = mkdtempSync(join(tmpdir(), "smashcraft-key-"));
+  const repo = mkdtempSync(join(tmpdir(), "makgora-key-"));
   git(repo, "init", "-q");
   writeFileSync(join(repo, "source.ts"), "export const a = 1;\n");
   git(repo, "add", ".");

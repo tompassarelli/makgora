@@ -34,7 +34,7 @@ fn usage() -> Stop {
     Stop::err(
         2,
         format!(
-            "Usage: smashcraft-tools TOOL [ARGUMENT]...\nTools: {}",
+            "Usage: makgora-tools TOOL [ARGUMENT]...\nTools: {}",
             names.join(", ")
         ),
     )

@@ -5,7 +5,7 @@ import { installHeadless } from "wisp/scripts/wisp/headless";
 import { recordedFacts } from "../scripts/wisp/cueModels";
 import { CUE_MODEL_RECORD } from "../scripts/wisp/cueInputs";
 import { effectUses, judgeUse, modelFactsKey, type TrackFacts } from "../scripts/wisp/effectVisibility";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH, PLAYABLE_BOUNDS } from "../src/game/presentation/arenaCamera";
 import { allProjectileModels, RIBBON_PARK_SEQUENCES } from "../src/game/presentation/projectileArt";
 import { ProjectilePresentation } from "../src/game/render/projectilePresentation";
@@ -67,7 +67,7 @@ function shoot(input: Readonly<Controls>, world: ReturnType<typeof createRoster>
 }
 
 test("every parked ribbon projectile effect waits in its model's park sequence after each frame, so a launch never moves a live ribbon, on the ground and in the air [k1 scenario]", () => {
-  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  const runtime = installHeadless(MAKGORA_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);
     const client = clients.client(0);

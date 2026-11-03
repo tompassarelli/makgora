@@ -56,7 +56,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     try: () => {
       const pin = readFileSync(join(projectRoot, "build-inputs/selection-assets"), "utf8").trim();
       mkdirSync(directory, { recursive: true, mode: 0o700 });
-      const assetDirectory = join(homedir(), ".local/share/smashcraft-build-inputs/store/selection-assets", pin);
+      const assetDirectory = join(homedir(), ".local/share/makgora-build-inputs/store/selection-assets", pin);
       return { point: readTga(readFileSync(join(assetDirectory, "SelectionHandPoint.tga"))), fan: readTga(readFileSync(join(assetDirectory, "SelectionHandFan.tga"))), pinch: readTga(readFileSync(join(assetDirectory, "SelectionHandPinch.tga"))), chip: readTga(readFileSync(join(assetDirectory, "SelectionChipP1.tga"))) };
     },
     catch: cause => new AcceptFailure({ operation: "cursor gate texture", problem: String(cause) }),

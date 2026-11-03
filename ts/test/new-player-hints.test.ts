@@ -6,12 +6,12 @@ import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
 import { views } from "../src/host/loop/ui";
 import { passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 import { GUIDE_ROWS, SELECT_BAR } from "../src/game/core/selectBarLayout";
 import { f32 } from "wisp/src/sim/f32";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const HUMANS = [0, 1];
 const START_TUTORIAL = { x: f32(0.23), y: f32(0.315), width: f32(0.16), height: f32(0.035) };

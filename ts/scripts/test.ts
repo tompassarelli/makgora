@@ -80,7 +80,7 @@ const groupCost = (group: Group) => group.env?.GAME_MODULES === undefined
 
 // Each Bun process also runs compiler threads; leave half the CPUs for them.
 const slots = Math.min(groups.length, 8, Math.max(1, Math.floor(usableCpus() / 2)));
-const costDirectory = mkdtempSync(join(tmpdir(), "smashcraft-test-cost-"));
+const costDirectory = mkdtempSync(join(tmpdir(), "makgora-test-cost-"));
 const costFile = (group: Group) => join(costDirectory, `${groups.indexOf(group)}.jsonl`);
 /** One line of test/testCost.ts's output. */
 const CostRow = Schema.Struct({
@@ -117,7 +117,7 @@ const suite = Effect.gen(function*() {
 });
 
 const program = Effect.gen(function*() {
-  const admitted = yield* admit("heavy", "smashcraft:test", 1800);
+  const admitted = yield* admit("heavy", "makgora:test", 1800);
   if (admitted !== undefined) return admitted;
   const { value: { results, verdicts }, pressure } = yield* withPressure(suite);
   const failed = results.some((result) => result.code !== 0) || verdicts.includes("failed");

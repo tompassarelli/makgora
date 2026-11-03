@@ -35,7 +35,7 @@ const arena = () => ({
 
 /** Art for a player with no source tree: the downloaded map's own files, then the Warcraft install, and no private build-input store. */
 export const playerRender = (map: string) => Effect.gen(function*() {
-  const shipped = process.env.SMASHCRAFT_PACKAGER;
+  const shipped = process.env.MAKGORA_PACKAGER;
   const packager = shipped ?? buildProject().packager;
   if (shipped === undefined) yield* ensurePackager(packager);
   const imports = yield* extractMapImports(map, packager);

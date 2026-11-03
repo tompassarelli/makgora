@@ -1323,7 +1323,7 @@ if (import.meta.main) {
       const sameOf = (two: readonly string[] | undefined, flag: string) => two !== undefined && two[0] === two[1] ? ` ${flag} ${two[0]}` : "";
       console.error(`GitHub's free runners play this sweep in about 4 minutes and leave this machine free: bun wisp farm balance${pairs === undefined ? "" : ` --matchups ${values.pairs}`}${sameOf(opponents, "--opponent")}${sameOf(tiers, "--tier")}${values["per-pair"] === undefined ? "" : ` --per-pair ${values["per-pair"]}`}${values.seeds === undefined ? "" : ` --seeds ${values.seeds}`} --wait`);
     }
-    await runAdmitted("moderate", "smashcraft:cpuField", 3600);
+    await runAdmitted("moderate", "makgora:cpuField", 3600);
   }
   const started = performance.now();
   const cpuBefore = process.cpuUsage();

@@ -1,4 +1,4 @@
-# #152 multi-hit aerials: Blademaster's neutral air (2 hits) and Sword Plunge. Blademaster a against Blademaster b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# #152 multi-hit aerials: Blademaster's neutral air (2 hits) and Sword Plunge. Blademaster a against Blademaster b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero blademaster
 # Both dash in, close.
 40 b stick -1 0

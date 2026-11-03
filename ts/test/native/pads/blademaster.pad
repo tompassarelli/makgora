@@ -1,5 +1,5 @@
 # Blademaster's native checks by parity: #523 Wind Walk dash and #124 Mirror Image swap.
-# Blademaster a against Blademaster b; syntax and checks: smashcraft:docs/native-bot-session.md.
+# Blademaster a against Blademaster b; syntax and checks: makgora:docs/native-bot-session.md.
 #! chat -dev quick hero blademaster
 # 7bc2877cdb (traction) and 1e934c1718 and db647159a5 (dash and run caps) leave b short of the swap slash
 # (probe run 39025558252 with them neutralised hits both), so b holds its dash to 45 (variant run 39025737993).

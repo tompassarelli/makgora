@@ -6,7 +6,7 @@ import { MapBuildFailure, type ArchiveEntry } from "wisp/scripts/wisp/mapBuild";
 import { encodeBlp, readTga } from "../blp";
 import { MINIMAP_MARKERS_ENTRY, NO_MINIMAP_MARKERS, PREVIEW_ENTRY, composePreview, encodePreview } from "../mapPreview";
 
-export const PREVIEW_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "smashcraft/map-preview");
+export const PREVIEW_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "makgora/map-preview");
 
 const tryMapPromise = <A>(operation: string, path: string, run: () => PromiseLike<A>) => Effect.tryPromise({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });
 const tryMapSync = <A>(operation: string, path: string, run: () => A) => Effect.try({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });

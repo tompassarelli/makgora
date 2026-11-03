@@ -4,7 +4,7 @@ import { Console, Effect } from "effect";
 import { PerfFailure, measureRun } from "wisp/scripts/wisp/commands/perf";
 import { parsePerfRun } from "wisp/scripts/wisp/perf";
 import { sourceHash } from "../generated";
-import { SMASHCRAFT_PERF } from "./commands/perf";
+import { MAKGORA_PERF } from "./commands/perf";
 import { tsDirectory } from "./project";
 
 const RUN = "playable-bot-four";
@@ -27,7 +27,7 @@ const cachedRun = (inputs: string) => Effect.gen(function*() {
     yield* Console.log(`reusing predicted Lua cost for inputs ${inputs.slice(0, 12)}`);
     return { output, measured: yield* Effect.try({ try: () => parsePerfRun(output), catch: (cause) => new PerfFailure({ problem: `cached playtest cost ${inputs}: ${String(cause)}` }) }) };
   }
-  const { output, measured } = yield* measureRun(SMASHCRAFT_PERF, RUN, FRAMES, true);
+  const { output, measured } = yield* measureRun(MAKGORA_PERF, RUN, FRAMES, true);
   if (measured.problems === 0) yield* Effect.promise(() => Bun.write(cache, output));
   return { output, measured };
 });

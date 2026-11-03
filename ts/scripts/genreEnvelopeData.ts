@@ -41,7 +41,7 @@ export function attackMeasures(startup: Cell, lastActive: Cell, total: Cell, lan
   ]);
 }
 
-// Melee's digital shieldstun: multiplier 1 and the 200/201 frame scale, unlike Smashcraft's own multipliers.
+// Melee's digital shieldstun: multiplier 1 and the 200/201 frame scale, unlike Mak'gora's own multipliers.
 const meleeShieldstun = (damage: number): number => Math.trunc(shieldstunDuration(damage, 1.0, 1.0) * 200 / 201);
 
 const DODGE_CLASSES: readonly MoveClass[] = ["spot-dodge", "roll", "shield-drop", "jump-squat"];

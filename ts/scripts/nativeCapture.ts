@@ -91,7 +91,7 @@ export function fixtureOf(path: string, script: string): CaptureFixture {
 
 const build = (args: readonly string[]) => Effect.gen(function*() {
   const out = option(args, "--out");
-  const name = option(args, "--name") ?? "Smashcraft native capture";
+  const name = option(args, "--name") ?? "Makgora native capture";
   const pads = positional(args).flatMap(path => statSync(path).isDirectory() ? readdirSync(path).filter(file => file.endsWith(".pad")).sort().map(file => join(path, file)) : [path]);
   if (out === undefined) return yield* new CaptureFailure({ problem: "usage: build --out MAP.w3x [--name NAME] [PAD|DIR...]; without scripts it builds the control" });
 

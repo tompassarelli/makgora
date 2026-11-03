@@ -19,8 +19,8 @@ import bpy
 from mathutils import Matrix, Quaternion, Vector
 
 project = Path(__file__).resolve().parents[2]
-private_assets = Path(os.environ.get('SMASHCRAFT_ANIMATION_ASSETS', project / 'build/animation-assets'))
-selected_clip = [c for c in os.environ.get('SMASHCRAFT_STRIKE_CLIP', '').split(',') if c]
+private_assets = Path(os.environ.get('MAKGORA_ANIMATION_ASSETS', project / 'build/animation-assets'))
+selected_clip = [c for c in os.environ.get('MAKGORA_STRIKE_CLIP', '').split(',') if c]
 fighter = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else ''
 SCENES = {
     'rifleman': project / 'build/animation-assets/rifleman-fighter',

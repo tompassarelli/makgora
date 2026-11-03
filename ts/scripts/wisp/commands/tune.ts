@@ -6,7 +6,7 @@ import { Effect } from "effect";
 import type { Command } from "wisp/scripts/wisp/command";
 import { makeTune } from "wisp/scripts/wisp/commands/tune";
 import { buildProject, profileOption, sourceMapDirectory, tsDirectory } from "../project";
-import { SMASHCRAFT_TUNABLES } from "../tunables";
+import { MAKGORA_TUNABLES } from "../tunables";
 
 export const tune: Command = (args) => Effect.gen(function*() {
   const { profile, args: remaining } = yield* profileOption(args);
@@ -16,6 +16,6 @@ export const tune: Command = (args) => Effect.gen(function*() {
     sourceMapDirectory,
     filePrefix: "smashcraft",
     root: tsDirectory,
-    tunables: SMASHCRAFT_TUNABLES,
+    tunables: MAKGORA_TUNABLES,
   })(remaining);
 });

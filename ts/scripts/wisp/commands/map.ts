@@ -17,7 +17,7 @@ import { glowFreeCaptureImports, decodeBuildOptions, editionImports, importedAss
 import { buildProject, gameFilesLayer, profileOption, projectRoot, sourceErrorsLayer } from "../project";
 import { describeMapSize, mapBudgetProblem, mapGrowthProblem, type MapSize, readMapBaseline, readTables, storedBytes, writeMapBaseline } from "../../mapSize";
 import { ensureGenerated } from "../../generated";
-import { SMASHCRAFT_MAP } from "../../mapInfo";
+import { MAKGORA_MAP } from "../../mapInfo";
 import { fighterUnits, fileIoAbility } from "../../objectData";
 import { POST_PROCESSING_FILE } from "../../postProcessing";
 import { checkCueModels, headlessRender } from "../headlessRender";
@@ -49,7 +49,7 @@ const MAP_SIZE_BASELINE = join(projectRoot, "ts/map-size-baseline.tsv");
 
 const measureMap = (out: string, declared: readonly ArchiveEntry[]) => Effect.scoped(Effect.gen(function*() {
   const scratch = yield* Effect.acquireRelease(
-    Effect.sync(() => mkdtempSync(join(tmpdir(), "smashcraft-size."))),
+    Effect.sync(() => mkdtempSync(join(tmpdir(), "makgora-size."))),
     (directory) => Effect.sync(() => rmSync(directory, { recursive: true, force: true })),
   );
   const listPath = join(scratch, "listfile");
@@ -138,7 +138,7 @@ export const build: Command = (args) => Effect.gen(function*() {
       const checked = yield* checkCueModels(headlessRender({ assets: assets ?? declared.assets, imports })).pipe(step("cue models resolved"));
       yield* Console.log(`${checked} cue model resolutions passed`);
       if (inputsOnly) return yield* Console.log("map-build inputs passed; compilation and packaging skipped");
-      const compiled = MapBuild.use((maps) => maps.build({ ...map, base: base ?? declared.base, container: container ?? declared.container, ...(packager === undefined ? {} : { packager }), declaration: commit === undefined ? SMASHCRAFT_MAP : { ...SMASHCRAFT_MAP, description: `${SMASHCRAFT_MAP.description} ${buildSentence(commit)}` }, imports, objectData: generatedFiles() }));
+      const compiled = MapBuild.use((maps) => maps.build({ ...map, base: base ?? declared.base, container: container ?? declared.container, ...(packager === undefined ? {} : { packager }), declaration: commit === undefined ? MAKGORA_MAP : { ...MAKGORA_MAP, description: `${MAKGORA_MAP.description} ${buildSentence(commit)}` }, imports, objectData: generatedFiles() }));
       yield* (process.env.WISP_MAP_REUSE === "off" ? compiled : mapBuildKey(projectRoot, buildArgs).pipe(Effect.flatMap((key) => reuseOrBuild({ key, out: map.out, build: compiled })))).pipe(Effect.andThen(checkMapSize(map.out, imports, bounded, edition)));
       if (predict) yield* writePlaytestCost(map.out).pipe(step("predict playtest Lua cost"));
     })),

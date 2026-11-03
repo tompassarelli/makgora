@@ -3,7 +3,7 @@ import type { NativeCheck, Rule } from "wisp/scripts/wisp/accept";
 const WON_ONCE = "^SETUP phase=\\d+ .* team-battle=1 .* teams=0,0,1,1 .* wins=(1,1,0,0|0,0,1,1) $";
 
 export const teamResultsCheck = (pass: readonly Rule[]): NativeCheck => ({
-      id: "c45-team-results", closes: "smashcraft#66 C45N", map: "team-results", session: "c45-team-results",
+      id: "c45-team-results", closes: "makgora#66 C45N", map: "team-results", session: "c45-team-results",
       setup: [
         { chat: "-dev reset" }, { chat: "-dev slots 0 15" }, { chat: "-dev teams on" },
         { chat: "-dev team 1 0" }, { chat: "-dev team 2 0" }, { chat: "-dev team 3 1" }, { chat: "-dev team 4 1" },

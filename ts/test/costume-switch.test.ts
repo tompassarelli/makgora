@@ -10,10 +10,10 @@ import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { costumePortraitBox } from "../src/game/ui/selectionCards";
 import { shell } from "../src/host/loop/state";
 import { declineTutorial, passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 const JUMP_KEY = keyFor(presetBindings(DEFAULT_PRESET), Action.jump, 0) ?? 0;
 
 function costumeLobby(enabled: boolean) {

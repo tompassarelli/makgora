@@ -4,10 +4,10 @@ import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { Key } from "../src/host/loop/keyEvents";
 import { declineTutorial, passStartControls } from "../scripts/wisp/startControls";
-import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
 
-const headless = testHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(MAKGORA_HEADLESS);
 
 const HUMANS = [0, 1];
 const ECHO_FRAMES = 600;

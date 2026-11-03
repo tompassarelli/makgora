@@ -131,7 +131,7 @@ export const CHECKS: readonly LandingCheck[] = [
     command: ["bun", "scripts/cpuCoverage.ts"],
     reaches: [shared, imported(["ts/scripts/cpuCoverage.ts"])], farm: ["computer-0", "computer-1"], shardVariable: "CPU_COVERAGE_SHARD", here: "beside",
   },
-  // The pre-push hook's own hosted checks (smashcraft:ts/scripts/prePush.ts), which the farm runs for a landing so its machine runs none of them.
+  // The pre-push hook's own hosted checks (makgora:ts/scripts/prePush.ts), which the farm runs for a landing so its machine runs none of them.
   { name: "clean room", command: ["bun", "scripts/cleanRoom.ts"], reaches: [pattern(/./, "any changed path")], farm: ["clean-room"] },
   {
     name: "kind tags, parity ledger and type-check ts",
