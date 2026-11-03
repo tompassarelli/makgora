@@ -4,7 +4,6 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { BODY_CAST, bossSpell } from "../presentation/bossSpellArt";
-import { BossPlate } from "../ui/bossPlate";
 import { BossSpells, type SpellCast, spellCast } from "./bossSpells";
 import { formatInt } from "wisp/game/text";
 import { idiv } from "wisp/src/sim/intMath";
@@ -49,13 +48,12 @@ export class ClassicPresentation {
   private readonly results: Frame;
   private cardText = "";
   private spells: BossSpells | undefined;
-  private readonly cast: SpellCast = spellCast();
+  readonly cast: SpellCast = spellCast();
   private shownHealth = -1;
   private readonly damage: FloatingText;
   private damageAge = DAMAGE_FRAMES;
   private damageX = 0.0;
   private damageZ = 0.0;
-  readonly plate: BossPlate;
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
     this.card = createBackdrop("ClassicEndingCard", gameUi(), 893);
@@ -80,16 +78,9 @@ export class ClassicPresentation {
     this.lines = text("ClassicEndingLines", 896, f32(0.43), f32(0.1), f32(0.011));
     this.results = text("ClassicEndingResults", 897, f32(0.32), f32(0.04), f32(0.0095));
     setFrameVisible(this.card, false);
-    this.plate = new BossPlate();
     this.damage = createFloatingText();
     setFloatingTextPermanent(this.damage, true);
     setFloatingTextVisible(this.damage, false);
-  }
-
-  updatePlate(game: Readonly<MatchState>, showMatch: boolean): void {
-    const { boss } = this;
-    const shown = showMatch && boss !== undefined && game.phase === Phase.match && game.run.active && game.run.boss.kind !== BossKind.none;
-    this.plate.update(shown, boss?.name ?? "", boss?.portrait ?? "", game.run.boss.health, game.run.boss.maxHealth);
   }
 
   private showDamage(x: number, z: number, amount: number): void {
@@ -246,7 +237,6 @@ export class ClassicPresentation {
 
   destroy(): void {
     this.endMatch();
-    this.plate.destroy();
     destroyFrame(this.card);
   }
 }

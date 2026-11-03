@@ -2,10 +2,10 @@ import { f32 } from "wisp/src/sim/f32";
 import { formatInt } from "wisp/game/text";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
-import { createOutline, attachOutline, destroyOutline, setOutlineText, showOutline } from "./textOutline";
+import { createTemplateOutline, attachOutline, destroyOutline, setOutlineText, showOutline } from "./textOutline";
 import { unitsForPixels } from "./portraitFrames";
 import { SHAKE_FRAMES, shakeX, shakeY } from "./plateLayout";
-import { destroyFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
+import { createFrame, destroyFrame, Frame, setFrameScale, setFrameAlpha, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 
 export interface PlateRectangle { readonly left: number; readonly top: number; readonly width: number; readonly height: number }
 
@@ -14,8 +14,9 @@ const INSET = f32(0.006);
 const PORTRAIT = f32(BOSS_PLATE.height - 2 * INSET);
 const TEXT_LEFT = f32(BOSS_PLATE.left + INSET + PORTRAIT + INSET);
 const TEXT_WIDTH = f32(BOSS_PLATE.left + BOSS_PLATE.width - INSET - TEXT_LEFT);
-const NAME_SIZE = f32(0.014);
-const HEALTH_SIZE = f32(0.024);
+const NAME_SIZE = f32(0.018);
+const HEALTH_SCALE = f32(0.8);
+export const BOSS_PLATE_CONTEXT = 1090;
 const ROW_HEIGHT = f32(0.03);
 const BAR_HEIGHT = f32(0.016);
 export const BOSS_BAR: PlateRectangle = { left: TEXT_LEFT, top: f32(BOSS_PLATE.top - BOSS_PLATE.height + INSET + BAR_HEIGHT), width: TEXT_WIDTH, height: BAR_HEIGHT };
@@ -63,8 +64,11 @@ export class BossPlate {
     this.trail = this.backdrop("BossPlateBarTrail", parent, 2, BAR_TRAIL);
     this.fill = this.backdrop("BossPlateBarFill", parent, 3, BAR_FILL);
     this.name = this.text("BossPlateName", parent, NAME_SIZE, TextAlignment.left);
-    this.healthOutline = createOutline("BossPlateHealth", parent, 0, MENU_FONT, HEALTH_SIZE, LEVEL + 3);
-    this.health = this.text("BossPlateHealth", parent, HEALTH_SIZE, TextAlignment.right);
+    this.healthOutline = createTemplateOutline("MakgoraDamageOutline", parent, BOSS_PLATE_CONTEXT, LEVEL + 3, HEALTH_SCALE);
+    this.health = createFrame("MakgoraDamage", parent, 0, BOSS_PLATE_CONTEXT);
+    setFrameScale(this.health, HEALTH_SCALE);
+    setFrameEnabled(this.health, false);
+    setFrameLevel(this.health, LEVEL + 4);
     placeTopLeft(this.panel, BOSS_PLATE.left, BOSS_PLATE.top);
     setFrameSize(this.panel, BOSS_PLATE.width, BOSS_PLATE.height);
     placeTopLeft(this.portrait, BOSS_PLATE.left + INSET, BOSS_PLATE.top - INSET);
@@ -72,6 +76,7 @@ export class BossPlate {
     placeTopLeft(this.name, TEXT_LEFT, BOSS_PLATE.top - INSET);
     setFrameSize(this.name, TEXT_WIDTH, ROW_HEIGHT);
     this.placeHealth(0.0, 0.0);
+    setFrameTextAlignment(this.health, TextAlignment.middle, TextAlignment.right);
     attachOutline(this.healthOutline, this.health, OUTLINE_PX, TextAlignment.middle, TextAlignment.right);
     placeTopLeft(this.barBack, BOSS_BAR.left, BOSS_BAR.top);
     setFrameSize(this.barBack, BOSS_BAR.width, BOSS_BAR.height);
@@ -129,7 +134,7 @@ export class BossPlate {
 
   private placeHealth(dxPx: number, dyPx: number): void {
     placeTopLeft(this.health, f32(TEXT_LEFT + unitsForPixels(dxPx)), f32(BOSS_PLATE.top - INSET + f32(0.002) - unitsForPixels(dyPx)));
-    setFrameSize(this.health, TEXT_WIDTH, ROW_HEIGHT);
+    setFrameSize(this.health, f32(TEXT_WIDTH / HEALTH_SCALE), f32(ROW_HEIGHT / HEALTH_SCALE));
   }
 
   private setShown(visible: boolean): void {

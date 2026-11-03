@@ -64,6 +64,7 @@ import { BodyFlash } from "../../game/render/bodyFlash";
 import { MeterGlow } from "../../game/render/meterGlow";
 import { type FighterDraw, createFighterDraw } from "../../game/presentation/fighterDraw";
 import { ClassicPresentation } from "../../game/render/classicPresentation";
+import { BossPlate } from "../../game/ui/bossPlate";
 import { PauseMenu } from "../../game/ui/pauseMenu";
 import { PauseScreen } from "../../game/ui/pauseScreen";
 import { InputPreview } from "../../game/ui/inputPreview";
@@ -134,6 +135,7 @@ export interface UiObjects {
   elements: ElementEffects;
 
   classic?: ClassicPresentation;
+  bossPlate?: BossPlate;
 }
 
 
@@ -199,6 +201,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     match: new MatchPresentation(s.origin, results),
     elements: new ElementEffects(s.origin),
     classic: new ClassicPresentation(s.origin),
+    bossPlate: new BossPlate(),
   };
   combat.costumeOf = (slot) => {
     if (!isParticipantSlot(slot)) return 0;
@@ -381,12 +384,14 @@ function rebindMatchPanels(s: ShellState, ui: UiObjects): void {
     ui.elements.destroy();
     ui.elements = new ElementEffects(s.origin);
   } else bindPrototype(ui.elements, ElementEffects.prototype);
-  const retainedClassic: { readonly classic?: { readonly plate?: unknown } } = ui;
+  const retainedClassic: { readonly classic?: { readonly cast?: unknown } } = ui;
   if (ui.classic === undefined) ui.classic = new ClassicPresentation(s.origin);
-  else if (retainedClassic.classic?.plate === undefined) {
+  else if (retainedClassic.classic?.cast === undefined) {
     ui.classic.destroy();
     ui.classic = new ClassicPresentation(s.origin);
   } else bindPrototype(ui.classic, ClassicPresentation.prototype);
+  if (ui.bossPlate === undefined) ui.bossPlate = new BossPlate();
+  else bindPrototype(ui.bossPlate, BossPlate.prototype);
 }
 
 function rebindFighterRenderers(renderers: FighterRenderers): void {

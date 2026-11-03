@@ -13,6 +13,7 @@ import type { Fighter } from "../../game/sim/fighter";
 import type { ParticipantSlot } from "../../game/input/participants";
 import type { KeyBindings } from "../../game/input/keyBindings";
 import { loreClears } from "../../game/classic/loreClears";
+import { bossDefinition } from "../../game/classic/bosses";
 import { type UiObjects, layoutHuds, menuControlHit } from "./ui";
 import { localDevice, localPreview } from "./keyboardPreview";
 import { type ShellState, activeRollback, localSlot, playsOnKeyboard } from "./state";
@@ -38,7 +39,8 @@ export function presentMatchPanels(s: ShellState, game: MatchState, ui: UiObject
   const keys = s.participants[local ?? 0].keys;
   ui.preview.update(showMatch && preview && game.phase === Phase.match && local !== undefined, s.participants[local ?? 0].bindings, localDevice(s), key => keyDown(keys, key));
   ui.classic?.updateCard(game);
-  ui.classic?.updatePlate(game, showMatch);
+  const boss = game.run.active ? bossDefinition(game.run.boss.kind) : undefined;
+  ui.bossPlate?.update(showMatch && boss !== undefined && game.phase === Phase.match, boss?.name ?? "", boss?.portrait ?? "", game.run.boss.health, game.run.boss.maxHealth);
 }
 
 export function markLoreClear(game: MatchState): void {

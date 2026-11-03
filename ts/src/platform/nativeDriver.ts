@@ -18,6 +18,8 @@ import { confirmedChecksum, startInputTrace } from "../host/loop/diagnostics";
 import { pauseMatchPresentation } from "../host/loop/view";
 import { startDown } from "../host/loop/keys";
 import { applyDeveloperCommand } from "../host/loop/developerCommands";
+import { finishStageLoad, stageLoading } from "../host/loop/stageLoad";
+import { CLASSIC_COMMAND } from "../game/session/devSettings";
 import { shell, type ShellState, localSlot } from "../host/loop/state";
 import { paintDrawnStamp } from "../host/loop/drawnStamp";
 import { fighterAt, neutralControls } from "../game/sim/roster";
@@ -227,8 +229,9 @@ export function nativeDriverCommand(text: string): void {
   const script = parseScript(text);
   applyDeveloperCommand(s, 0, "-dev reset");
 
-  setHumanCount(s.game, 2);
+  setHumanCount(s.game, script.setup.startsWith(CLASSIC_COMMAND) ? 1 : 2);
   applyDeveloperCommand(s, 0, script.setup);
+  if (stageLoading(s)) finishStageLoad(s);
   globalThis.__makgoraDriverScripts = (globalThis.__makgoraDriverScripts ?? 0) + 1;
   if (s.game.phase !== Phase.match || s.runtime.simulationFrame !== 0) throw new Error("native driver: pad setup did not start a new match");
   globalThis.__makgoraNativeDriver = { edges: script.edges, next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };

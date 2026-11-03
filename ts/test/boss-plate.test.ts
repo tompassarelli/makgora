@@ -7,6 +7,7 @@ import { install, startBuild } from "../src/platform/main";
 import { activeRollback, shellState } from "../src/host/loop/state";
 import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
 import { testHeadless } from "./headless";
+import { BOSS_PLATE_CONTEXT } from "../src/game/ui/bossPlate";
 
 const headless = testHeadless(MAKGORA_HEADLESS);
 
@@ -47,7 +48,7 @@ test("Archimonde's boss plate shows his name, portrait and remaining health, cou
   const start = shown();
   expect(start.named("BossPlateName")?.text).toContain("Archimonde");
   expect(start.named("BossPlatePortrait")?.texture).toBe("ReplaceableTextures\\CommandButtons\\BTNArchimonde.blp");
-  expect(start.named("BossPlateHealth")?.text).toContain(`${full}|r`);
+  expect(client.frames.named("MakgoraDamage", BOSS_PLATE_CONTEXT)?.text).toContain(`${full}|r`);
   expect(start.fill).toBeCloseTo(1.0, 3);
   const panel = start.named("BossPlatePanel")?.rectangle;
   if (panel === undefined) throw new Error("the boss plate is drawn");
@@ -64,7 +65,7 @@ test("Archimonde's boss plate shows his name, portrait and remaining health, cou
     });
     clients.frames(2);
     const now = shown();
-    expect(now.named("BossPlateHealth")?.text).toContain(`${left}|r`);
+    expect(client.frames.named("MakgoraDamage", BOSS_PLATE_CONTEXT)?.text).toContain(`${left}|r`);
     expect(now.fill).toBeCloseTo(left / full, 3);
   }
   expect(client.errors).toEqual([]);

@@ -25,7 +25,7 @@ export function requestStageLoad(s: ShellState, slot: ParticipantSlot): boolean 
 
 export const stageLoading = (s: Readonly<ShellState>): boolean => s.stageLoad !== undefined;
 
-function finishStageLoad(s: ShellState): void {
+export function finishStageLoad(s: ShellState): void {
   const load = s.stageLoad;
   s.stageLoad = undefined;
   if (load !== undefined && requestStart(s.game, load.starter)) startMatch(s);
