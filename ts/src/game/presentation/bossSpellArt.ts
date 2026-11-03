@@ -37,6 +37,9 @@ export const SHOCKWAVE_MODEL = "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx";
 export const SHOCKWAVE_PILLAR_SCALE = f32(1.2);
 export const SHOCKWAVE_FRAMES = 60;
 
+export const IMPACT_RESPAWN_FRAMES = 4;
+export const IMPACT_RESPAWNS = 3;
+
 export const BODY_CAST: { readonly [spell: number]: { readonly tell: string; readonly active: string | undefined } } = {
   [BossSpell.rainOfFire]: { tell: "spell", active: "attack" },
   [BossSpell.fingerOfDeath]: { tell: "spell", active: "attack" },
