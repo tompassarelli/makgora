@@ -6,7 +6,7 @@
 | Main is red (makgora:.github/workflows/main-red.yml) | after each CI or Background sweeps run on main, or run-ID dispatch | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (makgora:AGENTS.md) |
 | Revert red main (makgora:.github/workflows/revert-red.yml) | dispatch by Main is red with the failed run's ID | reverts a landing whose parent was green when no green run of that workflow follows within 15 minutes (see Sheriff) |
 | Farm test (makgora:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | the landing checks (makgora:ts/scripts/landingChecks.ts) in the jobs CI's checks fall into (boot, perf, rollback, parity-0 to parity-3, lua, corpus, computer-0 and computer-1, types, clean-room, static), each only when the `checks` input names it or, without one, when a changed path reaches one of its checks, which then run when a changed path reaches them (see Landing; safe-push's landing runs it with the groups it selects, see Landing); the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
-| Background sweeps (makgora:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on hosted runners, at most two jobs at once: the host test suite (`bun run test` in ts/, every ts/test file outside the sweeps), every sweep outside the gate allowlist (Bun, and Lua32 in three partitions), and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs' worst frames must stay within 10% of the nearest first-parent main commit's successful Background run artifact measured by the same instrument (Wisp's Lua32 build and profiler, hashed into the artifact name); the prior is searched through every green Background run on main within the 30-day artifact retention, and a run whose instrument has green artifacts but none still live on main fails with `NoPrior` until a `rebaseline` dispatch decides it, while an instrument with no artifact at all (a new Wisp build) warns and passes drift comparison while roster coverage and absolute frame budgets still apply; a decided rise rebaselines through the dispatch input `rebaseline` (makgora:docs/commands/perf.md); a landing's red run goes to the sheriff (see Sheriff) |
+| Background sweeps (makgora:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on hosted runners, at most two jobs at once: the host test suite (`bun run test` in ts/, every ts/test file outside the sweeps but the standalone parity test, which runs after landing from safe-push, see Landing), every sweep outside the gate allowlist (Bun, and Lua32 in three partitions), and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs' worst frames must stay within 10% of the nearest first-parent main commit's successful Background run artifact measured by the same instrument (Wisp's Lua32 build and profiler, hashed into the artifact name); the prior is searched through every green Background run on main within the 30-day artifact retention, and a run whose instrument has green artifacts but none still live on main fails with `NoPrior` until a `rebaseline` dispatch decides it, while an instrument with no artifact at all (a new Wisp build) warns and passes drift comparison while roster coverage and absolute frame budgets still apply; a decided rise rebaselines through the dispatch input `rebaseline` (makgora:docs/commands/perf.md); a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (makgora:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and comments each finding kind on its epic, or on the After 0.1 issue when no epic matches (makgora:docs/commands/soak.md) |
 | Autoland (makgora:.github/workflows/autoland.yml) | push to `claude/**`, dispatch with `branch` | the cloud workers' landing queue: tests each waiting tip alone at once and lands it from its test run, or in a train of tips that passed when main moved on its paths |
 | Auto-close (makgora:.github/workflows/autoclose.yml) | each landing (a push to main, or Autoland's dispatch with the landed SHA and the main before it) | reruns the declared Done-when checks of each issue the landed commits reference, ticks the passing boxes, closes an issue whose boxes are all ticked (see Auto-close) |
@@ -123,6 +123,22 @@ What reaches each check:
   the same on any machine, and each also checks that the four clients never
   desync; main's smoke job runs both on every landed commit, and a failure
   goes to the sheriff and the "main is red" issue.
+- The standalone parity of `test/native/pads/cpu-expert.pad` (`bun wisp parity
+  standalone test/native/pads/cpu-expert.pad --presentation native`, this
+  tree's sim against the pad's native recording, frame by frame) gates no
+  landing and is in no CI job (decided 2026-11-04: gameplay changes land at
+  once and drift from the native client is caught one landing late). It is
+  the `after-landing.check` in `.safe-push`, which safe-push's after-landing
+  gates run on each landed commit (north:crates/north-landing/src/landing/after_landing.rs;
+  log in `~/.local/state/safe-push/after-landing/`). A failure files the one
+  "After-landing gates failed on SHA" issue for that commit, holding the
+  command's output: the first divergent frame and whether to re-record the pad
+  in the native client (an intended gameplay change) or fix the drift. Nothing
+  is refused and the sheriff reverts nothing. Its host test,
+  `ts/test/standaloneParityCheck.test.ts`, is left out of `bun run test` so
+  Background sweeps cannot turn main red on it; safe-push's after-landing
+  test-kind gate still runs it on the change and on its mutant
+  `native-corpus-gravity-step` for the kill claim.
 - The native corpus replays each recording on the source that recorded it
   (wisp#69), and any change under `ts/src` moves this tree off every
   recording's source version, so only a recording, the replay command or the

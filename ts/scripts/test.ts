@@ -22,8 +22,10 @@ import { usableCpus } from "./usableCpus";
 const project = resolve(import.meta.dir, "..");
 process.chdir(project);
 ensureGenerated();
+const AFTER_LANDING_ONLY = ["test/standaloneParityCheck.test.ts"];
 const files = [...new Bun.Glob("**/*{.test,_test,.spec,_spec}.{js,jsx,ts,tsx}").scanSync(project)]
   .filter((file) => !file.startsWith("build/") && !file.split("/").some((part) => part === "node_modules" || part === ".git"))
+  .filter((file) => !AFTER_LANDING_ONLY.includes(file))
   .sort();
 if (files.length === 0) throw new Error("No tests found");
 // `--units` prints what may be split across machines (`wisp farm test`): every
