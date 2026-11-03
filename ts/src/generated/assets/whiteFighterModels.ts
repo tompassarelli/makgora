@@ -34,6 +34,8 @@ import * as firelord from "./white-models/firelord";
 import * as goblinAlchemist from "./white-models/goblin-alchemist";
 import * as onyxia from "./white-models/onyxia";
 import * as onyxiaDragon from "./white-models/onyxia-dragon";
+import * as whitemane from "./white-models/whitemane";
+import * as valeera from "./white-models/valeera";
 export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   1: rifleman.whiteModel,
   2: illidan.whiteModel,
@@ -69,4 +71,6 @@ export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   34: goblinAlchemist.whiteModel,
   35: onyxia.whiteModel,
   36: onyxiaDragon.whiteModel,
+  37: whitemane.whiteModel,
+  38: valeera.whiteModel,
 };

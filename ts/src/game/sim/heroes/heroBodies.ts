@@ -50,6 +50,8 @@ const HERO_BODIES: { readonly [character: number]: HeroBody | undefined } = {
   [Character.akama]: { ...body(f32(1.12), f32(1.0), f32(1.0), 1.0, f32(1.1)), traction: f32(0.06) },
   [Character.firelord]: { ...body(f32(1.12), f32(1.0), f32(1.0), 1.0, f32(1.1)), traction: f32(0.06) },
   [Character.alchemist]: { ...body(f32(1.12), f32(1.0), f32(1.0), 1.0, f32(1.1)), traction: f32(0.06) },
+  [Character.whitemane]: { ...body(f32(1.12), f32(1.0), f32(1.0), 1.0, f32(1.1)), traction: f32(0.06) },
+  [Character.valeera]: { ...body(f32(1.12), f32(1.0), f32(1.0), 1.0, f32(1.1)), traction: f32(0.06) },
   [Character.onyxia]: { ...body(f32(0.94), f32(1.06), f32(1.0), f32(0.9), f32(1.05)), traction: f32(0.07) },
   [Character.onyxiaDragon]: { ...body(f32(1.30), f32(0.84), f32(0.9), f32(1.6), f32(1.4)), dashRunFrame: 16, traction: f32(0.08) },
   [Character.murloc]: { ...body(f32(0.88), f32(1.12), f32(1.06), f32(0.90), f32(0.72)), runSpeed: 13.79999828338623, dashSpeed: 11.999999046325684, traction: f32(0.055) },
@@ -97,6 +99,8 @@ const FIGHTER_SHIELDS: { readonly [character: number]: FighterShield | undefined
   [Character.akama]: { centerZ: f32(62.6), radius: 117.0 },
   [Character.firelord]: { centerZ: f32(62.6), radius: 117.0 },
   [Character.alchemist]: { centerZ: f32(62.6), radius: 117.0 },
+  [Character.whitemane]: { centerZ: f32(62.6), radius: 117.0 },
+  [Character.valeera]: { centerZ: f32(62.6), radius: 117.0 },
   [Character.onyxia]: { centerZ: f32(62.6), radius: 112.0 },
   [Character.onyxiaDragon]: { centerZ: f32(90.0), radius: 170.0 },
 };

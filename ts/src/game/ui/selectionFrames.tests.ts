@@ -10,7 +10,7 @@ import { GRID_FIGHTERS, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, name
 
 const FACTION_ORDER = [
   "thrall", "grom-hellscream", "cairne-bloodhoof", "beastmaster", "blademaster", "shadow-hunter", "peon",
-  "uther", "jaina-proudmoore", "mountain-king", "medivh", "kael'thas-sunstrider", "lich-king", "lich", "sylvanas-windrunner", "dreadlord",
+  "uther", "jaina-proudmoore", "mountain-king", "medivh", "whitemane", "kael'thas-sunstrider", "valeera", "lich-king", "lich", "sylvanas-windrunner", "dreadlord",
   "anub'arak", "butcher", "malfurion-stormrage", "tyrande", "illidan", "warden",
   "lady-vashj", "akama", "chen-stormstout", "firelord", "goblin-tinker", "goblin-alchemist", "murloc", "pit-lord", "onyxia", "archimonde",
 ];

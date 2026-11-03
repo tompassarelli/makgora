@@ -34,9 +34,11 @@ import * as firelord from './firelord';
 import * as alchemist from './alchemist';
 import * as onyxia from './onyxia';
 import * as onyxiadragon from './onyxiadragon';
+import * as whitemane from './whitemane';
+import * as valeera from './valeera';
 
 /** Every fighter's Classic mapping onto the canonical rig, by character (#366). */
 export const FIGHTER_RIGS: ReadonlyMap<Character, FighterRig> = new Map([
     rifleman, illidan, blademaster, mountainking, warden, lich, uther, dreadlord, shadowhunter, pitlord, beastmaster, lichking, thrall,
-    jaina, sylvanas, cairne, chen, peon, tinker, kaelthas, murloc, grom, anubarak, malfurion, medivh, ladyvashj, archimonde, tyrande, butcher, akama, firelord, alchemist, onyxia, onyxiadragon,
+    jaina, sylvanas, cairne, chen, peon, tinker, kaelthas, murloc, grom, anubarak, malfurion, medivh, ladyvashj, archimonde, tyrande, butcher, akama, firelord, alchemist, onyxia, onyxiadragon, whitemane, valeera,
 ].map(rig => [rig.character, rig as FighterRig]));

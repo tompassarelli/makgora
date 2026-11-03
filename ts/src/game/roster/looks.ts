@@ -28,6 +28,8 @@ import { tyrandeLook } from "../fighters/tyrande/look";
 import { akamaLook } from "../fighters/akama/look";
 import { firelordLook } from "../fighters/firelord/look";
 import { alchemistLook } from "../fighters/alchemist/look";
+import { whitemaneLook } from "../fighters/whitemane/look";
+import { valeeraLook } from "../fighters/valeera/look";
 import { dragonLook, prestorLook } from "../fighters/onyxia/look";
 import { mountainKingLook } from "../fighters/mountain-king/look";
 import { murlocLook } from "../fighters/murloc/look";
@@ -61,6 +63,8 @@ const LOOKS: { readonly [character: number]: HeroLook | undefined } = {
   [Character.akama]: akamaLook,
   [Character.firelord]: firelordLook,
   [Character.alchemist]: alchemistLook,
+  [Character.whitemane]: whitemaneLook,
+  [Character.valeera]: valeeraLook,
   [Character.onyxia]: prestorLook,
   [Character.onyxiaDragon]: dragonLook,
   [Character.mountainKing]: mountainKingLook(MOUNTAIN_KING_GROUND),

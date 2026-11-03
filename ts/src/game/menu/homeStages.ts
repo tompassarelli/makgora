@@ -32,6 +32,8 @@ export const HOME_STAGES: readonly { readonly character: Character; readonly sta
   { character: Character.akama, stage: 14 },
   { character: Character.firelord, stage: 12 },
   { character: Character.alchemist, stage: 3 },
+  { character: Character.whitemane, stage: 6 },
+  { character: Character.valeera, stage: 14 },
   { character: Character.onyxia, stage: 12 },
   { character: Character.murloc, stage: 7 },
   { character: Character.ladyVashj, stage: 7 },

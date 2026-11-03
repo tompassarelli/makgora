@@ -31,7 +31,9 @@ import { thrallStrikeMoments } from "../../game/fighters/thrall/strikeMoments";
 import { tinkerStrikeMoments } from "../../game/fighters/tinker/strikeMoments";
 import { tyrandeStrikeMoments } from "../../game/fighters/tyrande/strikeMoments";
 import { utherStrikeMoments } from "../../game/fighters/uther/strikeMoments";
+import { valeeraStrikeMoments } from "../../game/fighters/valeera/strikeMoments";
 import { wardenStrikeMoments } from "../../game/fighters/warden/strikeMoments";
+import { whitemaneStrikeMoments } from "../../game/fighters/whitemane/strikeMoments";
 
 /**
  * Per hero and attack style (or SPECIAL_KEY plus a special slot): the clip measured, the clip
@@ -69,5 +71,7 @@ export const HERO_STRIKE_MOMENTS: { readonly [character: number]: { readonly [st
   [Character.tinker]: tinkerStrikeMoments,
   [Character.tyrande]: tyrandeStrikeMoments,
   [Character.uther]: utherStrikeMoments,
+  [Character.valeera]: valeeraStrikeMoments,
   [Character.warden]: wardenStrikeMoments,
+  [Character.whitemane]: whitemaneStrikeMoments,
 };
