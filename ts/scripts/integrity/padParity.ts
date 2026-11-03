@@ -58,7 +58,7 @@ export function padTraceCommand(command: string | undefined, callbacks: number):
 
 export const TRACE_FILE = "wc3-melee-input-trace.txt";
 export const REPRO_NAME = /^makgora-repro-p(\d)-f(\d+)-\d+\.txt$/;
-export const MATCH_REPLAY_NAME = /^smashcraft-replay-p[01]-\d+\.txt$/;
+export const MATCH_REPLAY_NAME = /^makgora-replay-p[01]-\d+\.txt$/;
 
 interface TraceEvent {
   readonly slot: number;

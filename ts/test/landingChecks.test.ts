@@ -29,7 +29,7 @@ test("a landing runs no check for docs, every check for a shared root or the ful
   expect(groups(["ts/src/game/sim/codes.ts"])).toEqual(["boot", "perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "computer-0", "computer-1", "clean-room", "static"]);
   expect(before(["ts/scripts/wisp/commands/tapes.ts"])).toEqual([]);
   expect(after(["ts/scripts/wisp/commands/tapes.ts"])).toEqual(LUA_PARITY);
-  expect(before(["ts/test/corpus/2026-10-08T08-30-47-695Z/a/smashcraft-replay-39.txt"])).toEqual(["parity corpus: every native recording replays headless with 0 divergent frames"]);
+  expect(before(["ts/test/corpus/2026-10-08T08-30-47-695Z/a/makgora-replay-39.txt"])).toEqual(["parity corpus: every native recording replays headless with 0 divergent frames"]);
   for (const parse of ["ts/src/game/replay/replayFormat.ts", "ts/src/game/core/gameFiles.ts"]) expect(before([parse])).toContain(CORPUS);
   expect(before(["ts/src/game/replay/canonical.ts"])).not.toContain(CORPUS);
   expect(before(["ts/src/game/core/gameFiles.ts"])).toContain("type-check edit loop and dependency validation");

@@ -167,7 +167,7 @@ yield* Effect.gen(function*() {
         `button a ${beat % 2}`, `button b ${beat % 7 === 0 ? 1 : 0}`, `button x ${beat % 5 === 0 ? 1 : 0}`]) yield* producer.write(line);
     }
     for (const [slot, directory] of data.entries()) {
-      const name = readdirSync(directory).find(name => /^smashcraft-match-\d+\.txt$/.test(name)
+      const name = readdirSync(directory).find(name => /^makgora-match-\d+\.txt$/.test(name)
         && !baseline[slot]?.has(name) && statSync(join(directory, name)).mtimeMs >= fresh);
       if (name !== undefined) records.set(slot, { file: name, lines: preloadLines(readFileSync(join(directory, name), "utf8")) ?? [] });
     }

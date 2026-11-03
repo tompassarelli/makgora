@@ -4,7 +4,7 @@
 import { readChunks, writeChunks } from "wisp/src/platform/fileio";
 import { LORE_BATTLES } from "./loreBattles";
 
-export const LORE_CLEARS_FILE = "SmashcraftLore.pld";
+export const LORE_CLEARS_FILE = "MakgoraLore.pld";
 
 const CHUNK = 200;
 

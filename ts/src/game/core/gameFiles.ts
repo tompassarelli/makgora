@@ -38,13 +38,13 @@ export const playtestReceiptFile = (slot: number) => `makgora-play-p${slot}.txt`
 
 export const stageReceiptFile = (build: string, slot: number) => `makgora-stage-${build}-p${slot}.txt`;
 
-export const matchRecordFile = (serial: number) => `smashcraft-match-${serial}.txt`;
+export const matchRecordFile = (serial: number) => `makgora-match-${serial}.txt`;
 
-export const replayFile = (serial: number) => `smashcraft-replay-${serial}.txt`;
-export const replayPartFile = (serial: number, part: number) => `smashcraft-replay-${serial}-${part}.txt`;
+export const replayFile = (serial: number) => `makgora-replay-${serial}.txt`;
+export const replayPartFile = (serial: number, part: number) => `makgora-replay-${serial}-${part}.txt`;
 
-export const MATCH_RECORD_INDEX_FILE = "smashcraft-match-index.pld";
-export const LOBBY_COUNTER_FILE = "smashcraft-lobby-counter.pld";
+export const MATCH_RECORD_INDEX_FILE = "makgora-match-index.pld";
+export const LOBBY_COUNTER_FILE = "makgora-lobby-counter.pld";
 
 export const drawnFrameFile = (build: string, slot: number) => `makgora-drawn-${build}-p${slot}.txt`;
 export const drawnFrameLine = (build: string, epoch: number, frame: number) => `MAKGORA DRAWN v=1 build=${build} epoch=${epoch} frame=${frame}`;

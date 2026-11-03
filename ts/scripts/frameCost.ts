@@ -17,7 +17,7 @@ if (command === "read") {
     if (stored === undefined) return yield* new MalformedGameFile({ file: path, field: "record", problem: "file is missing" });
     const { frames, totalSeconds, meanSeconds, initialChecksum, finalChecksum } = stored.value;
     const state = stored.value.state.map((line) => line.slice(6)).join("");
-    if (!state.startsWith("SmashcraftReplay2") || canonicalChecksum(state) !== finalChecksum) {
+    if (!state.startsWith("MakgoraReplay2") || canonicalChecksum(state) !== finalChecksum) {
       return yield* new MalformedGameFile({ file: path, field: "state", problem: "replay state is incomplete or does not match final_checksum" });
     }
     return { language, frames, totalSeconds, meanSeconds, initialChecksum, finalChecksum, state };

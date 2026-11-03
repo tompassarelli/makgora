@@ -213,11 +213,11 @@ const collect = (data: readonly [string, string], out: string, sinceMs: number, 
         if (REPRO_NAME.test(name)) copyFileSync(join(dir, name), join(out, name));
         // integrity rows (`bun wisp integrity delay`, #396); the page name already names its slot
         if (RESPONSE_PAGE.match(name)) copyFileSync(join(dir, name), join(out, name));
-        const match = /^smashcraft-replay-(\d+)\.txt$/.exec(name);
+        const match = /^makgora-replay-(\d+)\.txt$/.exec(name);
         if (match !== null) {
           const lines = readReplay(join(dir, name));
           if (typeof lines === "string") throw new Error(lines);
-          writeFileSync(join(out, `smashcraft-replay-p${slot}-${match[1]}.txt`), `${lines.join("\n")}\n`);
+          writeFileSync(join(out, `makgora-replay-p${slot}-${match[1]}.txt`), `${lines.join("\n")}\n`);
         }
       }
     });
@@ -446,7 +446,7 @@ function invalidRun(names: readonly string[], documents: readonly string[], data
     const errors = join(dir, "Errors");
     const folders = existsSync(errors) ? readdirSync(errors).filter((folder) => fresh(join(errors, folder))) : [];
     for (const folder of folders) reasons.push(`client ${names[index] ?? index} ${existsSync(join(errors, folder, "Crash.txt")) ? "crashed" : "wrote a desync report"} (Errors/${folder})`);
-    const records = existsSync(at(data, index)) ? readdirSync(at(data, index)).filter((name) => /^smashcraft-match-\d+\.txt$/.test(name) && fresh(join(at(data, index), name))) : [];
+    const records = existsSync(at(data, index)) ? readdirSync(at(data, index)).filter((name) => /^makgora-match-\d+\.txt$/.test(name) && fresh(join(at(data, index), name))) : [];
     if (records.length > 0) reasons.push(`client ${names[index] ?? index} reached the match results (${records.join(", ")})`);
   });
   return reasons;

@@ -324,7 +324,7 @@ export const MAKGORA_ACCEPT: AcceptSuite = {
         { receipt: "^parts [0-9]+$", client: "a", seconds: 600 },
       ],
       pass: [NO_ERRORS, { kind: "receipt", pattern: "^parts [0-9]+$", min: 1 }],
-      look: "client A's replay (smashcraft-replay-N.txt with its parts) replays to its checksum with `LUA=<32-bit lua> bun wisp replay` and shows player 1's key presses",
+      look: "client A's replay (makgora-replay-N.txt with its parts) replays to its checksum with `LUA=<32-bit lua> bun wisp replay` and shows player 1's key presses",
     },
     {
       id: "166-controller-match",

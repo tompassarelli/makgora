@@ -9,7 +9,7 @@ import { tutorialSeen } from "../src/game/ui/tutorialMenu";
 const PROMPT = "Start tutorial";
 const SETTLE_STEPS = 45;
 const ESCAPE = 0x1b;
-const WRITTEN_BY_NATIVE_WINDOW = join(import.meta.dir, "fixtures/tutorial-seen/SmashcraftTutorial.pld");
+const WRITTEN_BY_NATIVE_WINDOW = join(import.meta.dir, "fixtures/tutorial-seen/MakgoraTutorial.pld");
 
 async function selectSession(savedFiles: string) {
   const session = await createStandaloneSession({ start: "select", savedFiles });
@@ -64,7 +64,7 @@ test("Esc closes the first-run tutorial prompt [k1 scenario]", async () => {
 test("a seen file the native window wrote keeps the tutorial prompt closed [k1 scenario]", async () => {
   const savedFiles = mkdtempSync(join(tmpdir(), "tutorial-prompt-"));
   try {
-    copyFileSync(WRITTEN_BY_NATIVE_WINDOW, join(savedFiles, "SmashcraftTutorial.pld"));
+    copyFileSync(WRITTEN_BY_NATIVE_WINDOW, join(savedFiles, "MakgoraTutorial.pld"));
     const session = await selectSession(savedFiles);
     try {
       let seen = false;

@@ -41,7 +41,7 @@ export const CHECKED_IN_CORPUS = join(tsDirectory, "test/corpus");
 export const localCorpus = () => join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/corpus");
 
 
-const REPLAY_FILE = /^smashcraft-replay-(\d+)(?:-(\d+))?\.txt$/;
+const REPLAY_FILE = /^makgora-replay-(\d+)(?:-(\d+))?\.txt$/;
 
 interface Session {
   readonly commit?: string;
@@ -246,9 +246,8 @@ const replayElsewhere = (skipped: readonly ReplayOutcome[], replays: readonly Re
   }
   for (const [commit, group] of byCommit) {
     const result = join(tmpdir(), `makgora-corpus-${process.pid}-${commit}.json`);
-    // External format: a recording's own commit reads the SMASHCRAFT_ names if it predates the makgora rename.
     const played = yield* sourceAt(commit).pipe(
-      Effect.flatMap((source) => run(`replay at ${commit.slice(0, 12)}`, source, [process.execPath, join(source, "scripts/wisp.ts"), "parity", "corpus", ...roots], { MAKGORA_CORPUS_RESULT: result, MAKGORA_CORPUS_HERE: "1", SMASHCRAFT_CORPUS_RESULT: result, SMASHCRAFT_CORPUS_HERE: "1" })),
+      Effect.flatMap((source) => run(`replay at ${commit.slice(0, 12)}`, source, [process.execPath, join(source, "scripts/wisp.ts"), "parity", "corpus", ...roots], { MAKGORA_CORPUS_RESULT: result, MAKGORA_CORPUS_HERE: "1" })),
       Effect.flatMap(() => Effect.try({ try: (): unknown => JSON.parse(readFileSync(result, "utf8")), catch: (cause) => new CorpusFailure({ problem: `reading ${result}: ${describeCause(cause)}` }) })),
       Effect.flatMap((parsed) => Schema.decodeUnknownEffect(ReplayOutcomes)(parsed).pipe(Effect.mapError((cause) => new CorpusFailure({ problem: `${result}: ${String(cause)}` })))),
       Effect.map((theirs) => group.map(({ outcome }) => theirs.find((other) => other.file === outcome.file)

@@ -26,7 +26,7 @@ interface ReplayManifest {
   readonly parts: number;
 }
 
-const PART_HEADER = "smashcraft-replay-part";
+const PART_HEADER = "makgora-replay-part";
 const MANIFEST_WORD = "replay";
 
 
@@ -64,7 +64,7 @@ export function parseReplayHeader(lines: readonly string[]): ReplayHeader | stri
   if (typeof repro === "string") return repro;
   const serial = wholeNumber(wordValue(repro.lines[0], MANIFEST_WORD));
   const version = wordValue(repro.lines[1], "version");
-  if (serial === undefined || version === undefined) return "not a Smashcraft replay";
+  if (serial === undefined || version === undefined) return "not a Mak'gora replay";
   const partsText = wordValue(repro.lines[2], "parts");
   const parts = partsText === undefined ? undefined : wholeNumber(partsText);
   if (partsText !== undefined && parts === undefined) return "the replay's part count is malformed";

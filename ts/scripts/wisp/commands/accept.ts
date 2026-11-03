@@ -132,7 +132,7 @@ const fighterCount = (mask: number) => {
   return count;
 };
 
-const REPLAY_NAME = /^smashcraft-replay-(\d+)(-\d+)?\.txt$/;
+const REPLAY_NAME = /^makgora-replay-(\d+)(-\d+)?\.txt$/;
 
 
 
@@ -346,7 +346,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
       : Effect.fail(new AcceptFailure({ operation: `start ${map}`, problem: `${pairDropText(drop)}; the next accept on pair ${drop.pair} restarts it` }))))));
   const liveDriver = liveAcceptDriver({
     start,
-    receipt: (name) => name.startsWith("makgora-dev-") || name.startsWith("makgora-stage-") || name.startsWith("makgora-error-") || name.startsWith("makgora-render-clock-") || name.startsWith("smashcraft-replay-") || name.startsWith("smashcraft-match-"),
+    receipt: (name) => name.startsWith("makgora-dev-") || name.startsWith("makgora-stage-") || name.startsWith("makgora-error-") || name.startsWith("makgora-render-clock-") || name.startsWith("makgora-replay-") || name.startsWith("makgora-match-"),
   }).pipe(Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, ...(solo ? [] : [makgoraWatch]))));
   let smoke: ReturnType<typeof withSmokeCapture> | undefined;
   const driver = Layer.effect(AcceptDriver, Effect.gen(function*() {

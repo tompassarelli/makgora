@@ -18,7 +18,7 @@ import { sendSync } from "wisp/game/sync";
 
 export type TutorialButton = { kind: "tutorialOpen" } | { kind: "tutorialStep"; direction: -1 | 1 } | { kind: "tutorialStart" } | { kind: "tutorialClose" };
 
-const SEEN_FILE = "SmashcraftTutorial.pld";
+const SEEN_FILE = "MakgoraTutorial.pld";
 const SEEN = "seen";
 export const NOT_NOW_LABEL = "Not now";
 export const NOT_NOW_BOX = { x: f32(0.41), y: f32(0.315), width: f32(0.16), height: f32(0.035) } as const;

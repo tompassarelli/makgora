@@ -80,7 +80,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
   const bool = (name: string, value: boolean) => sink.bool("", name, value);
   const real = (name: string, value: number) => sink.real("", name, value);
   // Determinism: this tag is hashed into every canonical digest, so renaming it re-records every committed digest.
-  sink.text("SmashcraftReplay2");
+  sink.text("MakgoraReplay2");
   int("participantMask", world.mask);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;

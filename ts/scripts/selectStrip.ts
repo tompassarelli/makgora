@@ -7,7 +7,7 @@ import { MAKGORA_JOURNEYS } from "./wisp/journeys";
 import { headlessRender } from "./wisp/headlessRender";
 import { makgoraNativeBehavior } from "./wisp/headlessNatives";
 
-export const RETURNING_PLAYER_FILES: Readonly<Record<string, readonly string[]>> = { "SmashcraftTutorial.pld": ["seen"] };
+export const RETURNING_PLAYER_FILES: Readonly<Record<string, readonly string[]>> = { "MakgoraTutorial.pld": ["seen"] };
 
 class SelectStripFailure extends Schema.TaggedError<SelectStripFailure, { readonly brand: unique symbol }>()("SelectStripFailure", { problem: Schema.String }) {}
 

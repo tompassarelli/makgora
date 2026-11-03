@@ -20,7 +20,7 @@ import type { Controls } from "../sim/roster";
 import { f32 } from "wisp/src/sim/f32";
 import { toReal } from "../core/numbers";
 
-export const TAPE_HEADER = "smashcraft-tape 1";
+export const TAPE_HEADER = "makgora-tape 1";
 
 type FieldOf<V> = { [K in keyof Controls]-?: Controls[K] extends V ? K : never }[keyof Controls];
 type FlagField = FieldOf<boolean>;

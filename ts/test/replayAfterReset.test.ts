@@ -11,7 +11,7 @@ test("a pad's match replay is written by a driver reset alone, with no later pad
   try {
     const clients = runtime.clients(entry, [0]);
     const files = clients.client(0).files;
-    const manifests = (): string[] => [...files.keys()].filter(name => /^smashcraft-replay-\d+\.txt$/.test(name));
+    const manifests = (): string[] => [...files.keys()].filter(name => /^makgora-replay-\d+\.txt$/.test(name));
     clients.start();
     clients.frames(3);
     clients.everywhere(() => nativeDriverCommand("#! chat -dev quick hero illidan stocks 9\n40 a stick 1 0\n"));

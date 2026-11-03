@@ -31,7 +31,7 @@ import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, SMOKE_BINDINGS, SMOKE_PRESET, type
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
-const REPLAY = /^smashcraft-replay-(\d+)\.txt$/;
+const REPLAY = /^makgora-replay-(\d+)\.txt$/;
 const SEGMENT_GAP = "1 second";
 const MATCH_SETTLE = "6 seconds";
 const PAUSE_SETTLE = "1500 millis";

@@ -15,7 +15,7 @@ import type { MatchTally } from "../presentation/matchCues";
 import { fighterName } from "../roster/kits";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 
-export const MATCH_RECORD_HEADER = "smashcraft-match";
+export const MATCH_RECORD_HEADER = "makgora-match";
 const MATCH_RECORD_VERSION = 1;
 
 
