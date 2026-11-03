@@ -64,8 +64,8 @@ test("a dev build file name parses back to its version and number, and a release
 });
 
 test("installing a dev build leaves the latest release and the newest dev build at the top of the Maps folder and moves older releases to old/ [k5 boundary maps-folder]", () => {
-  const documents = mkdtempSync(join(tmpdir(), "smashcraft-maps-folder-"));
-  const staging = mkdtempSync(join(tmpdir(), "smashcraft-maps-staging-"));
+  const documents = mkdtempSync(join(tmpdir(), "makgora-maps-folder-"));
+  const staging = mkdtempSync(join(tmpdir(), "makgora-maps-staging-"));
   const root = library(documents);
   try {
     mkdirSync(root, { recursive: true });
