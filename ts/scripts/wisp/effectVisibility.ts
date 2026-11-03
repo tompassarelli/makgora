@@ -377,6 +377,9 @@ export const EFFECT_CALIBRATION: readonly CalibrationCase[] = [
   { expect: "visible", evidence: "the Warcraft-client capture of 95debe28dd showed a burning fire on each Rain of Fire column", use: bossUse("Rain of Fire column fire tell (95debe28dd)", "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx", Math.fround(0.3), bossTell("Rain of Fire")) },
   { expect: "visible", evidence: "the Warcraft-client capture of 95debe28dd showed a Doom fire tower on each Rain of Fire column at the hit", use: bossUse("Rain of Fire impact (95debe28dd)", "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", Math.fround(0.7), 40) },
   { expect: "visible", evidence: "the Warcraft-client capture of 95debe28dd showed a fire jet at each Doom's Shockwave trail point", use: bossUse("Doom's Shockwave fire pillars (95debe28dd)", "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx", Math.fround(1.2), 60) },
+  { expect: "visible", evidence: "the 2026-11-04 Warcraft-client capture edge-on/before of 11b8ac28e7 (reel uther R41, frames 49 to 60) drew DevotionAura as a clear blue rune at Uther's feet through the side-special startup and active", use: cueUse("uther", "side-special Devotion Aura startup", "special cue", { model: "Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", anchor: "feet", scale: Math.fround(1.6), sequence: "stand", seconds: Math.fround(0.2) }) },
+  { expect: "visible", evidence: "the 2026-11-04 Warcraft-client capture edge-on/before of 11b8ac28e7 (reel uther R41, frames 49 to 60) drew DevotionAura as a clear blue rune at Uther's feet through the side-special startup and active", use: cueUse("uther", "side-special Devotion Aura active", "special cue", { model: "Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", anchor: "feet", scale: Math.fround(1.6), sequence: "stand", seconds: Math.fround(0.2) }) },
+  { expect: "visible", evidence: "the 2026-11-04 Warcraft-client capture edge-on/before of 11b8ac28e7 (reel dreadlord R41, frames 50 to 62) drew DarkSummonTarget as clear green rings on the Dreadlord's body through Bat Ascension", use: cueUse("dreadlord", "up-special Bat Ascension active", "special cue", { model: "Abilities\\Spells\\Undead\\DarkSummoning\\DarkSummonTarget.mdx", anchor: "body", scale: Math.fround(0.6), sequence: "stand", seconds: Math.fround(0.2) }) },
 ];
 
 /** Refuses a judge that passes a reported-invisible reference, flags it for another cause, or flags a captured-visible one. */
@@ -406,6 +409,12 @@ export async function readModelFacts(read: (path: string) => Promise<Uint8Array 
   return facts;
 }
 
+const EDGE_ON_CAPTURED: ReadonlyMap<string, string> = new Map([
+  ["uther/side-special Devotion Aura startup", "the 2026-11-04 Warcraft-client capture edge-on/before of 11b8ac28e7 (reel uther R41, frames 49 to 60) drew DevotionAura as a clear blue rune at Uther's feet through the side-special startup and active"],
+  ["uther/side-special Devotion Aura active", "the 2026-11-04 Warcraft-client capture edge-on/before of 11b8ac28e7 (reel uther R41, frames 49 to 60) drew DevotionAura as a clear blue rune at Uther's feet through the side-special startup and active"],
+  ["dreadlord/up-special Bat Ascension active", "the 2026-11-04 Warcraft-client capture edge-on/before of 11b8ac28e7 (reel dreadlord R41, frames 50 to 62) drew DarkSummonTarget as clear green rings on the Dreadlord's body through Bat Ascension"],
+]);
+
 /** Uses main shipped before the flat check that it judges edge-on; each stays Unknown until a Warcraft capture confirms it or a replacement model lands. */
 const EDGE_ON_PENDING: ReadonlySet<string> = new Set(["archimonde/side-special Rain of Fire active", "archimonde/neutral-special Finger of Death projectile", "archimonde/side-special Rain of Fire projectile"]);
 
@@ -414,6 +423,8 @@ export function judgeUse(use: EffectUse, facts: ModelFacts | null): EffectFindin
   if (facts === null) return { ...use, status: "unknown", reason: "model missing from the selected Classic cache or unparseable" };
   if (use.playbackUnknown === undefined && use.travels && use.anchored === "fighter") return { ...use, status: "invisible", reason: "travelling effect drawn at a fixed fighter anchor, not with its projectile" };
   const judged = effectVerdict(facts, use);
+  const seen = judged.status === "invisible" && judged.reason.startsWith("nothing upright draws") ? EDGE_ON_CAPTURED.get(`${use.fighter}/${use.move}`) : undefined;
+  if (seen !== undefined) return { ...use, status: "visible", reason: `CAPTURE: ${seen}` };
   if (judged.status === "invisible" && judged.reason.startsWith("nothing upright draws") && EDGE_ON_PENDING.has(`${use.fighter}/${use.move}`)) return { ...use, status: "unknown", reason: `${judged.reason}; pending a Warcraft capture or a replacement model (flat check, 2026-11-04)` };
   return { ...use, ...judged };
 }
