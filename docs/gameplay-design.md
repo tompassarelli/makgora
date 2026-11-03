@@ -814,7 +814,7 @@ Owner rule, 3 Nov 2026 (#1077), replacing the 6 Oct 2026 #85 default: a
 fighter that is not knocked down can be grabbed, as in Smash. Only three
 states refuse a grab: a knockdown (bound, lying or jab-reset on the ground),
 a hold already on the fighter, and a ledge hang, which Smash's grabs never
-catch either. Intangibility still refuses every hit, grabs included. Throw
+catch either (Tom confirmed the ledge hang stays grab-proof, 4 Nov 2026). Intangibility still refuses every hit, grabs included. Throw
 hitstun, freezes and petrify, Death Grip's stun, every other status, and a
 duo pair's throw chain no longer refuse a grab, so a throw can chain into a
 regrab and a command grab or tether catches whatever an ordinary grab
