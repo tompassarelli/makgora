@@ -3,7 +3,7 @@
 Doctrine: the `testing` skill. A test is one of five kinds (recorded scenario, property over a pure core, product measurement, external reference, one integration check per real boundary); anything else is scaffolding and is deleted before landing.
 
 Where tests live and run:
-- Game rules: `src/**/*.tests.ts` with `test` from `wisp/src/runtime/testing`, no Bun or Node imports. Bun runs them through `test/game.test.ts` (`GAME_MODULES=game/x/y.tests.ts bun test test/game.test.ts`); `scripts/lua-tests.ts` compiles the same modules to Lua and runs them in 32-bit Lua, Warcraft's number model.
+- Game rules: `src/**/*.tests.ts` with `test` from `wisp/src/runtime/testing`, no Bun or Node imports. `scripts/lua-tests.ts` compiles them to Lua and runs them in 32-bit Lua, Warcraft's number model (`GAME_MODULES=src/game/x/y.tests.ts bun scripts/lua-tests.ts` runs some).
 - Host tools and assets: `test/*.test.ts` and `scripts/*.tests.ts` with `bun:test`; `bun run test FILE...` runs some, the farm runs all (docs/commands/testing.md).
 - Sweeps: `sweep()` (src/game/core/sweep.ts) for many matches, a whole roster or every stage; the suite skips them and CI runs them with `SWEEPS=1`. A seeded bot sweep is a property with a stated margin that holds at 3 unrelated seed offsets, or a measurement with a tolerance band; never a ranking or count one seed shift can flip (#394).
 

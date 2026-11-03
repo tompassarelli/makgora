@@ -8,4 +8,4 @@ const files = new Set([
   ...new Bun.Glob("src/**/*.tests.ts").scanSync(root),
   ...new Bun.Glob("test/lua/**/*.tests.ts").scanSync(root),
 ]);
-refuseUntagged(root, [...files].filter((file) => file !== "test/game.test.ts" && !file.startsWith("build/") && !file.split("/").some((part) => part === "node_modules" || part === ".git")).sort());
+refuseUntagged(root, [...files].filter((file) => !file.startsWith("build/") && !file.split("/").some((part) => part === "node_modules" || part === ".git")).sort());

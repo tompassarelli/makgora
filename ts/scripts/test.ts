@@ -9,7 +9,7 @@ import * as BunServices from "@effect/platform-bun/BunServices";
 import { Cause, Effect, Exit, Layer, Schema } from "effect";
 import { BUSY_PRESSURE, INCONCLUSIVE_EXIT, timingTestFiles, timingTests, withPressure } from "wisp/scripts/wisp/testRunner";
 import { TEST_PHASE_ENV } from "wisp/scripts/wisp/timingTest";
-import { ISOLATED_TEST_GROUPS, SWEEP_PARTS, TEST_TIMEOUT_MS, testWorkerEnvironment } from "./testWorkers";
+import { TEST_TIMEOUT_MS, testWorkerEnvironment } from "./testWorkers";
 import { admit } from "./heavyCapacity";
 import { runMeasuredProcess } from "./hostProcess";
 import { BUN_TEST_CEILING_FRAMES, addCost, cpuReport, readBaseline, type Costs } from "./testCost";
@@ -26,14 +26,12 @@ const files = [...new Bun.Glob("**/*{.test,_test,.spec,_spec}.{js,jsx,ts,tsx}").
   .filter((file) => !file.startsWith("build/") && !file.split("/").some((part) => part === "node_modules" || part === ".git"))
   .sort();
 if (files.length === 0) throw new Error("No tests found");
-// `--units` prints what may be split across machines (`wisp farm test`): each
-// isolated group comma-joined, every other file alone. Files as arguments run
-// only those; TEST_JUNIT_DIR writes each process's JUnit report there.
+// `--units` prints what may be split across machines (`wisp farm test`): every
+// file alone. Files as arguments run only those; TEST_JUNIT_DIR writes each
+// process's JUnit report there.
 const [first, ...rest] = process.argv.slice(2);
 if (first === "--units") {
-  const grouped = ISOLATED_TEST_GROUPS.flat();
-  for (const group of ISOLATED_TEST_GROUPS) console.log(group.filter((file) => files.includes(file)).join(","));
-  for (const file of files.filter((file) => !grouped.includes(file))) console.log(file);
+  for (const file of files) console.log(file);
   process.exit(0);
 }
 const only = [first, ...rest].filter((arg) => arg !== undefined).map((arg) => arg.replace(/^\.\//, ""));
@@ -42,19 +40,13 @@ const junitDirectory = process.env.TEST_JUNIT_DIR;
 
 // A file's CPU depends on the files before it in its process, so the processes are fixed by name hash, never by machine.
 // SWEEPS=1 runs only the sweeps (src/game/core/sweep.ts) in the same processes.
-const GAME_SHARDS = 3;
 const REST_SHARDS = 4;
 const baseline = readBaseline(resolve(project, "test/cost-baseline.tsv"));
 const fileCost = (file: string) => baseline.get(file)?.cpu ?? 1;
 const sweeps = process.env.SWEEPS === "1";
 const hasSweeps = (file: string) => /(^|[^\w.])sweep\)?\(/m.test(readFileSync(resolve(project, file), "utf8"));
-type Group = { readonly files: readonly string[]; readonly env?: Readonly<Record<string, string>> };
-const isolated = ISOLATED_TEST_GROUPS;
-const testFiles = files.filter((file) => file !== "test/game.test.ts" && (!sweeps || hasSweeps(file)));
-const shared = testFiles.filter((file) => !isolated.flat().includes(file));
-const gameModules = files.includes("test/game.test.ts")
-  ? [...new Bun.Glob("**/*.tests.ts").scanSync(resolve(project, "src"))].sort().filter((module) => !sweeps || hasSweeps(`src/${module}`))
-  : [];
+type Group = { readonly files: readonly string[] };
+const testFiles = files.filter((file) => !sweeps || hasSweeps(file));
 const shardOf = (name: string, count: number) => {
   let hash = 0x811c9dc5;
   for (let index = 0; index < name.length; index++) hash = Math.imul(hash ^ name.charCodeAt(index), 0x01000193) >>> 0;
@@ -62,20 +54,10 @@ const shardOf = (name: string, count: number) => {
 };
 const byName = (names: readonly string[], count: number) =>
   Array.from({ length: count }, (_, shard) => names.filter((name) => shardOf(name, count) === shard));
-const groups: Group[] = [
-  ...byName(gameModules, GAME_SHARDS).filter((modules) => modules.length > 0).map((modules) => ({ files: ["test/game.test.ts"], env: { GAME_MODULES: modules.join(",") } })),
-  ...byName(shared, REST_SHARDS).map((bin) => ({ files: bin })),
-  ...isolated.flatMap((names) => {
-    const files = testFiles.filter((file) => names.includes(file));
-    const parts = sweeps && files.length === 1 ? SWEEP_PARTS[files[0] ?? ""] ?? 1 : 1;
-    return parts === 1 ? [{ files }] : Array.from({ length: parts }, (_, part) => ({ files, env: { SWEEP_PART: `${part}/${parts}` } }));
-  }),
-].filter((group) => group.files.length > 0);
-refuseUntagged(project, [...testFiles, ...gameModules.map((module) => `src/${module}`)]);
+const groups: Group[] = byName(testFiles, REST_SHARDS).map((bin) => ({ files: bin })).filter((group) => group.files.length > 0);
+refuseUntagged(project, testFiles);
 refuseLiteralCopies(project);
-const groupCost = (group: Group) => group.env?.GAME_MODULES === undefined
-  ? group.files.reduce((sum, file) => sum + fileCost(file), 0)
-  : group.env.GAME_MODULES.split(",").reduce((sum, module) => sum + fileCost(`src/${module}`), 0);
+const groupCost = (group: Group) => group.files.reduce((sum, file) => sum + fileCost(file), 0);
 
 
 // Each Bun process also runs compiler threads; leave half the CPUs for them.
@@ -102,7 +84,7 @@ const runGroup = (group: Group) => Effect.suspend(() => {
   return runMeasuredProcess(
     [process.execPath, "test", "--timeout", String(TEST_TIMEOUT_MS), ...junit, ...sweepFilter, ...group.files.map((file) => resolve(project, file))],
     project,
-    { ...process.env, ...testWorkerEnvironment(group.files), ...group.env, [TEST_PHASE_ENV]: "correctness", ...cost },
+    { ...process.env, ...testWorkerEnvironment(group.files), [TEST_PHASE_ENV]: "correctness", ...cost },
   );
 });
 

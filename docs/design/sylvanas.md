@@ -123,7 +123,7 @@ measurement and completed roster presentation.
 
 ## Implementation checks
 
-- `GAME_TESTS=sylvanas bun test test/game.test.ts`: 26 gameplay contracts pass.
+- `GAME_TESTS=sylvanas bun scripts/lua-tests.ts`: 26 gameplay contracts pass.
   The focused Lua32 entry imports the same module: 27/27 pass, including the
   numeric runtime check.
 - Candidate `fighterCoverage` uses eight seeds, 1800 frames each. Black Arrow

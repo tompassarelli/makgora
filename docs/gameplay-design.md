@@ -2702,12 +2702,12 @@ The branch's up-special and empty-mana measurements are kept there too.
 | Gazlowe | 647 / 830 | 820 / 940 |
 | Kael'thas Sunstrider | 621 / 889 | 794 / 940 |
 
-`GAME_TESTS=upSpecialRecovery bun test test/game.test.ts` measures each
+`GAME_TESTS=upSpecialRecovery bun scripts/lua-tests.ts` measures each
 selectable fighter's up-special route from (700, 300), facing away from the
 stage with jumps spent: vertical holds up; horizontal takes the best of level,
 diagonal-up and a Wing Dive held on frame 19 (stick changed to level or diagonal-up from the launch's zone), while within 10 units below the start.
 The same tests check charged angles and guided steering through keyboard and
-controller input. `GAME_TESTS=edgeRecovery bun test test/game.test.ts` checks
+controller input. `GAME_TESTS=edgeRecovery bun scripts/lua-tests.ts` checks
 wall rides, Blink lip outcomes and descending up-special catches. The farm
 sweeps check every fighter's envelope and all eight aims against the stage.
 
@@ -2806,7 +2806,7 @@ Expert field.
 | Alchemist | Rising Strike | 10 | 0 | 29 | 426 / 411 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 221/256 |
 | Onyxia | Shadow Ascent | 8 | 0 | 18 | 285 / 280 | guided | 44 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 224/256 |
 
-`GAME_TESTS=edgeGuard bun test test/game.test.ts` checks Rifleman's recorded
+`GAME_TESTS=edgeGuard bun scripts/lua-tests.ts` checks Rifleman's recorded
 gimp and Recoil Shot opening, plus Thrall's and Warden's mixed plans. The
 sweeps check every fighter's recorded gimp, its up-special opening and its
 mixed-return rate. Open: the computer does not yet edge-guard differently at

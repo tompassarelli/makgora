@@ -580,19 +580,15 @@ From makgora:ts/:
 - `bun run test`: every host test file, in isolated Bun workers. The short-lived
   workers keep the baseline and DFG JIT tiers; the highest tier's compile cost
   exceeds its savings over this suite. Use
-  `bun test test/game.test.ts -t NAME` for a focused result.
+  `GAME_TESTS=NAME bun scripts/lua-tests.ts` for a focused game-rule result.
 - `bun wisp dev [--data A --data B]`: the loop to keep running while changing
   code ([Wisp dev loop](https://github.com/tompassarelli/wisp/blob/main/docs/dev.md)).
   Each save prints the saved files' type errors, the affected unit tests, the
-  journeys (the quick match plus the affected tests that play simulated
-  clients: the desync guard, the visual and player-view group, stack-trace,
-  rematch-load, missing-input, input-stall, tune, lag-recovery and
-  local-start) and the
+  quick-match journey and the
   whole `bun run check`, each timed from the save.
   makgora:ts/scripts/wisp/commands/dev.ts declares the tests: the Bun test
-  files, the registry modules game.test.ts runs, the files a test reads at run
-  time (a test that reads files without declaring them runs on every save),
-  the journey tests and scripts/test.ts's isolated groups. Under `wisp dev`
+  files, the registry modules and the files a test reads at run time (a test
+  that reads files without declaring them runs on every save). Under `wisp dev`
   the source-shape audit checks only the saved files; `bun run test` and CI
   check every file. Test processes share makgora:ts/scripts/testWorkers.ts's
   engine settings with the full suite.
@@ -653,9 +649,8 @@ From makgora:ts/:
   Wisp's pinned build, made once per user in ~/.cache/wisp/lua32
   (wisp:host/compile/lua32.ts). The corpus includes `f32(a + b)`, `f32(a - b)` and `f32(a * b)`
   as the compiler emits them.
-- `GAME_SOAK=1 bun test test/game.test.ts`: the long `*.soak.ts` scenarios,
+- `GAME_SOAK=1 bun scripts/lua-tests.ts`: the long `*.soak.ts` scenarios,
   such as the 100000-frame replay tape, which the default suite leaves out.
-  `GAME_SOAK=1` selects the same modules for `scripts/lua-tests.ts`.
 - `bun wisp parity tapes` runs replay acceptance
   tapes. It records cases for every bound action, corrected predictions and a
   rematch, then compares canonical replay state and fighter poses after every

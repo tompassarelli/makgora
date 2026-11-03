@@ -57,8 +57,7 @@ export function cpuReport(label: string, measured: Costs, totalCpu?: number): re
   let tests = 0;
   let cpu = 0;
   for (const [unit, cost] of measured) {
-    // game.test.ts counts module tests again to amortize loading, not as new tests.
-    if (unit !== "test/game.test.ts") tests += cost.tests;
+    tests += cost.tests;
     cpu += cost.cpu;
   }
   const heaviest = [...measured].filter(([, cost]) => (cost.max ?? 0) > 0).sort(([, a], [, b]) => (b.max ?? 0) - (a.max ?? 0)).slice(0, 5)

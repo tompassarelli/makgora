@@ -15,8 +15,8 @@
 
 - Where tests live: a module's tests are in one place. Map code (everything
   compiled to Lua, under ts/src and the Lua parts of ts/scripts/wisp) keeps
-  camelCase `*.tests.ts` beside its module; the Lua32 suite and
-  test/game.test.ts run them. Host tools test in kebab-case
+  camelCase `*.tests.ts` beside its module; the Lua32 suite
+  (makgora:ts/scripts/lua-tests.ts) runs them. Host tools test in kebab-case
   `ts/test/*.test.ts`, which `bun run test` runs; list a new one in
   makgora:ts/tsconfig.json's `include` so `bun run check` type-checks it.
 
@@ -100,9 +100,8 @@
   property whose title states its threshold and the range seen on three
   unrelated offsets, or a measurement with a tolerance band (#394).
 
-From ts/, `bun test test/game.test.ts -t NAME` runs focused game tests;
-`bun run check` checks host and map types. Use
-`LUA=<32-bit lua> GAME_TESTS=PATH bun scripts/lua-tests.ts` for affected emitted-Lua tests and
+From ts/, `GAME_TESTS=PATH bun scripts/lua-tests.ts` runs focused game tests in
+32-bit Lua (`LUA=<32-bit lua>` names the interpreter); `bun run check` checks host and map types. Use
 `bun wisp map build ...` to build a map. See makgora:docs/development-loop.md
 for the local toolchain and base-map setup.
 

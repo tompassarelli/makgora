@@ -1,25 +1,8 @@
 // How test processes run, shared by the full suite (scripts/test.ts) and
 // `bun wisp dev`.
 
-/**
- * The game registry and native fixtures own independent global stubs, so each
- * group runs in a process of its own; every other test file may share one.
- */
-export const ISOLATED_TEST_GROUPS: readonly (readonly string[])[] = [
-  ["test/standalone.test.ts"],
-  ["test/platform-advantage.test.ts"],
-  ["test/zero-to-death.test.ts"],
-  ["test/game.test.ts"],
-  ["test/desync-guard.test.ts"],
-  ["test/visual-lifecycle.test.ts", "test/player-text.test.ts"],
-  ["test/lag-recovery.test.ts"],
-  ["test/local-start.test.ts", "test/match-settings.test.ts"],
-];
-
 /** The hang timeout per test; cost is bounded by BUN_TEST_CEILING_FRAMES. */
 export const TEST_TIMEOUT_MS = 60_000;
-
-export const SWEEP_PARTS: Readonly<Record<string, number>> = { "test/zero-to-death.test.ts": 4 };
 
 /**
  * Engine settings for short-lived test processes: they cannot amortize the

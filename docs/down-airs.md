@@ -41,7 +41,7 @@ Sources: [Link in Melee](https://www.ssbwiki.com/Link_(SSBM)),
 The current verdict records the authoring and headless silhouette review in both
 facings. The Lich casts through a 60-degree body dive at contact, with the existing shoulder and palm coil; its other 50 clips remain unchanged.
 
-From ts/, `GAME_TESTS=downAir bun test test/game.test.ts` checks every selectable
+From ts/, `GAME_TESTS=downAir bun scripts/lua-tests.ts` checks every selectable
 fighter's active strike centres and exact downward clip. Both checks also run
 in `bun scripts/lua-tests.ts`. This repair changes no combat values.
 

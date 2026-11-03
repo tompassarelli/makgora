@@ -2,8 +2,8 @@
 
 - Roster AI coverage: `bun scripts/cpuCoverage.ts` prints movement, attacks,
   kit use, defense and recovery for all selectable fighters over eight
-  seeded Wren Expert matches each; `SWEEPS=1 GAME_TESTS=botCoverage bun test test/game.test.ts`
-  checks the same report as a sweep (in Bun and Lua32), and the suite plays
+  seeded Wren Expert matches each; `SWEEPS=1 GAME_TESTS=botCoverage bun scripts/lua-tests.ts`
+  checks the same report as a sweep (in Lua32), and the suite plays
   one seeded match a fighter.
 
 - CPU reads and move value: makgora:docs/design/cpu-profiles.md describes

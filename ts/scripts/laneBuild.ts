@@ -50,7 +50,7 @@ export const laneTests = (changed: readonly string[]) => {
   const present = changed.filter((file) => existsSync(join(tsDirectory, file)));
   return {
     host: present.filter((file) => /(?:\.test|_test|\.spec|_spec)\.(?:js|jsx|ts|tsx)$/.test(file)),
-    game: present.flatMap((file) => /^src\/(.+\.tests\.ts)$/.exec(file)?.[1] ?? []),
+    game: present.filter((file) => /^src\/.+\.tests\.ts$/.test(file)),
   };
 };
 
@@ -64,7 +64,7 @@ const hostSteps: LaneSteps<ChildProcessSpawner.ChildProcessSpawner> = {
     ].filter((file) => file !== "");
     const { host, game } = laneTests(changed);
     if (host.length > 0) yield* run("the lane's tests", ["bun", "run", "test", ...host]);
-    if (game.length > 0) yield* run("the lane's game tests", ["bun", "test", "test/game.test.ts"], { GAME_MODULES: game.join(",") });
+    if (game.length > 0) yield* run("the lane's game tests", ["bun", "scripts/lua-tests.ts"], { GAME_MODULES: game.join(",") });
     if (host.length + game.length === 0) console.log("The lane changes no test files");
   }),
   version: git("rev-parse", "HEAD").pipe(Effect.flatMap((head) => playTarget(head))),
