@@ -73,6 +73,7 @@ env:
   REPORTS_RUN: |
     install_reports() { (cd ts && bun install --frozen-lockfile); }
     regenerate_page() { (cd ts && bun scripts/wisp.ts ledger) > ledger.log 2>&1 || true; }
+    fold_reports() { local floor="$1"; shift; [ "$(git rev-parse HEAD)" != "$floor" ] && git commit --amend -q --no-edit -- "$@"; }
     regenerate_reports() {
       set -euo pipefail
       out() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
@@ -105,8 +106,8 @@ env:
       { echo "Changed rows (old → new):"; echo '```diff'; git diff -U0 -- tools/move-data/advantage-state.md | grep -E '^[-+]\|' | head -200 || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       git config user.name "github-actions[bot]"
       git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
-      git commit -q -m "Regenerate reports for $(echo $BRANCHES)" --trailer "Autoland-Reports: 1" -- "${reports[@]}"
-      [ -z "$SCRATCH" ] || git push -q origin "HEAD:refs/heads/$SCRATCH"
+      fold_reports "${BASE:-}" "${reports[@]}" || echo "No lane commit to carry the reports: main already holds the lanes" >> "$GITHUB_STEP_SUMMARY"
+      [ -z "$SCRATCH" ] || git push -q --force origin "HEAD:refs/heads/$SCRATCH"
       out sha "$(git rev-parse HEAD)"
     }
   LANES_QUERY: >-
@@ -313,7 +314,7 @@ jobs:
           if [ -z "$branches" ]; then out verdict none; exit 0; fi
           eval "$REPORTS_RUN"
           if install_reports > ledger.log 2>&1 && regenerate_page && ! git diff --quiet -- docs/design/melee-parity.md; then
-            git commit -q -m "Regenerate the Melee parity page for $(echo $branches)" --trailer "Autoland-Reports: 1" -- docs/design/melee-parity.md
+            fold_reports "$base" docs/design/melee-parity.md || true
           fi
           sha=$(git rev-parse HEAD)
           scratch="farm/autoland-${sha:0:12}"
@@ -398,6 +399,7 @@ jobs:
       VERDICT: ${{ needs.build.outputs.verdict }}
       SCRATCH: ${{ needs.build.outputs.scratch }}
       BRANCHES: ${{ needs.build.outputs.branches }}
+      BASE: ${{ needs.build.outputs.base }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -623,7 +625,7 @@ jobs:
             esac
             SHA=$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD)
             eval "$REPORTS_RUN"
-            if (cd "$RUNNER_TEMP/past-main" && install_reports && regenerate_page && ! git diff --quiet -- docs/design/melee-parity.md && git commit -q -m "Regenerate the Melee parity page for ${branches[*]}" --trailer "Autoland-Reports: 1" -- docs/design/melee-parity.md) > page.log 2>&1; then SHA=$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD); fi
+            if (cd "$RUNNER_TEMP/past-main" && install_reports && regenerate_page && ! git diff --quiet -- docs/design/melee-parity.md && fold_reports "$main" docs/design/melee-parity.md) > page.log 2>&1; then SHA=$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD); fi
             echo "main moved to ${main:0:10} only on paths the train doesn't change or generated records it regenerates or merges: the tested tree lands rebased onto it as ${SHA:0:10}" >> "$GITHUB_STEP_SUMMARY"
           fi
           mkdir -p "$RUNNER_TEMP/autoland"

@@ -17,7 +17,7 @@ class SheriffFailure extends Schema.TaggedError<SheriffFailure, { readonly brand
 
 export type { CiJob as Job, CiStep as Step };
 export interface CiRun { readonly conclusion: string; readonly attempt?: number; readonly jobs: readonly CiJob[] }
-export interface Commit { readonly sha: string; readonly message: string; readonly files?: readonly string[] }
+export interface Commit { readonly sha: string; readonly message: string }
 export interface Situation {
   readonly run: CiRun;
   readonly previous: (CiRun & { readonly ancestor: boolean }) | undefined;
@@ -63,8 +63,7 @@ export function decide({ run, previous, commits, workflowFiles }: Situation): Ve
 }
 
 export const LANE_TRAILER = "Autoland-Lane:";
-const REPORTS_TRAILER = "Autoland-Reports: 1";
-const REPORT_FILES = new Set(["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md", "docs/design/melee-parity.md"]);
+const REPORT_ATTRIBUTES = resolve(import.meta.dir, "sheriff-reports.gitattributes");
 const LaneRecord = Schema.fromJsonString(Schema.Struct({ branch: Schema.String, count: Schema.Int, issues: Schema.Array(Schema.Int) }));
 export interface LandedLane {
   readonly branch: string;
@@ -79,23 +78,21 @@ export function landedLanes(base: string, commits: readonly Commit[]): readonly 
   for (let end = commits.length - 1; end >= 0;) {
     const commit = commits[end]!;
     const records = commit.message.split("\n").filter((line) => line.startsWith(LANE_TRAILER));
-    if (records.length === 0 && commit.message.split("\n").includes(REPORTS_TRAILER)) {
-      if (commit.files === undefined || commit.files.length === 0 || !commit.files.every((file) => REPORT_FILES.has(file))) return undefined;
-      end--;
-      continue;
-    }
     if (records.length !== 1) return undefined;
     const record = Schema.decodeOption(LaneRecord)(records[0]!.slice(LANE_TRAILER.length).trim());
     if (record._tag === "None") return undefined;
     const { branch, count, issues } = record.value;
     const start = end - count + 1;
     if (!branch.startsWith("claude/") || count < 1 || start < 0 || issues.some((issue) => issue < 1)) return undefined;
-    if (commits.slice(start, end).some((entry) => entry.message.split("\n").some((line) => line.startsWith(LANE_TRAILER) || line === REPORTS_TRAILER))) return undefined;
+    if (commits.slice(start, end).some((entry) => entry.message.split("\n").some((line) => line.startsWith(LANE_TRAILER)))) return undefined;
     lanes.unshift({ branch, issues: [...new Set([...issues, ...referencedIssues(commits.slice(start, end + 1))])].toSorted((a, b) => a - b), parent: commits[start - 1]?.sha ?? base, head: commit.sha, commits: commits.slice(start, end + 1).map((entry) => entry.sha) });
     end = start - 1;
   }
   return lanes.length === 0 ? undefined : lanes;
 }
+
+export const revertArgs = (shas: readonly string[]): readonly string[] =>
+  ["-c", "merge.report.driver=true", "-c", `core.attributesFile=${REPORT_ATTRIBUTES}`, "revert", "--no-edit", "--no-commit", ...shas];
 
 export interface Probe { readonly head: string; readonly without?: readonly string[] }
 export type ProbeResult = "pass" | "fail" | "unmeasured";
@@ -205,7 +202,7 @@ const probeLane = (probe: Probe, suite: NonNullable<ReturnType<typeof suiteProbe
   }),
   (path) => Effect.gen(function*() {
     yield* git("worktree", "add", "-q", "--detach", path, probe.head);
-    if (probe.without !== undefined) yield* run("git", "-C", path, "revert", "--no-commit", ...probe.without);
+    if (probe.without !== undefined) yield* run("git", "-C", path, ...revertArgs(probe.without));
     const cwd = join(path, "ts");
     yield* runProcess(ChildProcess.make("bun", ["install", "--frozen-lockfile"], { cwd }));
     const measured = yield* collect(ChildProcess.make("bun", suite.args, { cwd, env: {
@@ -237,7 +234,7 @@ const revertOnMain = (verdict: Extract<Verdict, { kind: "revert" }>, lane: Lande
   yield* git("fetch", "-q", "origin", "main");
   if ((yield* git("rev-parse", "origin/main")).trim() !== main) return yield* new SheriffFailure({ command: "git revert", problem: "main moved after lane confirmation; reverts nothing" });
   yield* git("checkout", "-q", "-B", "sheriff", main);
-  yield* git("revert", "--no-edit", "--no-commit", ...verdict.shas).pipe(Effect.tapError(() => git("revert", "--abort").pipe(Effect.ignore)));
+  yield* git(...revertArgs(verdict.shas)).pipe(Effect.tapError(() => git("revert", "--abort").pipe(Effect.ignore)));
   yield* git("commit", "-q", "-m", message);
   yield* git("push", "-q", "origin", "HEAD:refs/heads/main");
   return (yield* git("rev-parse", "HEAD")).trim();
@@ -280,10 +277,7 @@ export const sheriffRun = (runId: string) => Effect.gen(function*() {
     return name === undefined ? [] : [name];
   });
   if (failures.length === 0) return yield* output(`report: no recorded failed test in ${verdict.step}; reverts nothing (${ci.url})`);
-  const withFiles = yield* Effect.forEach(commits, (commit) => commit.message.split("\n").includes(REPORTS_TRAILER)
-    ? git("diff-tree", "--no-commit-id", "--name-only", "-r", commit.sha).pipe(Effect.map((files) => ({ ...commit, files: files.trim().split("\n").filter(Boolean) })))
-    : Effect.succeed(commit));
-  const lanes = landedLanes(prior.headSha, withFiles);
+  const lanes = landedLanes(prior.headSha, commits);
   if (lanes === undefined) return yield* output(`report: landed range has missing, partial or invalid Autoland lane metadata; reverts nothing (${ci.url})`);
   const main = (yield* git("rev-parse", "origin/main")).trim();
   if (!(yield* git("merge-base", "--is-ancestor", ci.headSha, main).pipe(Effect.as(true), Effect.orElseSucceed(() => false)))) {

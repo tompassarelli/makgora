@@ -1,0 +1,3 @@
+tools/move-data/advantage-state.jsonl merge=report
+tools/move-data/advantage-state.md merge=report
+docs/design/melee-parity.md merge=report

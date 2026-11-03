@@ -9,7 +9,6 @@
 | Background sweeps (makgora:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on hosted runners, at most two jobs at once: the host test suite (`bun run test` in ts/, every ts/test file outside the sweeps), every sweep outside the gate allowlist (Bun, and Lua32 in three partitions), and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs' worst frames must stay within 10% of the nearest first-parent main commit's successful Background run artifact measured by the same instrument (Wisp's Lua32 build and profiler, hashed into the artifact name); the prior is searched through every green Background run on main within the 30-day artifact retention, and a run whose instrument has green artifacts but none still live on main fails with `NoPrior` until a `rebaseline` dispatch decides it, while an instrument with no artifact at all (a new Wisp build) warns and passes drift comparison while roster coverage and absolute frame budgets still apply; a decided rise rebaselines through the dispatch input `rebaseline` (makgora:docs/commands/perf.md); a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (makgora:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and comments each finding kind on its epic, or on the After 0.1 issue when no epic matches (makgora:docs/commands/soak.md) |
 | Autoland (makgora:.github/workflows/autoland.yml) | push to `claude/**`, dispatch with `branch` | the cloud workers' landing queue: tests each waiting tip alone at once and lands it from its test run, or in a train of tips that passed when main moved on its paths |
-| Reports (makgora:.github/workflows/reports.yml) | push to main, dispatch | regenerates the advantage-state reports and the Melee parity page on main after a `safe-push` landing and pushes them when they changed (see Landing) |
 | Auto-close (makgora:.github/workflows/autoclose.yml) | each landing (a push to main, or Autoland's dispatch with the landed SHA and the main before it) | reruns the declared Done-when checks of each issue the landed commits reference, ticks the passing boxes, closes an issue whose boxes are all ticked (see Auto-close) |
 | Autoland sweep (makgora:.github/workflows/autoland-sweep.yml) | every 5 minutes from Autoland heartbeat while Autoland has work, every finished Autoland or Farm test run, dispatch with `dry-run` or `landed` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
 | Effect upgrade (makgora:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
@@ -90,10 +89,11 @@ fetch, rebase, scan and push:
    takes 1.4 CPU s there instead of 2.6.
 2. **After landing.** The push to main runs CI's smoke, farm and
    code-health jobs, one run per landed commit (CI's
-   concurrency is per SHA on main), plus Background sweeps, Auto-close and
-   Reports (makgora:.github/workflows/reports.yml, which regenerates the
-   advantage-state reports and the Melee parity page and pushes them as one
-   "Regenerate reports" commit when they changed). A red CI run goes to the
+   concurrency is per SHA on main), plus Background sweeps and Auto-close. No
+   workflow pushes a report commit after a landing: the next Autoland batch
+   regenerates the advantage-state reports into its last lane commit, and
+   `bun wisp ledger --check` keeps the Melee parity page current in every lane
+   (makgora#983). A red CI run goes to the
    sheriff and the "main is red" issue (see Sheriff); the lane whose
    landing first failed owns the fix.
 
@@ -261,15 +261,16 @@ A conflicting rebase is checked by injected lanes that conflict in a generated r
 
 Lanes don't regenerate whole-roster reports. After the gate, Autoland's
 `reports` job runs beside the suite: it reruns `bun wisp combos --advantage`,
-commits changed tools/move-data/advantage-state.{jsonl,md} as "Regenerate
-reports for LANES" with the changed rows in the summary, and refuses a
+folds changed tools/move-data/advantage-state.{jsonl,md} and the Melee parity
+page into the batch's last lane commit (`git commit --amend`, never a commit of
+their own) with the changed rows in the summary, and refuses a
 candidate whose regenerated rows miss a target (ts/test/advantage-state.test.ts).
 When the cache keyed by ts/scripts/advantageInputs.ts misses, the rows are
 measured in three `--shard I/3` parts balanced by measured row cost: shard 0 in
 `reports`, shards 1 and 2 in `reports shard` jobs whose row artifacts `reports`
 collects and merges with `--merge`.
 The suite tests the candidate and the reports job tests the regenerated rows,
-their only reader; `land` waits for both and pushes the reports commit.
+their only reader; `land` waits for both and pushes the lane commits carrying the reports.
 A `code-health` job also runs beside the suite on the same candidate and base:
 north's `harness/code-health/cli.ts gate BASE CANDIDATE` (Bun 1.3.13,
 ast-grep 0.42.1). `land` waits for it too and refuses the candidate like a red
@@ -409,18 +410,17 @@ newer finished run exists:
   ancestor. Autoland records `Autoland-Lane: {"branch":"claude/name","count":N,"issues":[513]}`
   on each lane's last commit before testing and pushing. `count` is the actual
   first-parent commit count of that rebase, including the last commit; it
-  survives a train rebase without referring to its own SHA. The existing
-  generated reports commit carries `Autoland-Reports: 1` and may change only
-  the two advantage-state report files. The sheriff walks these records into
+  survives a train rebase without referring to its own SHA. The regenerated
+  reports travel inside that last commit, never as a commit between lanes. The sheriff walks these records into
   complete lanes, bisects their boundary snapshots, and replays the same suite
   with the workflow's exact sweep and Lua partition environment, including
   CI's workflow-level `SWEEP_PLACEMENT=gate` and Background sweeps'
   `SWEEP_PLACEMENT=background`, while preserving inherited `PATH` and `HOME`.
   It confirms that the actual culprit parent passes, the lane head fails with every recorded
-  failing test, and current main passes with only that lane reverted. A reports
-  commit between lanes is part of the actual parent confirmation. It then
-  reverts only that lane's commits, newest first; innocent lanes and report
-  commits stay landed. It pushes only while main remains the confirmed SHA.
+  failing test, and current main passes with only that lane reverted. It then
+  reverts only that lane's commits, newest first, keeping main's current
+  report files wherever a later landing regenerated them
+  (ts/scripts/sheriff-reports.gitattributes); innocent lanes stay landed. It pushes only while main remains the confirmed SHA.
   The revert carries `Sheriff-Reverts: SHA...` and only that lane's issue refs
   from its metadata and commit subjects (including `(#N)`),
   dispatches main's CI, and reopens only that lane's closed issues. The job
