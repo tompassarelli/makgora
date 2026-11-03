@@ -7,7 +7,7 @@ import { adaptInput } from "../../src/game/match/inputAdapter";
 import { ACTION_COUNT, Action, bit } from "../../src/game/input/actions";
 import { type AttackBuffer, attackBuffer } from "../../src/game/input/attackBuffer";
 import { commitEdges, keyboardCapture, sampleKeys } from "../../src/game/input/keyboardCapture";
-import { actionFor, keyLabel, presetBindings } from "../../src/game/input/keyBindings";
+import { actionFor, keyLabel, spaceUpBoxKeys } from "../../src/game/input/keyBindings";
 import { padLayerKey } from "../../src/game/input/padKeys";
 import { TAPE_HEADER, decodeTape } from "../../src/game/replay/tape";
 import { type TapeSession, createTapeSession, performTapeOperation } from "../../src/game/replay/tapeRunner";
@@ -19,7 +19,7 @@ import { surfaceLeft, surfaceRight, surfaceShiftX, surfaceShiftZ } from "../../s
 import { windPush } from "../../src/game/sim/stageHazards";
 import { stageClock } from "../../src/game/lobby/lobbyState";
 
-const bindings = presetBindings("standard");
+const bindings = { keys: spaceUpBoxKeys() };
 
 const SOURCES = new Map<string, Action>();
 for (const key of bindings.keys) {
