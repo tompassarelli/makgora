@@ -1,11 +1,12 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
-import { rosterGrid } from "../menu/selectionGrid";
+import { cellOf, cellRect, rosterGrid, tileAt } from "../menu/selectionGrid";
+import { isFeatured } from "../roster/forge";
 import { fighterKey, fighterSlug, PLAYABLE_CHARACTERS } from "../roster/kits";
 import { Character } from "../sim/codes";
 import { hudTitle } from "./duoTitle";
 import { RANDOM_FIGHTER } from "../lobby/lobbyState";
 import { FRIZ_QUADRATA_WIDTHS, textWidth } from "wisp/src/ui/chatLog";
-import { GRID_FIGHTERS, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, nameText, tileLabel, tileNameEms, tileOfCharacter } from "./selectionFrames";
+import { GRID_FIGHTERS, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, nameText, selectGrid, tileLabel, tileNameEms, tileOfCharacter } from "./selectionFrames";
 
 const FACTION_ORDER = [
   "thrall", "grom-hellscream", "cairne-bloodhoof", "beastmaster", "blademaster", "shadow-hunter", "peon",
@@ -76,4 +77,24 @@ test("Mrgl & Grgl reads with spaces on the select card, the match HUD plate and 
   const tile = tileLabel(tileOfCharacter(Character.murloc));
   assertEquals(tile, "Mrgl & Grgl");
   assertTrue(textWidth(tile, FRIZ_QUADRATA_WIDTHS) <= room);
+});
+
+test("With Show the Forge off the select grid lays out exactly the featured fighters in roster order then Random with no empty cell, and with it on every fighter [k2 property]", () => {
+  for (const forgeShown of [false, true]) {
+    const grid = selectGrid(forgeShown);
+    const expected: number[] = [];
+    for (let tile = 0; tile < GRID_FIGHTERS.length; tile++) if (forgeShown || isFeatured(characterOfTile(tile))) expected.push(tile);
+    expected.push(RANDOM_FIGHTER_TILE);
+    assertEquals(grid.tiles.join(","), expected.join(","));
+    assertEquals(grid.count, expected.length);
+    assertTrue(grid.rows * grid.columns - grid.count < grid.rows);
+    for (let cell = 0; cell < grid.count; cell++) {
+      const tile = expected[cell] ?? -1;
+      const rect = cellRect(grid, tile);
+      assertEquals(cellOf(grid, tile), cell);
+      assertEquals(tileAt(grid, (rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2), tile);
+    }
+  }
+  assertEquals(selectGrid(true).count, ROSTER_TILES);
+  assertTrue(selectGrid(false).count < ROSTER_TILES);
 });

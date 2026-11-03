@@ -9,9 +9,8 @@ import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, focus, loadClients } from "wisp/scripts/warcraft/desktop";
 import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, handSize, HAND_STATES, type HandState, handLeft, handTop } from "../../src/game/menu/selectionDrag";
-import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
-import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
-import { ROSTER_TILES } from "../../src/game/ui/selectionFrames";
+import { cellRect } from "../../src/game/menu/selectionGrid";
+import { selectGrid } from "../../src/game/ui/selectionFrames";
 import { readTga, type Rgba } from "../blp";
 import { runProcess } from "../hostProcess";
 import { handBadgeBox } from "../../src/game/ui/selectionHandFrames";
@@ -63,7 +62,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   });
   yield* reachFighterSelect(client, region);
   const frame = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate capture")));
-  const grid = rosterGrid(ROSTER_TILES);
+  const grid = selectGrid(false);
   const handExtent = handSize(grid);
   const samples: { file: string; sha256: string; elapsedMs: number; attempts: number; phase: string; x: number; y: number; error: number | undefined; state: HandState; pinched: boolean; handPixels: number; matchedHandPixels: number; chipError: number | undefined; visible: boolean }[] = [];
   const started = yield* Clock.currentTimeMillis;
@@ -125,7 +124,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   yield* sample("after-drop", drop.x, first.bottom + AFTER_DROP_RISE).pipe(Effect.repeat({ schedule: Schedule.recurs(39), until: sample => sample.chipError !== undefined && sample.chipError <= 24 }));
   const sweepStarted = yield* Clock.currentTimeMillis;
   for (let index = 0; index < 100; index++) {
-    const cell = cellRect(grid, index % PLAYABLE_CHARACTERS.length);
+    const cell = cellRect(grid, grid.tiles[index % grid.count] ?? 0);
     yield* sample("sweep", (cell.left + cell.right) / 2, (cell.top + cell.bottom) / 2);
   }
   const sweepMs = (yield* Clock.currentTimeMillis) - sweepStarted;

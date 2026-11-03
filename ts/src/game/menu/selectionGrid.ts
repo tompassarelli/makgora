@@ -29,6 +29,8 @@ export interface RosterGrid {
 
   readonly left: number;
   readonly top: number;
+
+  readonly tiles: readonly RosterTile[];
 }
 
 interface CellRect {
@@ -39,7 +41,13 @@ interface CellRect {
 }
 
 
-export function rosterGrid(count: number): RosterGrid {
+function inOrder(count: number): RosterTile[] {
+  const tiles: RosterTile[] = [];
+  for (let tile = 0; tile < count; tile++) tiles.push(tile);
+  return tiles;
+}
+
+export function rosterGrid(count: number, tiles: readonly RosterTile[] = inOrder(count)): RosterGrid {
   let columns = 1;
   let best = 0;
   for (let c = 1; c <= count; c++) {
@@ -53,10 +61,21 @@ export function rosterGrid(count: number): RosterGrid {
   const rows = Math.ceil(count / columns);
   const cellWidth = CELL_WIDTH * best;
   const cellHeight = CELL_HEIGHT * best;
-  return { count, columns, rows, scale: best, cellWidth, cellHeight, left: REGION_X + (REGION_WIDTH - columns * cellWidth) / 2, top: REGION_BOTTOM + (REGION_HEIGHT + rows * cellHeight) / 2 };
+  return { count, columns, rows, scale: best, cellWidth, cellHeight, left: REGION_X + (REGION_WIDTH - columns * cellWidth) / 2, top: REGION_BOTTOM + (REGION_HEIGHT + rows * cellHeight) / 2, tiles };
 }
 
-export function cellRect(grid: RosterGrid, tile: number): CellRect {
+export const rosterLayout = (tiles: readonly RosterTile[]): RosterGrid => rosterGrid(tiles.length, tiles);
+
+export function cellOf(grid: RosterGrid, tile: RosterTile): number | undefined {
+  for (let cell = 0; cell < grid.count; cell++) if (grid.tiles[cell] === tile) return cell;
+  return undefined;
+}
+
+export const laidOut = (grid: RosterGrid, tile: RosterTile): boolean => cellOf(grid, tile) !== undefined;
+
+export const cellRect = (grid: RosterGrid, tile: RosterTile): CellRect => slotRect(grid, cellOf(grid, tile) ?? 0);
+
+function slotRect(grid: RosterGrid, tile: number): CellRect {
   const shortRows = grid.rows * grid.columns - grid.count;
   const longRows = grid.rows - shortRows;
   const longCount = longRows * grid.columns;
@@ -71,8 +90,8 @@ export function cellRect(grid: RosterGrid, tile: number): CellRect {
 
 export function tileAt(grid: RosterGrid, x: number, y: number): RosterTile | undefined {
   for (let tile = 0; tile < grid.count; tile++) {
-    const rect = cellRect(grid, tile);
-    if (x >= rect.left && x < rect.right && y <= rect.top && y > rect.bottom) return tile;
+    const rect = slotRect(grid, tile);
+    if (x >= rect.left && x < rect.right && y <= rect.top && y > rect.bottom) return grid.tiles[tile];
   }
   return undefined;
 }
@@ -85,12 +104,12 @@ export function nearestTile(grid: RosterGrid, x: number, y: number): RosterTile 
   let nearest: RosterTile | undefined;
   let best = 0;
   for (let tile = 0; tile < grid.count; tile++) {
-    const rect = cellRect(grid, tile);
+    const rect = slotRect(grid, tile);
     const dx = x < rect.left ? rect.left - x : x > rect.right ? x - rect.right : 0;
     const dy = y > rect.top ? y - rect.top : y < rect.bottom ? rect.bottom - y : 0;
     const distance = dx * dx + dy * dy;
     if (nearest === undefined || distance < best) {
-      nearest = tile;
+      nearest = grid.tiles[tile];
       best = distance;
     }
   }

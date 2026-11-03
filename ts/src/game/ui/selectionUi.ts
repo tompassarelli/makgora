@@ -45,8 +45,8 @@ import {
   selectionDrag,
   updateSelectionDrag,
 } from "../menu/selectionDrag";
-import { cellRect, rosterGrid } from "../menu/selectionGrid";
-import { type HandFrames, createHandFrames, destroyHandFrames, presentHand } from "./selectionHandFrames";
+import { cellRect, laidOut } from "../menu/selectionGrid";
+import { type HandFrames, createHandFrames, destroyHandFrames, presentHand, resizeHandFrames } from "./selectionHandFrames";
 import { type HandPose, HIDDEN_HAND, SelectionHands, handPalette } from "./selectionHands";
 import { MENU_FONT, MENU_STYLE, type TextBox } from "./hudLayout";
 import { BAR_COLOURS, BAR_TEXT } from "./barFrames";
@@ -63,7 +63,7 @@ import { anyOpen, overAny } from "./menuHover";
 import { CommunityMenu } from "./communityMenu";
 import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffer, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offerTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
-import { ROSTER_TILES, TILE_NAME_INSET, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, forgeMark, label, tileMarked, tileShown, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
+import { ROSTER_TILES, TILE_NAME_INSET, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, forgeMark, label, placeForgeMark, selectGrid, tileMarked, tileShown, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, acceptsClick, cardPalette, cardRowShown, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, applyRuleButton } from "./selectionRules";
 import { FIXED_DELAY, type LobbyNet, type SelectText, type SelectionActions } from "./selectionActions";
@@ -122,7 +122,8 @@ export class SelectionPanel {
   private gameMenuWake = 0;
 
   private readonly chips: RosterChip[] = PARTICIPANT_SLOTS.map(() => ({ choice: 0, placed: false }));
-  private readonly roster: Roster = { grid: rosterGrid(ROSTER_TILES), selectable: 0, chips: this.chips };
+  private laidOutForge = forgeShown();
+  private readonly roster: Roster = { grid: selectGrid(this.laidOutForge), selectable: 0, chips: this.chips };
 
   private game: Readonly<MatchState> | undefined;
   private settingsOpen = false;
@@ -178,25 +179,16 @@ export class SelectionPanel {
     const row = createFrameByType("FRAME", `MeleeSelectRow${suffix}`, gameUi(), "", 0);
     this.row = row;
     const grid = this.roster.grid;
-    const scale = f32(grid.scale);
-    for (let choice = 0; choice < grid.count; choice++) {
-      const { left, top } = cellRect(grid, choice);
-      const x = f32(left);
-      const y = f32(top);
+    for (let choice = 0; choice < ROSTER_TILES; choice++) {
       const name = `${suffix}_${formatInt(choice)}`;
-      const tileFrame = art(root, `MeleeTile${name}`, MENU_STYLE.borderTexture, x, y, f32(grid.cellWidth), f32(grid.cellHeight));
-      const portrait = tilePortrait(scale);
-      const inset = (TILE_PORTRAIT_SLOT * scale - portrait) / 2;
-      const tilePortraitFrame = art(root, `MeleeTilePortrait${name}`, portraitTexture(characterOfTile(choice), true), x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset, portrait, portrait);
-      const text = tileLabel(choice);
-      const tileName = label(root, `MeleeTileName${name}`, x + TILE_NAME_INSET * scale, y - f32(0.106) * scale, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.023) * scale, TILE_NAME_SIZE);
-      setMenuText(tileName, text);
+      const tileFrame = art(root, `MeleeTile${name}`, MENU_STYLE.borderTexture, 0.0, 0.0, f32(grid.cellWidth), f32(grid.cellHeight));
+      const tilePortraitFrame = art(root, `MeleeTilePortrait${name}`, portraitTexture(characterOfTile(choice), true), 0.0, 0.0, 0.0, 0.0);
+      const tileName = label(root, `MeleeTileName${name}`, 0.0, 0.0, f32(grid.cellWidth), f32(grid.cellHeight), TILE_NAME_SIZE);
+      setMenuText(tileName, tileLabel(choice));
       this.tiles.push([tileFrame, tilePortraitFrame, tileName]);
       this.tilePortraits.push(tilePortraitFrame);
-      this.forgeMarks.push(fighterStatus(characterOfTile(choice)) === "forge" ? forgeMark(root, `MeleeTileForge${name}`, x, y, grid) : undefined);
+      this.forgeMarks.push(fighterStatus(characterOfTile(choice)) === "forge" ? forgeMark(root, `MeleeTileForge${name}`, 0.0, 0.0, grid) : undefined);
       const button = createFrameByType("BUTTON", `MeleeTileButton${name}`, root, "", 0);
-      placeTopLeft(button, x, y);
-      setFrameSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
       this.tileButtons.push(this.clicks.add(button, { kind: "tile", tile: choice }, undefined, "native"));
     }
     this.cards = PARTICIPANT_SLOTS.map(slot => createCard(row, root, suffix, slot, (frame, target) => this.clicks.add(frame, target, undefined, "native")));
@@ -204,6 +196,7 @@ export class SelectionPanel {
     setFrameLevel(this.bullseye, SELECT_LEVELS.hand);
     setFrameVisible(this.bullseye, false);
     this.hands = [0, 1, 2, 3].map(slot => createHandFrames(grid, suffix, slot)) as Slots<HandFrames>;
+    this.layTiles();
     this.handChannel = new SelectionHands(participantId);
     this.bar = new SelectBar(root, suffix, text, (frame, target: BarTarget, box) => this.clicks.add(frame, target, undefined, "native", box));
     const page = (frame: Frame, x: number, y: number, width: number, height: number) => {
@@ -736,13 +729,46 @@ export class SelectionPanel {
     return false;
   }
 
+  // Local presentation: each client lays out only the fighters it shows, so picks travel as roster tiles, never grid cells.
+  private layTiles(): void {
+    const grid = this.roster.grid;
+    const scale = f32(grid.scale);
+    const portrait = tilePortrait(scale);
+    const inset = (TILE_PORTRAIT_SLOT * scale - portrait) / 2;
+    for (let tile = 0; tile < this.tiles.length; tile++) {
+      const [tileFrame, tilePortraitFrame, tileName] = this.tiles[tile] ?? [];
+      const button = this.tileButtons[tile];
+      if (tileFrame === undefined || tilePortraitFrame === undefined || tileName === undefined || button === undefined || !laidOut(grid, tile)) continue;
+      const { left, top } = cellRect(grid, tile);
+      const x = f32(left);
+      const y = f32(top);
+      placeTopLeft(tileFrame, x, y);
+      setFrameSize(tileFrame, f32(grid.cellWidth), f32(grid.cellHeight));
+      placeTopLeft(tilePortraitFrame, x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset);
+      setFrameSize(tilePortraitFrame, portrait, portrait);
+      placeTopLeft(tileName, x + TILE_NAME_INSET * scale, y - f32(0.106) * scale);
+      sizeText(tileName, TILE_NAME_SIZE, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.023) * scale);
+      const mark = this.forgeMarks[tile];
+      if (mark !== undefined) placeForgeMark(mark, x, y, grid);
+      placeTopLeft(button, x, y);
+      setFrameSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
+    }
+    setFrameSize(this.bullseye, bullseyeSize(grid), bullseyeSize(grid));
+    for (const frames of this.hands) resizeHandFrames(frames, grid);
+  }
+
   private showTiles(game: Readonly<MatchState>): void {
+    const forge = forgeShown();
+    if (forge !== this.laidOutForge) {
+      this.laidOutForge = forge;
+      this.roster.grid = selectGrid(forge);
+      this.layTiles();
+    }
     const palette = cardPalette(game, this.participantId);
     if (palette !== this.shownTilePalette) {
       this.shownTilePalette = palette;
       this.tilePortraits.forEach((frame, tile) => setFrameTexture(frame, portraitTexture(characterOfTile(tile), true, palette), 0, true));
     }
-    const forge = forgeShown();
     for (let tile = 0; tile < this.tiles.length; tile++) {
       const selectable = tileShown(game, tile, forge);
       const mark = this.forgeMarks[tile];

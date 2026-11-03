@@ -1,7 +1,7 @@
 import type { SessionWinsFrames } from "./sessionWinsFrames";
 import { f32 } from "wisp/src/sim/f32";
 import { type RosterTile, cardDown, cardRight, cardSize } from "../menu/selectionDrag";
-import type { RosterGrid } from "../menu/selectionGrid";
+import { type RosterGrid, rosterLayout } from "../menu/selectionGrid";
 import { NATIVE_TEXT_BASE } from "./hudLayout";
 import { PLAYABLE_CHARACTERS, fighterName, DEFAULT_FIGHTER } from "../roster/kits";
 import { fighterPortrait } from "../roster/looks";
@@ -120,6 +120,15 @@ export const decodeTile = (data: string): RosterTile | undefined => {
 };
 export const decodeSlot = (data: string): number | undefined => (data === "0" ? 0 : data === "1" ? 1 : data === "2" ? 2 : data === "3" ? 3 : undefined);
 
+export function shownTiles(forgeShown: boolean): RosterTile[] {
+  const tiles: RosterTile[] = [];
+  for (let tile = 0; tile < GRID_FIGHTERS.length; tile++) if (fighterShown(characterOfTile(tile), forgeShown)) tiles.push(tile);
+  tiles.push(RANDOM_FIGHTER_TILE);
+  return tiles;
+}
+
+export const selectGrid = (forgeShown: boolean): RosterGrid => rosterLayout(shownTiles(forgeShown));
+
 export const tileOffered = (game: Readonly<MatchState>, tile: RosterTile): boolean => tile === RANDOM_FIGHTER_TILE ? randomFighterOffered(game) : selectableMatchCharacter(game, characterOfTile(tile));
 
 export function tileLabel(tile: RosterTile): string {
@@ -133,9 +142,17 @@ export const tileShown = (game: Readonly<MatchState>, tile: RosterTile, forgeSho
 
 export const tileMarked = (game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean): boolean => tileShown(game, tile, forgeShown) && fighterStatus(characterOfTile(tile)) === "forge";
 
+const FORGE_MARK_SIZE = f32(0.0062);
+
+export function placeForgeMark(mark: Frame, x: number, y: number, grid: Readonly<RosterGrid>): void {
+  const scale = f32(grid.scale);
+  placeTopLeft(mark, x + TILE_NAME_INSET * scale, y - f32(0.004) * scale);
+  sizeText(mark, FORGE_MARK_SIZE, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.012) * scale);
+}
+
 export function forgeMark(parent: Frame, name: string, x: number, y: number, grid: Readonly<RosterGrid>): Frame {
   const scale = f32(grid.scale);
-  const mark = label(parent, name, x + TILE_NAME_INSET * scale, y - f32(0.004) * scale, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.012) * scale, f32(0.0062));
+  const mark = label(parent, name, x + TILE_NAME_INSET * scale, y - f32(0.004) * scale, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.012) * scale, FORGE_MARK_SIZE);
   setFrameText(mark, FORGE_MARK);
   setFrameVisible(mark, false);
   return mark;

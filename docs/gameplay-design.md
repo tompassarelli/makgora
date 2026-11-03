@@ -1208,6 +1208,14 @@ so every client draws the same; a Classic fight whose planned rivals are all
 in the Forge takes a featured stand-in. An opponent's Forge pick is still
 accepted and fought online, because the setting filters only local menus.
 
+Character select lays out only the fighters it shows (`selectGrid` in
+makgora:ts/src/game/ui/selectionFrames.ts): with the setting off the featured
+fighters and Random fill a compact grid in roster order with no gaps, and with
+it on every fighter does, so two clients may draw different grids. Picks
+travel as roster tiles, fixed by `SELECT_GRID_ORDER` and the same on every
+client, never as grid cells. A player token on a fighter this client hides
+rests on its player card.
+
 ### Expansion roster defaults
 
 Owner decision, 6 October 2026: adopt the 2 October expansion brief as

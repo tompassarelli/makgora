@@ -7,8 +7,8 @@ import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { Character } from "../src/game/sim/codes";
 import { fighterAt } from "../src/game/sim/roster";
 import { fighterStatus } from "../src/game/roster/forge";
-import { cellRect, rosterGrid } from "../src/game/menu/selectionGrid";
-import { ROSTER_TILES, tileOfCharacter } from "../src/game/ui/selectionFrames";
+import { type RosterGrid, cellRect, laidOut } from "../src/game/menu/selectionGrid";
+import { selectGrid, tileOfCharacter } from "../src/game/ui/selectionFrames";
 import { setForgeShown } from "../src/game/ui/forgeSetting";
 import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
@@ -18,6 +18,12 @@ import { testHeadless } from "./headless";
 
 const headless = testHeadless(MAKGORA_HEADLESS);
 const FORGE_FIGHTER = Character.jaina;
+const FEATURED_FIGHTER = Character.archimonde;
+
+function centre(grid: RosterGrid, character: number): readonly [number, number] {
+  const rect = cellRect(grid, tileOfCharacter(character));
+  return [f32((rect.left + rect.right) / 2), f32((rect.top + rect.bottom) / 2)];
+}
 
 function value<T>(client: HeadlessClient, body: () => T): T {
   let result: T | undefined;
@@ -28,8 +34,12 @@ function value<T>(client: HeadlessClient, body: () => T): T {
 const tileFrame = (client: HeadlessClient, kind: "Portrait" | "Forge", tile: number) =>
   client.frames.snapshot().find(frame => frame.name === `MeleeTile${kind}${client.slot}_${tile}`);
 
-test("a player with Show the Forge on picks a Forge fighter while the other player has it off, and both clients fight that fighter with no divergence [k1 scenario]", () => {
+test("a player with Show the Forge on picks a Forge fighter on the full grid while the other player picks on the compact grid with it off, and both clients fight both picks with no divergence [k1 scenario]", () => {
   expect(fighterStatus(FORGE_FIGHTER)).toBe("forge");
+  expect(fighterStatus(FEATURED_FIGHTER)).toBe("featured");
+  const [full, compact] = [selectGrid(true), selectGrid(false)];
+  expect(laidOut(compact, tileOfCharacter(FORGE_FIGHTER))).toBe(false);
+  expect(centre(full, FEATURED_FIGHTER)).not.toEqual(centre(compact, FEATURED_FIGHTER));
   const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, [0, 1]);
   const [a, b] = [clients.client(0), clients.client(1)];
   clients.start();
@@ -43,14 +53,17 @@ test("a player with Show the Forge on picks a Forge fighter while the other play
   expect(tileFrame(b, "Portrait", tile)?.visible).toBe(false);
   for (const slot of [0, 1]) clients.press(slot, Key.n);
   clients.frames(5);
-  const rect = cellRect(rosterGrid(ROSTER_TILES), tile);
-  const [x, y] = [f32((rect.left + rect.right) / 2), f32((rect.top + rect.bottom) / 2)];
+  const [x, y] = centre(full, FORGE_FIGHTER);
   clients.click(1, x, y);
   clients.frames(10);
   expect(value(b, () => shell().game.characterChoices[1])).not.toBe(FORGE_FIGHTER);
   expect(clients.click(0, x, y)).toBe(true);
+  expect(clients.click(1, ...centre(compact, FEATURED_FIGHTER))).toBe(true);
   clients.frames(10);
-  for (const client of [a, b]) expect(value(client, () => shell().game.characterChoices[0])).toBe(FORGE_FIGHTER);
+  for (const client of [a, b]) {
+    expect(value(client, () => shell().game.characterChoices[0])).toBe(FORGE_FIGHTER);
+    expect(value(client, () => shell().game.characterChoices[1])).toBe(FEATURED_FIGHTER);
+  }
   const until = (what: string, phase: Phase) => {
     for (let frame = 0; frame < 120 && value(a, () => shell().game.phase) !== phase; frame++) clients.frames(1);
     expect(value(a, () => shell().game.phase), what).toBe(phase);
@@ -63,6 +76,7 @@ test("a player with Show the Forge on picks a Forge fighter while the other play
   for (const client of [a, b]) {
     expect(client.errors).toEqual([]);
     expect(value(client, () => fighterAt(shell().world, 0).character)).toBe(FORGE_FIGHTER);
+    expect(value(client, () => fighterAt(shell().world, 1).character)).toBe(FEATURED_FIGHTER);
   }
   expect(clients.firstDivergence()).toBeUndefined();
 });

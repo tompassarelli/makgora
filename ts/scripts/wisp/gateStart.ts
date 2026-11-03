@@ -8,9 +8,9 @@ import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, type Client, focus, frameWords, loadClients, type Region } from "wisp/scripts/warcraft/desktop";
 import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
-import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
+import { cellRect } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
-import { ROSTER_TILES, tileOfCharacter } from "../../src/game/ui/selectionFrames";
+import { selectGrid, tileOfCharacter } from "../../src/game/ui/selectionFrames";
 import { gameProcess } from "../integrity/capture";
 import { pollUntil } from "../hostPoll";
 import { runProcess, startInputProcess } from "../hostProcess";
@@ -30,7 +30,7 @@ export const pickFighters = (clients: readonly Client[]) => Effect.gen(function*
     yield* reachFighterSelect(selected, region);
     const point = (x: number, y: number) => ({ x: region.x + Math.round((region.width - region.height * 4 / 3) / 2 + x * region.height / 0.6), y: region.y + Math.round(region.height - y * region.height / 0.6) });
     const pin = point(parkedChipCentre(slot).x, parkedChipCentre(slot).y);
-    const tile = cellRect(rosterGrid(ROSTER_TILES), tileOfCharacter(PLAYABLE_CHARACTERS[slot] ?? 0));
+    const tile = cellRect(selectGrid(false), tileOfCharacter(PLAYABLE_CHARACTERS[slot] ?? 0));
     const drop = point((tile.left + tile.right) / 2, (tile.top + tile.bottom) / 2);
     yield* batch(selected, [{ kind: "click", ...pin, holdMillis: 200 }, { kind: "wait", millis: 100 }, { kind: "click", ...drop, holdMillis: 200 }]).pipe(Effect.mapError(fail("start gate fighters")));
   }

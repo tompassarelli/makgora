@@ -9,10 +9,10 @@ import { batch, capture, click, focus, frameWords, loadClients } from "wisp/scri
 import { encodePpm } from "wisp/scripts/wisp/frameProbe";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { Action, bit } from "../../src/game/input/actions";
-import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
+import { cellRect } from "../../src/game/menu/selectionGrid";
 import { parkedChipCentre, parkedChipLeft, readyChipSize } from "../../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
-import { ROSTER_TILES, tileOfCharacter } from "../../src/game/ui/selectionFrames";
+import { selectGrid, tileOfCharacter } from "../../src/game/ui/selectionFrames";
 import { Phase } from "../../src/game/lobby/lobbyState";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { journalMenuFile } from "../../src/game/core/gameFiles";
@@ -124,7 +124,7 @@ export const measureBindingsGate = (clientsFile: string, name: string, directory
   ], { env: { ...Bun.env, ...client.x11, ...client.wayland }, stderr: join(directory, `helper-${stick}-${triggers}.log`) }).pipe(Effect.mapError(fail("bindings gate helper")));
   const initial = yield* menu();
   if (initial.phase !== "CHARACTER") return yield* new AcceptFailure({ operation: "bindings gate setup", problem: `expected CHARACTER, got ${initial.phase}` });
-  const grid = rosterGrid(ROSTER_TILES);
+  const grid = selectGrid(false);
   for (const [slot, selected] of clients.entries()) {
     yield* focus(selected).pipe(Effect.mapError(fail("bindings gate setup")));
     const viewport = yield* input.windowRegion(selected).pipe(Effect.mapError(fail("bindings gate setup")));

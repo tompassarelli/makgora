@@ -8,12 +8,12 @@ import type { Frame } from "wisp/scripts/wisp/frameProbe";
 import { type Client, batch, capture, captureTimed, click, focus, frameWords, loadClients } from "wisp/scripts/warcraft/desktop";
 import { journalMenuFile } from "../../src/game/core/gameFiles";
 import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
-import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
+import { cellRect } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { BINDING_PRESETS } from "../../src/game/input/keyBindings";
 import { Character } from "../../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS, fighterName } from "../../src/game/roster/kits";
-import { ROSTER_TILES, tileOfCharacter } from "../../src/game/ui/selectionFrames";
+import { selectGrid, tileOfCharacter } from "../../src/game/ui/selectionFrames";
 import { MATCH_MODES } from "../../src/game/lobby/lobbyState";
 import { MODE_ROWS, SELECT_BAR } from "../../src/game/core/selectBarLayout";
 import { PICKER_DONE, presetButton } from "../../src/game/ui/settingsUi";
@@ -228,7 +228,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
   const hostView = yield* input.windowRegion(host).pipe(Effect.mapError(fail("moves gate viewport")));
   yield* chooseTraining(host, hostView);
 
-  const grid = rosterGrid(ROSTER_TILES);
+  const grid = selectGrid(false);
   const verdicts: { readonly fighters: readonly string[]; readonly verdict: SmokeVerdict }[] = [];
   const spots: { readonly fighters: readonly string[]; readonly results: readonly SpotResult[] }[] = [];
   let area = 0;

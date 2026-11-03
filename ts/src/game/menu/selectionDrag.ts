@@ -7,7 +7,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
 import { CARD_LEFT, CARD_PITCH, CARD_SCALE, CARD_TOP, CARD_WIDTH } from "../core/selectScreenLayout";
 import { PARTICIPANT_CAPACITY, participantActive } from "../input/participants";
-import { type RosterGrid, type RosterTile, cellRect, nearestTile, tileAt } from "./selectionGrid";
+import { type RosterGrid, type RosterTile, cellRect, laidOut, nearestTile, tileAt } from "./selectionGrid";
 
 export type { RosterTile };
 
@@ -118,7 +118,7 @@ function pickUp(drag: SelectionDrag, { grid, selectable, chips }: Readonly<Roste
   if (picked === undefined) {
     for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
       const chip = chips[slot];
-      if (chip?.placed === true && participantActive(selectable, slot) && onChip(grid, slot, chip.choice, x, y)) picked = slot;
+      if (chip?.placed === true && participantActive(selectable, slot) && laidOut(grid, chip.choice) && onChip(grid, slot, chip.choice, x, y)) picked = slot;
     }
   }
   if (picked !== undefined) drag.held = picked;
@@ -218,7 +218,7 @@ export interface ChipBox { readonly left: number; readonly top: number; readonly
 export function chipBox(grid: RosterGrid, slot: number, state: "parked" | "carried" | "placed", tile: number, hand: { readonly x: number; readonly y: number }): ChipBox {
   const size = readyChipSize(grid);
   if (state === "carried") return { left: carriedChipLeft(hand.x, size), top: carriedChipTop(hand.y, size), size };
-  if (state === "placed") return { left: chipX(grid, slot, tile), top: chipY(grid, slot, tile), size };
+  if (state === "placed" && laidOut(grid, tile)) return { left: chipX(grid, slot, tile), top: chipY(grid, slot, tile), size };
   return { left: parkedChipLeft(slot, size), top: parkedChipTop(size), size };
 }
 

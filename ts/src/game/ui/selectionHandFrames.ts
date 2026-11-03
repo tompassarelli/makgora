@@ -6,7 +6,7 @@ import { SELECT_LEVELS } from "./selectLevels";
 import { art } from "./selectionFrames";
 import { consoleUi, gameUi, placeTopLeft } from "./frames";
 import type { DrawnHand } from "./selectionHands";
-import { destroyFrame, Frame, setFrameLevel, setFrameTexture, setFrameVisible } from "wisp/game/frames";
+import { destroyFrame, Frame, setFrameLevel, setFrameSize, setFrameTexture, setFrameVisible } from "wisp/game/frames";
 import { handLabelName } from "./handLabelArt";
 import { formatInt } from "wisp/game/text";
 
@@ -58,6 +58,18 @@ function createLayer(parent: Frame, grid: RosterGrid, tag: string, suffix: strin
   setFrameLevel(badge, SELECT_LEVELS.handBadge);
   setFrameVisible(badge, false);
   return { states: { point: state("point"), fan: state("fan"), pinch: state("pinch") }, badge, badgePalette: slot, slot };
+}
+
+function resizeLayer(layer: HandLayer, grid: RosterGrid): void {
+  const size = handSize(grid);
+  for (const state of HAND_STATES) setFrameSize(layer.states[state], size, size);
+  const { width, height } = handBadgeBox(0.0, 0.0, size, readyChipSize(grid));
+  setFrameSize(layer.badge, width, height);
+}
+
+export function resizeHandFrames(frames: HandFrames, grid: RosterGrid): void {
+  resizeLayer(frames.inside, grid);
+  resizeLayer(frames.edge, grid);
 }
 
 export function createHandFrames(grid: RosterGrid, suffix: string, slot: number): HandFrames {

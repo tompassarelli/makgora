@@ -13,10 +13,10 @@ import { keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { MATCH_TICKS_PER_SECOND, ResultPick } from "../../src/game/lobby/lobbyState";
 import { RESULTS_DELAY_FRAMES } from "../../src/game/render/matchPresentation";
 import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
-import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
+import { cellRect } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
-import { ROSTER_TILES, tileOfCharacter } from "../../src/game/ui/selectionFrames";
+import { selectGrid, tileOfCharacter } from "../../src/game/ui/selectionFrames";
 import { BUTTON_WIDTH, CHOICE_HEIGHT, CHOICE_TOP, choiceLeft } from "../../src/game/ui/resultsBanner";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
 import { SELECT_BAR } from "../../src/game/core/selectBarLayout";
@@ -129,7 +129,7 @@ const oneStock = (d: Driver, host: Client) => Effect.gen(function*() {
 });
 
 export const pickFighters = (d: Driver, clients: readonly Client[]) => Effect.gen(function*() {
-  const grid = rosterGrid(ROSTER_TILES);
+  const grid = selectGrid(false);
   for (const [slot, client] of clients.entries()) {
     const tile = cellRect(grid, tileOfCharacter(PLAYABLE_CHARACTERS[slot] ?? 0));
     const pin = yield* d.at(client, parkedChipCentre(slot).x, parkedChipCentre(slot).y);
