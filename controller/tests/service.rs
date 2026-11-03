@@ -1,4 +1,4 @@
-//! A fake Smashcraft session served by padbridge's service through the
+//! A fake Mak'gora session served by padbridge's service through the
 //! real plug-in program (`wc3-journal --plugin`): a virtual pad, a stand-in
 //! game folder whose menu files the test writes, and the helper typing into a
 //! file. Needs a writable /dev/uinput.
@@ -181,7 +181,7 @@ fn start_presses_y_at_character_select_when_the_keys_session_appears_after_the_m
 fn a_private_pad_script_drives_the_published_menu_pointer() {
     use focus::{Foreground, Gate, Target};
     use padbridge::{model::{Button, InputView, PadPreset}, service::{any_map::{DesktopOutput, Driver, MenuCurve}, }};
-    use smashcraft_controller::profile::newest_menu;
+    use makgora_controller::profile::newest_menu;
 
     let setting = |name| std::env::var(name).unwrap_or_else(|_| panic!("missing {name}"));
     let display = setting("WC3_MENU_DISPLAY");

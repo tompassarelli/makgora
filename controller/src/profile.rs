@@ -1,7 +1,7 @@
-//! The Smashcraft profile: the map publishes
+//! The Mak'gora profile: the map publishes
 //! `CustomMapData/smashcraft-journal-menu-BUILD-sSLOT.txt` for the local
 //! player, naming its build, slot, epoch and menu phase; `wc3-journal
-//! --follow-matches` serves it (smashcraft:controller/README.md).
+//! --follow-matches` serves it (makgora:controller/README.md).
 //!
 //! Within one map session the epoch only grows, one per match. A newer
 //! publication with a lower epoch, or another build or slot, is a new map
@@ -148,7 +148,7 @@ pub fn started_at(birth: u64) -> Option<SystemTime> {
 }
 
 #[derive(Default)]
-pub struct Smashcraft {
+pub struct Makgora {
     tracker: Tracker,
     game: Option<(u32, u64)>,
     /// The keyboard session this game runs, when it is newer than any menu publication.
@@ -157,9 +157,9 @@ pub struct Smashcraft {
     keys_generation: u32,
 }
 
-impl Profile for Smashcraft {
+impl Profile for Makgora {
     fn name(&self) -> &str {
-        "smashcraft"
+        "makgora"
     }
 
     fn title(&self) -> &str {
@@ -289,7 +289,7 @@ mod tests {
 
     #[test]
     fn finds_the_newest_menu_file_with_a_dashed_build() {
-        let dir = std::env::temp_dir().join(format!("smashcraft-menus-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("makgora-menus-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
         assert_eq!(newest_menu(&dir), None);
         let write = |build: &str, slot: u32, epoch: u32| {
@@ -306,14 +306,14 @@ mod tests {
 
     #[test]
     fn a_menu_from_before_this_game_started_is_no_session() {
-        let documents = std::env::temp_dir().join(format!("smashcraft-fresh-{}", std::process::id()));
+        let documents = std::env::temp_dir().join(format!("makgora-fresh-{}", std::process::id()));
         fs::create_dir_all(documents.join("CustomMapData")).unwrap();
         fs::write(documents.join("CustomMapData/smashcraft-journal-menu-old-s0.txt"),
             "call Preload( \"SMASHCRAFT JOURNAL MENU v=1 build=old epoch=0 slot=0 phase=CHARACTER\" )\nendfunction\n").unwrap();
         let game = |birth| Game { pid: 1, birth, documents: documents.clone(), target: Target::Headless { text_out: "/dev/null".into() } };
         let boot = started_at(0).unwrap();
         let later = (SystemTime::now().duration_since(boot).unwrap().as_millis() / 10) as u64 + 360_000;
-        let mut profile = Smashcraft::default();
+        let mut profile = Makgora::default();
         assert_eq!(profile.session(&game(later)), None);
         assert!(profile.session(&game(1)).is_some());
         // Another game forgets it until that game publishes one.
@@ -324,7 +324,7 @@ mod tests {
     #[test]
     fn start_keeps_menu_confirm_until_the_map_publishes_match() {
         let documents = Path::new("/prefix/Documents/Warcraft III");
-        let mut profile = Smashcraft::default();
+        let mut profile = Makgora::default();
         assert!(!profile.pointer_menu());
         let now = SystemTime::now();
         for (phase, pointer) in [("CHARACTER", true), ("CPU", true), ("CHARACTER", true), ("STAGE", true), ("RESULT", true), ("BLOCKED", false)] {
@@ -367,11 +367,11 @@ mod tests {
 
     #[test]
     fn a_keyboard_build_is_a_keys_session_until_a_journal_map_publishes_a_menu() {
-        let documents = std::env::temp_dir().join(format!("smashcraft-keys-{}", std::process::id()));
+        let documents = std::env::temp_dir().join(format!("makgora-keys-{}", std::process::id()));
         let data = documents.join("CustomMapData");
         fs::create_dir_all(&data).unwrap();
         let game = Game { pid: 1, birth: 1, documents: documents.clone(), target: Target::Headless { text_out: "/dev/null".into() } };
-        let mut profile = Smashcraft::default();
+        let mut profile = Makgora::default();
         assert_eq!(profile.session(&game), None);
         fs::write(data.join("wc3-melee-ready.txt"), READY).unwrap();
         let first = profile.session(&game).unwrap();
@@ -405,7 +405,7 @@ mod tests {
 
     #[test]
     fn reads_helper_lifecycle_lines() {
-        let mut profile = Smashcraft::default();
+        let mut profile = Makgora::default();
         assert_eq!(profile.line("wc3-journal: no pad").problem.as_deref(), Some("no pad"));
         assert_eq!(profile.line("waiting_for_match build=b slot=0 start_before=final-match-confirmation").event, Some(HelperEvent::Ready));
         assert_eq!(profile.line("match_ready epoch=1 neutral_rearm=required").event, Some(HelperEvent::InMatch));

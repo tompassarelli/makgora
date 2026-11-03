@@ -51,7 +51,7 @@ async function page(path: string): Promise<Page> {
   if (!existsSync(file) || manifest[url] === undefined) {
     await Bun.sleep(Math.max(0, lastFetch + 1000 - Date.now()));
     lastFetch = Date.now();
-    const response = await fetch(url, { headers: { "user-agent": "smashcraft-reference-intake" } });
+    const response = await fetch(url, { headers: { "user-agent": "makgora-reference-intake" } });
     if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
     writeFileSync(file, await response.text());
     manifest[url] = new Date().toISOString().slice(0, 10);

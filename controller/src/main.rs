@@ -1,5 +1,5 @@
-//! Smashcraft's plug-in for padbridge (README.md): `wc3-journal --plugin`
-//! reports Smashcraft sessions to the service, and the same executable is the
+//! Mak'gora's plug-in for padbridge (README.md): `wc3-journal --plugin`
+//! reports Mak'gora sessions to the service, and the same executable is the
 //! journal helper that serves them.
 #![deny(unsafe_code)]
 
@@ -1008,7 +1008,7 @@ mod linux {
 
     fn usage() -> &'static str {
         "wc3-journal --plugin\n\
-         Smashcraft's map plug-in for padbridge --service --plugin wc3-journal: reports the map's sessions and names this helper.\n\
+         Mak'gora's map plug-in for padbridge --service --plugin wc3-journal: reports the map's sessions and names this helper.\n\
          wc3-journal --follow-matches --build BUILD --slot N [--epoch N] [--menu-keys all|start] [--preset melee|z-jump|tom|script] [--tap-jump on|off] [--left-trigger full|light] [--right-trigger full|light] [--right-stick smash|tilt] --device /dev/input/eventN --out DIR --editbox-display :N [--trace]\n\
          Start in character selection; stick left/right chooses, A selects, X backs, Start confirms. Follows matches and rematches.\n\
          Diagnostic only: wc3-journal --device /dev/input/eventN --out DIR --ready-file PATH --epoch-monotonic-ns NS [--mailbox-display :N | --editbox-display :N] [--first-frame N] [--stop-frame N] [--trace]\n\
@@ -4618,7 +4618,7 @@ mod linux {
 
     /// `--plugin`: answers padbridge's requests on standard input and output.
     fn plugin() -> Result<(), String> {
-        let mut profile = smashcraft_controller::profile::Smashcraft::default();
+        let mut profile = makgora_controller::profile::Makgora::default();
         padbridge::service::plugin::serve(&mut profile, io::stdin().lock(), io::stdout().lock()).map_err(|error| error.to_string())
     }
 
