@@ -22,7 +22,7 @@ uses the authorized encrypted account fields described below.
   with its error dialog up, sits at the empty login shell, a stale lobby or
   a stuck loading screen, or shares its prefix with a second runtime, and
   signs a launcher at its Battle.net sign-in form in with the client's account
-  (A: account c, B: account b; smashcraft:ts/scripts/wisp/doctor.ts), so Tom
+  (A: account c, B: account b; makgora:ts/scripts/wisp/doctor.ts), so Tom
   never signs in by hand (wisp:docs/doctor.md). Clients named clone-b,
   clone-c or clone-d start only through ~/.local/share/wisp/online/launch.sh and keep
   their own sign-in (wisp:docs/lan.md, "Clone-a"). `bun wisp client sign-out
@@ -32,4 +32,4 @@ uses the authorized encrypted account fields described below.
   hand.
 
 - Client driver: `bun wisp client look|read|click|keys CLIENT ...` reads and
-  drives a client. Session values live in ~/.local/state/smashcraft/clients.json.
+  drives a client. Session values live in ~/.local/state/makgora/clients.json.

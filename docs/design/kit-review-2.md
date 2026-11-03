@@ -16,8 +16,8 @@ roles ([roster.md](roster.md)) and #105 gameplans. Numbers are provisional
 authoring values, not measured balance; the #105 balance pass tunes them and
 Tom can veto any of them.
 
-Sources: smashcraft:ts/src/game/fighters/ (each kit's `specials.ts`) and
-the hero special engine, smashcraft:ts/src/game/sim/specials/engine.ts.
+Sources: makgora:ts/src/game/fighters/ (each kit's `specials.ts`) and
+the hero special engine, makgora:ts/src/game/sim/specials/engine.ts.
 
 ## How the moves are scored
 
@@ -211,7 +211,7 @@ long and contested:
   max fall speed for the full 160 frames (Tom, 2026-10-27), so the long sleep off-stage still leaves a ledge recovery after waking; the shared
   status rule and its measurement are in gameplay-design.md "Disabled fall".
 - The sleeper **mashes out** with the grab and freeze rule
-  (smashcraft:ts/src/game/sim/mash.ts): each press or new stick direction
+  (makgora:ts/src/game/sim/mash.ts): each press or new stick direction
   takes 8 frames off, never waking before frame 24. Any damaging hit wakes
   it; afterwards 240 frames of sleep immunity.
 - **Decisions:** Dreadlord chooses the payoff against the sleeper's mashing:

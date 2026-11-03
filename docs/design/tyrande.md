@@ -4,8 +4,8 @@ Tyrande is an aerial rushdown archer. Her arrows open offence rather than
 zone: they are fast, short-lived and barely stagger, so the foe holds shield
 while she closes in the air. Tom asked for her (2026-10-28) and moved
 her onto johnwar's Re-Classic dismounted model (2026-10-29); her spec is the
-Tyrande section of smashcraft:docs/design/roster-next.md. All combat values are original,
-provisional Smashcraft tuning. The Melee anchor is Falco's shape (a fast
+Tyrande section of makgora:docs/design/roster-next.md. All combat values are original,
+provisional Mak'gora tuning. The Melee anchor is Falco's shape (a fast
 faller whose lasers push into offence, with a reflector), not his numbers.
 
 ## How she differs
@@ -41,7 +41,7 @@ faller whose lasers push into offence, with a reflector), not his numbers.
   alpha track to 1.0, the value the pinned MDX codec writes, so the source
   round-trips losslessly.
 - **Clips.** The map imports her authored copy from her `hero-models` shard:
-  smashcraft:tools/animations/tyrande-clips.ts keeps the 17 stock sequences and
+  makgora:tools/animations/tyrande-clips.ts keeps the 17 stock sequences and
   appends 66 clips timed to her frame data (bow strikes; kicks for down tilt,
   dash attack, down smash, neutral air, back air and down air; her four casts;
   movement, paired grabs and nine damage reactions). Its motion helper parents
@@ -126,7 +126,7 @@ at Archimonde, through Ashenvale and the Battle of Mount Hyjal.
 
 ## Play-style profile
 
-Tom-tunable draft (2026-10-29; smashcraft:docs/design/balance.md,
+Tom-tunable draft (2026-10-29; makgora:docs/design/balance.md,
 "Play-style profiles"). She approaches in the air behind an arrow, lands
 forward airs into jabs and grabs, and kills with the forward smash and the
 back air.

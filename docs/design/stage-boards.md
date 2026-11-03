@@ -1,6 +1,6 @@
 # Stage boards
 
-Each Smashcraft stage has a board: the two to four Ultimate and Rivals of
+Each Mak'gora stage has a board: the two to four Ultimate and Rivals of
 Aether 2 references it follows, what to take from each, its material set
 (deck top, edge, body and underside, platforms) and a pass/fail rubric that a
 reviewer can check from native screenshots alone. The principles behind the
@@ -11,10 +11,10 @@ it follows (stage art rule 14), for example "follows FT-2".
 ## The reference pack
 
 Reference images are private, in
-~/.local/share/smashcraft-stage-design-178/references/; provenance.txt there
+~/.local/share/makgora-stage-design-178/references/; provenance.txt there
 gives each file's exact URL, source date, what it shows and its SHA-256.
 They are copyrighted screenshots kept for composition study only; no pixels,
-textures or geometry from them enter Smashcraft. Board items name the private
+textures or geometry from them enter Mak'gora. Board items name the private
 file and its public source.
 
 - `u272-*.jpg`: 18 official Ultimate stage screenshots from the
@@ -47,11 +47,11 @@ Castle, Mementos, Godai Delta, Hyperborean Harbor, Julesvale, Tempest Peak).
 | Ultimate Pokémon Stadium 2 | 187.6 | 156 | 180 | same |
 | RoA2 Aetherian Forest | 1,280 | 1,380 | — | [dragdown](https://dragdown.wiki/wiki/RoA2/Stages), 15 Sep 2026 |
 | RoA2 Fire Capital | 2,020 | 1,670 | — | same; side cut 2,824 → 2,680 from centre in [1.2.5](https://store.steampowered.com/news/app/2217000/view/1802354289729705), 17 Jun 2025 |
-| Smashcraft (every stage but Frozen Throne) | 1,200 | 963 | — | smashcraft:ts/src/game/sim/stageBounds.ts |
+| Mak'gora (every stage but Frozen Throne) | 1,200 | 963 | — | makgora:ts/src/game/sim/stageBounds.ts |
 
 Ultimate's camera reaches about 2.1 deck widths across at its widest, so a
 landmark at a third of the frame sits about one deck width from centre;
-Smashcraft's rule 3 band (1,000–1,600 units at landmark depth) agrees.
+Mak'gora's rule 3 band (1,000–1,600 units at landmark depth) agrees.
 RoA2's stages are 6.4 (Aetherian Forest) to 10 (Fire Capital) character
 heights wide with ~2 m characters ([RoA2 workshop docs](https://rivals2.com/workshop)).
 
@@ -107,11 +107,11 @@ Native assets first, in this order:
    without a new mesh (Battlefield's ice keel is decoration that "does not
    collide with anything", [SmashWiki](https://www.ssbwiki.com/Battlefield_(SSBU))).
    It counts as deck, not scenery; its facts go in
-   smashcraft:ts/scripts/wisp/model-facts/ like any model.
+   makgora:ts/scripts/wisp/model-facts/ like any model.
 
 Rule 10's value bands still hold: a texture is tinted (a static geoset
 colour) until the walking surface, body and underside meet the luma and ΔE00
-limits in smashcraft:ts/src/game/assets/stagePalette.tests.ts. The
+limits in makgora:ts/src/game/assets/stagePalette.tests.ts. The
 `stagePalette.ts` colours become each material's tint target.
 
 ## Shared rubric lines
@@ -134,20 +134,20 @@ mask for contrast.
 - **S4 Water only in the tide** (Tom, 18 Oct). No stage but Tomb of
   Sargeras shows water beneath or around its deck; the floor far below is
   the place's own ground or Blackrock's lava.
-  smashcraft:ts/src/game/presentation/stageScenery.tests.ts enforces it.
+  makgora:ts/src/game/presentation/stageScenery.tests.ts enforces it.
 - **S5 Depth beneath** (Tom, 18 Oct: "do a proper art pass"). Below and
   beside the deck the frame shows layered terrain of the place, not a flat
   floor: a near ridge rising from the floor on both sides of the deck, the
   place's props in the valley behind it, a lighter mid ridge and the far
   band, each farther layer lower in contrast; no ridge top is flat or
   reaches the deck's underside (stage art rule 16).
-  smashcraft:ts/src/game/presentation/stageScenery.tests.ts enforces the
+  makgora:ts/src/game/presentation/stageScenery.tests.ts enforces the
   bands; the look is judged at both extremes.
 - **S6 Own palette and skyline** (art pass round 2, 18 Oct). Every rock
   is in the stage's palette, with mossy rock only on Nordrassil and Tomb of
   Sargeras; red rock belongs to Durotar alone; each stage raises its
   skyline from its own rock (stage art rules 17 and 18).
-  smashcraft:ts/src/game/presentation/stageScenery.tests.ts enforces the
+  makgora:ts/src/game/presentation/stageScenery.tests.ts enforces the
   rock rules; the skyline is judged at both extremes.
 
 ## Boards

@@ -8,6 +8,6 @@
   value that differs from Melee's with no deviation row, a deviation that now
   matches Melee, an unresolved anchor or a row with no public source. Autoland
   regenerates the page on each merged candidate, so lanes that move anchored
-  lines in different files land together (smashcraft#338).
+  lines in different files land together (makgora#338).
 - `bun wisp ledger --open` lists the rows awaiting Tom's decision
-  (smashcraft:docs/design/melee-parity-plan.md, "Ledger").
+  (makgora:docs/design/melee-parity-plan.md, "Ledger").

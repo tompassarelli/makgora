@@ -4,7 +4,7 @@ How consistently real Melee players execute inputs, measured from Slippi
 replays. It calibrates the computers' human noise (#354 reactions, #356 dash
 dance and execution slips, #357 DI, SDI and jump height) and is a general model
 to reuse if a similar mechanic ever appears. Every Melee technique is measured,
-including ones Smashcraft doesn't have.
+including ones Mak'gora doesn't have.
 
 **Source.** [erickfm/melee-ranked-replays](https://huggingface.co/datasets/erickfm/melee-ranked-replays)
 (MIT; anonymized Slippi online ranked games, 2023). Rank groups are the
@@ -13,7 +13,7 @@ dataset's matched pairs: **master-master** (1,267 games, 7,599 player-minutes),
 2,540). Characters: Fox, Falco, Marth, Sheik, Jigglypuff, Captain Falcon,
 Peach. Two-human games of at least one minute only. The dataset starts at
 platinum, so there is no data below it. Measured 9 Oct 2026. Rerun:
-smashcraft:tools/slippi/README.md.
+makgora:tools/slippi/README.md.
 
 **Level mapping.** Master → Expert, diamond → Advanced, platinum →
 Intermediate. Beginner and Rookie have no data and keep their guesses.
@@ -33,7 +33,7 @@ not against beginners.
 Each kind is a precise class of input task. "Success" is the share done right.
 "Error" is the timing error in frames as mean ± standard deviation.
 
-| Kind | Definition | Melee techniques measured | Master | Diamond / platinum | Smashcraft today |
+| Kind | Definition | Melee techniques measured | Master | Diamond / platinum | Mak'gora today |
 |---|---|---|---|---|---|
 | **Press in a window after an event** | One press must land inside a fixed window that ends at a game event the player predicts (landing, ground contact). | L-cancel (7-frame window before aerial landing); tech (20-frame window before contact, 40-frame lockout) | L-cancel 87.5% success, last press 3.6 ± 3.0 frames before landing, 7.9% no press, 4.6% too early. Tech 47.9% success, press 11.6 ± 10.7 before contact | L-cancel 86.2% / 83.4%; tech 47.4% / 47.3% | L-cancel: none (removed, #54). Tech: the tech press before landing |
 | **Hold for a duration, then release** | A button must be released before a deadline that starts at its own press. | Short hop by releasing X/Y before the end of jumpsquat | Short-hop hold median 2 frames (p10–p90 1–4); release 1.7 ± 0.7 frames before the deadline; accidental full hop 0.9% of quick-aerial jumps | release 1.8 ± 0.7 / 1.8 ± 0.7; accidental full hop 1.2% / 1.6% | Pad short hop by release during jump startup; the short-hop button always short hops (#357 jump height) |
@@ -105,7 +105,7 @@ a tech state instead of a missed-tech bounce.
 
 ## Measured table
 
-Produced by `bun report.ts` in smashcraft:tools/slippi/ on the sample above.
+Produced by `bun report.ts` in makgora:tools/slippi/ on the sample above.
 
 | Measure | master-master | diamond-diamond | platinum-platinum |
 |---|---|---|---|

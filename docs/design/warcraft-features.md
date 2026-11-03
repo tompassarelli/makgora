@@ -6,7 +6,7 @@ Every engine and World Editor feature Warcraft III added from Reforged
 script can drive: lighting, fog, sky, water, particles, materials, terrain,
 camera and the natives behind them. For each: the patch, the native or
 editor field, whether map script can drive it at run time, graphics modes,
-and cost. [Visual quality](visual-quality.md) says which levers Smashcraft
+and cost. [Visual quality](visual-quality.md) says which levers Mak'gora
 uses and how they are measured; [stage art](stage-art.md) applies them per
 stage.
 
@@ -19,9 +19,9 @@ comparing common.j across releases ([Luashine/jass-history](https://github.com/L
 is the release with new lighting, fog, water and graphics script access;
 2.0.x changed the renderer and assets without new natives.
 
-Graphics modes: Smashcraft supports Classic only. The player picks the mode and a
+Graphics modes: Mak'gora supports Classic only. The player picks the mode and a
 map can neither read nor choose it ([visual quality](visual-quality.md#the-renderer-is-fixed)).
-"HD" below marks features of the HD renderer, which Smashcraft does not target.
+"HD" below marks features of the HD renderer, which Mak'gora does not target.
 
 ## 3.0.1 (October 2026): renderer and asset corrections
 
@@ -39,7 +39,7 @@ below still apply.
 | `WaterfallNoMist` asset | HD model path; no Classic copy | use a Classic stock waterfall when needed; no map-script emitter controls |
 | Imported assets, model paths containing periods, item-light cleanup and editor lighting/post-processing fixes | existing imports and editor fields | removes engine defects; no new per-frame script calls |
 
-## Smashcraft application by stage
+## Mak'gora application by stage
 
 This table describes the shipped setup in `ts/src/game/presentation/stageScenery.ts`,
 its scenery modules, and `ts/src/game/assets/stageLighting.ts` /
@@ -49,7 +49,7 @@ listed draw-over-sky choice. Point lights are model lights, with one shadow
 caster per lit stage; the shell requests that minimum through
 `BlzSetMinShadowCastingPointLightCount`. Classic is the
 supported player mode. Stage capture and performance results belong in
-[#192](https://github.com/tompassarelli/smashcraft/issues/192).
+[#192](https://github.com/tompassarelli/makgora/issues/192).
 
 | Stage | Sky | Shipped 3.0 feature application |
 | --- | --- | --- |
@@ -102,7 +102,7 @@ and common.j.
 | Fog styles | `FOG_STYLE_LINEAR` 0, `_EXP` 1, `_EXP2` 2, `_HEIGHT` 3, `_NEW_EXP` 4, `_NEW_EXP_2` 5 (`ConvertFogStyle`) | yes | 0–2 classic; 3–5 new | — |
 | Editor fog | "more fog options (height fog, new exponential, draw over sky, max opacity)", live editing of fog and HD water | editor; written into the map script's `main` | — | — |
 
-Smashcraft's native measurements of what height fog, max density and draw
+Mak'gora's native measurements of what height fog, max density and draw
 over sky actually do belong in [visual quality](visual-quality.md).
 
 ### Lights, shadows, post-processing
@@ -153,7 +153,7 @@ extension stopped resolving.
   ([2.0.0 notes](https://news.blizzard.com/en-us/article/24167122/warcraft-iii-reforged-patch-notes-patch-2-0-0)).
   Custom day/night models broke: one with a light lit the whole map without
   shadows, one without went black ([forum](https://us.forums.blizzard.com/en/warcraft3/t/dnc-light-models-now-bugged-post-patch-20/33763));
-  Smashcraft's per-stage lights are measured on 3.0 in [visual quality](visual-quality.md).
+  Mak'gora's per-stage lights are measured on 3.0 in [visual quality](visual-quality.md).
 - 2.0.2: Reforged environment light direction matches Classic; dungeon
   lighting overhauled ([2.0.2 notes](https://us.forums.blizzard.com/en/warcraft3/t/warcraft-iii-reforged-patch-notes-version-202/35355)).
 - 2.0.3: Reforged shaders updated (stronger shadows and lighting); AO and

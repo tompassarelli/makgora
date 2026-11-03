@@ -4,7 +4,7 @@ Cairne is the true super-heavyweight. His halberd controls a large patch of
 ground, his weight lets him survive a poor exchange, and an earned burst of
 Endurance Aura helps him reach his next read. His enormous body, slow whiffs
 and exposed recovery give opponents clear ways to beat him. All move values,
-hit regions and animation are original, provisional Smashcraft choices.
+hit regions and animation are original, provisional Mak'gora choices.
 
 ## References and body
 
@@ -125,7 +125,7 @@ the ledge.
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). The true super-heavyweight; his halberd controls a large patch of ground.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). The true super-heavyweight; his halberd controls a large patch of ground.
 
 ```balance-profile
 fighter: cairne-bloodhoof

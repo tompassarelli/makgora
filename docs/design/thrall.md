@@ -6,7 +6,7 @@ the foe along the floor: a slow spirit wolf he walks in behind against a
 shield, a pair of timber wolves only a full jump clears, or one fast dire
 wolf that punishes. Ghost Wolf turns him into a spirit wolf for a dash and a
 pounce, his sideways recovery. Values below are original,
-provisional Smashcraft values, not copied hitboxes or animation.
+provisional Mak'gora values, not copied hitboxes or animation.
 
 ## Sources and body
 
@@ -19,7 +19,7 @@ is the original ability reference. Only these ability identities and numerical
 facts are reused; no outside implementation, prose or animation is copied.
 
 The body counterpart is [Ultimate King Dedede](https://www.ssbwiki.com/King_Dedede_(SSBU)):
-weight 127, run speed 1.496, air speed 0.735. Smashcraft applies weight
+weight 127, run speed 1.496, air speed 0.735. Mak'gora applies weight
 127/75 and run 1.496/2.2 to its reference table, and raises air speed to the
 shared 0.75 floor, with the same world-unit conversion as other fighters.
 He stands on foot, on johnwar's Warchief Thrall model (see Presentation), and
@@ -75,7 +75,7 @@ action rules. Only weapon reach is disjoint; shoulder and limb attacks expose
 matching hurt volumes. Smashes use the shared charge (physics.md, "Smash charge").
 
 Every hammer move is keyed from one swing table,
-`THRALL_HAMMER_SWINGS` in smashcraft:ts/src/game/fighters/thrall/moves.ts: each
+`THRALL_HAMMER_SWINGS` in makgora:ts/src/game/fighters/thrall/moves.ts: each
 active frame names the shoulder pivot, the hand's distance from it and the
 hammer's angle, and both the hit region and the clip's hammer head come from
 that one row, so the drawn head lands within 12 units of its region on every
@@ -100,7 +100,7 @@ The computer holds midrange with lightning and Feral Spirit, approaches with
 down tilt, grab or a Ghost Wolf dash-in, juggles with up tilt and up air, and
 returns to the ledge with Rising Thunder or Ghost Wolf. It casts every wolf with the
 real stick motion through the shared bot motion-cast helper
-(smashcraft:ts/src/game/match/botMotionCast.ts), which picks the form from the
+(makgora:ts/src/game/match/botMotionCast.ts), which picks the form from the
 wolves' own data: the dire wolf, the earliest to arrive, against a foe in
 hitstun, end lag, landing lag or a knockdown; the spirit wolf, the most shield
 damage, against a raised shield; the timber pair, the most wolves, beyond his
@@ -144,8 +144,8 @@ Thrall stands on foot on [Warchief Thrall Dismounted by johnwar](https://www.hiv
 (Hive Workshop), built on Ujimasa Hojo's Grom Hellscream, with the stock
 `Units\Orc\Thrall\Thrall.blp` texture and his stock command icon (Tom asked
 for the change on 28 October 2026). The map imports the model as
-`war3mapImported\WarchiefThrallDismountedV2.mdx`; smashcraft:tools/animations/thrall-clips.ts
-authors every Smashcraft clip on its full biped and keeps its 31 stock
+`war3mapImported\WarchiefThrallDismountedV2.mdx`; makgora:tools/animations/thrall-clips.ts
+authors every Mak'gora clip on its full biped and keeps its 31 stock
 sequences. Far Seer lightning and earthquake effects and shared Warcraft impact sounds
 stay. The wolves are stock Warcraft III models only. The Spirit Wolf is the stock
 White Wolf (`units\creeps\WhiteWolf\WhiteWolf.mdx`), drawn translucent
@@ -168,7 +168,7 @@ and authored Warcraft model data remains in the private build-input store.
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A heavy ground-control brawler around Doomhammer's reach.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). A heavy ground-control brawler around Doomhammer's reach.
 
 ```balance-profile
 fighter: thrall

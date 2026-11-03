@@ -5,8 +5,8 @@ attack. Each one
 has its own frame data, hit volumes, reach and reward, so a player can tell
 the fighters apart by their tilts alone. This page covers the reference
 distribution, the angling rule and each fighter's design. The numbers come
-from the kits in smashcraft:ts/src/game/fighters/ and the original fighters'
-tables, and smashcraft:ts/src/game/match/groundNormalContracts.tests.ts pins the relations.
+from the kits in makgora:ts/src/game/fighters/ and the original fighters'
+tables, and makgora:ts/src/game/match/groundNormalContracts.tests.ts pins the relations.
 Illidan's normals belong to his own kit work and are not designed here.
 
 Notation follows [the roster](roster.md#timing-and-geometry-notation):
@@ -17,14 +17,14 @@ Notation follows [the roster](roster.md#timing-and-geometry-notation):
 - Angles are degrees from the facing direction: 0 is horizontal, 90 straight
   up; over 90 sends the victim behind the attacker.
 - Knockback is growth/base in the shared formula
-  (smashcraft:ts/src/game/sim/knockback.ts). A hit launches into tumble when
+  (makgora:ts/src/game/sim/knockback.ts). A hit launches into tumble when
   its knockback reaches 80.
 
 ## Reference distribution
 
 Melee is the timing reference. Over its 26 fighters
 ([Melee attacks](melee/attacks.md), from
-smashcraft:references/melee-frame-data/records.jsonl), first active frames run:
+makgora:references/melee-frame-data/records.jsonl), first active frames run:
 
 | Move | Fastest | Quarter | Median | Three quarters | Slowest |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -43,7 +43,7 @@ Melee's tilts also sort into roles:
     has almost no knockback and chains into itself.
   - Launchers: Fox's and Falco's pop the victim straight up as combo starters.
   - Edge tool: Falcon's is a semi-spike that sends the victim low and outward.
-- **Smashcraft's tilts are slower.** They run about two frames behind
+- **Mak'gora's tilts are slower.** They run about two frames behind
   Melee's, the same offset as the rest of the roster's normals. The spread
   between fighters is what this page sets.
 
@@ -55,7 +55,7 @@ Marth 5/8/6/7 for jab/forward/up/down tilt
 
 ## Angled forward tilts
 
-Smashcraft follows Ultimate first, and Melee where Ultimate is silent
+Mak'gora follows Ultimate first, and Melee where Ultimate is silent
 ([gameplay design](../gameplay-design.md)).
 
 **Ultimate's rule.** A fighter can angle its forward tilt by holding the
@@ -91,7 +91,7 @@ limb.
 - The launch angle follows the strike's direction. Melee's Mario and Luigi
   down angle is the extreme case: it has set knockback.
 
-**Smashcraft's version.** An angleable kit gives each angle its own hit
+**Mak'gora's version.** An angleable kit gives each angle its own hit
 volume and its own launch angle. The timing and damage of all three stay the
 same, except where a row below says the down angle hits harder. A
 non-angleable kit plays its plain forward tilt for every angle, so a diagonal
@@ -281,14 +281,14 @@ Repeatability is the jab's identity; a tilt never chains.
 - A chain step needs a fresh A press, never a held button
   ([SmashWiki, Jab](https://www.ssbwiki.com/Jab)).
 - A press is kept while a per-fighter input window counts down
-  (smashcraft:references/melee-frame-data/character-attributes.csv, "Jab 2
+  (makgora:references/melee-frame-data/character-attributes.csv, "Jab 2
   Window?" and "Jab 3 Window?"). The next jab starts only once the jab's
   animation allows it, so an early press waits.
 - With no press, the jab plays out and returns to Wait.
 - Rapid jab counts A press and release edges across the chain against the
   fighter's rapid-jab window (character-attributes.csv, "Rapid Jab Window"). Its loop ends after one
   animation cycle without an edge, so it needs mashing.
-- Melee's jab rows (smashcraft:references/melee-frame-data/records.jsonl,
+- Melee's jab rows (makgora:references/melee-frame-data/records.jsonl,
   start/damage):
   - Fox: 2/4, then 2/4.
   - Marth: 4/6, then 4/6.
@@ -297,19 +297,19 @@ Repeatability is the jab's identity; a tilt never chains.
   - Link: 6/5, 6/3, 6/6.
   - Kirby, Link, Mewtwo, Sheik and Young Link have rapid jabs.
 
-**Smashcraft's version.**
+**Mak'gora's version.**
 - A jab step names the frame its window opens (`AuthoredMove.chainsFrom`):
   the frame after its last active frame.
 - From then until its last frame, a fresh jab press starts the next step
-  (`jabChainStep`, smashcraft:ts/src/game/sim/conditions.ts).
+  (`jabChainStep`, makgora:ts/src/game/sim/conditions.ts).
 - An earlier press waits in the attack buffer. A press during the jab's
   hitlag is held through it, as Melee latches it.
 - The chain's last jab has no window, so a later press starts a new chain.
-- Smashcraft has no rapid jab. A loop that needs no recovery could hold a
+- Mak'gora has no rapid jab. A loop that needs no recovery could hold a
   victim in place, which the lock-loop rules (#68) forbid.
 - The steps are AttackStyle `jab2` and `jab3`, Melee's Attack12 and Attack13.
 
-smashcraft:ts/src/game/match/jabChainContracts.tests.ts pins two relations:
+makgora:ts/src/game/match/jabChainContracts.tests.ts pins two relations:
 - Each jab reaches less, covers a smaller area and starts no later than the
   fighter's forward tilt.
 - Every step of a chain connects on a standing target.
@@ -339,7 +339,7 @@ opener's launch.
 
 A swing's whoosh, its hit sound and its hit spark come in three sizes by move
 class, so a jab never sounds like a tilt (#163,
-smashcraft:ts/src/game/presentation/moveTiers.ts).
+makgora:ts/src/game/presentation/moveTiers.ts).
 
 - **Melee**, heard in play: hit sounds come in light, medium and heavy
   sizes by move, and shield hits in sizes too; swing sounds have no size rule.
@@ -358,7 +358,7 @@ smashcraft:ts/src/game/presentation/moveTiers.ts).
   UI\SoundInfo\UnitCombatSounds.slk lists light, medium and heavy slice, chop
   and bash sounds against each armor.
 
-**Smashcraft's tiers.**
+**Mak'gora's tiers.**
 - Jabs and shots are small, smashes are large, and every other normal is
   medium.
 - `TIER_DEPARTURES` names two exceptions: Warden's chain-poke down tilt is
@@ -380,9 +380,9 @@ smashcraft:ts/src/game/presentation/moveTiers.ts).
   from volume 110, so no tier plays a hit below that.
 - **Playback.** The weapon sounds and the whoosh play by path. Each weapon
   sound rotates through the game's three variants.
-- **Checked against the game.** smashcraft:tools/presentation/stock-sounds.ts
+- **Checked against the game.** makgora:tools/presentation/stock-sounds.ts
   checks every path against the installed game and records it in
-  smashcraft:ts/src/generated/assets/stockSoundInfo.ts.
+  makgora:ts/src/generated/assets/stockSoundInfo.ts.
 
 ## Dash attacks
 
@@ -431,14 +431,14 @@ retimed so the sequence's strike moment lands on the first active frame
 (`aligned` in each hero's clip table). Angled variants choose the sequence
 that already swings high or low where the model has one; otherwise they share
 the plain clip. The drawn body must stay over its hurt volumes (#97,
-smashcraft:ts/test/drawn-size.test.ts). Each sequence is chosen by drawn reach:
+makgora:ts/test/drawn-size.test.ts). Each sequence is chosen by drawn reach:
 the skinned model must reach toward the hit on its active frames, and
-smashcraft:ts/test/drawn-reach.test.ts pins every hero's jab, tilts and dash
+makgora:ts/test/drawn-reach.test.ts pins every hero's jab, tilts and dash
 attack (#156). Check a clip change with `bun wisp view reach --assets DIR`.
 
 **Jab slices (#163).** A jab plays a slice of its sequence rather than the
 whole swing (`HeroClip.until`, `jabSlice` in
-smashcraft:ts/src/game/sim/heroes/groundNormals.ts):
+makgora:ts/src/game/sim/heroes/groundNormals.ts):
 - The startup plays the sequence from its start to the slice's end, so the
   partial reach lands on the first active frame.
 - The active frames hold that pose, and recovery returns to the fighter's

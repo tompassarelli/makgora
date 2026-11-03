@@ -2,7 +2,7 @@
 
 Peon is a stubborn worker who fights around his burrow: slow feet, short axe
 tools and a fragile worksite. All combat values below are original,
-provisional Smashcraft tuning.
+provisional Mak'gora tuning.
 
 ## Cargo carry
 
@@ -80,7 +80,7 @@ The hit capsules run along the drawn log from his hands, so the tipper reaches
 about 125–185 units out. The air form is the same heave and hit regions, once
 per airtime, with no stall: he keeps falling with his momentum, and landing
 mid-move ends it with 15 frames of landing lag. Frame data and values are in
-smashcraft:docs/design/peasant.md.
+makgora:docs/design/peasant.md.
 
 ## Gold Sack
 
@@ -93,7 +93,7 @@ next special press swings it at once. It reuses the release follow-up Quickdraw
 draws with (`FollowUpInput.release`); the charge's `releases` flag keeps the
 full sack held instead of dropping it and swings a stored charge at its stage
 when the move starts. The air form is the same move. Frames, damage, reach and
-the full-charge lunge are in smashcraft:docs/design/peasant.md.
+the full-charge lunge are in makgora:docs/design/peasant.md.
 
 | Stage | First active | Active frames | End |
 | --- | ---: | ---: | ---: |
@@ -110,4 +110,4 @@ charged, over 24–29 and 17–21, in animations of 51 and 44 frames
 The drawn bonk reaches as far as the hit: the sack rides the end of a long pole held in
 his hands, and on every active frame its centre sits on the far end of that frame's
 hit capsule (about 70, 125 and 145 units out), checked when the clips are generated
-(smashcraft:tools/animations/peon-sack.ts; Tom reported the drawn sack stopping short of the doubled reach, 2026-10-28).
+(makgora:tools/animations/peon-sack.ts; Tom reported the drawn sack stopping short of the doubled reach, 2026-10-28).

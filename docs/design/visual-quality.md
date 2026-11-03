@@ -2,7 +2,7 @@
 
 What Warcraft III 3.0 and 3.0.1 let a map change about how the game looks, what each
 lever does and costs on the native clients (Warcraft under Wine), and which
-ones Smashcraft uses on which stage. Stage composition (scenery, depth bands,
+ones Mak'gora uses on which stage. Stage composition (scenery, depth bands,
 deck palettes) is in [stage art](stage-art.md); this page is about light,
 atmosphere and materials. Every feature added since Reforged, by patch, is
 indexed in [Warcraft features since Reforged](warcraft-features.md).
@@ -19,7 +19,7 @@ at row 0.76, above the HUD, and treats pixels within CIELAB distance 12 of that
 sky image as empty. Run it for each stage's captured views.
 
 The limit is calibrated on Tom's Smash Ultimate references
-(~/.local/share/smashcraft-stage-references, kept local), cropped to the game
+(~/.local/share/makgora-stage-references, kept local), cropped to the game
 frame and measured with the same command at horizon row 1/3. Each sky-only
 image stretches the frame's own clear sky band down the frame; the enclosed
 Pokémon Stadium has no sky, so its backdrop is black.
@@ -57,17 +57,17 @@ structure. These visual surfaces do not change collision or blast bounds.
 
 Each claim below names its source: a repository file, a cited document, or a
 measured capture. **Unmeasured** marks a lever whose 3.0 behaviour no
-Smashcraft capture has shown yet; *(guess)* marks an inference.
+Mak'gora capture has shown yet; *(guess)* marks an inference.
 
 ## Art quality rubric: stage, fighter and effect art
 
 The judged half of the remaster bar. Wisp's `remaster_check` example
-(wisp:docs/native-window-plan.md, "Measured gates"; run it with `cargo run --release -p wisp-window --example remaster_check -- --out ~/.local/state/smashcraft/shots --imports MAP_IMPORTS_DIR` from wisp/window, which saves side-by-side crops of the worst ten textures as `remaster-check-*.png` there) measures what a texture
+(wisp:docs/native-window-plan.md, "Measured gates"; run it with `cargo run --release -p wisp-window --example remaster_check -- --out ~/.local/state/makgora/shots --imports MAP_IMPORTS_DIR` from wisp/window, which saves side-by-side crops of the worst ten textures as `remaster-check-*.png` there) measures what a texture
 upscaler can change; this rubric judges everything a person authors or
 dresses: a stage's scenery and deck, a fighter's skin or model, an effect.
 It comes from a professional artist's annotated critique of an AI-remastered
 building set (shared by Tom, 2026-10-31), which named what makes remade art
-fail. That set is a list of faults to avoid, not an asset source: Smashcraft
+fail. That set is a list of faults to avoid, not an asset source: Mak'gora
 uses Classic models only (roster.md).
 
 The test the critique sets: the Classic art, stretched and blurry as it is,
@@ -99,7 +99,7 @@ fails line 1.
 | 8 | **Readable at distance** | Corners and silhouettes are not bold enough to read at far camera, or fine detail makes the fighter's band harder to see (see the fighter L* check above) |
 
 Tom's Rivals of Aether 2 match captures (kept local in
-~/.local/state/smashcraft/shots/roa2-refs, added 2026-10-31) are look targets
+~/.local/state/makgora/shots/roa2-refs, added 2026-10-31) are look targets
 for the next three lines, as the Smash references are for the filled frame
 above; nothing is copied from them (game-ip).
 
@@ -117,7 +117,7 @@ animation. Judge them in a motion strip (AGENTS.md), not a still.
 ## The renderer is fixed
 
 A map ships data and a Lua script; it can't ship shaders or change the
-pipeline. Smashcraft targets Classic, the graphics mode the player picks with
+pipeline. Mak'gora targets Classic, the graphics mode the player picks with
 War3Preferences `[Misc] hd` = 0: it draws the root asset set with
 fixed-function lighting
 ([Blizzard's 3.0.0.24268 patch notes](https://us.forums.blizzard.com/en/warcraft3/t/warcraft-iii-reforged-forsaken-kingdom-patch-notes/38400)).
@@ -130,14 +130,14 @@ Record the graphics mode in each capture.
 ## The levers
 
 Native names are from 3.0.0.24268's common.j (wisp:src/natives/warcraft.d.ts).
-"On 3.0" says what a Smashcraft native capture or file read has shown; the
+"On 3.0" says what a Mak'gora native capture or file read has shown; the
 measurements are in [Measured on 3.0](#measured-on-30-under-wine).
 
 | Lever | Natives | What it changes | On 3.0 under Wine |
 | --- | --- | --- | --- |
 | Lighting model | `SetDayNightModels(terrain, unit)` | The directional key light, its colour and the ambient fill for terrain and for every unit and effect, sampled at the time of day | **Measured**: an authored stage light lifts fighter L\* by 8–13 against stock on four stages; the decks and sky barely move |
-| Shadow strength | none | No field for it in the MDX 800 light record (smashcraft:ts/scripts/stageLight.ts writes all of them) | Version-1800 light records carry 24 bytes the decoder doesn't read; whether they hold shadow settings is unknown *(guess: they might)* |
-| Time of day | `SetTimeOfDay`, `SetTimeOfDayScale(0)` | Where the lighting model is sampled; the shell freezes noon (smashcraft:ts/src/host/loop/shell.ts) | Source only; the authored lights are constant over the day, so the frozen hour can't move them |
+| Shadow strength | none | No field for it in the MDX 800 light record (makgora:ts/scripts/stageLight.ts writes all of them) | Version-1800 light records carry 24 bytes the decoder doesn't read; whether they hold shadow settings is unknown *(guess: they might)* |
+| Time of day | `SetTimeOfDay`, `SetTimeOfDayScale(0)` | Where the lighting model is sampled; the shell freezes noon (makgora:ts/src/host/loop/shell.ts) | Source only; the authored lights are constant over the day, so the frozen hour can't move them |
 | Distance fog | `SetTerrainFogEx(style, start, end, density, r, g, b)` | Linear (0), exponential (1) or exponential-squared (2) fog over terrain, units and effects | In use (linear, density 0) on every stage; no separate fog measurement |
 | 3.0 fog | `SetTerrainFogExV`, `BlzSetTerrainFog{Style,ZStart,ZEnd,Density,HeightStart,HeightEnd,LinearStart,LinearEnd,MaxLinearDensity,DrawOverSky,Color}`, styles 3–5 | Height fog, a density cap and fog drawn over the sky | **Unmeasured**; `-dev fogv` and the `192-*-linear\|height` checks exist, no run yet |
 | Sky | `SetSkyModel`, `BlzShowSkyBox` | The sky dome model; hiding it leaves the clear colour. A stock sky with no Classic copy is blank | **Measured**: authored skies fill 76–96% of the top band on all nine #178 stages; hidden, the empty screen reads rgb(4,4,4) |
@@ -149,7 +149,7 @@ measurements are in [Measured on 3.0](#measured-on-30-under-wine).
 | Lightning | `AddLightningEx` | Textured beams between two points | In use in 1 file; nothing measured |
 | Cinematic filter | `SetCineFilter*`, `DisplayCineFilter` | A full-screen textured overlay, local per player | Unused. It covers fighters and backdrop alike, so it can't separate them *(guess)* |
 | Lighting editor | World Editor 3.0 (`war3map.w3l`, imported DNC models) | The map's own terrain and unit DNC models, chosen once per map, not per stage | Unused; file format in [Lighting editor output](#lighting-editor-output-war3mapw3l) |
-| Map post-processing | World Editor 3.0 (`war3mapPostProcessing.txt`) | Ambient occlusion, bloom, portrait bloom, tone-map exposure and normal-map strength for the whole map | Shipped (#288, smashcraft:ts/scripts/postProcessing.ts): bloom above 0.9 and contact-shadow ASSAO; fields in [Map-level post-processing](#map-level-post-processing-what-the-editor-writes); no native changes them; *(guess)* Classic draws neither |
+| Map post-processing | World Editor 3.0 (`war3mapPostProcessing.txt`) | Ambient occlusion, bloom, portrait bloom, tone-map exposure and normal-map strength for the whole map | Shipped (#288, makgora:ts/scripts/postProcessing.ts): bloom above 0.9 and contact-shadow ASSAO; fields in [Map-level post-processing](#map-level-post-processing-what-the-editor-writes); no native changes them; *(guess)* Classic draws neither |
 
 ### What is impossible
 
@@ -168,7 +168,7 @@ In 3.0, Point Light Shadows, Water and Supersampling were added, Shadows
 became Environment Shadows, and the player-facing Ambient Occlusion, Bloom,
 Portrait Bloom, Particles and Spells options were removed.
 
-A pooled effect whose model carries a ribbon emitter draws a streak from its parked pose to its launch point (#735). Scale 0 does not hide such an effect: Jaina's Water Elemental bolt held at scale 0 above the floor still drew its white particle puff, and the Resurrect ring held the same way still drew vertical lines (native Classic, 2026-10-30). Holding the first launch frames at scale 0 for three frames changed nothing visible on either. Creating or destroying an effect during play desyncs Warcraft, so the answer is to park a ribbon model in a sequence whose last frame stops its ribbons (RIBBON_PARK_SEQUENCES in smashcraft:ts/src/game/presentation/projectileArt.ts); ResurrectTarget and WaterElementalMissile have no such sequence and keep the faint launch line. The pad scripts smashcraft:ts/test/native/pads/735/ hold each model's first launch frames.
+A pooled effect whose model carries a ribbon emitter draws a streak from its parked pose to its launch point (#735). Scale 0 does not hide such an effect: Jaina's Water Elemental bolt held at scale 0 above the floor still drew its white particle puff, and the Resurrect ring held the same way still drew vertical lines (native Classic, 2026-10-30). Holding the first launch frames at scale 0 for three frames changed nothing visible on either. Creating or destroying an effect during play desyncs Warcraft, so the answer is to park a ribbon model in a sequence whose last frame stops its ribbons (RIBBON_PARK_SEQUENCES in makgora:ts/src/game/presentation/projectileArt.ts); ResurrectTarget and WaterElementalMissile have no such sequence and keep the faint launch line. The pad scripts makgora:ts/test/native/pads/735/ hold each model's first launch frames.
 
 ### What the modern examples change
 
@@ -176,7 +176,7 @@ A pooled effect whose model carries a ribbon emitter draws a streak from its par
 edits ambient-colour tracks in a 60,000-frame lighting sequence. It changes
 the scene's key and fill without repainting every asset. The alternative is
 a stock DNC with fog and stock sky selection: less precise mood control, but
-it avoids relying on custom DNC support. Smashcraft compares the two on the
+it avoids relying on custom DNC support. Mak'gora compares the two on the
 same paused fighter scene with `-dev lighting stock` and `-dev lighting stage`.
 
 [POLAT G's HD maps](https://www.hiveworkshop.com/threads/playable-nerubian-%E2%80%93-high-elf-%E2%80%93-naga-races-reforged-hd-only.332605/)
@@ -188,7 +188,7 @@ Classic map can't draw.
 describe replacement object shaders crashing after loading and replacement
 post-processing glitching. It modifies the client, so its shader screenshots
 do not establish a renderer feature that an ordinary map can distribute.
-Smashcraft uses map lighting, atmosphere and the installed Classic assets;
+Mak'gora uses map lighting, atmosphere and the installed Classic assets;
 it does not require that client modification.
 
 ### Assets and graphics modes
@@ -200,7 +200,7 @@ and all four distinct skies in Classic (25 normalized paths; `.mdl` and `.mdx`
 aliases counted once). Frozen Throne is 80,057 bytes in Classic. Byte counts
 establish asset availability, not successful native drawing.
 The recorded numerical audit is
-smashcraft:evidence/visual-assets-20261007/asset-summary.json. Some models'
+makgora:evidence/visual-assets-20261007/asset-summary.json. Some models'
 new light-node data exceeds the current `war3-model` decoder; their successful
 extraction and byte count remain observed, while their material slots are
 not claimed from that decoder.
@@ -211,8 +211,8 @@ impact effects, the stage lights) draw their own files with classic materials.
 The stock lighting model is a Classic file (below); an imported lighting model
 replaces it.
 
-Ten stages draw an authored sky sphere (smashcraft:ts/src/generated/stages/stageSkyInfo.ts,
-generated by smashcraft:tools/stage/skies.ts), imported. Nordrassil keeps the stock FelwoodSky for its aurora
+Ten stages draw an authored sky sphere (makgora:ts/src/generated/stages/stageSkyInfo.ts,
+generated by makgora:tools/stage/skies.ts), imported. Nordrassil keeps the stock FelwoodSky for its aurora
 ([stage art](stage-art.md#authored-compositions-and-visual-references)).
 Stock skies with no Classic copy (IcecrownGlacierSky, NorthrendSky, AshenvaleSky,
 BarrensSky, NaxxNightSky, UndercitySky, ArcaneSky) show nothing in Classic, so
@@ -223,12 +223,12 @@ no stage uses them.
 A day/night (DNC) model is an MDX with one directional light whose `Color`
 (key) and `AmbColor` (fill) tracks run over a 60-second `Stand` sequence
 mapped to the 24-hour day. The terrain model lights terrain and the unit
-model lights units and special effects, so on Smashcraft's floating arena the
+model lights units and special effects, so on Mak'gora's floating arena the
 unit model lights both the fighters and the scenery. The decks are unshaded
 and ignore it; so is the sky.
 
 The stock Lordaeron unit light, read from 3.0.1.24342's storage
-(smashcraft:evidence/stage-lighting-20261008/), has a noon key colour of
+(makgora:evidence/stage-lighting-20261008/), has a noon key colour of
 (0.996, 0.996, 0.996) at a static intensity that is not decoded and a noon fill
 of (0.84, 0.84, 0.98). Its night key and fill are (0.31, 0.53, 0.80). It is MDX
 version 1800, whose light records `war3-model` 4.0.1 rejects; the tracks
@@ -236,8 +236,8 @@ were read by their chunk tags.
 
 Every stage draws with the stock Lordaeron light, so fighters are never
 darker than at stock (#375). A stage's mood stays in its sky, fog and scenery
-colour: smashcraft:ts/src/game/assets/stageLighting.ts keeps each stage's
-key and fill, and `sceneryColor` in smashcraft:ts/src/game/presentation/stageScenery.ts
+colour: makgora:ts/src/game/assets/stageLighting.ts keeps each stage's
+key and fill, and `sceneryColor` in makgora:ts/src/game/presentation/stageScenery.ts
 multiplies each scenery piece's stock colour (its stage `tint`, else its own
 colour, else white) by that light divided by the stock noon light (the first
 entry), averaging key and fill, clamped at 255. `-dev lighting stock|stage`
@@ -246,7 +246,7 @@ never changes. Stage-specific lighting models and fighter tints were removed;
 a deliberately darker light needs Tom's sign-off.
 
 `bun tools/stage/contrast.ts --stock-light [--out DIR] [STAGE...]` from
-smashcraft's root (about two minutes a stage, serial, local Warcraft storage)
+makgora's root (about two minutes a stage, serial, local Warcraft storage)
 draws each stage's near and far views for both clients in Classic with
 Wisp, and fails when the fighters' mean L\* falls below the
 same frame under the stock light at one decimal. It also prints each view's
@@ -269,7 +269,7 @@ native owner to record shadow changes.
 
 ### Stage light rules
 
-smashcraft:ts/src/game/assets/stageLighting.tests.ts enforces them:
+makgora:ts/src/game/assets/stageLighting.tests.ts enforces them:
 
 1. Every selectable stage has its own light; no two share one.
 2. The key light's luma is at least 210, so a fighter's lit side stays bright.
@@ -298,8 +298,8 @@ the narrowest field of view and farthest 4:3 zoom; fog clearance follows
 that eye-space depth rather than a scenery placement's world y.
 Height fog's upper edge stays below the deck. These requirements are
 pinned through `stageScenery` in
-smashcraft:ts/src/game/presentation/stageScenery.tests.ts; the camera-specific
-fighter clearance check remains in smashcraft:ts/test/player-view.test.ts.
+makgora:ts/src/game/presentation/stageScenery.tests.ts; the camera-specific
+fighter clearance check remains in makgora:ts/test/player-view.test.ts.
 
 The light rows live in `stageLighting.ts`; sky and fog are selected by
 `stageScenery.ts`. The stage choice uses the authored DNC model. Stock scene
@@ -335,7 +335,7 @@ expansion's art add, read on 8 Oct 2026 from
 [Blizzard's 3.0.1 notes](https://us.forums.blizzard.com/en/warcraft3/t/warcraft-iii-reforged-forsaken-kingdom-patch-notes/38400/4)
 ("PN301"), Blizzard's patch servers, Hive Workshop, and the installed
 3.0.1.24342 storage. The storage was read with the CascLib extractor
-(smashcraft:tools/animations/casc-extract.cpp) and a CascLib file listing
+(makgora:tools/animations/casc-extract.cpp) and a CascLib file listing
 (175,416 entries).
 
 ### Which version runs where
@@ -352,10 +352,10 @@ live, so they were taken on 3.0.0. The stock light decode above was read from
 3.0.1.
 
 Since 3.0 the Reforged client must stay online (PN3), and Battle.net serves
-one live build, so every player who can join a Smashcraft lobby runs
+one live build, so every player who can join a Mak'gora lobby runs
 3.0.1.24342. *(guess)* A client on an older build can't join, because
 Battle.net has always required the current build. The offline Classic Client
-has no Lua and can't run Smashcraft.
+has no Lua and can't run Mak'gora.
 
 How a map uses a newer feature safely:
 
@@ -369,7 +369,7 @@ How a map uses a newer feature safely:
    native returns the patch number: `VersionGet` reports only Reign of Chaos
    or Frozen Throne (common.j).
 2. **Graphics-mode features: use only what Classic draws.** The map can't
-   detect the mode, and Smashcraft targets Classic.
+   detect the mode, and Mak'gora targets Classic.
    - A stock path resolves per mode ([Assets and graphics modes](#assets-and-graphics-modes));
      use only paths with a Classic copy.
    - Effects only other graphics modes draw (point lights, depth of field, AO,
@@ -400,14 +400,14 @@ How a map uses a newer feature safely:
 
 From PN301 (art, world editor and bug fix lists):
 
-| Change | Effect on Smashcraft |
+| Change | Effect on Mak'gora |
 | --- | --- |
 | Ambient Occlusion is a player option again (`assao` in War3Preferences); it "may result in reduced performance" and no longer affects terrain or close-up cinematic shots | When a player turns it on, AO darkens the creases on fighters and scenery. A map tunes it through its post-processing file (below). Hidden terrain makes the terrain exclusion moot |
 | Daytime lighting on Lordaeron Summer biomes is 10% dimmer | This may move the stock baseline `-dev lighting stock` uses (DNCLordaeron). Re-capture stock baselines on 3.0.1. Authored stage lights are imported and don't change |
 | About 35 spell effects retuned (Blizzard, Divine Shield, Starfall, Death Coil, Breath of Fire, Banish and others); Pandaren Brewmaster and Orc Grunt reanimated; tint or scale changed on turtles, wildkin, golems and wolves | Re-take reference captures of any stock effect used as a hit or special effect. Chen's private model comes from the stock Brewmaster rig, so re-check his clips against 3.0.1 *(guess: extracted before 3.0.1)* |
 | `Doodads\Terrain\CliffDoodad\Waterfall\WaterfallNoMist` added | A waterfall without its mist cloud. Storage has no Classic copy |
 | Aura effects tilt to the terrain angle; Lordaeron short grass overhauled | No effect: the terrain is hidden and the floor is flat |
-| Dynamic portrait animation; better lip sync | No effect: Smashcraft draws renders, not unit portraits ([fighter portraits](fighter-portraits.md)) |
+| Dynamic portrait animation; better lip sync | No effect: Mak'gora draws renders, not unit portraits ([fighter portraits](fighter-portraits.md)) |
 | Fixes for imported assets: custom assets and test-map textures load, model paths with periods load, geosets with vertices but no faces no longer crash, item lights no longer stay after pickup, the post-processing dialog keeps its sliders, a second open map keeps its lighting | Imported art behaves as it did in 2.0 |
 
 **Natives: none new for presentation.** The 3.0.1 common.j, read from storage,
@@ -464,9 +464,9 @@ The 3.0 lighting editor writes `war3map.w3l` (magic `W3L!`, version 3). In
 Silverpine Sprint and Forgotten Hollow it holds two GUID-named `.mdl` paths
 and some flag bytes. The paths are the map's own terrain and unit lighting
 models, imported into the map: Silverpine's `02fbcd95-….mdx` is in its file
-list. Smashcraft's base map has an empty one (22 bytes). So the lighting
+list. Mak'gora's base map has an empty one (22 bytes). So the lighting
 editor is a lighting-model authoring tool. It makes the same kind of model
-smashcraft:ts/scripts/stageLight.ts writes, chosen once per map; script swaps
+makgora:ts/scripts/stageLight.ts writes, chosen once per map; script swaps
 models with `SetDayNightModels`, as Silverpine does for its cinematics.
 Silverpine also imports `OmniLightCar.mdx`, `OmniLightLantern.mdx` and
 `OmniLightWithDeath.mdx`, and Forgotten Hollow imports `omnicustom13.mdx`,
@@ -486,7 +486,7 @@ prefix:
 | `Environment\Foliage\LordaeronFall` | 0 | fall grass |
 | `Doodads\Cityscape` | 96 | city props; *(guess)* partly new in 3.0 |
 | `Units\Forsaken` | 0 | campaign heroes and Forsaken units |
-| `Units\Creeps\HeroForsakenPaladin` | 2 | the tavern hero; Smashcraft's Forsaken Paladin is built on it |
+| `Units\Creeps\HeroForsakenPaladin` | 2 | the tavern hero; Mak'gora's Forsaken Paladin is built on it |
 | UndercitySky, NaxxNightSky, ArcaneSky | 0 | skies |
 | LordaeronFallSky, Outland_Sky | 1 | stock skies |
 | `WaterfallNoMist` | 0 | 3.0.1 |
@@ -572,7 +572,7 @@ Classic's installed ordinary stock waterfall, which is misty; `WaterfallNoMist`
 has no Classic copy.
 
 Blackrock's native-window sky is a painted look (`skyLook` in
-smashcraft:ts/src/game/presentation/hazardStageScenery.ts): a dark smoky zenith,
+makgora:ts/src/game/presentation/hazardStageScenery.ts): a dark smoky zenith,
 heavy ash cloud cover and a low ember glow at the fog-coloured horizon, so the sky
 shades from smoke to heat where it was one flat red (Tom's second playtest, 2026-10-31).
 Its two flames stand on two dark volcano cones, which are the stage's own
@@ -581,16 +581,16 @@ the tips of the thin spires before, with no vent under them; no fire or smoke
 emitter on the stage has no visible source.
 
 Blackrock's row is in place (#292). Its two forge fires carry light-only
-omni models (smashcraft:ts/src/game/assets/stagePointLights.ts): warm orange,
+omni models (makgora:ts/src/game/assets/stagePointLights.ts): warm orange,
 a slow flicker of ±12.5%, and a reach that ends at least 3,000 units behind
 the fight, so they light the basalt by the fires and no fighter. The fire
 pillar's light casts shadows (`BlzSetMinShadowCastingPointLightCount(1)`
 while Blackrock is drawn). Classic draws no model omni lights, so there it
 shows the stage as before. The lava gains an additive crest layer
-(smashcraft:ts/scripts/stageLiquid.ts). The crests peak above luma 0.9 and
+(makgora:ts/scripts/stageLiquid.ts). The crests peak above luma 0.9 and
 the body stays under the stock bloom threshold of 0.72, so the map-wide bloom
 (#288) catches only the veins. Blackrock's AO is #288's map-wide ASSAO.
-smashcraft:ts/test/stage-model.test.ts checks these rules.
+makgora:ts/test/stage-model.test.ts checks these rules.
 
 Hellfire's #293 choices follow HF-2/HF-3 in `stage-boards.md`: stock
 `Outland_Sky`, green linear haze beginning at 5,000, and two
@@ -608,7 +608,7 @@ For fighters on every stage: AO and point-light shadows give contact shading
 in HD when the player turns them on. `DisallowHeroGlowOnUnit` and
 `BlzShowUnitTeamGlow(false)` remove ground glows that a floating arena can
 misplace. *(guess)* The 3.0 HD air-to-ground indicators may draw under
-fighters, since fighters use fly height (smashcraft:ts/src/host/loop/fighterBody.ts);
+fighters, since fighters use fly height (makgora:ts/src/host/loop/fighterBody.ts);
 check one HD capture before any stage issue.
 
 ## Measured on 3.0 under Wine
@@ -619,7 +619,7 @@ The #170 lighting batch on offline pair 2, 7 Oct, produced complete
 stock/mask/stage triples for four stages, both clients. Same paused pose,
 camera, sky and fog; only the lighting model changes. Numbers from
 `bun tools/stage/contrast.ts`; the full table, run and provenance are in
-smashcraft:evidence/stage-lighting-20261008/. The run did not record its
+makgora:evidence/stage-lighting-20261008/. The run did not record its
 graphics mode.
 
 | Stage | Fighter L\* rise | Ring L\* rise | ΔE00 stock → stage (a, b) | abs ΔL stock → stage (a, b) | Contrast |
@@ -648,7 +648,7 @@ recording it would settle the cause.
 ### Skies and fighter contrast, #178
 
 The #178 after-captures on pair 2 (integrated map with the stage lights;
-evidence ~/.local/share/smashcraft-stage-design-178/native-pair2/, recorded
+evidence ~/.local/share/makgora-stage-design-178/native-pair2/, recorded
 in #178's status): every one of nine stages drew its sky, 76–96% of the top
 band; Nordrassil's aurora 76% before and after; fighter ΔE00 against the
 backdrop at least 21.2 (Sky Deck 22.8, Frozen Throne 30.9, Durotar 27.3,
@@ -711,7 +711,7 @@ Nordrassil, Tomb) put a mid-grey sky band across the fighters' L\* range, and
 their fighters read through hue rather than lightness, which this metric
 does not credit. Each needs its own pass or a measured chroma term before the
 check gates them. Evidence:
-~/.local/state/smashcraft/evidence/strath-contrast/ (native-before-all,
+~/.local/state/makgora/evidence/strath-contrast/ (native-before-all,
 native-after3-6, side-by-side-after3/).
 
 ### Durotar Skies, Ahn'Qiraj and Nordrassil: fighters first (31 Oct 2026)
@@ -751,7 +751,7 @@ The renderer's rim light (wisp-109-light2) would give each fighter a lit edge
 against any backdrop, so the backdrop could rise a few L\* again; haze
 (wisp-weather) would build the depth steps back without changing the play
 plane. The native-window captures at match zoom are in
-~/.local/state/smashcraft/shots/contrast-durotar-*.png, contrast-aq-*.png and
+~/.local/state/makgora/shots/contrast-durotar-*.png, contrast-aq-*.png and
 contrast-nordrassil-*.png.
 
 ### Ahn'Qiraj reference palette (31 Oct 2026)
@@ -825,7 +825,7 @@ Chen first; the standalone window, one frame each) read sky-strip luma 110.3 and
 before and 28.1 and 27.9 after, backdrop above the deck 103.2 and 103.3 before and
 31.9 and 31.4 after, against 33.0 in Classic after, so Classic's sky strip sits
 about 5 luma above the window's.
-Captures: ~/.local/state/smashcraft/shots/aq-classic/ (classic-before-*,
+Captures: ~/.local/state/makgora/shots/aq-classic/ (classic-before-*,
 classic-after-*; pass1-* is the intermediate take).
 
 ### Gryphon Aerie backdrop rock (31 Oct 2026)
@@ -869,7 +869,7 @@ the tool's 25% size cut: Illidan, fighter band 27.9–48.2 against backdrop band
 top and the Blacksmith behind him, not rock: darkening the near row from
 78,76,82 to 51,50,55 left the band unchanged. Dimming the Blacksmith, and a
 far-camera and second-pair-order capture, are not done. Captures:
-~/.local/state/smashcraft/shots/gryphon/.
+~/.local/state/makgora/shots/gryphon/.
 
 Gryphon's sky drew a dark gradient in the native window, where library 7bd7edc
 drew grey cloud smears. Wisp 2d6b04a6 replaced the old smear with a painted
@@ -912,7 +912,7 @@ fighter contrast and frame cost before #294 closes.
 ## Per-stage recommendations
 
 From the measurements above and the stage sources
-(smashcraft:ts/src/game/presentation/stageScenery.ts and its
+(makgora:ts/src/game/presentation/stageScenery.ts and its
 `*StageScenery.ts` siblings). Every stage currently uses linear
 `SetTerrainFogEx` with density 0, start 5,000–6,000 and end 10,000–12,000,
 behind the fighting volume ([stage art](stage-art.md#rules), rule 6).
@@ -956,14 +956,14 @@ The other levers, for every stage:
 
 ## White body flash: can the engine do it? (#308)
 
-The flash (smashcraft:ts/src/game/presentation/whiteGlow.ts) shows a white
+The flash (makgora:ts/src/game/presentation/whiteGlow.ts) shows a white
 copy of the fighter's body over the real one, on exact frames: alpha 220 and
 100 alternating during heavy hitlag, 190 on and off during smash charge. The
-copies (smashcraft:tools/animations/white-flash-models.ts) are unshaded,
+copies (makgora:tools/animations/white-flash-models.ts) are unshaded,
 textured pure white with each texture's alpha kept, so a pixel of base
 colour B reads `0.86·255 + 0.14·B` at alpha 220 (B = 100 gives 234). That
 is the bar below. Fighters are drawn as special effects (the clip pools,
-smashcraft:ts/src/game/render/fighterPool.ts), already coloured with
+makgora:ts/src/game/render/fighterPool.ts), already coloured with
 `BlzSetSpecialEffectColorByPlayer(model, Player(slot))`; a unit body is only
 the fallback, and units have no native to seek an animation to an exact
 time.
@@ -1096,7 +1096,7 @@ fighter sample and a whole-scene capture, so a mean cannot conceal a missing
 fighter. The image reader uses Wisp's decoder for native 8-bit PPM captures;
 other formats use ImageMagick conversion to 8-bit RGB. It rejects missing silhouettes or
 mismatched dimensions. Run
-`bun tools/stage/contrast.ts MASK.png STOCK.png STAGE.png` from smashcraft's
+`bun tools/stage/contrast.ts MASK.png STOCK.png STAGE.png` from makgora's
 root. The report also gives mean absolute per-pixel lightness distance to the
 surrounding ring (`localDL`).
 
@@ -1108,7 +1108,7 @@ Use one mask for the stock/stage pair, keeping sky, fog, camera and pose fixed.
 
 ### Unpaused comparison with shadows and post-processing
 
-The #287 batch uses Smashcraft `9c57ccfa`, Wisp `1383a934` and the installed
+The #287 batch uses Mak'gora `9c57ccfa`, Wisp `1383a934` and the installed
 Warcraft `3.0.1.24342` stock assets. Each stock/mask/stage triple is drawn
 at frame 410 (match frame 380), with separate deterministic journeys and
 the same near/far camera and fighter pose. Both clients receive the view
@@ -1150,7 +1150,7 @@ workers' later lighting and composition fixes have their own comparisons.
 
 ### 3.0.1 headless comparison reference
 
-The earlier #287 producer at Smashcraft `5e8ef374` and Wisp `9b821201` uses
+The earlier #287 producer at Mak'gora `5e8ef374` and Wisp `9b821201` uses
 Warcraft 3.0.1.24342 assets in Classic, and separate stock/mask/stage
 journeys drawn at frame 410. It pauses at frame 345 (holding match frame 315)
 and fixes the near or far camera before the pause. These views differ from

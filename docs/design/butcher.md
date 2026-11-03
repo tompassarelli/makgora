@@ -3,11 +3,11 @@
 Stitches is a heavy ranged grappler: a stitched Scourge abomination who
 flings a hook across the stage, reels the foe into his hands and throws them.
 Tom asked for him (2026-10-28); his spec is Stitches section of
-smashcraft:docs/design/roster-next.md, and his name was decided on
+makgora:docs/design/roster-next.md, and his name was decided on
 2026-10-29 (Stitches everywhere, code slug `butcher`, character code 31).
 His kit takes ideas only from the hero-arena butcher; no name, model, sound
 or text from another game appears. All combat values are original,
-provisional Smashcraft tuning. The Melee anchor is Donkey Kong's role, a heavy
+provisional Mak'gora tuning. The Melee anchor is Donkey Kong's role, a heavy
 grappler with strong throws who is combo food, not his numbers.
 
 ## Body and model
@@ -133,7 +133,7 @@ Classic route ends at the Lich King.
 
 ## Play-style profile
 
-Tom-tunable draft (2026-10-29; smashcraft:docs/design/balance.md,
+Tom-tunable draft (2026-10-29; makgora:docs/design/balance.md,
 "Play-style profiles"). He wins neutral from range with the hook, converts
 through throws and smashes, and is open to combos the rest of the time.
 

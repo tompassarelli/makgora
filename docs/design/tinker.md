@@ -6,7 +6,7 @@ catches tech rolls and forces airborne opponents to dodge, at the price of a
 readable wind-up and long end lag. He wins by
 standing near his machinery and loses space while replacing it. His short
 claws cannot contest a sword at its tip. All combat values below are original,
-provisional Smashcraft tuning; references establish roles, not copied hitboxes.
+provisional Mak'gora tuning; references establish roles, not copied hitboxes.
 
 Tom asked on 2026-11-01 to show this fighter to players as Gazlowe. Gazlowe is Warcraft's goblin engineer, and Heroes of the Storm built his kit from the same Tinker toolset (laser, turrets, Robo-Goblin). Only the display name changed: the Character code, the hero key "Goblin Tinker", the slug goblin-tinker, folders, generated art and the balance baseline keys keep their internal names.
 
@@ -22,7 +22,7 @@ Tinker supplies the Laser. The original claw-pack and hammer-tank supply the nor
 roles are used; no outside code or animation is copied.
 
 The named body counterpart is [R.O.B. in Ultimate](https://www.ssbwiki.com/R.O.B._(SSBU)):
-weight **106**, run **1.725**, air speed **1.134**. Smashcraft stores these as
+weight **106**, run **1.725**, air speed **1.134**. Mak'gora stores these as
 106/75 weight, 1.725/2.2 run, and 1.134 air multipliers; movement uses the shared
 Melee-to-world scale. Width 1.12 and height 0.95 are original model-fit values.
 Jumps, gravity, dodge windows, shield rules and automatic aerial landing-lag
@@ -82,7 +82,7 @@ angles, damage and base knockback retain their authored values.
 
 ## Specials and ultimate
 
-| Input | Original Smashcraft rule | Warcraft source | Smash comparison |
+| Input | Original Mak'gora rule | Warcraft source | Smash comparison |
 |---|---|---|---|
 | Neutral: Cluster Rockets | 10 mana; rockets on 14/20/26, 4.5 damage each, short rising arc from 45 units above the feet, reflectable, ends 43; landing in the air finishes the cast on the ground with no landing lag. Each rocket is one contact. Interrupting ends unlaunched rockets. | [Cluster Rockets](https://wowpedia.fandom.com/wiki/Tinker_(Warcraft_III)#Cluster_Rockets) | [Snake grenade](https://www.ssbwiki.com/Hand_Grenade), staggered space control |
 | Side: Laser | He stops dead on frame 1, ground or air, dropping any run or drift momentum; his mechanical arms glow with laser light on 1–19, then a beam fires on 20–27 from his arm through an aim point that snaps to the nearest opponent in front within 360 units on frame 1 and follows that opponent at up to 11 units/frame; 7 fire damage, launch at 70°, one hit; end 54; landing in the air finishes the cast on the ground on the same frames with no landing lag, and ground friction slows his slide. A shield blocks it on reaction and punishes the end lag; rolling behind him or leaving range escapes; an air dodge outruns the aim. Reasoning: [gameplay design](../gameplay-design.md#tinker-laser). | [Laser](https://dota2.fandom.com/wiki/Tinker#Laser), Dota 2 | [Ike's Eruption](https://www.ssbwiki.com/Eruption) for the punishable commitment |
@@ -111,7 +111,7 @@ size. Simulation capsules, never drawn model bones, decide contacts.
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A heavyweight gadget fighter; the Pocket Factory sends out its pressure.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). A heavyweight gadget fighter; the Pocket Factory sends out its pressure.
 
 ```balance-profile
 fighter: goblin-tinker

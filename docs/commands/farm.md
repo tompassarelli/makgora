@@ -2,7 +2,7 @@
 
 - Compute farm: `bun wisp farm test [--ref REF] [--wait]` runs the full Bun
   and 32-bit Lua suites, sharded by measured time
-  (smashcraft:.github/workflows/farm-test.yml). It refuses a commit already
+  (makgora:.github/workflows/farm-test.yml). It refuses a commit already
   on main (main's CI runs these suites) or pending in Autoland (queued,
   testing alone, passed alone or in a train: Autoland runs them).
   Balance and Playtest run only on a commit on main or on a lane tip named
@@ -12,7 +12,7 @@
   Autoland never lands it. Memory soaks, perf, pads and difficulty runs may also use a `farm/`
   scratch branch, the place for scratch instrumentation, since Autoland lands
   every pushed `claude/` lane, including one pushed only to be measured.
-  The Scratch retire workflow (smashcraft:.github/workflows/scratch-retire.yml)
+  The Scratch retire workflow (makgora:.github/workflows/scratch-retire.yml)
   runs when any of these runs completes and deletes every `farm/` and `probe/`
   branch that no active run or open pull request holds and whose head commit
   was neither committed nor pushed within the 3-hour scratch grace (180 minutes,
@@ -23,7 +23,7 @@
   because GitHub refuses a run whose concurrency group holds a long pair list),
   and every job first cancels its run
   when the commit has left main (or main reverted it) and its lane
-  (smashcraft:ts/scripts/farmGuard.ts). Job timeouts sit about 1.5 times above
+  (makgora:ts/scripts/farmGuard.ts). Job timeouts sit about 1.5 times above
   the longest measured job; Balance packs each runner core to 750 s from
   each pair's newest measured seconds and gives shards 45 minutes, because a
   pair's time moved up to 3.31 times between commits.
@@ -46,7 +46,7 @@
   CPU records. The field is followed by each fighter's spam probe (its top damage move only,
   `--probe N` matches a pair, 40 by default, 0 to skip), and with `--wait`
   prints the verdicts, the field table and the damage-by-move, play-style,
-  openings-per-kill and balance-score tables (smashcraft:docs/design/balance.md).
+  openings-per-kill and balance-score tables (makgora:docs/design/balance.md).
   Local saved fields use `bun scripts/cpuField.ts --merge FILE`;
   `--seed-offset N` starts a fresh seed range for optimizer holdouts.
   A Wren Expert run with at least 400 matches per pair fails when the win-rate
@@ -55,7 +55,7 @@
   `--matchups rifleman:chen-stormstout,lich:chen-stormstout` runs only those
   named pairs for a repair comparison; its report is not a full-roster gate.
   `bun wisp farm pads [--ref REF] [--only PATH]... [--wait]` plays
-  every top-level smashcraft:ts/test/native/pads/ script (or each issue
+  every top-level makgora:ts/test/native/pads/ script (or each issue
   file or folder named by `--only`, such as `--only 151 --only rifleman-cues.pad`) headless through the
   real helper against its own `#!` expectations, for a change that moves hit
   timing or a new issue script on a loaded host; each job uploads its traces
@@ -74,8 +74,8 @@
   checks an extracted playable Lua bundle locally; its report names every match.
   Use the farm instead of a local cpuField or pad run: the repository is public, so the
   runners cost nothing, and this machine stays free.
-  The self-hosted `farm-big` runners live on two hosts: gex45 (11 smashcraft
-  runners, always on) and Tom's laptop whiterabbit (2 smashcraft runners of 4
+  The self-hosted `farm-big` runners live on two hosts: gex45 (11 makgora
+  runners, always on) and Tom's laptop whiterabbit (2 makgora runners of 4
   CPUs and 8 GiB, the same rootless Podman image, one job per container, no
   sudo and no access to his home or secrets). The laptop's runners pause while
   its game reserve is on (`north capacity game-reserve`), its gaming hold is set

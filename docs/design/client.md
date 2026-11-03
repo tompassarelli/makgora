@@ -1,11 +1,11 @@
-# The Smashcraft client
+# The Mak'gora client
 
 Tom's goal is "a Slippi type of client": one desktop app that owns the
 controller, starts matches, keeps every match's history, stats and replay,
-and finds online opponents. Smashcraft runs as a Warcraft III custom map, so
+and finds online opponents. Mak'gora runs as a Warcraft III custom map, so
 the client sits beside Warcraft the way the Slippi Launcher sits beside
 Dolphin and the W3Champions launcher sits beside Warcraft. Epic
-[#143](https://github.com/tompassarelli/smashcraft/issues/143) tracks the
+[#143](https://github.com/tompassarelli/makgora/issues/143) tracks the
 phases; each phase's issue holds its acceptance and status.
 
 ## Prior art
@@ -86,7 +86,7 @@ need.
   worker makes a remote flo node look like a LAN game to Warcraft, so game
   traffic goes through flo instead of Battle.net. W3Champions runs
   custom-map ladders this way (Legion TD, Castle Fight, Survival Chaos).
-  **Warcraft 3.0.0 (12 Sept 2026, the build Smashcraft's clients run)
+  **Warcraft 3.0.0 (12 Sept 2026, the build Mak'gora's clients run)
   removed LAN from Reforged's menus and must stay online**
   ([patch notes](https://warcraft.wiki.gg/wiki/Warcraft_III/Patch_3.0.0)),
   yet W3Champions still plays through flo on 3.0.0.24268 (below). #19 found
@@ -102,13 +102,13 @@ need.
     `LastReplay.w3g`.
 - **Native replays (.w3g).** These hold only player actions in time slots,
   and playback re-runs the map. They include `BlzSendSyncData` payloads
-  (action 0x78 in [w3gjs](https://github.com/PBug90/w3gjs)). Smashcraft's
+  (action 0x78 in [w3gjs](https://github.com/PBug90/w3gjs)). Mak'gora's
   input rows travel as `SC_GP` sync messages, so a Warcraft replay of a
-  Smashcraft match should carry every input. On 7 Oct 2026 Warcraft 3.0
+  Mak'gora match should carry every input. On 7 Oct 2026 Warcraft 3.0
   was asked to play the saved match 76 `LastReplay.w3g` (67,353 bytes,
   header length 244,275 ms). It stopped with “The map file associated with
   the replay could not be found”, naming
-  `Maps/00-Smashcraft/tests/Smashcraft 0.0.77 test 5.w3x`. The private
+  `Maps/00-Makgora/tests/Makgora 0.0.77 test 5.w3x`. The private
   playback client did not hold that original map, so Warcraft could not
   reach the recorded result. A native replay needs the original map at
   its recorded path; opening a current map cannot replace it. Replays are saved under
@@ -126,13 +126,13 @@ need.
 - **Map file output.** Preload files land in `CustomMapData` (subfolders
   allowed; paths up to 259 characters). The map can write them but reads
   each name only once a session
-  (smashcraft:docs/warcraft-api-netcode-findings.md, "Preloader reads in the
+  (makgora:docs/warcraft-api-netcode-findings.md, "Preloader reads in the
   game").
 
 ### flo as a host (#142, checked 7 Oct 2026)
 
-**Verdict: flo can't host a Smashcraft game for two clients without
-W3Champions.** It isn't a self-serve host. A Smashcraft game on flo needs
+**Verdict: flo can't host a Mak'gora game for two clients without
+W3Champions.** It isn't a self-serve host. A Mak'gora game on flo needs
 W3Champions to add the map, or a self-hosted flo that would first have to
 rebuild the closed 3.0 support. Players meet online in Wisp's own window
 over its relay instead (Direct play, below).
@@ -186,17 +186,17 @@ over its relay instead (Direct play, below).
   copyleft: modified flo files stay MPL-2.0 and their source is published.
   The current flo has no licence available to us.
 - **What it would take.**
-  1. **W3Champions route.** Tom asks W3Champions to list Smashcraft as a
+  1. **W3Champions route.** Tom asks W3Champions to list Mak'gora as a
      custom-game map, as Legion TD and Castle Fight are. That is an outside
      commitment. Players would then install their launcher and lose
-     Smashcraft's own launch flow.
+     Mak'gora's own launch flow.
   2. **Self-host route.** Revive the 2022 flo, add 2.0 and 3.0 W3GS
      support, and rebuild the 3.0 LAN path (the launcher's direct launch
      plus discovery). Count weeks, plus one always-on node, which is
      billable (Tom).
   3. Neither route is needed for #142's direct-play box.
 
-### What fits Smashcraft
+### What fits Mak'gora
 
 | Feature | Fit | How |
 | --- | --- | --- |
@@ -211,11 +211,11 @@ over its relay instead (Direct play, below).
 | Own netplay transport (Slippi's peer to peer, flo) | No for now | Battle.net carries the game on 3.0; flo needs W3Champions to list the map or a rebuilt 3.0 path ("flo as a host") |
 | W3MMD results in .w3g | Optional | Cheap at match end; makes wc3stats.com work. Not needed for the client |
 
-## What Smashcraft already has
+## What Mak'gora already has
 
 - **Moments ("repro" files).** Typing -clip in chat, or View held on a controller, saves the
-  last ten to twelve seconds (smashcraft:ts/src/game/replay/moment.ts).
-  - The file is `smashcraft-repro-p<slot>-f<frame>-<n>.txt` in
+  last ten to twelve seconds (makgora:ts/src/game/replay/moment.ts).
+  - The file is `makgora-repro-p<slot>-f<frame>-<n>.txt` in
     CustomMapData, in Wisp's repro format (wisp:docs/repro.md): a header
     with build, frame and checksum; a snapshot as record text; every frame's
     input rows, run-length encoded; and checkpoint checksums.
@@ -230,13 +230,13 @@ over its relay instead (Direct play, below).
     rows. It is a full-match replay limited to a window.
 - **Confirmed-frame funnel.** Every confirmed frame, in both callback and
   rollback matches, passes through `applyFrame`
-  (smashcraft:ts/src/host/loop/frame.ts). That is where moments record
+  (makgora:ts/src/host/loop/frame.ts). That is where moments record
   rows, the results tally counts KOs and falls
-  (smashcraft:ts/src/game/presentation/matchCues.ts), and the match-end
+  (makgora:ts/src/game/presentation/matchCues.ts), and the match-end
   hook runs. Predicted frames never reach it.
 - **Journal receipts.** With a controller helper, the end-of-match
   journal file names the winner
-  (smashcraft:ts/src/game/session/journalFiles.ts, `endFile`). The dev
+  (makgora:ts/src/game/session/journalFiles.ts, `endFile`). The dev
   receipt names the setup and the stage receipt names the drawn stage. These
   are protocol for the helper and automation, not for players.
 - **Headless runtime.** `bun wisp headless` runs the map's TypeScript in
@@ -257,19 +257,19 @@ over its relay instead (Direct play, below).
 At every match result each client writes its player's record. Nothing is
 synchronized and the simulation is unchanged.
 
-- **Code.** smashcraft:ts/src/game/session/matchRecord.ts builds the lines and
-  smashcraft:ts/src/host/loop/matchRecords.ts writes the file.
+- **Code.** makgora:ts/src/game/session/matchRecord.ts builds the lines and
+  makgora:ts/src/host/loop/matchRecords.ts writes the file.
 - **When.** At the result of a finished match in `applyFrame`, and when a
   player leaves mid-match in `playerLeft`.
-- **File name.** `smashcraft-match-<serial>.txt`.
+- **File name.** `makgora-match-<serial>.txt`.
 - **Serial.** It counts across sessions through
-  `smashcraft-match-index.pld`. The map reads that file once a session,
+  `makgora-match-index.pld`. The map reads that file once a session,
   because Preloader keeps the first content it read. `startMatch` takes the
   serial and writes the index, so the write runs before the first frame, and
   the replay and the record share it so a serial is never reused.
 
 ```text
-smashcraft-match v=1 build=BUILD serial=12 local=P1 mode=versus
+makgora-match v=1 build=BUILD serial=12 local=P1 mode=versus
 rules stocks=3 minutes=7
 result frames=4521 winner=P1 timed-out=0 interrupted=0
 stage id=2 name=Frozen Throne
@@ -296,7 +296,7 @@ end lines=8
 
 Each fighter line is followed by its `combat` line. Its counters are computed
 in presentation from confirmed frames, beside the results tally
-(smashcraft:ts/src/game/presentation/combatStats.ts):
+(makgora:ts/src/game/presentation/combatStats.ts):
 
 - `dealt`: percent the fighter's hits added to others, credited to the last
   fighter to hit, as KOs are; rounded down.
@@ -311,7 +311,7 @@ in presentation from confirmed frames, beside the results tally
 Records written before the combat line existed have none; the client shows
 those matches without combat stats.
 
-L-cancel stats don't apply, because Smashcraft removed L-cancelling (#54).
+L-cancel stats don't apply, because Mak'gora removed L-cancelling (#54).
 
 ## Full-match replays (Phase 3)
 
@@ -337,7 +337,7 @@ Two ways to watch were considered:
    which competes with input for sync bandwidth. A single-player replay
    mode could read it locally, but Preloader's once-a-session reads and
    Preload's escaping limits make large files fragile. Warcraft's own
-   `.w3g` replay (above) may already play Smashcraft matches with the real
+   `.w3g` replay (above) may already play Mak'gora matches with the real
    models. Phase 3's native box checks that before anyone builds an
    in-map mode.
 
@@ -352,13 +352,13 @@ the parts.
 A replay plays only on its build. The client keeps the simulation bundle of
 every build it has played and names the version an unknown replay needs.
 
-**What the map writes.** smashcraft:ts/src/game/replay/matchReplay.ts records
-and smashcraft:ts/src/host/loop/replays.ts writes.
+**What the map writes.** makgora:ts/src/game/replay/matchReplay.ts records
+and makgora:ts/src/host/loop/replays.ts writes.
 
-- **Parts.** `smashcraft-replay-<serial>-<part>.txt`, from part 1, each
+- **Parts.** `makgora-replay-<serial>-<part>.txt`, from part 1, each
   written once 48 lines are waiting. The serial is the match record's: it is
   taken at the match's first frame.
-- **Manifest.** `smashcraft-replay-<serial>.txt`, written when the match
+- **Manifest.** `makgora-replay-<serial>.txt`, written when the match
   leaves play: a repro header (build, last frame, checksum there), then
   `replay SERIAL`, `version SOURCE` and `parts COUNT`.
 - **Joined replay.** The header, `replay` and `version` lines, then every
@@ -371,15 +371,15 @@ and smashcraft:ts/src/host/loop/replays.ts writes.
   `checkpoint FRAME CHECKSUM` every 120 frames and at its end.
 - **Version.** `version` is the map's source version. It is the first 12
   hex digits of a SHA-256 over `ts/src` (tests left out) and the Wisp pin
-  (smashcraft:ts/scripts/sourceVersion.ts). Every map build replaces
-  the placeholder in smashcraft:ts/src/game/shell/sourceVersion.ts with it,
-  development maps included (smashcraft:ts/plugins/source-version.ts, in
+  (makgora:ts/scripts/sourceVersion.ts). Every map build replaces
+  the placeholder in makgora:ts/src/game/shell/sourceVersion.ts with it,
+  development maps included (makgora:ts/plugins/source-version.ts, in
   `beforeEmit`, which Wisp's incremental compiler runs too). Tests, the
   headless runtime and a module sent by a hot reload say `development`. The client's `sim.js` gets the same value, so a client
   knows which replays its simulation plays. For another version the client
   finds that version's map in the Maps folders and plays the replay in the
   map's own `war3map.lua`, in 32-bit Lua, with the viewer's modules added
-  ([smashcraft-client](https://github.com/tompassarelli/smashcraft-client) README, "Replays").
+  ([makgora-client](https://github.com/tompassarelli/makgora-client) README, "Replays").
 - **Cost.** The replay checksum folds every number and boolean of each
   fighter, its projectiles and the match, in any order. In 32-bit Lua it is
   about 0.22 million instructions for four fighters. The canonical checksum
@@ -390,26 +390,26 @@ and smashcraft:ts/src/host/loop/replays.ts writes.
 
 ## Direct play (Phase 4)
 
-Retired as a player feature on 2026-10-31: Smashcraft provides no online play
+Retired as a player feature on 2026-10-31: Mak'gora provides no online play
 inside the Warcraft client, so the client's Online page offers only Wisp's
-own window over its relay (smashcraft-client#28; wisp:docs/clean-room.md,
-"Smashcraft Servers (stopped)"). The commands below remain developer and test
+own window over its relay (makgora-client#28; wisp:docs/clean-room.md,
+"Mak'gora Servers (stopped)"). The commands below remain developer and test
 tools for our own clients; Battle.net custom games in Warcraft's own menus are
 unaffected.
 
 Two players meet in a private Battle.net custom game, found by a join code.
-No Smashcraft server is involved, and players are their Battle.net names.
+No Mak'gora server is involved, and players are their Battle.net names.
 
 - **The code.** Eight characters of Crockford's base 32, shown `ABCD-EFGH`
-  (smashcraft:ts/scripts/wisp/joinCode.ts). The first four name the game,
-  `Smashcraft ABCD`; the last four are its password. Typing ignores case,
+  (makgora:ts/scripts/wisp/joinCode.ts). The first four name the game,
+  `Makgora ABCD`; the last four are its password. Typing ignores case,
   spaces and dashes and reads O, I and L as 0, 1 and 1. When the game refuses to
   create the lobby (a name in use, for example), the host takes a new code
   (three tries). The game and password also work typed into Warcraft III's own
   Join by name.
-- **Host** (`bun wisp online host`, smashcraft:ts/scripts/wisp/online.ts).
+- **Host** (`bun wisp online host`, makgora:ts/scripts/wisp/online.ts).
   Through Wisp's menu page it creates a private lobby of the newest
-  `Smashcraft X.Y.Z.w3x` in Maps/00-Smashcraft (else its newest release candidate or dev build), prints `Join code: …`
+  `Makgora X.Y.Z.w3x` in Maps/00-Makgora (else its newest release candidate or dev build), prints `Join code: …`
   and waits. Once the guest has joined, the host sends `start` on stdin
   (the client's Start now) or starts it in Warcraft III. Readiness sends no
   Battle.net chat. A start the game ignores (a guest still downloading the map)
@@ -422,31 +422,31 @@ No Smashcraft server is involved, and players are their Battle.net names.
 - **Guest** (`bun wisp online join CODE`). Joins by name and password,
   retried twice 2 s apart as fresh does, then waits for the host to start
   and the loading screen to appear.
-- **In the match.** Each side returns once its Smashcraft writes
+- **In the match.** Each side returns once its Mak'gora writes
   `wc3-melee-ready.txt` after the loading screen: fighter selection.
 - **Lines.** Standard output is written for players and the client shows it;
   the technical reason for a failure goes to standard error, which the
   client keeps in its log folder as `online.log`.
-- **Setup** (`bun wisp online setup`, smashcraft:ts/scripts/wisp/menuPageSetup.ts).
+- **Setup** (`bun wisp online setup`, makgora:ts/scripts/wisp/menuPageSetup.ts).
   Run by the client only after the player agrees, once. It writes Wisp's menu
   page into `_retail_/webui` (refusing another program's page) and sets
   Warcraft III's `Allow Local Files` in the prefix's `user.reg`, keeping
-  the old file as `user.reg.before-smashcraft`. `user.reg` is changed only
+  the old file as `user.reg.before-makgora`. `user.reg` is changed only
   while no wineserver uses the prefix; otherwise the player is asked to close
   Warcraft III and Battle.net. With the player's agreement remembered,
   every host and join writes the page again first (`--repair`), so a
   Warcraft III update that drops it is repaired at the next start.
 - **Which Warcraft III.** Tom's install (play's prefix, report port 47124), or
-  `--client NAME` for a client of ~/.local/state/smashcraft/clients.json.
+  `--client NAME` for a client of ~/.local/state/makgora/clients.json.
 
 ## Phases
 
 | Phase | Issue | What it delivers | Feasibility | Owner decisions |
 | --- | --- | --- | --- | --- |
-| 1 Controller and Play | [#139](https://github.com/tompassarelli/smashcraft/issues/139) | Tauri v2 app (Rust core, Bun/TypeScript page): tray icon, controller page, helper, Play | In progress (lanes controller-app-20261007, controller-service-20261007) | None |
-| 2 Match history and stats | [#140](https://github.com/tompassarelli/smashcraft/issues/140) | Map records at every result; client ingests them into a local store; history list; win rate per fighter and matchup, KOs, damage, tech and opening stats | Map side done; the rest is local code | None (local only) |
-| 3 Replays | [#141](https://github.com/tompassarelli/smashcraft/issues/141) | Every match recorded; browse, watch in the client's viewer, step, seek, share a file | Proven pieces: moments, `wisp repro`, headless runtime. Risk: frame cost of recording | None; video export is later |
-| 4 Online | [#142](https://github.com/tompassarelli/smashcraft/issues/142) | Host or join by code through the menu page; observers; then a queue | Direct codes need no server. A queue needs one | Servers and their cost, accounts, menu-page install on players' machines |
+| 1 Controller and Play | [#139](https://github.com/tompassarelli/makgora/issues/139) | Tauri v2 app (Rust core, Bun/TypeScript page): tray icon, controller page, helper, Play | In progress (lanes controller-app-20261007, controller-service-20261007) | None |
+| 2 Match history and stats | [#140](https://github.com/tompassarelli/makgora/issues/140) | Map records at every result; client ingests them into a local store; history list; win rate per fighter and matchup, KOs, damage, tech and opening stats | Map side done; the rest is local code | None (local only) |
+| 3 Replays | [#141](https://github.com/tompassarelli/makgora/issues/141) | Every match recorded; browse, watch in the client's viewer, step, seek, share a file | Proven pieces: moments, `wisp repro`, headless runtime. Risk: frame cost of recording | None; video export is later |
+| 4 Online | [#142](https://github.com/tompassarelli/makgora/issues/142) | Host or join by code through the menu page; observers; then a queue | Direct codes need no server. A queue needs one | Servers and their cost, accounts, menu-page install on players' machines |
 
 **Cost and accounts (Tom).**
 
@@ -458,7 +458,7 @@ No Smashcraft server is involved, and players are their Battle.net names.
   one small virtual machine a month.
 - **Ranked and profiles** add a database and a website.
 - **Identity.** Players can be identified by their Battle.net names, which
-  the records already carry, or by a Smashcraft account. An account adds
+  the records already carry, or by a Mak'gora account. An account adds
   sign-in and stored personal data.
 - **Billing is Tom's decision.** Each of these is billable or a commitment.
   Nothing is provisioned until he decides.

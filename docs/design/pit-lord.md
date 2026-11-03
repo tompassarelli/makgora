@@ -9,7 +9,7 @@ His vertical physics, shared with Cairne, follow Melee's heavyweights: gravity
 0.18 instead of Fox's 0.23, with full and double jump speeds lowered to keep
 Fox's peak heights. His short hop lasts 24 airborne frames instead of 19, so
 his f20 down air hits from it with 4 frames to spare (#611).
-All special values below are original, provisional Smashcraft tuning.
+All special values below are original, provisional Mak'gora tuning.
 
 ## Sources and interpretation
 
@@ -95,7 +95,7 @@ The issue carries the delivery and playtest checklist.
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). The siege heavyweight: Rain of Fire closes a landing lane, the cleaver kills early.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). The siege heavyweight: Rain of Fire closes a landing lane, the cleaver kills early.
 
 ```balance-profile
 fighter: pit-lord

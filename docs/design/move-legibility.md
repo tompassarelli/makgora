@@ -1,7 +1,7 @@
 # Move legibility: every special shows its Warcraft spell
 
 How platform fighters make a special readable to both players, and how
-Smashcraft maps each fighter's specials onto Warcraft III's own spell art
+Mak'gora maps each fighter's specials onto Warcraft III's own spell art
 (#144). Retrieved 2026-10-07.
 
 ## What other games do
@@ -10,7 +10,7 @@ Smashcraft maps each fighter's specials onto Warcraft III's own spell art
   episode on effects and character prominence: effects must land with impact
   without outshining the fighter; overly flashy effects hide who is doing what
   ([GoNintendo summary](https://www.gonintendo.com/contents/12076-sakurai-discusses-visual-effects-and-character-prominence-in-his-latest-video)).
-  Smashcraft keeps cues small and anchored to the body (hand, body, feet, just
+  Mak'gora keeps cues small and anchored to the body (hand, body, feet, just
   ahead), scaled with the fighter's model.
 - **Colour per element, chosen for tracking.** Rivals of Aether recoloured its
   fire across every palette after players reported fire effects hard to track
@@ -27,9 +27,9 @@ Smashcraft maps each fighter's specials onto Warcraft III's own spell art
   danger; both games give the strike frames the loudest visual (the hitbox's
   own flash and trail) and the startup a smaller, character-coloured tell.
 
-## Smashcraft's mapping
+## Mak'gora's mapping
 
-Source: smashcraft:ts/src/game/presentation/specialCues.ts (cues),
+Source: makgora:ts/src/game/presentation/specialCues.ts (cues),
 projectileArt.ts (missiles) and elementLooks.ts (elements). All models and
 sounds are stock Warcraft III content: classic models need no import.
 

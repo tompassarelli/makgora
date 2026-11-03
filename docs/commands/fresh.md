@@ -18,8 +18,8 @@ client that still cannot leave it.
   applies the stage look before the first match draw, avoiding midmatch chat.
   Omitted options keep current defaults.
   Ending any quick-start command with ` |cine off` hides the KO wash's cine filter in that match (local presentation; `-dev reset` restores it), for wisp#75's cine on/off fidelity captures.
-  `-dev classic NAME` starts that fighter's Classic run and `-dev classic boss NAME` its boss battle (smashcraft:docs/design/classic-mode.md).
-  `-dev lore N` starts Lore Battle N (1-20, smashcraft:ts/src/game/classic/loreBattles.ts) for the first player.
+  `-dev classic NAME` starts that fighter's Classic run and `-dev classic boss NAME` its boss battle (makgora:docs/design/classic-mode.md).
+  `-dev lore N` starts Lore Battle N (1-20, makgora:ts/src/game/classic/loreBattles.ts) for the first player.
   `-dev lore win` during a Lore Battle knocks out every opponent (a boss's health to zero), so the battle ends and is saved as cleared through the normal result.
   `-dev quick offstage hero NAME` starts the #189 recovery check at x=700, z=300 on Frozen Throne with jumps spent.
   The named variant uses the normal CPU selection rule.
@@ -36,7 +36,7 @@ client that still cannot leave it.
   stand side by side without a reload; `-dev capture clear` removes them all and shows the match
   fighters again. Each accepted command writes the dev command receipt; an unknown fighter or move,
   or a move the fighter lacks, writes none. The staged fighters run a private presentation-only copy
-  of the move (smashcraft:ts/src/platform/captureStage.ts), never the match, rollback or hit state.
+  of the move (makgora:ts/src/platform/captureStage.ts), never the match, rollback or hit state.
   `bun wisp accept --only '614-*'` is its native check.
 - Item setup at fighter selection: `-dev items on|off` controls whether pickups appear;
   `-dev item speed|heavy on|off` controls each kind. The normal selection
@@ -46,5 +46,5 @@ client that still cannot leave it.
 
 - Orb setup at fighter or stage selection: `-dev orbs on|off` controls
   whether centre-stage orbs appear (off by default since 2026-11-02, when the meter fills from the clock); the stage menu's "Orbs: On/Off" button does
-  the same (smashcraft:docs/gameplay-design.md, "Centre-stage orbs").
+  the same (makgora:docs/gameplay-design.md, "Centre-stage orbs").
 - Meter setup: `-dev meter N` sets the ultimate meter to N percent.

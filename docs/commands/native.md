@@ -9,7 +9,7 @@ LAN-pair queue for them took most of a 12 hour Lava Raze effects lane on
 on any host (a host other than gex45 ships the run there, below):
 
 ```sh
-bun scripts/windowStrip.ts PAD.pad --out ~/.local/state/smashcraft/shots/NAME/NAME-low.jpg \
+bun scripts/windowStrip.ts PAD.pad --out ~/.local/state/makgora/shots/NAME/NAME-low.jpg \
   --after 580 --count 1000 --row 8,20,24,32,40,56 --row 140,152,158,164
 ```
 
@@ -37,7 +37,7 @@ on whiterabbit). `scripts/windowStrip.ts` and `scripts/perf-window.ts` therefore
 check the host first (`captureRoute` in `scripts/nativeCaptureHost.ts`): on gex45
 they run in place, on any other host they copy this lane's files (tracked and
 unignored untracked), the pad and the `OWNER.graphics.json` look to
-`~/.local/state/smashcraft/remote-runs/RUN` on gex45 over ssh, install packages
+`~/.local/state/makgora/remote-runs/RUN` on gex45 over ssh, install packages
 there, run the same script, copy the output folder (the strip, and the frames with
 `--keep-frames`; perf-window's `--out`) back to the `--out` you gave, and remove the
 run folder. The shipped run prints its own log to stderr, and a lease wait or
@@ -50,7 +50,7 @@ release candidate. The capture queue and `native-capture` below are those paths.
 
 Native startup verifies private-window focus, observed
 pointer motion and a harmless Scroll Lock key in the map-written
-`smashcraft-input-preflight.txt`. The probe has a twelve-second deadline
+`makgora-input-preflight.txt`. The probe has a twelve-second deadline
 and names the failed display, focus, pointer or key-trace boundary. Pad
 batches probe once per game, after its first hot reload when `--hot` is
 set, so the probe exercises the reloaded script. The key receipt is local
@@ -65,7 +65,7 @@ shield down, full, mid and low. The acceptance driver sends
 `-dev shield-energy down|full|mid|low` after the training setup. The full,
 mid and low commands resume normal partner shield input until the requested
 energy is reached, then pause after drawing. Each capture has a
-`SMASHCRAFT SHIELD` receipt in `smashcraft-dev-shield-energy-pSLOT.txt`, naming
+`MAKGORA SHIELD` receipt in `makgora-dev-shield-energy-pSLOT.txt`, naming
 the simulation frame, raised state, energy, and drawn centre/radius in stage
 coordinates. The receipt describes the draw parameters; judge the pixels too.
 Classic `raised=T` with no visible bubble is FAIL, never RECAPTURE.
@@ -173,7 +173,7 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`). `-dev hi
 - Voice budget (#30): `bun wisp map build --profile voice-check --out MAP.w3x`
   starts four Wren Expert computers over three stocks and two minutes as soon
   as fighter selection opens, paints the drawn stamp on every match frame, and
-  at the match's end writes `smashcraft-voice-log.txt`: each admitted combat
+  at the match's end writes `makgora-voice-log.txt`: each admitted combat
   voice with its frame, the frame drawn that tick, fighter, class, voice slot,
   live voices and volume. Host it with `bun wisp fresh MAP.w3x --no-quick
   --clients-file FILE` while `bun scripts/voiceCheck.ts run --clients-file
@@ -190,7 +190,7 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`). `-dev hi
   frame. It plays the shipped pool-predicted match and holds every simulated
   frame from the shot's start to its end for 5 game ticks, the capture reel's
   frame hold (`holdEveryVisualFrame`), so a recording below 60 fps still shows
-  every frame. It writes `smashcraft-trailer-log.txt`: each shot's stock losses and
+  every frame. It writes `makgora-trailer-log.txt`: each shot's stock losses and
   state checksums at its first and last frame. Play it with `lan solo` on a
   `--pool-profile capture-classic-1080` pair while `bun
   scripts/trailerCapture.ts record --clients-file FILE --client NAME --install
@@ -228,7 +228,7 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`). `-dev hi
   way but hides only that fighter's cues (`-dev hide cues SLOT`), draws hit-area
   cues as a match does, stamps the concealed grab only after 120 held ticks so particles the cues emitted before hiding have died, and writes one `SCREEN FIXTURE FRAME WIDTH HEIGHT` line
   per frame with the projected strike-and-hurt and hurt-only boxes, which `run`
-  keeps as the receipt's `screen` lines (smashcraft:docs/commands/view.md). The default scenario is smashcraft:ts/test/native/captures/wisp125-warden-nair.pad
+  keeps as the receipt's `screen` lines (makgora:docs/commands/view.md). The default scenario is makgora:ts/test/native/captures/wisp125-warden-nair.pad
   (Warden's neutral air, 10 held frames); build and run it as above, never on
   Tom's install.
 
@@ -373,7 +373,7 @@ several services and other native requests land on different pairs. With
 such as `whiterabbit=0,1` for the laptop while `laptop status` says available). The
 service then builds each map here as usual and queues the batch as a `laptop` job
 on the ledger. The laptop's `north laptop-runner` takes it and runs
-`captureQueuePull.ts` from `~/code/smashcraft/main/ts`: it pulls the stored build
+`captureQueuePull.ts` from `~/code/makgora/main/ts`: it pulls the stored build
 over its own ssh to this host into `~/.cache/wisp/maps` under the same key, with
 the plan and manifest, runs `nativeCapture.ts batch` on its own private desktop,
 clients and installs, and pushes the frames back to `native-INDEX` here, so the
@@ -393,8 +393,8 @@ SERVICE`: it waits its turn in wisp's line, stays warm between batches and stops
 when the service exits. The service stops after `--idle-minutes` (default 30)
 with an empty queue, or after one pass with `--once`. Stop it early with
 Ctrl-C or SIGTERM to its PID; that also stops its pool. Whoever starts it owns
-it. The queue lives in `~/.local/state/smashcraft/capture-queue`
-(`SMASHCRAFT_CAPTURE_QUEUE`): `pending/`, `taken/`, `results/ID/` and
+it. The queue lives in `~/.local/state/makgora/capture-queue`
+(`MAKGORA_CAPTURE_QUEUE`): `pending/`, `taken/`, `results/ID/` and
 `batches/BATCH/log.jsonl`, which records each step's wall seconds (fold, map
 build, pool wait and clients to door, capture, each fixture). The defaults name
 gex45's pair `K` client `lanKa`, its install and the north private-desktop and

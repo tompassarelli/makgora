@@ -1,6 +1,6 @@
 # Shield and body pushes
 
-Smashcraft uses six world units per Melee unit. These rules are our design
+Mak'gora uses six world units per Melee unit. These rules are our design
 targets, set from NTSC 1.02 public frame data (SmashWiki's Shield and Pushing
 pages). No game code or assets are copied.
 
@@ -31,7 +31,7 @@ opponent until it leaves the deck. The contract starts a Rifleman 30 units
 inside the edge and its shielded opponent 3 units inside; two walking frames
 push the opponent past either edge without damage.
 
-Smashcraft uses its authored standing torso radii instead of Melee's
+Mak'gora uses its authored standing torso radii instead of Melee's
 character-specific nudge widths. It computes all pair contributions before
 moving anyone, with slot order resolving coincident centres. Grabbed fighters,
 ground dodges, airborne fighters and hitlag participants do not nudge. No

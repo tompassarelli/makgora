@@ -1,15 +1,15 @@
 # Home stages
 
 In Smash every fighter has a home stage from their own world (Dream Land for
-Kirby, Pokémon Stadium for Pikachu). Each Smashcraft fighter has a stage
+Kirby, Pokémon Stadium for Pikachu). Each Mak'gora fighter has a stage
 that feels like a place you would meet them in a Warcraft III campaign
 (Reign of Chaos, RoC; The Frozen Throne, TFT). Tom decided, 7 Oct
 (delegated).
 
-The source of truth is smashcraft:ts/src/game/menu/homeStages.ts;
-smashcraft:ts/test/home-stages.test.ts checks that it covers every
+The source of truth is makgora:ts/src/game/menu/homeStages.ts;
+makgora:ts/test/home-stages.test.ts checks that it covers every
 selectable fighter exactly once, naming any fighter without one, and that each home stage is a selectable stage. Stage ids are the catalog tiles in
-smashcraft:ts/src/game/menu/stageCatalog.ts.
+makgora:ts/src/game/menu/stageCatalog.ts.
 
 | Fighter | Home stage | Stage id | Why |
 | --- | --- | --- | --- |

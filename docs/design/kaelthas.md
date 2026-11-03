@@ -18,7 +18,7 @@ decisions rather than inputs; there are no cooldowns, because a pillar on
 screen already tells both players why another cannot come; his down air does
 not spike and his up smash is not a pillar. The lead's decisions on #360
 (same day) bind the meter, the ultimate and the roster-wide Banish rule.
-Every value below is an original provisional Smashcraft value; Smash, Rivals
+Every value below is an original provisional Mak'gora value; Smash, Rivals
 and Street Fighter references explain roles, not copied hitboxes or
 animation.
 
@@ -237,7 +237,7 @@ line; Kael's Phoenix steers but can be broken into an egg.
 
 ## Play-style profile
 
-Tom-tunable draft (2026-10-26; smashcraft:docs/design/balance.md,
+Tom-tunable draft (2026-10-26; makgora:docs/design/balance.md,
 "Play-style profiles").
 
 ```balance-profile

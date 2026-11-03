@@ -1,6 +1,6 @@
 # Match rules and another match
 
-Smashcraft puts Stocks, Time, Endless and Automatic rematch in the rules
+Mak'gora puts Stocks, Time, Endless and Automatic rematch in the rules
 drawer above the fighter roster (the top bar's rules pill shows them). Every player sees the same choices and any present player can change
 them before continuing to stages. The defaults are 3 stocks, 7:00, Endless off
 and Automatic rematch off. These are a short competitive match with room for a
@@ -30,7 +30,7 @@ Sources:
   of host rules, ready-up/back-out and rotation.
 
 The direct player preference informing this choice is Tom's request in
-[Smashcraft #74](https://github.com/tompassarelli/smashcraft/issues/74): he liked
+[Mak'gora #74](https://github.com/tompassarelli/makgora/issues/74): he liked
 Slippi's repeat-match shortcut and wants two people to keep playing without
 menus. “Friendlies” did not communicate that purpose. Rivals' developer calls
 its equivalent quality of life; that is developer intent, not a player survey.
@@ -45,7 +45,7 @@ the music; random events repeat. That is a practice reset, distinct from
 finishing and repeating a competitive match. Source: [Training Mode,
 Reset](https://www.ssbwiki.com/Training_Mode#Training_options).
 
-## Smashcraft's choice
+## Mak'gora's choice
 
 Use **Automatic rematch**, not “Friendlies” or “Salty Runback”: it names what
 happens. After a normal result, a visible **Rematch in N** counts down five
@@ -71,7 +71,7 @@ Tom asked on 2026-11-02 for the clock to be about the size of Melee's, as ours r
 - The digits' outer top sits 54 px down, **11.25%** of the height; the group sits about 2% of the width right of centre, which ours keeps centred. Ours is not Melee's here: Tom asked on 2026-11-02 for the clock higher, so our margin is **4%** (`CLOCK_TOP_MARGIN_SHARE`), while `MELEE_CLOCK_SHARE` keeps only Melee's digit heights.
 - Melee's digits are wide: MM:SS is 119 px (24.8% of the height), the hundredths 40 px (8.3%), the whole group 169 px (35.2%). Our font is narrower, so at Melee's height ours is 16.3%, 5.7% and 22.9%. The height share is what the clock matches; the font stays.
 
-`src/game/ui/clockLayout.ts` holds the shares (`MELEE_CLOCK_SHARE`) and derives the sizes, boxes and split from them, and `test/clock-size.test.ts` pins them. Native 1280x720 captures of the Wisp window before and after (Illidan against a CPU on Tomb of Sargeras) read 51 px (7.08%) and 29 px (4.03%) at a 2.2% margin before, and **36 px (5.00%)**, **30 px (4.17%)** and a **81 px (11.25%)** margin after; the group is centred (x 557 to 721 of 1280) and clear of the fighters' damage tags. Captures: `~/.local/state/smashcraft/evidence/timer-size-20261102` (`before.png`, `after.png`). With the margin moved to 4% (2026-11-02), a native 1280x720 capture of a live match on Tomb of Sargeras reads the white digits 32 px (4.4%) down and x 559 to 720 of 1280, still centred (`~/.local/state/smashcraft/shots/sc-clock-higher/clock-high-match.png`); the pre-match line, countdown and fighter tags stay clear (`test/notice-clear.test.ts`), and Warcraft hides its own top frames with `BlzHideOriginFrames`, with the clock having stood at a 2.2% margin there before the Melee sizing.
+`src/game/ui/clockLayout.ts` holds the shares (`MELEE_CLOCK_SHARE`) and derives the sizes, boxes and split from them, and `test/clock-size.test.ts` pins them. Native 1280x720 captures of the Wisp window before and after (Illidan against a CPU on Tomb of Sargeras) read 51 px (7.08%) and 29 px (4.03%) at a 2.2% margin before, and **36 px (5.00%)**, **30 px (4.17%)** and a **81 px (11.25%)** margin after; the group is centred (x 557 to 721 of 1280) and clear of the fighters' damage tags. Captures: `~/.local/state/makgora/evidence/timer-size-20261102` (`before.png`, `after.png`). With the margin moved to 4% (2026-11-02), a native 1280x720 capture of a live match on Tomb of Sargeras reads the white digits 32 px (4.4%) down and x 559 to 720 of 1280, still centred (`~/.local/state/makgora/shots/sc-clock-higher/clock-high-match.png`); the pre-match line, countdown and fighter tags stay clear (`test/notice-clear.test.ts`), and Warcraft hides its own top frames with `BlzHideOriginFrames`, with the clock having stood at a 2.2% margin there before the Melee sizing.
 
 **No time limit** removes only the clock. **Endless** additionally removes the
 stock end: fighters respawn after knockouts, the HUD hides stocks and time,
@@ -96,9 +96,9 @@ moment, and then a results screen shows the winner in its victory pose with
 its series' victory fanfare, beside every fighter's KOs, falls and damage.
 Each stage plays music from its own franchise.
 
-Smashcraft follows that shape with Warcraft III's built-in assets
-([#123](https://github.com/tompassarelli/smashcraft/issues/123); the held start is
-[#129](https://github.com/tompassarelli/smashcraft/issues/129)):
+Mak'gora follows that shape with Warcraft III's built-in assets
+([#123](https://github.com/tompassarelli/makgora/issues/123); the held start is
+[#129](https://github.com/tompassarelli/makgora/issues/129)):
 
 - **Calls.** "3", "2" and "1" tick with the Battle.net countdown tick, "GO!"
   plays the Battle.net game-found sting, and "GAME!"/"TIME!" tolls the
@@ -131,9 +131,9 @@ Smashcraft follows that shape with Warcraft III's built-in assets
   selection play the Frozen Throne menu theme.
 - **Hurt cries.** Melee gives a damage voice only to knockback past its
   damage-fly threshold and to KOs.
-  Smashcraft's hero models carry their death cry in the Death sequence, so a
+  Mak'gora's hero models carry their death cry in the Death sequence, so a
   weak hit shows a silent stand-in, and one fighter cries at most every 120
-  frames (smashcraft:ts/src/game/presentation/hurtVoice.ts).
+  frames (makgora:ts/src/game/presentation/hurtVoice.ts).
 
 Stage themes are matched to setting and race:
 
@@ -153,7 +153,7 @@ All of these are presentation, so they read confirmed frames and never feed the
 simulation. Every path is a script path into the installed game:
 `bun tools/presentation/stock-sounds.ts --extract CASC_EXTRACT` checks each
 against the game's storage through CascLib and records it in
-smashcraft:ts/src/generated/assets/stockSoundInfo.ts, and a test holds the
+makgora:ts/src/generated/assets/stockSoundInfo.ts, and a test holds the
 presentation to that table. It also resolves every sound label hit
 presentation plays through the game's AnimSounds.slk and AbilitySounds.slk and
 checks each file: a label can name a file the game doesn't store
@@ -164,15 +164,15 @@ No audio is copied.
 
 Warcraft III streams a stage's models and textures after the script creates
 them, so a match that begins on the start press can open on a half-drawn stage
-(Tom, 7 Oct). Smashcraft puts a loading screen between the press and the
-match: the chosen stage's square card picture (smashcraft:docs/design/stage-select.md) and name over a dark cover, with the
+(Tom, 7 Oct). Mak'gora puts a loading screen between the press and the
+match: the chosen stage's square card picture (makgora:docs/design/stage-select.md) and name over a dark cover, with the
 stage drawn behind it. Each client reports "stage drawn" through a
 synchronized message once its drawing has settled (`STAGE_SETTLE_FRAMES`). The
 match, and so its countdown, begins on the callback where the last present
 player's report arrives, or after `STAGE_LOAD_TIMEOUT_FRAMES` (ten seconds), so
 a stuck client can't hold the others. Every step runs from a synchronized event,
-so all clients start together (smashcraft:ts/src/game/session/stageLoad.ts).
-The slowest stage, Gryphon Aerie, measured natively on Smashcraft 0.0.72
+so all clients start together (makgora:ts/src/game/session/stageLoad.ts).
+The slowest stage, Gryphon Aerie, measured natively on Mak'gora 0.0.72
 (Warcraft 3.0.0.24268, 2880x1920, one human and a computer, two samples):
 the loading screen is up 0.05 s after the press, the match starts at
 0.91-0.93 s (30 settle frames plus the sync round trip), and every deck and

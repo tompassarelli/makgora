@@ -3,15 +3,15 @@
 Author fighter animation for the Classic models only.
 
 Which of each fighter's moves plays a sequence its Warcraft model already has
-("stock") and which plays a clip authored for Smashcraft, with the verdict of
+("stock") and which plays a clip authored for Mak'gora, with the verdict of
 the #309 audit (8 Oct 2026). Prefer the stock sequence where it does the job
-as well or better (smashcraft:docs/design/map-size.md); keep an authored clip
+as well or better (makgora:docs/design/map-size.md); keep an authored clip
 where Smash timing, reach or a pose the model lacks needs it.
 
 ## How a move plays a stock sequence
 
 A swap changes only the move-to-sequence mapping, in
-smashcraft:ts/src/game/presentation/stockClipSwaps.ts, applied over every
+makgora:ts/src/game/presentation/stockClipSwaps.ts, applied over every
 generated clip table so regenerating those leaves it in place. Frame data
 never changes:
 
@@ -22,7 +22,7 @@ never changes:
   reach --assets DIR --character ID` re-measures the drawn reach test.
 - Rifleman and Illidan have no measured moments: the entry is
   `aligned` with seconds = strike × total frames ÷ first active frame, the
-  same retime as `strikeClip` (smashcraft:ts/src/game/sim/heroes/groundNormals.ts).
+  same retime as `strikeClip` (makgora:ts/src/game/sim/heroes/groundNormals.ts).
 
 Each candidate was judged on a side-by-side silhouette render of the same
 move frames (start, mid startup, first and last active, mid recovery, end),
@@ -72,7 +72,7 @@ Stock attack and cast sequences: "Attack", "Attack Slam", "Attack 2", "Attack Wa
 
 | Moves | Clip in use | Verdict |
 | --- | --- | --- |
-| Jabs | jab: sword gesture jab quick cut; jab2: sword gesture jab returning cut | Keep: authored sword gestures, one per move (smashcraft:docs/fighter-animation-work.md); stock "Attack"/"Attack 2" already carry Wind Walk |
+| Jabs | jab: sword gesture jab quick cut; jab2: sword gesture jab returning cut | Keep: authored sword gestures, one per move (makgora:docs/fighter-animation-work.md); stock "Attack"/"Attack 2" already carry Wind Walk |
 | Tilts | f-tilt: sword gesture tilt level cut; f-tilt up: sword gesture tilt rising cut; f-tilt down: sword gesture tilt falling cut; u-tilt: sword gesture tilt overhead arc; d-tilt: sword gesture tilt low poke | Keep: same reason |
 | Dash attack, smashes | dash: sword gesture dash lunging cut; f-smash: sword gesture smash shoulder cleave; u-smash: sword gesture smash sky splitter; d-smash: sword gesture smash front rear sweep | Keep: same reason |
 | Aerials | nair: sword gesture air crescent slash; fair: sword gesture air forward cleave; bair: sword gesture air turning back cut; uair: sword gesture air upward pierce; dair: down air sword plunge | Keep: every stock sequence stands on the ground; aerials need airborne legs |
@@ -106,7 +106,7 @@ Stock attack and cast sequences: "Attack - 2", "Spell Slam", "Spell", "Spell Thr
 | Aerials | nair: attack gesture forwardtiltdown; fair: attack gesture downsmash; bair: attack gesture backair (Illidan's back air retargeted, tools/animations/retargets/warden-back-air.json); uair: attack gesture forwardair; dair: drill down air | Keep: every stock sequence stands on the ground; aerials need airborne legs |
 | Grab, pummel, throws | grab: paired grab grab; pummel: paired grab pummel; f-throw: paired grab throwforward; b-throw: paired grab throwback; u-throw: paired grab throwup; d-throw: paired grab throwdown | Keep: paired holder and victim gestures meet on a contact frame; no stock sequence holds a victim |
 | Get-up, ledge attacks | get-up: recovery getupattack; ledge: recovery ledgeattack | Keep: they start lying down or hanging; no stock sequence does |
-| Specials | N: spell throw (stock); N air: spell throw (stock); S: attack - 2 (stock); S air: attack - 2 (stock); U: dissipate (stock); U air: dissipate (stock); D: fan of knives ground; D air: fan of knives air | Already stock except Fan of Knives (authored, smashcraft:docs/design/warden-fan-of-knives.md) |
+| Specials | N: spell throw (stock); N air: spell throw (stock); S: attack - 2 (stock); S air: attack - 2 (stock); U: dissipate (stock); U air: dissipate (stock); D: fan of knives ground; D air: fan of knives air | Already stock except Fan of Knives (authored, makgora:docs/design/warden-fan-of-knives.md) |
 
 ### Lich
 
@@ -177,7 +177,7 @@ Stock attack and cast sequences: "Attack Slam - 1", "Spell Slam", "Attack", "Att
 | Aerials | nair: attack gesture neutralair; fair: attack gesture forwardair; bair: attack - 2 (stock); uair: attack gesture upair; dair: down air four hooves | bair already stock; others keep |
 | Grab, pummel, throws | grab: paired grab grab; pummel: paired grab pummel; f-throw: paired grab throwforward; b-throw: paired grab throwback; u-throw: paired grab throwup; d-throw: paired grab throwdown | Keep: paired holder and victim gestures meet on a contact frame; no stock sequence holds a victim |
 | Get-up, ledge attacks | get-up: recovery getupattack; ledge: recovery ledgeattack | Keep: they start lying down or hanging; no stock sequence does |
-| Specials | N: special howl of terror; N air: special howl of terror; S: special ruin charge; S air: special ruin charge; U: special abyssal leap; U air: special abyssal leap; D: special rain of fire; D air: special rain of fire | Keep: authored Howl, Ruin Charge, Abyssal Leap and Rain of Fire (smashcraft:docs/design/pit-lord.md) |
+| Specials | N: special howl of terror; N air: special howl of terror; S: special ruin charge; S air: special ruin charge; U: special abyssal leap; U air: special abyssal leap; D: special rain of fire; D air: special rain of fire | Keep: authored Howl, Ruin Charge, Abyssal Leap and Rain of Fire (makgora:docs/design/pit-lord.md) |
 
 ### Beastmaster
 

@@ -3,7 +3,7 @@
 The Orc Peon is a stubborn worker who wins by making an awkward little worksite,
 then landing a clean axe blow when the opponent dismantles it. His short arms,
 slow run and committed throws make being rushed down costly. All numbers below
-are original provisional Smashcraft tuning; the references supply identity and
+are original provisional Mak'gora tuning; the references supply identity and
 trade-offs, never copied hitboxes or animation.
 
 ## Sources and body
@@ -18,7 +18,7 @@ the character: “Work work”, “Zug zug”, and “Me not that kind of orc”
 
 The named body counterpart is
 [Ultimate Villager](https://www.ssbwiki.com/Villager_(SSBU)#Stats): weight 92,
-run 1.397 and air speed 0.987. Smashcraft's reference weight is 75, run is 2.2
+run 1.397 and air speed 0.987. Mak'gora's reference weight is 75, run is 2.2
 Smash units and air speed is 1.0. Therefore Peon's weight and air multipliers are 92/75
 and 0.987. His run is 1.6/2.2, faster than Villager's 1.397, because at 1.397 the
 seeded field left him unable to reach his tool range (#227). Width 0.88 and height 0.80 fit the stock worker; jumps,
@@ -102,7 +102,7 @@ recognizable work gestures in both facings at gameplay zoom.
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A stubborn worker who wins by making an awkward little worksite.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). A stubborn worker who wins by making an awkward little worksite.
 
 ```balance-profile
 fighter: peon

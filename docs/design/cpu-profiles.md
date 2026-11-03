@@ -3,9 +3,9 @@
 Choose an **Opponent** and **Difficulty** independently. The six original
 fictional opponents are **Rook, Ember, Flint, Vale, Kite and Wren**. Each grows
 through exactly five tiers: **Rookie, Beginner, Intermediate, Advanced, Expert**.
-These 30 combinations are authored Smashcraft difficulty settings, with no
+These 30 combinations are authored Mak'gora difficulty settings, with no
 claimed equivalence to human ratings or imitation/endorsement of real players.
-Design ownership: [#183](https://github.com/tompassarelli/smashcraft/issues/183).
+Design ownership: [#183](https://github.com/tompassarelli/makgora/issues/183).
 
 ## Identity and growth
 
@@ -119,7 +119,7 @@ willingness to take a comeback gamble without faster perception or extra
 knowledge. Rook's reluctance and Ember's impatience remain biases, not rules
 that prevent a rational desperate attack or a safe disengagement.
 
-Every combination preserves [#176](https://github.com/tompassarelli/smashcraft/issues/176):
+Every combination preserves [#176](https://github.com/tompassarelli/makgora/issues/176):
 trained recognition (a held guard, tech or ledge answer) waits at least 14 frames
 (233 ms). A new decision waits at least 16 frames (267 ms), plus one frame for
 each additional viable option: retreat, grounded shield, remaining jump and legal
@@ -142,10 +142,10 @@ than Rookie. Sleep's full duration is 160 frames, grounded or airborne. Rollback
 include 48 frames so the computer acts after the reaction curve's 40-frame tail.
 High-tier matches retain 43 observation frames; a Beginner or Rookie retains
 61 frames for its slower floor plus the curve's tail.
-[#356](https://github.com/tompassarelli/smashcraft/issues/356) draws each turn’s
+[#356](https://github.com/tompassarelli/makgora/issues/356) draws each turn’s
 interval from the match seed and the last committed turn. Targets come from
 master, diamond and platinum Slippi replays for Expert, Advanced and
-Intermediate (smashcraft:docs/design/human-input-consistency.md); Beginner and
+Intermediate (makgora:docs/design/human-input-consistency.md); Beginner and
 Rookie are guesses. Intended medians are Rookie 8, Beginner 7, Intermediate 7,
 Advanced 7 and Expert 6 frames, and no intended turn holds past 12 frames, since
 a 13-frame hold enters run. Faster intended turns incur more late-turn noise,
@@ -160,7 +160,7 @@ options), against measured masters’ 12.5–13%. Braking to neutral remains
 immediate. The computer calibration report prints these tables.
 Prepared sequences and fallible reads can act before a predicted action occurs.
 Delayed observations, bounded history and move-value logic are owned by
-[#182](https://github.com/tompassarelli/smashcraft/issues/182).
+[#182](https://github.com/tompassarelli/makgora/issues/182).
 
 Defense forecasts an observed strike's clock and position through the
 observation delay. Visible shots follow their last observed velocity; arrival
@@ -187,7 +187,7 @@ for a second guard; without active protection, the guard reserve still applies.
 
 ## Defence and aerial execution slips
 
-[#357](https://github.com/tompassarelli/smashcraft/issues/357) adds legal seeded
+[#357](https://github.com/tompassarelli/makgora/issues/357) adds legal seeded
 input errors without changing fighter stats. DI uses the victim’s visible
 knockback angle: side launches turn upward for survival and downward for combo
 escape; vertical launches turn outward for survival and inward for escape.
@@ -314,7 +314,7 @@ Snapshots, canonical comparisons, first-difference and full-match replays carry
 these fields. All decisions use existing seeded integer draws, with no clock,
 client-local randomness, hidden input or private future state.
 
-[#184](https://github.com/tompassarelli/smashcraft/issues/184) composes a resolved
+[#184](https://github.com/tompassarelli/makgora/issues/184) composes a resolved
 independent decision record for each named opponent/tier over #182's shared
 policy. The record supplies execution, judgment, spacing, history capacity /
 update stride, read evidence/confidence, repetition, punish weight, speculative
@@ -325,8 +325,8 @@ Fight, developer setup, reports and fixtures together without an old selector
 or compatibility adapter. General strongest-play diagnostics explicitly select
 **Wren + Expert**, avoiding a silent weaker default.
 
-[#185](https://github.com/tompassarelli/smashcraft/issues/185) owns selection and
-player-guide copy. [#186](https://github.com/tompassarelli/smashcraft/issues/186)
+[#185](https://github.com/tompassarelli/makgora/issues/185) owns selection and
+player-guide copy. [#186](https://github.com/tompassarelli/makgora/issues/186)
 owns one aggregate calibration report across all 30 combinations: reaction,
 execution, judgment/spacing, adaptation after a pattern switch, repetition,
 successful/wrong reads, ahead/behind risk, and proactive/defensive/kit activity.
@@ -381,11 +381,11 @@ existing kit/recovery/gameplan contracts for whole-roster coverage. Reuse a
 passing result only while its covered policy is unchanged. Calibration rows
 change one measured behavior at a time; never retune fighter stats or relax a
 coverage/rank assertion to make an AI report pass. These are authored
-Smashcraft measurements, with no human rating or imitation claim.
+Mak'gora measurements, with no human rating or imitation claim.
 
 ## Reads and move value
 
-smashcraft:ts/src/game/match/botStrategy.ts records transitions in delayed
+makgora:ts/src/game/match/botStrategy.ts records transitions in delayed
 opponent observations, partitioned by close, middle and far spacing and by
 ground, air, knockdown and ledge situations. Each context retains the policy's
 bounded number of events, with a total ceiling of 128. Update stride, evidence
@@ -400,7 +400,7 @@ fighter's own recovery. A committed guard can lose to an unexpected grab;
 the forecast does not inspect new opponent inputs. Seeded choices sometimes
 decline reliable patterns and sometimes guess from weak evidence.
 
-smashcraft:ts/src/game/match/botMoveValue.ts weights eligible moves by observed
+makgora:ts/src/game/match/botMoveValue.ts weights eligible moves by observed
 shield/jump frequency, authored damage and startup, an approximate kill reward,
 recovery exposure at the computer's own percent, and resulting distance from
 stage centre. A stock deficit or a short clock while trailing increases the
@@ -410,19 +410,19 @@ Every eligible move keeps a positive weight alongside its fighter's gameplan.
 Lower judgment favors familiar answers and smashes; higher judgment uses the
 value comparison more often.
 
-smashcraft:ts/src/game/match/cpuDecisionPolicy.ts defines the independent policy
+makgora:ts/src/game/match/cpuDecisionPolicy.ts defines the independent policy
 dimensions consumed by reads and move choice. The named opponent/tier design
-is in smashcraft:docs/design/cpu-profiles.md. Mechanical reaction, execution
+is in makgora:docs/design/cpu-profiles.md. Mechanical reaction, execution
 and spacing remain separate from judgment, memory and risk preference.
 History and mutable read commitments are copied in detached snapshots,
 restored with input rows and included in exact and periodic replay checksums.
-smashcraft:ts/test/native/pads/cpu-reads.pad is the native comparison script.
+makgora:ts/test/native/pads/cpu-reads.pad is the native comparison script.
 
 ## Whiff punish
 
 Without it, the computer answered threats but never attacked into an
 opponent's end lag, so slow, committal fighters (Pit Lord) got away with
-whiffs and overperformed in #105's matrix. smashcraft:ts/src/game/match/botPunish.ts
+whiffs and overperformed in #105's matrix. makgora:ts/src/game/match/botPunish.ts
 reads the window from the delayed opponent observation, the frames until it
 can act: a ground move past its active frames (`attack.cooldown`), a missed
 grab, a hero special past its last strike with nothing still to come (no
@@ -446,7 +446,7 @@ grab. It runs after defense and before the attack pause and idle
 stretches, so a profile's pause doesn't eat the window; the profile gates it
 with its delayed perception, the punish share and the misjudgment, each drawn
 on the window's key under the match seed. Scripted checks:
-smashcraft:ts/src/game/match/botPunishContracts.tests.ts.
+makgora:ts/src/game/match/botPunishContracts.tests.ts.
 
 ## Determinism and the match seed
 
@@ -470,7 +470,7 @@ The seed is what makes win rates measurable: before it, a computer-against-
 computer setup was one fixed match, so a matchup's rate was 0% or 100% per
 setup. `bun scripts/cpuField.ts --seeds N` plays N seeds of each setup and
 `bun scripts/cpuTiers.ts` measures Wren at the five tiers against each other
-(smashcraft:docs/typescript.md).
+(makgora:docs/typescript.md).
 
 The field calls `produceComputerInput`, which delays the observation before
 choosing any response. `PERCEIVED_SKILLS` has zero extra reaction frames only

@@ -3,7 +3,7 @@
 - Parity: `bun wisp parity numeric` compares the numeric corpus with both Lua32s;
   `bun wisp integrity capture --screen --clients-file FILE --client NAME --out PRIVATE_DIR [--count N] [--region X,Y,WIDTH,HEIGHT]`
   measures serial framebuffer acquisition on the input stimulus clock and saves
-  actual pixels privately (smashcraft:docs/native-bot-session.md). Its cadence
+  actual pixels privately (makgora:docs/native-bot-session.md). Its cadence
   sample is preparation for response measurements, with no latency pass result.
   `bun wisp integrity capture ...` runs native input-integrity capture and
   `bun wisp integrity result DIR` reconciles its output. `bun wisp integrity
@@ -13,14 +13,14 @@
   and replay tapes stay under `parity`.
 
 - Native journeys: `bun wisp integrity capture --four-fighters` runs #17's
-  four-fighter match (smashcraft:docs/native-four-fighters.md);
+  four-fighter match (makgora:docs/native-four-fighters.md);
   `bun wisp integrity capture --playable` runs a playable candidate's one-stock
-  match and rematch (smashcraft:docs/playable-0047.md).
+  match and rematch (makgora:docs/playable-0047.md).
   `bun wisp integrity result DIR` reconciles either session from its recorded kind.
 
 - Delay readout: `bun wisp integrity delay RUN_DIR...` prints, per client
   from the latest probe run's response pages under each directory
-  (smashcraft:ts/scripts/integrity/delayReadout.ts, #396), p50 / p95 / max of:
+  (makgora:ts/scripts/integrity/delayReadout.ts, #396), p50 / p95 / max of:
   input delay (service callbacks from a press's `capture` row to its first
   `action` prediction); own echo (the frontier at an own edge row's `receive`
   minus the frontier at its `capture`); edge-row lateness (a remote edge

@@ -11,9 +11,9 @@ one thing the meter buys.
 
 Each fighter carries one meter, `fighter.meter.ultimate`. It is a frame counter,
 part of replay and rollback state, and is kept through a KO and respawn. The
-rules live in smashcraft:ts/src/game/sim/meter.ts; the match step adds the clock fill
-and, with orbs on, schedules the orbs and runs the pickup (smashcraft:ts/src/game/match/orbs.ts), whose rules and
-record live in smashcraft:ts/src/game/sim/orbs.ts and sim/orbState.ts.
+rules live in makgora:ts/src/game/sim/meter.ts; the match step adds the clock fill
+and, with orbs on, schedules the orbs and runs the pickup (makgora:ts/src/game/match/orbs.ts), whose rules and
+record live in makgora:ts/src/game/sim/orbs.ts and sim/orbState.ts.
 
 By default the match clock is the only source: a fighter's meter gains 2 frames
 every frame of play (after the start hold), so it is full 60 seconds after the

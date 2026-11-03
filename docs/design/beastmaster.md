@@ -13,7 +13,7 @@ costs time and mana. Animals never block hits intended for Beastmaster.
 
 ## Controls and decisions
 
-Values below are original provisional Smashcraft values, in simulation frames;
+Values below are original provisional Mak'gora values, in simulation frames;
 the call frame is one-based. H is the existing hero reference height.
 With the shared recovery band, his authored normal, throw and pack damage is
 90% of the preceding kit; timing, geometry and knockback growth are unchanged.
@@ -104,7 +104,7 @@ all special and companion gameplay contracts remain in Bun and emitted Lua.
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Separate ground and air threats from the pack, followed by axe normals.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). Separate ground and air threats from the pack, followed by axe normals.
 
 ```balance-profile
 fighter: beastmaster

@@ -1,9 +1,9 @@
 # Ultimates
 
 Tom, 9 October 2026 (#382): every Warcraft III hero has an ultimate, so every
-Smashcraft fighter gets one. It is a real move bought with the full ultimate meter,
+Mak'gora fighter gets one. It is a real move bought with the full ultimate meter,
 never a cutscene. A match rule turns ultimates off. All frame, damage and
-launch values below are original, provisional Smashcraft tuning.
+launch values below are original, provisional Mak'gora tuning.
 
 ## Why supers work and Final Smashes failed
 
@@ -12,12 +12,12 @@ launch values below are original, provisional Smashcraft tuning.
   stock of meter is a spend-now-or-save choice. A super is an ordinary move
   with frame data: blockable, punishable, and its startup is known.
 - **Street Fighter 6:** splits Drive (enhanced specials, parries, rushes) from the Super Art
-  bar. Smashcraft keeps only the Super Art half: one ultimate meter, and the spend-or-save choice.
+  bar. Mak'gora keeps only the Super Art half: one ultimate meter, and the spend-or-save choice.
 - **Smash Ultimate Final Smash meter:** fills over time, its cinematic hits
   cannot be answered, and it hands out comebacks; tournaments switch it off.
   Smash Balls are random. Rivals of Aether has no supers at all.
 
-Smashcraft takes the Street Fighter half and refuses the Smash half.
+Mak'gora takes the Street Fighter half and refuses the Smash half.
 
 ## Rules
 
@@ -27,7 +27,7 @@ Smashcraft takes the Street Fighter half and refuses the Smash half.
 | Gain | The match clock by default, full 60 s after the match starts and 60 s after each spend; with the Orbs rule on, only orbs at centre stage instead (one every 30 s, each worth half a meter); nothing from damage (docs/design/mana.md, clock default restored 2026-11-02). |
 | Input | Attack + Special together (hold Attack, press Special; controller A + X), any direction, from any state a special could start. Below a full ultimate meter, or with ultimates off, the ordinary special starts instead. |
 | Flash | At most 4 frames of white fighter flash and the ready sound. No camera cut, no freeze of the opponent. |
-| Readiness (#192, #253, #255) | The meter shows as a rim of light round the fighter's own silhouette, a ki-aura feel Tom chose over separate effects for the charge and the full bar (2026-10-25): a second white copy of the fighter's model, held on its pose every frame, grown 9% round the body's middle and set 14 units behind it, so only its edge shows. A full ultimate meter with the ultimate on wears a warm gold rim, breathing slowly (alpha 110 to 210 over 2 s) with no restart until the meter is spent; with the meter not full there is none (smashcraft:ts/src/game/presentation/meterGlow.ts). Each fighter owns one rim model, made once and hidden when unused. Casting the ultimate plays a Doom fire tower at its feet for 16 frames and the ultimate sound, ahead of or with the move's own first effect (docs/design/sound.md). The tower is sized to the hurt body (the larger of its height and width against a unit body), so it wraps every fighter size on every stage. Presentation only: sounds follow confirmed frames; the tower starts on the first presented or confirmed frame that holds the cast (at once for the caster; online, as soon as the opponent confirms the received cast, even while a rollback is still repairing the presented frame), plays its full length from there whatever the move's frame by then, stops if a rollback removes a cast no confirmed frame held, and never restarts for the same cast. |
+| Readiness (#192, #253, #255) | The meter shows as a rim of light round the fighter's own silhouette, a ki-aura feel Tom chose over separate effects for the charge and the full bar (2026-10-25): a second white copy of the fighter's model, held on its pose every frame, grown 9% round the body's middle and set 14 units behind it, so only its edge shows. A full ultimate meter with the ultimate on wears a warm gold rim, breathing slowly (alpha 110 to 210 over 2 s) with no restart until the meter is spent; with the meter not full there is none (makgora:ts/src/game/presentation/meterGlow.ts). Each fighter owns one rim model, made once and hidden when unused. Casting the ultimate plays a Doom fire tower at its feet for 16 frames and the ultimate sound, ahead of or with the move's own first effect (docs/design/sound.md). The tower is sized to the hurt body (the larger of its height and width against a unit body), so it wraps every fighter size on every stage. Presentation only: sounds follow confirmed frames; the tower starts on the first presented or confirmed frame that holds the cast (at once for the caster; online, as soon as the opponent confirms the received cast, even while a rollback is still repairing the presented frame), plays its full length from there whatever the move's frame by then, stops if a rollback removes a cast no confirmed frame held, and never restarts for the same cast. |
 | Telegraph | Every ultimate shows its area, line or target before its first active frame. Startup is at least 16 frames. |
 | Counterplay | Each can be shielded or dodged on its startup frames, or escaped by movement, and leaves the user punishable on a whiff. |
 | Payoff | Strong, never a guaranteed stock: none kills from 0%. Below 100%, an ultimate and its true follow-ups stay within #83's 30% (gameplay-design.md, "Combo structure"). |
@@ -137,11 +137,11 @@ Frames count from the input frame (frame 1 is the first frame after it).
 ## Implementation contract
 
 - One ultimate per fighter, authored as hero special data
-  (smashcraft:ts/src/game/sim/ultimates.ts) and run by the hero special engine
+  (makgora:ts/src/game/sim/ultimates.ts) and run by the hero special engine
   as special action 17, so it is deterministic and in snapshots through the
   special state. Telegraphs are drawn-only projectiles; transformations reuse
   the speed and heavy item buffs.
-- smashcraft:ts/src/game/sim/ultimates.tests.ts plays each ultimate as a
+- makgora:ts/src/game/sim/ultimates.tests.ts plays each ultimate as a
   recorded scenario in both facings: it lands undefended without a KO from
   0%, its defence (shield, spot dodge, staying grounded) takes
   no damage, its first threat is at least frame 16 and its user stays

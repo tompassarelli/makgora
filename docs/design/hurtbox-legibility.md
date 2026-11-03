@@ -3,7 +3,7 @@
 Why players of Super Smash Bros. Ultimate report spacing that looked right by
 every visible cue and still lost the exchange, which collision mechanisms
 produce it, whether any of it is random, and Melee's comparable cases. This is
-a descriptive reference and takes no position; Smashcraft's rules are in
+a descriptive reference and takes no position; Mak'gora's rules are in
 [gameplay design decisions](../gameplay-design.md#legible-hurtboxes). The
 vocabulary (hitbox, hurtbox, disjoint, interpolation) is in
 [fighting-game design language](fighting-games.md#hitboxes-and-hurtboxes).
@@ -124,9 +124,9 @@ From SmashWiki and public frame data:
   Melee's analog light shield adds a player-controlled size
   ([Melee defence](melee/defense.md)).
 
-## Smashcraft's current collision, for comparison
+## Mak'gora's current collision, for comparison
 
-Described, not judged; the source is smashcraft:docs/hurtboxes.md.
+Described, not judged; the source is makgora:docs/hurtboxes.md.
 
 - A fighter's body is a short list of authored capsules chosen from replay
   state (character, kit, attack style and frame, crouch, facing). Standing,

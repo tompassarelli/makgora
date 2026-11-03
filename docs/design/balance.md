@@ -3,7 +3,7 @@
 Tom's balance spec (8 Oct 2026). Every number here is an **initial value
 Tom tunes**; the code holds each in one constant, `BALANCE_SPEC`,
 `PUNISH_RESET_FRAMES`, `DISADVANTAGE_FRAMES` and `SCORE_WEIGHTS` in
-smashcraft:ts/scripts/balance.ts. Changing one changes the code and this doc
+makgora:ts/scripts/balance.ts. Changing one changes the code and this doc
 together.
 
 ## Philosophy
@@ -42,7 +42,7 @@ Wren Expert:
 | Spam probe win rate against the Expert field | at most 45% |
 | Largest single move's share of the fighter's damage | at most 40%, except its signature move |
 
-The win-rate rule is the roster's existing gate (smashcraft:docs/design/roster.md,
+The win-rate rule is the roster's existing gate (makgora:docs/design/roster.md,
 "Balance gate"). A **signature move** is named by the
 `signature: MOVE PERCENT` line of the fighter's play-style profile in its
 own design doc; that move may carry up to that share of the damage, every
@@ -63,13 +63,13 @@ shields, dodges and recovers (an up special offstage stays), but every other
 attack, special, get-up and ledge attack it chooses is dropped. The move is
 pressed whenever it reaches, a grounded fighter runs toward its target
 until it does, and an aerial is jumped for near the target
-(smashcraft:ts/scripts/spamPolicy.ts). It plays every other fighter, both
+(makgora:ts/scripts/spamPolicy.ts). It plays every other fighter, both
 orders on every soak stage, 40 matches a pair (800 a fighter, a 95% interval
 of about +-3.5 points), in the same farm run as the field.
 
 The spammer perceives its target as late as the Expert it plays: it reads the
 target from the same observation history at the perception delay its own
-Wren Expert skill would wait (smashcraft:ts/scripts/spamPolicy.ts
+Wren Expert skill would wait (makgora:ts/scripts/spamPolicy.ts
 `perceivedTarget`), so its reach, spacing and facing use the target's old
 position while its own body is read live. The probe models a human mashing
 one move, who reacts late too; zero delay against an Expert that sees 16 or
@@ -193,7 +193,7 @@ and a seeded Wren match checks that the explorer finds an observed true follow-u
 ## Play-style profiles
 
 Each fighter's design doc (its own doc, or its section of
-smashcraft:docs/design/roster.md) ends its identity with a "Play-style
+makgora:docs/design/roster.md) ends its identity with a "Play-style
 profile" holding one fenced `balance-profile` block. They are Tom-tunable
 drafts written from the design docs and kits on 8 Oct; playtests calibrate
 them. Keys, percentages as LOW-HIGH ranges:
@@ -212,7 +212,7 @@ them. Keys, percentages as LOW-HIGH ranges:
 | `signature` | optional; `MOVE PERCENT`, the signature move and the damage share it may carry |
 | `openings-per-kill` | optional; the fighter's combo-potential target by Slippi's count, 3-4 by default |
 
-smashcraft:ts/scripts/balance.ts reads every block under docs/design/; a
+makgora:ts/scripts/balance.ts reads every block under docs/design/; a
 fighter without one is scored without profile terms, and the tests require
 one for every selectable fighter.
 
@@ -245,15 +245,15 @@ An optimizer that tunes a fighter against its score changes only these, per
 fighter, within these bounds:
 
 - **Normals and throws** (`AuthoredMove` and `AuthoredThrow` in
-  smashcraft:ts/src/game/fighters/NAME/moves.ts; the original fighters'
-  in smashcraft:ts/src/game/sim/moves.ts): each hit region's damage, base
+  makgora:ts/src/game/fighters/NAME/moves.ts; the original fighters'
+  in makgora:ts/src/game/sim/moves.ts): each hit region's damage, base
   knockback and growth within ±25% of the frozen baseline value; startup, active
   and ending frames and landing lag within ±3 frames (startup at least 1).
-- **Specials** (smashcraft:ts/src/game/fighters/NAME/specials.ts): damage,
+- **Specials** (makgora:ts/src/game/fighters/NAME/specials.ts): damage,
   knockback, mana cost and cooldown within ±25% of the frozen baseline; frames within ±3 of baseline.
 - **Computer weights** (the fighter's gameplan,
-  smashcraft:ts/src/game/fighters/NAME/gameplan.ts or
-  smashcraft:ts/src/game/sim/originalGameplans.ts): calibrate weights and spacing against its play-style profile first,
+  makgora:ts/src/game/fighters/NAME/gameplan.ts or
+  makgora:ts/src/game/sim/originalGameplans.ts): calibrate weights and spacing against its play-style profile first,
   then freeze the complete gameplan, computer code and chosen opponent/tier
   before kit tuning. Win rate is never
   the calibration target; kit rounds cannot change computer play.

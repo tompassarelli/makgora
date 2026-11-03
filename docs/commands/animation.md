@@ -1,18 +1,18 @@
 # Animation
 
 For fighter animation quality and action coverage, use the source-owned
-`smashcraft` skill (`agents path smashcraft`, references/animation.md): its
+`makgora` skill (`agents path makgora`, references/animation.md): its
 reference library supplies Sakurai's impact/attack principles and the Fox
 drill example; its procedure routes the existing motion audit, paired throws,
 recovery clips and nine-way pain reactions. The project index of sources,
 with URLs, verified timestamps and rights, is
-smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
+makgora:docs/design/animation-reference.md. Reference pixels remain private.
 
 `bun tools/animations/recovery-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` from
   the repository root appends fighter recovery and transition clips before
-  storing their families and refreshing the clip pool (smashcraft:docs/fighter-animation-work.md).
+  storing their families and refreshing the clip pool (makgora:docs/fighter-animation-work.md).
   `--replace-pose POSE` re-keys that action's root motion in place on each shipped model that
-  carries it (smashcraft:tools/animations/recovery-actions.ts holds the poses), checking every other sequence draws unchanged;
+  carries it (makgora:tools/animations/recovery-actions.ts holds the poses), checking every other sequence draws unchanged;
   the turn is a pure yaw, upright on every frame, because a lean read as tipping over backward
   under Blademaster's back banner (Tom's playtest, 2026-11-01).
   `bun tools/animations/drill-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` appends
@@ -47,7 +47,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   leg targets with gl-matrix. For the neutral air he tucks with the right hammer drawn back over his shoulder, flings it out at arm's length as
   the window opens and turns one front flip about his middle through the window, so the hammer head circles him in front,
   under, behind and over, then opens out to ready; `--debug` prints each frame's hand and hammer head, which are the
-  `NEUTRAL_AIR_HAMMER` table in smashcraft:ts/src/game/fighters/mountain-king/moves.ts. For the down air he coils, flips
+  `NEUTRAL_AIR_HAMMER` table in makgora:ts/src/game/fighters/mountain-king/moves.ts. For the down air he coils, flips
   head-down with his legs straight up and his body dropped 26 units through the startup, then drills two turns about his
   vertical axis through the window with the right hammer held out, so it sweeps in front of and behind him, and flips the
   rest of the way upright; `--debug` adds his crown and feet, the `DOWN_AIR_DRILL` table. `... --replace-pose POSE --keys KEYS.json`
@@ -62,8 +62,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/dreadlord-pounce-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Dreadlord’s horizontal corkscrew, bite and recovery; `bun tools/animations/dreadlord-pounce-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` captures their production phase selection in both facings.
   `bun tools/animations/jump-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID] [--no-preview]` appends
   movement-only jump gestures, including Blademaster's front flip
-  (smashcraft:docs/fighter-animation-work.md). `--character` authors one selected
-  fighter's double jump in the style smashcraft:docs/design/animation-reference.md picks (Blademaster keeps his #230 flip) and retains other jump bindings; `--no-preview`
+  (makgora:docs/fighter-animation-work.md). `--character` authors one selected
+  fighter's double jump in the style makgora:docs/design/animation-reference.md picks (Blademaster keeps his #230 flip) and retains other jump bindings; `--no-preview`
   skips silhouette sheets. Store the changed model family and refresh both body
   timelines and clip metadata before using the generated bindings.
   `bun tools/animations/hop-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors Mal'Ganis's short-hop and full-hop clips
@@ -71,7 +71,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   in frames (`HOPS`: 19 and 33, from `sampleHop`): a coil released into a wing down-stroke and leg drive at takeoff, a raised-wing apex, and a
   wing-braked fall that settles to his stand pose at landing. It appends them, or re-keys them in place on a rerun, keeps every other
   clip identical (his old `jump` and his wing-beat double jump included) and writes the generated
-  smashcraft:ts/src/game/presentation/hopClipInfo.ts; then store the family and run `bun wisp inputs derive --fighter dreadlord`.
+  makgora:ts/src/game/presentation/hopClipInfo.ts; then store the family and run `bun wisp inputs derive --fighter dreadlord`.
   Production plays the clip for the hop's held or released jump button through the landing (`advanceJumpClip`).
   `bun tools/animations/tumble-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors the
   tumble (Melee's DamageFall, played once hitstun ends while still airborne) for
@@ -80,7 +80,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   body centre through the model's existing root helper, limbs flung through the
   canonical rig. A rerun re-authors `Tumble Motion damageTumble` in place; every
   other clip stays identical. It binds the clips in the generated
-  smashcraft:ts/src/game/presentation/tumbleClipInfo.ts and writes both-facing
+  makgora:ts/src/game/presentation/tumbleClipInfo.ts and writes both-facing
   sheets; store the family and run `bun wisp inputs derive --fighter NAME`.
   `bun tools/animations/movement-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID --pose crouch|ledgeHang [--pose ...]`
   authors a fighter's crouch or ledge hang on its shipped model through the
@@ -90,14 +90,14 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   corner for the hang, and a coordinate search over the joint angles keeps the
   pose scoring best on `anim score`'s crouch or ledge line, measured against the
   standing pose the sampler shows, and that keeps every held weapon's blade 4 units clear of
-  the grip audit's limb capsules and its grip within 4 units of the wrist on every frame (smashcraft:tools/animations/weapon-clearance.ts, #451, #450); a crouch keeps its chest within 40 degrees of upright,
+  the grip audit's limb capsules and its grip within 4 units of the wrist on every frame (makgora:tools/animations/weapon-clearance.ts, #451, #450); a crouch keeps its chest within 40 degrees of upright,
   so it lowers by bending the legs rather than tipping into a lunge, and fails if it
   sinks a non-weapon vertex more than 3% of its height below the stand's lowest
   (a robe or tabard hem may dip into the deck). Pit Lord's tail and every legged body's fold are
   searched for the hang as well. A clip already named
   for the pose is re-authored in place, and Illidan's Ledge Catch then eases into
   the new hang over its first 60%; otherwise it appends `Movement POSE` and
-  binds it in the generated smashcraft:ts/src/game/presentation/movementClipInfo.ts;
+  binds it in the generated makgora:ts/src/game/presentation/movementClipInfo.ts;
   run fighters one at a time, since each run rewrites that table. Every other clip stays
   identical. Run it after the fighter's own generator, which rebuilds from stock,
   and before `jump-clips.ts --character`; then store the family and run
@@ -105,7 +105,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   Tinker's backpack claws, Mountain King's left-hand hammer, Anub'arak's
   carapace and squash, Sylvanas's dress, which sinks into the deck unless she squashes) keeps its own search space in
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
-  smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
+  makgora:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
   than search (Chen's hang) is pinned in `PINNED`; Chen's hang turns his left wrist rather than the staff, since the staff's own pivot is off the grip and turning it pulls the shaft out of his fist (#525).
   `bun tools/animations/butcher-clips.ts STOCK_ABOMINATION.mdx PRIVATE_OUTPUT` appends Stitches' eighteen authored clips to the stock Classic Abomination, aims the cleaver and hook arms by search toward per-frame targets, writes per-pose sheets in both facings and regenerates `ts/src/game/fighters/butcher/clips.ts`.
   `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace aerials|up-air|forward-air|counter|back-air|quickdraw]`
@@ -132,16 +132,16 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   only that to the shipped model, checking every other sequence draws unchanged.
   `SHIPPED_PEON.mdx PRIVATE_OUTPUT reauthor ACTION...` re-keys the named actions in place on the
   shipped model, shortening a sequence whose action got shorter, updates their rows in
-  peon/clips.ts and checks every other sequence draws unchanged (Log Heave, 2026-10-28); re-authoring sideSpecial also keys the drawn log, a copy of his lumber geoset stretched to 156 units on its own bone, along smashcraft:ts/src/game/fighters/peon/logPath.ts, hides the stock lumber bundle, keeps the log out of the body's floor snap and fails unless both hands hold the log's near end on every grip frame.
-  `SHIPPED_PEON.mdx PRIVATE_OUTPUT sack` (smashcraft:tools/animations/peon-sack.ts) appends, or re-keys in place, Gold Sack's stuffing clip and one bonk clip per handful: a copy of his own gold-bag geoset rides its own bone from his right hand, swelling a step per handful while his left hand stuffs it every 20 frames, then both hands swing it overhead and down through the bonk's hit capsules on a drawn pole of his lumber geoset, hands to sack, so the sack's centre sits on each active frame's capsule far end (the sim's goldSackArcAt, 68, 124 and 144 units out) and it fails unless the sack and pole stay inside the capsule and the sack centre is within 8 units of its far end (2026-10-28); the pickaxe is hidden in all six, every other sequence must draw unchanged, and it writes smashcraft:ts/src/game/fighters/peon/goldSackClips.ts.
+  peon/clips.ts and checks every other sequence draws unchanged (Log Heave, 2026-10-28); re-authoring sideSpecial also keys the drawn log, a copy of his lumber geoset stretched to 156 units on its own bone, along makgora:ts/src/game/fighters/peon/logPath.ts, hides the stock lumber bundle, keeps the log out of the body's floor snap and fails unless both hands hold the log's near end on every grip frame.
+  `SHIPPED_PEON.mdx PRIVATE_OUTPUT sack` (makgora:tools/animations/peon-sack.ts) appends, or re-keys in place, Gold Sack's stuffing clip and one bonk clip per handful: a copy of his own gold-bag geoset rides its own bone from his right hand, swelling a step per handful while his left hand stuffs it every 20 frames, then both hands swing it overhead and down through the bonk's hit capsules on a drawn pole of his lumber geoset, hands to sack, so the sack's centre sits on each active frame's capsule far end (the sim's goldSackArcAt, 68, 124 and 144 units out) and it fails unless the sack and pole stay inside the capsule and the sack centre is within 8 units of its far end (2026-10-28); the pickaxe is hidden in all six, every other sequence must draw unchanged, and it writes makgora:ts/src/game/fighters/peon/goldSackClips.ts.
   `bun tools/animations/peon-pool.ts AUTHORED_PEON.mdx PRIVATE_OUTPUT` prepares
   Peon's checked pooled clips and a retained record for the final roster export.
   `bun tools/animations/warden-fan-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT` authors
   Warden's ground and air Fan of Knives casts, preserving other clips
-  (smashcraft:docs/design/warden-fan-of-knives.md).
+  (makgora:docs/design/warden-fan-of-knives.md).
   `bun tools/animations/down-air-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT` writes
   both-facing down-air sheets from production pose selection and the roster's
-  strike-height inventory (smashcraft:docs/down-airs.md).
+  strike-height inventory (makgora:docs/down-airs.md).
   `bun tools/animations/pain-captures.ts PRIVATE_OUTPUT [FIRST_FIGHTER_SLUG]` plays accepted hits through
   the Wisp map, checks held hitstun and recovery, validates the bound pain models,
   and renders interruption, entry, held and recovery frames for the remaining roster.
@@ -158,22 +158,22 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   with the UI (`classic`) and, for cold readers, without the UI or the winner's level-up burst (`classic-poses`).
   `--views` renders only the listed views; `--views classic-poses` skips the UI view, which under software GL is what keeps a full 26-fighter round inside five minutes.
   `bun tools/animations/victory-anatomy.ts` (from ts/) samples every selectable fighter's shipped victory every third frame,
-  prints each frame and joint that breaks the anatomy rules in smashcraft:ts/scripts/wisp/victoryAnatomy.ts (an elbow bent
+  prints each frame and joint that breaks the anatomy rules in makgora:ts/scripts/wisp/victoryAnatomy.ts (an elbow bent
   backward, folded past its range or off its hinge, a bone stretched, an elbow or hand inside the torso, an upper arm pulled
   out of its shoulder) and rewrites the joint record ts/test/fixtures/victory-anatomy.json that `bun run test` checks (#496).
   The shoulder rule pairs each arm-only vertex within 0.6 shoulder widths of the shoulder with its nearest torso vertex in the
   stand pose, and flags a frame where even the closest tenth of those pairs have drawn more than 0.3 shoulder widths apart:
   the arm has left the pauldron or sleeve it sits in, which reads as a dislocated arm (Kael'thas's arms-overhead cheer reached
   0.41; the stock Blademaster, Grom and Pit Lord victories reach 0.27). Victories still owing a fix are listed in
-  `VICTORY_SEAM_DEBT` (smashcraft:ts/scripts/wisp/victoryAnatomyRecord.ts). Rerun it after storing a changed hero model;
+  `VICTORY_SEAM_DEBT` (makgora:ts/scripts/wisp/victoryAnatomyRecord.ts). Rerun it after storing a changed hero model;
   `victory-clips.ts` refuses any cheer pose that breaks the same rules.
-  Both `jump-clips.ts` and `victory-clips.ts` key a free weapon (Cairne's `Bone_Axe_Free`, listed in smashcraft:ts/scripts/wisp/victoryJoints.ts) to its hand on every frame of the clip they author, from its Stand Ready or Stand grip, so it cannot drift off the hand between beats (#540).
+  Both `jump-clips.ts` and `victory-clips.ts` key a free weapon (Cairne's `Bone_Axe_Free`, listed in makgora:ts/scripts/wisp/victoryJoints.ts) to its hand on every frame of the clip they author, from its Stand Ready or Stand grip, so it cannot drift off the hand between beats (#540).
   Illidan's victory is his own cheer (#590): arms out in a V, the right glaive tipped 75 degrees outward, both sleeve flaps hung from the forearm so no red shard points sideways, and a lowered-arm start so the stock stand pose's glaive disc is not on screen at frame 1;
   re-author it with `victory-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character 2`, store `illidan-animation` and run `inputs derive --fighter Illidan`.
   `bun tools/animations/grab-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]` appends
   coordinated expansion-hero reach, hold, pummel and four-direction holder/victim
   gestures or reauthors their existing indices. `--character` limits reauthoring
-  to one expansion fighter (smashcraft:docs/fighter-animation-work.md).
+  to one expansion fighter (makgora:docs/fighter-animation-work.md).
   `bun tools/animations/pit-lord-specials.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
   authors Pit Lord's four special gestures while preserving all earlier clips.
   `bun tools/animations/kaelthas-clips.ts STOCK_BLOOD_MAGE.mdx PRIVATE_OUTPUT`
@@ -235,11 +235,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/weapon-clear.ts SHIPPED.mdx FIGHTER PRIVATE_OUTPUT SEQUENCE...`
   runs a weapon-clearance pass on named clips of any shipped model with a held weapon: on each
   run of 60 Hz frames where the weapon comes within 2 units of the grip audit's limb
-  capsules (smashcraft:tools/animations/limb-capsules.ts), it keys the smallest hand
+  capsules (makgora:tools/animations/limb-capsules.ts), it keys the smallest hand
   turn that clears them, eased in and out over 4 frames, and leaves every other clip
   unchanged (#453).
-  `bun tools/animations/fade-clear.ts SHIPPED.mdx PRIVATE_OUTPUT SEQUENCE...` holds every body geoset and layer alpha track that drops below the opacity it has in the first stock sequence, every bone and helper scale track that shrinks below half the size it has there, and every root translation that lowers its pivot more than 25 units under the floor, inside the named stock sequences (Death, or Dissipate where that is the clip played) at that level and leaves every other sequence unchanged; store the family with `bun wisp inputs add hero-models PRIVATE_OUTPUT --fighter SLUG` and run `bun wisp inputs derive --fighter NAME` (Archimonde, 2026-10-30). A clip start is stored as f32 and can sample just below its sequence window, so the timeline body (smashcraft:tools/animations/timeline-body.ts) also holds each track's window-start value at the millisecond before the window whenever no played window covers it; without it Warden's wall tech (Attack - 1) read its step-held body alpha as hidden for the clip's first sampled instant.
-  `bun scripts/bodyFades.ts [--record]` (from ts/) samples every clip of every fighter's timeline body each 60 Hz frame for a body geoset dropping below the opacity it has in the first clip, or for a tenth of the visible vertices hanging under a bone or helper shrunk below half its first-clip size or under a root whose pivot sinks more than 25 units under the floor (stock Death clips that shrink or sink the body away), prints which down, getup and roll actions fade, and writes smashcraft:ts/test/fixtures/body-fades.json for smashcraft:ts/test/bodyFades.test.ts, which names the fighters still fading.
+  `bun tools/animations/fade-clear.ts SHIPPED.mdx PRIVATE_OUTPUT SEQUENCE...` holds every body geoset and layer alpha track that drops below the opacity it has in the first stock sequence, every bone and helper scale track that shrinks below half the size it has there, and every root translation that lowers its pivot more than 25 units under the floor, inside the named stock sequences (Death, or Dissipate where that is the clip played) at that level and leaves every other sequence unchanged; store the family with `bun wisp inputs add hero-models PRIVATE_OUTPUT --fighter SLUG` and run `bun wisp inputs derive --fighter NAME` (Archimonde, 2026-10-30). A clip start is stored as f32 and can sample just below its sequence window, so the timeline body (makgora:tools/animations/timeline-body.ts) also holds each track's window-start value at the millisecond before the window whenever no played window covers it; without it Warden's wall tech (Attack - 1) read its step-held body alpha as hidden for the clip's first sampled instant.
+  `bun scripts/bodyFades.ts [--record]` (from ts/) samples every clip of every fighter's timeline body each 60 Hz frame for a body geoset dropping below the opacity it has in the first clip, or for a tenth of the visible vertices hanging under a bone or helper shrunk below half its first-clip size or under a root whose pivot sinks more than 25 units under the floor (stock Death clips that shrink or sink the body away), prints which down, getup and roll actions fade, and writes makgora:ts/test/fixtures/body-fades.json for makgora:ts/test/bodyFades.test.ts, which names the fighters still fading.
   `bun tools/animations/anubarak-clips.ts STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT` authors
   Anub'arak's insect gestures, floor burrow, paired throws and nine pain poses,
   preserving all seventeen stock clips and writing both-facing pose sheets.
@@ -248,7 +248,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   changed length; every other clip, and the `... Motion` roots later passes added, stays
   byte-identical, so a move whose sim timing is unchanged is reworked without regenerating the
   clips that later passes edited (#459).
-  Its down air keys three poses from smashcraft:tools/animations/anubarak-gestures.ts on the move's own timing: claws overhead
+  Its down air keys three poses from makgora:tools/animations/anubarak-gestures.ts on the move's own timing: claws overhead
   with the legs tucked, both claws driven straight down under the shell on the first active frame, then carried
   back under him through the active frames before easing to the fall pose; `--rekey downAir` re-authors it alone.
   A Blender take of his dash attack (#339, judged but not yet shipped): `... STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT --rig RIG.json`
@@ -257,7 +257,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   those keys spliced into the dash attack, set on the floor each frame (`tools/animations/blender-keys.ts`).
   `bun tools/animations/grab-pads.ts` generates the #180 mirror and unlike-height capture batch:
   every selectable fighter, four throws, both facings, with ordinary catch/pummel
-  inputs and contact-frame captures in smashcraft:ts/test/native/pads/180/.
+  inputs and contact-frame captures in makgora:ts/test/native/pads/180/.
   `-dev quick pair FIRST / SECOND` selects different named fighters in the two human slots.
 
 - Original strike authoring (from the repository root):
@@ -269,8 +269,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   bakes one key per attack frame, turning every joint in the side-view plane and solving the axe arm onto each key's hand and axe-head aim,
   and `... dashAttack --keys KEYS.json` splices them and sets every frame on the floor.
   `blender --background --python tools/animations/strikes.py -- rifleman|illidan`.
-  `SMASHCRAFT_ANIMATION_ASSETS=PRIVATE_DIR` selects the editable inputs;
-  `SMASHCRAFT_STRIKE_CLIP='Attack Jab'` reauthors only the jab.
+  `MAKGORA_ANIMATION_ASSETS=PRIVATE_DIR` selects the editable inputs;
+  `MAKGORA_STRIKE_CLIP='Attack Jab'` reauthors only the jab.
   Run Blender commands inside `nix develop`; its shell pins Blender and sets
   `WC3_MDL_ADDON` to the private exporter tree named by
   `tools/animations/mdl-exporter4.pin`. Its archived source revision is recorded
@@ -282,7 +282,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   strikes, specials, movement, recovery, paired throws and nine pain clips,
   keeping its 31 stock sequences, and writes both-facing silhouette sheets and
   `PRIVATE_OUTPUT/hero-models/WarchiefThrallDismountedV2.mdx`. Every hammer move is
-  keyed from `THRALL_HAMMER_SWINGS` in smashcraft:ts/src/game/fighters/thrall/moves.ts,
+  keyed from `THRALL_HAMMER_SWINGS` in makgora:ts/src/game/fighters/thrall/moves.ts,
   the table his hit regions come from, as Uther's are; the generator refuses a
   clip whose drawn hammer head lands more than 12 units from its swing row. It
   drops the model's portrait camera from this derivation copy, because the
@@ -331,7 +331,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   Given the shipped model and pose names instead, it re-authors only those clips in
   place at their indices, rewrites their bindings and checks every other clip is unchanged.
   Every authored clip ends with a staff-clearance pass: on any 60 Hz frame where her staff
-  comes within 7 units of the grip audit's limb capsules (smashcraft:tools/animations/limb-capsules.ts),
+  comes within 7 units of the grip audit's limb capsules (makgora:tools/animations/limb-capsules.ts),
   it keys the smallest hand turn that clears it (#522).
 
 - Tinker animation authoring (from the repository root):
@@ -340,7 +340,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   recovery, paired throws and nine pain reactions. It writes the private
   model, both-facing silhouette sheets, clip metadata and measured stride;
   `--no-pool` leaves pooled export to the combined roster pass
-  (smashcraft:docs/fighter-animation-work.md, "Gazlowe"). Given the shipped
+  (makgora:docs/fighter-animation-work.md, "Gazlowe"). Given the shipped
   model instead, `pain` re-keys the nine pain cells and `rekey POSE...` re-keys the
   named clips in place at their shipped indices and lengths, leaving every other
   sequence unchanged. A phase's `travel` moves the whole drawn body forward by that
@@ -352,14 +352,14 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   bakes one key per attack frame, pitching each joint about the side-view axis, and `... rekey dashAttack --keys KEYS.json` splices them and sets every frame on the floor.
 
 - Lich King animation authoring (from the repository root):
-  `tools/smashcraft-tools/target/release/smashcraft-tools build-lichking [PRIVATE_INPUTS] [IMMUTABLE_EXISTING_MODEL] [--replace NAME]...`
+  `tools/makgora-tools/target/release/makgora-tools build-lichking [PRIVATE_INPUTS] [IMMUTABLE_EXISTING_MODEL] [--replace NAME]...`
   authors clips through Blender; the optional existing model preserves shipped
-  sequences and appends only new clips; `--replace NAME`, repeatable, reauthors an existing clip at its same index, in place when its length is unchanged and otherwise after the last clip, dropping its old keys (smashcraft:docs/fighter-animation-work.md).
+  sequences and appends only new clips; `--replace NAME`, repeatable, reauthors an existing clip at its same index, in place when its length is unchanged and otherwise after the last clip, dropping its old keys (makgora:docs/fighter-animation-work.md).
 
 - Derived fighter art (from ts/): `bun wisp inputs derive [--fighter NAME]... [--rebuild]`
   runs the clip export, the timeline body and the white flashes below for each fighter, fighters in
   parallel, redoes only the steps whose inputs changed and pins the result
-  (smashcraft:docs/build-inputs.md, "Change art"). Run the single tools below to debug one step.
+  (makgora:docs/build-inputs.md, "Change art"). Run the single tools below to debug one step.
 
 - Fighter body (from the repository root):
   `bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER`
@@ -420,17 +420,17 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   whose regions are all pass-through paths or whose motion stops at the first body, strikes with something other than the traced weapon: it is
   reported as `prop` or `body`, never failed or fitted, printed as `excluded`, listed in build/anim-score/weapon-fit.json, and any fit it
   already had is dropped from weaponRegions.ts (the file and its kit.ts wiring go when it was the last).
-  A move listed in `LIMB_STRIKES` (smashcraft:ts/scripts/wisp/animStrikeKinds.ts) strikes with a limb the bow or axe does not reach (Lady Vashj's tail lashes and upper-arm smash, Peon's belly-flop dash) and is treated the same way, as `limb` (#864).
+  A move listed in `LIMB_STRIKES` (makgora:ts/scripts/wisp/animStrikeKinds.ts) strikes with a limb the bow or axe does not reach (Lady Vashj's tail lashes and upper-arm smash, Peon's belly-flop dash) and is treated the same way, as `limb` (#864).
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);
   pre-push runs it when the clip pool or its tools change. The 1.0-unit translation limit is
-  calibrated on Shadow Hunter's 0.0.145 bodies (smashcraft#4): his 14 shaking clips, forward smash
+  calibrated on Shadow Hunter's 0.0.145 bodies (makgora#4): his 14 shaking clips, forward smash
   and angled-up forward tilt among them, scored 1.10 to 6.23, and his 54 clean clips, stock ones
   included, at most 0.59. `thinKeys` writes clamped slopes
   for generator-broken handles, and for every key of a close-key segment that would still leave
   its keys past the limit, and flat handles on held axes, so regenerating through it fixes
-  an offender. `JITTER_EXEMPTIONS` in smashcraft:ts/scripts/wisp/animJitter.ts names a fighter
+  an offender. `JITTER_EXEMPTIONS` in makgora:ts/scripts/wisp/animJitter.ts names a fighter
   that cannot yet be regenerated, with its issue; the check fails once that fighter stops jittering.
   It also fails when a root node's translation keys turn back twice in a row by more than
   `BOB_LIMIT` (2 units): the whole body bobbing every frame. Cairne's grounding read his soles
@@ -443,14 +443,14 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   model). It flags and exits nonzero when a drawn axis turns back twice in a row by more than
   2 units outside hitlag, a clip returns to the one it left within two frames outside hitlag
   (`clip-flap`, a pose flickering between two states), or a non-looping clip's time stops rising
-  before its end. The #277 pads in smashcraft:ts/test/native/captures/277/ run through it
+  before its end. The #277 pads in makgora:ts/test/native/captures/277/ run through it
   unchanged; crouch-release-analog.pad releases over 2–6 frames and rests the stick with noise
   inside Melee's 0.625–0.6875 crouch band.
 
 - White body flashes (from the repository root):
   `bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]`
   authors white body-only copies with the original meshes and keys for selectable gameplay poses, removing unused sequences, repeated constant keys, glow cards and team-glow ground planes for charge and heavy-hit flashes (the pre-push stored-model check fails a white copy that keeps a ground plane, #346); store PRIVATE_OUTPUT as `impact-assets`, which lists each fighter's white bodies and the textures they draw in white-flash-imports/NAME.txt and drops textures no list names. The flash draws 8 units toward the camera and shrinks to keep the body's on-screen silhouette without z-fighting.
-  `--character` refreshes one fighter in an existing PRIVATE_OUTPUT family and its own files in smashcraft:ts/src/generated/assets/white-models/ and white-facts/ (named by fighter slug; the indexes change only when a fighter is added).
+  `--character` refreshes one fighter in an existing PRIVATE_OUTPUT family and its own files in makgora:ts/src/generated/assets/white-models/ and white-facts/ (named by fighter slug; the indexes change only when a fighter is added).
 
 - Sylvanas animation authoring (from the repository root):
   `bun tools/animations/sylvanas-clips.ts STOCK_SYLVANAS.mdx PRIVATE_OUTPUT`
@@ -481,7 +481,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   (the stock Stand Victory pulls her shoulder out of its socket), store
   `VICTORY/hero-models` with `--fighter tyrande` and derive. Sylvanas and
   Tyrande share the bow-rig gestures, movement, grabs and pain set in
-  smashcraft:tools/animations/bow-rig-clips.ts; the in-place `CLIP...` form
+  makgora:tools/animations/bow-rig-clips.ts; the in-place `CLIP...` form
   works as Sylvanas's does.
 
 - Cairne animation authoring (from the repository root):
@@ -490,7 +490,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   to the private classic Tauren Chieftain model, preserving its stock clips.
   It rebuilds from stock, so follow it with `jump-clips.ts --character 16` and
   `victory-clips.ts --character 16` to re-append his double jump (96) and victory (97);
-  `bun run check` (smashcraft:ts/scripts/clipBindingsCheck.ts) refuses a clip binding
+  `bun run check` (makgora:ts/scripts/clipBindingsCheck.ts) refuses a clip binding
   past the end of a fighter's model (#278).
   His down air is authored in Blender (#96): `... SHIPPED_TAUREN.mdx PRIVATE_OUTPUT downAir --rig RIG.json`
   writes his skeleton, stand pose and halberd grip, then
@@ -506,7 +506,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   appends his hammer strikes, specials, movement, recovery, paired throws and nine pain
   clips to the stock Classic Uther, preserving its 13 stock sequences, and writes
   both-facing silhouette sheets. Every hammer move is keyed from the swing table in
-  smashcraft:ts/src/game/fighters/uther/moves.ts (`UTHER_HAMMER_SWINGS`, and
+  makgora:ts/src/game/fighters/uther/moves.ts (`UTHER_HAMMER_SWINGS`, and
   `UTHER_SPECIAL_SWINGS` in specials.ts), the same table his hit regions come from: on each
   active frame the right arm puts his hand at the swing's grip and turns the hammer head
   along the swing's angle, the left hand holds the haft behind it, and a wind-up and a
@@ -520,10 +520,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/chen-clips.ts STOCK_CHEN.mdx PRIVATE_OUTPUT` authors
   Chen's staff, footwork, special, recovery, paired throw and nine pain clips
   from his private stock model and regenerates his clip table
-  (smashcraft:docs/design/chen.md). With `pain` and his shipped model it re-authors
+  (makgora:docs/design/chen.md). With `pain` and his shipped model it re-authors
   only the nine pain clips in place and gates them with pain-gate.ts; with `specials`,
   `aerials` or `upTilt` it re-authors only those clips in place on the shipped model.
-  These are keyed beat by beat (smashcraft:tools/animations/chen-beats.ts): the up air
+  These are keyed beat by beat (makgora:tools/animations/chen-beats.ts): the up air
   and the up tilt aim the staff tip at each active frame's hit region (the up tilt
   then drops it behind him and brings it forward low at his side, never back
   over his head), the forward air reaches the foot to the heel sweetspot, and
@@ -533,9 +533,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/damage-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --fighter NAME...`
   re-keys the named fighters' nine Damage Grid pain clips in place, gates them
   with pain-gate.ts and proves every other sequence unchanged. Store changed model families
-  and refresh the clip pool (smashcraft:docs/fighter-animation-work.md).
+  and refresh the clip pool (makgora:docs/fighter-animation-work.md).
 
 Fighter portraits: `bun scripts/fighterPortraits.ts PRIVATE_OUTPUT` (from ts/, through the
 capacity helper) renders the Classic portrait set, neutral and the four slot
 outfits, with Wisp's headless renderer; store PRIVATE_OUTPUT/fighter-renders as `fighter-renders`.
-See smashcraft:docs/design/fighter-portraits.md.
+See makgora:docs/design/fighter-portraits.md.

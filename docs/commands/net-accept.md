@@ -14,4 +14,4 @@
   moderate for one job and heavy for more, and it runs at most one match per
   two CPUs of its scope, so a run never starves its own handshakes.
 - Each side's log, pad script and standalone result land under DIR; the
-  command exits non-zero when any round trip fails (smashcraft:ts/scripts/wisp/netAcceptance.ts).
+  command exits non-zero when any round trip fails (makgora:ts/scripts/wisp/netAcceptance.ts).

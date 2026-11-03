@@ -1,11 +1,11 @@
 # Single-player modes
 
-Which single-player modes fighting-game players value, which of Smashcraft's
+Which single-player modes fighting-game players value, which of Mak'gora's
 candidates to build first, and why. Issue
-[#285](https://github.com/tompassarelli/smashcraft/issues/285); Classic is
-[#284](https://github.com/tompassarelli/smashcraft/issues/284), the frame
+[#285](https://github.com/tompassarelli/makgora/issues/285); Classic is
+[#284](https://github.com/tompassarelli/makgora/issues/284), the frame
 story and adventure are
-[#269](https://github.com/tompassarelli/smashcraft/issues/269). Researched
+[#269](https://github.com/tompassarelli/makgora/issues/269). Researched
 8 Oct 2026.
 
 Statements marked **Judgement** are reasoning, not findings. Everything else
@@ -163,15 +163,15 @@ What the table shows:
 | Score-attack minigames | Smash players only (Home-Run patched in) | Speedrun and nostalgia niche |
 | Long adventure or RPG mode | Smash players remember Subspace | Splits players; under 10% finish |
 
-## Smashcraft's candidates
+## Mak'gora's candidates
 
-What Smashcraft has to reuse (main, 8 Oct 2026): 21 fighters, a home stage
-for each (smashcraft:docs/design/home-stages.md), six named computer
+What Mak'gora has to reuse (main, 8 Oct 2026): 21 fighters, a home stage
+for each (makgora:docs/design/home-stages.md), six named computer
 opponents with five difficulty tiers each
-(smashcraft:docs/design/cpu-profiles.md), Stocks, Time and Endless rules
-(smashcraft:docs/design/match-flow.md), deterministic hazards, and Training
+(makgora:docs/design/cpu-profiles.md), Stocks, Time and Endless rules
+(makgora:docs/design/match-flow.md), deterministic hazards, and Training
 with partner behaviours, frame readout and combo counter
-(smashcraft:docs/design/training-mode.md, #120, shipped). Warcraft III itself
+(makgora:docs/design/training-mode.md, #120, shipped). Warcraft III itself
 supplies in-engine cinematics: letterbox, unit portraits with speech
 ("transmissions"), camera paths.
 

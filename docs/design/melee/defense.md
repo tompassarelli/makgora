@@ -16,19 +16,19 @@ The shield starts at <!-- v:shield.max -->60<!-- /v --> health. Held, it drains
 shield and freezes the defender in shieldstun, during which the shield can do
 nothing. A broken shield launches the fighter
 upward, leaves it dizzy for longer the lower its percent, and restores the
-shield to <!-- v:shield.afterBreak -->30<!-- /v --> (smashcraft:docs/physics.md,
+shield to <!-- v:shield.afterBreak -->30<!-- /v --> (makgora:docs/physics.md,
 "Shield-break recovery", has the timing). The shield shrinks as its health
 drops, so an attack can reach a part of the body it no longer covers: a shield
 poke.
 
 A lightly pressed trigger gives a weaker shield: it takes less shieldstun and
 more pushback (SmashWiki "Shield" gives both as functions of trigger pressure;
-smashcraft:docs/melee-analog-shield.md has the formulas). A full press
+makgora:docs/melee-analog-shield.md has the formulas). A full press
 within <!-- v:shield.powershield -->2<!-- /v --> frames of the trigger first moving
 starts a powershield, which reflects projectiles and, against attacks, keeps
 the shield's health and pushes the defender back harder. Shieldstun is
 unchanged; the reward is that the shield can be dropped 1 frame after it
-instead of 15 (SmashWiki "Powershield"; smashcraft:docs/melee-powershield.md).
+instead of 15 (SmashWiki "Powershield"; makgora:docs/melee-powershield.md).
 
 From a held shield the fighter can grab, jump, roll, spot-dodge or drop through
 a platform it stands on (the platform drop is shield held with the stick
@@ -100,7 +100,7 @@ A tumbling fighter that hits the floor, a wall or a ceiling techs if its
 shield button was pressed within the last <!-- v:tech.window -->20<!-- /v --> frames;
 after a press, the button is refused for <!-- v:tech.lockout -->40<!-- /v --> frames
 (SmashWiki "Tech"), so
-pressing early or repeatedly fails (smashcraft:docs/melee-tech-input.md has
+pressing early or repeatedly fails (makgora:docs/melee-tech-input.md has
 the exact frame rule). A tech either stays in place or rolls forward or back,
 all intangible. A missed tech knocks the fighter down; it may lie for a while, then get up in place, roll either
 way or attack. Hits totalling <!-- v:jabReset.damage -->7<!-- /v --> damage or less
@@ -112,7 +112,7 @@ the jab reset, which forces a get-up (SmashWiki "Lock").
 A falling fighter near the edge of the main stage catches the ledge and is
 briefly intangible; it can then climb, roll, jump or attack from it, or drop.
 A fighter that lets go cannot catch a ledge again for a short while.
-smashcraft:docs/physics.md, "Outer ledge recovery", has the catch box and the
+makgora:docs/physics.md, "Outer ledge recovery", has the catch box and the
 options. One fighter holding a ledge keeps it from another, which is the
 basis of edge-hogging ([SmashWiki](https://www.ssbwiki.com/Edge-hogging)).
 Dropping from the ledge, jumping and air-dodging onto the stage keeps some of

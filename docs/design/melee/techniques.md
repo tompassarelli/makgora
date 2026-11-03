@@ -132,5 +132,5 @@ shield recoil has decayed can lose all of its vertical knockback in the air
 later, as if it hit an invisible ceiling. The airborne recoil decay clears the
 fighter's vertical knockback instead of the recoil's vertical part: the
 line is a known bug, and
-smashcraft:docs/melee-air-cutoff.md records how Smashcraft keeps it
+makgora:docs/melee-air-cutoff.md records how Mak'gora keeps it
 ([SmashWiki](https://www.ssbwiki.com/Invisible_ceiling_glitch)).

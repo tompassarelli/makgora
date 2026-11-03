@@ -24,7 +24,7 @@ Judgment only; nothing here is copied, traced or committed.
 5. **Hokusai, "Fine Wind, Clear Morning"** (c. 1831, public domain, Wikimedia
    Commons): a lit mountain in graded air, one cloud band in the sky. Take
    atmospheric perspective: each farther plane is paler and bluer.
-6. **Anti-reference: Tomb in 0.0.100** (`00-anti-smashcraft-tomb-0.0.100.png`)
+6. **Anti-reference: Tomb in 0.0.100** (`00-anti-makgora-tomb-0.0.100.png`)
    and the native playtest of 2026-10-31: a flat sky band, a tiled sea and a
    tiled deck with nothing behind the fighters.
 
@@ -119,7 +119,7 @@ This section
 governs wherever it differs from the palette, foam and reference lines above:
 foam is no longer `#f4fbfa` and no longer a hard-edged line, and the sea has no
 caustic web. The one-page sheet is
-`~/.local/state/smashcraft/shots/water-style/style-sheet.png` (references stay
+`~/.local/state/makgora/shots/water-style/style-sheet.png` (references stay
 outside Git); the redesign pass is judged against the rules below.
 
 ### What the references show

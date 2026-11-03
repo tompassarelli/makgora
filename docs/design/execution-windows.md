@@ -1,7 +1,7 @@
 # Execution and reaction windows
 
 Reference for how tight execution and reaction windows are in other games, what
-human perception and motor control allow, and where Smashcraft's windows sit.
+human perception and motor control allow, and where Mak'gora's windows sit.
 It follows from "non-interactive execution is dubious" in
 [gameplay design decisions](../gameplay-design.md#l-cancelling): a window is
 worth its difficulty only when it is part of an exchange with the opponent.
@@ -90,30 +90,30 @@ developer statements on buffer lengths. Add them with their source when found.
 - **Why Smash removed execution tests.** Sakurai judged L-canceling and
   wavedashing to widen the gap between beginners and advanced players too much
   ([SmashWiki L-canceling](https://www.ssbwiki.com/L-canceling)).
-- **Smashcraft.** Owner decision #54 removed L-cancelling, accepting the
+- **Mak'gora.** Owner decision #54 removed L-cancelling, accepting the
   principle in [gameplay design decisions](../gameplay-design.md).
 
-## Smashcraft's windows today
+## Mak'gora's windows today
 
 | Window | Frames | Where |
 |---|---|---|
-| Tech press window; lockout between presses | 20; 40 | smashcraft:ts/src/game/sim/geometry/techInput.ts |
-| Tech intangibility; tech roll | 20; 34 | smashcraft:ts/src/game/sim/conditions.ts |
-| Wall tech startup; wall-tech jump input; wall jump stick flick | 5; 20; 3 | conditions.ts, smashcraft:ts/src/game/sim/fighter.ts |
-| Attack buffer (human) | 6 | smashcraft:ts/src/game/input/attackBuffer.ts |
+| Tech press window; lockout between presses | 20; 40 | makgora:ts/src/game/sim/geometry/techInput.ts |
+| Tech intangibility; tech roll | 20; 34 | makgora:ts/src/game/sim/conditions.ts |
+| Wall tech startup; wall-tech jump input; wall jump stick flick | 5; 20; 3 | conditions.ts, makgora:ts/src/game/sim/fighter.ts |
+| Attack buffer (human) | 6 | makgora:ts/src/game/input/attackBuffer.ts |
 | Powershield input; fast-fall input; platform drop input | 2; 4 (age below); 6 | fighter.ts, [physics.md](../physics.md) |
 | Jump squat (Rifleman); release inside it gives a short hop | 3; 5 | [physics.md](../physics.md) |
-| Ledge catch intangibility; regrab lock after release or interruption | 30; 30 | smashcraft:ts/src/game/sim/ledge.ts, transitions.ts |
-| Knockdown bound; down wait; get-up attack input age; down recovery intangibility | 26; 220; under 60; 20 to 27 | smashcraft:ts/src/game/sim/down.ts, conditions.ts |
-| Demon Hunter parry | 4 to 9 inclusive | smashcraft:ts/src/game/sim/hits.ts |
+| Ledge catch intangibility; regrab lock after release or interruption | 30; 30 | makgora:ts/src/game/sim/ledge.ts, transitions.ts |
+| Knockdown bound; down wait; get-up attack input age; down recovery intangibility | 26; 220; under 60; 20 to 27 | makgora:ts/src/game/sim/down.ts, conditions.ts |
+| Demon Hunter parry | 4 to 9 inclusive | makgora:ts/src/game/sim/hits.ts |
 | Roll, spot dodge, air dodge intangibility | 4 to 19; 2 to 15; 4 to 29 | [physics.md](../physics.md) |
 | Dash to run command; run brake opposite-input window | 12 or 16; through 14 | [physics.md](../physics.md) |
-| Late dash guard grab | 3 | smashcraft:ts/src/game/sim/step.ts |
-| Pivot after a dash back or run turn: standing frames that keep the slide and give the pivot grab | 2 (Melee 1; Tom 2026-11-01, an easier window; parity row `pivot-window`) | smashcraft:ts/src/game/sim/groundMovement.ts `PIVOT_FRAMES`, [Pivots](../gameplay-design.md#pivots) |
+| Late dash guard grab | 3 | makgora:ts/src/game/sim/step.ts |
+| Pivot after a dash back or run turn: standing frames that keep the slide and give the pivot grab | 2 (Melee 1; Tom 2026-11-01, an easier window; parity row `pivot-window`) | makgora:ts/src/game/sim/groundMovement.ts `PIVOT_FRAMES`, [Pivots](../gameplay-design.md#pivots) |
 | Shield release lag; minimum shield hold | 11; 8 | [physics.md](../physics.md) |
 | L-cancel; wavedash input timing | none; not a defined window | [gameplay design decisions](../gameplay-design.md) |
 
-## Bounds adopted for Smashcraft
+## Bounds adopted for Mak'gora
 
 The recommendations below were adopted 6 Oct 2026 through the owner's blanket
 authorization to carry out the proposed work. The authoritative decisions and

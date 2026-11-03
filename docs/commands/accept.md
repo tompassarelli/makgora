@@ -1,7 +1,7 @@
 # Accept
 
 - Native acceptance: `bun wisp accept [--only ID...] [--pair K... | --pairs N | --clients-file FILE] [--solo] [--map MAP.w3x] [--dry-run]` runs every
-  open native check declared in smashcraft:ts/scripts/wisp/acceptChecks.ts in
+  open native check declared in makgora:ts/scripts/wisp/acceptChecks.ts in
   as few fresh matches as their maps allow and prints pass, fail or
   needs-look per check with its evidence folder (wisp:docs/accept.md). `--pair K`
   selects the offline pool pair; every check, capture and receipt follows its
@@ -21,13 +21,13 @@
   A `chat` setup step that starts with `-dev ` waits for every client's command
   receipt; any other text is typed as a plain chat line.
   Development-map profiles rebuild the script into the most recently built
-  complete `native-acceptance-YYYYMMDD-SHA` set under smashcraft-build-inputs
+  complete `native-acceptance-YYYYMMDD-SHA` set under makgora-build-inputs
   (its presentation .w3x and .w3x.base.lua; the map file's time picks it, not
   the name). When accept reports that the map does not carry a model, build a
   new set named by the date and the commit with `bun wisp map build --profile
   main` rather than overwriting an old one.
   Move smoke (#32): one check pair per fighter pair, `gate-moves-NN` and
-  `gate-specials-spot-NN` for NN 01-13 (smashcraft:ts/scripts/wisp/smokeShards.ts),
+  `gate-specials-spot-NN` for NN 01-13 (makgora:ts/scripts/wisp/smokeShards.ts),
   so each shard is one session and one match that fits a 5-minute native run.
   `bun wisp smoke --native --pair K [--map CANDIDATE.w3x] [--shard N...]`
   runs every shard on the green candidate (the commit `play --install-green`
@@ -36,7 +36,7 @@
   lease held only while that run lasts; the run is stopped at 280 s and the
   lease released, so no shard holds the clients or the lease 5 minutes,
   writes each report under
-  `~/.local/state/smashcraft/green-builds/accept/SHA256/classic/gate-moves-NN/`
+  `~/.local/state/makgora/green-builds/accept/SHA256/classic/gate-moves-NN/`
   where the green install reads it, prints and saves the per-move table
   `smoke.md` beside them, and exits nonzero on a crash, a stopped run, a dead
   key or a move that fails to start. A lease the helper has not reserved
@@ -50,7 +50,7 @@
   striker's smash lands on that opponent headless, so a frame of key timing
   either way still lands it. The match ends from
   the pause menu, and its own replay is judged headless
-  (smashcraft:ts/scripts/wisp/smokeJudge.ts): the replay must reach every
+  (makgora:ts/scripts/wisp/smokeJudge.ts): the replay must reach every
   recorded checksum, every key must reach the game and every move must start,
   or the shard fails. `match-NN.tsv` lists each key and move with its
   verdict, and `match-NN.json` its dead bindings and moves that did not start;
@@ -58,7 +58,7 @@
   in `restart` and the Run column when the pair was restarted (the native smoke
   restarts a dropped pair before each shard's 280 s budget starts), and whether the shard
   crashed, written when that shard finishes, and `play --install-green`, which runs this smoke on each candidate,
-  refuses any of the three whatever `SMASHCRAFT_GREEN_GATE` says. A `--shard`
+  refuses any of the three whatever `MAKGORA_GREEN_GATE` says. A `--shard`
   run replaces only its own shards' `smoke.json`, so runs of a few shards on
   several pairs together smoke a whole candidate; the install refuses a shard
   with none. `smoke.md` is the last run's table.
@@ -77,7 +77,7 @@
   rest between training resets the host frame's bright play-area pixels are
   counted, and a special or ultimate fails when the next rest is brighter than
   the rest before it by more than three times the largest rest-to-rest change
-  of the normals (smashcraft:ts/scripts/wisp/specialsSpot.ts). Training mode
+  of the normals (makgora:ts/scripts/wisp/specialsSpot.ts). Training mode
   has no orbs and the count skips the HUD band.
   `--map MAP.w3x` uses that already-built candidate for the selected checks
   without rebuilding it; select checks needing the same build profile. Each
@@ -86,16 +86,16 @@
   --only '422-*'`, with a map from `bun wisp map build --profile showcase`,
   runs `-dev showcase start`, `spawn` and `clear` three times in one session
   on client a, each pad receipt within 3 s, and keeps a frame after each
-  spawn and clear (smashcraft:ts/scripts/wisp/showcaseChecks.ts). A solo
+  spawn and clear (makgora:ts/scripts/wisp/showcaseChecks.ts). A solo
   run has no client watch, and on a native-driver map its dev commands go
   through the driver channel (`bun scripts/showcase.ts send`), because Wisp
   types chat only into a match the watch reports.
   Render cadence: `-dev render-clock` in a development map records timer
   callback bursts and cost; `bun wisp accept --only 169-render-clock --dry-run`
-  prints its native plan (smashcraft:docs/high-refresh.md).
+  prints its native plan (makgora:docs/high-refresh.md).
   `-dev camera-smooth on|off` compares native one-frame camera transitions
   with the normal camera in the same development map; it keeps the simulated
-  camera unchanged (smashcraft:docs/high-refresh.md).
+  camera unchanged (makgora:docs/high-refresh.md).
   `bun scripts/cameraDraw.ts --video PRIVATE.mkv --pages DATA_DIR --out PRIVATE_DIR
   [--slot 0 --run 1 --viewport X,Y,W,H]` joins lossless compositor frames and
   their original timestamps to the response marker and exported callback rows.
@@ -103,4 +103,4 @@
   key input and pooled presentation with developer setup commands. In a match,
   `-dev capture 18000` writes every client's raw callback samples; read full-run
   median/p95/p99/worst with Wisp's capture reader. Procedure and limits:
-  smashcraft:docs/native-bot-session.md, "Raw playable cost captures".
+  makgora:docs/native-bot-session.md, "Raw playable cost captures".

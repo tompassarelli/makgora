@@ -11,7 +11,7 @@ These come from Tom's playtests and hold for every later take; a pass that seems
 
 ## References (private, outside Git)
 
-`~/.local/share/smashcraft-stage-design-frozen-throne/references/`:
+`~/.local/share/makgora-stage-design-frozen-throne/references/`:
 
 - `tom-134.png`: Warcraft-style concept: a throne on an ice spire behind the deck, a snowy stair, chained pillars, two curved bone arches, aurora in a storm sky, falling snow, a mist vortex below the deck, a thick carved ice slab.
 - `tom-135.png`: first concept: gothic Icecrown towers either side, ice spires, runed platforms, moon and aurora.
@@ -60,11 +60,11 @@ The throne is a dark high-backed chair on the spire's dais, centred behind the d
 - The cyan crystals moved behind the chair (y 2450 to 2550); in front of it their translucent glow washed the chair out.
 - `matrixScale` order for these floes is depth, lateral, height (lateral is the second entry).
 - Checks: `bun tools/stage/contrast.ts --stock-light 2` passes; `headlessSeparation.ts` reports the same negative band gap as before the change on every row, and a smaller one on all twelve rows compared (it fails on origin/main too and is not the landing gate).
-- Captures: before and after, both pair orders, in the Wisp native window and the headless renderer under `~/.local/state/smashcraft/shots/ft-throne/`.
+- Captures: before and after, both pair orders, in the Wisp native window and the headless renderer under `~/.local/state/makgora/shots/ft-throne/`.
 
 ## Stair in-game capture (#897)
 
-The restored stair was captured in a real Warcraft III pool pair at near match zoom, Shadow Hunter first and Chen Stormstout first, on the checkout's development map (31 Oct 2026; `bun wisp accept --only '897-*' --pair K --map STAGED.w3x`, frames in `~/.local/state/smashcraft/shots/ft-stair-ingame/` on gex45). One cold viewer in a fresh session saw the ice tiers rising from the deck's back edge to the throne block but called the link weak (the tiers meet the throne base without a landing, and two thin floating ice slivers connect to nothing), and said the fighters are not the clearest shapes: the cyan crystals behind the throne, the two skull braziers and the arch are brighter than the small, low fighters. The fighters-first half of the box is open.
+The restored stair was captured in a real Warcraft III pool pair at near match zoom, Shadow Hunter first and Chen Stormstout first, on the checkout's development map (31 Oct 2026; `bun wisp accept --only '897-*' --pair K --map STAGED.w3x`, frames in `~/.local/state/makgora/shots/ft-stair-ingame/` on gex45). One cold viewer in a fresh session saw the ice tiers rising from the deck's back edge to the throne block but called the link weak (the tiers meet the throne base without a landing, and two thin floating ice slivers connect to nothing), and said the fighters are not the clearest shapes: the cyan crystals behind the throne, the two skull braziers and the arch are brighter than the small, low fighters. The fighters-first half of the box is open.
 
 ## Take 4 status
 
@@ -74,8 +74,8 @@ Tom's native-window playtest (2026-11-01, map 0.3-dev.702) found the skull pilla
 - The magenta clusters were the braziers' particle flame. Classic draws it as a few small dim dots in the emitter's own magenta; the native window draws a dense column of large bright puffs. That is a Wisp emitter-scale difference, recorded on wisp#178; Classic does not tint particles by the effect colour, so tinting them is not the fix.
 - The translucent shards were the eight crystals; they are removed (layer 8).
 - The throne was hidden behind the top platform's thick dark stem and matched the sky. The chair is pale ice, and the centre stem is as slim as the side stems (matrix scale 0.5 across), so the high back, arms and crown read on either side of it.
-- Captures: `~/.local/state/smashcraft/shots/throne-window/` (before-near, after-near, after2-near; native window, near match camera).
+- Captures: `~/.local/state/makgora/shots/throne-window/` (before-near, after-near, after2-near; native window, near match camera).
 
 ## Take 5 status
 
-Tom's playtest (2026-11-01) undid two misreads. The platform stems (take 2) and the slim centre stem (take 4) are gone: the platforms float (hard rule 1). The skull pillars take 4 deleted are back, grounded on the stair's top step and chained (hard rule 2, layer 7). Chain0 draws about 250 units above its model extents at scale 5 in the native window, so its height was set from captures, not from its bounds. Captures: `~/.local/state/smashcraft/shots/throne-window-fix/take5-near.png` and `take5-far.png` (native window, near and far match camera).
+Tom's playtest (2026-11-01) undid two misreads. The platform stems (take 2) and the slim centre stem (take 4) are gone: the platforms float (hard rule 1). The skull pillars take 4 deleted are back, grounded on the stair's top step and chained (hard rule 2, layer 7). Chain0 draws about 250 units above its model extents at scale 5 in the native window, so its height was set from captures, not from its bounds. Captures: `~/.local/state/makgora/shots/throne-window-fix/take5-near.png` and `take5-far.png` (native window, near and far match camera).

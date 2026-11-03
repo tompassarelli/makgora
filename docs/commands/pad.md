@@ -3,14 +3,14 @@
 - Scripted pad: `bun wisp pad SCRIPT --helper BINARY --build BUILD --out DIR
   --app-id a=ID --app-id b=ID [--chat=TEXT] [--map MAP.w3x [--retries N]]` plays timed virtual-pad input
   through each client's real helper and reports the frame each edge landed on
-  (script syntax: smashcraft:ts/scripts/integrity/padScript.ts). It copies
+  (script syntax: makgora:ts/scripts/integrity/padScript.ts). It copies
   fresh selected-pair setup receipts to `DIR/setup.json` before the first edge;
   missing chat entry or requested setup is INVALID at that client and boundary,
   with no input timeline started (Wisp's observed chat/command receipt helpers).
   the clients' input traces, scene reports and moments beside the result;
   captures require the requested frame in both drawn receipts, otherwise the
   run is INVALID with retained captures and the first failed boundary in its report
-  (smashcraft:docs/native-bot-session.md, "Native checks by parity");
+  (makgora:docs/native-bot-session.md, "Native checks by parity");
   a scripted quick match holds each requested pose locally through the capture
   while inputs and simulation continue; `held visual` images are not timing evidence;
   a desynced, crashed or early-ended run is INVALID and, with --map, rerun.
@@ -21,8 +21,8 @@
   Headless checks hold the script's capture frames even without `--render`,
   so brief spell cues are observed before play resumes.
   It passes a native run when checksums, fighter
-  lines and the script's `#!` expectations match (smashcraft:docs/native-bot-session.md,
-  "Native checks by parity"; issue scripts in smashcraft:ts/test/native/pads/).
+  lines and the script's `#!` expectations match (makgora:docs/native-bot-session.md,
+  "Native checks by parity"; issue scripts in makgora:ts/test/native/pads/).
   Comparisons preflight the existing View replay export before starting helpers
   or native sessions: hold at least 60 frames and release (normally 70), after
   the last capture to preserve authored action frames. Missing exports fail
@@ -37,7 +37,7 @@
   Never loop `bun wisp fresh` + `bun wisp pad` per script (about a minute a
   script); `--fresh-each` exists only to measure that. `bun wisp pad
   SCRIPT|DIR... --headless ...` plays the same batch in one headless session
-  (smashcraft:docs/native-bot-session.md, "Many scripts in one game"),
+  (makgora:docs/native-bot-session.md, "Many scripts in one game"),
   beside `--headless-jobs` reference runs; each realtime process takes about
   1.1 cores (1.6 peak), so lease `heavy` with `--headless-jobs 2`: starved
   processes start scripts late ("helpers reported the match at frame N").

@@ -7,7 +7,7 @@
   file only through other modules are counted and left to the landing gate.
   The whole-project `bun run check` is not part of the loop: pre-push runs it.
   Add `--data A --data B` to also hot-reload both clients as `hot --watch`
-  does. smashcraft:ts/scripts/wisp/commands/dev.ts declares the files tests
+  does. makgora:ts/scripts/wisp/commands/dev.ts declares the files tests
   read at run time (`tests.reads`, which for a test with a computed `import()`
   also names the modules it loads), the journey tests, the per-file
   source-shape audit and the per-test timeout the complete test run uses. A

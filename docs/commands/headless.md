@@ -9,7 +9,7 @@
   and `WC3_STORAGE`; stock caches follow that installation's `.build.info`, so
   updated game art is extracted again. `WC3_ASSET_MANIFEST=FILE` records the build
   and SHA256 of every returned asset for a comparison. `WC3_TEXTURES` reuses extracted PNGs
-  (smashcraft:docs/player-view.md).
+  (makgora:docs/player-view.md).
 
 - Text match: `bun wisp headless text-match [--seed N] [--you SLUG] [--cpu SLUG] [--level rookie|beginner|intermediate|advanced|expert] [--stage NAME] [--delay N] [--every N] [--frames N] [--stocks N] [--minutes N] [--input FILE]`
   plays one seeded match in the pure simulation (no Warcraft runtime) where
@@ -29,6 +29,6 @@
   plus `--delay` (default 4). The whole input is read before the match starts,
   so an agent that plays turn by turn re-runs the match with the file grown by
   its latest lines; determinism makes the earlier frames identical. Core:
-  smashcraft:ts/scripts/textMatchView.ts (parsing, delay, the line format),
-  driver: smashcraft:ts/scripts/textMatch.ts. Issue: #407.
+  makgora:ts/scripts/textMatchView.ts (parsing, delay, the line format),
+  driver: makgora:ts/scripts/textMatch.ts. Issue: #407.
 

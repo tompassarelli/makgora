@@ -4,7 +4,7 @@ Jaina is a zoner: she gives up ground speed and close-range pressure for a
 straight frost bolt, a delayed patch of Blizzard and a destructible Water
 Elemental. The opponent can jump the bolt, leave the marked patch or hit the
 elemental; Jaina must choose which route to cover. Every number below is an
-original provisional Smashcraft value except the explicitly named body facts.
+original provisional Mak'gora value except the explicitly named body facts.
 
 ## Sources and body
 
@@ -17,7 +17,7 @@ uses the Reign of Chaos campaign model `units\\human\\Jaina\\Jaina.mdl`, the
 Water Elemental, and existing Warcraft spell effects and sounds.
 
 Her physical counterpart is [NTSC Melee Zelda][zelda]: weight **90**, run
-speed **1.1**, air speed **0.95** in Smash units. Smashcraft's body multipliers
+speed **1.1**, air speed **0.95** in Smash units. Mak'gora's body multipliers
 are therefore weight `90/75 = 1.2`, run `1.1/2.2 = 0.5`, air `0.95/1 = 0.95`.
 Width is 0.90 and height 1.05 of the reference body. Shared jump, gravity,
 dodge and ledge rules remain the roster defaults. A slow run makes a lost
@@ -119,7 +119,7 @@ before the opponent enters it, not trapping input or winning trades.
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A zoner: she gives up ground speed and close pressure for spells at range.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). A zoner: she gives up ground speed and close pressure for spells at range.
 
 ```balance-profile
 fighter: jaina-proudmoore

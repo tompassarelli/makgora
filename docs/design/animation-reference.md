@@ -1,11 +1,11 @@
 # Fighter animation reference library
 
-Public sources for authoring Smashcraft fighter animation: silhouettes,
+Public sources for authoring Mak'gora fighter animation: silhouettes,
 anticipation/contact/recovery, drills, defensive movement, grabs and throws,
-and the nine damage reactions. Use them for study. Smashcraft motion is
+and the nine damage reactions. Use them for study. Mak'gora motion is
 authored originally on licensed Warcraft rigs. The authoring standard and
-procedure are in the `smashcraft` skill
-(north:harness/skills/smashcraft/references/animation.md, whose
+procedure are in the `makgora` skill
+(north:harness/skills/makgora/references/animation.md, whose
 animation-library.md records the Sakurai hitstop article in detail). The
 tools and checks are in [fighter animation work](../fighter-animation-work.md).
 
@@ -25,7 +25,7 @@ tools and checks are in [fighter animation work](../fighter-animation-work.md).
 - **Videos, game footage, frame-data GIFs and thumbnails** are copyrighted by
   their owners. Link to them; never commit them.
 - **Private pixels.** Downloaded stills, GIFs and recordings stay in
-  `~/.local/share/smashcraft-animation-reference/`, outside every Git tree.
+  `~/.local/share/makgora-animation-reference/`, outside every Git tree.
   Record each one's source URL, frame or timestamp and purpose next to the
   file. Never commit frames, contact sheets or traced poses from these
   sources, and never import Nintendo models, animation data or decompiled
@@ -57,7 +57,7 @@ tools and checks are in [fighter animation work](../fighter-animation-work.md).
 
 | Source | Where | What it shows | Use |
 | --- | --- | --- | --- |
-| [Fox (SSBM)/Down aerial, SmashWiki rev. 1940996](https://www.ssbwiki.com/index.php?title=Fox_(SSBM)/Down_aerial&oldid=1940996) | Overview, Timing | An airborne drill with the feet leading and the body spinning. Seven hit pulses at frames 5–6, 8–9, …, 23–24. | Body turn with a leading limb across a repeated active window. Smashcraft keeps its own frames. |
+| [Fox (SSBM)/Down aerial, SmashWiki rev. 1940996](https://www.ssbwiki.com/index.php?title=Fox_(SSBM)/Down_aerial&oldid=1940996) | Overview, Timing | An airborne drill with the feet leading and the body spinning. Seven hit pulses at frames 5–6, 8–9, …, 23–24. | Body turn with a leading limb across a repeated active window. Mak'gora keeps its own frames. |
 | [Ultimate Frame Data: Fox](https://ultimateframedata.com/fox) | down air and down air landing entries (GIFs) | Down air with hits starting on frames 5/8/11/14/17/20/23 of 49, shown as hitbox GIFs. | The drill's phases frame by frame. GIFs are reference only. |
 
 ## Defensive movement
@@ -87,7 +87,7 @@ tools and checks are in [fighter animation work](../fighter-animation-work.md).
 
 | Source | Where | What it shows | Use |
 | --- | --- | --- | --- |
-| [Flinch, SmashWiki rev. 1885379](https://www.ssbwiki.com/index.php?title=Flinch&oldid=1885379) | introduction; the paragraph on flinching animations | Grounded flinches come in three heights (high, central, low) by the hurtbox struck and three strengths by knockback: nine animations named DamageHi1–3, DamageN1–3 and DamageLw1–3. A high hit rears the head back and a low hit kneels. Airborne hits use three strength-only animations; launches use separate flying animations. | The primary reference for Smashcraft's 3×3 grid. Smashcraft's height and strength thresholds are its own (see [Contact pain poses](../fighter-animation-work.md#contact-pain-poses)). |
+| [Flinch, SmashWiki rev. 1885379](https://www.ssbwiki.com/index.php?title=Flinch&oldid=1885379) | introduction; the paragraph on flinching animations | Grounded flinches come in three heights (high, central, low) by the hurtbox struck and three strengths by knockback: nine animations named DamageHi1–3, DamageN1–3 and DamageLw1–3. A high hit rears the head back and a low hit kneels. Airborne hits use three strength-only animations; launches use separate flying animations. | The primary reference for Mak'gora's 3×3 grid. Mak'gora's height and strength thresholds are its own (see [Contact pain poses](../fighter-animation-work.md#contact-pain-poses)). |
 | Sakurai, [Damage Animations](https://www.youtube.com/watch?v=0xHE3ypX96U) (4:11, 2023-08-29) | whole video | Description: damage animations are feedback to the player, and each body type needs its own. Tom picked the Captain Falcon high/mid/low × small/medium/large comparison in this video as the nine-pose brief. | Author per fighter; do not use one generic flinch. |
 | Mike Jungbluth, [Anatomy of a Hit Reaction](https://www.youtube.com/watch?v=PSm4MZsDgJA) (Konsoll talk, 57:35, uploaded 2017-03-22) | whole video | Ways to convey impact through animation, effects, sound and UI, for synced and unsynced combat (Shadow of Mordor, Elder Scrolls Online). | The reaction pose as one part of impact feedback. |
 | GDC 2017 Animation Bootcamp, [Tricks of the Trade](https://www.youtube.com/watch?v=VIgHW4ddHLc) (38:34) | page chapters: 16:28 hit reactions and body mechanics | A micro-talk on hit reactions and body mechanics. | Reacting through the whole body, not one joint. |
@@ -102,7 +102,7 @@ tools and checks are in [fighter animation work](../fighter-animation-work.md).
 | [Crouch, SmashWiki](https://www.ssbwiki.com/Crouch) (edited 2026-03-01) | introduction; character differences | Crouching shortens the hurtbox. Kirby, Jigglypuff, Snake, Sheik and Wii Fit Trainer nearly hug the ground; Meta Knight, Bowser and Pac-Man barely lower, and large fighters such as Donkey Kong gain little. | A crouch reads by a lower silhouette; how low is per body, but it must visibly drop. |
 | [Double jump, SmashWiki rev. 2062038](https://www.ssbwiki.com/index.php?title=Double_jump&oldid=2062038) | animations; delayed and multiple jumps | "Most characters twist or flip": Mario and Luigi spin, and backflip on a backward jump. Kirby, Jigglypuff and King Dedede inflate; Meta Knight, Charizard, Pit, Bayonetta and Ridley beat wings; Ness, Mewtwo and Lucas pause and rise (Peach in Melee too). Multi-jumpers turn 180 degrees between jumps. | Flips are the default, not the rule; the body and personality pick the style. |
 
-**Ledge hang.** Smashcraft holds a hanging fighter 90 units below the deck
+**Ledge hang.** Mak'gora holds a hanging fighter 90 units below the deck
 and 24 out, facing the stage, inside its standing hurt capsule. The hang
 shows the grip (hands, claws or weapon) at the ledge corner, the body
 below it, and the face toward the stage. A tall fighter reaches it with
@@ -113,7 +113,7 @@ reads as a held state rather than a frozen frame.
 **Crouch.** A crouch drops the silhouette clearly below standing at the
 far gameplay camera: hips down, knees bent, chest forward, head lowered.
 A legless or mounted body crouches by lowering and hunching its torso.
-Smashcraft's crouch clip enters quickly and holds the low pose.
+Mak'gora's crouch clip enters quickly and holds the low pose.
 
 **Double jump.** The midair jump must differ from the first jump in
 silhouette. Flips suit acrobats; heavy, armoured or mounted bodies tuck,
@@ -162,11 +162,11 @@ Jump physics and counts are unchanged; only the body's gesture differs.
 | MasterWarlord, [Warcraft 3 Model Ripping, Conversion, and Animation Transfer Process](https://www.youtube.com/watch?v=EWexatHhd6M) (35:11, 2024-11-26) | page chapters: 17:34 animation transfer; 26:18 automating animations | Moving animations between Warcraft rigs. | Background for reusing donor motion on another rig. |
 | Retera, [How to Mirror Animations](https://www.youtube.com/watch?v=-r9Q5VYLpXI) (1:27, 2018-05-26) | whole video | Mirroring a Warcraft animation. | Checking both facings. |
 
-## Smashcraft's own numbers
+## Mak'gora's own numbers
 
-Timings come from Smashcraft's existing data, not from the videos:
-smashcraft:references/melee-frame-data/records.jsonl and
-smashcraft:docs/smash-melee-reference/. In particular,
+Timings come from Mak'gora's existing data, not from the videos:
+makgora:references/melee-frame-data/records.jsonl and
+makgora:docs/smash-melee-reference/. In particular,
 the recorded design targets records
 measured grounded damage. An animation repair never changes action timing,
 hit regions or balance.

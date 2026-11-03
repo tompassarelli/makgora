@@ -5,15 +5,15 @@ tool for every situation and none of them the best in its class. He replaced
 Forsaken Paladin as character code 27 on 28 October 2026, at Tom's request;
 code 7 is retired. The plan and its Melee anchors are in
 [roster-next.md](roster-next.md#uther-the-lightbringer-replaces-forsaken-paladin).
-Every number below is an original, provisional Smashcraft value to tune.
+Every number below is an original, provisional Mak'gora value to tune.
 
 ## Body and model
 
 - Model: the stock Classic `units\human\Uther\Uther.mdl` at match scale 1.1,
   portrait `BTNHeroPaladin`. Its 13 stock sequences are kept; every attack,
   special, movement, recovery, throw and pain clip is authored by
-  smashcraft:tools/animations/uther-clips.ts on the canonical rig mapping in
-  smashcraft:tools/animations/rigs/uther.ts.
+  makgora:tools/animations/uther-clips.ts on the canonical rig mapping in
+  makgora:tools/animations/rigs/uther.ts.
 - Body: weight 106/75, run 0.86, air 0.84 (slow drift), width 1.08, height 1.02, one aerial jump.
 - Strengths: neutral flexibility and durability. Weaknesses: no long-range
   pressure, and a slow air drift that makes his recovery readable.

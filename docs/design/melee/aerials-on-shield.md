@@ -29,7 +29,7 @@ A hit on a shield puts the defender in shieldstun. SmashWiki "Shield" gives it
 for a full press as (damage × <!-- v:aos.stunFactor -->0.45<!-- /v --> +
 <!-- v:aos.stunBase -->2<!-- /v -->) × 200/201 frames, where damage is the
 largest hit that frame; a lighter shield takes more stun, more pushback and
-has a smaller bubble (smashcraft:docs/melee-analog-shield.md). Truncated to
+has a smaller bubble (makgora:docs/melee-analog-shield.md). Truncated to
 whole frames, this reproduces meleeframedata.com's shieldstun
 (references/melee-frame-data/records.jsonl, `stun`) for
 <!-- v:aos.agree -->398 of 412<!-- /v --> attacks

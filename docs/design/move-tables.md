@@ -1,6 +1,6 @@
 # Move tables
 
-Design for [#408](https://github.com/tompassarelli/smashcraft/issues/408):
+Design for [#408](https://github.com/tompassarelli/makgora/issues/408):
 fighter moves as compact numeric tables read by one small interpreter, in place
 of per-move code. It measures today's move code, proposes the table format and
 the interpreter loop, sets the determinism rules and picks the first fighter.

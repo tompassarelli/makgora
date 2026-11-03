@@ -1,19 +1,19 @@
 # Durotar, Naxxramas and Hellfire scenery
 
-The compositions in smashcraft:ts/src/game/presentation/patrolStageScenery.ts
+The compositions in makgora:ts/src/game/presentation/patrolStageScenery.ts
 give each stage one recognizable landmark and a quieter approach beneath it.
 The fighting deck owns the central silhouette. Scenery remains presentation;
 collision, patrol paths, lighting and fog belong to their existing owners.
-The shared principles are in smashcraft:docs/design/stage-art.md.
+The shared principles are in makgora:docs/design/stage-art.md.
 
 ## Visual references and rights
 
 Reference images were downloaded on 7 October 2026 into private storage at
-~/.local/share/smashcraft-stage-design-178/references/. They are copyrighted
+~/.local/share/makgora-stage-design-178/references/. They are copyrighted
 game screenshots, retained for visual research only; neither SmashWiki's text
 license nor public availability grants a license to incorporate their art.
 No screenshot pixels, textures, models, code or recognizable architectural
-designs are copied into Smashcraft. These compositions use the existing
+designs are copied into Mak'gora. These compositions use the existing
 Warcraft buildings, rocks and props with measured model bounds. The borrowed
 ideas are depth separation, relative scale and allocation of empty space.
 
@@ -84,7 +84,7 @@ the Outland rocks and spires 1.5 to 2 times the Classic size (the Reforged
 spire is 404 by 401 by 465 units, the Classic one 242 by 311 by 458; the
 Reforged gate 525 by 568 by 662), so a clearing was cut in front of the gate
 sized from the Reforged extents, kept in `REFORGED_BOUNDS` of
-smashcraft:ts/scripts/stageViewRules.ts: no piece in front of the gate
+makgora:ts/scripts/stageViewRules.ts: no piece in front of the gate
 overlaps its screen box at the near or far camera extreme. The mid spires at
 y 4400 to 4700 stand outside x ±2500, the three large spires that stood
 beside the gate at y 6600 to 6900 now stand behind it at y 7900 to 8100, and
@@ -106,12 +106,12 @@ an object's apparent horizon position. Scenery height is therefore chosen
 together with depth, rather than from z alone. Near pieces sit low and outside
 the deck's centre, while landmarks occupy the far band. Model meshes and
 particle reaches must stay behind the complete fighting volume in every
-declared camera, as enforced by smashcraft:ts/test/player-view.test.ts.
+declared camera, as enforced by makgora:ts/test/player-view.test.ts.
 The figure ban and asymmetry constraints are enforced by
-smashcraft:ts/src/game/presentation/stageScenery.tests.ts.
+makgora:ts/src/game/presentation/stageScenery.tests.ts.
 
 All selected models already have measured facts in
-smashcraft:ts/scripts/wisp/model-facts/; the depth pass (18 Oct) measured
+makgora:ts/scripts/wisp/model-facts/; the depth pass (18 Oct) measured
 its new stock Classic models there. These changes require no model imports or
 generated textures. Stage fog remains at its declared settings;
 lighting and fog tuning are separate from this composition.

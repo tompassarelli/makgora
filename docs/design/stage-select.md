@@ -1,16 +1,16 @@
 # Stage select
 
 How other platform fighters present stage select, and the card every
-Smashcraft stage gets on the stage panel (#304). The cards are generated from
+Mak'gora stage gets on the stage panel (#304). The cards are generated from
 the current stage data, so they never go stale: after a stage changes,
 `bun scripts/stageThumbnails.ts --stage NAME` from ts/ regenerates that stage's
-card, and smashcraft:ts/test/stage-thumbnails.test.ts fails, printing that
+card, and makgora:ts/test/stage-thumbnails.test.ts fails, printing that
 command, until it has run.
 
 ## References
 
 Screenshots are kept privately, with exact URLs and SHA-256 in `provenance.txt`,
-under `~/.local/share/smashcraft-stage-design-178/references/` (copyrighted;
+under `~/.local/share/makgora-stage-design-178/references/` (copyrighted;
 private visual study only, no pixels reused).
 
 | Game | File | Source |
@@ -34,14 +34,14 @@ What they do:
   fills the right two-thirds; the left side shows the stage's outline and
   blast-zone numbers; the name in bold italics over a translucent band.
 
-What Smashcraft takes: one picture per stage framed the same way on every
+What Mak'gora takes: one picture per stage framed the same way on every
 card (Ultimate), the selected stage large beside the grid (Ultimate, Rivals),
 and a drawn outline of the stage's layout (Rivals), so a player reads the
 platforms before picking; the outline is not drawn now (below).
 
 ## The card
 
-Every card has the same two parts (smashcraft:ts/src/game/ui/stageCard.ts):
+Every card has the same two parts (makgora:ts/src/game/ui/stageCard.ts):
 
 1. **Picture**, a square: Warcraft's own campaign loading art for the stage's
    zone, or for a stage with none, a render of the stage from its hero camera
@@ -106,16 +106,16 @@ are 3D scenes, not pictures. Neither is used.
 | Ahn'Qiraj | hero render `StageCardAhnQiraj.blp` (no Silithus art) | imported | 42,372 |
 | Sky Deck (test) | hero render `StageCardSkyDeck.blp` | imported | 18,045 |
 
-smashcraft:ts/src/game/menu/stageCatalog.ts names each picture;
-smashcraft:docs/design/map-size.md records the import bytes.
+makgora:ts/src/game/menu/stageCatalog.ts names each picture;
+makgora:docs/design/map-size.md records the import bytes.
 
 ## Hero renders
 
-For the four stages without zone art, smashcraft:ts/scripts/stageThumbnails.ts
+For the four stages without zone art, makgora:ts/scripts/stageThumbnails.ts
 plays a headless quick match on the stage with items off at the widest camera
 (`-dev view far`), captures frame 80, and re-draws that scene with the headless
-renderer (smashcraft:docs/player-view.md) without fighters, HUD or menus from
-the stage's hero camera (smashcraft:ts/scripts/stageThumbnailSpec.ts,
+renderer (makgora:docs/player-view.md) without fighters, HUD or menus from
+the stage's hero camera (makgora:ts/scripts/stageThumbnailSpec.ts,
 `HERO_CAMERAS`):
 
 - rotation 80 (10 degrees off the gameplay view, showing the deck's side),
@@ -127,14 +127,14 @@ the stage's hero camera (smashcraft:ts/scripts/stageThumbnailSpec.ts,
   gradient from the stage's fog colour at the horizon to 35% of it at the top;
   then `-modulate 100,94,100 -sigmoidal-contrast 2.5x42%`.
 - Format: opaque BLP1 with JPEG content at quality 82, one level, written by
-  the portraits' encoder (smashcraft:ts/scripts/blp.ts, #307): Warcraft reads a
+  the portraits' encoder (makgora:ts/scripts/blp.ts, #307): Warcraft reads a
   BLP's JPEG as raw B, G, R, A components with no colour transform, which
   general encoders don't write (ImageMagick's four-component JPEG is YCCK).
 - Budget: under 1 MB for all pictures together (8 Oct: 122,043 bytes).
 
 Each picture is stored in the build-input store
-(smashcraft:docs/build-inputs.md) under its own SHA-256, at
-`stage-cards/SHA256`; smashcraft:ts/stage-thumbnails.json records each one's
+(makgora:docs/build-inputs.md) under its own SHA-256, at
+`stage-cards/SHA256`; makgora:ts/stage-thumbnails.json records each one's
 bytes, SHA-256 and the hash of its own stage's inputs, and the map build
 imports each card by that hash.
 
@@ -144,13 +144,13 @@ Stage select uses fighter select's frame ([fighter-portraits.md](fighter-portrai
 "Select screen frame"), so switching between the two screens moves nothing at
 the top or bottom (Tom asked on 2026-11-02, from a wireframe, for stage select
 to match the new fighter select). Its bar sits on the same band and the same
-boxes (`STAGE_BAR` in smashcraft:ts/src/game/core/selectBarLayout.ts): `<  BACK`
+boxes (`STAGE_BAR` in makgora:ts/src/game/core/selectBarLayout.ts): `<  BACK`
 where Back is, Hazards and Orbs as an attached pair where Mode and Teams are,
 lit gold while on, the rules line in the rules pill, Stage pool across the
 Guide and gear boxes, and `START` with its key (Y, or A on a journal pad).
 Below it the body holds two equal framed boxes side by side
 (`STAGE_PREVIEW_BOX` and `STAGE_LIST_BOX` in
-smashcraft:ts/src/game/core/selectScreenLayout.ts): the chosen stage's name,
+makgora:ts/src/game/core/selectScreenLayout.ts): the chosen stage's name,
 preview card and description at the left, and the stage list at the right,
 headed Choose a stage, its tiles in three columns at the largest size that
 fits. The bottom row is fighter select's own chat slot and four cards, which
@@ -165,7 +165,7 @@ helper; NAME is the catalog name, such as `--stage "Gryphon Aerie"`): it
 re-renders that stage's picture if it has one,
 stores it and rewrites only that stage's row of ts/stage-thumbnails.json;
 commit both files with the stage change. Without `--stage` it redraws every
-stage (about a minute). smashcraft:ts/test/stage-thumbnails.test.ts fails,
+stage (about a minute). makgora:ts/test/stage-thumbnails.test.ts fails,
 naming the stage and printing its `--stage` command, when a selectable stage
 has neither zone art nor a recorded render, when a rendered stage's own inputs
 (its scenery, its placed pieces with their mood colours, terrain, decks, scenery models and surfaces,

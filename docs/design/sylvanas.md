@@ -6,7 +6,7 @@ temporarily removes offensive specials while leaving movement, normals,
 defense and recovery available. She wins through spacing and a read, with
 short melee reach and punishable casts when that read misses.
 
-This is the original #224 kit. Numbers are provisional Smashcraft tuning;
+This is the original #224 kit. Numbers are provisional Mak'gora tuning;
 references supply character identity and decision structure, not copied
 hitboxes, animations or code. Frames below count entry as frame 1, with
 inclusive active windows. H is the shared 132-unit design height.
@@ -24,7 +24,7 @@ supplies the spirit and Possession identity.
 
 The named physical counterpart is
 [Ultimate Pit](https://www.ssbwiki.com/Pit_(SSBU)): weight **96**, run **1.828**
-Smash units/frame and maximum air speed **0.935**. Smashcraft uses six world
+Smash units/frame and maximum air speed **0.935**. Mak'gora uses six world
 units per Smash unit: run 10.968 and air 5.61. Hero body multipliers are
 96/75 weight, 1.828/2.2 run and 0.935 air. Width 0.90 and height 1.00 are
 original visual choices. The shared jump, gravity and dodge rules remain.
@@ -133,7 +133,7 @@ measurement and completed roster presentation.
   sequences preserved, nine distinct pain poses. Held poses stay fixed;
   moving actions move the visible body. Both-facing side-view sheets cover
   each action. The down-air contact is a vertical inverted bow strike.
-- Private model: `~/.local/share/smashcraft-build-inputs/sylvanas224-20261008/authored/hero-models/evilsylvanas.mdx`.
+- Private model: `~/.local/share/makgora-build-inputs/sylvanas224-20261008/authored/hero-models/evilsylvanas.mdx`.
   The combined asset publication owns its clip pool, white flash and model facts.
 
 [ranger]: https://liquipedia.net/warcraft/Dark_Ranger
@@ -151,7 +151,7 @@ measurement and completed roster presentation.
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A bow fighter who keeps distance.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). A bow fighter who keeps distance.
 
 ```balance-profile
 fighter: sylvanas-windrunner

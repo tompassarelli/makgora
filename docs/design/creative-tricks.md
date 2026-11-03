@@ -1,17 +1,17 @@
 # Creative tricks: what the best maps do with native tools
 
 The tricks that make good Warcraft III maps look better than players expect
-from the engine, and how a Smashcraft stage can use each one. The source is
+from the engine, and how a Mak'gora stage can use each one. The source is
 Blizzard's own 3.0 maps in the installed client, plus dated Hive Workshop
 threads and contests. [Visual quality](visual-quality.md) lists the renderer
-levers and what Smashcraft has measured about them.
+levers and what Mak'gora has measured about them.
 [Stage art](stage-art.md) holds the composition rules every trick must obey:
 fighters first, no creatures, an ambient motion budget and no ground under the
 deck. This page lists ways to use those levers that players won't see coming.
 
 Researched 8 Oct 2026. Blizzard files were read from the installed
 3.0.1.24342 storage with the CascLib extractor
-(smashcraft:tools/animations/casc-extract.cpp), a CascLib file listing
+(makgora:tools/animations/casc-extract.cpp), a CascLib file listing
 (175,416 entries) and Wisp's map packer (`map-pack extract`). Those files are:
 
 - **Silverpine Sprint:** `Maps\ForsakenKingdom\Scenario\(1)SilverpineSprint.w3x`.
@@ -38,7 +38,7 @@ gives its page's own date.
 ★ marks the five picks for the Tomb of Sargeras showcase (#299), explained in
 [The five for the Tomb](#the-five-for-the-tomb-of-sargeras).
 
-| # | Technique | Bytes | Best Smashcraft use |
+| # | Technique | Bytes | Best Mak'gora use |
 | --- | --- | --- | --- |
 | 1 ★ | Stock animation driven by the match clock | 0 | The Temple of Tides rising; the sea level following the tide |
 | 2 ★ | A current that runs backwards: signed time scale | 0 | Foam and falls that reverse with the tide |
@@ -62,10 +62,10 @@ gives its page's own date.
 
 ### 1. Stock animation driven by the match clock ★
 
-- **Example:** Smashcraft already seeks effect animations this way. Summon
+- **Example:** Mak'gora already seeks effect animations this way. Summon
   poses call `BlzSetSpecialEffectTime(model, pose.seconds)`
-  (smashcraft:ts/src/game/render/summonPresentation.ts), and so do the
-  combat effects (smashcraft:ts/src/game/render/combatEffects.ts). Hive's
+  (makgora:ts/src/game/render/summonPresentation.ts), and so do the
+  combat effects (makgora:ts/src/game/render/combatEffects.ts). Hive's
   ["Special Effect Animation by Index"](https://www.hiveworkshop.com/threads/special-effect-animation-by-index.352866)
   (27 Feb 2024) does the same through the time scale: Uncle's
   RingProgressHelper jumps a 10-second Birth animation to one of 16 ticks.
@@ -75,7 +75,7 @@ gives its page's own date.
   `BlzSetSpecialEffectTime(e, f32(frame / 60))` with `BlzSetSpecialEffectTimeScale(e, 0)`.
   The picture is then a fixed function of the match clock. It is the same in
   a replay and after a rollback, so it can't drift between clients.
-  smashcraft:docs/netcode-proposal.md asks that seeking be confirmed on each
+  makgora:docs/netcode-proposal.md asks that seeking be confirmed on each
   asset rather than assumed. The summon path is that confirmation for its
   clips.
 - **Stock assets that suit it, read from 3.0.1.24342:**
@@ -94,7 +94,7 @@ gives its page's own date.
     match. It is a one-off reveal on a third of the frame, slow enough for
     rule 8.
   - The rising-water doodad's level follows the tide table
-    (smashcraft:docs/design/water-stage.md).
+    (makgora:docs/design/water-stage.md).
   - The same tool can scrub any stage set piece along a fixed schedule.
 
 ### 2. A current that runs backwards: signed time scale ★
@@ -138,7 +138,7 @@ gives its page's own date.
     `SetTimeOfDay(0)` and `SetTimeOfDayScale(0)`.
 - **How:**
   - A lighting model's key and fill tracks are read at the current time of
-    day. Smashcraft's stage lights are constant (smashcraft:ts/scripts/stageLight.ts),
+    day. Mak'gora's stage lights are constant (makgora:ts/scripts/stageLight.ts),
     so the frozen noon can't move them.
   - Author the stage light with keyframes instead. The tide light, for
     example, keys:
@@ -149,11 +149,11 @@ gives its page's own date.
     phase maps to. One model then gives a smooth, timed ramp. A model swap
     can only cut.
   - Rules 2–5 of the stage lights must hold at every key, not only at noon
-    (smashcraft:ts/src/game/assets/stageLighting.tests.ts).
+    (makgora:ts/src/game/assets/stageLighting.tests.ts).
   - *(guess)* `SetTimeOfDay` re-reads the light the same frame. Native
     clients set it at the same match frame, so it stays in step; the hour is
-    also game state (night vision), which no Smashcraft rule reads.
-- **Bytes:** ~1.5 KB a timed light (Blizzard's are 1,468; Smashcraft's
+    also game state (night vision), which no Mak'gora rule reads.
+- **Bytes:** ~1.5 KB a timed light (Blizzard's are 1,468; Mak'gora's
   constant ones are 744).
 - **Frame cost:** one call a frame during a ramp, none otherwise.
 - **Classic limit:** Classic clamps bright values *(guess)*, so keys stay within
@@ -176,7 +176,7 @@ gives its page's own date.
   - **Silverpine Sprint:** puts its lanterns (`LOlp`) into `"death"` to turn
     them off, then `"show"`s and `"hide"`s doodad sets per rect (its
     `SetDoodadAnimationRect` block).
-- **How:** Smashcraft scenery is special effects, not doodads. Its equivalents
+- **How:** Mak'gora scenery is special effects, not doodads. Its equivalents
   are:
   - `BlzPlaySpecialEffect(e, ANIM_TYPE_STAND | ANIM_TYPE_DEATH | ANIM_TYPE_BIRTH)`;
   - `BlzSpecialEffectAddSubAnimation(e, SUBANIM_TYPE_ALTERNATE_EX)`
@@ -216,7 +216,7 @@ gives its page's own date.
   turn. The list of fields is in visual-quality, "The levers".
 - **Bytes:** 0.
 - **Frame cost:** one to three calls a frame while tweening.
-- **Status:** **unmeasured** in Smashcraft (the `192-*-linear|height`
+- **Status:** **unmeasured** in Mak'gora (the `192-*-linear|height`
   checks).
 - **Suits:**
   - Tomb: a teal fog lying just above the tide floor, thickening a little in
@@ -235,7 +235,7 @@ gives its page's own date.
 - **How:**
   - A hard cut is `SetSkyModel`.
   - For a fade, place a second inward sphere as a special effect and tween
-    its `BlzSetSpecialEffectAlpha` across the old sky. Smashcraft's sky
+    its `BlzSetSpecialEffectAlpha` across the old sky. Mak'gora's sky
     spheres are 1,024 triangles with one 256×128 texture (stage-art).
   - *(guess)* An effect is fogged and lit where a sky isn't. The cross-fade
     sphere needs the same unshaded, unfogged material as the authored skies,
@@ -266,7 +266,7 @@ gives its page's own date.
   - Weather is emitted relative to the terrain, and the arena stands 1,800
     above it (stages, "What the clients can show"). So the weather alone falls
     below the play.
-  - **Native first:** a few tall additive planes in Smashcraft's own stage
+  - **Native first:** a few tall additive planes in Mak'gora's own stage
     package, textured with the stock
     `ReplaceableTextures\Weather\RaysOfLight` path. The texture costs nothing.
   - Alternatively, a map-imported `TerrainArt\Weather.slk` row with a larger
@@ -294,7 +294,7 @@ gives its page's own date.
   - `Doodads\Cinematic\LightningBolt`: a `LITE` in Classic.
 
   Few stock models carry lights. Treat the light as garnish.
-- **How:** `AddSpecialEffect` with the stock path, or Smashcraft's own small
+- **How:** `AddSpecialEffect` with the stock path, or Mak'gora's own small
   light model (the tech-contact and slash sparks already carry one;
   visual-quality, "How the numbers are taken").
 - **Bytes:** 0 stock, about 0.7 KB authored.
@@ -315,7 +315,7 @@ gives its page's own date.
   (25 Jan–25 Mar 2023) required HD assets and allowed only cropping and
   rotation of screenshots.
 - **How:**
-  - Smashcraft already stretches stock rock with `matrixScale` (stage-art
+  - Mak'gora already stretches stock rock with `matrixScale` (stage-art
     rule 11).
   - Go further: compose one landmark from several stock models overlapped
     and turned with `BlzSetSpecialEffectOrientation`. For example:
@@ -387,7 +387,7 @@ gives its page's own date.
   - Copy a piece at low alpha.
   - For a reflection, place a second Temple of Tides under the tide surface,
     flipped with `BlzSetSpecialEffectRoll(e, π)`, tinted toward the water
-    colour and drawn under Smashcraft's StageWater surface (alpha 110;
+    colour and drawn under Mak'gora's StageWater surface (alpha 110;
     water-stage, "Warcraft water rendering options").
   - *(guess)* A roll flips the model without the backface problem a negative
     `matrixScale` would cause.
@@ -441,8 +441,8 @@ gives its page's own date.
   - Shake for the local player only, then clear the noise. Use fixed
     magnitudes, not Blizzard's random ones: a random draw is local
     presentation here, but a fixed shake is learnable and matches replays.
-  - Smashcraft's camera is placed by script every frame. A shake is better as
-    a small offset added in its own camera code, which Smashcraft controls
+  - Mak'gora's camera is placed by script every frame. A shake is better as
+    a small offset added in its own camera code, which Mak'gora controls
     and can replay. *(guess)* Native noise is added after the scripted
     camera.
 - **Bytes:** 0.
@@ -535,7 +535,7 @@ and each needs a single native capture to confirm.
 3. **The glyphs flare in the slack (technique 4).** Blizzard's own "The Tomb
    of Sargeras" map lights its glyphs by switching stock rune models between
    Stand, Stand Alternate and Death. Using the same stock runes on
-   Smashcraft's ruins turns each slack into a recognisable Tomb moment.
+   Mak'gora's ruins turns each slack into a recognisable Tomb moment.
 4. **The Temple of Tides rises (technique 1).** Its stock Birth animation is
    exactly 60 seconds in Classic, so seeking it from the
    match clock is safe. A landmark that slowly rises out of the

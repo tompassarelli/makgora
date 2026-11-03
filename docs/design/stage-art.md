@@ -17,7 +17,7 @@ The quality judgment uses captures beside the stage's Ultimate and Rivals of
 Aether 2 references, line by line against its board. A missed line is fixed or
 filed before the finished showcase is used to grade another stage.
 
-How a Smashcraft stage's backdrop is composed so it tells its place without
+How a Mak'gora stage's backdrop is composed so it tells its place without
 competing with the fight. The stage pass applies these rules to every
 selectable stage; a new stage follows them before it ships. Stage layouts,
 hazards and the asset inventory per race are in [stages](stages.md).
@@ -175,19 +175,19 @@ applies these. The reference images are private, listed there.
 
 ## Rules
 
-Smashcraft's arena camera looks along +y, ten degrees down; scenery `x` is
+Mak'gora's arena camera looks along +y, ten degrees down; scenery `x` is
 across the screen, `y` is depth behind the fighting plane and `z` is height
-from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
+from the floor (makgora:ts/src/game/presentation/stageScenery.ts).
 
 1. **The fight plane belongs to the fighters.** Every mesh and particle stays
    behind the whole fighting volume in every arena camera, and fog starts
-   beyond it. smashcraft:ts/test/player-view.test.ts enforces this for every
+   beyond it. makgora:ts/test/player-view.test.ts enforces this for every
    stage.
 2. **Deck symmetric, dressing not.** Collision, blast zones and platform
    paths stay mirror-symmetric. Scenery never pairs a model with its mirror
    twin: two pieces of one model on opposite sides differ in scale (at least
    25%), depth (600 units) or height (300 units), and sit at different
-   distances from the centre. smashcraft:ts/src/game/presentation/stageScenery.tests.ts
+   distances from the centre. makgora:ts/src/game/presentation/stageScenery.tests.ts
    enforces it. Turn each model with `yaw` so repeats don't present the same
    face.
 3. **One focal landmark, off the centre line.** The landmark that names the
@@ -218,7 +218,7 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
    while it warns and strikes, inside the fight, and is gone otherwise. The
    Tomb of Sargeras hydra is allowed under this rule (Claude, with Tom's
    delegated authority, 8 Oct, #277): it shows only in its 45-frame tell and
-   its bite (smashcraft:docs/stage-hazards.md).
+   its bite (makgora:docs/stage-hazards.md).
 8. **Motion budget.** Ambient motion only: fire, water, glow and weather that
    loop in place, never flashing and never crossing the fighting area.
    Gameplay motion (moving platforms, cannon, wind cues) stays the most
@@ -243,8 +243,8 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
     little a step among dark values shows, which is why Nordrassil's and
     Hellfire's bodies at lightness 19 and 15 read as faint.
     The lip carries the theme's accent.
-    smashcraft:ts/src/game/assets/stagePalette.tests.ts enforces the values;
-    smashcraft:ts/src/game/assets/stagePalette.ts declares the palettes.
+    makgora:ts/src/game/assets/stagePalette.tests.ts enforces the values;
+    makgora:ts/src/game/assets/stagePalette.ts declares the palettes.
 11. **The deck sits in a world** (Tom's 9 Oct playtest, #360). Water, cliffs or
     structure fill the space beneath and beside the deck; no background
     surface is presented as another place to land. Tomb's opaque sea sits at
@@ -264,7 +264,7 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
     trees, obelisks, the waterfall) are stretched downward with
     `matrixScale`; buildings and props stand on a stretched stock rock of the
     stage's kind (Barrens rock, Icecrown glacier, Ruins rock).
-    smashcraft:ts/test/player-view.test.ts enforces it for every stage.
+    makgora:ts/test/player-view.test.ts enforces it for every stage.
 12. **The sky is one smooth gradient with soft painted cloud over it; the
     horizon sits at or below the deck.** The brightest region and the busiest
     clouds stay out of the deck's height band; the lower sky is the abyss
@@ -289,9 +289,9 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
     the Shy Guys, who fly across on a fixed schedule. Corneria's Arwings are
     the counterexample: they shoot a player out of the sky at moments no one
     can predict. Chaos is welcome; randomness that happens to a player is
-    not. smashcraft:ts/src/game/match/stageHazardTracks.tests.ts plays every
+    not. makgora:ts/src/game/match/stageHazardTracks.tests.ts plays every
     stage with hazards under two match seeds and requires identical hazard
-    tracks, and smashcraft:ts/test/stage-hazard-random.test.ts refuses
+    tracks, and makgora:ts/test/stage-hazard-random.test.ts refuses
     hazard code that reads the match's random source.
 14. **Every stage change names its board item.** A commit, issue box or
     review that changes a stage's scenery, sky, fog, light, deck or platform
@@ -318,8 +318,8 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
     valley between them at y 2,000–2,400. Jagged tops, not flat ones, so no
     ridge reads as a place to land. The floor plane shows only in the gaps
     and fades into the fog behind them. `depthProblems` in
-    smashcraft:ts/src/game/presentation/stageRules.ts and
-    smashcraft:ts/src/game/presentation/stageScenery.tests.ts enforce the
+    makgora:ts/src/game/presentation/stageRules.ts and
+    makgora:ts/src/game/presentation/stageScenery.tests.ts enforce the
     bands and the near ridge.
 17. **Rock in the stage's palette** (round 2 of the art pass, 18 Oct). Mossy
     rock (the Lordaeron, Ruins, Felwood and Ashenvale rock and spires) stands
@@ -330,9 +330,9 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
     backdrop (`y` ≥ 4,000) is its own: no two stages share it, so no stage
     borrows another's skyline.
     `paletteProblems` and `skylineProblems` in
-    smashcraft:ts/src/game/presentation/stageRules.ts enforce both. Bare
+    makgora:ts/src/game/presentation/stageRules.ts enforce both. Bare
     grey granite comes from the generated crags
-    (smashcraft:tools/stage/crags.ts): original peak, crag and knoll meshes
+    (makgora:tools/stage/crags.ts): original peak, crag and knoll meshes
     wrapped in the stock Lordaeron rock-chunk granite, with no particle
     emitters, tinted grey on Gryphon Aerie.
 
@@ -512,7 +512,7 @@ Nordrassil, Blackrock and Hellfire keep their depth-pass look. Rules 17 and
 ### Art checklist
 
 Every stage passes these, judged from one batch of Wisp window captures at both
-camera extremes (smashcraft:ts/scripts/wisp/stageCompositionChecks.ts):
+camera extremes (makgora:ts/scripts/wisp/stageCompositionChecks.ts):
 `bun tools/stage/search.ts STAGE SPEC.json` ([stage help](../commands/stage.md))
 checks the render-free rules on every fog, tint, position, scale and light
 candidate before rendering, then ranks the survivors by empty backdrop; run
@@ -522,21 +522,21 @@ it before contrast.ts and the judge.
 | --- | --- | --- |
 | A | **Sky**: the stage's sky draws; at least 50% of the top 40% of the frame is sky; no hotspot in the deck's band | `bun wisp view frame` sky feature; look |
 | B | **Nothing below**: no terrain or ground texture and no cut-off prop base below the deck, near and far | look at both extremes; rule 11 |
-| C | **Underside**: the deck's body and underside read against the lower sky (ΔE00 ≥ 15, rule 10) | smashcraft:ts/src/game/assets/stagePalette.tests.ts |
-| D | **Depth layers**: three bands, each farther one lower in contrast and closer to the fog colour (rules 4, 6) | look; fog test in smashcraft:ts/test/player-view.test.ts |
+| C | **Underside**: the deck's body and underside read against the lower sky (ΔE00 ≥ 15, rule 10) | makgora:ts/src/game/assets/stagePalette.tests.ts |
+| D | **Depth layers**: three bands, each farther one lower in contrast and closer to the fog colour (rules 4, 6) | look; fog test in makgora:ts/test/player-view.test.ts |
 | E | **Playfield vs background**: walking surface ≥ 40 luma from the fog (rule 10); fighter contrast not reduced by the stage's atmosphere | stagePalette tests; `bun tools/stage/contrast.ts` |
 | F | **Art quality**: concept same as Classic, one palette, believable materials at scale, clean joins, no repeats in view, finished from every shown angle | the judged rubric in [visual quality](visual-quality.md#art-quality-rubric-stage-fighter-and-effect-art), both facings; remastered textures also pass Wisp `remaster_check` |
 
 ## Warcraft limits
 
 Scenery is special effects from the stock classic-graphics models the clients
-draw, placed by smashcraft:ts/src/host/loop/stageScenery.ts and loaded
-before the match by smashcraft:ts/src/game/presentation/stagePreload.ts. A new
-model needs model facts (smashcraft:docs/player-view.md) before the player-view
+draw, placed by makgora:ts/src/host/loop/stageScenery.ts and loaded
+before the match by makgora:ts/src/game/presentation/stagePreload.ts. A new
+model needs model facts (makgora:docs/player-view.md) before the player-view
 checks accept it, so a pass reuses the models those facts already list unless
 it regenerates them. Skies come from `SetSkyModel`; their classic choices are
 listed in [stages](stages.md#what-the-clients-can-show). Deck models and
-their palette textures are generated by smashcraft:tools/stage/package.ts;
+their palette textures are generated by makgora:tools/stage/package.ts;
 a new palette needs that generator run, the map's stage assets refreshed and
 the new models' facts added.
 
@@ -555,25 +555,25 @@ and out as the camera zooms with the fighters' spread:
   left the frame while most of its stretched mesh was still on screen
   (Gryphon Aerie's near granite, Tom's 0.1.1 4850170 playtest). Authors keep
   writing `matrixScale` freely: `drawnScale` in
-  smashcraft:ts/src/game/presentation/stageScenery.ts moves any stretch past
+  makgora:ts/src/game/presentation/stageScenery.ts moves any stretch past
   1 into the scale, so the culled extents always enclose the drawn mesh.
 - **Far cull.** A piece whose origin is farther from the eye than the
   camera's far clip is not drawn (wisp:docs/headless.md, "Far cull"), so
   every origin stays inside `arenaFarZ` across the zoom range.
 
-smashcraft:ts/test/scenery-culling.test.ts checks both for every stage.
+makgora:ts/test/scenery-culling.test.ts checks both for every stage.
 
 ## Authored compositions and visual references
 
 Actual reference screenshots are retained in
-~/.local/share/smashcraft-stage-design-178/references/. Their exact download
+~/.local/share/makgora-stage-design-178/references/. Their exact download
 URLs and local SHA-256 values are in the private provenance.txt; the table
 below identifies the source files and what is observed in them. These are
 Nintendo/HAL/Sora copyrighted game screenshots via SmashWiki, used only for
 private composition study. No screenshot pixels, geometry or textures are
 copied into a model or published. Atmospheric textures and sky spheres are
-original art generated by smashcraft:ts/scripts/stageSky.ts and
-smashcraft:tools/stage/skies.ts. Warcraft scenery remains installed stock
+original art generated by makgora:ts/scripts/stageSky.ts and
+makgora:tools/stage/skies.ts. Warcraft scenery remains installed stock
 models, referenced by path and never copied into Git.
 
 | Private reference file | Exact image source | Observable composition |
@@ -587,7 +587,7 @@ models, referenced by path and never copied into Git.
 
 Melee and Ultimate are complemented by actual Rivals of Aether screenshots
 and concrete skyline observations in
-smashcraft:docs/design/patrol-stage-composition.md. Its provenance table names
+makgora:docs/design/patrol-stage-composition.md. Its provenance table names
 the official Steam screenshot revisions and their private local files.
 
 The per-stage table below is #178's composition pass; each stage's current
@@ -617,7 +617,7 @@ Original skies use one seamless inward sphere of 1,024 triangles and one
 behind the world with unshaded, unfogged materials and no depth writes.
 Only one sky draws at a time. Regenerate all stage art with
 `bun tools/stage/package.ts`, pin the stage-assets family with
-`bun wisp inputs add stage-assets DIR` from smashcraft:ts/, and use a full map
+`bun wisp inputs add stage-assets DIR` from makgora:ts/, and use a full map
 build when content-addressed sky paths change. Nordrassil draws its own dark
 teal sky since 31 Oct 2026; the stock Felwood sky no longer draws.
 
@@ -629,6 +629,6 @@ fighters (y 7,344), so the terrain runs 40 boundary cells north of the playable
 area instead of the editor's 8 (64 x 96 cells, world y -4,096..8,192; #298).
 The extended base copied the top row of terrain points, pathing and shadow
 into the 32 new rows and raised the top camera-bounds complement in
-war3map.w3i from 8 to 40. smashcraft:ts/test/player-view.test.ts checks every
+war3map.w3i from 8 to 40. makgora:ts/test/player-view.test.ts checks every
 placed piece against the world bounds and every blast zone against the
 playable bounds.

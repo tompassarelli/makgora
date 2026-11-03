@@ -1,10 +1,10 @@
 # Move sound check
 
-smashcraft#391 boxes 3 and 4, 10 Oct 2026. Each move ran headlessly through the map's own
+makgora#391 boxes 3 and 4, 10 Oct 2026. Each move ran headlessly through the map's own
 impact-event and move-sound path (the frames the presentation reads); a perform counts when its
 sound plays on the move's first active frame (a special: by its frame 2), a hit when the struck
 fighter plays the striking move's own hit sound. Moves come from `soundedMoves` in
-smashcraft:ts/src/game/presentation/moveSounds.ts. A move with no hit whiffed in the scripted
+makgora:ts/src/game/presentation/moveSounds.ts. A move with no hit whiffed in the scripted
 spacing; its hit sound is the table's.
 
 Listening clips: one per fighter, recorded from signed-in clone-c's own audio sink

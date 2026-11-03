@@ -28,9 +28,9 @@ runs; never touch Tom’s install.
 Wisp holds each pair's custody (wisp:docs/lan.md, wisp#69): the pool holding
 pair K names itself in `~/.local/state/wisp/lan/pair-K/claim.json` (its PID,
 the fleet session from `NORTH_FLEET_SESSION` and the lane label from
-`--owner NAME`). Every smashcraft `lan pool` waits in Wisp's line with
+`--owner NAME`). Every makgora `lan pool` waits in Wisp's line with
 `--queue`, so sessions asking for a held pair get it one at a time in the order
-they asked (smashcraft:ts/test/lan-pool-queue.test.ts). A pool unit is named per fleet
+they asked (makgora:ts/test/lan-pool-queue.test.ts). A pool unit is named per fleet
 session and pairs and passes `--owner-pid` with the session's own process, the
 outermost ancestor carrying its `NORTH_FLEET_SESSION`, so a running or waiting
 unit stops itself once that session ends.

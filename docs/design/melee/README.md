@@ -3,7 +3,7 @@
 A descriptive study of Super Smash Bros. Melee for what it is: its
 movement, its attacks and defences, how its cast trades weight against speed
 against frame data, the techniques players found in it, and why it came out
-this way. It states no preference. What Smashcraft takes from Melee, changes or
+this way. It states no preference. What Mak'gora takes from Melee, changes or
 leaves out is decided only in [gameplay design decisions](../../gameplay-design.md).
 
 - [Movement](movement.md): ground speeds and the initial dash, jumps, falling,
@@ -26,7 +26,7 @@ leaves out is decided only in [gameplay design decisions](../../gameplay-design.
 
 The numbers in these pages are frozen gameplay facts, kept as our own design
 reference. Per-move frame data comes from
-smashcraft:references/melee-frame-data/: meleeframedata.com's database
+makgora:references/melee-frame-data/: meleeframedata.com's database
 (startup, active frames, interruptible frame, total, shieldstun, damage,
 landing lag) and libmelee's recorded hitbox positions and attack and dodge travel. Its
 README records provenance and the meaning and traps of every field. Fighter
@@ -49,7 +49,7 @@ SmashWiki lists. Edit the values by hand, citing a public source (README
   flat ground with the stick fully held. It is arithmetic on the recorded
   parameters, not a recorded game trace.
 
-## Smashcraft decisions
+## Mak'gora decisions
 
 The questions raised by Melee's wavedash, dash dancing, shield safety,
 out-of-shield actions, ledges, crouch cancelling and ASDI are resolved in

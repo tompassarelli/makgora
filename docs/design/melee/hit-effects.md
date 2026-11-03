@@ -1,7 +1,7 @@
 # Melee's hit and movement event language
 
 What Melee shows and plays on each event, as a player sees and hears it, set as
-design targets for Smashcraft's own presentation with Warcraft III assets.
+design targets for Mak'gora's own presentation with Warcraft III assets.
 Melee's art and audio are never copied or shipped, and its effect and sound
 numbering is not recorded here.
 
@@ -34,9 +34,9 @@ shakes the camera and plays ThunderClap.
 A top KO is a Star KO about 7 times in 8 and a Screen KO about 1 time in 8
 (SmashWiki "Screen KO" and "Star KO": the choice is mostly random, and in the
 first three games Screen KOs are considerably rarer than Star KOs; no page
-gives an exact rate, so Smashcraft uses 1 in 8, 2026-10-30). The choice is a
+gives an exact rate, so Mak'gora uses 1 in 8, 2026-10-30). The choice is a
 hash of the KO frame, the owner slot and the character
-(`topKoKind` in smashcraft:ts/src/game/presentation/impactState.ts), so a
+(`topKoKind` in makgora:ts/src/game/presentation/impactState.ts), so a
 replay or rollback picks the same kind. A Star KO tumbles the fighter slowly
 away into the background, shrinking toward the screen centre over 90 frames
 (1.5 s), then draws a Dispel Magic sparkle and plays a high-pitched DispelMagic
@@ -60,7 +60,7 @@ braking dust each frame the slide slows), and catching a pass-through platform
 raises a symmetric ground burst. Falling onto a platform, the rise-and-stand
 mount (rising into a platform while holding down, [Platforms](../../gameplay-design.md#platforms))
 and a waveland onto a platform each draw two flattened dust clouds (the
-Smashcraft dust at 1.6 times width and half height) that spread outward along
+Mak'gora dust at 1.6 times width and half height) that spread outward along
 the platform top for 16 frames, plus a thin dust line (0.12 times height, about
 140 units wide at size 1, kept on the platform) along the platform lip for 14
 frames, so the eye sees which surface caught the fighter; a waveland keeps its
@@ -70,38 +70,38 @@ soft landing draws at about 1 and a fast-fall landing at 1.8; a mount draws at
 1. The burst replaces the ordinary landing puff on a platform; a landing on
 the main stage keeps the small puff, because the burst's message is that a
 pass-through surface caught the fighter and it would lose that meaning if every
-landing drew it (`platformDust.ts` in smashcraft:ts/src/game/presentation/).
+landing drew it (`platformDust.ts` in makgora:ts/src/game/presentation/).
 
-## Smashcraft's Warcraft presentation
+## Mak'gora's Warcraft presentation
 
-The mapping lives in smashcraft:ts/src/game/presentation/hitPresentation.ts.
-Sounds and elemental effects use stock Warcraft assets; contact stars, rings and dust reuse Smashcraft's existing geometry. This mapping imports no
+The mapping lives in makgora:ts/src/game/presentation/hitPresentation.ts.
+Sounds and elemental effects use stock Warcraft assets; contact stars, rings and dust reuse Mak'gora's existing geometry. This mapping imports no
 Melee asset. Effects use the existing pooled handles; audio consumes confirmed
 frames and never runs from a rollback replay. Tint and vibration change only
-the presented body. The bounded, authored choices below are Smashcraft's style,
+the presented body. The bounded, authored choices below are Mak'gora's style,
 not claims that Warcraft renders Melee's artwork or exact animation programs.
 
 | Event | Warcraft effect | Stock sound label |
 | --- | --- | --- |
-| Ordinary hit / pummel | Smashcraft hit burst | tiered wood strike on flesh; pummel uses higher, quieter Defend |
-| Fire hit | orange Smashcraft hit burst | Fireball |
+| Ordinary hit / pummel | Mak'gora hit burst | tiered wood strike on flesh; pummel uses higher, quieter Defend |
+| Fire hit | orange Mak'gora hit burst | Fireball |
 | Electric hit / electric shield | Lightning Shield target (Stand loop, held 24 frames) | LightningBolt |
-| Slash hit | Smashcraft hit burst (authored 16-ray star) | Sound\Units\Combat\MetalHeavySliceFlesh1 (heavy sword on flesh, by path) |
+| Slash hit | Mak'gora hit burst (authored 16-ray star) | Sound\Units\Combat\MetalHeavySliceFlesh1 (heavy sword on flesh, by path) |
 | Ice / freeze begins | Frost Nova target | FrostNova |
-| Shield / powershield / shield break | Smashcraft shield star (authored 10-ray star; break draws it twice as large) | Defend, powershield higher |
+| Shield / powershield / shield break | Mak'gora shield star (authored 10-ray star; break draws it twice as large) | Defend, powershield higher |
 | Missed floor/wall/ceiling tech | War Stomp impact and dust | Warstomp |
 | Successful tech | Dispel Magic target | DispelMagic |
-| Grab | Smashcraft shield star | EntanglingRoots |
-| Throw release | Smashcraft jump ring | BlinkTarget |
-| Ledge catch / recovery | Smashcraft shield star (Melee's contact spark at the lip) / Smashcraft dust (climb dust) | quiet BlinkTarget |
-| Ground jump / aerial jump | Smashcraft dust / jump ring | quiet BlinkTarget |
-| Walk / run / dash / ordinary landing | Smashcraft dust | DeepFootstep / DeepFootstep2; distinct volume and pitch |
-| Platform landing / rise-and-stand mount / waveland onto a platform | Smashcraft dust as a flat platform burst both ways and a thin lip line along the platform top | DeepFootstep, as an ordinary landing |
-| Blast KO / star close / respawn | Smashcraft KO burst / Dispel Magic / Resurrection | ThunderClap for KO, DispelMagic at pitch 2.0 for the star KO twinkle; original fighter death cues remain |
+| Grab | Mak'gora shield star | EntanglingRoots |
+| Throw release | Mak'gora jump ring | BlinkTarget |
+| Ledge catch / recovery | Mak'gora shield star (Melee's contact spark at the lip) / Mak'gora dust (climb dust) | quiet BlinkTarget |
+| Ground jump / aerial jump | Mak'gora dust / jump ring | quiet BlinkTarget |
+| Walk / run / dash / ordinary landing | Mak'gora dust | DeepFootstep / DeepFootstep2; distinct volume and pitch |
+| Platform landing / rise-and-stand mount / waveland onto a platform | Mak'gora dust as a flat platform burst both ways and a thin lip line along the platform top | DeepFootstep, as an ordinary landing |
+| Blast KO / star close / respawn | Mak'gora KO burst / Dispel Magic / Resurrection | ThunderClap for KO, DispelMagic at pitch 2.0 for the star KO twinkle; original fighter death cues remain |
 
 Inspection command in developer builds: `-dev quick`, then `-dev effects N`.
 The numbered cases are declared in
-smashcraft:ts/src/game/session/hitPresentationCases.ts; the command changes only
+makgora:ts/src/game/session/hitPresentationCases.ts; the command changes only
 presentation. It gives native capture an exact event list, while the matching
 headless test checks the effect pose, sound dispatch, and rejection of repeat
 or older confirmed frames. A fresh map start is required after changing the

@@ -6,8 +6,8 @@ Brawl (2008), Smash 4 (2014), Smash Ultimate (2018), Project M and Project+
 Slap City, Brawlhalla, MultiVersus (2022 beta, relaunched 2024, servers closed
 30 May 2025) and Nickelodeon All-Star Brawl 1 and 2 (NASB).
 
-Already decided for Smashcraft, so not re-asked here
-(smashcraft:docs/gameplay-design.md): no stale-move or freshness mechanics;
+Already decided for Mak'gora, so not re-asked here
+(makgora:docs/gameplay-design.md): no stale-move or freshness mechanics;
 L-cancelling removed, aerials always get the L-cancelled landing lag
 automatically; non-interactive execution tests are treated as dubious;
 [no tap-jump](../gameplay-design.md#controls).
@@ -15,7 +15,7 @@ automatically; non-interactive execution tests are treated as dubious;
 ## How to read the estimates
 
 "Likelihood to embrace" is a neutral estimate of how well the mechanic fits the
-decisions above and Smashcraft's Melee physics base. It is reasoning, not a
+decisions above and Mak'gora's Melee physics base. It is reasoning, not a
 verdict. Sources are wiki pages (SmashWiki, Dragdown, SuperCombo), press and
 forum threads. Wiki pages state rules, not opinions; where reception is thin
 the entry says so. Frame counts are as published by those wikis for the named
@@ -46,8 +46,8 @@ game and version and have not been re-measured.
   particularly against multi-hit attacks (AceStarThe3rd in
   [Inven Global](https://www.invenglobal.com/articles/8054/nearly-5-months-after-release-a-reflection-on-the-successes-and-failures-of-super-smash-bros-ultimate)).
 - **Likelihood:** Medium. It is an interaction with an opponent (fits the
-  "interactive execution" rule) and Smashcraft already has a 4-sample
-  powershield (smashcraft:docs/melee-powershield.md); the cost is replacing
+  "interactive execution" rule) and Mak'gora already has a 4-sample
+  powershield (makgora:docs/melee-powershield.md); the cost is replacing
   that input and its projectile reflection.
 
 ## 2. Shield drop and shield release lag
@@ -98,7 +98,7 @@ game and version and have not been re-measured.
   [esports.gg](https://esports.gg/news/fgc/nick-all-star-brawl-mechanic-breakdown/)).
   Project M/Plus restored the Melee air dodge including wavedash and helplessness
   ([SmashWiki Project M](https://www.ssbwiki.com/Project_M)).
-- **Likelihood:** Medium. Smashcraft starts from Melee's air dodge; a
+- **Likelihood:** Medium. Mak'gora starts from Melee's air dodge; a
   once-per-airtime rule or landing lag is a number change, but the
   directional/wavedash choice shapes movement identity.
 
@@ -151,8 +151,8 @@ game and version and have not been re-measured.
 - **Reception:** most criticized Ultimate mechanic in the Inven pro
   interviews (MVD: precise inputs needed; VikkiKitty: large buffer causes
   unintended self-destructs).
-- **Likelihood:** Medium. Smashcraft already runs on an input-clock contract
-  (smashcraft:docs/input-clock-contract-20261004.md); a buffer is a
+- **Likelihood:** Medium. Mak'gora already runs on an input-clock contract
+  (makgora:docs/input-clock-contract-20261004.md); a buffer is a
   per-action window. Offstage-safe exceptions are a design question.
 
 ## 7. Parry as a dedicated button (Rivals, Rivals 2, NASB, Slap City)
@@ -175,7 +175,7 @@ game and version and have not been re-measured.
   return of shields ([Kimball](https://davidvkimball.com/posts/my-thoughts-on-rivals-of-aether-ii)).
   A Slap City Steam thread titled "New Parry Mechanic: Not A Fan" exists
   ([thread](https://steamcommunity.com/app/725480/discussions/0/1768133742957295337/)).
-- **Likelihood:** Low to medium. Smashcraft keeps Melee's shield, grab and
+- **Likelihood:** Low to medium. Mak'gora keeps Melee's shield, grab and
   powershield; a parry would be an addition, not a replacement.
 
 ## 8. Wall jump and wall tech (Rivals, Rivals 2, Brawlhalla)
@@ -198,7 +198,7 @@ game and version and have not been re-measured.
   Kimball calls Rivals 2's every-character walljump a compromise biased
   toward Melee.
 - **Likelihood:** Low to medium. It interacts with stage design and ledge
-  rules; Smashcraft has Melee ledges.
+  rules; Mak'gora has Melee ledges.
 
 ## 9. Ledge rules: edgehogging, ledge trumping, ledge decay
 
@@ -210,7 +210,7 @@ game and version and have not been re-measured.
 - **Reception:** SmashWiki's summary reads these as positive for offstage
   play; no direct pro quotes retrieved.
 - **Likelihood:** Medium. It is one rule on an existing Melee mechanic,
-  and Smashcraft's bots already handle ledges (smashcraft:docs/gameplay-design.md).
+  and Mak'gora's bots already handle ledges (makgora:docs/gameplay-design.md).
 
 ## 10. Tripping (Brawl) and random elements
 
@@ -221,7 +221,7 @@ game and version and have not been re-measured.
 - **Reception:** strongly disliked by competitive players; Project M removed
   it; Project+ lists it as excluded.
 - **Likelihood:** Very low. It contradicts the predictability principle in
-  smashcraft:docs/gameplay-design.md.
+  makgora:docs/gameplay-design.md.
 
 ## 11. Shield removal (Rivals 1, Brawlhalla, MultiVersus)
 
@@ -234,7 +234,7 @@ game and version and have not been re-measured.
 - **Reception:** Kotaku praises Brawlhalla as feeling good to play; Push Square
   7/10 ("accessibility and challenge", less tightly designed)
   ([Wikipedia](https://en.wikipedia.org/wiki/Brawlhalla)).
-- **Likelihood:** Low. Smashcraft's shield and powershield are Melee
+- **Likelihood:** Low. Mak'gora's shield and powershield are Melee
   reference behavior.
 
 ## 12. Damage-based and no-percent knockback (Brawlhalla)
@@ -244,7 +244,7 @@ game and version and have not been re-measured.
   ([Wikipedia](https://en.wikipedia.org/wiki/Brawlhalla)).
 - **Reception:** Brawlhalla's core loop is widely played; no sourced criticism
   specific to the display.
-- **Likelihood:** Low. Smashcraft already shows percent; this is a
+- **Likelihood:** Low. Mak'gora already shows percent; this is a
   presentation choice.
 
 ## 13. Cooldown specials, perks, 2v2 default, ring-out count (MultiVersus)
@@ -258,7 +258,7 @@ game and version and have not been re-measured.
   currency create unequal footing for new characters. The game ended in
   May 2025.
 - **Likelihood:** Low for perks (unequal footing by design); medium for a
-  cooldown-gated special as a character-identity tool. Smashcraft has
+  cooldown-gated special as a character-identity tool. Mak'gora has
   no source for the latter beyond MultiVersus.
 
 ## 14. Slime meter (NASB)
@@ -309,7 +309,7 @@ game and version and have not been re-measured.
   mechanics but contain no analysis of tech-chase design with platforms
   cancelling. That claim is not sourced; treat as an open research item.
 - **Likelihood:** Existing Melee tech input is already documented in
-  smashcraft:docs/melee-tech-input.md; changing the window is a number
+  makgora:docs/melee-tech-input.md; changing the window is a number
   change.
 
 ## 17. Chaingrab and infinite removal by design (Slap City)
@@ -324,7 +324,7 @@ game and version and have not been re-measured.
 
 ---
 
-## Smashcraft decisions
+## Mak'gora decisions
 
 The questions raised by these mechanics—powershield, platform shield drop,
 release lag, air dodge, wavedash, offstage buffering, rage, short hop, jump

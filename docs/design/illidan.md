@@ -12,7 +12,7 @@ remain deliberate actions.
 
 
 Numbers are provisional authoring values, not measured balance. Frames follow
-the roster notation (smashcraft:docs/design/roster.md): the press is frame 1,
+the roster notation (makgora:docs/design/roster.md): the press is frame 1,
 windows are inclusive. H is 132 units. The bar is
 [kit review 1](kit-review-1.md): a
 second decision after the press, a visible setup the opponent can answer, a
@@ -78,7 +78,7 @@ above all, the hero who empties casters: Mana Burn is why he is picked.
 - Blademaster's Wind Walk ([kit review 1](kit-review-1.md#down-b-wind-walk-picked))
   shows the house pattern: a tell, travel that stops at a raised shield, and
   attack and special branches.
-- #97's legibility rule (smashcraft:docs/gameplay-design.md, "Legible
+- #97's legibility rule (makgora:docs/gameplay-design.md, "Legible
   hurtboxes"): what the player sees must agree with what the simulation does.
 
 ## Side special: Fel Rush
@@ -87,10 +87,10 @@ above all, the hero who empties casters: Mana Burn is why he is picked.
 2026-10-28).** Tom asked for Fel Rush to work like Maiev's new Illusion-style
 side special, to go about as far, and to differ from hers the way Falco's
 Phantasm differs from Fox's Illusion. Maiev's Shadow Dash keeps Melee's
-Illusion timing (smashcraft:ts/src/game/sim/specials/illusionDash.ts; SmashWiki,
+Illusion timing (makgora:ts/src/game/sim/specials/illusionDash.ts; SmashWiki,
 [Fox (SSBM)/Side special](https://www.ssbwiki.com/Fox_(SSBM)/Side_special):
 hitbox frames 22-25, five travel frames, 63 frames in all, 20 frames of
-landing lag). Fel Rush takes Phantasm's timing (smashcraft:ts/src/game/sim/specials/phantasmDash.ts;
+landing lag). Fel Rush takes Phantasm's timing (makgora:ts/src/game/sim/specials/phantasmDash.ts;
 Melee's record in references/melee-frame-data: hitbox frames 18-21, four
 travel frames, 59 frames in all, 20 frames of landing lag) over the same
 3.5H, so each step is longer and the rush starts sooner and ends sooner
@@ -182,7 +182,7 @@ Shield (#131) already owns the defensive-special slot in the roster.
 Every attack Illidan lands drains the target's ultimate meter as part of the hit, as the
 Warcraft III Demon Hunter empties casters. The drain is a property of each
 move in his kit data (`manaDrain` on the move's hit effect,
-smashcraft:ts/src/game/sim/hitRegions.ts and specials.ts), scaled so combo
+makgora:ts/src/game/sim/hitRegions.ts and specials.ts), scaled so combo
 enders and big hits drain more:
 
 | Move | Drain | Move | Drain |
@@ -259,7 +259,7 @@ and its mana-scaled stun are gone; no other move used the stun's drain rule.
 Counterplay: the 23-frame ground windup is a reaction window to jump it or
 close in; a shield holds it and a powershield reflects it; crouching short
 fighters still take it, but a full-hop foe is over it. Source:
-smashcraft:ts/src/game/sim/eyeBeam.ts (numbers), sim/specials.ts and
+makgora:ts/src/game/sim/eyeBeam.ts (numbers), sim/specials.ts and
 sim/projectiles.ts; tests in sim/eyeBeam.tests.ts.
 
 **Alternative B, keep Mana Burn and add the beam as a separate move**
@@ -425,7 +425,7 @@ Crash:
   frame is intangible, 15 in all, jump-cancellable from frame 4.
 - Every frame of it zeroes his vertical speed while his horizontal speed
   carries, as every special started in the air keeps it (26 Oct, #490,
-  smashcraft:docs/gameplay-design.md#special-momentum).
+  makgora:docs/gameplay-design.md#special-momentum).
 - Its strike since #272 is Fan of Knives' former shape on both sides of him:
   a foe whose feet are within 116 to either side and 104 below to 108 above
   is popped away from him at 85 degrees, base 108,
@@ -460,7 +460,7 @@ knockback barely grows, so both hits connect at 0, 50 and 100%.
 
 Counterplay: the launcher reaches 25 less than the link, so a fighter caught
 at the tip who SDIs away during the link's freeze slips the launcher
-(bounded SDI, smashcraft:docs/gameplay-design.md); shields take both hits.
+(bounded SDI, makgora:docs/gameplay-design.md); shields take both hits.
 Alternatives: **B, a three-hit drill** (rejected: existing drills
 lane own multi-hit drills, and a third hit adds lock without a decision);
 **C, a single sweet-spotted slash** (rejected by the owner's direction).
@@ -470,7 +470,7 @@ multi-hit there would crowd the forward air's role.
 ## Ultimate: Metamorphosis (design only)
 
 Tom's direction: an ultimate is earned by skill and switchable off in the
-match rules (the ultimate rules in smashcraft:docs/design/mana.md). Illidan's
+match rules (the ultimate rules in makgora:docs/design/mana.md). Illidan's
 is **Metamorphosis**, Black Temple's Demon Form and Warcraft III's
 ultimate:
 
@@ -515,7 +515,7 @@ back to shield and spot dodge.
 
 ## Presentation (stock Warcraft assets)
 
-Each option shows a stock Warcraft effect (smashcraft:ts/src/game/presentation/specialCues.ts,
+Each option shows a stock Warcraft effect (makgora:ts/src/game/presentation/specialCues.ts,
 attackCues.ts and elementLooks.ts):
 
 | Option | Effect |
@@ -536,12 +536,12 @@ Birth reaches its full fire at 1.3 s and its Stand draws nothing, so the fire
 wall starts at 1.3 s into Birth; Mana Burn target draws
 nothing before 0.23 s and start at 0.3 s; Breath of Fire missile and Volcano
 death have only a Birth, drawn 0–0.5 s; the missiles and Moon Glaive draw
-from 0 s. smashcraft:ts/src/game/presentation/illidanCues.tests.ts holds the
+from 0 s. makgora:ts/src/game/presentation/illidanCues.tests.ts holds the
 measured windows.
 
-Source: smashcraft:ts/src/game/sim/specials.ts (Fel Rush),
-smashcraft:ts/src/game/sim/hitRegions.ts (drain on hit), contract tests in
-smashcraft:ts/src/game/sim/felRush.tests.ts.
+Source: makgora:ts/src/game/sim/specials.ts (Fel Rush),
+makgora:ts/src/game/sim/hitRegions.ts (drain on hit), contract tests in
+makgora:ts/src/game/sim/felRush.tests.ts.
 
 ## Combo targets: Falco's vertical game (#457)
 
@@ -638,7 +638,7 @@ What he keeps, so he does not become Falco in a costume:
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Air speed and glaive reach: he attacks from the air and chases.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). Air speed and glaive reach: he attacks from the air and chases.
 
 ```balance-profile
 fighter: illidan

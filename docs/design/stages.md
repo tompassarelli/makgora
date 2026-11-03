@@ -1,7 +1,7 @@
 # Stages
 
 What Melee and Ultimate players pick, why, which layouts and hazards they
-accept, and which Warcraft places and built-in assets could dress Smashcraft's
+accept, and which Warcraft places and built-in assets could dress Mak'gora's
 stages. Descriptive and sourced; the stance is the owner's
 ([gameplay design](../gameplay-design.md)). The last two sections evaluate the
 draft list of eight in issue #75; current choices are in
@@ -10,8 +10,8 @@ How each stage's sky and scenery are composed is in [stage art](stage-art.md);
 which fighter calls each stage home is in [home stages](home-stages.md).
 
 Units: Melee lengths are Melee units; Ultimate lengths are Ultimate units (its
-Battlefield is 160 wide). Smashcraft's world uses 6
-world units per Melee unit (smashcraft:ts/src/game/sim/tuning.ts).
+Battlefield is 160 wide). Mak'gora's world uses 6
+world units per Melee unit (makgora:ts/src/game/sim/tuning.ts).
 
 ## Melee's competitive stages
 
@@ -252,8 +252,8 @@ it kills or damages (Klaptrap, Arwings, cars), when it changes what wins
 A wind, carried platform or cannon on a published schedule removes random
 timing; fixed advance warnings let players plan around it. It can still change
 recovery and permit camping, so layout, blast zones and safe routes decide
-whether it belongs in competitive play. Smashcraft's hidden hazard stages use
-those schedules and warnings (smashcraft:docs/stage-hazards.md); passing their
+whether it belongs in competitive play. Mak'gora's hidden hazard stages use
+those schedules and warnings (makgora:docs/stage-hazards.md); passing their
 determinism checks does not establish stage legality.
 
 ## Warcraft inspiration and built-in assets
@@ -276,14 +276,14 @@ WorldEditData.txt's sky list, and the CASC file list.
 - Weather (`AddWeatherEffect(rect, id)`) is particle-drawn from Weather.slk's
   textures, all in classic except Snowflakes (`VWsf`, **HD**). Emitters start
   `height` above the terrain (768 for snow and rain), while the arena floor
-  stands 1,800 above the ground (smashcraft:ts/src/game/presentation/arenaCamera.ts),
+  stands 1,800 above the ground (makgora:ts/src/game/presentation/arenaCamera.ts),
   so weather placed on the ground falls below the fight; the stage lane must
   place it or emit it at arena height.
 - Lighting: `SetDayNightModels` takes the tileset lights under
   `Environment\DNC\` (Lordaeron, Ashenvale, Felwood, Dalaran, Dungeon,
   Underground).
 - Doodads and units are drawn as special effects, as the decks already are
-  (smashcraft:ts/src/host/loop/view.ts); tiles only matter for ground the
+  (makgora:ts/src/host/loop/view.ts); tiles only matter for ground the
   camera sees behind the stage.
 
 ### Undead and the Scourge
@@ -488,7 +488,7 @@ Ultimate's legal stages do (Battlefield's tapered keel, Final Destination's
 slab, Pokémon Stadium's flat with its lower shell). The walking line stays
 flat and 1,200 wide on every stage, so blast zones, camera limits, bots and
 hazards keep their measurements; what changes is everything under it.
-smashcraft:ts/src/game/sim/stage.ts declares each profile as its right side
+makgora:ts/src/game/sim/stage.ts declares each profile as its right side
 from the ledge down, in Melee units, mirrored for the left.
 
 | Stage | Archetype | Under the walking line |
@@ -513,17 +513,17 @@ Competitive rules every profile keeps:
 - **Seven profile points**: five walls and an underside line per side, then
   the level underside, so every stage has the same number of body lines.
 - **Recoverable**: every fighter gets back onto every stage from below
-  either ledge (smashcraft:ts/src/game/match/stageRecoveryContracts.tests.ts);
-  smashcraft:ts/src/game/sim/stageTopology.tests.ts checks symmetry, ledges,
+  either ledge (makgora:ts/src/game/match/stageRecoveryContracts.tests.ts);
+  makgora:ts/src/game/sim/stageTopology.tests.ts checks symmetry, ledges,
   one outline per stage and the level underside.
 
 Melee-reference contracts (wall techs, the underside scenario, the oracle and
 the interaction graph) measure Final Destination's walls on stage 0; the
 wall bounce, wall tech and wall-tech jump are also played against every
 stage's own side wall, all 11 stages
-(smashcraft:ts/src/game/match/wallTechInputContracts.tests.ts). Each
+(makgora:ts/src/game/match/wallTechInputContracts.tests.ts). Each
 stage's drawn main deck is generated from its own outline by
-smashcraft:tools/stage/package.ts.
+makgora:tools/stage/package.ts.
 
 ## Layout archetypes
 
@@ -550,7 +550,7 @@ layouts and player accounts above:
 - **Timed platforms** (Town and City's alternating sets, Randall) make
   stage position a matter of timing: a fighter reads where relief will be.
 
-### Smashcraft's layouts
+### Mak'gora's layouts
 
 Each ranked stage takes a different archetype; the main deck is 1,200 wide on
 every stage (Main-deck topology, above). Heights are above the main deck in
@@ -558,7 +558,7 @@ world units, then in full hops and in a full hop plus double jump of the
 reference fighter (and every hero: 188 and 429; Rifleman 309 and 559,
 Illidan 245 and 517). Ledge to blast zone: Frozen Throne 1,270 sideways, 1,500
 up, 816 down; every other stage 963, 1,128 and 840 (Final Destination's,
-smashcraft:ts/src/game/sim/stageBounds.ts).
+makgora:ts/src/game/sim/stageBounds.ts).
 
 | Stage | Archetype | Platforms (width at height; hops; share of jump and double jump) |
 | --- | --- | --- |
@@ -574,9 +574,9 @@ smashcraft:ts/src/game/sim/stageBounds.ts).
 
 Blackrock was a second Battlefield; it now holds one static forge platform,
 so no two ranked stages share a layout.
-smashcraft:ts/src/game/sim/stageTopology.tests.ts checks that and that
+makgora:ts/src/game/sim/stageTopology.tests.ts checks that and that
 every fighter reaches every static platform with a jump and a double jump;
-smashcraft:ts/src/game/match/stageRecoveryContracts.tests.ts checks
+makgora:ts/src/game/match/stageRecoveryContracts.tests.ts checks
 recovery to every stage.
 
 ### Centre-stage orb point
@@ -588,10 +588,10 @@ is there; otherwise it is the point of the fixed, solid (non-moving,
 non-pass-through) deck nearest the centre. On every stage in the catalog the
 centre of the main deck is solid, so the point is (0, 0), except Stratholme,
 whose main floor is flat at 21 units across the centre.
-smashcraft:ts/src/game/match/orbs.tests.ts checks that the point sits over
+makgora:ts/src/game/match/orbs.tests.ts checks that the point sits over
 solid, fixed ground on every stage.
 
-## Smashcraft decisions
+## Mak'gora decisions
 
 The questions this research raised about the flat arena, platform motion,
 starter/counterpick roles, hazard variety and effects, blast zones, race themes,

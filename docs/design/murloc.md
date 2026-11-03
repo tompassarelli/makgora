@@ -8,10 +8,10 @@ easy to kill, and weak once Grgl is down. Later that day he asked for play deep
 enough that the Ice Climbers look simple beside it, with full independence of
 the two bodies at its core and deliberate, readable depth beyond accidental
 desyncs. The plan and its decisions are in
-south:agents/decisions/smashcraft/murlocs-duo-plan.md.
+south:agents/decisions/makgora/murlocs-duo-plan.md.
 
 All geometry, damage, timings and bars below are original provisional
-Smashcraft values, relayed with Tom's approval of the plan on 2026-10-30, to be
+Mak'gora values, relayed with Tom's approval of the plan on 2026-10-30, to be
 revisited when the balance pass reports or a native capture shows a bar
 misreads. Smash references explain roles and trade-offs, not copied hitboxes.
 The Melee facts used come only from SmashWiki
@@ -125,7 +125,7 @@ double them. Only relations come from SmashWiki's [Fox
 (SSBM)](https://www.ssbwiki.com/Fox_(SSBM)) pages: a rapid jab that repeats at
 a short fixed rate while held and ends with a finisher, a drill whose hits come
 every few frames and end on a launching hit, and a neutral air among the
-fastest in the cast. All values are original provisional Smashcraft values.
+fastest in the cast. All values are original provisional Mak'gora values.
 
 - Flurry: jab 1 → jab 2 chain on taps as before; the third jab is the flurry. Jab 1, jab 2 and each flurry hit are drawn as point-first spear pokes, and the forward tilt as a longer reaching poke (Tom, 2026-10-30).
   While the attack button is held a slap lands every 4 frames (frames 3, 7, 11,
@@ -298,7 +298,7 @@ One rule prevents each loop the pair could build. `bun wisp interactions --attac
 
 ## Presentation
 
-The name reads "Mrgl & Grgl" with spaces on the player card, the HUD plate and results (Tom asked on 2026-11-01, after a playtest, for the spaced form wherever it fits). The card holds it on one line at 95% of its font (6.5 font sizes against the plate's 6.2). The roster tile alone keeps the compact "Mrgl&Grgl": its one line holds 6.48 font sizes on the current 32-tile grid, under the spaced name's 6.5. In the native window the player card draws both bodies live, Mrgl on the left and Grgl on the right at his match scale, as the match draws them (smashcraft:ts/src/game/ui/liveCard.ts). The HUD plate shows the name with
+The name reads "Mrgl & Grgl" with spaces on the player card, the HUD plate and results (Tom asked on 2026-11-01, after a playtest, for the spaced form wherever it fits). The card holds it on one line at 95% of its font (6.5 font sizes against the plate's 6.2). The roster tile alone keeps the compact "Mrgl&Grgl": its one line holds 6.48 font sizes on the current 32-tile grid, under the spaced name's 6.5. In the native window the player card draws both bodies live, Mrgl on the left and Grgl on the right at his match scale, as the match draws them (makgora:ts/src/game/ui/liveCard.ts). The HUD plate shows the name with
 the pair's one percent and no separate Grgl readout (the pip went with the
 shared percent on 2026-10-30; its text also overlapped the name). The camera frames Grgl as any active fighter,
 and a separated Grgl near a blast zone gets the off-screen indicator at
@@ -314,7 +314,7 @@ each starting facing.
 
 ## Home stage
 
-Tomb of Sargeras (stage 7, smashcraft:docs/design/home-stages.md): TFT's
+Tomb of Sargeras (stage 7, makgora:docs/design/home-stages.md): TFT's
 "Terror of the Tides" puts murlocs and the naga's mur'gul thralls on the
 Broken Isles' shores around the tomb, and the stage's shallow tide floor and
 waterfall are a murloc's coast. The Mrgl & Grgl share it with the Warden. No new
@@ -360,7 +360,7 @@ is separated by more than 200 units or offstage, the standard anti-pair plan.
 
 ## Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A small, light rushdown pair: Mrgl closes with dash attacks, Belly Slides and the Net while Grgl doubles the hits, holds a flank or recovers alone.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). A small, light rushdown pair: Mrgl closes with dash attacks, Belly Slides and the Net while Grgl doubles the hits, holds a flank or recovers alone.
 
 ```balance-profile
 fighter: murloc

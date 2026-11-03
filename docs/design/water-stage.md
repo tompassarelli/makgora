@@ -7,8 +7,8 @@ follows the hazard rule of #274: position, timing and effect are a fixed
 function of the match clock and the fighters' own actions, visible or
 telegraphed before they can hurt, and learnable.
 
-Units: Melee units (mu) where a source gives them; Smashcraft world units are
-six per Melee unit (smashcraft:ts/src/game/sim/tuning.ts). Frames are 60 per
+Units: Melee units (mu) where a source gives them; Mak'gora world units are
+six per Melee unit (makgora:ts/src/game/sim/tuning.ts). Frames are 60 per
 second.
 
 ## Reference 1: Jungle Japes' river (Melee)
@@ -26,7 +26,7 @@ Design targets for the river, set from SmashWiki's Jungle Japes page.
 - **Tell.** The river itself is the tell: always there, always one way.
 - **Klaptrap, the creature.** SmashWiki gives "every 8-17 seconds" in Melee,
   30% and a spike strong enough to KO anyone. Its timing is random, so
-  Smashcraft does not copy it.
+  Mak'gora does not copy it.
 - **Later versions.** Brawl lets fighters swim and float, and the Klaptrap
   comes "consistently every 10 seconds"; Ultimate keeps the leftward river
   and swimming, restores the Melee Klaptrap's one-hit spike, and keeps the
@@ -102,15 +102,15 @@ Smash's nearest equivalents, checked for the same memory:
   gauge is learnable. Rivals 2's Hyperborean Harbor is a counterpick; no
   published account of water play on it was found.
 
-## Smashcraft design: the tide at the Tomb of Sargeras
+## Mak'gora design: the tide at the Tomb of Sargeras
 
 **Home stage: Tomb of Sargeras (stage 7).** It is already "sunken ruins
-awash in the tide": a shallow tide floor (friction 0.5, smashcraft:docs/physics.md),
+awash in the tide": a shallow tide floor (friction 0.5, makgora:docs/physics.md),
 two end platforms overhanging the sea, a distant Naga temple and waterfall.
 In The Frozen Throne's "Terror of the Tides" Maiev hunts Illidan across the
 Broken Isles by sea and into the Tomb, and in "Rise of the Naga" Illidan calls
 Lady Vashj's naga up out of the ocean. It is the Warden's home stage; the
-Mrgl & Grgl (smashcraft:docs/design/murloc.md), a coastal creep with no home stage
+Mrgl & Grgl (makgora:docs/design/murloc.md), a coastal creep with no home stage
 yet, belongs here when he becomes selectable. No new stage, collision layout
 or catalog tile is needed.
 
@@ -120,7 +120,7 @@ or catalog tile is needed.
   line, with its surface at z −360 (mu −60), 60 below the deck's deepest
   underside (−300), so a fighter passes under the deck. It sits inside the
   camera's bottom (−480) and 480 above the bottom blast line (−840)
-  (smashcraft:ts/src/game/sim/stageBounds.ts).
+  (makgora:ts/src/game/sim/stageBounds.ts).
 - **In the water** means the fighter's position is below the surface.
 - **Buoyancy.** In the water a fighter's vertical speed gains 0.6 world
   units/frame² upward (Ultimate's 0.1 mu), capped at 18 up (3 mu), until it
@@ -134,7 +134,7 @@ or catalog tile is needed.
 
 ### The current: the tide turns every ten seconds
 
-Rule 2 of smashcraft:docs/design/stage-art.md keeps the stage
+Rule 2 of makgora:docs/design/stage-art.md keeps the stage
 mirror-symmetric, so unlike Jungle Japes the current alternates, on a
 1,200-frame cycle counted from match frame 1:
 
@@ -147,7 +147,7 @@ mirror-symmetric, so unlike Jungle Japes the current alternates, on a
 
 - **Region and push.** Every fighter in the water, across the whole width,
   is moved 4.8 a frame in the tide's direction, added to its position after
-  its own motion, as Smashcraft's wind already does (smashcraft:docs/stage-hazards.md).
+  its own motion, as Mak'gora's wind already does (makgora:docs/stage-hazards.md).
   Hitstun and hitlag don't stop it; it moves fighters only.
 - **Strength.** "A few seconds" to the blast line, as SmashWiki puts Brawl's Japes current: from the ledge a floating fighter
   reaches the side blast line (±1,442.6) in 176 frames (2.9 s), from under the
@@ -164,7 +164,7 @@ mirror-symmetric, so unlike Jungle Japes the current alternates, on a
   lands multiplies that water jump by 0.91, at most four times (Ultimate's
   rule). From the surface a jump and a double jump clear the deck: the
   lowest such reach on record is 429 (every hero,
-  smashcraft:docs/design/stages.md), above the surface's 360 depth, before
+  makgora:docs/design/stages.md), above the surface's 360 depth, before
   any recovery special; box 2's test checks every fighter. Where the deck
   body blocks a jump from under it, a fighter swims or rides out first.
   Leaving the water ends the push that frame.
@@ -172,7 +172,7 @@ mirror-symmetric, so unlike Jungle Japes the current alternates, on a
 ### The hydra
 
 The stage's creature is a hydra of the Broken Isles, the amphibious creep
-(stock unit sounds include `HydraDeathSwim`, smashcraft:ts/test/fixtures/stock-sound-labels.txt).
+(stock unit sounds include `HydraDeathSwim`, makgora:ts/test/fixtures/stock-sound-labels.txt).
 
 - **Trigger.** Each fighter has a water count: frames spent in the water since
   it last landed on a deck. Leaving the water pauses it; landing resets it.
@@ -195,7 +195,7 @@ The stage's creature is a hydra of the Broken Isles, the amphibious creep
 - **Escape.** Be out of the water on frame 46: jump out during the tell and
   stay out, onto a deck or with the double jump and recovery. Swimming away
   doesn't help. The computer leaves the water whenever a tell is running
-  (smashcraft:ts/src/game/match/botRecovery.ts).
+  (makgora:ts/src/game/match/botRecovery.ts).
 - **Once per visit.** After a strike the hydra submerges; that fighter's
   count restarts from zero.
 - **Hazards Off** removes the hydra. The current stays, as Ultimate keeps
@@ -218,15 +218,15 @@ never as land.
 
 ## Warcraft water rendering options
 
-From smashcraft:docs/design/visual-quality.md and
-smashcraft:docs/design/warcraft-features.md, for Classic models.
+From makgora:docs/design/visual-quality.md and
+makgora:docs/design/warcraft-features.md, for Classic models.
 
 | Option | Natives or source | For this stage |
 | --- | --- | --- |
 | Classic water tint | `SetWaterBaseColor(r, g, b, a)` | Terrain water hides with terrain. The Tomb hides terrain, so this cannot draw its sea |
 | Stock water models as effects | `AddSpecialEffect` with stock paths: the Tomb's waterfall, coral `Doodads\Ruins\Water\Coral\Coral0`, wave and water-missile spell art for foam | Native first: foam lines and the hydra's ring from stock spell art |
 | Stock terrain-water frames by path | `ReplaceableTextures\Water\Water00.blp` to `Water44.blp` (the 45 frames Warcraft's terrain water cycles), named in the model's texture list and never imported | TombSea's additive water layer flips through all 45 on a 4,050 ms global sequence (90 ms a frame, `DontInterp` texture-ID keys, the first frame again at the end so the loop closes), over the same moving UV scroll; the map's imports gain only the model and its two authored textures |
-| Smashcraft's StageWater model | `STAGE_WATER_MODEL`, generated by smashcraft:tools/stage/liquids.ts (rippled, alpha 110) | Already drawn on the Tomb's tide floor; scaled across the width it is the fallback surface, no new import |
+| Mak'gora's StageWater model | `STAGE_WATER_MODEL`, generated by makgora:tools/stage/liquids.ts (rippled, alpha 110) | Already drawn on the Tomb's tide floor; scaled across the width it is the fallback surface, no new import |
 | Fog | `SetTerrainFogEx` and 3.0 height fog | Tint the sea's far edge toward the sky; keep fighter contrast (visual-quality rule) |
 
 Cause (#277): the shared 64×64 ripple repeats across the sea, and each 128-unit deck cell restarts the same rock/vine crop.
@@ -241,7 +241,7 @@ Terrain stays hidden, swimming stays at z −360, and the terrain-water controls
 
 ## Stage board: Tomb of Sargeras (water)
 
-In #272's format; it moves into smashcraft:docs/design/stage-boards.md when
+In #272's format; it moves into makgora:docs/design/stage-boards.md when
 that file lands.
 
 | Reference | Take | In Warcraft terms, native first |

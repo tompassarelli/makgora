@@ -2,7 +2,7 @@
 
 Historical fixture notes below retain Archer only where they describe captures before the 9 October 2026 roster cut (#339); she is absent from the current roster.
 
-Smashcraft's interaction graph, computed from its own move data and physics:
+Mak'gora's interaction graph, computed from its own move data and physics:
 for each situation, the options both players have, which option beats which and
 by how many frames, and the frames in which a punish lands. It is the
 measurement layer of the design docs: it describes what the game does and holds
@@ -15,9 +15,9 @@ should look like is Tom's stance, written only in
 ## The generated graph
 
 `bun wisp interactions` writes one page per fighter, with every situation's
-tables and a Mermaid graph, to smashcraft:tools/move-data/interactions/FIGHTER.md
+tables and a Mermaid graph, to makgora:tools/move-data/interactions/FIGHTER.md
 (rifleman.md, illidan.md). The same numbers, one JSON row per
-situation and variant, are in smashcraft:tools/move-data/interactions/interactions.jsonl.
+situation and variant, are in makgora:tools/move-data/interactions/interactions.jsonl.
 Both are generated output: never edit them by hand, and never treat them as
 tuning input.
 
@@ -27,8 +27,8 @@ different trees, so landings conflicted and a merged graph could describe
 neither tree. The graph is a function of the source; derive it where it is read.
 
 Combo trees are measured by the same command. Their rows are in
-smashcraft:tools/move-data/interactions/combos.jsonl, with each fighter's
-report in smashcraft:tools/move-data/interactions/combos-FIGHTER.md. These
+makgora:tools/move-data/interactions/combos.jsonl, with each fighter's
+report in makgora:tools/move-data/interactions/combos-FIGHTER.md. These
 reports compare the measured strings and stock-taking paths with the accepted
 [combo targets](../gameplay-design.md#combo-structure). A reported violation
 feeds balance work; a passing regeneration check says the written measurement
@@ -44,7 +44,7 @@ and is excluded from the reported stock paths.
 Stock loss is observed against those defender scripts; there is no separate
 search for a directed ledge or special recovery.
 
-From smashcraft:ts/:
+From makgora:ts/:
 
 - `bun wisp interactions` plays every situation and combo search for every
   fighter, one worker thread a fighter (three workers; run it in a finite
@@ -55,7 +55,7 @@ From smashcraft:ts/:
   removed or changed against the files this checkout last wrote, with the
   changed fields; it also checks the combo rows and reports, and fails until the
   files are written again. Write the graph before changing a move, and
-  `--check` lists what the change moved. smashcraft:tools/move-data/compare.sh
+  `--check` lists what the change moved. makgora:tools/move-data/compare.sh
   `--check` runs it after the move comparisons.
 - `bun wisp interactions --move FIGHTER:MOVE` (for example
   `rifleman:forward-air`, `rifleman:down-tilt`) plays that fighter's situations
@@ -65,9 +65,9 @@ From smashcraft:ts/:
   changed move is evaluated against the graph, by move comparisons and by
   character creation.
 
-Implementation: smashcraft:ts/scripts/interactions.ts (situations, engine,
-pages), smashcraft:ts/scripts/interactionsWorker.ts and
-smashcraft:ts/scripts/wisp/commands/interactions.ts.
+Implementation: makgora:ts/scripts/interactions.ts (situations, engine,
+pages), makgora:ts/scripts/interactionsWorker.ts and
+makgora:ts/scripts/wisp/commands/interactions.ts.
 The graph reports one safe and one punishable aerial on shield per fighter
 (#106): Archer's spaced fade-back forward air (-1,
 safe) and early advancing neutral air (-13, shield-grabbed), Rifleman's
@@ -79,7 +79,7 @@ jump neutral air and jump back air 13 frames after contact.
 ## How it is measured
 
 Every number comes from playing the situation through the match frame executor
-from controller rows (smashcraft:ts/src/game/match/padScene.ts, shared with the
+from controller rows (makgora:ts/src/game/match/padScene.ts, shared with the
 Melee oracle), with the six-frame attack buffer a live match gives each player.
 So the graph reads the authored timing, hit regions, landing lag, shield,
 hitlag, hitstun and input rules exactly as a match does, not a second model of

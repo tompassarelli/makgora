@@ -1,14 +1,14 @@
 # Drills and multi-hit aerials
 
 How platform fighters build multi-hit aerials, why drill down airs are hard
-to escape at low percent, and how Smashcraft's drills and multi-hit aerials
+to escape at low percent, and how Mak'gora's drills and multi-hit aerials
 work (#152). Retrieved 2026-10-07.
 
 ## Reference facts
 
 ### Melee
 
-Frame data from the one corpus, smashcraft:references/melee-frame-data/
+Frame data from the one corpus, makgora:references/melee-frame-data/
 (`records.jsonl` from meleeframedata.com, hitbox frames from libmelee's
 `framedata.csv` in `libmelee.jsonl`):
 
@@ -72,24 +72,24 @@ neutral or forward air. Examples:
   Piranha Plant's up special at 3 and 3.5
   ([SmashWiki](https://www.ssbwiki.com/Piranha_Plant_(SSBU)/Up_special)).
 
-## Smashcraft's rules
+## Mak'gora's rules
 
 - **Rehit by window.** A contact may hit a target once per window; a later
-  window may hit it again (smashcraft:ts/src/game/sim/attacks.ts). A
+  window may hit it again (makgora:ts/src/game/sim/attacks.ts). A
   multi-hit gives hit *k* window *k*; `multiHit` in
-  smashcraft:ts/src/game/sim/heroes/multiHit.ts builds them.
+  makgora:ts/src/game/sim/heroes/multiHit.ts builds them.
 - **Link hits.** Every hit but a multi-hit's last is a link hit: zero
   growth, so its launch is its base at every percent and weight, and its
   hitstun covers the gap to the next hit, even crouch-cancelled. An
   airborne target struck by one also takes the attacker's own velocity
-  (`carry` in smashcraft:ts/src/game/sim/hitRegions.ts, applied in
-  contacts.ts): Smashcraft's form of the autolink angle. Grounded targets
+  (`carry` in makgora:ts/src/game/sim/hitRegions.ts, applied in
+  contacts.ts): Mak'gora's form of the autolink angle. Grounded targets
   are held on the floor by a downward link.
 - **Drills.** An authored `fall` holds the attacker's vertical speed over
   attack frames, replacing gravity and fast fall; horizontal air drift and
   stick control persist through every aerial, as in Melee (Tom, 0.0.103); a `landingHit` turns landing during the active frames into a
   grounded continuation of the same attack instead of landing lag, so its
-  hits keep their windows (smashcraft:ts/src/game/sim/down.ts).
+  hits keep their windows (makgora:ts/src/game/sim/down.ts).
 - **SDI stays the answer.** Bounded SDI allows 12 Melee units per hit and
   24 per string ([gameplay design](../gameplay-design.md#bounded-sdi)), so
   every new multi-hit is shaped so that a defender who smash-DIs away
@@ -115,7 +115,7 @@ shared up air was already two hits (4 then 8, two frames apart); both link,
 but its second hit covers the same box as the first, so one hit's SDI
 cannot clear it.
 
-smashcraft:ts/src/game/match/multiHitAerialContracts.tests.ts plays each
+makgora:ts/src/game/match/multiHitAerialContracts.tests.ts plays each
 through the match step with scripted inputs: every hit connects in order at
 0, 50 and 100%; the drills' endings; a shield grab punishing a shielded
 Bladestorm; SDI away escaping each new multi-hit before its last hit; and a

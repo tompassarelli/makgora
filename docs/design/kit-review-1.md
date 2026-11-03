@@ -11,7 +11,7 @@ being redesigned elsewhere are out of scope: Rifleman's bear (#111), blaster
 (#117) and frost trap (#114), and Illidan's Mana Burn (#116).
 
 Numbers are provisional authoring values, not measured balance; #105 tunes
-them. Frames follow the roster notation (smashcraft:docs/design/roster.md):
+them. Frames follow the roster notation (makgora:docs/design/roster.md):
 the press is frame 1, windows are inclusive. H is the hero reference height,
 132 units. Run speeds for scale: Archer 13.2 a frame, Blademaster 14.3,
 Warden 15.0, Mountain King 11.6.
@@ -98,7 +98,7 @@ These are kit data, so each fighter states which it uses:
 
 - **Branches after the press.** A running special lists follow-ups, each with
   a frame window and the input that takes it: special, attack or shield. The
-  first matching branch replaces the rest of the action (smashcraft:ts/src/game/sim/specials/schema.ts).
+  first matching branch replaces the rest of the action (makgora:ts/src/game/sim/specials/schema.ts).
   A follow-up can turn the fighter to the held stick when it starts.
 - **Travel that passes bodies but stops at a raised shield.**
 - **Relocation:** a motion frame that moves the fighter to its placed object,
@@ -144,7 +144,7 @@ pressure, an edge-guard (leave the image at the ledge, swap there), and one
 length of sideways travel offstage before an angled Rising Whirlwind. The
 computer recovers with both: from 700 units past the ledge at deck height
 with no jump left, the step is what gets him back
-(smashcraft:ts/src/game/fighters/blademaster/recovery.tests.ts).
+(makgora:ts/src/game/fighters/blademaster/recovery.tests.ts).
 
 Rejected: an image that attacks on its own (an autonomous clone is a second
 fighter's worth of pressure for 15 mana; the roster forbids autonomous clone
@@ -189,13 +189,13 @@ his body with the Wind Walk sound; the attacker draws frozen. The Wind
 Walk Kick clip crouches him behind them with the sword hand planted on the
 floor, then rolls him over that hand into a handstand, legs straight up
 through the kick's capsules on frames 13-22, and brings him back to his
-guard by frame 46 (smashcraft:tools/animations/blademaster-clips.ts,
+guard by frame 46 (makgora:tools/animations/blademaster-clips.ts,
 `--replace counter`). The attacker's own momentum stops when it is
 countered, so the kick also meets an attacker that was falling fast.
 
 Counterplay: the fade is the cue. Wait it out: every fighter's dash attack or
 running grab pressed the frame after the window closes lands before he can act
-(smashcraft:ts/src/game/fighters/blademaster/specials.tests.ts). Grabs and
+(makgora:ts/src/game/fighters/blademaster/specials.tests.ts). Grabs and
 shields beat it outright, since only a strike is countered.
 
 Rejected for #523 and later replaced: the dash through the opponent (no hit,

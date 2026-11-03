@@ -6,12 +6,12 @@ strings, and her down special reveals Onyxia, the black dragonflight's
 broodmother, whose claws, tail and breath guard the ledge and finish the
 stock. Tom asked for her in the Goblin Alchemist's place, with the
 transformation on down special and a separate ultimate (2026-10-31). All
-combat values are original, provisional Smashcraft tuning.
+combat values are original, provisional Mak'gora tuning.
 
 ## Roster place
 
 - She takes the Goblin Alchemist's place. The Alchemist is hidden, not
-  deleted: `HIDDEN_FIGHTERS` in smashcraft:ts/src/game/sim/heroes/releaseRoster.ts
+  deleted: `HIDDEN_FIGHTERS` in makgora:ts/src/game/sim/heroes/releaseRoster.ts
   lists his slug, which takes him off the select grid, Random and the
   computers' draws; removing it restores him. His kit, look, home stage
   row and object data stay.
@@ -26,7 +26,7 @@ The forms are two characters: `Character.onyxia` (Prestor, selectable) and
 `Character.onyxiaDragon` (the dragon, never selectable). A swap sets the
 fighter's character and copies that character's tuning (moves, specials,
 ultimate, physics, ground, shield) on the swap's last frame
-(smashcraft:ts/src/game/sim/forms.ts). Character and tuning are already in
+(makgora:ts/src/game/sim/forms.ts). Character and tuning are already in
 the rollback snapshot and the state hash, so the swap replays like any
 other state, and every per-character table (hurtbox, body, model, sounds,
 CPU plan) follows the current form. The dragon's hero names Prestor as its
@@ -113,13 +113,13 @@ in the air; hitting her ends it and every flame still to come.
 ## Models and credits
 
 The terms of both pages Tom chose were read on 31 October 2026 and are
-recorded in smashcraft:docs/design/roster-next.md#hive-model-terms.
+recorded in makgora:docs/design/roster-next.md#hive-model-terms.
 
 - The dragon: [Onyxia by Symphoneum](https://www.hiveworkshop.com/threads/onyxia.348925/),
   its "Lore Accurate" `Onyxia.mdx` and `Onyxia_portrait.mdx`, built from
   Warcraft III Reforged assets and usable with credit to Symphoneum. It is a
-  Reforged HD model (PBR textures in DDS); Smashcraft ships a Classic MDX 800
-  conversion of it (smashcraft:tools/animations/hd-to-classic.ts), which draws
+  Reforged HD model (PBR textures in DDS); Mak'gora ships a Classic MDX 800
+  conversion of it (makgora:tools/animations/hd-to-classic.ts), which draws
   the diffuse texture only. It has flying animations only, so the dragon hovers
   with its claws on the floor.
   Tom judged the first draw (scale 0.4, a standing body 154 units tall, 1.17
@@ -146,6 +146,6 @@ recorded in smashcraft:docs/design/roster-next.md#hive-model-terms.
 ## Status (31 October 2026)
 
 Landed: this design and the select grid order. The form swap, both kits and
-their tests are on the `onyxia` branch (smashcraft:ts/src/game/sim/forms.ts,
-smashcraft:ts/src/game/fighters/onyxia/), waiting on the Prestor model and the
+their tests are on the `onyxia` branch (makgora:ts/src/game/sim/forms.ts,
+makgora:ts/src/game/fighters/onyxia/), waiting on the Prestor model and the
 dragon's Classic-mode check before the roster switch hides the Alchemist.

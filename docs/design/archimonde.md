@@ -3,8 +3,8 @@
 Archimonde is a superheavy zone-control punisher: the tallest fighter in the
 roster, who marks the ground and waits for the foe to step into it. Tom asked
 for him (2026-10-28); his spec is the Archimonde section of
-smashcraft:docs/design/roster-next.md. All combat values are original,
-provisional Smashcraft tuning; the Melee anchor is Ganondorf's shape (slow,
+makgora:docs/design/roster-next.md. All combat values are original,
+provisional Mak'gora tuning; the Melee anchor is Ganondorf's shape (slow,
 heavy, huge punishes, a recovery edge-guards punish), not his numbers.
 
 ## Body and model
@@ -54,7 +54,7 @@ route ends at Kil'jaeden; the Classic boss Archimonde is a separate boss kind.
 
 ## Play-style profile
 
-Tom-tunable draft (2026-10-28; smashcraft:docs/design/balance.md,
+Tom-tunable draft (2026-10-28; makgora:docs/design/balance.md,
 "Play-style profiles"). He holds ground with the column and the pillars,
 then punishes approaches with the claw smash and the back air.
 
@@ -89,7 +89,7 @@ the same CPU skill.
 
 The Balance workflow's field (Wren Expert, 400 matches a pair) over his 27
 matchups only (`--matchups`), at main f994bc7, GitHub run
-[40889015028](https://github.com/tompassarelli/smashcraft/actions/runs/40889015028),
+[40889015028](https://github.com/tompassarelli/makgora/actions/runs/40889015028),
 puts him at **34% wins**, outside the 40-60% band. This is a repair
 measurement, not the full-roster gate. Against the profile above (archetype
 bait-and-punish):
@@ -111,14 +111,14 @@ The first measurement's 34% led to three field runs over his 30 matchups
 (`--matchups`, Wren Expert, 400 matches a pair, probe skipped). Holding him at
 range with a shoot-only approach, retreat-leaning defense and `whenStale: hold`
 made him worse (25% wins, GitHub run
-[41069772700](https://github.com/tompassarelli/smashcraft/actions/runs/41069772700)),
+[41069772700](https://github.com/tompassarelli/makgora/actions/runs/41069772700)),
 so the gameplan stays as authored. A longer, steerable Fel Ascent (rise 1.8 to
 2.6 reference heights, drift 2 to 6) reached 36% (run
-[41080144005](https://github.com/tompassarelli/smashcraft/actions/runs/41080144005)):
+[41080144005](https://github.com/tompassarelli/makgora/actions/runs/41080144005)):
 41% of his stocks were lost more than 3 s after a hit. A smaller hurt body
 (width 1.70 to 1.45, height 1.60 to 1.50 times the reference) with faster run
 (0.70 to 0.80) and air speed (0.72 to 0.82) reached **45% wins** (run
-[41082799550](https://github.com/tompassarelli/smashcraft/actions/runs/41082799550),
+[41082799550](https://github.com/tompassarelli/makgora/actions/runs/41082799550),
 12240 matches), inside the 40-60% band. Shares at that run:
 
 - archetype bait-and-punish
@@ -158,7 +158,7 @@ does not pass yet:
 - The first frames of the forward smash and ultimate rows come from before the
   match clock restarts, and the walk shows almost no travel.
 
-Sheets and viewer notes: `~/.local/state/smashcraft/evidence/sc-664`.
+Sheets and viewer notes: `~/.local/state/makgora/evidence/sc-664`.
 
 ## Native re-capture (2026-10-31)
 
@@ -189,7 +189,7 @@ aerials, down smash, grab and the whiteout flashes, and a full 58-row reel at
 
 Both native-check boxes were run on gex45 pair 1 through `nativeCapture.ts`
 (Classic, offline pool). Sheets, row key and viewer reads:
-`~/.local/state/smashcraft/evidence/sc-native-archi`.
+`~/.local/state/makgora/evidence/sc-native-archi`.
 
 **Knockdown, lie and get-up (#823).** `archimonde-left.pad` and
 `archimonde-right.pad` captured 9 of 9 frames each, none missed. Two fresh

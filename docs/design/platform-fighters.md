@@ -10,9 +10,9 @@ analysts give. It is descriptive and sourced and states no preference.
   release, air-dodge limits, rage, ledge trumping, parry buttons, wall jumps):
   [modern platform fighters](modern-platform-fighters.md).
 - Tech windows, buffers and reaction limits: [execution windows](execution-windows.md).
-- Smashcraft's computed interaction graph:
-  [#67](https://github.com/tompassarelli/smashcraft/issues/67).
-- Smashcraft's decisions: only [gameplay design decisions](../gameplay-design.md).
+- Mak'gora's computed interaction graph:
+  [#67](https://github.com/tompassarelli/makgora/issues/67).
+- Mak'gora's decisions: only [gameplay design decisions](../gameplay-design.md).
   Its implementation: [physics](../physics.md), [move data](../move-data.md),
   [move comparisons](../move-comparisons.md).
 
@@ -157,7 +157,7 @@ time, and the reach and side of the defender's OoS options.
   whiff punishing is less tight
   ([Neutral Spacing, 2022](https://nmwhittier.wordpress.com/2022/10/30/leveraging-and-avoiding-baits-part-2-neutral-spacing/)).
 - **Landing lag is the aerial's recovery.** Melee's L-cancel halved it on
-  input; Rivals adds lag only on whiff; Smashcraft's choice is in
+  input; Rivals adds lag only on whiff; Mak'gora's choice is in
   [gameplay design decisions](../gameplay-design.md#l-cancelling); other games'
   alternatives are in [modern platform fighters §15](modern-platform-fighters.md#15-landing-lag-alternatives-to-l-cancel).
 
@@ -219,8 +219,8 @@ time, and the reach and side of the defender's OoS options.
   hitboxes carry drift-DI and SDI multipliers
   ([Rivals hitbox grid](https://rivalsofaether.com/hitbox-grid-indexes/)).
   Melee's SDI extremes are part of the
-  [case study](melee/techniques.md#sdi-teleports); Smashcraft's
-  bounded design is [#70](https://github.com/tompassarelli/smashcraft/issues/70).
+  [case study](melee/techniques.md#sdi-teleports); Mak'gora's
+  bounded design is [#70](https://github.com/tompassarelli/makgora/issues/70).
 
 ## Tech chases
 
@@ -231,7 +231,7 @@ time, and the reach and side of the defender's OoS options.
   Melee's cast) ([SmashWiki Tech](https://www.ssbwiki.com/Tech); other games in
   [execution windows](execution-windows.md)).
 - **Missed tech.** The fighter lies down and chooses among getup, getup attack
-  and getup rolls, or stays and risks jab resets (Smashcraft's version:
+  and getup rolls, or stays and risks jab resets (Mak'gora's version:
   [physics](../physics.md), "Grounded knockdown and jab resets").
 - **Tech chasing** follows or predicts the tech: "it is possible to read (or, in
   some cases, react to) the direction of a player's tech and punish them." It
@@ -370,7 +370,7 @@ play ([slippi-js stats](https://github.com/project-slippi/slippi-js/tree/master/
   the opponent's own opening was in progress) or **trades** (both at once),
   giving a neutral win ratio, counter-hit ratio and beneficial-trade ratio.
 
-## Smashcraft decisions
+## Mak'gora decisions
 
 The questions raised here about shields, aerial shieldstun, whiffs, cross-ups,
 grab/strike priority, clanking, ledges, DI, tech chases, launchers, recovery and

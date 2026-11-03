@@ -9,7 +9,7 @@ ideas only: no Dota 2 model, sound, text or ability name appears in the map,
 the repository or the release page, and every move is named and described in
 Warcraft terms.
 
-This is a plan. Every number below is an original, provisional Smashcraft
+This is a plan. Every number below is an original, provisional Mak'gora
 value to tune, not copied frame data. Melee anchors are cited for role and
 trade-off relations only, from public frame data, under the `game-ip` rule.
 
@@ -18,18 +18,18 @@ own words, so when the first new fighter lands, AGENTS.md's "holds at 26" line
 and roster.md's opening paragraph change to 29 in that same change.
 
 Issues:
-[Uther (#662)](https://github.com/tompassarelli/smashcraft/issues/662),
-[Lady Vashj (#663)](https://github.com/tompassarelli/smashcraft/issues/663),
-[Archimonde (#664)](https://github.com/tompassarelli/smashcraft/issues/664),
-[Tyrande (#665)](https://github.com/tompassarelli/smashcraft/issues/665),
-[Stitches (#666)](https://github.com/tompassarelli/smashcraft/issues/666),
-[dismounted Thrall (#667)](https://github.com/tompassarelli/smashcraft/issues/667).
+[Uther (#662)](https://github.com/tompassarelli/makgora/issues/662),
+[Lady Vashj (#663)](https://github.com/tompassarelli/makgora/issues/663),
+[Archimonde (#664)](https://github.com/tompassarelli/makgora/issues/664),
+[Tyrande (#665)](https://github.com/tompassarelli/makgora/issues/665),
+[Stitches (#666)](https://github.com/tompassarelli/makgora/issues/666),
+[dismounted Thrall (#667)](https://github.com/tompassarelli/makgora/issues/667).
 
 ## Models and source terms
 
 Stock paths were checked on 28 October 2026 by extracting each file from the
 Classic `war3.w3mod` storage with the CASC extractor
-(smashcraft:tools/animations/casc-extract.cpp). No Warcraft client was started.
+(makgora:tools/animations/casc-extract.cpp). No Warcraft client was started.
 Sequence and bone lists come from each file's `SEQS` and `BONE` chunks.
 
 | Fighter | Model | Rig | Stock sequences |
@@ -106,7 +106,7 @@ check; the Onyxia page matches the Wayback Machine's 25 June 2025 copy.
   - Not used. The page is filed under "Ported Models", its author line is
     "ZugothNDeadly, Blizzard Entertainment", and its title names the World
     of Warcraft Classic version: a model ported from World of Warcraft's
-    files, which smashcraft's clean-room rule forbids. State Pending,
+    files, which makgora's clean-room rule forbids. State Pending,
     created 16 October 2026, `LadyKatranaPrestor.mdx`, 1,344 polygons.
   - Candidates read the same day for gate 145: Footman16's
     [Katrana Prestor](https://www.hiveworkshop.com/threads/katrana-prestor.362851/)
@@ -532,7 +532,7 @@ is done.
 | Bots | match/botMoves.ts, match/botPerception.ts, match/botCandle.ts, match/edgeGuardScenarios.ts | Remove the fighter cases; the new fighters' gameplans take their place. |
 | Selection and menus | ui/selectionFrames.ts, host/loop/ui.ts, menu/homeStages.ts, classic/routes.ts, classic/loreBattles.ts, session/fighterSetup.ts, session/trailerShots.ts | Replace each with the new fighter's row, in the same slot when the select grid keeps its order. |
 | Presentation | fighterClips, fighterPose, fighterViewBounds, heroStrikeMomentInfo, hurtVoice, matchAudio, modelScale, moveSounds, moveTiers, specialCues, disjointCues, drawnStrideInfo, render/projectilePresentation | Remove the rows. |
-| Generated | ts/src/generated/clips/{forsaken-paladin,kobold}.ts, fighter-art/, white-models/, white-facts/, whiteFighterModels.ts, whiteModelFacts.ts, fighterArtData.ts, fighterOriginalClipInfo.ts, stockSoundInfo.ts, state/ | Regenerate each through its producer (`smashcraft-tools build-animation-assets`, the codegen). Generated files are never hand-edited. |
+| Generated | ts/src/generated/clips/{forsaken-paladin,kobold}.ts, fighter-art/, white-models/, white-facts/, whiteFighterModels.ts, whiteModelFacts.ts, fighterArtData.ts, fighterOriginalClipInfo.ts, stockSoundInfo.ts, state/ | Regenerate each through its producer (`makgora-tools build-animation-assets`, the codegen). Generated files are never hand-edited. |
 | Animation tools | tools/animations/forsaken-paladin-clips.ts, forsaken-paladin-weapon-clips.ts, stock-forsaken-model.ts, kobold-clips.ts, rigs/{forsakenpaladin,kobold}.ts and rigs/index.ts, plus rows in grab-clips, jump-clips, murloc-clips, pain-captures, pain-pads, recovery-clips and victory-clips | Delete the per-fighter files and remove the rows. |
 | Host scripts | ts/scripts/wisp/koboldDirectionChecks.ts, acceptanceTapes, acceptChecks, commands/{anim,combos,view}.ts, cueBudget, drawnMotionInfo, drawnReachInfo, effectVisibility, showcaseChecks, specialStripChecks, teamResultsCheck, cue-models.tsv, aerialDownSpecials, cameraFeel, fighterPortraits, portraitParts, throwParity, throwRoleObjectives, and 6 model-facts JSON files | Delete the Kobold check and the model facts; remove the rows elsewhere. |
 | Balance census | ts/scripts/balanceBaseline.json (both fighters), ts/test/fixtures/census/census-pairs.txt (both pairs), tools/move-data/ (advantage state, combo potential and objectives, fighter strengths, radius exceptions, throw parity, anim-score judge) | Regenerate with the new fighter in the same change: the farm baseline through `bun wisp farm balance --wait`, the census pairs through their census run, and the move-data reports through Autoland's report regeneration. |

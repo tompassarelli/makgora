@@ -1,19 +1,19 @@
 # Online
 
 - Direct play: `bun wisp online host [--client NAME] [--password VALUE]` hosts the newest
-  Smashcraft map as a private Battle.net game and prints its join code;
+  Mak'gora map as a private Battle.net game and prints its join code;
   `bun wisp online join CODE [--client NAME] [--password VALUE]` joins it;
   with an explicit host password, the guest supplies that same password. All
   hosted games are private and passworded; without the flag the code carries
   the generated password. Both return at fighter selection. The host presses Start now once the guest has joined; no Battle.net chat is sent.
   `online setup` installs the menu page and Allow Local Files after
   the owner agrees. These are developer and test tools for our own clients:
-  no player build runs them, because Smashcraft provides no online play
-  inside the Warcraft client (smashcraft-client#28, 2026-10-31;
-  smashcraft:docs/design/client.md, "Direct play").
+  no player build runs them, because Mak'gora provides no online play
+  inside the Warcraft client (makgora-client#28, 2026-10-31;
+  makgora:docs/design/client.md, "Direct play").
 - Standalone window through Wisp's relay: the client's Online page offers only this
-  (smashcraft-client#25, #26). Host runs `bun wisp play --standalone --host --relay nearest`
-  in this `ts/` folder (`SMASHCRAFT_TS`). The command pings every relay region
+  (makgora-client#25, #26). Host runs `bun wisp play --standalone --host --relay nearest`
+  in this `ts/` folder (`MAKGORA_TS`). The command pings every relay region
   (the published `sgp`, plus any `WISP_RELAYS="name=ADDRESS:PORT"` adds), opens
   a room on the nearest and prints, on standard error, `net: hosting through
   REGION, round trip to it N ms` and, on standard output, `TITLE: join code

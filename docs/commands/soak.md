@@ -21,8 +21,8 @@
   Its saved samples include each menu's reachable table field shapes and
   representative reference paths: compare the full shape union between a
   warm-up high and a later rise to identify the retaining lifecycle.
-  `bun wisp soak handles [--rematches N]` plays smashcraft:ts/scripts/wisp/handleBaseline.ts's
-  four-computer match and 20 rematches (N) through fighter selection in Bun (smashcraft:ts/test/soak/handles.ts) and on the compiled integrity build in
+  `bun wisp soak handles [--rematches N]` plays makgora:ts/scripts/wisp/handleBaseline.ts's
+  four-computer match and 20 rematches (N) through fighter selection in Bun (makgora:ts/test/soak/handles.ts) and on the compiled integrity build in
   32-bit Lua, both runs at once (#409). After every match each live Warcraft handle kind at
   fighter selection must equal its menu baseline: the kinds the first match adds and the menu keeps
   (effects and frames of the stage-loading cover, one fighter body per fighter) equal their counts
@@ -42,7 +42,7 @@
   matches still in play at the frame cap, stuck matches (no damage or stock change for
   `--stuck-seconds`, 30), zero-to-death strings of three or more hits, strings of two or more
   true moves (no actionable frame between them; one move instance's hits count once)
-  branched over every victim option (smashcraft#10 C12): `true-chain` (more than
+  branched over every victim option (makgora#10 C12): `true-chain` (more than
   `--chain-max`, 2, follow-ups no option escapes), `low-agency-link` (a later
   follow-up escaped by under `--escape-floor`, 0.1, of options), `long-no-control`
   (links each under that floor for over `--control-seconds`, 3) and `loop` (a
@@ -58,4 +58,4 @@
   or on the After 0.1 issue (#14) when no epic matches, never as a new issue, and skips a
   comment that repeats the last one. `--issues FINDINGS --dry-run` prints those
   actions instead of the JSON lines the workflow applies with gh. The loop, the
-  classification and the issue actions are pure in smashcraft:ts/scripts/playtestCore.ts.
+  classification and the issue actions are pure in makgora:ts/scripts/playtestCore.ts.

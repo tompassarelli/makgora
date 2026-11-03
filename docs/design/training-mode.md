@@ -25,7 +25,7 @@ Sources: [TrainingMode Community Edition](https://github.com/AlexanderHarrison/T
 [EventHubs on SF6's frame meter](https://www.eventhubs.com/news/2022/sep/16/sf6-training-visual-frame-data),
 [Infil's SF6 beta notes](https://words.infil.net/w03-sf6beta-p6.html).
 
-## What Smashcraft keeps, and why
+## What Mak'gora keeps, and why
 
 1. **Frame readout.** After each of the player's attacks: the frame its first
    hit can land (startup), how many frames it can hit (active) and its total
@@ -54,7 +54,7 @@ Sources: [TrainingMode Community Edition](https://github.com/AlexanderHarrison/T
 6. **Hit areas.** An option draws every active attack's hit areas and every
    fighter's body, red and green after Rivals (parts that cannot be hit in
    blue), as lightning outlines on the fighters' plane. It reads the same
-   authored volumes the hits use (smashcraft:docs/hurtboxes.md), so what it draws is
+   authored volumes the hits use (makgora:docs/hurtboxes.md), so what it draws is
    what hits.
 7. **Speed.** Full, Half or Quarter: the match runs on the last of every one,
    two or four input frames. Presses made on the frames it skips are kept
@@ -68,7 +68,7 @@ Sources: [TrainingMode Community Edition](https://github.com/AlexanderHarrison/T
 - **Frame advance and savestates.** Warcraft matches are multiplayer and
   rollback-confirmed; a paused frame advance would need every client's
   controller helper to agree on each step (the pause barrier,
-  smashcraft:ts/src/game/session/pauseBarrier.ts) and savestates would need a
+  makgora:ts/src/game/session/pauseBarrier.ts) and savestates would need a
   second snapshot channel. Quarter speed covers most of the use.
 - **Changing partner settings mid-match.** Settings are chosen at fighter
   selection; leaving from the pause returns there in two presses. Changing
@@ -80,7 +80,7 @@ Sources: [TrainingMode Community Edition](https://github.com/AlexanderHarrison/T
 ## How it works
 
 Training is `MatchState.training` plus a `TrainingState` record
-(smashcraft:ts/src/game/match/trainingState.ts) holding the partner settings and
+(makgora:ts/src/game/match/trainingState.ts) holding the partner settings and
 the readout. Both are synchronized simulation state: they are copied with the
 match, compared by the replay difference and written to the checksum (only
 when training is on, so other matches keep their checksums). The partner's
@@ -91,12 +91,12 @@ network rows and replays all use the same partner. The readout is measured in
 `Controls.resetPressed`, adapted from the input row (both trigger actions or
 analog triggers held as attack is pressed), and runs at the start of the
 frame. Hit areas are presentation
-(smashcraft:ts/src/game/presentation/hitAreas.ts): the lightning is created
+(makgora:ts/src/game/presentation/hitAreas.ts): the lightning is created
 with the fighter's renderers at match start and posed from the predicted
 world, like the other effects; it never feeds the simulation. Setup commands
 for native sessions: `-dev training on`, `-dev hit-areas on`,
 `-dev partner BEHAVIOUR DRIFT TECH DAMAGE`, `-dev speed 1|2|4`
-(smashcraft:ts/src/game/session/sessionSetup.ts).
+(makgora:ts/src/game/session/sessionSetup.ts).
 
 ## Tutorial
 
@@ -104,7 +104,7 @@ The basic tutorial (#306) runs as a training match on the Sky Deck with the
 partner standing: ten lessons (move and dash, double jump, attacks, the four
 specials, ultimate orbs, the ultimate, shield and dodge, grab and throw, back to
 the ledge, knock out the partner), each with one instruction in the readout's
-place and a count the sim keeps (smashcraft:ts/src/game/match/tutorial.ts).
+place and a count the sim keeps (makgora:ts/src/game/match/tutorial.ts).
 The specials lesson counts each of neutral, side, up and down once; the orbs
 lesson (lesson 5, "Ultimate orbs", since 2026-10-29)
 hangs an orb above centre stage whenever the player's meter is not full and
@@ -122,5 +122,5 @@ when other players are in the lobby, so their next match is Versus rather than
 the tutorial again (#676). The Guide's How to Play (Tutorial) row
 opens the menu where any lesson can be chosen and replayed. The same menu
 opens by itself on fighter selection for a player whose client has never
-started a match or answered it (`SmashcraftTutorial.pld`;
-smashcraft:ts/src/game/ui/tutorialMenu.ts).
+started a match or answered it (`MakgoraTutorial.pld`;
+makgora:ts/src/game/ui/tutorialMenu.ts).

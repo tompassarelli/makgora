@@ -1,13 +1,13 @@
 # Movement
 
-Smashcraft's air dodge matches this Melee reference: 3.1 Melee units per
+Mak'gora's air dodge matches this Melee reference: 3.1 Melee units per
 frame. #347 raised it to 3.4; Tom found platform wavelands slid off too far
 (17 Oct), so it is back at 3.1. Decay stays 0.9, landing lag stays 10
 frames, and intangibility is unchanged.
 A wavedash carries
 its landing velocity into the fighter's traction, doubled above its
-walk speed as below. Smashcraft's heroes span traction 0.03-0.08
-(smashcraft:docs/physics.md, "Ground traction by fighter").
+walk speed as below. Mak'gora's heroes span traction 0.03-0.08
+(makgora:docs/physics.md, "Ground traction by fighter").
 
 How Melee's fighters move: the rules the game applies to every fighter, and the
 per-fighter parameters those rules read. Conventions and sources are in the

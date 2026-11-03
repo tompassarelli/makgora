@@ -2,8 +2,8 @@
 
 - Tiers: the edit loop runs locally and aims at under 60 s: `bun wisp dev`
   on each save (type errors of the saved files, their affected unit tests and
-  journeys, then the whole type check; smashcraft:docs/commands/dev.md). The
-  landing gate runs the landing checks a lane's diff can reach on the landing machine, and Background sweeps runs the host test suite (`bun run test`) on each landed commit (smashcraft:docs/ci.md, "Landing"). After landing, Background sweeps runs every sweep
+  journeys, then the whole type check; makgora:docs/commands/dev.md). The
+  landing gate runs the landing checks a lane's diff can reach on the landing machine, and Background sweeps runs the host test suite (`bun run test`) on each landed commit (makgora:docs/ci.md, "Landing"). After landing, Background sweeps runs every sweep
   on the landed SHA. Nightly or on dispatch: Playtest, Memory soak, Headless
   pads, Balance and Perf; Effect upgrade runs weekly.
 
@@ -18,15 +18,15 @@
   camelCase `*.tests.ts` beside its module; the Lua32 suite and
   test/game.test.ts run them. Host tools test in kebab-case
   `ts/test/*.test.ts`, which `bun run test` runs; list a new one in
-  smashcraft:ts/tsconfig.json's `include` so `bun run check` type-checks it.
+  makgora:ts/tsconfig.json's `include` so `bun run check` type-checks it.
 
 - Sweeps: a test that plays many matches, a whole roster or every stage is a
-  sweep: register it with `sweep()` (smashcraft:ts/src/game/core/sweep.ts, or
-  smashcraft:ts/test/sweep.ts in Bun-only files) and keep its smallest form,
+  sweep: register it with `sweep()` (makgora:ts/src/game/core/sweep.ts, or
+  makgora:ts/test/sweep.ts in Bun-only files) and keep its smallest form,
   such as one seeded match, as an ordinary test. The suite skips sweeps;
   `SWEEPS=1 bun run test` and `SWEEPS=1 bun scripts/lua-tests.ts` run only
   them. `SWEEP_PLACEMENT=gate` runs only the short allowlist in
-  smashcraft:ts/src/game/core/gateSweeps.ts (one cheap seeded representative
+  makgora:ts/src/game/core/gateSweeps.ts (one cheap seeded representative
   of a family no ordinary test protects at landing);
   `SWEEP_PLACEMENT=background` runs every other sweep. Background sweeps runs
   them on hosted runners on every landed main SHA and nightly, at most three
@@ -39,10 +39,10 @@
   sweeps uses `SWEEP_PLACEMENT=background`.
 
 - Test cost: ts/AGENTS.md sets the per-test ceilings. The Lua32 runner
-  (`bun scripts/lua-tests.ts`, enforced by smashcraft:ts/scripts/testCost.ts)
+  (`bun scripts/lua-tests.ts`, enforced by makgora:ts/scripts/testCost.ts)
   counts each test's Lua VM instructions and kilobytes allocated, charges
   them to its src module and compares each module with its row in its
-  shard smashcraft:records/lua-cost/<module path>.tsv (one file per module). Counts are deterministic for a
+  shard makgora:records/lua-cost/<module path>.tsv (one file per module). Counts are deterministic for a
   runtime and test order, so every machine judges alike and nothing is
   scaled (#394). A test over 420M instructions (the 6 s ceiling at the
   reference runner's 70M instructions per second) fails, and so does a module
@@ -52,12 +52,12 @@
   new module or a changed test count passes under the ceiling and rewrites
   its shard: commit it with the tests. `TEST_COST_UPDATE=1` rewrites every
   measured shard, after a cut. A run rewrites only the shards of the modules
-  it ran, and `bun run check` (smashcraft:ts/scripts/luaCostRecordsCheck.ts)
+  it ran, and `bun run check` (makgora:ts/scripts/luaCostRecordsCheck.ts)
   refuses a shard whose test file is gone or moved, so delete or move it with
   the test. The farm's merge job judges every partition's rows.
   Natives are counted by the frame-cost gate (`bun wisp perf compare`), not
   here. `bun run test` counts the frames stepMatch simulates in each test
-  (smashcraft:ts/test/testCost.ts) and fails a test over the 58,000-frame
+  (makgora:ts/test/testCost.ts) and fails a test over the 58,000-frame
   Bun ceiling, 4 s at a farm runner's 14,500 frames per CPU second; work that steps no frames is
   bounded only by the hang timeout. It reports each run's CPU and five
   heaviest tests by CPU and by frames without gating CPU;
@@ -75,7 +75,7 @@
   once in the suite). Keep a test only if it fits one of these kinds and
   kills a mutant that no other kept test kills; otherwise it is scaffolding.
   `bun run check`, `bun run test` and `bun scripts/lua-tests.ts` refuse a
-  title that breaks this (smashcraft:ts/scripts/oracleTags.ts), so titles stay
+  title that breaks this (makgora:ts/scripts/oracleTags.ts), so titles stay
   literal text (#243).
 
 - Mutant kills: make each mutant in the lane, save it with `mutant record ID`,
@@ -96,14 +96,14 @@
 
 - Seed offsets: `SWEEP_SEED_OFFSET=N SWEEPS=1 bun test test/game.test.ts`
   shifts every computer sweep's match seeds by N (`sweepSeed()` in
-  smashcraft:ts/src/game/core/sweep.ts). A computer-behaviour sweep is a
+  makgora:ts/src/game/core/sweep.ts). A computer-behaviour sweep is a
   property whose title states its threshold and the range seen on three
   unrelated offsets, or a measurement with a tolerance band (#394).
 
 From ts/, `bun test test/game.test.ts -t NAME` runs focused game tests;
 `bun run check` checks host and map types. Use
 `LUA=<32-bit lua> GAME_TESTS=PATH bun scripts/lua-tests.ts` for affected emitted-Lua tests and
-`bun wisp map build ...` to build a map. See smashcraft:docs/development-loop.md
+`bun wisp map build ...` to build a map. See makgora:docs/development-loop.md
 for the local toolchain and base-map setup.
 
 Pure simulation tests establish logical rules, not Warcraft callback timing,

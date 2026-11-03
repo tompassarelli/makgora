@@ -4,22 +4,22 @@ How far Warcraft's own models and textures go for a stage's raised platforms,
 so a stage gets a platform that fits its place without a custom model or a
 large import (#290, feeding #276; map size: [map-size](map-size.md)).
 Platform collision never changes: a platform's walking line, ends and
-pass-through rule stay the deck's own (smashcraft:ts/src/game/sim/stage.ts).
+pass-through rule stay the deck's own (makgora:ts/src/game/sim/stage.ts).
 Only the drawn models change.
 
 ## How a stage uses it
 
-smashcraft:ts/src/game/presentation/stockPlatforms.ts lists, per raised deck,
+makgora:ts/src/game/presentation/stockPlatforms.ts lists, per raised deck,
 the stock models drawn for it: each with an offset from the deck's centre on
 its walking line, a per-axis scale in the model's own axes, and a yaw in
 degrees. The first part stands in for the palette slab, so the scene still
 counts one deck piece per platform; the rest are dressing parts that the
 shell creates, fades and clears with the decks
-(smashcraft:ts/src/host/loop/view.ts). A stage with no list keeps its
+(makgora:ts/src/host/loop/view.ts). A stage with no list keeps its
 palette slab. The parts' models are declared as "stage deck" in
-smashcraft:ts/scripts/wisp/playerView.ts and need model facts like any other
-model (smashcraft:docs/player-view.md).
-smashcraft:ts/test/stock-platforms.test.ts checks every deck of every stage,
+makgora:ts/scripts/wisp/playerView.ts and need model facts like any other
+model (makgora:docs/player-view.md).
+makgora:ts/test/stock-platforms.test.ts checks every deck of every stage,
 slabs included, from each model's bounds and scale in every graphics mode:
 the drawn walking piece's top within 3 units of its collision top and its
 ends within 4 units of the deck's ends; no drawn part above its walking line;
@@ -40,8 +40,8 @@ standing fighter's head. Imports: none.
 
 Measured on 8 Oct 2026 with headless renders of Frozen Throne at the near
 (frame 160) and far (frame 260) camera extremes, the method of
-smashcraft:evidence/stages191-20261008/result.md; raw record in
-smashcraft:evidence/platforms290-20261008/result.md. Byte costs are the
+makgora:evidence/stages191-20261008/result.md; raw record in
+makgora:evidence/platforms290-20261008/result.md. Byte costs are the
 classic model files in Warcraft 3.0.1's CASC storage.
 
 | Technique | Render (private) | Map bytes | Limits | Suits |
@@ -57,7 +57,7 @@ classic model files in Warcraft 3.0.1's CASC storage.
 
 ## Classic models
 
-Smashcraft draws the classic stock files, which cost the map nothing. A copied
+Mak'gora draws the classic stock files, which cost the map nothing. A copied
 (swapped) model draws its classic geometry and classic texture. The headless
 renderer draws classic models only.
 

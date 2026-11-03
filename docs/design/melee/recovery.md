@@ -1,10 +1,10 @@
-# Melee recovery reference for Smashcraft's recovery redesign
+# Melee recovery reference for Mak'gora's recovery redesign
 
-Scale: 1 Melee unit (MU) = 6 Smashcraft world units (w)
-(`smashcraft:ts/src/game/sim/tuning.ts` `WORLD_UNITS_PER_MELEE_UNIT = 6.0`). Cells read
-"MU (w)". Speeds are per frame at 60 fps. Smashcraft's main deck spans −600..600 w (±100 MU)
+Scale: 1 Melee unit (MU) = 6 Mak'gora world units (w)
+(`makgora:ts/src/game/sim/tuning.ts` `WORLD_UNITS_PER_MELEE_UNIT = 6.0`). Cells read
+"MU (w)". Speeds are per frame at 60 fps. Mak'gora's main deck spans −600..600 w (±100 MU)
 and the hero reference height is 132 w (22 MU); stage sizes are in
-`smashcraft:docs/design/stages.md`.
+`makgora:docs/design/stages.md`.
 
 ## Table
 
@@ -23,18 +23,18 @@ and the hero reference height is 132 w (22 MU); stage sizes are in
 | Mewtwo | 0.082 (0.492) | 1.50 (9.0) | 1.20 (7.2) | unknown (own animation) × 1 | 7 / 32 / – | teleport at 5.0 (30) a frame | none |
 
 An air dodge leaves the fighter helpless (SmashWiki "Air dodge"), and it can't catch the ledge
-until its 49-frame animation has ended (`smashcraft:docs/physics.md`, "Outer ledge recovery").
+until its 49-frame animation has ended (`makgora:docs/physics.md`, "Outer ledge recovery").
 
 ## How each value was obtained
 
 - **Gravity, fall speed, air speed, aerial jump height, jump count**: from
-  `smashcraft:docs/design/melee/movement.md` (Falling and Jumps tables), which reads
-  `smashcraft:references/melee-frame-data/character-attributes.csv`. Peach, Mewtwo and
+  `makgora:docs/design/melee/movement.md` (Falling and Jumps tables), which reads
+  `makgora:references/melee-frame-data/character-attributes.csv`. Peach, Mewtwo and
   Jigglypuff use their own animation-driven aerial jumps, which movement.md marks "own", so
   their heights are unknown.
 - **Up-B first active, total and special-fall landing**: meleeframedata.com's `up_b` (`aup_b`
   where the aerial version differs) `start`, `total` and `ld_fl_spec`, from
-  `smashcraft:references/melee-frame-data/records.jsonl`; – where the record has none.
+  `makgora:references/melee-frame-data/records.jsonl`; – where the record has none.
 - **Recorded travel**: libmelee's recorded frame table (`melee/framedata.csv` at revision
   `ef679270`, SHA-256 `8e0d8112…`, the file the repo's libmelee intake uses), summing each
   up-B and side-B action's per-frame `locomotion_x/y`. None of these figures is frame-perfect:
@@ -69,11 +69,11 @@ until its 49-frame animation has ended (`smashcraft:docs/physics.md`, "Outer led
 ## Sources and rights
 
 - In-repo, read only:
-  - `smashcraft:ts/src/game/sim/tuning.ts`
-  - `smashcraft:docs/design/melee/movement.md`
-  - `smashcraft:references/melee-frame-data/records.jsonl`, `character-attributes.csv` and
+  - `makgora:ts/src/game/sim/tuning.ts`
+  - `makgora:docs/design/melee/movement.md`
+  - `makgora:references/melee-frame-data/records.jsonl`, `character-attributes.csv` and
     their `README.md`
-  - `smashcraft:docs/physics.md` ("Outer ledge recovery")
+  - `makgora:docs/physics.md` ("Outer ledge recovery")
 - meleeframedata.com database: https://github.com/mitchhit234/meleeWebProject `characters.db` at
   `ec5155149faeed24b5e5781d7efe17387cc9ee3d` (https://meleeframedata.com/). Rights: no reuse
   license found; factual numbers only.

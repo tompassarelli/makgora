@@ -2,16 +2,16 @@
 
 #330 proposes the roles a throw can play and the rule that decides how a
 fighter's four throws fill them, so Tom can pick the rule in #331. Today's rule
-(#107, smashcraft:docs/gameplay-design.md "Throw roles") fixes one slot per role:
+(#107, makgora:docs/gameplay-design.md "Throw roles") fixes one slot per role:
 every up throw is a short juggle, every down throw a tech chase, and forward
 and back throws follow identity. Regrabs follow #85 (same file, "Throw
 regrabs"): a grab cannot catch a fighter whose current hitstun came from a
 throw.
 
 Prior art below is restated in our own words from public sources. Melee
-numbers come from smashcraft:references/melee-frame-data/fightcore.csv (angle,
+numbers come from makgora:references/melee-frame-data/fightcore.csv (angle,
 base knockback, growth, set knockback); its provenance is in
-smashcraft:references/melee-frame-data/README.md.
+makgora:references/melee-frame-data/README.md.
 
 ## Prior art
 
@@ -94,7 +94,7 @@ then brought back in the sequel as a shield counter and a way into combos.
 ## Role menu
 
 Each role has a test that `bun wisp interactions` can measure in the same way as
-smashcraft:ts/scripts/throwRoles.ts. Every test uses a Fox-weight victim (75)
+makgora:ts/scripts/throwRoles.ts. Every test uses a Fox-weight victim (75)
 at the role's percents, against every victim DI choice and tech option that
 script already enumerates. A throw passes a role when it meets that role's
 test at every listed percent.

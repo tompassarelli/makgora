@@ -261,7 +261,7 @@ Built on the existing headless sim and search, not beside them.
   each staleness. Intaken for Fox and Falco first, then all 26, they are golden
   oracles that test weight, integer damage, crouch cancel and the 80 and 32
   rules end to end; stale rows run through a Melee-only staling path, since
-  Smashcraft has no staling.
+  Mak'gora has no staling.
 - Validation (#297): at least 8 cited Fox cases, including expected
   non-combos and DI-dependent links, must come out in the right class with
   deviations switched to Melee for the run.
@@ -326,7 +326,7 @@ guard, then a balance field.
 Running work is absorbed, not restarted:
 
 - Side special stun and pass-through (#273) lands as filed; its stun is a
-  set-hitstun Smashcraft move with no Melee analogue, a Maiev deviation row,
+  set-hitstun Mak'gora move with no Melee analogue, a Maiev deviation row,
   and its +14 frames is her first objective row.
 - Down special swap (#272) lands as filed; its `setKnockback` field is the set
   knockback row of the ledger (#287), and the air Fan of Knives spike was one of

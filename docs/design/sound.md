@@ -1,6 +1,6 @@
 # Sound design
 
-How every move sounds (#391): what platform fighters do, the model Smashcraft
+How every move sounds (#391): what platform fighters do, the model Mak'gora
 uses, its mixing and variation rules, and what Warcraft III's own sound library
 offers. The per-fighter, per-move table is generated from the code in
 [sound-table.md](sound-table.md). Earlier work this builds on: Melee's hit event
@@ -73,7 +73,7 @@ small where pitch carries the tier.
 **Rollback.** Audio is "a particularly difficult problem in rollback games"
 [23]; SFxT lost sounds whose trigger frames were skipped [24]. Skullgirls writes
 only a desired sound state and syncs real playback on non-rollback frames [25].
-Smashcraft starts a hit sound (the hit voice class) on the first speculative
+Mak'gora starts a hit sound (the hit voice class) on the first speculative
 frame that runs its hit, so it sounds on the callback that draws the hitstop,
 and a move's start sound (its perform layers or swing) on the first speculative
 frame of the press, so a special sounds on the callback that draws its first
@@ -82,17 +82,17 @@ other sound starts on its confirmed frame. Each early start is keyed by the
 fighter, frame and the hit, shield, special and start serials, so the confirmed
 frame and a re-run of the same frame never start it again; a rollback that
 erases the hit or the press does not cut it
-(smashcraft:ts/src/game/render/combatEffects.ts, `presentPredicted`,
+(makgora:ts/src/game/render/combatEffects.ts, `presentPredicted`,
 `presentConfirmed`; #30).
 
 Not verified: per-element sound allocation by tier in Melee, SF6 and Rivals 2
 sound or rollback-audio specifics, stereo panning rules, and loudness numbers
 for hit versus swing.
 
-## Smashcraft's model
+## Mak'gora's model
 
 Every move has five slots
-(smashcraft:ts/src/game/presentation/moveSounds.ts). Each slot is one or more
+(makgora:ts/src/game/presentation/moveSounds.ts). Each slot is one or more
 layers, and each layer is a native sound with alternatives:
 
 | Slot | When it plays | What it is |
@@ -123,7 +123,7 @@ layers, and each layer is a native sound with alternatives:
   summon, a freeze.
 - **Model-keyed sounds stay.** The original Rifleman and Illidan models play
   their own attack sounds from their animation keys
-  (smashcraft:ts/src/generated/assets/modelSoundInfo.ts): the rifle shot, and
+  (makgora:ts/src/generated/assets/modelSoundInfo.ts): the rifle shot, and
   Illidan's glaive swings. The table does not layer those again.
 - **Kits in flux.** Kael'thas (#381) and Illidan (#379) are being reworked.
   Sounds key on the special slot and the normal's input, not on a kit's
@@ -168,7 +168,7 @@ plays at most four move layers:
 **Meter casts (#192).** An ultimate adds one fighter-wide cast sound on the
 cast's first confirmed frame, over the move's own perform layer: Flame
 Strike's eruption, matching its fire tower
-(smashcraft:ts/src/game/presentation/meterCues.ts). It is the same for
+(makgora:ts/src/game/presentation/meterCues.ts). It is the same for
 every fighter, so a player learns one sound, and it plays outside the
 four move layers and the voice budget, like the special cues' own sounds.A fighter whose ultimate has its own sound row replaces the ultimate cast and
 hit: Sylvanas's Banshee Form casts with the Possession launch and strikes with
@@ -226,7 +226,7 @@ page and wago.tools' SoundKitEntry table both show; the first take imported, `mm
 was a different aggro variant and not the famous one. It is not a fan re-record. Tom chose on
 2026-10-28 to import it because Hive Workshop's map-submission rule 8
 says material created by Blizzard Entertainment can safely be used. The earlier rule that
-Smashcraft ships no Blizzard sound files gives way for this clip only. The clip is converted to
+Mak'gora ships no Blizzard sound files gives way for this clip only. The clip is converted to
 a 22,050 Hz mono mp3 (11,041 bytes at 48 kbps) and imported through the map build's imported-files list
 (`ts/src/game/assets/importedVoiceInfo.ts`, the same route as the imported music) from the
 `imported-models` build-input family, so it stays out of Git. Credit is in
@@ -237,7 +237,7 @@ a 22,050 Hz mono mp3 (11,041 bytes at 48 kbps) and imported through the map buil
 
 Inventory from the installed game's sound tables
 (`war3.w3mod:ui\soundinfo\*.slk`, read with the CASC tooling in
-smashcraft:tools/animations/). No audio is copied into the repository.
+makgora:tools/animations/). No audio is copied into the repository.
 
 | Category | Table | Count | Use here |
 | --- | --- | --- | --- |

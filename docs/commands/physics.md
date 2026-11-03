@@ -2,14 +2,14 @@
 
 - Air drift: `bun scripts/airDrift.ts` prints every fighter's air speed,
   air acceleration, dash/run-jump takeoff speed and dash-jump cross-up;
-  smashcraft:ts/test/air-drift.test.ts holds them to the bands in
-  smashcraft:docs/gameplay-design.md ("Air drift and jump momentum").
+  makgora:ts/test/air-drift.test.ts holds them to the bands in
+  makgora:docs/gameplay-design.md ("Air drift and jump momentum").
   Analog ingress diagnostics use `bun wisp map build --profile analog-keys`
   or `--profile analog-cursor`; both keep one fixed top-down camera and the
   keyboard rollback input path. Cursor calibration holds PageUp at grid cell
   (0,0), then PageDown at (127,127), with Home and End held, before match measurements.
-  Each corner writes `smashcraft-pad-calibration-pSLOT.txt`; finished matches
-  export `smashcraft-pad-ROUTE-eEPOCH-pSLOT.txt` with captured axes, pressures,
+  Each corner writes `makgora-pad-calibration-pSLOT.txt`; finished matches
+  export `makgora-pad-ROUTE-eEPOCH-pSLOT.txt` with captured axes, pressures,
   payloads and mouse/input-sync event counts. The candidates are opt-in;
   the playable build still samples its usual keys.
   Home marks an armed pad; End commits a complete payload. While Home stays

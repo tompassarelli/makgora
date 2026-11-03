@@ -13,12 +13,12 @@ The size is a number to watch, not a ban.
 `bun wisp map build` prints the built map's size and its imported bytes, e.g.
 `map 177.8 MB, imports 168.6 MB (95%) in 2455 files`. An import's bytes are what
 it occupies inside the archive (compressed), read from the map's MPQ block
-table (smashcraft:ts/scripts/mapSize.ts). Imports are the files the build
+table (makgora:ts/scripts/mapSize.ts). Imports are the files the build
 declares plus every other file in a folder of the archive; the map's own root
 files (`war3map.lua`, `war3map.w3i`, ...) are not.
 
 The default build (no `--profile`) compares the map with
-smashcraft:ts/map-size-baseline.tsv and fails when it is more than 10% larger,
+makgora:ts/map-size-baseline.tsv and fails when it is more than 10% larger,
 naming the five largest new or grown imports. After a justified import or a
 cut, rebuild with `MAP_SIZE_UPDATE=1` and commit the rewritten baseline.
 The baseline has one row per import and one `(outside imports)` row rounded
@@ -30,7 +30,7 @@ Updating the baseline cannot bypass this limit.
 
 ## Measurement, 8 Oct 2026
 
-Build of main at 88e494da (`bun wisp map build --name Smashcraft`):
+Build of main at 88e494da (`bun wisp map build --name Makgora`):
 
 | Part | Files | Size |
 | --- | ---: | ---: |
@@ -67,7 +67,7 @@ not have.
 
 ## Unused imports and slack removed, 8 Oct 2026 (#286)
 
-Build of main at eebd57ca, before and after (`bun wisp map build --name Smashcraft`):
+Build of main at eebd57ca, before and after (`bun wisp map build --name Makgora`):
 
 | | Before | After |
 | --- | ---: | ---: |
@@ -81,7 +81,7 @@ The same cut on main at 56465340 builds 122.3 MB (122,344,480 B), imports
 Three cuts, 40.0 MB in all:
 
 - **Container leftovers, 245 files, 30.28 MB.** The container map
-  (`container` in smashcraft:build-inputs.json) carried files no build
+  (`container` in makgora:build-inputs.json) carried files no build
   declares: superseded Archer, Rifleman and Illidan models and clip pools,
   their old TGA portraits, tiles and names, the old match HUD, two selection
   cards for slots 5 and 7, and older stage and impact models. The build
@@ -94,7 +94,7 @@ Three cuts, 40.0 MB in all:
   (slotless) card, bust and stock-icon portraits of the 13 rendered
   fighters: the map draws those only in a slot's outfit; only the selection
   grid's tile is also drawn without a slot (`MAP_PORTRAITS` in
-  smashcraft:ts/scripts/wisp/mapInputs.ts). And the Three Bridges stage
+  makgora:ts/scripts/wisp/mapInputs.ts). And the Three Bridges stage
   thumbnail, whose stage is not in the catalog.
 
 How each was confirmed unreferenced: every file's name without its
@@ -103,8 +103,8 @@ searched in the built map script (`war3map.lua`, every string the script
 holds, sound labels included), the generated object data (`war3map.w3u`,
 `war3map.w3a`), the post-processing file, every base-map file, and the bytes
 of all 2306 declared imports (every model's texture, attachment and event
-path), then in smashcraft:ts/src, smashcraft:ts/scripts, smashcraft:tools and
-smashcraft:build-inputs.json. None of the 245 container files matched
+path), then in makgora:ts/src, makgora:ts/scripts, makgora:tools and
+makgora:build-inputs.json. None of the 245 container files matched
 anywhere. Names the script builds at run time (portraits, selection cards
 and chips, HUD plates) were checked at their call sites instead: selection
 cards take slots 1 to 4 only (red, blue, teal, purple), and
@@ -406,9 +406,9 @@ the same on the uncut map.
 ## Live imports, 8 Oct 2026 (#291)
 
 The live imports are the 2211 files the build declares (`importedAssets` in
-smashcraft:ts/scripts/wisp/mapInputs.ts, read from the inputs in
-smashcraft:build-inputs.json at a75b307b), 138.3 MB. Sizes are the bytes
-each one occupies in the built map (smashcraft:ts/map-size-baseline.tsv, the
+makgora:ts/scripts/wisp/mapInputs.ts, read from the inputs in
+makgora:build-inputs.json at a75b307b), 138.3 MB. Sizes are the bytes
+each one occupies in the built map (makgora:ts/map-size-baseline.tsv, the
 88e494da build); four stage light and impact models newer than that build are
 counted at 40% of their file size, under 0.1 MB together. The 245 undeclared
 files #286 removed are not counted; #286 also dropped 40 declared files
@@ -489,8 +489,8 @@ Each stage is a deck slab, a main deck, a light, a sky and a thumbnail
 ## Portraits as BLP, 8 Oct 2026 (#307)
 
 The build encodes each fighter portrait from its TGA in the `fighter-renders`
-input to a one-level BLP1 JPEG at quality 78 (smashcraft:ts/scripts/blp.ts),
-cached by source hash under `~/.cache/smashcraft/blp-portraits/`; the map
+input to a one-level BLP1 JPEG at quality 78 (makgora:ts/scripts/blp.ts),
+cached by source hash under `~/.cache/makgora/blp-portraits/`; the map
 script names the `.blp` files. Build of 4af9c1d3 plus #307: the 260 portraits
 take 11.86 MB in the map instead of 28.63 MB, and the map measured 162.7 MB.
 Tom's #307 decision (9 Oct 2026) budgets the portraits at 15 MB: the
@@ -520,15 +520,15 @@ same frames into fewer bytes.
 
 | Item | Size | Option | Saves | Visual cost |
 | --- | ---: | --- | ---: | --- |
-| 21 clip pools | 73.75 MB | Draw the body from one model per fighter with every sequence on one seekable timeline, as the white-flash bodies already do (smashcraft:tools/animations/white-flash-models.ts), with original materials. The mesh is stored once instead of once per clip. | about 55 MB (the 19 timeline bodies weigh about what the white set does, 18.6 MB) | None expected: the white flash already follows the pool frame for frame on that timeline. Static lights and model-sound cues keyed to pooled clips move to timeline times. Unknown: why the pool was chosen over a timeline; check one fighter natively first. |
+| 21 clip pools | 73.75 MB | Draw the body from one model per fighter with every sequence on one seekable timeline, as the white-flash bodies already do (makgora:tools/animations/white-flash-models.ts), with original materials. The mesh is stored once instead of once per clip. | about 55 MB (the 19 timeline bodies weigh about what the white set does, 18.6 MB) | None expected: the white flash already follows the pool frame for frame on that timeline. Static lights and model-sound cues keyed to pooled clips move to timeline times. Unknown: why the pool was chosen over a timeline; check one fighter natively first. |
 | Clip pools, same | | Drop sequences no fighter plays: cinematic, portrait and test sequences | 1.8 MB (1.7 MB of it the Forsaken Paladin's 13 cinematics) | None |
 | Forsaken Paladin clip pool | 12.61 MB | Halve the community model's polygons | about 6 MB now, about 0.8 MB after the timeline | Medium: the hammer and armour lose detail up close |
-| `IllidanWhite.mdx` | 4.16 MB | Keep keys only inside clips that can flash (hitlag poses and smash charge, smashcraft:ts/src/game/presentation/whiteGlow.ts); drop the rest of the timeline's keys | about 1.7 MB (assumes 40% of keys stay) | None: other poses never flash |
+| `IllidanWhite.mdx` | 4.16 MB | Keep keys only inside clips that can flash (hitlag poses and smash charge, makgora:ts/src/game/presentation/whiteGlow.ts); drop the rest of the timeline's keys | about 1.7 MB (assumes 40% of keys stay) | None: other poses never flash |
 | `RiflemanWhite.mdx` | 3.28 MB | Same | about 1.3 MB | None |
 | `ArcherWhite.mdx` | 3.20 MB | Same | about 1.3 MB | None |
 | `ForsakenPaladinWhite.mdx` | 1.57 MB | Same | about 0.3 MB (mesh-heavy, few keys) | None |
 | White-flash set, all 71 | 19.31 MB | Same, plus removing keys that linear interpolation reproduces | about 8 MB | None at a small tolerance |
-| `DemonHunterFighter.mdx` | 4.04 MB | KO bodies, winner pose and the fighter unit draw from the pool or the timeline body instead of a full model (smashcraft:ts/src/game/render/combatEffects.ts `fighterModel`) | 4.04 MB | None |
+| `DemonHunterFighter.mdx` | 4.04 MB | KO bodies, winner pose and the fighter unit draw from the pool or the timeline body instead of a full model (makgora:ts/src/game/render/combatEffects.ts `fighterModel`) | 4.04 MB | None |
 | `RiflemanFighter.mdx` | 3.25 MB | Same | 3.25 MB | None |
 | `ArcherFighter.mdx` | 3.17 MB | Same | 3.17 MB | None |
 | `ForsakenPaladin.mdx` | 1.57 MB | Same; the timeline body is derived from it, so the source stays in private inputs only | 1.57 MB | None |
@@ -540,7 +540,7 @@ same frames into fewer bytes.
 | `FighterTile*` set | 7.85 MB (65) | Covered by the BLP row | about 6.3 MB | As above |
 
 Smaller textures (resolution) are not worth it here: the portraits are
-already at the size their frames draw (smashcraft:docs/design/fighter-portraits.md),
+already at the size their frames draw (makgora:docs/design/fighter-portraits.md),
 and the selection backdrops compress to 0.9 MB.
 
 White-flash generation retains the clips named by gameplay's clip tables,
@@ -617,7 +617,7 @@ to about 40 MB, a third of the budget.
 Seven stages show Warcraft's own campaign loading art, which costs no import
 bytes; their layout silhouettes and name banners are drawn by frames. The four
 stages with no fitting zone art import one 512x512 BLP each
-(smashcraft:docs/design/stage-select.md), 122,043 bytes together, measured
+(makgora:docs/design/stage-select.md), 122,043 bytes together, measured
 by `bun scripts/stageThumbnails.ts` on 8 Oct 2026 (ts/stage-thumbnails.json
 keeps each card's current bytes):
 

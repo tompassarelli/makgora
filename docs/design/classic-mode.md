@@ -1,22 +1,22 @@
 # Classic mode
 
-Classic is Smashcraft's arcade ladder: each fighter has a themed route of six
+Classic is Mak'gora's arcade ladder: each fighter has a themed route of six
 fights that ends at a lore boss, then an ending card. Issue
-[#284](https://github.com/tompassarelli/smashcraft/issues/284); the approved
+[#284](https://github.com/tompassarelli/makgora/issues/284); the approved
 MVP and Tom's boss upgrade are in
-[#285](https://github.com/tompassarelli/smashcraft/issues/285) and
-smashcraft:docs/design/single-player-modes.md. The tournament opening that
-frames it is [#269](https://github.com/tompassarelli/smashcraft/issues/269).
+[#285](https://github.com/tompassarelli/makgora/issues/285) and
+makgora:docs/design/single-player-modes.md. The tournament opening that
+frames it is [#269](https://github.com/tompassarelli/makgora/issues/269).
 Researched 8 Oct 2026.
 
 Classic offers the 21 fighters with finished routes. Grom, Anub’arak,
 Malfurion and Medivh remain available in other modes while their
 Classic routes and Lore Battles are pending.
 
-The source of truth for the routes is smashcraft:ts/src/game/classic/routes.ts;
-smashcraft:ts/src/game/classic/classic.tests.ts checks that every fighter in the Classic selector
+The source of truth for the routes is makgora:ts/src/game/classic/routes.ts;
+makgora:ts/src/game/classic/classic.tests.ts checks that every fighter in the Classic selector
 has exactly one route and that its fifth fight is on its home stage
-(smashcraft:docs/design/home-stages.md). Statements marked **Judgement** are
+(makgora:docs/design/home-stages.md). Statements marked **Judgement** are
 reasoning, not findings.
 
 ## How others do it
@@ -49,7 +49,7 @@ unlocks that ending's artwork
 ([Steam discussion](https://steamcommunity.com/app/1364780/discussions/0/4337609007231330086/?ctp=2)).
 Reviewers found the stories thin ("won't win any awards", Tom's Guide, 2023),
 and one player in three finishes Arcade once (Steam 35.5%,
-smashcraft:docs/design/single-player-modes.md).
+makgora:docs/design/single-player-modes.md).
 
 **Tekken 8, Arcade Battle and Character Episodes.** Arcade Battle is a pure
 ladder: "you pick a character and face eight opponents, back to back", with no
@@ -93,12 +93,12 @@ Each fight is one data entry of the configured-match engine (below).
 
 The player chooses a starting difficulty at fighter selection, one of the
 computer players' five tiers (Rookie, Beginner, Intermediate, Advanced,
-Expert; smashcraft:docs/design/cpu-profiles.md); the default is Beginner. The
+Expert; makgora:docs/design/cpu-profiles.md); the default is Beginner. The
 fights climb from it: start, start, +1, +1, +2, capped at Expert. A loss
 offers a continue: the same fight again, with the whole run one tier easier
 (not below Rookie). Back at any result ends the run. **Judgement:** whole
 tiers instead of Ultimate's 0.1 steps, because the tiers are the authored
-difficulty Smashcraft has and each one plays visibly differently.
+difficulty Mak'gora has and each one plays visibly differently.
 
 ## Boss rules
 
@@ -112,7 +112,7 @@ at one of them.
   (Kil'jaeden) at Rookie, plus 30 for each tier above. The player has two
   stocks and five minutes; the boss wins if either runs out.
 - **Deterministic pattern** (stage rule 13, #274, in
-  smashcraft:docs/design/stage-art.md). Each boss repeats a fixed timetable of
+  makgora:docs/design/stage-art.md). Each boss repeats a fixed timetable of
   strikes, starting 1.5 s after GO!. Every strike has a tell (35 to 55
   frames: the boss's spell animation, a warning mark on each area and its
   name in the notice line), then its active frames, then a rest. Timing is a
@@ -151,14 +151,14 @@ voice acting, unlocks, a bonus stage, saved records.
 ## The tournament opening
 
 #269 builds a 30-60 second opening the first time Classic starts.
-It plays in smashcraft:ts/src/host/loop/menus.ts, where Classic's start
+It plays in makgora:ts/src/host/loop/menus.ts, where Classic's start
 calls `requestStageLoad`: before a run's first fight loads, from the same
 synchronized event, calling the fight's start when it ends.
 
 ## Configured matches
 
 Classic and Lore Battles share one engine
-(smashcraft:ts/src/game/classic/runState.ts and configuredMatch.ts): a
+(makgora:ts/src/game/classic/runState.ts and configuredMatch.ts): a
 configured match is one data entry naming the player's fighter (or the one
 chosen), the opponents with their named computer and tier, the stage, rule
 changes from the existing settings (stocks, the player's stocks, time,

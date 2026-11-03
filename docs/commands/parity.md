@@ -9,11 +9,11 @@
   ~/.local/state/wisp/corpus/ with no extra step:
   each match's replay, whose test-build frames each carry a digest of every
   fighter's position, velocity, action, timers, shield and damage
-  (smashcraft:ts/src/game/replay/frameDigest.ts). `bun wisp parity corpus [DIR...]`
-  replays every recording (by default smashcraft:ts/test/corpus/ and the local
+  (makgora:ts/src/game/replay/frameDigest.ts). `bun wisp parity corpus [DIR...]`
+  replays every recording (by default makgora:ts/test/corpus/ and the local
   corpus) in Bun and 32-bit Lua, each on the commit that recorded it, and names
   each replay's first divergent frame and field; `bun wisp parity corpus keep
-  RECORDING...` copies local recordings into smashcraft:ts/test/corpus/, which
+  RECORDING...` copies local recordings into makgora:ts/test/corpus/, which
   CI and `farm test` replay on every push.
   A native box in a subsystem with zero corpus divergence is met by its
   headless check plus the weekly native spot batch. Keep the corpus coverage

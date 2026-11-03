@@ -13,7 +13,7 @@ preference.
   [modern platform fighters](modern-platform-fighters.md).
 - Human reaction and execution limits:
   [execution windows](execution-windows.md).
-- Smashcraft's decisions: only [gameplay design decisions](../gameplay-design.md).
+- Mak'gora's decisions: only [gameplay design decisions](../gameplay-design.md).
   Its implementation: [physics](../physics.md), [move data](../move-data.md),
   [move comparisons](../move-comparisons.md).
 
@@ -33,7 +33,7 @@ summary or a secondary transcription, the entry says so.
   the first active frame inside startup, so "8-frame startup" means it hits on
   its 8th frame and punishes anything at −8 or worse
   ([Infil Startup](https://glossary.infil.net/?t=Startup)). State the
-  convention whenever frame numbers are compared; Smashcraft's own export
+  convention whenever frame numbers are compared; Mak'gora's own export
   counts zero-based ([move data](../move-data.md)).
 - **Hitstop.** On contact both fighters freeze briefly for impact; those frames
   sit outside startup, active and recovery
@@ -77,7 +77,7 @@ With the double-counting convention above:
   stun (a blockstring); a small positive value is a frame trap
   ([Infil Frame Trap](https://glossary.infil.net/?t=Frame%20Trap)).
 - **Reach is a second condition.** Timing alone does not make a punish or a
-  link; the follow-up must also reach. Smashcraft's comparison fixtures
+  link; the follow-up must also reach. Mak'gora's comparison fixtures
   separate "timing window but reach miss" from reachable punishes for this
   reason ([move comparisons](../move-comparisons.md)).
 - **Hit confirm.** A player checks that the first hit landed before committing
@@ -445,7 +445,7 @@ of the opponent's options.
   The arithmetic above settles local questions (is this punishable, what is
   this guess worth); matchup-level balance is judged by play.
 
-## Smashcraft decisions
+## Mak'gora decisions
 
 The questions this reference raised about hurtbox exposure/fidelity, hitbox
 extent, counter hits, knockdowns, reversals, simultaneous contact, option
@@ -453,4 +453,4 @@ selects, mixup rewards and balance changes are resolved in
 [shared mechanic defaults](../gameplay-design.md#shared-mechanic-defaults).
 The weapon-disjoint, throw-escape and archetype decisions also use the adopted
 [expansion roster defaults](../gameplay-design.md#expansion-roster-defaults).
-This reference describes other games; Smashcraft's stance stays in that document.
+This reference describes other games; Mak'gora's stance stays in that document.

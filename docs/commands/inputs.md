@@ -5,4 +5,4 @@
   so changing art is `bun wisp inputs add FAMILY DIR` plus a commit, landed
   like code. `bun wisp inputs check` verifies them, `bun wisp inputs fetch HOST...` copies
   the pinned entries this host lacks from another host over ssh, verified by hash, `bun wisp inputs path
-  [assets]` prints them for tools (smashcraft:docs/build-inputs.md).
+  [assets]` prints them for tools (makgora:docs/build-inputs.md).

@@ -3,7 +3,7 @@
 Which properties of Super Smash Bros. Ultimate's projectiles players blame for
 safe, slow play, how Melee and other platform fighters answer projectiles, and
 what players liked. This is a descriptive reference and takes no position;
-Smashcraft's rules are in
+Mak'gora's rules are in
 [gameplay design decisions](../gameplay-design.md#projectiles-and-powershield).
 Shield vocabulary (shieldstun, shield advantage, out of shield) is in
 [platform-fighter design language](platform-fighters.md); powershield and parry
@@ -47,13 +47,13 @@ search results rather than the primary source or game data.
   window is 4 frames and removes shield damage, at the cost of more pushback
   ([SmashWiki Perfect shield](https://www.ssbwiki.com/Perfect_shield);
   [Melee defence](melee/defense.md); frame timing in
-  smashcraft:docs/melee-powershield.md). The reflected projectile's damage and
+  makgora:docs/melee-powershield.md). The reflected projectile's damage and
   speed multipliers are part of each reflector's descriptor. SmashWiki notes that humans
   rarely powershield because of "the reaction times and precision usually
   required".
 - **Lasers as the reference projectile.** Fox's laser starts on frame 10 and
   ends on 36 grounded; aerial lasers land with no landing lag, so short-hop
-  lasers cost little (smashcraft:references/melee-frame-data/records.jsonl,
+  lasers cost little (makgora:references/melee-frame-data/records.jsonl,
   `fox` `neutral_b`/`aneutral_b`; Falco 23 and 57, aerial from frame 13).
   Fox's laser has "no knockback or hitstun" and is used "to camp and bring up
   damage" ([SmashWiki Blaster (Fox)](https://www.ssbwiki.com/Blaster_(Fox)));
@@ -92,9 +92,9 @@ movement: "immediate dash movement to close distance"
 ([Jackie Peanuts](https://jackiepeanuts.substack.com/p/the-logic-behind-parrying-projectiles)).
 No retrieved source praises Ultimate's projectile safety itself.
 
-## Smashcraft's current projectiles, for comparison
+## Mak'gora's current projectiles, for comparison
 
-Described, not judged; sources are smashcraft:ts/src/game/sim/projectiles.ts,
+Described, not judged; sources are makgora:ts/src/game/sim/projectiles.ts,
 specials.ts and shield.ts.
 
 | Fighter | Projectile | Spawn | Flight | Hit |
@@ -108,5 +108,5 @@ raise-timed powershield reflects a projectile during the shield's first 2
 frames inside 0.75 of the shield radius, sending it back at 0.7 speed and half
 damage; a held shield blocks a projectile that meets the shield circle, and a
 projectile that meets exposed body outside the shield hits. Illidan's parry
-answers projectiles as well as strikes. Rifleman's bear and trap are summons, not projectiles (smashcraft:ts/src/game/sim/summons.ts).
+answers projectiles as well as strikes. Rifleman's bear and trap are summons, not projectiles (makgora:ts/src/game/sim/summons.ts).
 The [interaction graph](interaction-graph.md) measures each projectile's flight, arrival on a shield, out-of-shield punishes, powershield presses and a standing defender's answers in its projectile situations.

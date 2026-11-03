@@ -7,17 +7,17 @@ parent. Ambiguous parents are listed for the proxy and keep the check failing.
 The daily Release tree workflow checks this invariant; Autoland planning
 doesn't run it, since its walk spends one API call per tree issue (#350).
 
-Smashcraft is a platform fighter for Warcraft III, written in TypeScript and
+Mak'gora is a platform fighter for Warcraft III, written in TypeScript and
 compiled to Lua with TypeScriptToLua. Wisp and Bun are the supported build,
-test and development tools. `smashcraft:typescript-toolchain.lock` pins Bun,
+test and development tools. `makgora:typescript-toolchain.lock` pins Bun,
 TypeScript, TypeScriptToLua and Effect; the map build checks it. Wisp is
-maintained in its own repository. smashcraft:ts/wisp.lock records the exact
-source revision; Bun installs its generated archive from smashcraft:ts/vendor/.
+maintained in its own repository. makgora:ts/wisp.lock records the exact
+source revision; Bun installs its generated archive from makgora:ts/vendor/.
 Change framework code in an owned Wisp lane, publish it, and update the
-consumer pin with `bun run update:wisp` from smashcraft:ts/ (fetches the
+consumer pin with `bun run update:wisp` from makgora:ts/ (fetches the
 current published `main` and records its resolved commit).
 
-Roadmap [#16](https://github.com/tompassarelli/smashcraft/issues/16) lists the
+Roadmap [#16](https://github.com/tompassarelli/makgora/issues/16) lists the
 open work in order. Each issue's **Done when** and **Not required** lists are its
 complete scope, and its "Rules for whoever picks this up" govern the work.
 
@@ -32,45 +32,45 @@ Answer "what can we claim about input timing?" from #26's integrity table, or
 its Status until the table exists. A status question never starts a new
 investigation.
 
-- smashcraft:ts/src/ owns gameplay, deterministic state/replay, selection and UI.
-- smashcraft:controller/ owns Smashcraft's controller plug-in and journal helper (`wc3-journal`); the service itself is github.com/tompassarelli/padbridge, pinned by rev in controller/Cargo.toml.
-- The player's desktop app is github.com/tompassarelli/smashcraft-client; it reads Smashcraft only through smashcraft:docs/client-interface.md, which this repository owns.
-- smashcraft:tools/ owns build, native probes and automation.
-- smashcraft:docs/ holds durable knowledge only: how systems work, design
+- makgora:ts/src/ owns gameplay, deterministic state/replay, selection and UI.
+- makgora:controller/ owns Mak'gora's controller plug-in and journal helper (`wc3-journal`); the service itself is github.com/tompassarelli/padbridge, pinned by rev in controller/Cargo.toml.
+- The player's desktop app is github.com/tompassarelli/makgora-client; it reads Mak'gora only through makgora:docs/client-interface.md, which this repository owns.
+- makgora:tools/ owns build, native probes and automation.
+- makgora:docs/ holds durable knowledge only: how systems work, design
   decisions, reference data and procedures. Status, progress, plans, claim
   tables and trial results live in the owning issue: the table, the run link
   and the commit. When a trial teaches something durable, add that fact to the
   relevant doc, with its build.
 - Use the declared project development shell rather than repeated ad hoc setup.
 
-Every push runs the pre-push gate (smashcraft:.githooks/pre-push, enabled for
+Every push runs the pre-push gate (makgora:.githooks/pre-push, enabled for
 the repository with `git config core.hooksPath .githooks`; safe-push runs it):
 the local private-store map input check for build-input, pin, generated clip
 and build tooling changes (`bun scripts/wisp.ts map build --profile playable
 --edition classic --inputs-only` from ts/). It runs the build's input, import
 and cue checks before Autoland hand-off, with no source-only cache; hosted
 runners omit it because they have no private store. The other checks are
-the clean-room check (smashcraft:ts/scripts/cleanRoom.ts: no game files or
-copied game scripts outside smashcraft:clean-room-allowlist.tsv; wisp:docs/clean-room.md),
-`bun run check` (the kind-tag refusal of test titles, smashcraft:ts/scripts/oracleTagsCheck.ts,
-then the type check, then Wisp's Lua number rules over the game and Lua-test configs, wisp#129) and the type-escape audit (smashcraft:ts/test/source-shapes.test.ts)
+the clean-room check (makgora:ts/scripts/cleanRoom.ts: no game files or
+copied game scripts outside makgora:clean-room-allowlist.tsv; wisp:docs/clean-room.md),
+`bun run check` (the kind-tag refusal of test titles, makgora:ts/scripts/oracleTagsCheck.ts,
+then the type check, then Wisp's Lua number rules over the game and Lua-test configs, wisp#129) and the type-escape audit (makgora:ts/test/source-shapes.test.ts)
 when the pushed commits change ts/, the model facts check
-(smashcraft:ts/test/model-facts.test.ts; it refuses with the `bun wisp view models`
-refresh command) when they change clips or model build inputs, and the cue models check (smashcraft:ts/scripts/cueModels.ts) when they change a file that defines a cue, accent or projectile model (the import closure of that script) or its record: every such model must appear in smashcraft:ts/scripts/wisp/cue-models.tsv. The record needs the private render-asset cache, so it is written locally by `bun scripts/cueModels.ts --record` (from ts/, on a machine with the Warcraft III 3.0.0.24268 install; the first run extracts what no render has cached) and committed; Autoland's hosted runners check the lane against it. The same record carries Classic model facts from one exact 3.0.0.24268 cache: per model path (plus the imported-models pin for a non-content-addressed imported model) and the digest of its cache bytes, exactly what the judge reads (sequences, emitters, ribbons, geosets, their tracks and whether their textures resolve), extracted by `classicModelFacts` at `FACTS_VERSION` (smashcraft:ts/scripts/wisp/effectVisibility.ts). Verdicts are never committed: every check computes each use's verdict from its descriptor (fighter, move, model, sequence, seek, time scale, scale, alpha, lifetime, matrix width and height, anchor and playback) and its model's facts, so a landing that edits a render file, a lockfile or a use's presentation needs no record change, and the record changes only when a model path is first used or `FACTS_VERSION` is bumped. Each facts row carries its own checksum and rows merge per model (`.gitattributes` routes the record through smashcraft:ts/scripts/mergeGenerated.ts), so two lanes' records merge without re-recording, while a hand-edited row refuses. `bun scripts/cueModels.ts --verdicts` prints every computed verdict. Missing and invisible uses refuse the report gate; every Unknown use is listed with its reason and awaits calibration. The check also refuses unless its calibration holds: it must flag the 0.0.145 Breath of Fire and Shockwave uses for their causes (#365, #484) and pass the native-captured known-visible set (`EFFECT_CALIBRATION`). A passing report keeps Unknown resolution and native acceptance open; visible means supported model-data visibility. All of this takes a few seconds (smashcraft:ts/scripts/prePush.ts).
+(makgora:ts/test/model-facts.test.ts; it refuses with the `bun wisp view models`
+refresh command) when they change clips or model build inputs, and the cue models check (makgora:ts/scripts/cueModels.ts) when they change a file that defines a cue, accent or projectile model (the import closure of that script) or its record: every such model must appear in makgora:ts/scripts/wisp/cue-models.tsv. The record needs the private render-asset cache, so it is written locally by `bun scripts/cueModels.ts --record` (from ts/, on a machine with the Warcraft III 3.0.0.24268 install; the first run extracts what no render has cached) and committed; Autoland's hosted runners check the lane against it. The same record carries Classic model facts from one exact 3.0.0.24268 cache: per model path (plus the imported-models pin for a non-content-addressed imported model) and the digest of its cache bytes, exactly what the judge reads (sequences, emitters, ribbons, geosets, their tracks and whether their textures resolve), extracted by `classicModelFacts` at `FACTS_VERSION` (makgora:ts/scripts/wisp/effectVisibility.ts). Verdicts are never committed: every check computes each use's verdict from its descriptor (fighter, move, model, sequence, seek, time scale, scale, alpha, lifetime, matrix width and height, anchor and playback) and its model's facts, so a landing that edits a render file, a lockfile or a use's presentation needs no record change, and the record changes only when a model path is first used or `FACTS_VERSION` is bumped. Each facts row carries its own checksum and rows merge per model (`.gitattributes` routes the record through makgora:ts/scripts/mergeGenerated.ts), so two lanes' records merge without re-recording, while a hand-edited row refuses. `bun scripts/cueModels.ts --verdicts` prints every computed verdict. Missing and invisible uses refuse the report gate; every Unknown use is listed with its reason and awaits calibration. The check also refuses unless its calibration holds: it must flag the 0.0.145 Breath of Fire and Shockwave uses for their causes (#365, #484) and pass the native-captured known-visible set (`EFFECT_CALIBRATION`). A passing report keeps Unknown resolution and native acceptance open; visible means supported model-data visibility. All of this takes a few seconds (makgora:ts/scripts/prePush.ts).
 It checks the working tree, so push from a clean checkout of the commit.
-The repository's .safe-push sets `landing.queue = lock`, so `safe-push --to main` lands the lane straight on main under the landing lock: the hook runs the local checks and, on the same machine at once, only the landing checks the lane's diff can reach, printing each with the path and rule that selected it (smashcraft:ts/scripts/landingChecks.ts), and refuses on the first failed check, main's known failures included (#394). A docs-only lane selects none and lands on the local checks; `LAND_FULL_SUITE=1 safe-push --to main` forces every check. Main's CI runs the full suite on each landed commit, and a red run goes to the "main is red" issue below (smashcraft:docs/ci.md, "Landing"). Autoland still lands cloud workers' `claude/**` pushes, and smashcraft:ts/scripts/suiteParity.ts keeps its suite equal to farm-test.yml.
+The repository's .safe-push sets `landing.queue = lock`, so `safe-push --to main` lands the lane straight on main under the landing lock: the hook runs the local checks and, on the same machine at once, only the landing checks the lane's diff can reach, printing each with the path and rule that selected it (makgora:ts/scripts/landingChecks.ts), and refuses on the first failed check, main's known failures included (#394). A docs-only lane selects none and lands on the local checks; `LAND_FULL_SUITE=1 safe-push --to main` forces every check. Main's CI runs the full suite on each landed commit, and a red run goes to the "main is red" issue below (makgora:docs/ci.md, "Landing"). Autoland still lands cloud workers' `claude/**` pushes, and makgora:ts/scripts/suiteParity.ts keeps its suite equal to farm-test.yml.
 
 Main stays green. Each CI run on main opens, updates or closes the one
-"main is red" issue (smashcraft:.github/workflows/main-red.yml), which lists the
+"main is red" issue (makgora:.github/workflows/main-red.yml), which lists the
 failing tests and the first failing commit; the pre-push gate prints that list
 on every push. Its runs post no issue comments; each run's summary and
 annotation say red, still red or green again (`gh run view RUN_ID`). A red main is not "already failing": before landing, check
 whether your change touches a listed test, and if your commit broke main, fix
 it first. A landing that turned a green main red with no green run within 15
-minutes is reverted by a new `Revert` commit (smashcraft:docs/ci.md, "Sheriff").
+minutes is reverted by a new `Revert` commit (makgora:docs/ci.md, "Sheriff").
 A push to a `claude/**` branch (a cloud worker's) lands on main by itself
 when its full suite adds no failure to main's, and otherwise its run fails
-with the reason in its job summary and annotation (smashcraft:docs/ci.md, "Autoland").
+with the reason in its job summary and annotation (makgora:docs/ci.md, "Autoland").
 
 Keep proprietary game assets and base maps privately outside repository trees.
 Always identify the current playable artifact separately from an experimental

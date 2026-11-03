@@ -6,7 +6,7 @@ arrows and a bouncing water serpent wear the foe down. Up close she is slow
 and wide, and a foe who drains her meter finds an easy target. She replaces Kobold in code
 28 (Tom asked, 2026-10-28; plan in [roster-next.md](roster-next.md#lady-vashj-replaces-kobold)).
 
-Numbers are provisional Smashcraft tuning. Frames count entry as frame 1 with
+Numbers are provisional Mak'gora tuning. Frames count entry as frame 1 with
 inclusive active windows. H is the shared 132-unit design height.
 Every damage value below is authored; her live hits deal 1.2 times it with
 0.92 times its knockback growth (the balance pass of 2026-10-29, below).
@@ -124,14 +124,14 @@ rows still counts recovering, the later rows count it only over the stage.
 
 | Run | Change | Wins | Approach | Ranged | Specials n/s/u/d |
 | --- | --- | ---: | ---: | ---: | --- |
-| [40805783142](https://github.com/tompassarelli/smashcraft/actions/runs/40805783142) | main at f44e1e2, before the pass | 17% | 73% | 7% | 21/14/11/0% |
-| [40807089726](https://github.com/tompassarelli/smashcraft/actions/runs/40807089726) | gameplan keeps range, ranged share fixed | 17% | 67% | 39% | 22/12/10/0% |
-| [40809474573](https://github.com/tompassarelli/smashcraft/actions/runs/40809474573) | V1: Tidal Surge 2.6H rise, 1.5H drift | 28% | 65% | 39% | 22/12/11/0% |
-| [40809535231](https://github.com/tompassarelli/smashcraft/actions/runs/40809535231) | V1, every hit ×1.15 damage, ×0.94 growth | 38% | 66% | 39% | 22/12/11/0% |
-| [40809536985](https://github.com/tompassarelli/smashcraft/actions/runs/40809536985) | V1, arrows 4%, serpent 8% | 35% | 66% | 46% | 22/13/11/0% |
+| [40805783142](https://github.com/tompassarelli/makgora/actions/runs/40805783142) | main at f44e1e2, before the pass | 17% | 73% | 7% | 21/14/11/0% |
+| [40807089726](https://github.com/tompassarelli/makgora/actions/runs/40807089726) | gameplan keeps range, ranged share fixed | 17% | 67% | 39% | 22/12/10/0% |
+| [40809474573](https://github.com/tompassarelli/makgora/actions/runs/40809474573) | V1: Tidal Surge 2.6H rise, 1.5H drift | 28% | 65% | 39% | 22/12/11/0% |
+| [40809535231](https://github.com/tompassarelli/makgora/actions/runs/40809535231) | V1, every hit ×1.15 damage, ×0.94 growth | 38% | 66% | 39% | 22/12/11/0% |
+| [40809536985](https://github.com/tompassarelli/makgora/actions/runs/40809536985) | V1, arrows 4%, serpent 8% | 35% | 66% | 46% | 22/13/11/0% |
 | local, 48 a pair | V1, arrows 4%, serpent 8%, every hit ×1.2 damage, ×0.92 growth | 54% | 57% | 46% | 22/13/11/0% |
 | local, 48 a pair, `--orbs` | the same, ultimate orbs on | 62% | 57% | 48% | 23/13/10/2% |
-| [40818616523](https://github.com/tompassarelli/smashcraft/actions/runs/40818616523) | the landed pass, 086b48e | 50% | 57% | 46% | 22/13/11/0% |
+| [40818616523](https://github.com/tompassarelli/makgora/actions/runs/40818616523) | the landed pass, 086b48e | 50% | 57% | 46% | 22/13/11/0% |
 
 On the landed run (archetype zoner): air share of normals 7% (band 15-45),
 aerials n/f/b/u/d 22/20/37/12/8% (all inside their bands), approach 57%

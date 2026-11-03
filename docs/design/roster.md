@@ -1,4 +1,4 @@
-# Smashcraft roster
+# Mak'gora roster
 
 > **Frozen (26 October 2026):** Forsaken Paladin was frozen pending replacement, and Uther replaced him on 28 October 2026 ([uther.md](uther.md)). `agents/frozen-topics.toml` in south, which the issue guard and dispatch read, keeps listing him until Tom lifts it. The remaining planned additions, Tyrande, Stitches and a dismounted Thrall, are in [roster-next.md](roster-next.md) (28 October 2026).
 
@@ -16,7 +16,7 @@
 
 > **Select grid order (1 November 2026):** the Orc fighters now come first, before the Human fighters; the rest of the order is unchanged (Tom, 1 November 2026).
 
-Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 29 fighters (Tom, 28 October 2026, [roster-next.md](roster-next.md)) until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), and [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343). No further additions are planned.
+Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 29 fighters (Tom, 28 October 2026, [roster-next.md](roster-next.md)) until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/makgora/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/makgora/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/makgora/issues/342), and [Medivh (#343)](https://github.com/tompassarelli/makgora/issues/343). No further additions are planned.
 
 We explored Definitive Edition models, found they differ widely from the Classic models (for example, Sylvanas's Definitive body is about 55% wider than her Classic one, so shared animations and hurtboxes would need rescaling), and the game focuses on the Classic models.
 
@@ -92,7 +92,7 @@ balance measurements. Existing fighters and newer gameplay decisions remain
 authoritative; in particular, the throw-hitstun regrab rule adopted in #85
 replaces this brief's earlier fixed protection timer.
 
-This is a proposed expansion roster and implementation brief for Tom Passarelli’s Smashcraft, a Warcraft III platform fighter. It defines complete initial movesets for the seven requested heroes and all eight Tavern candidates, with a recommended build order. The goal is distinct, readable fighters with measurable counterplay and moves that can be replayed correctly by the custom simulation.
+This is a proposed expansion roster and implementation brief for Tom Passarelli’s Mak'gora, a Warcraft III platform fighter. It defines complete initial movesets for the seven requested heroes and all eight Tavern candidates, with a recommended build order. The goal is distinct, readable fighters with measurable counterplay and moves that can be replayed correctly by the custom simulation.
 
 All move designs and numbers below are proposals, not existing implementation facts, copied Melee frame data, or a claim of proven balance. Preserve the existing Rifleman and Illidan. The current source tree was not inspected for this document; the implementation agent must map this specification onto the real project rather than assume module or animation names.
 
@@ -144,7 +144,7 @@ Tom's idea on 2026-10-30: Akama's up B is **Shadow Step**, a two-leg invisible t
 | Up B | **Shadow Step:** he dissolves into shadow smoke on frames 1 to 12, intangible from frame 8, and the stick sets his heading at any angle until frame 12. Frames 13 to 22 he travels unseen along that heading at 0.25H a frame, 2.5H in all, marked by a thin smoke streak along the path. He reappears on frame 23 with an arrival slash for 6% at a 20 degree launch (a small hit at a low angle, after Vanish's reappearance hit of 5%). If special is still held on frame 26 he stays visible and vulnerable for 8 frames to aim with the stick, dissolves for 4 frames (intangible from the tenth frame of the second leg), and steps again for 6 frames at the same speed, 1.5H, which is 60% of the first step, with a second arrival slash. Releasing special before frame 26 ends the move at the first arrival. At most two steps, then a helpless fall. Total reach is about 4H, a little beyond Sheik's Vanish, paid for by the visible aim window between the steps. A step that reaches a free ledge snaps to it, on either leg: a path entering the stage lip within 0.5H below the top and ending within 0.5H of the ledge catches it, as Blink does; deeper entry lands him or stops against the stage. One use per airtime; landing lag 24 after the helpless fall. 0 mana | Leg one: dissolve f1 to 12, intangible f8 to 22, travel f13 to 22, slash f23 to 25, hold check f26, end f36 (10 recovery frames after the slash). Leg two: aim f1 to 8, intangible f10 to 18, travel f13 to 18, slash f19 to 21, end f32 |
 Akama, Ragnaros and Goblin Alchemist are selectable now as stand-ins on the shared placeholder moveset ([standins.md](standins.md)); the sections below are their real kits, not yet built.
 
-Mrgl & Grgl ([#262](https://github.com/tompassarelli/smashcraft/issues/262)),
+Mrgl & Grgl ([#262](https://github.com/tompassarelli/makgora/issues/262)),
 requested by Tom on 8 October 2026, is a small, light rushdown; his kit,
 body and gameplan are in [murloc.md](murloc.md). His close-range normals are fast and multi-hit (Tom, 2026-10-30): a held spear-poke jab flurry, a five-hit spear drill down air that links into a grounded jab, and a frame-3 neutral air. His up smash is a point-first spear thrust straight up overhead whose hit is a column over his head reaching 122 (2026-10-30, was a rearward arc to 100); frame data is in the Mrgl & Grgl kit table.
 
@@ -172,7 +172,7 @@ Smash timings describe an uncharged move. Hold charging immediately before its f
 
 ### Knockback and hitstun
 
-Use the project’s existing knockback, hitlag, hitstun, DI, shieldstun, and staling formulas. Do not replace core physics to make this document’s estimates match. Each attack names a tuning class: LINK for a short follow-up opportunity, POKE for separation without a strong launch, LAUNCH for an aerial chase, EDGE for a low outward launch, KILL for a finisher, or SPIKE for an airborne downward launch. Throws add two (#107): JUGGLE for an up throw's guaranteed short juggle and CHASE for a down throw's tech chase, tuned per kit until `bun wisp interactions` reports the role in smashcraft:tools/move-data/interactions/throws.md.
+Use the project’s existing knockback, hitlag, hitstun, DI, shieldstun, and staling formulas. Do not replace core physics to make this document’s estimates match. Each attack names a tuning class: LINK for a short follow-up opportunity, POKE for separation without a strong launch, LAUNCH for an aerial chase, EDGE for a low outward launch, KILL for a finisher, or SPIKE for an airborne downward launch. Throws add two (#107): JUGGLE for an up throw's guaranteed short juggle and CHASE for a down throw's tech chase, tuned per kit until `bun wisp interactions` reports the role in makgora:tools/move-data/interactions/throws.md.
 
 Calibrate classes in an empty test stage against a reference weight at 60 percent, no DI and no walls. Indicative displacement along the launch direction after 30 ticks: LINK 0.6–1.2H; POKE 1.2–2.0H; LAUNCH 2.0–3.0H; EDGE 2.5–3.5H; KILL 3.5–5.0H; SPIKE downward 2.5–3.5H before gravity. These are test bands, not a second knockback formula. Publish the actual coefficients and measured outcomes once calibrated. Adjust hitstun separately through the established formula rather than assuming distance proves a true combo. LINK never guarantees a follow-up without testing DI, percentage, weight, and move timing.
 
@@ -190,7 +190,7 @@ Offensive specials may be interrupted by being hit normally. No generic B-to-B o
 
 Standing, dash and pivot grab boxes follow the shared [scaled grab envelope](grabs.md) adopted in #337: reach 96/120/144, height 50 and three active frames. The individual kit rows retain their startup and whiff duration; their former grab reach and active duration are superseded. Dash and pivot grabs add three startup and eleven total frames. Shield grabs begin on the first free frame after shield stun, without dropping shield; jump squat accepts a standing grab on every frame. A successful grab latches one target at a defined anchor and ends grab hitboxes. Grabs beat shield, but never intangible opponents. Mutual grabs on the same frame break both grabs with symmetric separation and 12 frames of recovery.
 
-Use the existing escape system if one exists. Otherwise use a deterministic 45-frame base hold plus min(30, floor(victim percent / 5)) frames, reduced by validated new input edges at most once every three frames. Each accepted edge removes two hold frames. Throw input starts immediately and locks out pummel. Each kit authors its pummel's look (no launch; no mana gain or healing); its 3 percent damage, hold length, mashing and the pummel's timing and single use are shared (smashcraft:docs/gameplay-design.md, "Grab holds and pummels", #101). Throws list damage, release frame counted from throw entry, thrower recovery after release, launch angle, and knockback class. Every up throw is a JUGGLE and every down throw a CHASE; forward and back throws follow the kit's identity (smashcraft:docs/gameplay-design.md, "Throw roles"). The tables of kits not yet built keep their first-pass rows until the kit is measured. Targets are held until release and then enter normal hitstun. Do not add a second guaranteed hit via throw animation contact.
+Use the existing escape system if one exists. Otherwise use a deterministic 45-frame base hold plus min(30, floor(victim percent / 5)) frames, reduced by validated new input edges at most once every three frames. Each accepted edge removes two hold frames. Throw input starts immediately and locks out pummel. Each kit authors its pummel's look (no launch; no mana gain or healing); its 3 percent damage, hold length, mashing and the pummel's timing and single use are shared (makgora:docs/gameplay-design.md, "Grab holds and pummels", #101). Throws list damage, release frame counted from throw entry, thrower recovery after release, launch angle, and knockback class. Every up throw is a JUGGLE and every down throw a CHASE; forward and back throws follow the kit's identity (makgora:docs/gameplay-design.md, "Throw roles"). The tables of kits not yet built keep their first-pass rows until the kit is measured. Targets are held until release and then enter normal hitstun. Do not add a second guaranteed hit via throw animation contact.
 
 Use #85's adopted regrab rule: a fighter cannot be grabbed while its remaining hitstun comes from a throw, including remaining hitstun after a gentle landing. This restriction ends with that throw hitstun or a replacing hit, and does not block ordinary attacks. Do not add a fixed post-throw protection timer. Throws cannot be cancelled or redirected after entry. Thrower movement is limited to the scripted anchor motion; no walk-off carrying. In multiplayer, an external hit breaks the hold before release and clears both actors consistently. Resolve same-frame external hits, throw releases, and grabs with stable rules; do not let player-slot iteration decide.
 
@@ -221,7 +221,7 @@ speed. Our design target, from public frame data (SmashWiki's Captain Falcon
 page), is a run speed of 2.299999952316284 and a dash entry of 2.0 Melee
 units/frame.
 
-Smashcraft's existing scale is six world units per Melee unit at 60 logical
+Mak'gora's existing scale is six world units per Melee unit at 60 logical
 frames/second (`WORLD_UNITS_PER_MELEE_UNIT` in `sim/tuning.ts`,
 [physics](../physics.md#initial-implementation-choices)). Binary32 scaling
 gives a run ceiling of **13.799999237060547 world units/frame** and dash-entry
@@ -272,10 +272,10 @@ shared factor, `FIGHTER_MATCH_SCALE` (1.0), with no per-fighter size boost;
 The stock scale is the unit's `modelScale:sd` in the game's
 `units/unitskin.txt`, the field Warcraft applies to the classic models the
 clients draw. Unit body, clip pool, effects, star knockout and stage placement
-all read the one value in smashcraft:ts/src/game/presentation/modelScale.ts;
-smashcraft:ts/test/model-scale.test.ts pins draw scale = stock scale × the
+all read the one value in makgora:ts/src/game/presentation/modelScale.ts;
+makgora:ts/test/model-scale.test.ts pins draw scale = stock scale × the
 factor for every fighter. Hurt capsules follow the drawn body:
-smashcraft:ts/test/drawn-size.test.ts holds each drawn head within 0.9-1.3 of
+makgora:ts/test/drawn-size.test.ts holds each drawn head within 0.9-1.3 of
 its capsule's top.
 
 | Fighter | Stock unit | Stock model scale | Draw scale | Before #162 |
@@ -309,7 +309,7 @@ so no unit model scale applies: he is drawn at 1.0 times the shared factor.
 
 Every fighter draws Warcraft III's own models except these community works,
 which the map imports from private build inputs (never Git) at the archive
-paths their authors' readmes name (smashcraft:ts/src/game/assets/importedModelInfo.ts).
+paths their authors' readmes name (makgora:ts/src/game/assets/importedModelInfo.ts).
 The map's description carries the same credits.
 
 - The [Lich King model by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-king.154837/)
@@ -320,15 +320,15 @@ The map's description carries the same credits.
   (Hive Workshop), built on Ujimasa Hojo's Grom Hellscream:
   `WarchiefThrallDismountedV2.mdx`, imported as
   `war3mapImported\WarchiefThrallDismountedV2.mdx` for Thrall's unit, with
-  every Smashcraft clip authored on it by smashcraft:tools/animations/thrall-clips.ts.
+  every Mak'gora clip authored on it by makgora:tools/animations/thrall-clips.ts.
   The page states no usage terms (read 28 October 2026,
-  smashcraft:docs/design/roster-next.md#hive-model-terms), so we credit
+  makgora:docs/design/roster-next.md#hive-model-terms), so we credit
   every author it names, as Hive's custom asks.
 - [Tyrande Whisperwind (Re-Classic Pack) by johnwar](https://www.hiveworkshop.com/threads/tyrande-whisperwind-re-classic-pack.348819/)
   (Hive Workshop, approved and recommended): its dismounted body
   `TyrandeDismountedV2.mdx`, imported as `war3mapImported\TyrandeDismountedV2.mdx`
-  for Tyrande, with every Smashcraft clip authored on it by
-  smashcraft:tools/animations/tyrande-clips.ts. It is a 5,181-polygon model
+  for Tyrande, with every Mak'gora clip authored on it by
+  makgora:tools/animations/tyrande-clips.ts. It is a 5,181-polygon model
   that draws only Warcraft III's own Classic textures, with no texture of its own.
 
 - [Katrana Prestor by Footman16](https://www.hiveworkshop.com/threads/katrana-prestor.362851/)
@@ -337,14 +337,14 @@ The map's description carries the same credits.
   `war3mapImported\KatranaPrestorHero.mdx` for Onyxia's human form. It is an
   843-polygon edit of AndrewOverload519's Female Human Mage and kangyun's Sally
   Whitemane staff, both permissions posted on the page (read 31 October 2026,
-  smashcraft:docs/design/roster-next.md#onyxias-two-models-read-31-october-2026).
+  makgora:docs/design/roster-next.md#onyxias-two-models-read-31-october-2026).
   Its page asks only for credit. Its two command icons are crops of Hearthstone
   art and are not imported; the select portrait is rendered from the model.
 
 - [Onyxia by Symphoneum](https://www.hiveworkshop.com/threads/onyxia.348925/)
   (Hive Workshop, Reforged HD model, open source, credit asked): its "Lore Accurate"
   `Onyxia.mdx`, converted to a Classic MDX 800 model by
-  smashcraft:tools/animations/hd-to-classic.ts (diffuse textures as BLP, normal,
+  makgora:tools/animations/hd-to-classic.ts (diffuse textures as BLP, normal,
   ORM and emissive maps dropped, each vertex held to its heaviest three bones)
   and imported as `war3mapImported\OnyxiaDragon.mdx` with five
   `OnyxiaDragon*.blp` textures for Onyxia's dragon form.
@@ -391,7 +391,7 @@ description credits Kuzakani and Hive Workshop.
 
 Original art generated in this repository needs no credit beyond the
 project's own: Chen's paper parasol, its model and both textures, is
-generated by smashcraft:tools/effects/parasol.ts with no outside art.
+generated by makgora:tools/effects/parasol.ts with no outside art.
 
 The individual hero sections below specify all attacks. Their counterplay descriptions are acceptance goals to test, not claims established by these numbers.
 
@@ -424,7 +424,7 @@ The individual hero sections below specify all attacks. Their counterplay descri
 | Neutral B | **Quickdraw** (Tom, 2026-10-28; after Melee Marth's Shield Breaker and Roy's Flare Blade): hold special to crouch in an iaido stance with the blade sheathed while the hilt glows brighter, then release to draw. Uncharged it is a quick cut with a 0.3H step; each further 1/17 of the charge adds 1% and speed, up to a 2.2H dash slash at full charge that passes through the foe and leaves him behind them. 7–24 damage at 80 degrees, growth 108.6, base 40, so the foe pops up as he blurs past (a low-charge draw leads into up air; a full one kills off the top); shield damage 1.5 times the damage. Each foe is struck once per draw, and every hit pops a red Warcraft III critical-strike number of the damage dealt, sized by it. In the air the stance neither stalls nor lifts him, and the draw's horizontal dash happens once per airtime. | Stance f1–8, charge up to 60 frames held at f8, auto-draw at full; draw: dash and hit from f13 for 6 (uncharged) to 10 (full) frames, stop, end 16 frames later (f34 uncharged, f38 full); 0 mana |
 | Side B | **Mirror Image** (#124): after a visible tell, an image stays where he stood (one hit of any kind shatters it; 210 frames, 3.5 s) and he steps 1.0H the way side B points, turning first when it points behind him; holding left or right during frames 1–11 sets the side he steps instead while he keeps the facing side B gave him; in the air the step is sideways only, once per airtime, with no rise. Side special while the image stands **swaps**: he takes the image's place facing its way and slashes for 10 damage at 40 degrees, EDGE. The image never attacks; no intangibility. | Image and step f12, end f28, 15 mana;
 | Up B | **Rising Whirlwind:** sword extended through a charged spin dash, in the chosen direction, meeting the [#252 long-route recovery band](../gameplay-design.md#recovery-and-edgeguarding); one hit for 9 damage at 80 degrees, LAUNCH. No intangibility. Mana-free version meets the 240-unit route floor with no attack. | Aim f1–8, hit f9–14, dash f9–22, stop f23, then helpless; 15 mana |
-| Down B | **Wind Walk** (#124, #523, smashcraft:docs/design/kit-review-1.md): Marth's Counter. He fades see-through; a strike that meets him in the window freezes its attacker 11 frames while he steps out behind them and kicks them straight up from a hand plant, 7% at 90 degrees, base 30, growth 170 (kills Rifleman at centre stage from 160%). A whiff stands wide open; in the air it is the same whiff, with no travel and no helpless fall. | Counter f5–29, end f59 (acts f60); kick: behind on f8, hit f14–20, end f46; 18 mana | swap f6, slash f8–10, end f30, free |
+| Down B | **Wind Walk** (#124, #523, makgora:docs/design/kit-review-1.md): Marth's Counter. He fades see-through; a strike that meets him in the window freezes its attacker 11 frames while he steps out behind them and kicks them straight up from a hand plant, 7% at 90 degrees, base 30, growth 170 (kills Rifleman at centre stage from 160%). A whiff stands wide open; in the air it is the same whiff, with no travel and no helpless fall. | Counter f5–29, end f59 (acts f60); kick: behind on f8, hit f14–20, end f46; 18 mana | swap f6, slash f8–10, end f30, free |
 
 ### Grab and throws
 
@@ -441,7 +441,7 @@ Standing grab 7/2/22, reach 0.55H, one-handed collar catch. Pummel: pommel strik
 
 **Required counterplay test:** forward smash whiff must give a fast fighter at its outer edge a plausible approach punish; Mirror Image cannot reset its own recovery or create a true 50/50 without prior advantage.
 
-**As implemented** (smashcraft:ts/src/game/fighters/blademaster/moves.ts, blademasterSpecials.ts, blademasterClips.ts). Every row above is authored; these are the departures:
+**As implemented** (makgora:ts/src/game/fighters/blademaster/moves.ts, blademasterSpecials.ts, blademasterClips.ts). Every row above is authored; these are the departures:
 
 - Forward tilt also has up- and down-angled forms with the row's timing and damage; only the blade path changes.
 - Down air's tip spikes airborne targets only; it sends grounded targets at 55 degrees, as the shared notation directs.
@@ -454,7 +454,7 @@ Standing grab 7/2/22, reach 0.55H, one-handed collar catch. Pummel: pommel strik
 
 ### Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Blade-tip spacing and whiff punishment on the ground.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). Blade-tip spacing and whiff punishment on the ground.
 
 ```balance-profile
 fighter: blademaster
@@ -510,7 +510,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 
 | Input | Proposed move and behavior | Timing and cost |
 | --- | --- | --- |
-| Neutral B | **Storm Bolt** (#125, smashcraft:docs/design/kit-review-1.md): thrown hammer; 5 damage, LAUNCH at 65 degrees, flies straight ahead at 0.10H/frame until it hits or its life (90) ends; it never comes back (#547). Reflectable; one bolt active. Landing before the hammer leaves continues the same cast on the ground, with the hammer still on f23 and no landing lag added. | Spawn f23, end f61; 8 mana |
+| Neutral B | **Storm Bolt** (#125, makgora:docs/design/kit-review-1.md): thrown hammer; 5 damage, LAUNCH at 65 degrees, flies straight ahead at 0.10H/frame until it hits or its life (90) ends; it never comes back (#547). Reflectable; one bolt active. Landing before the hammer leaves continues the same cast on the ground, with the hammer still on f23 and no landing lag added. | Spawn f23, end f61; 8 mana |
 | Side B | **Storm Rush:** shoulder dash 1.2H; 12 damage, EDGE at 35 degrees. No armor, no command grab, stops at shield. Air version has no upward lift and ends helpless. | f13–18 active/moving, R28; 18 mana |
 | Up B | **Thunder Leap:** after the 8-frame aim and a 10-frame crouch, a straight zip of 3.0H along the aimed one of the 8 zones in 12 frames (0.25H/frame); hammer attack during ascent for 10.8 damage, EDGE-class launch (growth 113.26, base 25) at 80 degrees. **Hammerfall** (#125, #509): with no special press, on f31 of the leap (its top), hit or miss, a stick held in a different one of the 8 direction zones from the leap's starts the dive: he hangs 2 frames, then dives hammer first along that zone at 0.24H/frame (straight down with the stick down); a stick at rest or still in the leap's zone starts nothing and he falls helpless (Tom 2026-10-28): 12 damage against airborne targets (SPIKE on the downward dives, LAUNCH at 85, 50 or 35 degrees on the up, up-diagonal and sideways ones), 10 at 55 degrees against grounded ones. The downward dives run until he lands; the up, up-diagonal and sideways dives travel 9 frames (2.16H) and end on f37. Landing lag 24 after a dive that met someone (hit or shield), 40 after one that met no one, on the dive's own landing or after its helpless fall, unless the landing slide reaches an edge (teeter or slide-off cancels the lag); 24 after the leap without a dive. Helpless after the dive, or after the leap without one. | Rise/hit f19–24, movement through f30, then helpless; 15 mana; Hammerfall free |
 | Down B | **Thunder Clap, charged** (#125): he raises the hammer f1–6 and holds the charge f7–46. Special in f7–26: Clap, ground ring of 0.85H both sides, 9 damage LAUNCH 70 degrees; special in f27–46 or running out (slam f50): Thunder Clap, the ring at 12 plus a reflectable ground wave each way (0.10H/frame, 24 frames, active from its 6th, 7 damage LAUNCH 75 degrees); shield in f7–46 drops the charge. No armor. Air version swings hammer underneath with 0.55H reach, no charge, no shockwave. | Slam active f4–7 after the release, end 28 (Clap) or 32 (Thunder Clap) frames after it; run-out ends f78; 20 mana |
@@ -530,13 +530,13 @@ Standing grab 8/2/25, reach 0.50H. Pummel: helmet headbutt.
 
 **Required counterplay test:** blocked Storm Bolt must not guarantee a grab from its full travel distance; Thunder Clap cannot cover both a retreat and a jump without a read (a jump clears ring and waves; the shield cancel is the bait).
 
-**Implemented kit** (smashcraft:ts/src/game/fighters/mountain-king/moves.ts, mountainKingSpecials.ts, fighters/mountain-king/clips.ts). Every row above is implemented; nothing is omitted. Deliberate additions and choices where the table is silent:
+**Implemented kit** (makgora:ts/src/game/fighters/mountain-king/moves.ts, mountainKingSpecials.ts, fighters/mountain-king/clips.ts). Every row above is implemented; nothing is omitted. Deliberate additions and choices where the table is silent:
 
 - Forward tilt also has up- and down-angled paths with the same timing and damage.
 - Hammer Drop's head launches grounded targets at 55 degrees (the shared grounded spike rule).
 - Air Thunder Clap reuses 10 damage and 70-degree LAUNCH on its 0.55H under-hammer path.
 - Thunder Clap is a ground-level ring 30 units tall, so a jump clears it while it still covers both sides; its release and shield cancel are follow-up branches (`followUps`), and the waves start just past the ring.
-- Thunder Leap and Hammerfall zip like Melee Pikachu's Quick Attack (Tom's playtest, 2026-11-01: faster and a little longer, and a whiffed second part should leave him open unless he edge-cancels it). Quick Attack is two short, very fast straight zips with a brief pause between, and a landing that slides off a platform or teeters at its edge cancels into the edge state. So the leap goes from 2.7H in 16 frames (0.17H/frame) to 3.0H in 12 (0.25H/frame), the hang at the top from 3 frames to 2, the dive from 0.16H/frame to 0.24H/frame and the up, up-diagonal and sideways dives from 12 frames (1.9H) to 9 (2.16H): straight up and sideways the whole move covers 5.2H instead of 4.6H and ends 8 frames sooner. The price is a whiff lag of 40 in place of 24: 40 frames is more than a human reaction (about 20) plus a dash-in grab or smash, and more than shield drop plus any shield-option, so a dive that meets no one is punished on reaction. A dive that meets anyone, on hit or on shield, keeps 24, and after a sideways dive that hit, the helpless landing keeps the leap's lag (24 since 2026-11-02). The whiff lag uses the shared landing-slide rule: a landing slide that reaches an edge it faces teeters there with the lag cancelled, and one held toward the edge slides off it with no lag (smashcraft:docs/physics.md).
+- Thunder Leap and Hammerfall zip like Melee Pikachu's Quick Attack (Tom's playtest, 2026-11-01: faster and a little longer, and a whiffed second part should leave him open unless he edge-cancels it). Quick Attack is two short, very fast straight zips with a brief pause between, and a landing that slides off a platform or teeters at its edge cancels into the edge state. So the leap goes from 2.7H in 16 frames (0.17H/frame) to 3.0H in 12 (0.25H/frame), the hang at the top from 3 frames to 2, the dive from 0.16H/frame to 0.24H/frame and the up, up-diagonal and sideways dives from 12 frames (1.9H) to 9 (2.16H): straight up and sideways the whole move covers 5.2H instead of 4.6H and ends 8 frames sooner. The price is a whiff lag of 40 in place of 24: 40 frames is more than a human reaction (about 20) plus a dash-in grab or smash, and more than shield drop plus any shield-option, so a dive that meets no one is punished on reaction. A dive that meets anyone, on hit or on shield, keeps 24, and after a sideways dive that hit, the helpless landing keeps the leap's lag (24 since 2026-11-02). The whiff lag uses the shared landing-slide rule: a landing slide that reaches an edge it faces teeters there with the lag cancelled, and one held toward the edge slides off it with no lag (makgora:docs/physics.md).
 - Thunder Leap hotfix, 2026-11-02 (Tom judged the up special oppressive on stage: very fast, the electric hit stuns, and with Hammerfall he zips through the opponent and back to where he started with almost no end lag, compared with Pikachu's Quick Attack: first active 13, 3% and 2% weak set-up hits, 24 landing lag, 149 frames in all). It becomes the slower, harder-hitting version that a miss or a shield punishes on stage. First active frame 11 to 19 (Maiev's Shadow Dash travels from 21, Illidan's Fel Rush from 18; the proxy set 19 on 2026-11-02): a 10-frame crouch after the unchanged 8-frame aim window, so the stick still aims on the same frames, and the top, the Hammerfall dive frame and the move's end each come 8 frames later (f23 to f31, dive end f29 to f37); the first active frame is one named constant, THUNDER_LEAP_FIRST_ACTIVE, and the crouch, top and dive frame derive from it. Damage 8.6 to 10.8, launch class LAUNCH to EDGE (growth 107.6 to 113.26, base 22 to 25) at the same 80 degrees with no set knockback, so it sends instead of setting up, with no stun beyond the shared electric hitlag. Leap landing lag 11 to 24 (Quick Attack's); Hammerfall keeps 24 on a hit and 40 on a whiff, and a dive that only returns him to the stage keeps the whiff lag. The leap distance (3.0H) and the dive travel are unchanged, so the recovery reaches the ledge from the same distances; the 9 extra frames of startup make it edge-guardable, which is intended.
 - Storm Rush stops at a raised shield or a body (shared `stopsAtBody`) and stops dead after its 1.2H dash; its lowered shoulder carries a hurt volume while it strikes.
 - Mountain King's hurt volumes add the arm, leg or boots behind each normal from late startup through early recovery; hammer and axe stay outside them.
@@ -544,11 +544,11 @@ Standing grab 8/2/25, reach 0.50H. Pummel: helmet headbutt.
 
 **Balance** (#105, all-pairs computer field, 3 stocks): Storm Bolt 7 → 5 damage, so it covers his slow approach instead of winning neutral from range: field win rate 71% (b2ed6109, 100/pair) → 66% (20/pair), self-destructs 1%.
 
-**Gameplan** (smashcraft:ts/src/game/fighters/mountain-king/gameplan.ts, #105): he keeps 0.6-1.0H, at Axe Hook's tip, spacing with Axe Hook and Boot and Axe and covering his slow approach with Storm Bolt from 1.5H out; he shoots or runs in with grab, Boot and Axe and Dwarf Charge, never jumps in, and meets an attack with his shield or a spot dodge. Boot and Axe, Hammer Lift and the down throw start his strings; Mountain Breaker, Twin Lift, Backhand Axe and the back throw finish. His limited air drift is the weakness he plays around: he fights on the ground and keeps his spot 160 units inside the edge, so a launch leaves the shortest way back, and returns to the ledge with his jump before Thunder Leap.
+**Gameplan** (makgora:ts/src/game/fighters/mountain-king/gameplan.ts, #105): he keeps 0.6-1.0H, at Axe Hook's tip, spacing with Axe Hook and Boot and Axe and covering his slow approach with Storm Bolt from 1.5H out; he shoots or runs in with grab, Boot and Axe and Dwarf Charge, never jumps in, and meets an attack with his shield or a spot dodge. Boot and Axe, Hammer Lift and the down throw start his strings; Mountain Breaker, Twin Lift, Backhand Axe and the back throw finish. His limited air drift is the weakness he plays around: he fights on the ground and keeps his spot 160 units inside the edge, so a launch leaves the shortest way back, and returns to the ledge with his jump before Thunder Leap.
 
 ### Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A grounded heavy; back air only as a finisher, Storm Bolt covers the approach.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). A grounded heavy; back air only as a finisher, Storm Bolt covers the approach.
 
 ```balance-profile
 fighter: mountain-king
@@ -604,7 +604,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 
 | Input | Proposed move and behavior | Timing and cost |
 | --- | --- | --- |
-| Side B | **Shadow Dash** (Tom's 2026-10-28 rework, Fox's Melee Illusion): a straight horizontal dash with her Blink afterimages along the path, holding still on f1–20 and covering 3.5H on f21–25; pressing special again on f21–24 stops her where she is, and the shortened dash still slashes everyone on the path it covered. The slash is 7 damage at 80 degrees, growth 40 standing and 60 in the air (fightcore.csv's Illusion rows) with base 74 (Illusion's 68 raised so a foe tumbles from 0%), a hit, a shield and a whiff all keep the same 63 frames; a pop-up that starts her strings at low percent; no stun, no homing, no teleport. In the air she hangs through the dash and uses it once per airtime, landing lag 20; a dash that ends in the air, from the ground or the air, leaves her helpless. Shared with Fel Rush through smashcraft:ts/src/game/sim/specials/illusionDash.ts. | f21–25 travel, end f63; 15 mana |
+| Side B | **Shadow Dash** (Tom's 2026-10-28 rework, Fox's Melee Illusion): a straight horizontal dash with her Blink afterimages along the path, holding still on f1–20 and covering 3.5H on f21–25; pressing special again on f21–24 stops her where she is, and the shortened dash still slashes everyone on the path it covered. The slash is 7 damage at 80 degrees, growth 40 standing and 60 in the air (fightcore.csv's Illusion rows) with base 74 (Illusion's 68 raised so a foe tumbles from 0%), a hit, a shield and a whiff all keep the same 63 frames; a pop-up that starts her strings at low percent; no stun, no homing, no teleport. In the air she hangs through the dash and uses it once per airtime, landing lag 20; a dash that ends in the air, from the ground or the air, leaves her helpless. Shared with Fel Rush through makgora:ts/src/game/sim/specials/illusionDash.ts. | f21–25 travel, end f63; 15 mana |
 | Neutral B | **Shadow Strike:** one slow thrown blade; 2 impact damage, flinchless (Tom 2026-10-28): no knockback, hitstun, launch, hitlag or interruption of the victim's action, as Fox's laser, while a raised shield still blocks it as before. Each hit adds one **poison stack** (cap 5) and refreshes a 120-frame timer; when the timer runs out the stacks burst for 1 damage each, flinchless, with a poison-burst effect and sound, and clear. A glow over the victim's head grows with the stack count. Fan of Knives keeps its own ticking poison. Speed 0.11H/frame, life 30, radius 0.13H. Reflectable; the stacks and their burst never flinch. Timed as Fox's laser (2026-10-28): the blade leaves on frame 10 of 36 standing and in the air, she acts on frame 37, a second blade may follow while the first still flies, and landing in the air ends the cast at once with no landing lag. | Spawn f10, end f36, air landing lag 0; 5 mana |
 | Up B | **Blink:** choose one of eight directions from held input at entry, travel up to 3.5H; f1–7 vulnerable, f8–10 intangible, endpoint vulnerable from f11. No hitbox. A path entering the main-deck lip within 0.5H below its top may pass: an endpoint above stays there, an endpoint within 0.5H of a free ledge catches, and one farther in lands. A taken ledge leaves her outside; deeper entry stops against the stage. Free version travels 1.9H in the chosen direction, with no intangibility. | Displacement f9; f11–30 endpoint recovery then helpless; 20 mana |
 | Down B | **Fan of Knives**, a ring of knives around her (#494): f4–7, two mirrored knife capsules ahead of and behind her that each launch the foe away from her. On the ground 6.1 damage pushes the foe away at 15 degrees with shine's set knockback of 80 at every percent, so it stuns for as many frames as shine and tumbles only foes light enough for shine to tumble (Tom, 27 Oct); in the air it hits like Fox's Melee shine, 5 damage with a set knockback of 80 on a fixed horizontal semi-spike away from her, and her vertical speed is held at zero, so she nearly stops falling. Jump-cancellable from f4; every body hit is poisoned. ([design](warden-fan-of-knives.md)). | f4–7 active, end f27; 18 mana |
@@ -624,7 +624,7 @@ Standing grab 6/2/22, reach 0.48H. Pummel: elbow to the ribs.
 
 **Required counterplay test:** Blink endpoint can be covered after reading direction; Fan of Knives on shield must leave a punish opportunity. No teleport may be activated from attack recovery.
 
-**As implemented** (smashcraft:ts/src/game/fighters/warden/moves.ts, wardenSpecials.ts, wardenHero.ts; clips in smashcraft:ts/src/game/fighters/warden/clips.ts). Every row above is authored; these are the departures:
+**As implemented** (makgora:ts/src/game/fighters/warden/moves.ts, wardenSpecials.ts, wardenHero.ts; clips in makgora:ts/src/game/fighters/warden/clips.ts). Every row above is authored; these are the departures:
 
 - Forward tilt also has up- and down-angled forms with the row's timing and damage; only the blade path changes.
 - Warden's arm reaches each blade's hand from two frames before the strike to four after, in held poses; only the blades are disjoint. Heel Blade's leg is exposed on frames 5-13.
@@ -635,11 +635,11 @@ Standing grab 6/2/22, reach 0.48H. Pummel: elbow to the ribs.
 - Presentation uses the stock Warden model with authored motion clips. Fan of Knives has distinct ground and air casts, coiling then spreading both arms at release (#239). Shadow Strike plays Spell Throw, and Blink plays Dissipate.
 - Spirit of Vengeance is not implemented; ultimates stay off in competitive play.
 
-**Gameplan** (smashcraft:ts/src/game/fighters/warden/gameplan.ts, #105): she keeps 0.7-1.4H, just past her blades, and spaces with Crescent Slice and Shadow Dash; she runs in with dash attack, Shadow Dash and grab or jumps in with aerials led by Pursuer, and never camps at long range. Up tilt, down tilt, up air, the up and down throws and her side special start her strings, the Shadow Dash pop-up into up air; Heel Blade, Judgment Edge, Moon Arc and the low outward Pursuer and Twin Crescent finish. She spends her jump before Blink, so its punishable endpoint is her last resort, and stays out from under a target.
+**Gameplan** (makgora:ts/src/game/fighters/warden/gameplan.ts, #105): she keeps 0.7-1.4H, just past her blades, and spaces with Crescent Slice and Shadow Dash; she runs in with dash attack, Shadow Dash and grab or jumps in with aerials led by Pursuer, and never camps at long range. Up tilt, down tilt, up air, the up and down throws and her side special start her strings, the Shadow Dash pop-up into up air; Heel Blade, Judgment Edge, Moon Arc and the low outward Pursuer and Twin Crescent finish. She spends her jump before Blink, so its punishable endpoint is her last resort, and stays out from under a target.
 
 ### Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Precision mobility and edge pressure by a light fighter.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). Precision mobility and edge pressure by a light fighter.
 
 ```balance-profile
 fighter: warden
@@ -763,7 +763,7 @@ Standing grab 10/2/28, reach 0.70H. Visible spectral hand, no tether recovery or
 
 ### As built
 
-Source: smashcraft:ts/src/game/fighters/lich/kit.ts, lichMoves.ts and
+Source: makgora:ts/src/game/fighters/lich/kit.ts, lichMoves.ts and
 lichSpecials.ts. Every normal, grab, pummel, throw and special above is
 implemented; the ultimate is not (there is no ultimate action). Changes from
 the tables:
@@ -777,7 +777,7 @@ the tables:
 - **Spectral Ascent** steers with the live stick at up to 0.4H/25 per frame
   over its window, in place of air drift; with a neutral stick it rises
   straight up.
-- **Vertical physics** (Tom asked for a slightly floatier Lich after a playtest, 2026-10-30): gravity 0.19, terminal speed 2.4 and fast-fall speed 3.0 Melee units (the reference fighter's 0.23, 2.8 and 3.4), and full, short and aerial jump speeds the reference's scaled by sqrt(0.19 / 0.23): 3.34, 1.91 and 4.01 (3.68, 2.10 and 4.416). A full jump peaks 0.5% lower and hangs 10.7% longer (33.8 to 37.4 frames); ground speed, air speed, air acceleration, weight and every move are unchanged. Spectral Ascent's rise is a fixed velocity, so its recovery reach does not shrink. The values are `HERO_VERTICAL` in smashcraft:ts/src/game/sim/tuning.ts.
+- **Vertical physics** (Tom asked for a slightly floatier Lich after a playtest, 2026-10-30): gravity 0.19, terminal speed 2.4 and fast-fall speed 3.0 Melee units (the reference fighter's 0.23, 2.8 and 3.4), and full, short and aerial jump speeds the reference's scaled by sqrt(0.19 / 0.23): 3.34, 1.91 and 4.01 (3.68, 2.10 and 4.416). A full jump peaks 0.5% lower and hangs 10.7% longer (33.8 to 37.4 frames); ground speed, air speed, air acceleration, weight and every move are unchanged. Spectral Ascent's rise is a fixed velocity, so its recovery reach does not shrink. The values are `HERO_VERTICAL` in makgora:ts/src/game/sim/tuning.ts.
 - **Frost Armor**'s shell protects from frame 22 for 240 frames, even after
   the cast ends; any hit spends it, and only a hit of at most 8 damage loses
   its reaction. While it holds, down B is Dark Ritual.
@@ -792,11 +792,11 @@ the tables:
 - Knockback classes use provisional growth/base values, not the
   displacement-calibrated bands.
 
-**Gameplan** (smashcraft:ts/src/game/fighters/lich/gameplan.ts, #105): he keeps 1.5-2.4H, where Death and Decay lands on the target and Frost Nova still flies, and never runs in: he advances behind his shots and covers a run-in with Ice Spear. A threat close by he mostly answers by backing out to range. Death and Decay, down tilt, up tilt and the down throw start his strings; Ice Spear, Bone Spike and a late Death and Decay finish. He jumps before Spectral Ascent, aims for the ledge, and stays off the edge, out of close range and out from under a target.
+**Gameplan** (makgora:ts/src/game/fighters/lich/gameplan.ts, #105): he keeps 1.5-2.4H, where Death and Decay lands on the target and Frost Nova still flies, and never runs in: he advances behind his shots and covers a run-in with Ice Spear. A threat close by he mostly answers by backing out to range. Death and Decay, down tilt, up tilt and the down throw start his strings; Ice Spear, Bone Spike and a late Death and Decay finish. He jumps before Spectral Ascent, aims for the ledge, and stays off the edge, out of close range and out from under a target.
 
 ### Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Deliberate projectile placement from range by a frail, slow caster.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). Deliberate projectile placement from range by a frail, slow caster.
 
 ```balance-profile
 fighter: lich
@@ -880,7 +880,7 @@ Standing grab 7/3/26, reach 0.65H. Pummel: claw squeeze. No automatic lifesteal.
 
 **Required counterplay test:** Sleep from neutral must be jumpable or shieldable and cannot reset its own sleep chain. Vampiric Pounce should lose to a preemptive attack and to a correctly spaced retreat.
 
-**As implemented (smashcraft:ts/src/game/fighters/dreadlord/moves.ts, dreadlordSpecials.ts):** every row above is present; the departures are these.
+**As implemented (makgora:ts/src/game/fighters/dreadlord/moves.ts, dreadlordSpecials.ts):** every row above is present; the departures are these.
 
 - Nothing Dreadlord swings is disjointed: each claw, wing, horn and elbow path is also his body, fully out from a frame before its first active frame to two after its last, drawn out and folded back through held 3-frame poses. His standing body adds folded wings behind the shoulders to the roster capsule.
 - Vampiric Pounce’s ground and air approaches stop at a body or shield and hold their height through the corkscrew. Both forms bite; the air form is once per airtime and ends helpless.
@@ -890,7 +890,7 @@ Standing grab 7/3/26, reach 0.65H. Pummel: claw squeeze. No automatic lifesteal.
 
 ### Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Air movement, grabs and close pressure.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). Air movement, grabs and close pressure.
 
 ```balance-profile
 fighter: dreadlord
@@ -966,11 +966,11 @@ Standing grab 8/2/24, reach 0.55H. Pummel: mask headbutt.
 
 **Required counterplay test:** a ward can be cleared with one or two intentional attacks; ward fire plus Hex cannot permanently remove recovery or lock shield. Throws into a ward are setups to measure, not assumed true combos.
 
-**Implemented kit notes.** Source: smashcraft:ts/src/game/fighters/shadow-hunter/moves.ts (normals, grab, throws), shadowHunterSpecials.ts (specials, ward and Hex values) and shadowHunterHero.ts (registration and clip map). The model is the classic `units\orc\HeroShadowHunter\HeroShadowHunter.mdl` at scale 1.0 (Stand Ready is 138 units tall against 1.08H). It has fourteen sequences and one attack clip, so moves share clips by motion: glaive cuts play Attack, overhead moves Spell, the low lunge and the overhand release Spell Throw, Twin Totems and Serpent Ward the hopping Stand Channel, jumps and Loa Vault the leap in Stand Victory, knockdown Death, and a KO the rising spirit of Dissipate. The model has no kick, so Heel Hook plays the rear arm-and-glaive sweep of Stand -2; its hit volume keeps the listed M reach and the swinging arm carries an exposed hurt volume, preserving the move's no-disjoint trade-off. No move is omitted.
+**Implemented kit notes.** Source: makgora:ts/src/game/fighters/shadow-hunter/moves.ts (normals, grab, throws), shadowHunterSpecials.ts (specials, ward and Hex values) and shadowHunterHero.ts (registration and clip map). The model is the classic `units\orc\HeroShadowHunter\HeroShadowHunter.mdl` at scale 1.0 (Stand Ready is 138 units tall against 1.08H). It has fourteen sequences and one attack clip, so moves share clips by motion: glaive cuts play Attack, overhead moves Spell, the low lunge and the overhand release Spell Throw, Twin Totems and Serpent Ward the hopping Stand Channel, jumps and Loa Vault the leap in Stand Victory, knockdown Death, and a KO the rising spirit of Dissipate. The model has no kick, so Heel Hook plays the rear arm-and-glaive sweep of Stand -2; its hit volume keeps the listed M reach and the swinging arm carries an exposed hurt volume, preserving the move's no-disjoint trade-off. No move is omitted.
 
 ### Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Totem placement and angles.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). Totem placement and angles.
 
 ```balance-profile
 fighter: shadow-hunter
@@ -1050,7 +1050,7 @@ Standing grab 11/3/31, reach 0.80H. Pummel: horn jab, shared 3 damage despite hu
 
 ### Pit Lord as built
 
-Source: smashcraft:ts/src/game/fighters/pit-lord/moves.ts (normals, grabs,
+Source: makgora:ts/src/game/fighters/pit-lord/moves.ts (normals, grabs,
 throws, body), pitLordSpecials.ts and pitLordHero.ts (#121). Every row
 above is implemented with its listed timing, damage, angle and reach. Launch
 classes use provisional coefficients. Deliberate differences:
@@ -1062,7 +1062,7 @@ classes use provisional coefficients. Deliberate differences:
   window (#107).
 - Down air's glaive tip reaches about 45 below his feet, just behind his centre; his hurtboxes are fitted
   to the drawn body (weapon excluded) inside the legible-hurtbox limits, Tail
-  Lash included, with no rule-6 departure (smashcraft:docs/gameplay-design.md).
+  Lash included, with no rule-6 departure (makgora:docs/gameplay-design.md).
 - His shield is the reference shield scaled by his 1.35 height (centre and
   radius). The reference shield would leave his 1.65-wide body outside it, and
   an arcing Fel Spit then struck him through it.
@@ -1080,7 +1080,7 @@ seventeen sequences and no hit, ready or jump clip, so flinches play
 pair (overhead) and "attack - 2" (both-sides sweep). pitLordHero.ts lists
 every pose's clip.
 
-**Gameplan** (smashcraft:ts/src/game/fighters/pit-lord/gameplan.ts, #105):
+**Gameplan** (makgora:ts/src/game/fighters/pit-lord/gameplan.ts, #105):
 he holds 120-190 units at Cleaving Sweep's tip. He makes the target act with
 Rain of Fire from range and runs in behind Ruin Charge's armor. Down tilt and the
 throws start his strings. Annihilating Cleave kills from 70%, then Abyssal
@@ -1275,7 +1275,7 @@ Stampede is the Bear command on side special; it needs no separate ultimate
 input. Normals and throws retain their current authored data, including the
 low down-throw chase from #208 and the accepted #186 numeric tuning.
 
-Source: smashcraft:ts/src/game/fighters/beastmaster/moves.ts,
+Source: makgora:ts/src/game/fighters/beastmaster/moves.ts,
 beastmasterSpecials.ts, beastmasterHero.ts and sim/companions.ts. Stock classic
 BeastMaster, GrizzlyBear, QuillBeast and WarEagle models draw the formation;
 the Stampede missile draws its two thunder lizards. The computer uses the
@@ -1422,10 +1422,10 @@ caster: the Lich King wins with blade reach and kill power, controls space
 with Death Grip and Howling Gale, and raises a Ghoul from the souls he harvests. He is slow on foot and in the air, so fast
 pressure inside the blade and juggles are his weakness.
 
-Source: smashcraft:ts/src/game/fighters/lich-king/moves.ts, lichKingSpecials.ts,
+Source: makgora:ts/src/game/fighters/lich-king/moves.ts, lichKingSpecials.ts,
 lichKingHero.ts and lichKingGameplan.ts. Frames are F/A/R as in the notation
 above; damage and launch classes are provisional. The move list
-(smashcraft:docs/move-list.md) names every special.
+(makgora:docs/move-list.md) names every special.
 
 ### Normals
 
@@ -1579,7 +1579,7 @@ gale's band with Howling Gale, and kills with the smashes and his back air.
 
 ### Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). A heavy swordsman holding Frostmourne's tip; kills with smashes and back air.
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). A heavy swordsman holding Frostmourne's tip; kills with smashes and back air.
 
 ```balance-profile
 fighter: lich-king
@@ -1612,9 +1612,9 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 ## Original fighters
 
 Rifleman and Illidan were built before this specification. Their kits live in
-the shared move tables (smashcraft:ts/src/game/sim/hitRegions.ts,
-smashcraft:ts/src/game/sim/specials.ts, smashcraft:ts/src/game/sim/summons.ts)
-and their gameplans (#105) in smashcraft:ts/src/game/sim/originalGameplans.ts.
+the shared move tables (makgora:ts/src/game/sim/hitRegions.ts,
+makgora:ts/src/game/sim/specials.ts, makgora:ts/src/game/sim/summons.ts)
+and their gameplans (#105) in makgora:ts/src/game/sim/originalGameplans.ts.
 Their normals still share one set of frame data and hitboxes (Rifleman's down
 tilt is the exception), so physics and specials carry their identities.
 
@@ -1645,7 +1645,7 @@ avoids close range.
 
 #### Play-style profile
 
-Tom-tunable draft (8 Oct; smashcraft:docs/design/balance.md, "Play-style profiles"). Blaster and traps from range; the Bear is his signature spell (smashcraft:docs/design/mana.md).
+Tom-tunable draft (8 Oct; makgora:docs/design/balance.md, "Play-style profiles"). Blaster and traps from range; the Bear is his signature spell (makgora:docs/design/mana.md).
 
 ```balance-profile
 fighter: rifleman
@@ -1692,7 +1692,7 @@ the ground and 9 in the air, with an intangible first frame; it holds him in
 place in the air, a jump cancels it from frame 4. **Weakness:** his light hits make
 him land more of them to take a stock.
 
-**Gameplan** (smashcraft:ts/src/game/sim/illidanGameplan.ts): he fights in
+**Gameplan** (makgora:ts/src/game/sim/illidanGameplan.ts): he fights in
 the air at his glaives' length, forward air in and back air drifting out,
 threatens forward smash's reach on the ground, and whittles the
 opponent's mana and pressures with short-hop Eye Beams.
@@ -1709,7 +1709,7 @@ Rifleman / Mrgl & Grgl / Cairne: uncharged forward smash kills from 145 / 137 /
 unchanged at 77 / 76 / 114%. 9 Oct, #379: forward smash became Fel Lunge,
 a short lunge with no beam (uncharged 128 / 122 / 171%, fully charged 94 /
 90 / 125%), and Eye Blast moved to his neutral special
-(smashcraft:docs/design/illidan.md; removed 2026-10-28). Dash attack kills from 115 / 115 / 170%
+(makgora:docs/design/illidan.md; removed 2026-10-28). Dash attack kills from 115 / 115 / 170%
 before and 145 / 135 / 190% after; at 120% it now sends Rifleman 180 units
 up (39 before) with Illidan 22 frames ahead.
 
@@ -1720,7 +1720,7 @@ laser from his eyes timed like Falco's Blaster: frame 23 of 57 on the ground,
 frame 13 of 42 in the air with a 4-frame landing, 3% with set knockback 5.
 Mana Burn's slow orb, its percent-scaled stun and its projectile clash are
 gone; no projectile clashes remain. Design, numbers and reasons:
-smashcraft:docs/design/illidan.md, "Neutral special: Eye Beam".
+makgora:docs/design/illidan.md, "Neutral special: Eye Beam".
 
 ## Implementation details for the overnight agent
 
@@ -1728,7 +1728,7 @@ smashcraft:docs/design/illidan.md, "Neutral special: Eye Beam".
 
 Read the repository’s applicable AGENTS.md and active implementation notes, inspect the current branch/worktree and uncommitted changes, and identify the actual fighter-definition, input, simulation, animation, and presentation interfaces. This document is a design handoff, not a source audit. Do not assume a named model, animation clip, native function, or rollback primitive is available because it appears in a moveset description.
 
-The earlier CODEX_IMPLEMENTATION_BRIEF.md and SMASHCRAFT_NETCODE_PROPOSAL.md remain architecture references. The user’s newer source and measured capability reports take precedence on current implementation status. Specifically, an observed early local polling transition is not proof that visible rollback, exact animation phase restoration, physical latency, or fairness has passed. Keep the hero rollout separate from those claims.
+The earlier CODEX_IMPLEMENTATION_BRIEF.md and MAKGORA_NETCODE_PROPOSAL.md remain architecture references. The user’s newer source and measured capability reports take precedence on current implementation status. Specifically, an observed early local polling transition is not proof that visible rollback, exact animation phase restoration, physical latency, or fairness has passed. Keep the hero rollout separate from those claims.
 
 Preserve existing characters and established controls. If a hero already exists, compare its kit before adding a duplicate. Illidan is outside this expansion spec; integrate through the same interfaces but do not replace his moves or change Rifleman without a concrete shared-system need. Never disrupt another running development session merely to build this roster. The user is requesting this specification here; no unattended agent has been launched by writing it.
 
@@ -1804,13 +1804,13 @@ fighter's win rate against the field is between 45% and 55%**, with both
 computers at **Wren Expert** and at least **400 matches a pair**: every pair
 of different fighters, both orders, on every soak stage, over seeded
 matches. The numbers live in one constant, `BALANCE_GATE` in
-smashcraft:ts/scripts/cpuField.ts. smashcraft:ts/test/cpu-field.test.ts
+makgora:ts/scripts/cpuField.ts. makgora:ts/test/cpu-field.test.ts
 checks that this section states the constant's numbers, so changing the gate
 means changing the code and this section together.
 
 Tom's fuller balance spec (8 Oct), which adds the spam probe, the move-share
 ceiling, play-style profiles and the balance score on top of this band, is
-smashcraft:docs/design/balance.md.
+makgora:docs/design/balance.md.
 
 Matchup parity is reported but not gated. Each matchup's win rate, the
 count inside 45-55%, the count whose 95% interval overlaps that band and
@@ -1838,12 +1838,12 @@ bun scripts/cpuField.ts --merge shard.0.json,shard.1.json,...
 The merged table ends with "Balance gate (...): passes", "fails" or "not a
 gate run" (a different level or fewer matches a pair), and lists any fighter
 outside the band. Latest run:
-smashcraft:evidence/balance-105-20261007/n400-after-arrow-defile.md.
+makgora:evidence/balance-105-20261007/n400-after-arrow-defile.md.
 
 A fighter failing the gate when a release build is cut is hidden from
 selection rather than holding the release (Tom, 7 Oct 2026): `bun
 scripts/releaseRoster.ts FIELD.json` writes the hidden slugs into
-smashcraft:ts/src/game/sim/heroes/releaseRoster.ts, compiled into the map so
+makgora:ts/src/game/sim/heroes/releaseRoster.ts, compiled into the map so
 every client agrees. Measurement still plays the whole roster.
 
 ## Balance and feel measurement
@@ -1899,7 +1899,7 @@ The morning report should include the source revision/worktree, build artifact l
 
 ## Prompt to give the implementation agent
 
-Read the attached Smashcraft Hero Expansion Specification and the repository’s current instructions. Preserve ongoing netcode work and existing fighters. Audit existing character/move interfaces and available assets, then implement the recommended roster incrementally, starting with one complete Blademaster base kit and then Mountain King if time permits. Treat all numbers as initial tuning, not proof of balance. Use the existing deterministic simulation and replay architecture; do not substitute native Warcraft combat or add a second unsynchronized gameplay path. Validate actual moves, hitboxes, throws, mana-free recovery, and replay correctness. Keep optional ultimates disabled until base kits pass. Continue through the build order as time permits, checkpoint complete work, and leave a morning report with exact completed work, evidence, and gaps. Do not claim a hero finished solely because its data or selection entry exists.
+Read the attached Mak'gora Hero Expansion Specification and the repository’s current instructions. Preserve ongoing netcode work and existing fighters. Audit existing character/move interfaces and available assets, then implement the recommended roster incrementally, starting with one complete Blademaster base kit and then Mountain King if time permits. Treat all numbers as initial tuning, not proof of balance. Use the existing deterministic simulation and replay architecture; do not substitute native Warcraft combat or add a second unsynchronized gameplay path. Validate actual moves, hitboxes, throws, mana-free recovery, and replay correctness. Keep optional ultimates disabled until base kits pass. Continue through the build order as time permits, checkpoint complete work, and leave a morning report with exact completed work, evidence, and gaps. Do not claim a hero finished solely because its data or selection entry exists.
 
 ## Sources and design provenance
 
@@ -1912,7 +1912,7 @@ Relevant Blizzard character references:
 - [Pandaren Brewmaster](https://classic.battle.net/war3/neutral/pandarenbrewmaster.shtml), [Pit Lord](https://classic.battle.net/war3/neutral/pitlord.shtml), [Goblin Tinker](https://classic.battle.net/war3/neutral/goblintinker.shtml), [Goblin Alchemist](https://classic.battle.net/war3/neutral/goblinalchemist.shtml)
 - [Naga Sea Witch](https://classic.battle.net/war3/neutral/nagaseawitch.shtml), [Beastmaster](https://classic.battle.net/war3/neutral/beastmaster.shtml), [Dark Ranger](https://classic.battle.net/war3/neutral/darkranger.shtml), [Firelord](https://classic.battle.net/war3/neutral/firelord.shtml)
 
-Architecture reference: the project’s CODEX_IMPLEMENTATION_BRIEF.md and SMASHCRAFT_NETCODE_PROPOSAL.md dated 30 September 2026, read for this handoff, plus the current implementation agent’s actual source, logs, and tests. This expansion document does not certify those earlier technical claims or supersede newer measured findings.
+Architecture reference: the project’s CODEX_IMPLEMENTATION_BRIEF.md and MAKGORA_NETCODE_PROPOSAL.md dated 30 September 2026, read for this handoff, plus the current implementation agent’s actual source, logs, and tests. This expansion document does not certify those earlier technical claims or supersede newer measured findings.
 
 
 ## Grom Hellscream
@@ -2129,7 +2129,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 Move healing restores its authored amount on a successful action, capped by
 current damage; it keeps no hidden per-stock bank.
 Which special carries which trait (a status, a heal or a meter drain) is
-one table, smashcraft:ts/src/game/sim/identityTraits.ts;
+one table, makgora:ts/src/game/sim/identityTraits.ts;
 contacts, command grabs, guards and armour read it, so an ordinary move, throw
 or pummel carries no trait. The same file classifies every contact for
 Banish (#360): a spell comes from a special or ultimate or what one spawned,
