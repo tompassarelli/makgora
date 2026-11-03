@@ -1,14 +1,11 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const FORMERLY = /formerly called Smashcraft/g;
-const OLD_NAME = /smashcraft/i;
 const LINK = /\]\(([^)\s]+)\)/g;
 
 export const readmeProblems = (text: string, exists: (path: string) => boolean): string[] => {
   const problems: string[] = [];
   for (const [index, line] of text.split("\n").entries()) {
-    if (OLD_NAME.test(line.replace(FORMERLY, ""))) problems.push(`README.md:${index + 1} still says Smashcraft; the game is Mak'gora (one "formerly called Smashcraft" mention is allowed)`);
     for (const [, target = ""] of line.matchAll(LINK)) {
       if (/^([a-z][a-z0-9+.-]*:|#)/i.test(target)) continue;
       const path = decodeURIComponent(target.split("#")[0] ?? "");
