@@ -6,7 +6,6 @@ import { BossSpell, FIRE_BURST_MODEL, SHOCKWAVE_MODEL, SHOCKWAVE_POINTS } from "
 import { BossSpells, spellCast } from "../src/game/render/bossSpells";
 
 const HOLD = 15;
-const BURST_SHOWS = 4;
 const ZONES = [-300.0, 0.0, 300.0];
 
 function play(spell: BossSpell, tell: number, active: number, frame: (into: number, created: ReadonlySet<number>, live: readonly { readonly model: string; readonly id: number }[]) => void): void {
@@ -39,7 +38,7 @@ function play(spell: BossSpell, tell: number, active: number, frame: (into: numb
   }
 }
 
-test("Archimonde's Rain of Fire impact stands one looping fire pillar at every zone from the hit frame through 15 frames after it, never respawned [k1 scenario]", () => {
+test("Archimonde's Rain of Fire impact stands one fire tower at every zone from the hit frame through 15 frames after it, never respawned [k1 scenario]", () => {
   const tell = 50;
   const born: number[] = [];
   let pillars: readonly number[] = [];
@@ -53,16 +52,16 @@ test("Archimonde's Rain of Fire impact stands one looping fire pillar at every z
   expect(pillars.length).toBe(ZONES.length);
 });
 
-test("Doom's Shockwave impact jets appear first on the hit frame and a fresh jet stays on screen through 15 frames after it, at every pillar [k1 scenario]", () => {
+test("Doom's Shockwave impact stands one fire jet at every pillar from the hit frame through 15 frames after it, never respawned [k1 scenario]", () => {
   const tell = 45;
   const born: number[] = [];
+  let jets: readonly number[] = [];
   play(BossSpell.doomsShockwave, tell, 10, (into, created, live) => {
-    const fresh = live.filter((pose) => pose.model === SHOCKWAVE_MODEL && created.has(pose.id)).length;
-    if (fresh > 0) {
-      expect(fresh).toBe(SHOCKWAVE_POINTS);
-      born.push(into);
-    }
+    const shown = live.filter((pose) => pose.model === SHOCKWAVE_MODEL).map((pose) => pose.id);
+    if (shown.some((id) => created.has(id))) born.push(into);
+    if (into === tell) jets = shown;
+    if (into >= tell && into <= tell + HOLD) expect(shown).toEqual(jets);
   });
-  expect(born[0]).toBe(tell);
-  for (let into = tell; into <= tell + HOLD; into++) expect(born.some((at) => at <= into && into - at < BURST_SHOWS + 1)).toBe(true);
+  expect(born).toEqual([tell]);
+  expect(jets.length).toBe(SHOCKWAVE_POINTS);
 });

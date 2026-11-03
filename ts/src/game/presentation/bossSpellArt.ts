@@ -13,8 +13,8 @@ export const RAIN_OF_FIRE_FRAMES = 84;
 export const RAIN_OF_FIRE_SCALE = f32(0.75);
 export const COLUMN_FIRE_MODEL = "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx";
 export const COLUMN_FIRE_SCALE = { from: f32(0.3), to: f32(0.9) } as const;
-export const FIRE_BURST_MODEL = "Doodads\\Cinematic\\FirePillarMedium\\FirePillarMedium.mdx";
-export const FIRE_BURST_SCALE = f32(1.2);
+export const FIRE_BURST_MODEL = "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx";
+export const FIRE_BURST_SCALE = f32(0.7);
 export const FIRE_BURST_FRAMES = 40;
 
 export const FINGER_LIGHTNING = "AFOD";
@@ -36,9 +36,6 @@ export const SHOCKWAVE_SWEEP = f32(0.6);
 export const SHOCKWAVE_MODEL = "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx";
 export const SHOCKWAVE_PILLAR_SCALE = f32(1.2);
 export const SHOCKWAVE_FRAMES = 60;
-
-export const IMPACT_RESPAWN_FRAMES = 4;
-export const IMPACT_RESPAWNS = 3;
 
 export const BODY_CAST: { readonly [spell: number]: { readonly tell: string; readonly active: string | undefined } } = {
   [BossSpell.rainOfFire]: { tell: "spell", active: "attack" },
