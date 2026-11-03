@@ -214,6 +214,7 @@ export const RIBBON_PARK_SEQUENCES: { readonly [model: string]: string | null } 
   "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx": null,
   "Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx": "Death",
   "Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilMissile.mdl": "Death",
+  "Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilMissile.mdx": "Death",
   "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx": "Birth",
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": "Death",
   "Abilities\\Weapons\\WaterElementalMissile\\WaterElementalMissile.mdx": null,
@@ -223,6 +224,9 @@ export const RIBBON_PARK_SEQUENCES: { readonly [model: string]: string | null } 
   "Abilities\\Weapons\\WyvernSpear\\WyvernSpearMissile.mdx": "Death",
   "Units\\Undead\\Locust\\Locust.mdx": "Death",
   "Units\\Undead\\Scarab\\Scarab.mdl": "Death",
+  [SPIRIT_WOLF_MODEL]: "Stand",
+  [TIMBER_WOLF_MODEL]: "Stand",
+  [DIRE_WOLF_MODEL]: "Stand",
 };
 
 export function heroPoolSize(specials: Readonly<FighterSpecials>, model: string, least: number): number {

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { recordedFacts } from "../scripts/wisp/cueModels";
 import { CUE_MODEL_RECORD } from "../scripts/wisp/cueInputs";
-import { modelFactsKey, type TrackFacts } from "../scripts/wisp/effectVisibility";
+import { effectUses, judgeUse, modelFactsKey, type TrackFacts } from "../scripts/wisp/effectVisibility";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH, PLAYABLE_BOUNDS } from "../src/game/presentation/arenaCamera";
 import { allProjectileModels, RIBBON_PARK_SEQUENCES } from "../src/game/presentation/projectileArt";
@@ -42,6 +42,15 @@ test("the ribbon park table covers exactly the projectile models whose recorded 
     if (parked === null) expect(stopped).toEqual([]);
     else expect(stopped).toContain(parked);
   }
+});
+
+test("every parked ribbon projectile is shown again in a sequence its Classic model holds, because Warcraft leaves an effect asked for a missing sequence in the one it was parked in [k2 property]", () => {
+  const recorded = recordedFacts(readFileSync(join(import.meta.dir, "../..", CUE_MODEL_RECORD), "utf8"));
+  if ("problem" in recorded) throw new Error(recorded.problem);
+  const parked = effectUses().filter((use) => use.kind === "projectile" && use.parked !== undefined);
+  expect(parked.length).toBeGreaterThan(0);
+  const stuck = parked.map((use) => judgeUse(use, recorded.facts.get(modelFactsKey(use.model)) ?? null)).filter((finding) => finding.status === "invisible").map((finding) => `${finding.fighter} ${finding.move}`);
+  expect(stuck).toEqual([]);
 });
 
 function shoot(input: Readonly<Controls>, world: ReturnType<typeof createRoster>): void {

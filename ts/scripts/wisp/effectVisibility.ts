@@ -12,7 +12,7 @@ import { HERO_CUES, fighterMoveCues, fighterBranchCues, fighterCueList } from ".
 import type { Cue } from "../../src/game/presentation/cue";
 import { ATTACK_CUES } from "../../src/game/presentation/attackCues";
 import { DISJOINT_CUES } from "../../src/game/presentation/disjointCues";
-import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, SPECIAL_SLOTS, heroProjectileArt, ultimateProjectiles, fighterProjectileModels } from "../../src/game/presentation/projectileArt";
+import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, RIBBON_PARK_SEQUENCES, SPECIAL_SLOTS, heroProjectileArt, ultimateProjectiles, fighterProjectileModels } from "../../src/game/presentation/projectileArt";
 import { STATIONARY_PARTICLE_MODELS, STATIONARY_SECONDS, BIRTH_MISSILES, RISEN_ALPHA } from "../../src/game/render/projectilePresentation";
 import { projectileModelScale } from "../../src/game/presentation/projectilePose";
 import { ACCENT_SECONDS, ACCENT_SEQUENCE } from "../../src/game/render/hitAreaEffects";
@@ -50,6 +50,7 @@ export interface EffectUse {
   readonly lifetime?: number | undefined;
   readonly anchor?: string | undefined;
   readonly playbackUnknown?: string;
+  readonly parked?: string | undefined;
   readonly width?: number | undefined;
   readonly height?: number | undefined;
 }
@@ -163,7 +164,7 @@ export function classicModelFacts(model: mdx.Model, textureResolves: (path: stri
 }
 
 /** Judges one use against its model's facts: a hidden sequence window, a frozen travelling particle effect or presentation that prevents drawing. */
-export function effectVerdict(model: ModelFacts, use: Pick<EffectUse, "sequence" | "seconds" | "timeScale"> & Partial<Pick<EffectUse, "travels" | "playbackUnknown" | "scale" | "scaleEnd" | "alpha" | "lifetime" | "width" | "height">>): EffectVerdict {
+export function effectVerdict(model: ModelFacts, use: Pick<EffectUse, "sequence" | "seconds" | "timeScale"> & Partial<Pick<EffectUse, "travels" | "playbackUnknown" | "parked" | "scale" | "scaleEnd" | "alpha" | "lifetime" | "width" | "height">>): EffectVerdict {
   if ((use.alpha ?? 255) <= 0 || (use.lifetime ?? Infinity) <= 0 || use.scale === 0 && (use.scaleEnd ?? 0) === 0 || use.width === 0 || use.height === 0) return verdict("invisible", "presentation scale, alpha or lifetime prevents drawing");
   if (use.playbackUnknown !== undefined) return verdict("unknown", use.playbackUnknown);
   if (use.scaleEnd !== undefined && use.scaleEnd !== use.scale) return verdict("unknown", "per-frame scale transition coverage is unmodeled");
@@ -172,7 +173,10 @@ export function effectVerdict(model: ModelFacts, use: Pick<EffectUse, "sequence"
   const wanted = use.sequence === undefined ? ["birth", "stand"] : [use.sequence];
   const found = wanted.map((name) => selectSequence(sequences, name)).filter((index) => index >= 0);
   const stand = selectSequence(sequences, "stand");
-  const picked = found.length > 0 ? found : sequences.length > 0 ? [stand >= 0 ? stand : 0] : [];
+  const fallback = stand >= 0 ? stand : 0;
+  const kept = use.parked === undefined ? -1 : selectSequence(sequences, use.parked);
+  if (found.length === 0 && kept >= 0 && kept !== fallback) return verdict("invisible", `model has no ${use.sequence ?? "birth or stand"} sequence, so Warcraft leaves the pooled effect in ${sequences[kept]?.name ?? use.parked}, the sequence it was parked in (Onyxia's Shadow Bolt, 2026-11-03 Classic capture)`);
+  const picked = found.length > 0 ? found : sequences.length > 0 ? [fallback] : [];
   const windows = picked.length === 0 ? [{ sequence: [0, 0] as Window, window: [0, 0] as Window, name: "none" }] : picked.map((index) => {
     const { start, end, name } = sequences[index] ?? { start: 0, end: 0, name: "none" };
     const at = Math.min(end, start + use.seconds * 1000);
@@ -226,7 +230,7 @@ export function projectileUse(character: Character, fighter: string, move: strin
   const cue = PROJECTILE_DRAW_CUES[model];
   const travels = spec.velocityX !== 0 || spec.velocityZ !== 0;
   const birthNamed = BIRTH_MISSILES.some((name) => model.includes(name));
-  const base = { fighter, move, kind: "projectile" as const, model, travels, anchored: "projectile" as const, scale: (cue?.scale ?? 1) * projectileModelScale(spec.radius, spec), lifetime: spec.life / 60, anchor: "projectile", width: draw?.width, height: draw?.height };
+  const base = { fighter, move, kind: "projectile" as const, model, travels, anchored: "projectile" as const, scale: (cue?.scale ?? 1) * projectileModelScale(spec.radius, spec), lifetime: spec.life / 60, anchor: "projectile", width: draw?.width, height: draw?.height, parked: RIBBON_PARK_SEQUENCES[model] ?? undefined };
   if (character === Character.lichKing && spec.pool !== undefined) return { ...base, sequence: "stand", seconds: 0, timeScale: 1, playbackUnknown: "Defile per-frame age seeking and armed visibility is unmodeled" };
   if (character === Character.lichKing && model.includes("ImpaleHitTarget")) return { ...base, sequence: "birth", seconds: STATIONARY_SECONDS, timeScale: 0, alpha: RISEN_ALPHA };
   if (character === Character.lichKing && model.includes("AnimateDeadTarget")) return { ...base, sequence: "birth", seconds: 0, timeScale: 1, playbackUnknown: "Val'kyr tell per-frame lifetime seeking is unmodeled" };
@@ -319,6 +323,7 @@ const CRUSHING_WAVE: EffectUse = { fighter: "cairne-bloodhoof", move: "neutral-s
 export const EFFECT_CALIBRATION: readonly CalibrationCase[] = [
   { expect: "flagged", cause: "#365", evidence: "Tom saw no Breath of Fire flame in the 0.0.145 Classic playtest (c39ada1e5: 11 emitter births, none lingering)", use: cueUse("chen-stormstout", "neutral-special Breath of Fire active (0.0.145)", "special cue", { model: "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx", anchor: "breath", scale: Math.fround(0.4), sequence: "birth", seconds: 0, birth: { eachFrame: true, strike: 0, voices: 11 } }) },
   { expect: "flagged", cause: "#484", evidence: "Tom saw nothing launch from Cairne's Shockwave in the 0.0.145 Classic playtest (e56c745be^: the travelling wave held at 0.2 s, time scale 0)", use: { ...CRUSHING_WAVE, move: "neutral-special Shockwave projectile (0.0.145)", seconds: Math.fround(0.2), timeScale: 0 } },
+  { expect: "flagged", cause: "the sequence it was parked in", evidence: "the 2026-11-03 Classic 3.0.0.24268 capture onyxia-wc3-vis/before drew no Shadow Bolt on frames 210 to 220 while the bolt hit for 5% (c84dc7b856)", use: { fighter: "onyxia", move: "neutral-special Shadow Bolt projectile (c84dc7b856)", kind: "projectile", model: "Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilMissile.mdl", travels: true, anchored: "projectile", scale: 1, lifetime: 0.4, anchor: "projectile", sequence: "stand", seconds: 0, timeScale: 1, parked: "Death" } },
   { expect: "visible", evidence: "#484: after e56c745be the Classic strip draws the wave on 37 of 37 live frames", use: CRUSHING_WAVE },
   { expect: "visible", evidence: "native Classic 3.0.1.24371 capture effects-native-24371-20261022 blademaster-cues frame 262", use: cueUse("blademaster", "neutral-special Wind Cutter startup", "special cue", { model: "Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", anchor: "body", scale: Math.fround(0.4), sequence: "stand", seconds: Math.fround(0.2) }) },
   { expect: "visible", evidence: "native Classic 3.0.1.24371 capture effects-native-24371-20261022 blademaster-cues frame 278", use: { fighter: "blademaster", move: "neutral-special Wind Cutter projectile", kind: "projectile", model: "Abilities\\Weapons\\WingedSerpentMissile\\WingedSerpentMissile.mdx", travels: true, anchored: "projectile", scale: 1, lifetime: 0.4, anchor: "projectile", sequence: "stand", seconds: 0, timeScale: 1 } },
