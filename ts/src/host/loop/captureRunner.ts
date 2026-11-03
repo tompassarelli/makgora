@@ -2,7 +2,7 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { CAPTURE_SCREEN_FILE, CAPTURE_STATUS_FILE } from "../../game/core/gameFiles";
 import { emptyBounds, hurtBounds, screenBox, effectBounds, type PixelBox } from "../../game/presentation/screenBoxes";
 import { fighterAt, isActive } from "../../game/sim/roster";
-import { type CaptureFixture, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../../platform/captureFixtures";
+import { type CaptureFixture, fixtureStamp, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../../platform/captureFixtures";
 import { nativeDriverCommand } from "../../platform/nativeDriver";
 import { applyDeveloperCommand } from "./developerCommands";
 import { paintDrawnStamp } from "./drawnStamp";
@@ -72,8 +72,9 @@ function nextScript(r: Runner, fixtures: readonly CaptureFixture[]): void {
     status(`CAPTURE DONE ${fixtures.length}`);
     return;
   }
+  globalThis.__makgoraDriverScripts = fixtureStamp(fixture, r.script) - 1;
   nativeDriverCommand(fixture.script);
-  status(`CAPTURE SCRIPT ${r.script + 1} ${fixture.name}`);
+  status(`CAPTURE SCRIPT ${fixtureStamp(fixture, r.script)} ${fixture.name}`);
 }
 
 function openingTick(r: Runner, fixture: CaptureFixture): void {

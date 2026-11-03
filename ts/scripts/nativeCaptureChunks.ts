@@ -16,6 +16,8 @@ const option = (args: readonly string[], name: string) => {
 
 const positional = (args: readonly string[]) => args.filter((value, index) => !value.startsWith("--") && !(args[index - 1]?.startsWith("--") === true && args[index - 1] === "--out"));
 
+export const rowStamp = (index: number) => (index % 63) + 1;
+
 export const nativeCaptureChunks = <A, E, R>(args: readonly string[], build: (args: readonly string[]) => Effect.Effect<A, E, R>, fixtureOf: (path: string, script: string) => { readonly name: string; readonly frames: readonly number[] }) => Effect.gen(function*() {
   const out = option(args, "--out");
   const pads = positional(args).flatMap(path => statSync(path).isDirectory() ? readdirSync(path).filter(file => file.endsWith(".pad")).sort().map(file => join(path, file)) : [path]);
@@ -23,10 +25,10 @@ export const nativeCaptureChunks = <A, E, R>(args: readonly string[], build: (ar
   yield* Effect.try({ try: () => mkdirSync(out, { recursive: true }), catch: cause => new CaptureChunkFailure({ problem: `create row map folder: ${String(cause)}` }) });
   const sourceRevision = yield* runProcess(ChildProcess.make("git", ["rev-parse", "HEAD"], { cwd: join(import.meta.dir, "..") })).pipe(Effect.mapError(failure => new CaptureChunkFailure({ problem: failure.message })));
   const rows: { name: string; map: string; manifest: string; mapSha256: string; frames: readonly number[] }[] = [];
-  for (const pad of pads) {
+  for (const [index, pad] of pads.entries()) {
     const fixture = yield* Effect.try({ try: () => fixtureOf(pad, readFileSync(pad, "utf8")), catch: cause => new CaptureChunkFailure({ problem: `read ${pad}: ${String(cause)}` }) });
     const map = join(out, `${fixture.name}.w3x`);
-    yield* build(["--out", map, "--name", `Makgora native capture ${fixture.name}`, pad]);
+    yield* build(["--out", map, "--name", `Makgora native capture ${fixture.name}`, "--stamp", String(rowStamp(index)), pad]);
     const manifest = `${map.replace(/\.w3x$/, "")}.captures.json`;
     const mapSha256 = yield* Effect.try({ try: () => createHash("sha256").update(readFileSync(map)).digest("hex"), catch: cause => new CaptureChunkFailure({ problem: `hash ${map}: ${String(cause)}` }) });
     rows.push({ name: fixture.name, map, manifest, mapSha256, frames: fixture.frames });

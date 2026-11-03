@@ -20,7 +20,10 @@ export interface CaptureFixture {
   readonly tailFrames?: number;
   readonly reel?: { readonly fighter: string; readonly row: string; readonly slot: string; readonly facing: "right" | "left" };
   readonly silhouette?: Silhouette;
+  readonly stamp?: number;
 }
+
+export const fixtureStamp = (fixture: { readonly stamp?: number }, index: number): number => fixture.stamp ?? index + 1;
 
 // A hidden capture's stamp names frame + SILHOUETTE_HIDDEN_FRAME, so a pixel stamp tells the pair apart.
 export const SILHOUETTE_HIDDEN_FRAME = 16384;

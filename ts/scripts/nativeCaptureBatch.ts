@@ -149,7 +149,7 @@ const runChunk = (args: { readonly pair: number; readonly pool: PairPool; readon
   return yield* Effect.raceFirst(Fiber.join(collector), monitor);
 });
 
-export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Effect.gen(function*() {
+export const nativeCaptureBatch = (args: readonly string[], beforePoolCloses: Effect.Effect<void> = Effect.void) => Effect.scoped(Effect.gen(function*() {
   const planPath = option(args, "--plan");
   const out = option(args, "--out");
   const pair = Number(option(args, "--pair") ?? "0");
@@ -205,6 +205,7 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
     }
     if (!finished) return yield* new CaptureBatchFailure({ problem: `${row.name}: exhausted four capture attempts: ${lastReason}` });
   }
+  yield* beforePoolCloses;
   if (pool.child !== undefined && !solo) yield* wispCommand(["lan", "end", "--pair", String(pair)]).pipe(Effect.ignore);
   yield* closePool(pool);
   console.log(`batch complete: ${completed}/${plan.rows.length} rows`);

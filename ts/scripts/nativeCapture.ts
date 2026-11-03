@@ -35,7 +35,7 @@ import { dataDirectory } from "wisp/scripts/wisp/gameFiles";
 import { CAPTURE_MAP_LINE, parsePadScript, withoutCaptureMapLines } from "./integrity/padScript";
 import { STAMP_CELL } from "../src/game/core/drawnStamp";
 import { CAPTURE_SCREEN_FILE, CAPTURE_STATUS_FILE } from "../src/game/core/gameFiles";
-import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../src/platform/captureFixtures";
+import { CAPTURE_FIXTURES, type CaptureFixture, fixtureStamp, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../src/platform/captureFixtures";
 import { encodePng } from "./wisp/hurtboxView";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { sheetCanvas, putSheetFrame, writeSheet } from "./nativeCaptureSheet";
@@ -104,7 +104,10 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
   if (out === undefined) return yield* new CaptureFailure({ problem: "usage: build --out MAP.w3x [--name NAME] [PAD|DIR...]; without scripts it builds the control" });
 
   const scripts = yield* attempt("read pad scripts", () => pads.map(path => fixtureOf(path, readFileSync(path, "utf8"))));
-  const fixtures = pads.length === 0 ? CAPTURE_FIXTURES : args.includes("--control") ? [...CAPTURE_FIXTURES, ...scripts] : scripts;
+  const stampFrom = option(args, "--stamp");
+  const listed = pads.length === 0 ? CAPTURE_FIXTURES : args.includes("--control") ? [...CAPTURE_FIXTURES, ...scripts] : scripts;
+  const fixtures = stampFrom === undefined ? listed : listed.map((fixture, index) => ({ ...fixture, stamp: Number(stampFrom) + index }));
+  if (fixtures.some((fixture, index) => !Number.isInteger(fixtureStamp(fixture, index)) || fixtureStamp(fixture, index) < 1 || fixtureStamp(fixture, index) > 63)) return yield* new CaptureFailure({ problem: "a drawn stamp names scripts 1 to 63; give --stamp so every script fits" });
   if (new Set(fixtures.map(fixture => fixture.name)).size !== fixtures.length) return yield* new CaptureFailure({ problem: "two pad scripts share a fixture name" });
   if (fixtures.length >= 64) return yield* new CaptureFailure({ problem: "a capture map holds at most 63 scripts; split the batch" });
   const original = yield* attempt("read the checked-in fixtures", () => readFileSync(FIXTURES_MODULE, "utf8"));
@@ -126,7 +129,7 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
 });
 
 const SilhouetteRow = Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite, conceal: Schema.optionalKey(Schema.Literals(["fighter", "cues"])) });
-const FixtureRecord = Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), holdTicks: Schema.optionalKey(Schema.Finite), reel: Schema.optionalKey(Schema.Struct({ fighter: Schema.String, row: Schema.String, slot: Schema.String, facing: Schema.Literals(["right", "left"]) })), silhouette: Schema.optional(SilhouetteRow) });
+const FixtureRecord = Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), holdTicks: Schema.optionalKey(Schema.Finite), reel: Schema.optionalKey(Schema.Struct({ fighter: Schema.String, row: Schema.String, slot: Schema.String, facing: Schema.Literals(["right", "left"]) })), silhouette: Schema.optional(SilhouetteRow), stamp: Schema.optionalKey(Schema.Finite) });
 const Manifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, mapSha256: Schema.optionalKey(Schema.String), sourceRevision: Schema.optionalKey(Schema.String), fixtures: Schema.Array(FixtureRecord) }));
 const CaptureRecord = Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, phase: Schema.Literals(["held", "shown", "hidden"]), file: Schema.String, capturedMs: Schema.Finite, width: Schema.Finite, height: Schema.Finite });
 const Checkpoint = Schema.fromJsonString(Schema.Struct({ version: Schema.Literals([1]), mapSha256: Schema.String, sourceRevision: Schema.String, captures: Schema.Array(CaptureRecord) }));
@@ -291,16 +294,17 @@ export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen
     const status = existsSync(statusPath) && statSync(statusPath).mtimeMs >= started ? preloadLines(readFileSync(statusPath, "latin1"))?.[0] ?? "" : "";
     if (status !== lastStatus) { lastStatus = status; console.log(status); }
     const finalFixture = manifest.fixtures.at(-1);
-    if (finalFixture !== undefined && status === `CAPTURE SCRIPT ${manifest.fixtures.length} ${finalFixture.name}`) sawFinalScript = true;
+    if (finalFixture !== undefined && status === `CAPTURE SCRIPT ${fixtureStamp(finalFixture, manifest.fixtures.length - 1)} ${finalFixture.name}`) sawFinalScript = true;
     if (sawFinalScript && status === `CAPTURE DONE ${manifest.fixtures.length}`) captureDone = true;
     const before = Date.now();
     const whole = yield* capture(client).pipe(Effect.mapError(failure => new CaptureFailure({ problem: `${failure.operation}: ${failure.cause}` })));
     const shot = crop === undefined || sheets ? whole : cropFrame(whole, crop);
     const verdict = frameVerdict(whole);
-    const stamp = "keep" in verdict && status === `CAPTURE SCRIPT ${verdict.keep.script} ${manifest.fixtures[verdict.keep.script - 1]?.name ?? ""}` ? verdict.keep : undefined;
+    const stampIndex = "keep" in verdict ? manifest.fixtures.findIndex((row, index) => fixtureStamp(row, index) === verdict.keep.script) : -1;
+    const stamp = "keep" in verdict && stampIndex >= 0 && status === `CAPTURE SCRIPT ${verdict.keep.script} ${manifest.fixtures[stampIndex]?.name ?? ""}` ? verdict.keep : undefined;
     log.push({ ms: before - started, captureMs: Date.now() - before, stamp: "keep" in verdict ? `${verdict.keep.script}/${verdict.keep.frame}` : verdict.reject });
-    const fixture = stamp === undefined ? undefined : manifest.fixtures[stamp.script - 1];
-    if (stamp !== undefined && stamp.script > lastScript) { lastScript = stamp.script; idleSince = Date.now(); }
+    const fixture = stamp === undefined ? undefined : manifest.fixtures[stampIndex];
+    if (stamp !== undefined && stampIndex + 1 > lastScript) { lastScript = stampIndex + 1; idleSince = Date.now(); }
     const held = stamp === undefined || fixture === undefined ? undefined : heldCapture(fixture, stamp.frame);
     const key = held === undefined || fixture === undefined ? "" : `${fixture.name}/${held.frame}/${held.phase}`;
     if (stamp !== undefined && held !== undefined && fixture !== undefined && !saved.has(key)) {
@@ -310,7 +314,7 @@ export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen
           mkdirSync(join(out, fixture.name), { recursive: true });
           writeFileSync(join(out, file), held.phase === "held" ? encodePpm(shot) : encodePng(shot.width, shot.height, shot.rgb));
         } else {
-          const row = stamp.script - 1;
+          const row = stampIndex;
           const column = fixture.frames.indexOf(held.frame);
           putSheetFrame(canvas, row, column, whole, crop ?? fail("missing crop"));
           if (column === 3 || column === 7) putSheetFrame(canvas, row, column === 3 ? 8 : 9, whole, effectCrop ?? fail("missing effect crop"));
@@ -395,6 +399,7 @@ const reel = (args: readonly string[]) => Effect.gen(function*() {
     writeFileSync(join(out, "reel-plan.json"), `${JSON.stringify(batches, null, 2)}\n`);
   });
   console.log(`reel: ${batches.length} fighters, ${batches.flat().length} move/facing rows, ${batches.flat().reduce((total, row) => total + row.frames.length, 0)} frames; ${out}`);
+  console.log("reel: held frames run the game in real time between captures, so timed effects can finish between frames; judge timed effects with `bun wisp native-capture realtime --out DIR --frames F,F... PAD...` (docs/commands/native.md, Real-time video)");
 });
 
 
@@ -435,7 +440,7 @@ const compare = (args: readonly string[]) => Effect.gen(function*() {
 export function nativeCapture(argv: readonly string[]) {
   const [verb, ...args] = argv;
   const normalize = <A, E, R>(effect: Effect.Effect<A, E, R>): Effect.Effect<A, CaptureFailure, R> => effect.pipe(Effect.mapError(failure => failure instanceof CaptureFailure ? failure : new CaptureFailure({ problem: String(failure) })));
-  const program = verb === "reel" ? normalize(reel(args)) : verb === "build" ? normalize(build(args)) : verb === "chunks" ? normalize(nativeCaptureChunks(args, build, fixtureOf)) : verb === "plan" ? normalize(plan(args)) : verb === "run" ? normalize(runCaptures(args)) : verb === "batch" ? normalize(Effect.promise(() => import("./nativeCaptureBatch")).pipe(Effect.flatMap(module => module.nativeCaptureBatch(args)))) : verb === "compare" ? normalize(compare(args)) : verb === "build-check" ? normalize(buildCheck(args)) : Effect.fail(new CaptureFailure({ problem: "usage: nativeCapture.ts reel|build|chunks|plan|run|batch|compare|build-check ..." }));
+  const program = verb === "reel" ? normalize(reel(args)) : verb === "build" ? normalize(build(args)) : verb === "chunks" ? normalize(nativeCaptureChunks(args, build, fixtureOf)) : verb === "plan" ? normalize(plan(args)) : verb === "run" ? normalize(runCaptures(args)) : verb === "batch" ? normalize(Effect.promise(() => import("./nativeCaptureBatch")).pipe(Effect.flatMap(module => module.nativeCaptureBatch(args)))) : verb === "realtime" ? normalize(Effect.promise(() => import("./nativeCaptureRealtime")).pipe(Effect.flatMap(module => module.nativeCaptureRealtime(args, chunkArgs => nativeCaptureChunks(chunkArgs, build, fixtureOf))))) : verb === "compare" ? normalize(compare(args)) : verb === "build-check" ? normalize(buildCheck(args)) : Effect.fail(new CaptureFailure({ problem: "usage: nativeCapture.ts reel|build|chunks|plan|run|batch|realtime|compare|build-check ..." }));
   return program.pipe(
     Effect.provide(Layer.merge(BunServices.layer, platformLayer())),
   );

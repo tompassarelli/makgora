@@ -215,6 +215,26 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`). `-dev hi
   running. 3.0.1.24371 only starts with network, so its batches
   also pass `--network`, which starts that one pair through `lan pool --pair K
   --network` (wisp:docs/lan.md, Guardrails); every other pair stays offline.
+  Each row map's drawn stamp names the row's own place in the plan (row 1 to
+  63, `--stamp` on `build`), not the script's place in its map, so a recording
+  of several rows tells them apart.
+- Real-time video (judge timed effects here, not from held frames): a held
+  capture pauses the game while real time runs, so a timed Birth effect plays
+  out between held frames and reads wrong (Archimonde's DoomDeath and several
+  fighter effects were misjudged that way on 2026-11-04). On gex45, `bun wisp
+  native-capture realtime --out DIR --frames F,F... [--crop WxH+X+Y] [--tile
+  WxH] [--minutes N] [--pair K] PAD...` builds one row map per pad as `chunks`
+  does, takes a pair from the lease queue unless `--pair` names one, runs the
+  `batch` while wf-recorder records client `a`'s private desktop at 60 fps to
+  `DIR/video-N.mkv` (a new file whenever the pool restarts that desktop), then
+  reads every video frame's stamp and writes `DIR/stills/ROW-fF.png`, the
+  first video frame showing game frame F of that row (or the next within two
+  frames, labelled with the frame it shows), and `DIR/sheet.png`, one row per
+  pad with a cropped `--tile` cell per frame. End each pad with one `capture`
+  line after the last wanted frame, so the game plays at speed up to it. The
+  recorder is stopped before the pool closes and killed after 10 seconds,
+  since it never exits once its desktop is gone; the lease is released on any
+  exit.
 - Native silhouettes (wisp#125): a capture script with `#! silhouette a|b
   FIGHTER MOVE [WIDTHxHEIGHT]` (default 1920x1080) holds each capture frame
   twice, the fighter shown and then hidden by `-dev hide fighter SLOT`, with
