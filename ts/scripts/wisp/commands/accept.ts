@@ -46,7 +46,6 @@ import { measureCursorGate } from "../gateCursor";
 import { measureHandsGate } from "../gateHands";
 import { measureStartGate } from "../gateStart";
 import { measureStartRestGate } from "../gateStartRest";
-import { measureButtonsGate } from "../gateButtons";
 import { measureBindingsGate } from "../gateBindings";
 import { measureMovesGate } from "../gateMoves";
 import { movesShardId, parseShardChat } from "../smokeShards";
@@ -363,7 +362,6 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
       "gate:hands": () => measureHandsGate(selectedClients, evidence("gate-select-hands", "pair"), undefined),
       "gate:hands-teams": () => measureHandsGate(selectedClients, evidence("gate-select-hands-teams", "pair"), [1, 3]),
       "gate:start": (name: string) => measureStartGate(selectedClients, name, evidence("gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")),
-      "gate:buttons": (name: string) => measureButtonsGate(selectedClients, name, evidence("gate-panel-buttons", name)),
       "gate:start-rest": (name: string) => measureStartRestGate(selectedClients, name, evidence("gate-start-rest", name)),
       "gate:results": (name: string) => measureResultsGate(selectedClients, evidence("gate-results-rematch", name)),
       "gate:stages": (name: string) => measureStagesGate(selectedClients, evidence("gate-stages", name), controlled.start("gate-playable", "gate-stages")),
