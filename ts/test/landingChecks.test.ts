@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { Effect } from "effect";
-import { CHECKS, GROUPS, landingSelection, selectGroups } from "../scripts/landingChecks";
+import { CHECKS, GROUPS, STANDALONE_PARITY, landingSelection, selectGroups } from "../scripts/landingChecks";
 import { type GateRunner, PrePushRefusal, landingGate } from "../scripts/prePush";
 import { tapeShard } from "../scripts/wisp/commands/tapes";
 import costs from "../scripts/wisp/tapeCosts.json";
@@ -16,20 +16,20 @@ const BOOT = "the playable map boots to character select in 32-bit Lua";
 const CORPUS = "parity corpus: every native recording replays headless with 0 divergent frames";
 const LUA_PARITY = ["parity tapes", "parity numeric", "stack-trace profile TypeScript frames"];
 
-test("a landing runs no check for docs, every check for a shared root or the full suite, and for gameplay source the boot and computer checks while the Lua parity checks and the frame budgets wait for main's CI [k2 property]", () => {
+test("a landing runs no check for docs, every check for a shared root or the full suite, and for gameplay source the boot, standalone parity and computer checks while the Lua parity checks and the frame budgets wait for main's CI [k2 property]", () => {
   expect(before(["docs/ci.md", "tools/move-data/notes.md"])).toEqual([]);
   for (const root of ["ts/bun.lock", "ts/wisp.lock", "ts/package.json", ".github/workflows/farm-test.yml", "ts/scripts/landingChecks.ts", "ts/scripts/landingRun.ts", "unknown"]) {
     expect(before([root])).toEqual(HERE);
     expect(groups([root])).toEqual([...GROUPS]);
   }
   expect(before(["docs/ci.md"], true)).toEqual(HERE);
-  expect(before(["ts/src/game/sim/codes.ts"])).toEqual([BOOT, "every selectable computer fighter is active"]);
+  expect(before(["ts/src/game/sim/codes.ts"])).toEqual([BOOT, STANDALONE_PARITY, "every selectable computer fighter is active"]);
   expect(before(["ts/src/game/ui/menuHover.ts"])).toContain(BOOT);
   expect(after(["ts/src/game/sim/codes.ts"])).toEqual([PERF, ROLLBACK, ...LUA_PARITY]);
-  expect(groups(["ts/src/game/sim/codes.ts"])).toEqual(["boot", "perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "computer-0", "computer-1", "clean-room", "static"]);
+  expect(groups(["ts/src/game/sim/codes.ts"])).toEqual(["boot", "perf", "rollback", "parity-0", "parity-1", "parity-2", "parity-3", "lua", "corpus", "computer-0", "computer-1", "clean-room", "static"]);
   expect(before(["ts/scripts/wisp/commands/tapes.ts"])).toEqual([]);
   expect(after(["ts/scripts/wisp/commands/tapes.ts"])).toEqual(LUA_PARITY);
-  expect(before(["ts/test/corpus/2026-10-08T08-30-47-695Z/a/makgora-replay-39.txt"])).toEqual(["parity corpus: every native recording replays headless with 0 divergent frames"]);
+  expect(before(["ts/test/corpus/2026-10-08T08-30-47-695Z/a/makgora-replay-39.txt"])).toEqual([CORPUS, STANDALONE_PARITY]);
   for (const parse of ["ts/src/game/replay/replayFormat.ts", "ts/src/game/core/gameFiles.ts"]) expect(before([parse])).toContain(CORPUS);
   expect(before(["ts/src/game/replay/canonical.ts"])).not.toContain(CORPUS);
   expect(before(["ts/src/game/core/gameFiles.ts"])).toContain("type-check edit loop and dependency validation");

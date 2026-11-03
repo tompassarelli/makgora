@@ -38,6 +38,8 @@ const REPLAY_HEADER = /^ts\/src\/game\/(replay\/(replayFormat|matchReplay)|core\
 const WISP_CLI = "ts/scripts/wisp.ts";
 const LUA_TESTS = "ts/scripts/lua-tests.ts";
 const PARITY_COMMAND = "ts/scripts/wisp/commands/parity.ts";
+const STANDALONE_PAD = "test/native/pads/cpu-expert.pad";
+export const STANDALONE_PARITY = "parity standalone: cpu-expert.pad played on this tree's sim matches its native recording on every frame";
 
 export interface Rule { readonly why: string; readonly matches: (path: string) => boolean }
 
@@ -113,6 +115,12 @@ export const CHECKS: readonly LandingCheck[] = [
     command: ["bun", "wisp", "parity", "corpus", "test/corpus"],
     reaches: [shared, pattern(CORPUS, "a native recording"), pattern(REPLAY_HEADER, "read by the corpus replay's header parse"),
       files([WISP_CLI, PARITY_COMMAND, "ts/scripts/wisp/corpus.ts", "ts/scripts/wisp/replayFiles.ts", "ts/scripts/wisp/commands/replay.ts", "ts/scripts/sourceVersion.ts"], "the corpus replay command")],
+    farm: ["corpus"], here: "beside",
+  },
+  {
+    name: STANDALONE_PARITY,
+    command: ["bun", "wisp", "parity", "standalone", STANDALONE_PAD, "--presentation", "native"],
+    reaches: [shared, luaBuild, pattern(CORPUS, "a native recording"), files([`ts/${STANDALONE_PAD}`, WISP_CLI, PARITY_COMMAND], "the standalone parity command or its pad"), imported(["ts/scripts/wisp/standaloneParity.ts"])],
     farm: ["corpus"], here: "beside",
   },
   {
