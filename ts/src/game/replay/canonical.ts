@@ -158,6 +158,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
 
   if (match.classic) {
     bool("match.classic", true);
+    int("match.classicTier", match.classicTier);
   }
   if (match.lore) {
     bool("match.lore", true);

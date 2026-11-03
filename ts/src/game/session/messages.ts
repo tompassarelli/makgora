@@ -7,7 +7,7 @@ import { DownState, LedgeState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { SPECIAL_INPUTS, fighterKit, normalName, specialName } from "../sim/moveNames";
 import { fighterName } from "../roster/kits";
-import { classicResultHelp, classicResultMessage } from "../classic/classicText";
+import { classicResultHelp, classicResultMessage, classicLevel, levelName } from "../classic/classicText";
 import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, cpuProfileLabel } from "../match/cpuProfiles";
 import { TEAM_NAMES } from "../sim/teams";
 import { LORE_BATTLES, loreBattle, loreResultHelp, loreResultMessage } from "../classic/loreBattles";
@@ -59,7 +59,7 @@ export const hazardsSetting = (on: boolean) => `Hazards: ${on ? "On" : "Off"}`;
 export const orbsSetting = (on: boolean) => `Orbs: ${on ? "On" : "Off"}`;
 
 export function rulesSummary(game: Readonly<MatchState>): string {
-  if (game.classic) return "Classic · six fights and a boss";
+  if (game.classic) return `Classic · starts at ${levelName(classicLevel(game))}`;
   if (game.lore) return `Lore Battle · ${loreBattle(game.loreBattle)?.title ?? ""}`;
   if (game.training) return "Training · No time limit";
   if (practiceSelected(game)) return "Practice · No time limit";
@@ -70,7 +70,7 @@ export function rulesSummary(game: Readonly<MatchState>): string {
 
 /** The select bar's rules pill: the live rules, short enough for one line. */
 export function rulesPillParts(game: Readonly<MatchState>): readonly string[] {
-  if (game.classic) return ["Classic"];
+  if (game.classic) return ["Classic", levelName(classicLevel(game))];
   if (game.lore) return ["Lore Battle", `${game.loreBattle + 1}/${LORE_BATTLES.length}`];
   if (game.training) return ["Training", partnerBehaviourSetting(game.trainer.behaviour)];
   const rules = game.endless ? ["Endless"] : [stockSetting(game.stockCount), game.timeLimitMinutes === 0 ? "No timer" : timeSetting(game.timeLimitMinutes)];

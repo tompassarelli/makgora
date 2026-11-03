@@ -101,6 +101,7 @@ function firstMatchDifference(e: Readonly<MatchState>, a: Readonly<MatchState>):
   const training = firstTrainingDifference(e.trainer, a.trainer);
   if (training !== undefined) return training;
   if (e.classic !== a.classic) return "match.classic";
+  if (e.classicTier !== a.classicTier) return "match.classicTier";
   if (e.lore !== a.lore) return "match.lore";
   if (e.loreBattle !== a.loreBattle) return "match.loreBattle";
   const run = firstRunDifference(e.run, a.run);

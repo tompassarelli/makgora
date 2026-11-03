@@ -8,6 +8,12 @@ import { CLASSIC_FIGHTS } from "./classic";
 import { classicRoute } from "./routes";
 import { RunOutcome } from "./runState";
 
+export const levelName = (tier: number): string => `Level ${tier + 1}`;
+export const classicLevel = (game: Readonly<MatchState>): number => (game.run.active ? game.run.tier : game.classicTier);
+
+
+export const classicTierSetting = (tier: number): string => `Classic start: ${levelName(tier)}`;
+
 
 export function classicRouteSummary(character: number): string {
   const route = classicRoute(character);
@@ -34,7 +40,7 @@ export function runTime(frames: number): string {
 export function classicResults(game: Readonly<MatchState>): string {
   const { run } = game;
   const continues = run.continues === 1 ? "1 continue" : `${run.continues} continues`;
-  return `Time ${runTime(run.frames)} · ${Math.floor(run.damageTaken)}% damage taken · ${continues}`;
+  return `Time ${runTime(run.frames)} · ${Math.floor(run.damageTaken)}% damage taken · ${continues} · ${levelName(run.tier)}`;
 }
 
 

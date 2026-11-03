@@ -312,8 +312,7 @@ export class SelectBar {
       });
       return [partner("behaviour"), partner("escape"), partner("tech"), partner("damage"), toggle(rules.hitAreas, { kind: "hitAreas" }), toggle(rules.speed, { kind: "speed" })];
     }
-    if (mode === "classic") return [];
-    if (mode === "lore") return [{ controls: [rules.battle.less, rules.battle.more], step: direction => ({ kind: "loreBattle", direction }) }];
+    if (mode !== "versus") return [{ controls: [rules.classic.less, rules.classic.more], step: direction => ({ kind: "classicTier", direction }) }];
     const presets: PadRow[] = (["tourney", "party", "endless"] as const).map((preset, index) => ({ controls: [rules.presets[index] ?? rules.reset], press: { kind: "preset", preset } }));
     const kinds: PadRow[] = game.items.on ? [toggle(rules.itemKinds[0], { kind: "itemKind", item: ItemKind.speed }), toggle(rules.itemKinds[1], { kind: "itemKind", item: ItemKind.heavy })] : [];
     return [
@@ -432,7 +431,7 @@ export class SelectBar {
       presentRules(this.rules, game, classic);
     }
     const { rules } = this;
-    const steppers = [rules.stocks, rules.time, rules.partner.behaviour, rules.partner.escape, rules.partner.tech, rules.partner.damage, rules.battle];
+    const steppers = [rules.stocks, rules.time, rules.partner.behaviour, rules.partner.escape, rules.partner.tech, rules.partner.damage, rules.classic];
     for (const stepper of steppers) for (const control of [stepper.less, stepper.more]) lit(control, false);
     for (const control of [...rules.presets, rules.reset]) lit(control, false);
     const toggles: readonly (readonly [BarControl, boolean])[] = [
