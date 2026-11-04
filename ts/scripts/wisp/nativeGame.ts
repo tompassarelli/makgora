@@ -7,6 +7,7 @@ import { livePortraits } from "../../src/game/ui/liveCard";
 import type { MapBuild } from "../../src/game/session/build";
 import type { StageTile } from "../../src/game/menu/stageCatalog";
 import { type StandaloneStart, createStandaloneSession, makgoraStandalone } from "./standalone";
+import { MEASURED_FROM } from "../perfWindowTable";
 
 livePortraits.enabled = true;
 
@@ -26,6 +27,12 @@ export const MAKGORA_NATIVE_GAME = {
   ...makgoraStandalone(playerMap === null ? headlessRender() : await Effect.runPromise(playerRender(playerMap))),
   create: async (session: Parameters<typeof createStandaloneSession>[0]) => {
     const created = await createStandaloneSession({ ...session, ...match, start, ...(presentation === undefined ? {} : { presentation }), ...(savedFiles === undefined ? {} : { savedFiles }), ...(chosen === undefined ? {} : { chosen }), ...(tutorialOffer ? {} : { tutorialOffer }) });
+    const warmup = Number(process.env.WISP_WINDOW_WARMUP_FRAMES ?? 0);
+    if (warmup > 0) {
+      const step = created.step;
+      let steps = 0;
+      created.step = (input) => { if (++steps === warmup + 1) console.error(MEASURED_FROM); step(input); };
+    }
     if (digestFile === undefined) return created;
     const rows: string[] = [];
     return {

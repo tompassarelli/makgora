@@ -82,11 +82,20 @@ headless client to the scene), `encodeMs`, `parseMs`, `cpuEncodeMs` and
 
 `bun scripts/perf-window.ts` is wisp#183's benchmark: the native four-fighter
 match on Blackrock, Tomb of Sargeras, Stratholme and Naxxramas at each graphics
-preset (Low, Medium, High, Ultra), each run in its own 1920x1080 private
-desktop under a gpu capacity lease taken for that run only. It prints one
-markdown table per preset, with the CPU pressure each run saw, and keeps the
-runs and `perf-window.md` under `build/perf-window/`. It refuses to start while
-the gpu lease is held for gaming (DEFER_GAMING). `--preset`, `--stage`,
+preset (Low, Medium, High, Ultra), each run in its own private desktop
+(1920x1080 unless `--resolution`) under a gpu capacity lease taken for that run
+only. The whole sweep holds one quiet, latency-declared native lease, so new
+batch work queues, and waits up to ten minutes for running batch work to bring
+CPU PSI some avg10 under 5% before its first run, because timing under peer load
+measures the peers. Each run plays `--warmup` steps (900) that no figure counts, while the
+window reads in its preload models, then `--frames` measured steps (3600). It
+prints one markdown table per preset: p50 / p99 / max of each step stage, the
+scene encode and parse, CPU encode and each GPU pass, the frame interval, late
+scenes per five-second pulse, the lowest ticks/s, the step worker's collector
+cycles and pauses (from `BUN_JSC_logGC=1`) and the CPU pressure each run saw. It
+keeps the runs, their logs and emulated-call counts and `perf-window.md` under
+`build/perf-window/`. It refuses to start while the gpu lease is held for gaming
+(DEFER_GAMING). Off gex45 it runs there unless `--here`. `--preset`, `--stage`,
 `--frames`, `--rollback` and `--out` narrow or change the runs.
 
 Add `--presentation native|pool-confirmed|pool-predicted` to select the map's
