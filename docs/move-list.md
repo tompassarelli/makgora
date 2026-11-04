@@ -703,7 +703,7 @@ Strong and weak hits (frames are active frames, damage uncharged):
 | Move | Axis | Strong hit | Weak hit | Why |
 | --- | --- | --- | --- | --- |
 
-## Valeera Sanguinar
+## Valeera
 
 | Input | Name | What it does |
 | --- | --- | --- |

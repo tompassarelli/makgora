@@ -164,7 +164,7 @@ export const tileShown = (game: Readonly<MatchState>, tile: RosterTile, forgeSho
 
 export const tileMarked = (game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean): boolean => tileShown(game, tile, forgeShown) && fighterStatus(characterOfTile(tile)) === "forge";
 
-const FORGE_BADGE_SIZE = f32(0.016);
+const FORGE_BADGE_SIZE = f32(0.032);
 const FORGE_BADGE_INSET = f32(0.004);
 
 export function placeForgeMark(mark: Frame, x: number, y: number, grid: Readonly<RosterGrid>): void {
