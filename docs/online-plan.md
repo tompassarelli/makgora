@@ -84,3 +84,65 @@ and 4.99 / 3.72 at 300 ms (host / join), the same with and without smoothing,
 since smoothing changes no input. That is two frames per rollback: each
 scripted tap's press frame and its release frame. Neither is predictable from
 the previous row, so no cheaper guess was built.
+
+## Lua32 rollback cost at input delay 1 against 2 in the Warcraft build (makgora#1122 part 8a, 2026-11-05)
+
+The question: can the Warcraft build play at 1 frame of input delay, as the
+native window does since part 6, without breaking the frame budget the perf
+gate holds? The gate holds p99 ≤ 10 ms and worst ≤ 14 ms
+(makgora:ts/scripts/wisp/perfBudget.ts).
+
+Setup:
+
+- Run: `PERF_INPUT_DELAY=N bun wisp perf playable-human-four --samples --out
+  FILE`, then `bun wisp perf budget FILE`.
+- Match: four human peers on the fixed key tape, 1800 measured callbacks, on
+  the playable build (Classic, window 7).
+- Delivery: Battle.net's measured turn model, 80 ms one way and 25 ms turns
+  with the measured extra-turn spread (`syncDelivery(MEASURED_BATTLE_NET)`).
+  Online-rollback.test.ts uses the same model.
+- `PERF_INPUT_DELAY` sets the host's manual delay on every peer before the
+  match starts, the way the lobby control does. It is new in this change
+  (makgora:ts/scripts/wisp/perfLua.ts). With it set, the run prints each
+  peer's agreed delay, rollbacks, depth p50/p99/max and callbacks held at the
+  window edge.
+- Machine: the laptop, under a moderate machine-capacity lease, load about 6
+  on 24 cores. The frame costs are not wall-clock times. The gate predicts
+  Warcraft milliseconds from each callback's Lua instructions, native calls
+  and allocation (`nativeFrameCost(WARCRAFT_COST)`, Wisp), so they don't
+  depend on the host machine or its load. The same runs give the same
+  numbers on gex45 or CI.
+
+Each line gives the four peers.
+
+- **Delay 1:**
+  - rollbacks/s: 8.30, 8.17, 8.23, 8.27
+  - depth p50/p99/max: 5/7/7 on all four
+  - held at the window edge: 994, 1007, 991 and 994 of 1800 callbacks
+  - p99: 8.22, 8.18, 8.12 and 8.14 ms
+  - worst: 9.38, 8.94, 9.35 and 9.36 ms
+  - worst catch-up callback: 8.93, 8.94, 8.69 and 8.95 ms (budget 10)
+  - no desync
+- **Delay 2** (the same numbers as the Auto run, which also agreed 2):
+  - rollbacks/s: 8.07, 8.03, 8.03, 8.23
+  - depth p50/p99/max: 5/7/7 on all four
+  - held: 899, 880, 892 and 887 of 1800
+  - p99: 8.07, 8.01, 8.05 and 8.06 ms
+  - worst: 10.00, 9.51, 9.99 and 10.20 ms
+  - worst catch-up callback: 8.73, 8.32, 8.73 and 8.73 ms
+  - no desync
+
+Worst-frame Lua at delay 1 is 9.38 ms, under the 14 ms budget and below
+delay 2's 10.20 ms. Its p99 rises by about 0.15 ms, and every peer stays under
+10 ms. Depth is the same at both delays because the window caps it at 7. Delay
+1 rolls back about 2% more often and holds about 12% more callbacks at the
+window edge.
+
+**Decision under the rule:** the universal 1 applies to both builds.
+`PLAYABLE_BUILD` plays 1 offline and is Auto's floor online, the same as the
+native window, so the separate `NATIVE_PLAYABLE_BUILD` is gone.
+
+On Battle.net the cost is the held callbacks, not the frame time. At a 160 ms
+round trip Auto now agrees 1 where it used to agree 2. The host can still
+raise the delay, and error correction raises the next match's delay when
+prediction holds. Battle.net is not the competitive path (Tom, 2026-10-30).

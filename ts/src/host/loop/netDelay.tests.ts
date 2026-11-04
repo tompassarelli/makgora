@@ -1,6 +1,6 @@
 import { assertEquals, assertLessThan, test } from "wisp/src/runtime/testing";
 import { AUTO_DELAY, agreedDelay, autoDelay, delayPolicy, observeRtt, rttEstimate, stepManualDelay } from "wisp/src/netcode/delay";
-import { NATIVE_PLAYABLE_BUILD, PLAYABLE_BUILD } from "../../game/session/currentBuild";
+import { PLAYABLE_BUILD, PLAYABLE_SINGLE_SENDS_BUILD } from "../../game/session/currentBuild";
 import { createMatchState, setHumanCount, setParticipants } from "../../game/lobby/lobbyState";
 import { delayLabel, delayStepTarget } from "../../game/ui/selectionRules";
 import { MAX_INPUT_DELAY } from "../../game/netcode/inputSchedule";
@@ -116,11 +116,10 @@ const offlineGear = (floor: number, computers: number) => {
   return { net, game, delay: lobbyNet(net, game, 0).delay };
 };
 
-test("The native window plays at 1 frame of input delay against computers and alone and the Warcraft build at 2, and each gear note and rule help names its own number [k3 measure #1122]", () => {
-  assertEquals(buildDelay(NATIVE_PLAYABLE_BUILD), 1);
-  assertEquals(buildDelay(PLAYABLE_BUILD), 2);
-  for (const build of [NATIVE_PLAYABLE_BUILD, PLAYABLE_BUILD]) {
-    const floor = buildDelay(build);
+test("The native window and the Warcraft build both play at 1 frame of input delay against computers and alone, and the gear note and rule help name it, while a 2-frame floor still reads 2 [k3 measure #1122]", () => {
+  assertEquals(buildDelay(PLAYABLE_BUILD), 1);
+  assertEquals(buildDelay(PLAYABLE_SINGLE_SENDS_BUILD), 1);
+  for (const floor of [buildDelay(PLAYABLE_BUILD), 2]) {
     const versusComputers = offlineGear(floor, 2);
     assertEquals(matchDelay(versusComputers.net, versusComputers.game), floor);
     assertEquals([versusComputers.delay.frames, versusComputers.delay.offline, versusComputers.delay.adjustable].join(), `${floor},${floor},false`);
@@ -130,7 +129,7 @@ test("The native window plays at 1 frame of input delay against computers and al
   }
 });
 
-test("Online Auto floors at the build's delay: 1 on the native window and 2 on Warcraft at 100 ms, both 5 at 300 ms, and the host's number still overrides it on the native window [k3 measure #1122]", () => {
+test("Online Auto floors at the build's delay: 1 at 100 ms against 2 for a 2-frame floor, both 5 at 300 ms, and the host's number still overrides a 1-frame floor [k3 measure #1122]", () => {
   assertEquals(measuredDelay(window, 1, 0), 1);
   assertEquals(measuredDelay(window, 1, 100), 1);
   assertEquals(measuredDelay(window, 2, 100), 2);

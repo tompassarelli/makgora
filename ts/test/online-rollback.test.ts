@@ -10,7 +10,7 @@ import { Phase } from "../src/game/lobby/lobbyState";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { MAX_INPUT_DELAY } from "../src/game/netcode/inputSchedule";
-import { autoDelay, delayPolicy, observeRtt, rttEstimate } from "wisp/src/netcode/delay";
+import { ROLLBACK_BUDGET, autoDelay, delayPolicy, observeRtt, rttEstimate } from "wisp/src/netcode/delay";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { install, startBuild } from "../src/platform/main";
 import { installSessionRates } from "../src/host/loop/sessionRates";
@@ -24,6 +24,7 @@ type Lockstep = ReturnType<typeof headless.clients>;
 
 const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-online-rollback", devConsole: true };
 const WINDOW = PLAYABLE_BUILD.input.kind === "keyboard" ? PLAYABLE_BUILD.input.rollback : 0;
+const FLOOR = PLAYABLE_BUILD.input.kind === "keyboard" ? PLAYABLE_BUILD.input.delay : 0;
 const DEEPEST_ROLLBACK = 7;
 const HUMANS = [0, 1];
 const SENDER_SPREAD_PERCENT = [85, 100, 115];
@@ -129,7 +130,7 @@ const field = (seconds: readonly Fields[], name: string): number[] => seconds.ma
 function linkDelay(rttMs: number): number {
   const estimate = rttEstimate();
   observeRtt(estimate, rttMs);
-  return autoDelay(delayPolicy(WINDOW, MAX_INPUT_DELAY), estimate);
+  return autoDelay(delayPolicy(WINDOW, MAX_INPUT_DELAY, ROLLBACK_BUDGET, FLOOR), estimate);
 }
 
 function coversTrip(rttMs: number): void {

@@ -22,8 +22,8 @@ export const INTEGRITY_BUILD: MapBuild = {
 
 export const PLAYABLE_BUILD: MapBuild = {
   id: "playable-0047",
-  inputProfile: "keyboard-d2-r7",
-  input: { kind: "keyboard", pairedSends: true, delay: 2, rollback: 7 },
+  inputProfile: "keyboard-d1-r7",
+  input: { kind: "keyboard", pairedSends: true, delay: 1, rollback: 7 },
   presentation: "pool-predicted",
   scenario: "normal",
   responseProbe: false,
@@ -49,9 +49,7 @@ export const CURRENT_BUILD: MapBuild = {
 
 export const NATIVE_DRIVER_BUILD: MapBuild = { ...CURRENT_BUILD, id: "typescript-native-driver", inputProfile: "native-driver", presentation: "native", hotReload: false };
 
-export const NATIVE_PLAYABLE_BUILD: MapBuild = { ...PLAYABLE_BUILD, inputProfile: "keyboard-d1-r7", input: { kind: "keyboard", pairedSends: true, delay: 1, rollback: 7 } };
-
-export const PLAYABLE_SINGLE_SENDS_BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "playable-single-sends", input: { kind: "keyboard", pairedSends: false, delay: 2, rollback: 7 } };
+export const PLAYABLE_SINGLE_SENDS_BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "playable-single-sends", input: { kind: "keyboard", pairedSends: false, delay: 1, rollback: 7 } };
 
 export const SOAK_PLAYABLE_BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "soak-playable", inputProfile: INTEGRITY_BUILD.inputProfile, input: INTEGRITY_BUILD.input };
 export const SOAK_INTEGRITY_BUILD: MapBuild = { ...INTEGRITY_BUILD, id: "soak-integrity" };

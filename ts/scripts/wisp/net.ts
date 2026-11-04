@@ -9,7 +9,7 @@ import { Phase } from "../../src/game/lobby/lobbyState";
 import { type InputSchedule, acceptedInput, remoteAccepted } from "../../src/game/netcode/inputSchedule";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { nativeDeclarations } from "./nativeDeclarations";
-import { NATIVE_PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
+import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { StageTile } from "../../src/game/menu/stageCatalog";
 import { Character } from "../../src/game/sim/codes";
 import type { MapBuild } from "../../src/game/session/build";
@@ -119,7 +119,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
     const { POP_UNITS, handMeasuredRtt, hostDelayFrom, measuredDelay }: { POP_UNITS: number; handMeasuredRtt(net: object, rttMs: number): number; hostDelayFrom(net: object, game: State["game"], sender: number, manual: number): void; measuredDelay(window: number, floor: number, rttMs: number): number } = await import("../../src/host/loop/netDelay");
     const { setHumanCount }: { setHumanCount(game: State["game"], count: number): void } = await import("../../src/game/lobby/lobbyState");
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import("../../src/platform/main");
-    const build: MapBuild = { ...NATIVE_PLAYABLE_BUILD, devConsole: true };
+    const build: MapBuild = { ...PLAYABLE_BUILD, devConsole: true };
     const lockstep = runtime.clients({ install: () => main.install(build), start: () => main.startBuild(build) }, [slot], { humans: Array.from({ length: humans }, (_, member) => member), link, keepCalls: 0 });
     const client = lockstep.client(slot);
     const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import("../../src/host/loop/developerCommands");
@@ -154,7 +154,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
       start: () => lockstep.start(),
       measured: (rttMs) => {
         measuredRtt = rttMs;
-        return NATIVE_PLAYABLE_BUILD.input.kind === "keyboard" ? measuredDelay(NATIVE_PLAYABLE_BUILD.input.rollback, NATIVE_PLAYABLE_BUILD.input.delay, rttMs) : 0;
+        return PLAYABLE_BUILD.input.kind === "keyboard" ? measuredDelay(PLAYABLE_BUILD.input.rollback, PLAYABLE_BUILD.input.delay, rttMs) : 0;
       },
       step: () => {
         if (lockstep.frame === SETUP_FRAME) {
