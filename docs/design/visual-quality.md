@@ -121,7 +121,14 @@ pipeline. Mak'gora targets Classic, the graphics mode the player picks with
 War3Preferences `[Misc] hd` = 0: it draws the root asset set with
 fixed-function lighting
 ([Blizzard's 3.0.0.24268 patch notes](https://us.forums.blizzard.com/en/warcraft3/t/warcraft-iii-reforged-forsaken-kingdom-patch-notes/38400)).
-The map can't read or choose the mode. Everything below is the set of inputs
+The map can't read the mode or choose a richer one, but its war3map.w3i
+Supported Modes can exclude HD: a map that supports SD only draws in Classic
+art for a Reforged player too (Tom's check on his client with Graphics set to
+Reforged, 2026-11-05: Tomb of Sargeras in Classic art from the SD-only build and
+in Reforged art from the build supporting both; on gex45's client with the
+Definitive setting the SD-only build matched the Classic setting's capture, image
+difference 0.039, against 0.103 for the build supporting both). Wisp's `supportedModes`
+declaration writes it and Mak'gora declares `"sd"`. Everything below is the set of inputs
 that fixed pipeline takes. The pool clients run 3.0.1.24342 as of 8 Oct
 (their `.build.info`); the native names below are unchanged from 3.0.0.
 
@@ -157,7 +164,8 @@ Not available to a map: custom shaders or materials beyond what MDX layers
 and material slots express, replacing the renderer, colour LUTs, bloom or
 exposure from script, creating or moving omni lights at run time (except by
 placing effects whose models carry lights), driving PopcornFX particles, and
-reading or choosing the player's graphics mode or options
+reading the player's graphics mode or options or choosing a richer mode for
+them (Supported Modes can only exclude HD)
 ([features index](warcraft-features.md#impossible-for-a-map)).
 Editor-level post-processing is available in 3.0 as one file per map:
 ambient occlusion, bloom and tone-map exposure are map-wide settings, not
@@ -369,7 +377,8 @@ How a map uses a newer feature safely:
    native returns the patch number: `VersionGet` reports only Reign of Chaos
    or Frozen Throne (common.j).
 2. **Graphics-mode features: use only what Classic draws.** The map can't
-   detect the mode, and Mak'gora targets Classic.
+   detect the mode, and Mak'gora targets Classic: its build supports SD only,
+   which makes Reforged players draw Classic art as well.
    - A stock path resolves per mode ([Assets and graphics modes](#assets-and-graphics-modes));
      use only paths with a Classic copy.
    - Effects only other graphics modes draw (point lights, depth of field, AO,

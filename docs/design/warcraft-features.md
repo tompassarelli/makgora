@@ -20,7 +20,16 @@ is the release with new lighting, fog, water and graphics script access;
 2.0.x changed the renderer and assets without new natives.
 
 Graphics modes: Mak'gora supports Classic only. The player picks the mode and a
-map can neither read nor choose it ([visual quality](visual-quality.md#the-renderer-is-fixed)).
+map can neither read it nor choose Reforged or Definitive, but it can restrict
+itself: war3map.w3i's Supported Modes (1 SD, 2 HD, 3 both) set to SD only makes
+a Reforged player draw the map in Classic art. Tom checked it on his client
+with Graphics set to Reforged on 2026-11-05: the SD-only build drew Tomb of
+Sargeras in Classic art, the build with both modes drew Reforged art, and the
+map loaded either way. The same holds for Definitive: on gex45's signed-in client
+with the Definitive setting, the SD-only build drew Tomb of Sargeras like the
+Classic setting does (image difference 0.039 from it) while the build with both
+modes drew Definitive's scenery (0.103 from Classic). Wisp declares it as `supportedModes` and Mak'gora's map
+declaration sets `"sd"` ([visual quality](visual-quality.md#the-renderer-is-fixed)).
 "HD" below marks features of the HD renderer, which Mak'gora does not target.
 
 ## 3.0.1 (October 2026): renderer and asset corrections
@@ -199,6 +208,7 @@ model to classic drops them.
   post-processing tool is editor-only.
 - Creating, moving or recolouring omni lights at run time, except by placing
   effects whose models contain lights (capped in Classic).
-- Reading or choosing the graphics mode or the player's graphics options.
+- Reading the player's graphics mode or options, or choosing Reforged or
+  Definitive for them; a map can only exclude HD through Supported Modes.
 - Driving PopcornFX or any material parameter beyond tint, alpha, team
   colour and skin.

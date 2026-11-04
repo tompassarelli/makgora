@@ -12,4 +12,5 @@ export const MAKGORA_MAP = {
     { id: 3, name: "Player 4" },
   ],
   forces: [{ name: "Players", playerIds: [0, 1, 2, 3] }],
+  supportedModes: "sd",
 } as const satisfies MapDeclaration;

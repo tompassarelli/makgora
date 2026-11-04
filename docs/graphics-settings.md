@@ -26,7 +26,7 @@ wisp:docs/lan.md ("Profiles"), one active script, one setting changed at a time.
 
 | Setting (`War3Preferences` key) | Values | CPU per client | GPU per client | Visual impact on what Mak'gora reads |
 |---|---|---|---|---|
-| Graphics mode (`[Misc] hd`) | 0 Classic | Unmeasured | Unmeasured | Mak'gora supports Classic only; Classic loses the HD stage lighting (#170). Parity runs read no pixels. |
+| Graphics mode (`[Misc] hd`) | 0 Classic | Unmeasured | Unmeasured | Mak'gora supports Classic only, and its SD-only Supported Modes makes a Reforged player draw Classic art too (Tom's check, 2026-11-05); Classic loses the HD stage lighting (#170). Parity runs read no pixels. |
 | Window/render size (`reswidth`, `resheight`) | any | Unmeasured | Unmeasured | Load-bearing below 1280×720: the HUD and hit sparks become hard to read. |
 | Frame cap (`maxfps`, `backgroundmaxfps`) | 1–… | Quick idle fixture: 60 fps 106–108%; 40 fps 81% | 60 fps 1.67–1.70%; 40 fps 1.15–1.17% | The simulation is a fixed 60 Hz; above 60 only presentation changes (makgora:docs/high-refresh.md). The 40 fps sample has no completed pad-parity or visual-check result; retain the 60 fps default. |
 | Texture quality (`texquality`) | 0–2 | Unmeasured | Unmeasured | Medium (1) keeps fighter detail readable at match zoom. |
