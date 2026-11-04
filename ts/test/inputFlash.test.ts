@@ -24,13 +24,15 @@ async function stepsToFlash(devCommands: readonly string[]): Promise<{ readonly 
   }
 }
 
-test("the input flash lights on the frame a press acts, one frame earlier for each frame of input delay removed [k1 scenario]", async () => {
+test("the input flash lights on the frame a press acts, one frame earlier for each frame of input delay removed, down to a development delay of 0 under the build's 1 [k1 scenario]", async () => {
   const two = await stepsToFlash(["delay 2", "flash on"]);
   const one = await stepsToFlash(["flash on"]);
-  expect([two.delay, one.delay]).toEqual([2, 1]);
-  expect([two.stillLit, one.stillLit]).toEqual([false, false]);
+  const zero = await stepsToFlash(["delay 0", "flash on"]);
+  expect([two.delay, one.delay, zero.delay]).toEqual([2, 1, 0]);
+  expect([two.stillLit, one.stillLit, zero.stillLit]).toEqual([false, false, false]);
   expect(two.steps).toBeDefined();
   expect(two.steps! - one.steps!).toBe(1);
+  expect(one.steps! - zero.steps!).toBe(1);
 });
 
 test("the input flash stays off unless asked for, in any build [k1 scenario]", async () => {
