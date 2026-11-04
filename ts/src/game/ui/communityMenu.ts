@@ -21,11 +21,10 @@ export class CommunityMenu {
 
   constructor(owner: Frame, opener: Frame, suffix: string, private readonly participantId: number) {
     this.clicks = new ButtonClicks(`ui.community.${suffix}.click`, (target, clicker) => this.click(target, clicker));
-    this.wheel = new PopupWheel(`ui.community.${suffix}.wheel`, (delta, turner) => this.turn(delta, turner));
     const layout = communityLayout();
     const popup = infoPopup(owner, `MeleeCommunityMenu${suffix}`, layout, COMMUNITY_TITLE, true);
     this.root = popup.root;
-    this.wheel.add(popup.root);
+    this.wheel = new PopupWheel(`ui.community.${suffix}.wheel`, popup.root, (delta, turner) => this.turn(delta, turner));
     this.body = popup.body;
     this.state = new InfoPanelState(layout.maxFirst);
     this.clicks.add(popup.close, { kind: "communityClose" }, "Close", "native", layout.close);
@@ -41,15 +40,21 @@ export class CommunityMenu {
   private click(button: CommunityButton, clicker: Player): void {
     if (clicker !== playerOf(this.participantId)) return;
     if (button.kind === "communityOpen") this.open();
-    else this.state.close();
+    else this.shut();
   }
 
   private turn(delta: number, turner: Player): void {
     if (turner === playerOf(this.participantId) && this.state.isOpen) this.scroll(delta);
   }
 
+  private shut(): boolean {
+    this.wheel.disarm();
+    return this.state.close();
+  }
+
   open(): void {
     this.state.open();
+    this.wheel.arm();
     this.body.showFrom(0);
     this.onOpen();
   }
@@ -69,7 +74,7 @@ export class CommunityMenu {
   }
 
   close(): boolean {
-    return this.state.close();
+    return this.shut();
   }
 
   show(visible: boolean): void {
@@ -77,7 +82,7 @@ export class CommunityMenu {
   }
 
   destroy(): void {
-    this.wheel.destroy();
+    this.wheel.disarm();
     this.clicks.destroy();
     destroyFrame(this.root);
   }
