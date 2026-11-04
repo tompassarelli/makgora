@@ -5,8 +5,8 @@ import { generateMDX, renumberNodes } from '../../ts/scripts/clipNodes';
 import { encodeBlp, type Rgba } from '../../ts/scripts/blp';
 
 const [source, textures, destination, prefix, ...flags] = Bun.argv.slice(2);
-if (!source || !textures || !destination || !prefix) throw new Error('usage: hd-to-classic.ts HD.mdx TEXTURE_DIR OUT_DIR PREFIX [--lift Z] [--keep Seq]...');
-const option = (name: string): string | undefined => flags[flags.indexOf(name) + 1];
+if (!source || !textures || !destination || !prefix) throw new Error('usage: hd-to-classic.ts HD.mdx TEXTURE_DIR OUT_DIR PREFIX [--lift Z] [--drop GEOSET]...');
+const option = (name: string): string | undefined => flags.includes(name) ? flags[flags.indexOf(name) + 1] : undefined;
 const lift = Number(option('--lift') ?? 0);
 const QUALITY = 85;
 const WEIGHT_FLOOR = 64;
@@ -56,6 +56,16 @@ function decodeDds(bytes: Uint8Array): Rgba {
 const model = parseModelMDX(await Bun.file(source).arrayBuffer());
 mkdirSync(destination, { recursive: true });
 
+const dropped = new Set(flags.flatMap((flag, i) => flag === '--drop' ? [Number(flags[i + 1])] : []));
+const keptGeosets = model.Geosets.map((_, i) => i).filter((i) => !dropped.has(i));
+const geosetIndex = new Map(keptGeosets.map((old, i) => [old, i]));
+model.Geosets = keptGeosets.map((i) => model.Geosets[i]!);
+model.GeosetAnims = model.GeosetAnims.filter((anim) => geosetIndex.has(anim.GeosetId)).map((anim) => ({ ...anim, GeosetId: geosetIndex.get(anim.GeosetId)! }));
+for (const node of model.Nodes as { GeosetId?: number }[]) if (typeof node?.GeosetId === 'number' && node.GeosetId >= 0) node.GeosetId = geosetIndex.get(node.GeosetId) ?? -1;
+const keptMaterials = [...new Set(model.Geosets.map((geoset) => geoset.MaterialID))].sort((a, b) => a - b);
+model.Materials = keptMaterials.map((id) => model.Materials[id]!);
+for (const geoset of model.Geosets) geoset.MaterialID = keptMaterials.indexOf(geoset.MaterialID);
+
 const diffuseOf = (material: typeof model.Materials[number]): number => {
     const id = material.Layers[0]?.TextureID;
     if (typeof id !== 'number') throw new Error('material without a static diffuse texture');
@@ -67,7 +77,7 @@ for (const material of model.Materials) {
     const id = diffuseOf(material);
     if (written.has(id)) continue;
     const image = model.Textures[id]?.Image ?? '';
-    const name = `${prefix}${image.replace(/^.*[\\/]/, '').replace(/^onyxia_/i, '').replace(/_diffuse\.dds$/i, '').replace(/^./, (c) => c.toUpperCase())}.blp`;
+    const name = `${prefix}${image.replace(/^.*[\\/]/, '').replace(new RegExp(`^(onyxia|${prefix})_`, 'i'), '').replace(/(_diffuse)?\.dds$/i, '').replace(/^./, (c) => c.toUpperCase())}.blp`;
     const dds = decodeDds(new Uint8Array(await Bun.file(join(textures, image.replace(/^.*[\\/]/, ''))).arrayBuffer()));
     await Bun.write(join(destination, name), encodeBlp(dds, QUALITY));
     written.set(id, name);

@@ -684,3 +684,39 @@ Strong and weak hits (frames are active frames, damage uncharged):
 
 | Move | Axis | Strong hit | Weak hit | Why |
 | --- | --- | --- | --- | --- |
+
+## Sally Whitemane
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Bolt | A straight shot across the stage. Shield it or jump it. |
+| Side special | Lunge | A short rush with a strike at the end. A shield stops the rush. |
+| Up special | Rising Strike | A hit that carries him upward, then he falls helpless. |
+| Down special | Burst | A blast on both sides of him. Stay out of reach or shield it. |
+| Jab, repeated | Stand-in Jab | Two quick strikes ahead. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+
+Ground movement: walk 1.60, initial dash 1.90, run 2.20; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+
+## Valeera Sanguinar
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Bolt | A straight shot across the stage. Shield it or jump it. |
+| Side special | Lunge | A short rush with a strike at the end. A shield stops the rush. |
+| Up special | Rising Strike | A hit that carries him upward, then he falls helpless. |
+| Down special | Burst | A blast on both sides of him. Stay out of reach or shield it. |
+| Jab, repeated | Stand-in Jab | Two quick strikes ahead. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+
+Ground movement: walk 1.60, initial dash 1.90, run 2.20; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |

@@ -8,7 +8,7 @@ each Melee value links its public source. The plan is [melee-parity-plan.md](mel
 Each `bun wisp oracle` scenario that departs from Melee names its deviation row; a family's oracle checks
 list those scenarios under their row with each fighter's outcome.
 
-608 rows: 553 parity, 37 deviations, 18 open.
+638 rows: 583 parity, 37 deviations, 18 open.
 
 ## Deviations from Melee
 
@@ -908,6 +908,46 @@ in Melee units, with Fox's and Falco's values beside it; a value outside the spr
 | Run speed `onyxia-run` | 2.3 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Walk speed `onyxia-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 | Traction `onyxia-traction` | 0.07 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+
+### Sally Whitemane
+
+| Row | Ours | Melee | Code | Status |
+|---|---|---|---|---|
+| Weight `whitemane-weight` | 84 | [55–118 (Fox 75/73, Falco 80)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Gravity `whitemane-gravity` | 0.23 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Terminal speed `whitemane-terminal` | 2.8 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Fast-fall speed `whitemane-fast-fall` | 3.4 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Jump squat frames `whitemane-jump-squat` | 3 | [3–8 (Fox 3, Falco 5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Full jump velocity `whitemane-full-jump` | 3.68 | [1.6–4.1 (Fox 3.68, Falco 4.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Short jump velocity `whitemane-short-jump` | 2.1 | [1.05–2.14 (Fox 2.1, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Double jump velocity, against fighters with one double jump `whitemane-double-jump` | 4.416 | [1.54–4.416 (Fox 4.416, Falco 3.854)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Air speed `whitemane-air-speed` | 1 | [0.68–1.35 (Fox 0.83, Falco 0.83)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Air acceleration `whitemane-air-acceleration` | 0.08 | [0.0325–0.28 (Fox 0.08, Falco 0.07)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Air friction `whitemane-air-friction` | 0.02 | [0.005–0.05 (Fox 0.02, Falco 0.02)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Initial dash speed `whitemane-dash` | 1.9 | [1–2 (Fox 1.9, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Run speed `whitemane-run` | 2.2 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Walk speed `whitemane-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Traction `whitemane-traction` | 0.06 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+
+### Valeera Sanguinar
+
+| Row | Ours | Melee | Code | Status |
+|---|---|---|---|---|
+| Weight `valeera-weight` | 84 | [55–118 (Fox 75/73, Falco 80)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Gravity `valeera-gravity` | 0.23 | [0.064–0.23 (Fox 0.23, Falco 0.17)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Terminal speed `valeera-terminal` | 2.8 | [1.3–3.1 (Fox 2.8, Falco 3.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Fast-fall speed `valeera-fast-fall` | 3.4 | [1.6–3.5 (Fox 3.4, Falco 3.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Jump squat frames `valeera-jump-squat` | 3 | [3–8 (Fox 3, Falco 5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Full jump velocity `valeera-full-jump` | 3.68 | [1.6–4.1 (Fox 3.68, Falco 4.1)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Short jump velocity `valeera-short-jump` | 2.1 | [1.05–2.14 (Fox 2.1, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Double jump velocity, against fighters with one double jump `valeera-double-jump` | 4.416 | [1.54–4.416 (Fox 4.416, Falco 3.854)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Air speed `valeera-air-speed` | 1 | [0.68–1.35 (Fox 0.83, Falco 0.83)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Air acceleration `valeera-air-acceleration` | 0.08 | [0.0325–0.28 (Fox 0.08, Falco 0.07)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Air friction `valeera-air-friction` | 0.02 | [0.005–0.05 (Fox 0.02, Falco 0.02)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [tuning.ts:136](../../ts/src/game/sim/tuning.ts#L136) `AUTHORED_PHYSICS` | parity |
+| Initial dash speed `valeera-dash` | 1.9 | [1–2 (Fox 1.9, Falco 1.9)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Run speed `valeera-run` | 2.2 | [1.1–2.3 (Fox 2.2, Falco 1.5)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Walk speed `valeera-walk` | 1.6 | [0.65–1.6 (Fox 1.6, Falco 1.4)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
+| Traction `valeera-traction` | 0.06 | [0.025–0.1 (Fox 0.08, Falco 0.08)](https://wiki.supercombo.gg/w/SSBM/Character_Attributes) | [heroBodies.ts:25](../../ts/src/game/sim/heroes/heroBodies.ts#L25) `HERO_BODIES` | parity |
 
 ## Moves against Melee's
 

@@ -36,4 +36,6 @@ export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { r
   34: { walk: { clip: 4, model: "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist.mdl", speed: f32(217.565) }, run: { clip: 4, model: "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist.mdl", speed: f32(217.565) } },
   35: { walk: { clip: 6, model: "war3mapImported\\KatranaPrestorHero.mdx", speed: f32(153.204) }, run: { clip: 6, model: "war3mapImported\\KatranaPrestorHero.mdx", speed: f32(153.204) } },
   36: { walk: { clip: 6, model: "war3mapImported\\OnyxiaDragon.mdx", speed: f32(127.234) }, run: { clip: 6, model: "war3mapImported\\OnyxiaDragon.mdx", speed: f32(127.234) } },
+  37: { walk: { clip: 6, model: "war3mapImported\\High Inquisitor Whitemane HotS.mdx", speed: f32(173.542) }, run: { clip: 6, model: "war3mapImported\\High Inquisitor Whitemane HotS.mdx", speed: f32(173.542) } },
+  38: { walk: { clip: 29, model: "war3mapImported\\Valeera.mdx", speed: f32(225.532) }, run: { clip: 29, model: "war3mapImported\\Valeera.mdx", speed: f32(225.532) } },
 };
