@@ -13,7 +13,7 @@ import { MAX_BATCH } from "../netcode/journal/transport";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../input/participants";
 import {
   type MatchState, Phase, createMatchState, firstHumanSlot, humanFighterActive, humanPresent, requestStageSelect, requestStart, returnToCharacters,
-  selectCharacter, selectCpuCharacter, selectStage, setStocks, computerActive, cycleSlotMode, setCpuOpponent, setCpuTier, setHitAreas, setPartnerDamage, setTraining, stepPartnerBehaviour,
+  offeredMatchCharacter, selectCharacter, selectCpuCharacter, selectStage, setStocks, computerActive, cycleSlotMode, setCpuOpponent, setCpuTier, setHitAreas, setPartnerDamage, setTraining, stepPartnerBehaviour,
 } from "../lobby/lobbyState";
 import { isCpuOpponentChoice, isCpuTier, type CpuOpponentChoice, type CpuTier } from "../match/cpuProfiles";
 import { PartnerBehaviour } from "../match/trainingState";
@@ -259,7 +259,7 @@ export function prepareQuickMatch(game: MatchState, stage = 0, character?: Chara
     if (partner !== undefined) prepareQuickCpu(game, { opponent: "wren", tier: "rookie" }, typeof character === "number" ? character : character?.[partner] ?? defaults[partner]);
   }
   for (const slot of PARTICIPANT_SLOTS) {
-    if (humanFighterActive(game, slot) && humanPresent(game, slot)) selectCharacter(game, slot, typeof character === "number" ? character : character?.[slot] ?? defaults[slot]);
+    if (humanFighterActive(game, slot) && humanPresent(game, slot)) selectCharacter(game, slot, typeof character === "number" ? character : character?.[slot] ?? defaults[slot], offeredMatchCharacter);
   }
   if (costumes !== undefined) for (const slot of PARTICIPANT_SLOTS) game.costumeChoices[slot] = costumeIndex(game.characterChoices[slot], costumes[slot] ?? 0);
   setStocks(game, first, stocks);
@@ -380,7 +380,7 @@ export function prepareQuickCpu(game: MatchState, profile: QuickCpuProfile, char
   for (let step = 0; step < 2; step++) cycleSlotMode(game, first, computer);
   setCpuOpponent(game, first, computer, profile.opponent);
   setCpuTier(game, first, computer, profile.tier);
-  if (character !== undefined) selectCpuCharacter(game, first, computer, character);
+  if (character !== undefined) selectCpuCharacter(game, first, computer, character, offeredMatchCharacter);
 }
 
 export function quickPromoRequest(message: string): { readonly stage: number; readonly pair: readonly [Character, Character] } | undefined {
@@ -404,7 +404,7 @@ export function prepareQuickPromo(game: MatchState, pair: readonly [Character, C
     if (wanted) {
       setCpuOpponent(game, first, slot, "wren");
       setCpuTier(game, first, slot, "expert");
-      selectCpuCharacter(game, first, slot, pair[slot === 0 ? 0 : 1]);
+      selectCpuCharacter(game, first, slot, pair[slot === 0 ? 0 : 1], offeredMatchCharacter);
     }
   }
   setTraining(game, first, false);

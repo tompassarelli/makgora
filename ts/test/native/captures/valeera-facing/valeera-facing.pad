@@ -1,0 +1,7 @@
+# Valeera runs right, stands facing right, runs left and stands facing left, so both facings of her stand and run show (makgora#1108).
+#! chat -dev quick hero valeera
+250 a stick 1 0
+300 a stick 0 0
+380 a stick -1 0
+430 a stick 0 0
+520 a capture

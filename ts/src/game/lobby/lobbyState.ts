@@ -314,8 +314,10 @@ export function nextMatchCharacter(game: Readonly<MatchState>, current: number |
   return nextCharacterIn(shownFighters(game.classic ? CLASSIC_CHARACTERS.filter(character => PLAYABLE_CHARACTERS.includes(character)) : PLAYABLE_CHARACTERS, game.forge), current, direction);
 }
 
-export function selectCharacter(game: MatchState, slot: number, choice: number): void {
-  if (game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !humanPresent(game, slot) || !humanFighterActive(game, slot) || !selectableMatchCharacter(game, choice)) return;
+export type CharacterOffer = (game: Readonly<MatchState>, choice: number) => choice is Character;
+
+export function selectCharacter(game: MatchState, slot: number, choice: number, offered: CharacterOffer = selectableMatchCharacter): void {
+  if (game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !humanPresent(game, slot) || !humanFighterActive(game, slot) || !offered(game, choice)) return;
   chooseFighter(game, slot, choice);
   game.characterReadiness[slot] = true;
 }
@@ -333,10 +335,10 @@ export const cpuFighterRandom = (game: Readonly<MatchState>, slot: number): bool
 
 export const shownFighter = (game: Readonly<MatchState>, slot: number): number | undefined => cpuFighterRandom(game, slot) ? RANDOM_FIGHTER : characterFor(game, slot);
 
-export function selectCpuCharacter(game: MatchState, actor: number, slot: number, choice: number): void {
+export function selectCpuCharacter(game: MatchState, actor: number, slot: number, choice: number, offered: CharacterOffer = selectableMatchCharacter): void {
   if (game.phase !== Phase.characterMenu || !isParticipantSlot(slot) || !canChooseComputer(game, actor, slot)) return;
   if (choice === RANDOM_FIGHTER && randomFighterOffered(game)) game.cpuRandomFighters[slot] = true;
-  else if (selectableMatchCharacter(game, choice)) {
+  else if (offered(game, choice)) {
     chooseFighter(game, slot, choice);
     game.cpuRandomFighters[slot] = false;
   } else return;

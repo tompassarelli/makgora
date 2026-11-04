@@ -372,7 +372,11 @@ The map's description carries the same credits.
   and World of Warcraft art by Blizzard Entertainment: its `Valeera.mdx`
   (Valeera 1.5), converted to a Classic MDX 800 model by
   makgora:tools/animations/hd-to-classic.ts (diffuse textures as BLP, the two
-  geosets that draw stock Reforged-only textures dropped) and imported as
+  geosets that draw stock Reforged-only textures dropped), its side-on Stand 1
+  to 4 and Stand Ready 1 clips (sequences 22 to 26) turned -100 degrees about
+  the vertical axis by makgora:tools/animations/turn-clips.ts so she stands
+  toward the side camera as stock heroes do in both facings (makgora#1108),
+  and imported as
   `war3mapImported\Valeera.mdx` with four `Valeera*.blp` textures for the
   Forge fighter Valeera Sanguinar (read 4 November 2026; Tom allowed ported
   Blizzard models on 4 November 2026).
