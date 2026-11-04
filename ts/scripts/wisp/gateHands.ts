@@ -7,7 +7,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, type Client, focus, loadClients, type Region } from "wisp/scripts/warcraft/desktop";
-import { HAND_STATES, type HandState, carriedChipLeft, carriedChipTop, readyChipSize, handLeft, handSize, handTop } from "../../src/game/menu/selectionDrag";
+import { HAND_STATES, type HandState, carriedChipLeft, carriedChipTop, readyChipSize, handLeft, HAND_SIZE, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect } from "../../src/game/menu/selectionGrid";
 import { CHAT_SLOT } from "../../src/game/core/selectScreenLayout";
 import { selectGrid } from "../../src/game/ui/selectionFrames";
@@ -89,7 +89,7 @@ export const measureHandsGate = (clientsFile: string, directory: string, teams: 
   if (first === undefined || second === undefined) return yield* new AcceptFailure({ operation: "hands gate", problem: "two clients are required" });
   const reference = yield* capture(first.client, first.region).pipe(Effect.mapError(fail("hands gate capture")));
   const grid = selectGrid(false);
-  const extent = handSize(grid);
+  const extent = HAND_SIZE;
   const chip = readyChipSize(grid);
   const tile = cellRect(grid, grid.tiles[HOVER_TILE] ?? 0);
   const hover = { x: (tile.left + tile.right) / 2, y: (tile.top + tile.bottom) / 2 };

@@ -8,7 +8,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, focus, loadClients } from "wisp/scripts/warcraft/desktop";
-import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, handSize, HAND_STATES, type HandState, handLeft, handTop } from "../../src/game/menu/selectionDrag";
+import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, HAND_SIZE, HAND_STATES, type HandState, handLeft, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect } from "../../src/game/menu/selectionGrid";
 import { selectGrid } from "../../src/game/ui/selectionFrames";
 import { readTga, type Rgba } from "../blp";
@@ -63,7 +63,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   yield* reachFighterSelect(client, region);
   const frame = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate capture")));
   const grid = selectGrid(false);
-  const handExtent = handSize(grid);
+  const handExtent = HAND_SIZE;
   const samples: { file: string; sha256: string; elapsedMs: number; attempts: number; phase: string; x: number; y: number; error: number | undefined; state: HandState; pinched: boolean; handPixels: number; matchedHandPixels: number; chipError: number | undefined; visible: boolean }[] = [];
   const started = yield* Clock.currentTimeMillis;
   const move = (x: number, y: number) => {

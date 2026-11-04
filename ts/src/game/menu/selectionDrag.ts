@@ -7,7 +7,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
 import { CARD_LEFT, CARD_PITCH, CARD_SCALE, CARD_TOP, CARD_WIDTH } from "../core/selectScreenLayout";
 import { PARTICIPANT_CAPACITY, participantActive } from "../input/participants";
-import { type RosterGrid, type RosterTile, cellRect, laidOut, nearestTile, tileAt } from "./selectionGrid";
+import { type RosterGrid, type RosterTile, cellRect, laidOut, nearestTile, rosterGrid, tileAt } from "./selectionGrid";
 
 export type { RosterTile };
 
@@ -153,11 +153,11 @@ export const HAND_STATES = ["point", "fan", "pinch"] as const;
 
 export type HandState = (typeof HAND_STATES)[number];
 
-// Melee draws one hand over most of a roster tile: the gauntlet is this share of a tile's height, so it holds at every grid scale and UI scale.
 export const HAND_TILE_HEIGHT = f32(0.72);
 
-// SelectionHand textures are drawn square, sized so the gauntlet rows span HAND_TILE_HEIGHT of a tile.
-export const handSize = (grid: RosterGrid): number => f32(f32(grid.cellHeight) * HAND_TILE_HEIGHT * HAND_TEXELS / HAND_ART_ROWS);
+export const HAND_REFERENCE_TILES = 33;
+
+export const HAND_SIZE = f32(f32(rosterGrid(HAND_REFERENCE_TILES).cellHeight) * HAND_TILE_HEIGHT * HAND_TEXELS / HAND_ART_ROWS);
 
 // The texel that sits exactly on the mouse: the index fingertip of the up-left pointing hand, the fan's leading (longest) fingertip, and the middle of the gap between the pinch's thumb and index tips.
 const HAND_HOTSPOT: Readonly<Record<HandState, { readonly x: number; readonly y: number }>> = {

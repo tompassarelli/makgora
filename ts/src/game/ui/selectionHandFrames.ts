@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import { HAND_STATES, type HandState, handLeft, handSize, handTop, readyChipSize } from "../menu/selectionDrag";
+import { HAND_STATES, type HandState, handLeft, HAND_SIZE, handTop, readyChipSize } from "../menu/selectionDrag";
 import { HAND_TEXELS } from "../core/handArt";
 import type { RosterGrid } from "../menu/selectionGrid";
 import { SELECT_LEVELS } from "./selectLevels";
@@ -46,7 +46,7 @@ export function handBadgeBox(left: number, top: number, size: number, chip: numb
 export const handCrossesEdge = (left: number, top: number, size: number): boolean => left < 0 || top > UI_HEIGHT || f32(left + size) > UI_WIDTH || f32(top - size) < 0;
 
 function createLayer(parent: Frame, grid: RosterGrid, tag: string, suffix: string, slot: number): HandLayer {
-  const size = handSize(grid);
+  const size = HAND_SIZE;
   const state = (hand: HandState) => {
     const frame = art(parent, `MeleeHand${TEXTURE_NAMES[hand]}${tag}${suffix}_${formatInt(slot)}`, `war3mapImported\\SelectionHand${TEXTURE_NAMES[hand]}.tga`, 0.0, 0.0, size, size);
     setFrameLevel(frame, SELECT_LEVELS.hand);
@@ -61,7 +61,7 @@ function createLayer(parent: Frame, grid: RosterGrid, tag: string, suffix: strin
 }
 
 function resizeLayer(layer: HandLayer, grid: RosterGrid): void {
-  const size = handSize(grid);
+  const size = HAND_SIZE;
   for (const state of HAND_STATES) setFrameSize(layer.states[state], size, size);
   const { width, height } = handBadgeBox(0.0, 0.0, size, readyChipSize(grid));
   setFrameSize(layer.badge, width, height);
@@ -90,7 +90,7 @@ function presentLayer(layer: HandLayer, hand: DrawnHand | undefined, left: numbe
 }
 
 export function presentHand(frames: HandFrames, hand: DrawnHand | undefined, grid: RosterGrid): void {
-  const size = handSize(grid);
+  const size = HAND_SIZE;
   const left = hand === undefined ? 0.0 : handLeft(hand.pose.x, hand.pose.state, size);
   const top = hand === undefined ? 0.0 : handTop(hand.pose.y, hand.pose.state, size);
   const crossing = hand !== undefined && handCrossesEdge(left, top, size);

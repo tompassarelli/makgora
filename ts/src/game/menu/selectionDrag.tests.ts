@@ -1,7 +1,7 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { HAND_ART_COLUMNS, HAND_ART_ROWS, HAND_TEXELS } from "../core/handArt";
-import { bullseyeLeft, bullseyeSize, bullseyeTop, GAME_MENU_WAKE_UPDATES, gameMenuWake, carriedChipLeft, carriedChipTop, chipBox, CARRIED_CHIP_OFFSET, HAND_STATES, handLeft, handSize, handTop, menuCursor, readyChipSize } from "./selectionDrag";
+import { bullseyeLeft, bullseyeSize, bullseyeTop, GAME_MENU_WAKE_UPDATES, gameMenuWake, carriedChipLeft, carriedChipTop, chipBox, CARRIED_CHIP_OFFSET, HAND_REFERENCE_TILES, HAND_SIZE, HAND_STATES, handLeft, handTop, menuCursor, readyChipSize } from "./selectionDrag";
 import { rosterGrid } from "./selectionGrid";
 
 // The chip texture's disc is 232 of its 256 texels.
@@ -94,20 +94,18 @@ test("The bullseye is centred on the mouse and moves one for one with it at ever
   }
 });
 
-test("The gauntlet is drawn at 0.67 to 0.77 of a roster tile's height at every grid size, one size for all three states, never squashed [k2 property]", () => {
-  for (let count = 1; count <= 60; count++) {
-    const grid = rosterGrid(count);
-    const size = handSize(grid);
-    const height = size * HAND_ART_ROWS / HAND_TEXELS;
-    const width = size * HAND_ART_COLUMNS / HAND_TEXELS;
-    assertTrue(height >= f32(0.67) * grid.cellHeight && height <= f32(0.77) * grid.cellHeight);
-    assertTrue(Math.abs(width / height - HAND_ART_COLUMNS / HAND_ART_ROWS) < f32(1e-6));
-    assertTrue(Math.abs(HAND_ART_COLUMNS / HAND_ART_ROWS - 828 / 848) < f32(0.002));
-  }
+test("The gauntlet is one size on every screen and at every grid size, 0.72 of a tile on 0.3's 33-tile grid, never squashed [k2 property]", () => {
+  const reference = rosterGrid(HAND_REFERENCE_TILES);
+  const height = HAND_SIZE * HAND_ART_ROWS / HAND_TEXELS;
+  const width = HAND_SIZE * HAND_ART_COLUMNS / HAND_TEXELS;
+  assertTrue(Math.abs(HAND_SIZE - f32(0.0635458)) < f32(0.00001));
+  assertTrue(height >= f32(0.67) * reference.cellHeight && height <= f32(0.77) * reference.cellHeight);
+  assertTrue(Math.abs(width / height - HAND_ART_COLUMNS / HAND_ART_ROWS) < f32(1e-6));
+  assertTrue(Math.abs(HAND_ART_COLUMNS / HAND_ART_ROWS - 828 / 848) < f32(0.002));
 });
 
 test("Every hand state keeps its hotspot inside the hand frame and moves the frame one for one with the mouse [k2 property]", () => {
-  const size = handSize(rosterGrid(24));
+  const size = HAND_SIZE;
   for (const state of HAND_STATES) {
     const left = handLeft(f32(0.4), state, size);
     const top = handTop(f32(0.3), state, size);
@@ -121,7 +119,7 @@ test("Every hand state keeps its hotspot inside the hand frame and moves the fra
 test("A carried chip hangs left of the pinch point with its right rim between the thumb and index tips, level with it, and narrower than the gauntlet [k2 property]", () => {
   for (let count = 1; count <= 60; count++) {
     const grid = rosterGrid(count);
-    const size = handSize(grid);
+    const size = HAND_SIZE;
     const chip = readyChipSize(grid);
     const x = f32(0.4);
     const y = f32(0.3);
