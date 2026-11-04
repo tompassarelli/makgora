@@ -16,7 +16,7 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "packageManager": "bun@1.3.13",
+  "packageManager": "bun@1.4.2",
   "scripts": {
     "postinstall": "git config merge.makgora-generated.name 'per-entry merge of generated files' && git config merge.makgora-generated.driver 'f=ts/scripts/mergeGenerated.ts; if [ -f \"$f\" ]; then bun \"$f\" %O %A %B %P; else git merge-file -L ours -L base -L theirs %A %O %B; fi' && bun node_modules/@effect/tsgo/dist/effect-tsgo.cjs patch --typescript --typescript-package typescript-native",
     "check": "bun scripts/check.ts",

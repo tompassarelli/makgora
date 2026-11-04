@@ -288,7 +288,7 @@ collects and merges with `--merge`.
 The suite tests the candidate and the reports job tests the regenerated rows,
 their only reader; `land` waits for both and pushes the lane commits carrying the reports.
 A `code-health` job also runs beside the suite on the same candidate and base:
-north's `harness/code-health/cli.ts gate BASE CANDIDATE` (Bun 1.3.13,
+north's `harness/code-health/cli.ts gate BASE CANDIDATE` (Bun 1.4.2,
 ast-grep 0.42.1). `land` waits for it too and refuses the candidate like a red
 suite ("it adds code-health debt", or "the code-health gate failed to run" on
 exit 2), with the gate's lines in the summary and annotation. The gate passes

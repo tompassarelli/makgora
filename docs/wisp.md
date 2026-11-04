@@ -28,7 +28,7 @@ The Wurst editor extension is excluded. The historical source observations
 and initial launch timings are retained in
 `9c41440^:docs/wurst-toolchain.md`.
 
-makgora:typescript-toolchain.lock pins Bun 1.3.13, TypeScript compiler API
+makgora:typescript-toolchain.lock pins Bun 1.4.2, TypeScript compiler API
 6.0.2, TypeScript checker 7.0.2, TypeScriptToLua 1.37.1, Effect 4.0.3 and Effect
 tsgo 0.48.0. makgora:ts/wisp.lock pins the consumed Wisp archive;
 each dated observation below identifies the Wisp/source revision it ran.

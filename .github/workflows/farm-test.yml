@@ -78,7 +78,7 @@ jobs:
       - if: github.event_name != 'pull_request' && github.event_name != 'pull_request_target'
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.13
+          bun-version: 1.4.2
       - if: github.event_name != 'pull_request' && github.event_name != 'pull_request_target'
         run: bun install --frozen-lockfile --ignore-scripts
         working-directory: ts
@@ -108,10 +108,10 @@ jobs:
           path: |
             ~/.bun/bin
             ~/.bun/install/cache
-          key: bun-1.3.13-${{ runner.os }}-${{ hashFiles('ts/bun.lock') }}
+          key: bun-1.4.2-${{ runner.os }}-${{ hashFiles('ts/bun.lock') }}
       - name: Put bun on PATH, installing it on a cache miss
         run: |
-          [ "${{ steps.bun.outputs.cache-hit }}" = true ] || curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.13"
+          [ "${{ steps.bun.outputs.cache-hit }}" = true ] || curl -fsSL https://bun.sh/install | bash -s "bun-v1.4.2"
           echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - run: bun install --frozen-lockfile
         working-directory: ts
@@ -181,10 +181,10 @@ jobs:
           path: |
             ~/.bun/bin
             ~/.bun/install/cache
-          key: bun-1.3.13-${{ runner.os }}-${{ hashFiles('ts/bun.lock') }}
+          key: bun-1.4.2-${{ runner.os }}-${{ hashFiles('ts/bun.lock') }}
       - name: Put bun on PATH, installing it on a cache miss
         run: |
-          [ "${{ steps.bun.outputs.cache-hit }}" = true ] || curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.13"
+          [ "${{ steps.bun.outputs.cache-hit }}" = true ] || curl -fsSL https://bun.sh/install | bash -s "bun-v1.4.2"
           echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Install dependencies, retrying a package download the network cut
         run: |
@@ -328,10 +328,10 @@ jobs:
           path: |
             ~/.bun/bin
             ~/.bun/install/cache
-          key: bun-1.3.13-${{ runner.os }}-${{ hashFiles('ts/bun.lock') }}
+          key: bun-1.4.2-${{ runner.os }}-${{ hashFiles('ts/bun.lock') }}
       - name: Put bun on PATH, installing it on a cache miss
         run: |
-          [ "${{ steps.bun.outputs.cache-hit }}" = true ] || curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.13"
+          [ "${{ steps.bun.outputs.cache-hit }}" = true ] || curl -fsSL https://bun.sh/install | bash -s "bun-v1.4.2"
           echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - run: bun install --frozen-lockfile
         working-directory: ts

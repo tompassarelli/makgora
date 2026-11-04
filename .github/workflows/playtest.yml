@@ -68,7 +68,7 @@ jobs:
           ref: ${{ steps.resolve.outputs.ref }}
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.13
+          bun-version: 1.4.2
       - run: bun install --frozen-lockfile
         working-directory: ts
       - name: Stop when the commit has left main and the lane
@@ -105,7 +105,7 @@ jobs:
           ref: ${{ needs.plan.outputs.sha }}
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.13
+          bun-version: 1.4.2
       - run: bun install --frozen-lockfile
         working-directory: ts
       - name: Stop when the commit has left main and the lane
@@ -159,7 +159,7 @@ jobs:
           ref: ${{ needs.plan.outputs.sha }}
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.13
+          bun-version: 1.4.2
       - run: bun install --frozen-lockfile
         working-directory: ts
       - uses: actions/download-artifact@v4
