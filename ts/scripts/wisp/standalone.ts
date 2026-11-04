@@ -19,6 +19,7 @@ import { Character } from "../../src/game/sim/codes";
 import { STAGE_CATALOG, type StageTile } from "../../src/game/menu/stageCatalog";
 import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
+import { QUICK_TRAINING_COMMAND } from "../../src/game/session/devSettings";
 import { DIZZY_MODEL } from "../../src/host/loop/fighterBody";
 import { preloadFighterModels, preloadFighterTextures } from "../../src/game/render/fighterPreload";
 import { preloadMatchModels } from "../../src/game/render/matchPreload";
@@ -45,7 +46,7 @@ const FOUR_FIGHTERS = ["-dev slots 1 14", "-dev fighter 2 Blademaster", "-dev fi
 const FOUR_FIGHTER_STOCKS = 99;
 
 
-export type StandaloneStart = "match" | "select" | "results";
+export type StandaloneStart = "match" | "training" | "select" | "results";
 
 const offersPrompt = (start: StandaloneStart, savedFiles: string | undefined, tutorialOffer: boolean): boolean => tutorialOffer && (start !== "select" || savedFiles !== undefined);
 
@@ -145,7 +146,7 @@ export async function createStandaloneSession(options: StandaloneSessionOptions 
     });
     else if (selection) client.run(() => { if (asksForCpu(script)) addCpuOpponent(shell().game as unknown as Parameters<typeof cycleSlotMode>[0]); });
     else if (script === undefined) client.run(() => {
-      applyDeveloperCommand(shell(), 0, QUICK_MATCH);
+      applyDeveloperCommand(shell(), 0, start === "training" ? QUICK_TRAINING_COMMAND : QUICK_MATCH);
       if (start === "results") for (const slot of PARTICIPANT_SLOTS) if (isActive(shell().world, slot)) fighterAt(shell().world, slot).status.stocks = 1;
     });
     else clients.everywhere(() => driverCommand?.(script));
@@ -280,7 +281,7 @@ function digestsOf(texts: ReadonlyMap<string, string>, window: "chrome" | "nativ
 
 function startArguments(texts: ReadonlyMap<string, string>): { readonly start?: StandaloneStart; readonly chosen?: string } {
   const start = texts.get("--start"), chosen = texts.get("--chosen");
-  if (start !== undefined && start !== "match" && start !== "select" && start !== "results") throw new Error("--start needs match, select or results");
+  if (start !== undefined && start !== "match" && start !== "training" && start !== "select" && start !== "results") throw new Error("--start needs match, training, select or results");
   if (chosen !== undefined && start !== "select") throw new Error("--chosen needs --start select");
   return { ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) };
 }
