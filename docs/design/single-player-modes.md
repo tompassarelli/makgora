@@ -8,6 +8,16 @@ story and adventure are
 [#269](https://github.com/tompassarelli/makgora/issues/269). Researched
 8 Oct 2026.
 
+**Superseded for the build (5 Nov 2026):** Tom set single-player ahead of
+controller support and chose one definitive mode (2026-11-04). Arcade Mode,
+one fixed 8-stage run per fighter ending on a personal rival, replaces
+Classic, and Lore Battles are vaulted as bloat because the rival fight carries
+their personal-grudge payoff. The design, defaults and per-fighter tables are
+in makgora:docs/design/arcade-mode.md (issue
+[#1130](https://github.com/tompassarelli/makgora/issues/1130)). The research
+below still stands as the evidence for which modes players use; its MVP set
+and order are history.
+
 Statements marked **Judgement** are reasoning, not findings. Everything else
 cites a source listed at the end with its date.
 
