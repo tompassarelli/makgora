@@ -70,6 +70,13 @@ const glideAt = ({ from, to, since }: Readonly<Glide>, now: number): HandPose =>
   return { state: to.state, chip: to.chip, x: f32(from.x + f32(f32(to.x - from.x) * share)), y: f32(from.y + f32(f32(to.y - from.y) * share)) };
 };
 
+export const NO_HANDS: readonly DrawnHand[] = [];
+
+export function drawnFor(drawn: readonly DrawnHand[], slot: number): DrawnHand | undefined {
+  for (const hand of drawn) if (hand.slot === slot) return hand;
+  return undefined;
+}
+
 // One client's view of the select hands: its own pose goes out through `send`, the others' come in through `receive`.
 export class SelectionHands {
   private lastSent = encodeHand(HIDDEN_HAND);
@@ -97,6 +104,10 @@ export class SelectionHands {
   }
 
   // Where each connected human's hand is drawn; the local hand is the mouse's own pose with no glide.
+  drawnIn(game: Readonly<MatchState> | undefined, local: HandPose, now: number): readonly DrawnHand[] {
+    return game === undefined ? NO_HANDS : this.drawn(game, local, now);
+  }
+
   drawn(game: Readonly<MatchState>, local: HandPose, now: number): DrawnHand[] {
     const hands: DrawnHand[] = [];
     for (const slot of PARTICIPANT_SLOTS) {

@@ -46,7 +46,8 @@ import {
   updateSelectionDrag,
 } from "../menu/selectionDrag";
 import { type HandFrames, createHandFrames, destroyHandFrames, presentHand, resizeHandFrames } from "./selectionHandFrames";
-import { type DrawnHand, type HandPose, HIDDEN_HAND, SelectionHands, handPalette } from "./selectionHands";
+import { type HandPose, HIDDEN_HAND, NO_HANDS, SelectionHands, drawnFor, handPalette } from "./selectionHands";
+import { anyOpen, overAny } from "./menuHover";
 import { MENU_FONT, MENU_STYLE, type TextBox } from "./hudLayout";
 import { BAR_COLOURS, BAR_TEXT } from "./barFrames";
 import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_HEADER_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
@@ -91,13 +92,6 @@ const CPU_DEFAULTS: CpuDefaults = { opponent: CPU_OPPONENT_CHOICE_DEFAULT, tier:
 
 export interface MenuControlHit {
   over(x: number, y: number): boolean;
-}
-
-const NO_HANDS: readonly DrawnHand[] = [];
-
-function drawnFor(drawn: readonly DrawnHand[], slot: number): DrawnHand | undefined {
-  for (const hand of drawn) if (hand.slot === slot) return hand;
-  return undefined;
 }
 
 export class SelectionPanel {
@@ -559,9 +553,7 @@ export class SelectionPanel {
   // The menu pointer: every Mak'gora menu with a pointer draws this hand, and a panel over the select screen keeps it local, off the shared hands and off stage select's bullseye.
   private showHand(pointed: boolean, carried: number | undefined, x: number, y: number, panel: boolean, restOpen = panel): void {
     const drawn = pointed && this.menuCursorAllowed;
-    // Every list is asked whatever the pointer, so two clients with different mice make the same native calls.
-    const overClicks = this.clicks.over(x, y), overCredits = this.credits.over(x, y), overCommunity = this.community.over(x, y), overBar = this.bar.over(x, y), overControl = this.controlHit.over(x, y);
-    const over = overClicks || overCredits || overCommunity || overBar || overControl;
+    const over = overAny(x, y, this.clicks, this.credits, this.community, this.bar, this.controlHit);
     const hover = menuHover(drawn, over, this.drag.hover !== undefined);
     const { hand, bullseye, stock } = menuCursor(this.menuCursorAllowed, drawn, carried !== undefined, hover, restOpen, this.game?.phase === Phase.stageMenu && !panel, this.warcraftMenuOpen);
     this.localPanel = panel;
@@ -592,7 +584,7 @@ export class SelectionPanel {
     const choosing = this.choosing() !== undefined;
     const data = handChannel.send(choosing && !this.localPanel ? localHand : HIDDEN_HAND, now);
     if (data !== undefined) sendSync("select-hand", data);
-    const drawn = game === undefined || !choosing ? NO_HANDS : handChannel.drawn(game, localHand, now);
+    const drawn = choosing ? handChannel.drawnIn(game, localHand, now) : NO_HANDS;
     for (const slot of PARTICIPANT_SLOTS) {
       const frames = this.hands[slot];
       const remote = drawnFor(drawn, slot);
@@ -675,8 +667,7 @@ export class SelectionPanel {
     const barOpen = this.bar.opened() !== undefined;
     this.trackDrag(game, barOpen, pointed, x, y);
     const carried = this.showCards(game, sessionWins, x, y);
-    const creditsOpen = this.credits.opened(), communityOpen = this.community.opened();
-    const infoOpen = this.tutorialOpen || creditsOpen || communityOpen;
+    const infoOpen = anyOpen(this.tutorialOpen, this.credits.opened(), this.community.opened());
     this.showHand(pointed, infoOpen ? undefined : carried, x, y, infoOpen);
     this.showBar(game, pointed && (barOpen || drag.dragging === undefined) ? { x, y } : undefined);
     this.showHelp(game, x, y);

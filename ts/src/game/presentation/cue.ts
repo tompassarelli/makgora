@@ -50,3 +50,19 @@ export interface CueState {
   readonly cues: MoveCues | undefined;
   readonly phase: "none" | "startup" | "active";
 }
+
+interface PhaseStates {
+  readonly active: CueState;
+  readonly startup: CueState;
+  readonly none: CueState;
+}
+
+const PHASE_STATES = new Map<MoveCues, PhaseStates>();
+
+export function phaseStates(cues: MoveCues): PhaseStates {
+  const known = PHASE_STATES.get(cues);
+  if (known !== undefined) return known;
+  const states: PhaseStates = { active: { cues, phase: "active" }, startup: { cues, phase: "startup" }, none: { cues, phase: "none" } };
+  PHASE_STATES.set(cues, states);
+  return states;
+}

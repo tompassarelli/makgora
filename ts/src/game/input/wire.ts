@@ -101,37 +101,19 @@ function edgeGroup(pressed: number, released: number): string {
 function encodeRecord(row: Readonly<InputRow>): string {
   let flags = 0;
   let body = "";
-  if (row.held !== 0) {
-    flags |= Flag.held;
-    body += heldGroup(row.held);
-  }
-  if (row.pressed !== 0 || row.released !== 0) {
-    flags |= Flag.edges;
-    body += edgeGroup(row.pressed, row.released);
-  }
+  if (row.held !== 0) { flags |= Flag.held; body += heldGroup(row.held); }
+  if (row.pressed !== 0 || row.released !== 0) { flags |= Flag.edges; body += edgeGroup(row.pressed, row.released); }
   const axes = signedDigit(row.axisX) * 255 + signedDigit(row.axisZ);
-  if (axes !== 0) {
-    flags |= Flag.axes;
-    body += digits(axes, 3);
-  }
+  if (axes !== 0) { flags |= Flag.axes; body += digits(axes, 3); }
   const triggers = row.triggerLeft * 256 + row.triggerRight;
-  if (triggers !== 0) {
-    flags |= Flag.triggers;
-    body += digits(triggers, 3);
-  }
+  if (triggers !== 0) { flags |= Flag.triggers; body += digits(triggers, 3); }
 
   const metadata = directionDigit(row.specialX) + 3 * directionDigit(row.specialZ)
     + 9 * directionDigit(row.dodgeX) + 27 * directionDigit(row.dodgeZ)
     + 81 * directionDigit(row.sdiX) + 243 * directionDigit(row.sdiZ) + 729 * directionDigit(row.ledgeVertical);
-  if (metadata !== 0) {
-    flags |= Flag.metadata;
-    body += digits(metadata, 2);
-  }
+  if (metadata !== 0) { flags |= Flag.metadata; body += digits(metadata, 2); }
   const throws = signedDigit(row.throwX) * 255 + signedDigit(row.throwZ);
-  if (throws !== 0) {
-    flags |= Flag.throws;
-    body += digits(throws, 3);
-  }
+  if (throws !== 0) { flags |= Flag.throws; body += digits(throws, 3); }
   return digits(flags, 1) + body;
 }
 
