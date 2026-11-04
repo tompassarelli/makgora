@@ -166,9 +166,8 @@ through automation-chrome on the private desktop; Whitemane's page was read
 from the Wayback Machine's copy captured 10 October 2026.
 
 - **Sally Whitemane HotS**, https://www.hiveworkshop.com/threads/sally-whitemane-hots.374513/
-  - Imported (Tom allowed ported Blizzard models inside the map, credited,
-    kept out of Git and shipped only through Hive Workshop and Battle.net,
-    on 4 November 2026). Author: Lumi. Approved and recommended, created 22 September 2026,
+  - Not imported: its animations come from Heroes of the Storm. Author:
+    Lumi. Approved and recommended, created 22 September 2026,
     `High Inquisitor Whitemane HotS.mdx`, 2,481 polygons, no textures of its own.
   - Source, in the author's words: "An overhaul of kangyun's Whitemane model
     to resemble her look in Heroes of the Storm", with "some extra animations
@@ -178,34 +177,12 @@ from the Wayback Machine's copy captured 10 October 2026.
     animations".
   - Conditions: "Feel free to edit the model & always give credits to the
     original authors."
-  - Files: `High Inquisitor Whitemane HotS.mdx` (MDX 800, 2,481 polygons,
-    278,736 bytes, sha256
-    `7b45264367f364bcf1caf6b36b3f1524d37a053f33744500b30fc6606b972050`;
-    sequences Stand - 1, Stand - 2, Stand Channel, Spell Throw, Spell,
-    Dissipate, Walk, Death, Stand Ready, Attack - 1 to 3, Spell Two, Portrait
-    and Portrait Talk 1 to 3, Spell Slam, Spell Channel, Stand Victory),
-    imported as `war3mapImported\High Inquisitor Whitemane HotS.mdx`. The
-    published copy, sha256
-    `897c845a9ef7210897b9e91709f03750ed7a02fd827d08899b4d2c19830c3d61`, is the
-    pinned `war3-model` codec's rewrite of it: the same bytes but for the
-    order of one particle emitter's visibility and emission tracks, so the
-    source round-trips losslessly as the clip generators require; bundle
-    zip 122,898 bytes, sha256
-    `9c3c1d9fba0e9f7c698de6c31f58c7596ca9388160fd9bec018dce1f643102ae`,
-    downloaded through automation-chrome on the private desktop.
-  - Textures: none of its own. It draws only Warcraft III Classic textures
-    (`BE_Robe`, `Sorceress`, `HeroNagaSeawitch`, `BloodPriest`,
-    `RunesOfGuldan`, `Peasant`, `FacelessOneUnbroken`, `HumanMage`,
-    `HeroLich`, `Hair02_09`, `BearDen`, `Archemonde`, `HighElfArcher`,
-    `star4_32` and team colour), so nothing else is imported.
-  - Used by the Forge fighter Sally Whitemane (`whitemane`), a stand-in
-    that walks and runs on the model's own clips.
-  - Credit line: "Sally Whitemane by Lumi (Hive Workshop), an overhaul of
-    kangyun's Whitemane, with animations from Razorclaw_X's Heroes of the
-    Storm port; Heroes of the Storm animations by Blizzard Entertainment."
+  - The mesh is community work, but the file carries animation data
+    extracted from Heroes of the Storm, which the clean-room rule forbids.
+    The decision goes to Tom.
 - **Valeera Sanguinar (DE Compatible)**, https://www.hiveworkshop.com/threads/valeera-sanguinar-de-compatible.327683/
-  - Imported (Tom allowed ported Blizzard models inside the map on
-    4 November 2026, as above). Author: Symphoneum. Filed under Reforged HD Models, approved and recommended,
+  - Not imported: it holds World of Warcraft geometry and textures. Author:
+    Symphoneum. Filed under Reforged HD Models, approved and recommended,
     tagged "Contains External Material", created 3 October 2020, updated
     19 October 2026, 202.87 MB, 13 resources (`Valeera_DE_opt.mdx`,
     `Valeera_v2_opt.mdx`, `Valeera.mdx`, `Felblade.mdx` and portraits).
@@ -216,27 +193,8 @@ from the Wayback Machine's copy captured 10 October 2026.
     from the WoW model" (27 September 2021), and "The icon is from HotS".
   - Conditions: "Please credit Symphoneum if used in a project. Feel free to
     use the model as you see fit and have fun!"
-  - Files: every model in the pack is Reforged HD, which Classic graphics do
-    not draw, so the smallest, Valeera 1.5 (`Valeera.mdx`, MDX 1000, 16,315
-    polygons, 2,314,813 bytes, sha256
-    `f2e95cf39b13d23a93e5e603b5fd74203a689cb46cb32b4ecc094680a678e93d`,
-    and its seven DDS textures; resource zip 3,572,837 bytes, sha256
-    `ee66e4fa216c554b2a2e8586802206d7a3dcc385e8e992c4046912405186da25`),
-    is converted by makgora:tools/animations/hd-to-classic.ts
-    (`--drop 3 --drop 6`) to a Classic MDX 800 `Valeera.mdx` (5 geosets,
-    16,110 polygons, 2,040,293 bytes, sha256
-    `18f23a595b8cc3c9b62022e7636729e5465d04d92ec783ab8412673b78bf1c1e`).
-    The two dropped geosets (166 vertices) draw stock Reforged-only `.tif`
-    textures (Samuro's and the Sorceress's) that Classic does not hold. The
-    diffuse maps become `ValeeraMain.blp` (1,225,209 bytes),
-    `ValeeraHair.blp` (374,285), `ValeeraPonytail.blp` (366,257) and
-    `ValeeraWeapon.blp` (159,067); normal, ORM and emissive maps are dropped.
-    The portrait models and the 2.0 and Felblade versions are not imported.
-  - Used by the Forge fighter Valeera Sanguinar (`valeera`), a stand-in
-    that walks and runs on the model's own clips.
-  - Credit line: "Valeera Sanguinar by Symphoneum (Hive Workshop), from
-    Warcraft III: Reforged and World of Warcraft art by Blizzard
-    Entertainment."
+  - The terms allow use, but World of Warcraft files are forbidden by the
+    clean-room rule. The decision goes to Tom.
 - **Renault Morgraine**, https://www.hiveworkshop.com/threads/renault-morgraine.354152/
   - Imported. Author: kangyun. Filed under Classic SD Models, approved and
     recommended, created 9 June 2024.

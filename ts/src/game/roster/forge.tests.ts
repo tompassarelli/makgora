@@ -62,7 +62,7 @@ function withForge(fighters: readonly string[], stages: readonly number[], body:
   }
 }
 
-test("the shipped Forge names 18 roster fighters, features the other 16 and every stage, and each featured Classic route fills its ladder from featured rivals [k2 property]", () => {
+test("the shipped Forge names 16 roster fighters, features the other 16 and every stage, and each featured Classic route fills its ladder from featured rivals [k2 property]", () => {
   for (const slug of FORGE_FIGHTERS) assertTrue(SELECTABLE_CHARACTERS.some(character => fighterSlug(character) === slug));
   assertEquals(SELECTABLE_CHARACTERS.filter(character => !isFeatured(character)).length, FORGE_FIGHTERS.length);
   assertEquals(SELECTABLE_CHARACTERS.filter(character => isFeatured(character)).length, SELECTABLE_CHARACTERS.length - FORGE_FIGHTERS.length);

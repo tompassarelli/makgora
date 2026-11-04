@@ -35,8 +35,6 @@ import * as firelord from "./white-facts/firelord";
 import * as goblinAlchemist from "./white-facts/goblin-alchemist";
 import * as onyxia from "./white-facts/onyxia";
 import * as onyxiaDragon from "./white-facts/onyxia-dragon";
-import * as whitemane from "./white-facts/whitemane";
-import * as valeera from "./white-facts/valeera";
 export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...rifleman.whiteModelFacts,
   ...illidan.whiteModelFacts,
@@ -72,6 +70,4 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
   ...goblinAlchemist.whiteModelFacts,
   ...onyxia.whiteModelFacts,
   ...onyxiaDragon.whiteModelFacts,
-  ...whitemane.whiteModelFacts,
-  ...valeera.whiteModelFacts,
 };

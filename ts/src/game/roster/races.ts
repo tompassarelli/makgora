@@ -38,8 +38,6 @@ const FIGHTER_RACES: { readonly [K in Character]: Race } = {
   [Character.akama]: "NightElf",
   [Character.firelord]: "Orc",
   [Character.alchemist]: "Orc",
-  [Character.whitemane]: "Human",
-  [Character.valeera]: "Human",
   [Character.onyxia]: "Human",
   [Character.onyxiaDragon]: "Human",
 };

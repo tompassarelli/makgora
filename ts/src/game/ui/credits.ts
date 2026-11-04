@@ -13,8 +13,6 @@ export const CREDITS_MARKDOWN: readonly string[] = [
   "Onyxia (Lady Katrana Prestor) model: [Katrana Prestor](https://www.hiveworkshop.com/threads/katrana-prestor.362851/) by Footman16, from Hive Workshop, an edit of AndrewOverload519's Female Human Mage with kangyun's Sally Whitemane staff, both used with their authors' permission",
   "Onyxia (dragon) model: [Onyxia](https://www.hiveworkshop.com/threads/onyxia.348925/) by Symphoneum, from Hive Workshop, built from Warcraft III Reforged models, converted to a Classic model",
   "Renault Morgraine model: [Renault Morgraine](https://www.hiveworkshop.com/threads/renault-morgraine.354152/) by kangyun, from Hive Workshop, with Stefan.K's Scarlet Crusade symbol",
-  "Sally Whitemane model: [Sally Whitemane HotS](https://www.hiveworkshop.com/threads/sally-whitemane-hots.374513/) by Lumi, from Hive Workshop, an overhaul of kangyun's Whitemane, with animations from Razorclaw_X's Heroes of the Storm port; Heroes of the Storm animations by Blizzard Entertainment",
-  "Valeera Sanguinar model: [Valeera Sanguinar (DE Compatible)](https://www.hiveworkshop.com/threads/valeera-sanguinar-de-compatible.327683/) by Symphoneum, from Hive Workshop, from Warcraft III: Reforged and World of Warcraft art by Blizzard Entertainment, converted to a Classic model",
   "Naxxramas wall model: [Undead Walls Pack](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/) by Kuzakani, from Hive Workshop, used with credit",
   "Cursors, wordmark & stage-select art: Mak'gora originals (the pinching-hand cursor made with AI assistance)",
   "Mrgl & Grgl sound: World of Warcraft, Blizzard Entertainment",

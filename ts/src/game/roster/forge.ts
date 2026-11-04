@@ -20,8 +20,6 @@ export const FORGE_FIGHTERS: readonly string[] = [
   "onyxia",
   "cairne-bloodhoof",
   "beastmaster",
-  "whitemane",
-  "valeera",
 ];
 
 export const FORGE_STAGES: readonly number[] = [];

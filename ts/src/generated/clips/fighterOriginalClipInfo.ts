@@ -36,8 +36,6 @@ import * as akama from "./akama";
 import * as goblinAlchemist from "./goblin-alchemist";
 import * as onyxia from "./onyxia";
 import * as onyxiaDragon from "./onyxia-dragon";
-import * as whitemane from "./whitemane";
-import * as valeera from "./valeera";
 
 /** The light model's animation while its fighter is shown, and while hidden. */
 export const ORIGINAL_LIGHT_ACTIVE_ANIMATION = "Stand";
@@ -86,8 +84,6 @@ const FIGHTERS: Readonly<Record<number, FighterClips>> = {
   34: goblinAlchemist,
   35: onyxia,
   36: onyxiaDragon,
-  37: whitemane,
-  38: valeera,
 };
 
 /** Clips 0 to count - 1 exist for this character. */

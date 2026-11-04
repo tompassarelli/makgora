@@ -644,65 +644,25 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Onyxia | ledge-get-up | 6: Walk | 64.0 | 35.5 | up; 42.1/30.9 |
 | Onyxia | ledge-roll | 6: Walk | 62.3 | 35.3 | forward; 58.2/61.8 |
 | Onyxia | ledge-attack | 2: Attack -1 | 159.5 | 69.0 | both; 100.5/90.9 |
-| Sally Whitemane | walk | 6: Walk | 102.3 | 35.4 | forward; 92.3/101.1 |
-| Sally Whitemane | dash | 6: Walk | 100.7 | 33.6 | forward; 91.6/99.7 |
-| Sally Whitemane | run | 6: Walk | 87.9 | 24.9 | forward; 87.6/77.2 |
-| Sally Whitemane | turn | 6: Walk | 38.4 | 13.5 | back; 38.3/25.3 |
-| Sally Whitemane | brake | 6: Walk | 47.0 | 15.0 | in place; 29.9/46.9 |
-| Sally Whitemane | jump-squat | 0: Stand - 1 | 0.0 | 0.0 | down; 0.0/0.0 |
-| Sally Whitemane | roll-forward | 6: Walk | 102.6 | 35.2 | forward; 92.4/101.4 |
-| Sally Whitemane | roll-back | 6: Walk | 102.6 | 35.2 | back; 101.4/92.4 |
-| Sally Whitemane | spot-dodge | 8: Stand Ready | 22.3 | 5.0 | in place; 12.7/21.9 |
-| Sally Whitemane | air-dodge | 8: Stand Ready | 22.8 | 4.9 | in place; 12.8/22.4 |
-| Sally Whitemane | tech | 0: Stand - 1 | 22.8 | 4.3 | in place; 12.7/22.4 |
-| Sally Whitemane | tech-forward | 0: Stand - 1 | 22.6 | 4.3 | forward; 12.7/22.2 |
-| Sally Whitemane | tech-back | 0: Stand - 1 | 22.6 | 4.3 | back; 22.2/12.7 |
-| Sally Whitemane | get-up | 8: Stand Ready | 22.8 | 5.0 | up; 6.2/4.7 |
-| Sally Whitemane | get-up-forward | 0: Stand - 1 | 23.0 | 4.3 | forward; 12.8/22.6 |
-| Sally Whitemane | get-up-back | 0: Stand - 1 | 23.0 | 4.3 | back; 22.6/12.8 |
-| Sally Whitemane | get-up-attack | 10: Attack - 2 | 127.1 | 29.7 | both; 81.2/52.8 |
-| Sally Whitemane | ledge-get-up | 6: Walk | 102.3 | 34.9 | up; 36.4/40.6 |
-| Sally Whitemane | ledge-roll | 6: Walk | 103.7 | 34.5 | forward; 92.9/102.3 |
-| Sally Whitemane | ledge-attack | 9: Attack - 1 | 150.5 | 40.6 | both; 108.3/107.3 |
-| Valeera Sanguinar | walk | 29: Walk 1 | 77.8 | 10.1 | forward; 77.6/75.0 |
-| Valeera Sanguinar | dash | 29: Walk 1 | 75.0 | 9.9 | forward; 74.6/74.7 |
-| Valeera Sanguinar | run | 29: Walk 1 | 82.0 | 9.6 | forward; 81.7/78.9 |
-| Valeera Sanguinar | turn | 29: Walk 1 | 30.6 | 5.9 | back; 30.5/21.2 |
-| Valeera Sanguinar | brake | 29: Walk 1 | 35.1 | 6.5 | in place; 25.6/35.1 |
-| Valeera Sanguinar | jump-squat | 22: Stand 1 | 0.0 | 0.0 | down; 0.0/0.0 |
-| Valeera Sanguinar | roll-forward | 29: Walk 1 | 78.4 | 10.1 | forward; 78.2/75.0 |
-| Valeera Sanguinar | roll-back | 29: Walk 1 | 78.4 | 10.1 | back; 75.0/78.2 |
-| Valeera Sanguinar | spot-dodge | 26: Stand Ready 1 | 27.4 | 3.5 | in place; 27.2/4.7 |
-| Valeera Sanguinar | air-dodge | 26: Stand Ready 1 | 27.5 | 3.5 | in place; 27.3/4.7 |
-| Valeera Sanguinar | tech | 22: Stand 1 | 26.2 | 2.2 | in place; 26.2/2.9 |
-| Valeera Sanguinar | tech-forward | 22: Stand 1 | 26.3 | 2.2 | forward; 26.3/2.9 |
-| Valeera Sanguinar | tech-back | 22: Stand 1 | 26.3 | 2.2 | back; 2.9/26.3 |
-| Valeera Sanguinar | get-up | 26: Stand Ready 1 | 27.5 | 3.5 | up; 1.9/5.7 |
-| Valeera Sanguinar | get-up-forward | 22: Stand 1 | 26.3 | 2.2 | forward; 26.3/2.9 |
-| Valeera Sanguinar | get-up-back | 22: Stand 1 | 26.3 | 2.2 | back; 2.9/26.3 |
-| Valeera Sanguinar | get-up-attack | 28: Attack 2 | 102.7 | 58.1 | both; 92.0/77.9 |
-| Valeera Sanguinar | ledge-get-up | 29: Walk 1 | 80.0 | 10.1 | up; 24.4/31.9 |
-| Valeera Sanguinar | ledge-roll | 29: Walk 1 | 79.4 | 10.1 | forward; 79.2/75.0 |
-| Valeera Sanguinar | ledge-attack | 27: Attack 1 | 121.3 | 49.6 | both; 116.8/30.1 |
-| Onyxia | walk | 6: Walk 1 | 159.1 | 36.8 | forward; 68.8/56.6 |
-| Onyxia | dash | 6: Walk 1 | 158.7 | 36.5 | forward; 68.5/56.1 |
-| Onyxia | run | 6: Walk 1 | 267.6 | 37.6 | forward; 88.7/51.8 |
-| Onyxia | turn | 6: Walk 1 | 75.1 | 16.0 | back; 45.3/6.8 |
-| Onyxia | brake | 6: Walk 1 | 62.0 | 13.6 | in place; 37.8/6.8 |
-| Onyxia | jump-squat | 1: Stand 2 | 0.0 | 0.0 | down; 0.0/0.0 |
-| Onyxia | roll-forward | 6: Walk 1 | 159.7 | 36.7 | forward; 68.0/56.8 |
-| Onyxia | roll-back | 6: Walk 1 | 159.7 | 36.7 | back; 56.8/68.0 |
-| Onyxia | spot-dodge | 5: Stand 1 | 160.6 | 43.5 | in place; 27.9/116.6 |
-| Onyxia | air-dodge | 5: Stand 1 | 160.7 | 43.6 | in place; 28.7/116.5 |
-| Onyxia | tech | 1: Stand 2 | 160.7 | 43.5 | in place; 28.7/116.6 |
-| Onyxia | tech-forward | 1: Stand 2 | 160.7 | 43.6 | forward; 28.6/116.5 |
-| Onyxia | tech-back | 1: Stand 2 | 160.7 | 43.6 | back; 116.5/28.6 |
-| Onyxia | get-up | 5: Stand 1 | 160.5 | 43.5 | up; 139.5/133.6 |
-| Onyxia | get-up-forward | 1: Stand 2 | 160.7 | 43.6 | forward; 28.7/116.6 |
-| Onyxia | get-up-back | 1: Stand 2 | 160.7 | 43.6 | back; 116.6/28.7 |
-| Onyxia | get-up-attack | 0: Attack 1 | 196.4 | 79.3 | both; 152.3/98.3 |
-| Onyxia | ledge-get-up | 6: Walk 1 | 158.6 | 36.7 | up; 121.7/157.1 |
-| Onyxia | ledge-roll | 6: Walk 1 | 159.6 | 36.8 | forward; 69.2/57.1 |
-| Onyxia | ledge-attack | 0: Attack 1 | 196.4 | 79.3 | both; 153.4/98.2 |
+| Onyxia | walk | 3: Walk | 183.0 | 15.0 | forward; 118.4/27.6 |
+| Onyxia | dash | 3: Walk | 180.3 | 14.8 | forward; 116.9/28.9 |
+| Onyxia | run | 3: Walk | 185.5 | 17.3 | forward; 126.0/23.2 |
+| Onyxia | turn | 3: Walk | 48.2 | 6.6 | back; 28.0/8.5 |
+| Onyxia | brake | 3: Walk | 34.2 | 5.1 | in place; 20.3/7.1 |
+| Onyxia | jump-squat | 0: Stand - 1 | 0.0 | 0.0 | down; 0.0/0.0 |
+| Onyxia | roll-forward | 3: Walk | 183.0 | 15.1 | forward; 118.4/28.7 |
+| Onyxia | roll-back | 3: Walk | 183.0 | 15.1 | back; 28.7/118.4 |
+| Onyxia | spot-dodge | 2: Stand - 3 | 184.4 | 32.4 | in place; 59.2/34.4 |
+| Onyxia | air-dodge | 2: Stand - 3 | 183.2 | 32.8 | in place; 64.5/34.7 |
+| Onyxia | tech | 0: Stand - 1 | 173.1 | 22.9 | in place; 63.6/32.5 |
+| Onyxia | tech-forward | 0: Stand - 1 | 173.0 | 23.0 | forward; 63.4/32.6 |
+| Onyxia | tech-back | 0: Stand - 1 | 173.0 | 23.0 | back; 32.6/63.4 |
+| Onyxia | get-up | 2: Stand - 3 | 182.2 | 32.2 | up; 180.9/46.7 |
+| Onyxia | get-up-forward | 0: Stand - 1 | 173.2 | 22.9 | forward; 63.6/32.5 |
+| Onyxia | get-up-back | 0: Stand - 1 | 173.2 | 22.9 | back; 32.5/63.6 |
+| Onyxia | get-up-attack | 1: Attack 1 | 186.2 | 51.6 | both; 89.8/55.8 |
+| Onyxia | ledge-get-up | 3: Walk | 183.0 | 15.0 | up; 144.7/33.2 |
+| Onyxia | ledge-roll | 3: Walk | 182.8 | 15.1 | forward; 118.8/28.9 |
+| Onyxia | ledge-attack | 1: Attack 1 | 186.9 | 51.5 | both; 87.7/55.8 |
 
 Walking/running cadence uses grounded vertices' horizontal excursion twice per gait cycle, times the cycles the widest-swinging vertices draw in the clip, because a stock Walk may loop more than once: Jaina's and Prestor's 2 s Walk loop three times and the Warden model's 1.166 s Walk twice, and the measure read one loop until 2026-11-01. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floater Lady Vashj. Firelord (Ragnaros) floats too, but his stock Walk raises and drops his body 22.6 units twice a loop, so at the 5x cap his walk, run and dash bobbed 10 times a second, 453 units of vertical travel a second against a median of 229 over the roster's runs; Tom saw it in a playtest on 2026-11-01 as his run bobbing too much and asked for a lower cap like Jaina's, so his cap is 2.5x (FIRELORD_BOB_RATE_CAP), 5 bobs and 226 units a second, the roster median. Tyrande runs on an authored `Movement run` (tools/animations/run-clips.ts, #834) whose stride is measured over the grounded vertices that move, leaving the hem and pelvis out. Warden walks on that clip (`--walk`) at 3.38x and runs and dashes on her stock Walk at 3.08x and 2.68x (Tom asked for this split on 2026-10-31; the one-loop reading had played it at 6.17x and 5.36x under a 6.25x cap, feet at twice the body). Jaina walks, runs and dashes on her stock Walk at 1.33x, 1.83x and 1.67x with body to feet 1.00. The one-loop reading had played the clip at 4.18x, 5x and 5x, feet drawing 3.1, 2.7 and 3.0 times the ground she covered (body to feet 0.32, 0.37 and 0.33), which Tom saw in a playtest on 2026-11-01 as her legs churning while she barely moved and asked to be capped lower like Ragnaros. Prestor walks at 3.76x and runs at the 5x cap with her feet 7% behind the body.

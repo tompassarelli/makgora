@@ -25,7 +25,7 @@ export const MOVES_BUTTON_HEIGHT = f32(0.032);
 /** The select grid's fighters in reading order, grouped by faction (Orc, Human, Undead, Night Elf, Neutral), then Mannoroth, Onyxia and Archimonde; the Random tile follows them. */
 export const SELECT_GRID_ORDER: readonly Character[] = [
   Character.thrall, Character.grom, Character.cairne, Character.beastmaster, Character.blademaster, Character.shadowHunter, Character.peon,
-  Character.uther, Character.jaina, Character.mountainKing, Character.medivh, Character.whitemane, Character.kaelthas, Character.valeera, Character.lichKing, Character.lich, Character.sylvanas,
+  Character.uther, Character.jaina, Character.mountainKing, Character.medivh, Character.kaelthas, Character.lichKing, Character.lich, Character.sylvanas,
   Character.dreadlord, Character.anubarak, Character.butcher, Character.malfurion, Character.tyrande, Character.demonHunter, Character.warden,
   Character.ladyVashj, Character.akama, Character.chen, Character.firelord, Character.tinker, Character.alchemist, Character.murloc,
   Character.pitLord, Character.onyxia, Character.archimonde,

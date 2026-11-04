@@ -28,8 +28,6 @@ import { BUTCHER_HERO } from "../fighters/butcher/kit";
 import { TYRANDE_HERO } from "../fighters/tyrande/kit";
 import { AKAMA_HERO } from "../fighters/akama/kit";
 import { FIRELORD_HERO } from "../fighters/firelord/kit";
-import { WHITEMANE_HERO } from "../fighters/whitemane/kit";
-import { VALEERA_HERO } from "../fighters/valeera/kit";
 import { ALCHEMIST_HERO } from "../fighters/alchemist/kit";
 import { ONYXIA_DRAGON_HERO, ONYXIA_HERO } from "../fighters/onyxia/kit";
 import { LADY_VASHJ_HERO } from "../fighters/lady-vashj/kit";
@@ -41,7 +39,7 @@ import { ANUBARAK_HERO } from "../fighters/anubarak/kit";
 
 export const HERO_ROSTER: readonly HeroDefinition[] = [
   BLADEMASTER_HERO, MOUNTAIN_KING_HERO, WARDEN_HERO, LICH_HERO, UTHER_HERO, DREADLORD_HERO, SHADOW_HUNTER_HERO, PIT_LORD_HERO, BEASTMASTER_HERO, LICH_KING_HERO, THRALL_HERO, JAINA_HERO, SYLVANAS_HERO,
-  CAIRNE_HERO, CHEN_HERO, PEON_HERO, TINKER_HERO, KAELTHAS_HERO, MURLOC_HERO, GROM_HERO, MALFURION_HERO, MEDIVH_HERO, ANUBARAK_HERO, LADY_VASHJ_HERO, ARCHIMONDE_HERO, TYRANDE_HERO, BUTCHER_HERO, AKAMA_HERO, FIRELORD_HERO, ALCHEMIST_HERO, ONYXIA_HERO, WHITEMANE_HERO, VALEERA_HERO,
+  CAIRNE_HERO, CHEN_HERO, PEON_HERO, TINKER_HERO, KAELTHAS_HERO, MURLOC_HERO, GROM_HERO, MALFURION_HERO, MEDIVH_HERO, ANUBARAK_HERO, LADY_VASHJ_HERO, ARCHIMONDE_HERO, TYRANDE_HERO, BUTCHER_HERO, AKAMA_HERO, FIRELORD_HERO, ALCHEMIST_HERO, ONYXIA_HERO,
 ];
 
 export const FORM_HEROES: readonly HeroDefinition[] = [ONYXIA_DRAGON_HERO];
@@ -75,8 +73,6 @@ const BY_CHARACTER: { readonly [character: number]: HeroDefinition | undefined }
   [Character.akama]: AKAMA_HERO,
   [Character.firelord]: FIRELORD_HERO,
   [Character.alchemist]: ALCHEMIST_HERO,
-  [Character.whitemane]: WHITEMANE_HERO,
-  [Character.valeera]: VALEERA_HERO,
   [Character.onyxia]: ONYXIA_HERO,
   [Character.onyxiaDragon]: ONYXIA_DRAGON_HERO,
   [Character.murloc]: MURLOC_HERO,

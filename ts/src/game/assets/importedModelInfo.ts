@@ -43,14 +43,6 @@ export const ONYXIA_DRAGON_STOCK_SCALE = { unit: "OnyxiaDragon", scale: f32(0.48
 
 export const RENAULT_MORGRAINE_MODEL = "war3mapImported\\Renault Morgraine.mdx";
 
-export const WHITEMANE_MODEL = "war3mapImported\\High Inquisitor Whitemane HotS.mdx";
-
-export const WHITEMANE_STOCK_SCALE = { unit: "High Inquisitor Whitemane HotS", scale: 1.0 } as const;
-
-export const VALEERA_MODEL = "war3mapImported\\Valeera.mdx";
-
-export const VALEERA_STOCK_SCALE = { unit: "Valeera", scale: 1.0 } as const;
-
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string; readonly reanimated?: true }[] = [
   { entry: GROM_BLOODLUST_MODEL, file: "GromBloodlustQuiet.mdx" },
   { entry: SCOURGE_WALL_MODEL, file: "UndeadWalls.mdx" },
@@ -70,8 +62,5 @@ export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly f
   { entry: ONYXIA_DRAGON_MODEL, file: "OnyxiaDragon.mdx" },
   { entry: RENAULT_MORGRAINE_MODEL, file: "Renault Morgraine.mdx" },
   { entry: "war3mapImported\\Renault Morgraine_Portrait.mdx", file: "Renault Morgraine_Portrait.mdx" },
-  { entry: WHITEMANE_MODEL, file: "High Inquisitor Whitemane HotS.mdx" },
-  { entry: VALEERA_MODEL, file: "Valeera.mdx" },
-  ...["Main", "Hair", "Ponytail", "Weapon"].map((part) => ({ entry: `Valeera${part}.blp`, file: `Valeera${part}.blp` })),
   ...["Attach", "Body", "Fin", "Head", "Limbs"].map((part) => ({ entry: `OnyxiaDragon${part}.blp`, file: `OnyxiaDragon${part}.blp` })),
 ];

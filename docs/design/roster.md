@@ -358,25 +358,6 @@ The map's description carries the same credits.
   its readme asks for credit (read 4 November 2026,
   makgora:docs/design/roster-next.md#whitemane-valeera-and-renault-morgraine-read-4-november-2026).
 
-- [Sally Whitemane HotS by Lumi](https://www.hiveworkshop.com/threads/sally-whitemane-hots.374513/)
-  (Hive Workshop, approved and recommended, Classic SD models), an overhaul of
-  kangyun's Whitemane, with animations from Razorclaw_X's Heroes of the Storm
-  port; Heroes of the Storm animations by Blizzard Entertainment:
-  `High Inquisitor Whitemane HotS.mdx`, imported as
-  `war3mapImported\High Inquisitor Whitemane HotS.mdx` for the Forge fighter
-  Sally Whitemane. It is a 2,481-polygon model that draws only Warcraft III's
-  own Classic textures. Its page asks for credit to the original authors
-  (read 4 November 2026; Tom allowed ported Blizzard models on 4 November 2026).
-- [Valeera Sanguinar (DE Compatible) by Symphoneum](https://www.hiveworkshop.com/threads/valeera-sanguinar-de-compatible.327683/)
-  (Hive Workshop, Reforged HD model, credit asked), from Warcraft III: Reforged
-  and World of Warcraft art by Blizzard Entertainment: its `Valeera.mdx`
-  (Valeera 1.5), converted to a Classic MDX 800 model by
-  makgora:tools/animations/hd-to-classic.ts (diffuse textures as BLP, the two
-  geosets that draw stock Reforged-only textures dropped) and imported as
-  `war3mapImported\Valeera.mdx` with four `Valeera*.blp` textures for the
-  Forge fighter Valeera Sanguinar (read 4 November 2026; Tom allowed ported
-  Blizzard models on 4 November 2026).
-
 Source terms read on 29 October 2026 from the Wayback Machine's 20 October
 2025 copy of the page: johnwar names Ujimasa Hojo's Archer, Dark Ranger,
 Sylvanas Windrunner and derivatives and kangyun's Tyrande Whisperwind (Heavy

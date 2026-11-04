@@ -45,8 +45,6 @@ export const PORTRAIT_PARTS: Readonly<Record<string, PortraitParts>> = {
   Akama: part('Bone_joint11', [], []),
   Firelord: part('Bone_Head', [], []),
   GoblinAlchemist: part('Bone_Head01', [], []),
-  Whitemane: part('Bone_Head', [], []),
-  Valeera: part('bone_head', [], []),
   Onyxia: part('Bone_Head', [], []),
   OnyxiaDragon: part('Bone_Head', [], []),
 };

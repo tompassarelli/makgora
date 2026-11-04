@@ -47,8 +47,6 @@ export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
   [Character.akama]: {},
   [Character.firelord]: {},
   [Character.alchemist]: {},
-  [Character.whitemane]: {},
-  [Character.valeera]: {},
   [Character.onyxia]: {},
   [Character.onyxiaDragon]: {},
 };
