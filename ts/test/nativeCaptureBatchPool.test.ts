@@ -13,3 +13,9 @@ test("a pair's desktops come from its own pair.json, one for a single-client pai
   expect(await Effect.runPromise(pairDesktops(single))).toEqual(["run-a"]);
   expect(await Effect.runPromise(pairDesktops(both))).toEqual(["run-a", "run-b"]);
 });
+
+test("a pool started for a leased pair carries the lease's owner, so a run outside a fleet session is the lease's own custodian [k2 property]", () => {
+  const args = poolArguments(3, "desktop.sh", "capacity.mjs", true, "realtime-9");
+  expect(args.slice(args.indexOf("--owner"), args.indexOf("--owner") + 2)).toEqual(["--owner", "realtime-9"]);
+  expect(args.at(-1)).toBe("--network");
+});

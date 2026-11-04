@@ -46,6 +46,14 @@ const exec = (command: readonly string[], what: string) => Effect.tryPromise({
   catch: cause => new RealtimeFailure({ problem: `${what}: ${cause instanceof Error ? cause.message : String(cause)}` }),
 });
 
+export const leaseOwner = (pid = process.pid) => `realtime-${pid}`;
+
+/** The capture batch's arguments: a pair this run leased is started by a pool under the lease's owner name, because the pool refuses a pair leased to another owner and a run outside a fleet session has no session id to match instead. */
+export const batchArguments = (out: string, pair: number, own: ReturnType<typeof pairDefaults>, minutes: string, leasedTo: string | undefined) => [
+  "--plan", join(out, "maps", "capture-batch.json"), "--out", join(out, "out"), "--pair", String(pair), "--desktop", own.desktop, "--capacity", own.capacity, "--clients-file", own.clientsFile, "--client", own.client, "--install", own.install, "--minutes", minutes,
+  ...(leasedTo === undefined ? [] : ["--owner", leasedTo]),
+];
+
 const leasePair = (owner: string) => Effect.acquireRelease(
   exec([process.execPath, "scripts/wisp.ts", "lan", "lease", "take", "--owner", owner, "--pid", String(process.pid), "--wait", "1800"], "lease a pair").pipe(Effect.flatMap(text => {
     const pair = Number(/"pair":\s*(\d+)/.exec(text)?.[1] ?? NaN);
@@ -169,7 +177,8 @@ export const nativeCaptureRealtime = <E, R>(args: readonly string[], chunks: (ar
   const plan = JSON.parse(readFileSync(join(out, "maps", "capture-batch.json"), "utf8")) as { rows: { name: string }[] };
   const rows = plan.rows.map(row => row.name);
   if (rows.length > MAX_ROWS) return yield* new RealtimeFailure({ problem: `a real-time run stamps at most ${MAX_ROWS} rows apart; split the pads` });
-  const pair = option(args, "--pair") === undefined ? yield* leasePair(`realtime-${process.pid}`) : Number(option(args, "--pair"));
+  const leased = option(args, "--pair") === undefined ? leaseOwner() : undefined;
+  const pair = leased === undefined ? Number(option(args, "--pair")) : yield* leasePair(leased);
   const own = pairDefaults(pair);
   const tools = yield* resolveTools(["wf-recorder"]).pipe(Effect.mapError(cause => new RealtimeFailure({ problem: String(cause) })));
   const batchOut = join(out, "out");
@@ -177,7 +186,7 @@ export const nativeCaptureRealtime = <E, R>(args: readonly string[], chunks: (ar
   const following = yield* Effect.forkScoped(video.follow);
   yield* Effect.addFinalizer(() => Fiber.interrupt(following).pipe(Effect.andThen(video.stop)));
   const stopVideo = Fiber.interrupt(following).pipe(Effect.andThen(video.stop));
-  yield* nativeCaptureBatch(["--plan", join(out, "maps", "capture-batch.json"), "--out", batchOut, "--pair", String(pair), "--desktop", own.desktop, "--capacity", own.capacity, "--clients-file", own.clientsFile, "--client", own.client, "--install", own.install, "--minutes", minutes], stopVideo).pipe(Effect.mapError(failure => new RealtimeFailure({ problem: failure.message })));
+  yield* nativeCaptureBatch(batchArguments(out, pair, own, minutes, leased), stopVideo).pipe(Effect.mapError(failure => new RealtimeFailure({ problem: failure.message })));
   yield* stopVideo;
   yield* stillsAndSheet(out, rows, frames, crop, tile);
 }));
