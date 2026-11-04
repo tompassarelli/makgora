@@ -1,6 +1,7 @@
 import { infoPopupAction } from "./infoPopupKeys";
 import { SELECT_LEVELS } from "./selectLevels";
-import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
+import { nextMatchCharacter } from "../lobby/lobbyState";
+import { nextCpuCharacter, shownFighter } from "../lobby/characterChoice";
 import { RULE_BUTTONS, rulePanel } from "./ruleButtons";
 import { hoveredRule, ruleHelp } from "./ruleHelp";
 import { type BarButton, type BarTarget, SelectBar, barShown } from "./selectBar";
@@ -13,20 +14,8 @@ import type { KeyBindings } from "../input/keyBindings";
 import { createMenuPrompt, updateMenuPrompt } from "./menuPrompt";
 import { bindPrototype } from "../../platform/rebind";
 import { PARTICIPANT_SLOTS, type Slots } from "../input/participants";
-import {
-  type MatchState,
-  Phase,
-  allCharactersReady,
-  canChooseComputer,
-  validTeams,
-  characterFor,
-  characterReady,
-  fighterActive,
-  fighterMask,
-  hasUnassignedHuman,
-  humanActive,
-  humanFighterActive,
-} from "../lobby/lobbyState";
+import { type MatchState, Phase, canChooseComputer, characterFor, characterReady, fighterActive, fighterMask, hasUnassignedHuman, humanActive, humanFighterActive } from "../lobby/lobbyState";
+import { allCharactersReady, validTeams } from "../lobby/characterReadiness";
 import { readScreenPointer } from "./screenPointer";
 import {
   type Placement,

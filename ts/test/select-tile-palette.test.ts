@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test";
 import { f32 } from "wisp/src/sim/f32";
 import { install, startBuild } from "../src/platform/main";
-import { RANDOM_FIGHTER, fighterActive } from "../src/game/lobby/lobbyState";
+import { fighterActive } from "../src/game/lobby/lobbyState";
+import { RANDOM_FIGHTER } from "../src/game/lobby/characterChoice";
 import { fighterPortrait } from "../src/game/roster/looks";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { RULE_BUTTONS, teamSettingsBox } from "../src/game/ui/ruleButtons";

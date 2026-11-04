@@ -6,7 +6,9 @@ import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases"
 import { createImpactEvents } from "../../game/presentation/impactEvents";
 import { emitImpacts } from "../../game/presentation/impactState";
 import { PARTICIPANT_SLOTS, isParticipantSlot } from "../../game/input/participants";
-import { Phase, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
+import { Phase } from "../../game/lobby/lobbyState";
+import { setTraining } from "../../game/lobby/matchMode";
+import { setHitAreas } from "../../game/lobby/trainingSettings";
 import { setMeterPercent } from "../../game/sim/meter";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { costumeOf } from "../../game/roster/costumes";

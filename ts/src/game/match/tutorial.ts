@@ -16,10 +16,12 @@ import type { MatchOrbs } from "../sim/orbState";
 import { spawnOrb } from "./orbs";
 import { type Roster, fighterAt, isContender } from "../sim/roster";
 import { PartnerBehaviour, PartnerEscape, PartnerTech, type TrainingState } from "./trainingState";
-import {
-  MATCH_TICKS_PER_SECOND, type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanCount, humanFighterActive, humanPresent, requestStageSelect, selectCharacter, selectCpuCharacter, selectStage,
-  setTraining, setTutorialLesson, setUltimatesOn,
-} from "../lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanCount, humanFighterActive, humanPresent } from "../lobby/lobbyState";
+import { selectCharacter, selectCpuCharacter } from "../lobby/characterChoice";
+import { requestStageSelect, selectStage } from "../lobby/stageSelect";
+import { setUltimatesOn } from "../lobby/matchRules";
+import { setTraining } from "../lobby/matchMode";
+import { setTutorialLesson } from "../lobby/trainingSettings";
 
 
 export const LessonAction = { dash: 0, doubleJump: 1, hit: 2, special: 3, dodge: 4, throw: 5, ledge: 6, knockout: 7, orb: 8, ultimate: 9 } as const;

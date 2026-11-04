@@ -1,7 +1,9 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { CPU_OPPONENT_IDS, CPU_PROFILES, CPU_TIER_DEFAULT, CPU_TIERS, cpuProfile, cpuProfileLabel, isCpuTier, stepCpuTier } from "../match/cpuProfiles";
 import { createTapeSession } from "../replay/tapeRunner";
-import { cycleSlotMode, selectCharacter, setCpuTier } from "./lobbyState";
+import { cycleSlotMode } from "./lobbyState";
+import { selectCharacter } from "./characterChoice";
+import { setCpuTier } from "./matchRules";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
 import { at } from "wisp/src/runtime/lookup";
 

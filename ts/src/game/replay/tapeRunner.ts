@@ -7,10 +7,11 @@ import { captureFrame, createMatchFrameInput, executeMatchFrame, resetMatchFrame
 import { produceComputerInput } from "../match/botPlay";
 import { clearBotMemory } from "../match/botPerception";
 import { clearBotStrategy } from "../match/botStrategy";
-import {
-  computerActive, confirmRematch, createMatchState, fighterMask, requestStageSelect, requestStart, selectCharacter, selectStage, setHazards, setOrbsOn,
-  setParticipants, setStocks, setTimeLimit, updateConnectedHumans,
-} from "../lobby/lobbyState";
+import { computerActive, createMatchState, fighterMask, setParticipants, updateConnectedHumans } from "../lobby/lobbyState";
+import { selectCharacter } from "../lobby/characterChoice";
+import { requestStageSelect, selectStage, setHazards } from "../lobby/stageSelect";
+import { setOrbsOn, setStocks, setTimeLimit } from "../lobby/matchRules";
+import { confirmRematch, requestStart } from "../lobby/matchFlow";
 import { clearPresentationHistory, createPacingAndPresentation } from "../match/pacingAndPresentation";
 import { initializeMatchFighters, matchSpawnX } from "../match/step";
 import { createFighter } from "../sim/fighter";

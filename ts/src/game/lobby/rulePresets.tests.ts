@@ -1,7 +1,9 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { ALL_ITEMS_MASK, ItemKind } from "../sim/codes";
 import { rulesPillParts } from "../session/messages";
-import { MATCH_MODES, Phase, chooseMatchMode, createMatchState, matchMode, setItemsOn, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./lobbyState";
+import { Phase, createMatchState } from "./lobbyState";
+import { setItemsOn, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./matchRules";
+import { MATCH_MODES, chooseMatchMode, matchMode } from "./matchMode";
 import { RULE_PRESETS, applyRulePreset } from "./rulePresets";
 
 type Rule = number | boolean;

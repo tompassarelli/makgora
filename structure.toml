@@ -91,16 +91,16 @@ responsibility = "Canonical text, state hash, copy/compare/diff of world state a
 may_use = ["sim", "fighter-kit", "core", "generated"]
 
 [[module]]
-name = "lobby"
-paths = ["ts/src/game/lobby/**"]
-responsibility = "Lobby state: slots, humans/CPU, character and stage select, teams, stock and timer choice."
-may_use = ["roster", "core"]
+name = "match"
+paths = ["ts/src/game/match/**", "ts/src/game/lobby/characterChoice.ts", "ts/src/game/lobby/characterReadiness.ts", "ts/src/game/lobby/costumeAndTeam.ts", "ts/src/game/lobby/stageSelect.ts", "ts/src/game/lobby/matchRules.ts", "ts/src/game/lobby/matchMode.ts", "ts/src/game/lobby/trainingSettings.ts", "ts/src/game/lobby/matchFlow.ts", "ts/src/game/lobby/matchOutcome.ts", "ts/src/game/lobby/rulePresets.ts"]
+responsibility = "Match step, stocks/teams/meter rules and training; drives the sim each frame; the lobby commands that change a match state: fighter choice, readiness, costume and team cycling, stage select, rules, mode, training settings, match start, rematch and outcome."
+may_use = ["lobby", "roster", "ai", "snapshot", "sim", "fighter-kit", "input", "core", "generated"]
 
 [[module]]
-name = "match"
-paths = ["ts/src/game/match/**"]
-responsibility = "Match step, stocks/teams/meter rules and training; drives the sim each frame."
-may_use = ["lobby", "roster", "ai", "snapshot", "sim", "fighter-kit", "input", "core", "generated"]
+name = "lobby"
+paths = ["ts/src/game/lobby/**", "ts/src/game/menu/stagePool.ts"]
+responsibility = "Lobby state: slots, humans/CPU, character and stage select, teams, stock and timer choice."
+may_use = ["roster", "core"]
 
 [[module]]
 name = "replay"

@@ -1,5 +1,6 @@
 import { PARTICIPANT_SLOTS, type Slots } from "../input/participants";
-import { type MatchState, winningMask } from "../lobby/lobbyState";
+import { type MatchState } from "../lobby/lobbyState";
+import { winningMask } from "../lobby/matchOutcome";
 
 export interface SessionWins {
   readonly counts: Slots<number>;

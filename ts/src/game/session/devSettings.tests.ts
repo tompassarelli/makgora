@@ -1,5 +1,6 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
-import { Phase, createMatchState, selectCharacter } from "../lobby/lobbyState";
+import { Phase, createMatchState } from "../lobby/lobbyState";
+import { selectCharacter } from "../lobby/characterChoice";
 import { Character } from "../sim/codes";
 import { prepareQuickMatch } from "./devSettings";
 

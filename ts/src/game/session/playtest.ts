@@ -7,10 +7,11 @@
 
 import { parseDecimal } from "../netcode/journal/decimal";
 import { PARTICIPANT_SLOTS, isParticipantMask, participantActive } from "../input/participants";
-import {
-  type MatchState, Phase, createMatchState, firstHumanSlot, humanFighterActive, humanPresent, requestStageSelect, requestStart, selectCharacter,
-  selectStage, setCpuOpponent, setCpuTier, setEndless, setParticipants,
-} from "../lobby/lobbyState";
+import { type MatchState, Phase, createMatchState, firstHumanSlot, humanFighterActive, humanPresent, setParticipants } from "../lobby/lobbyState";
+import { selectCharacter } from "../lobby/characterChoice";
+import { requestStageSelect, selectStage } from "../lobby/stageSelect";
+import { setCpuOpponent, setCpuTier, setEndless } from "../lobby/matchRules";
+import { requestStart } from "../lobby/matchFlow";
 import { isCpuOpponentChoice, isCpuTier, type CpuOpponentChoice, type CpuTier } from "../match/cpuProfiles";
 
 const PREFIX = "PLAY v=4 computers=";

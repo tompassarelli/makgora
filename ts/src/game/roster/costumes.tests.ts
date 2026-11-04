@@ -1,5 +1,7 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
-import { copyMatchState, costumeFor, createMatchState, cycleCostume, selectCharacter } from "../lobby/lobbyState";
+import { copyMatchState, costumeFor, createMatchState } from "../lobby/lobbyState";
+import { selectCharacter } from "../lobby/characterChoice";
+import { cycleCostume } from "../lobby/costumeAndTeam";
 import { Character, DuoRole } from "../sim/codes";
 import { bodyCostume, bodyVariants, costumeClipModel, costumeIndex, costumesFor, partnerLook } from "./costumes";
 import { costumeSystem } from "./costumeSwitch";

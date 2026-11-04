@@ -5,7 +5,8 @@
 import { at } from "wisp/src/runtime/lookup";
 import { floorMod } from "wisp/src/sim/intMath";
 import { CPU_TIERS, type CpuOpponentId } from "../match/cpuProfiles";
-import { type MatchState, Phase, characterReady, endConfiguredRun, firstHumanSlot } from "../lobby/lobbyState";
+import { type MatchState, Phase, characterReady, firstHumanSlot } from "../lobby/lobbyState";
+import { endConfiguredRun } from "../lobby/matchMode";
 import { PLAYABLE_CHARACTERS, fighterName } from "../roster/kits";
 import { isFeatured, shownFighters } from "../roster/forge";
 import type { Character } from "../sim/codes";

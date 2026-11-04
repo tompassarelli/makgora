@@ -1,5 +1,6 @@
 import { ITEM_KINDS, itemBit } from "../sim/codes";
-import { type MatchState, setAutomaticRematch, setEndless, setItemsOn, settingRules, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./lobbyState";
+import { type MatchState } from "./lobbyState";
+import { setAutomaticRematch, setEndless, setItemsOn, settingRules, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./matchRules";
 
 export type RulePreset = "standard" | "tourney" | "party" | "endless";
 

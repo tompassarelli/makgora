@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test";
 import { f32 } from "wisp/src/sim/f32";
 import { install, startBuild } from "../src/platform/main";
-import { costumeFor, selectCharacter } from "../src/game/lobby/lobbyState";
+import { costumeFor } from "../src/game/lobby/lobbyState";
+import { selectCharacter } from "../src/game/lobby/characterChoice";
 import { Character } from "../src/game/sim/codes";
 import { costumeSystem } from "../src/game/roster/costumeSwitch";
 import { Action } from "../src/game/input/actions";

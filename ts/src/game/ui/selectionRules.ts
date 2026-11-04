@@ -1,5 +1,6 @@
 import type { TrainingSetting } from "./ruleButtons";
-import { type MatchMode, type MatchState, matchMode } from "../lobby/lobbyState";
+import { type MatchState } from "../lobby/lobbyState";
+import { type MatchMode, matchMode } from "../lobby/matchMode";
 import { PRESET_NAMES, type RulePreset } from "../lobby/rulePresets";
 import { ItemKind, itemBit } from "../sim/codes";
 import type { ClassicLines, DelayControl, SelectionActions } from "./selectionActions";

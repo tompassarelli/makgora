@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
-import { ResultPick, resultChoicesOpen, shownResultPick } from "../src/game/lobby/lobbyState";
+import { ResultPick, shownResultPick } from "../src/game/lobby/lobbyState";
+import { resultChoicesOpen } from "../src/game/lobby/matchFlow";
 import { shell } from "../src/host/loop/state";
 import { NEUTRAL_INPUT, createStandaloneSession } from "../scripts/wisp/standalone";
 

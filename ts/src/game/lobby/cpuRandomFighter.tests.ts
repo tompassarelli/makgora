@@ -12,10 +12,11 @@ import { PLAYABLE_CHARACTERS, fighterName } from "../roster/kits";
 import { fighterAt } from "../sim/roster";
 import { shownFighters } from "../roster/forge";
 import { type PlayerFileQueue, lobbyCounter, receiveLobbyCounter } from "../../host/loop/playerFileQueue";
-import {
-  Phase, RANDOM_FIGHTER, ResultPick, beginRematchCountdown, confirmRematch, cpuFighterRandom, cycleSlotMode, requestStageSelect, selectCharacter,
-  selectCpuCharacter, setAutomaticRematch, startComputerChoices, tickRematchCountdown,
-} from "./lobbyState";
+import { Phase, ResultPick, cycleSlotMode } from "./lobbyState";
+import { RANDOM_FIGHTER, cpuFighterRandom, selectCharacter, selectCpuCharacter, startComputerChoices } from "./characterChoice";
+import { requestStageSelect } from "./stageSelect";
+import { setAutomaticRematch } from "./matchRules";
+import { beginRematchCountdown, confirmRematch, tickRematchCountdown } from "./matchFlow";
 
 const CPU = 1;
 let line = 0;

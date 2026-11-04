@@ -2,7 +2,8 @@
 
 
 import type { ParticipantSlot } from "../../game/input/participants";
-import { canRequestStart, requestStart, resolveStageChoice } from "../../game/lobby/lobbyState";
+import { resolveStageChoice } from "../../game/lobby/stageSelect";
+import { canRequestStart, requestStart } from "../../game/lobby/matchFlow";
 import { stageInfo } from "../../game/menu/stageCatalog";
 import { STAGE_READY_PREFIX, StageLoadStep, beginStageLoad, stageCardDue, stageReported, tickStageLoad } from "../../game/session/stageLoad";
 import { startMatch } from "./matchStart";

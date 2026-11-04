@@ -2,7 +2,7 @@ import { Action } from "../../game/input/actions";
 import { type KeyBindings, keyNames } from "../../game/input/keyBindings";
 import { PAD_PRESENT_KEY } from "../../game/input/padCapture";
 import { chordLabels } from "../../game/input/pauseChord";
-import { timedMatch } from "../../game/lobby/lobbyState";
+import { timedMatch } from "../../game/lobby/matchRules";
 import { leaveHoldFill } from "../../game/match/leaveHold";
 import { clockMain, clockSeconds } from "../../game/ui/clockReadout";
 import type { PauseView } from "../../game/ui/pauseScreen";

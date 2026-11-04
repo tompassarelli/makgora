@@ -4,7 +4,8 @@
 
 import { at } from "wisp/src/runtime/lookup";
 import { type CpuOpponentId, type CpuTier } from "../match/cpuProfiles";
-import { type MatchState, Phase, endConfiguredRun, firstHumanSlot } from "../lobby/lobbyState";
+import { type MatchState, Phase, firstHumanSlot } from "../lobby/lobbyState";
+import { endConfiguredRun } from "../lobby/matchMode";
 import { stageInfo, type StageTile } from "../menu/stageCatalog";
 import { Character } from "../sim/codes";
 import { fighterName } from "../roster/kits";

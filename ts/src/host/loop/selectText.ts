@@ -1,4 +1,5 @@
-import type { MatchMode, MatchState } from "../../game/lobby/lobbyState";
+import type { MatchState } from "../../game/lobby/lobbyState";
+import type { MatchMode } from "../../game/lobby/matchMode";
 import type { ClassicLines, SelectText } from "../../game/ui/selectionActions";
 import { MODE_LABELS, rulesPillParts, selectionModeLabel } from "../../game/session/messages";
 import { classicRouteSummary, classicTierSetting } from "../../game/classic/classicText";

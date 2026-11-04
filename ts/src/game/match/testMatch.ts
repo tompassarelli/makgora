@@ -8,7 +8,8 @@ import { type Roster, createRoster, isActive } from "../sim/roster";
 import { type FrameControls, createFrameControls } from "./controls";
 import { type MatchFrameInput, captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { type PacingAndPresentation, createPacingAndPresentation } from "./pacingAndPresentation";
-import { type MatchState, Phase, createMatchState, requestStart, setHumanMask } from "../lobby/lobbyState";
+import { type MatchState, Phase, createMatchState, setHumanMask } from "../lobby/lobbyState";
+import { requestStart } from "../lobby/matchFlow";
 import type { ReplayState } from "../replay/snapshot";
 
 export interface TestMatch {

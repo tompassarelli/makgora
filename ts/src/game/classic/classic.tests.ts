@@ -1,5 +1,6 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
-import { Phase, createMatchState, stepClassicTier } from "../lobby/lobbyState";
+import { Phase, createMatchState } from "../lobby/lobbyState";
+import { stepClassicTier } from "../lobby/matchMode";
 import { CPU_TIERS } from "../match/cpuProfiles";
 import { rulesPillParts, rulesSummary } from "../session/messages";
 import { Character } from "../sim/codes";

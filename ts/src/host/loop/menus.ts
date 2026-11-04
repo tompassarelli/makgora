@@ -8,13 +8,15 @@ import { Action } from "../../game/input/actions";
 import { menuAction } from "../../game/input/keyBindings";
 import { pressKey } from "../../game/input/playerKeys";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
-import {
-  DEFAULT_RESULT_PICK, Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, shownResultPick, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
-  setTeamBattle, setFriendlyFire, cycleTeam, cycleCostume, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, chooseMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
-  stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
-  returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setOrbsOn, setStocks, setTimeLimit, updateConnectedHumans,
-  type MatchState, START_HOLD_FRAMES, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
-} from "../../game/lobby/lobbyState";
+import { DEFAULT_RESULT_PICK, Phase, RESULT_PICKS, ResultPick, shownResultPick, canChooseComputer, firstHumanSlot, characterFor, cycleSlotMode, humanActive, updateConnectedHumans, type MatchState, START_HOLD_FRAMES, copyMatchState, createMatchState, setParticipants } from "../../game/lobby/lobbyState";
+import { selectCharacter, selectCpuCharacter, initializeComputerChoices } from "../../game/lobby/characterChoice";
+import { recallCharacter } from "../../game/lobby/characterReadiness";
+import { cycleTeam, cycleCostume } from "../../game/lobby/costumeAndTeam";
+import { changeStagePoolMode, changeStagePoolStage, requestStageSelect, returnToCharacters, selectStage, setHazards } from "../../game/lobby/stageSelect";
+import { setTeamBattle, setFriendlyFire, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setItemsOn, setUltimatesOn, toggleItemKind, setOrbsOn, setStocks, setTimeLimit } from "../../game/lobby/matchRules";
+import { setTraining, chooseMatchMode, stepClassicTier, stepLoreBattle } from "../../game/lobby/matchMode";
+import { setHitAreas, setPartnerDamage, stepPartnerBehaviour, stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson } from "../../game/lobby/trainingSettings";
+import { resultChoicesOpen, cancelRematchCountdown, confirmRematch, requestStart, tickRematchCountdown } from "../../game/lobby/matchFlow";
 import { resetMomentRecorder } from "../../game/replay/moment";
 import { applyRulePreset, setForgeShown } from "../../game/lobby/rulePresets";
 import { resetPacingAndPresentation } from "../../game/match/pacingAndPresentation";

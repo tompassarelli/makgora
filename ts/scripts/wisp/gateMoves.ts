@@ -14,7 +14,7 @@ import { BINDING_PRESETS } from "../../src/game/input/keyBindings";
 import { Character } from "../../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS, fighterName } from "../../src/game/roster/kits";
 import { selectGrid, tileOfCharacter } from "../../src/game/ui/selectionFrames";
-import { MATCH_MODES } from "../../src/game/lobby/lobbyState";
+import { MATCH_MODES } from "../../src/game/lobby/matchMode";
 import { MODE_ROWS, SELECT_BAR } from "../../src/game/core/selectBarLayout";
 import { PICKER_DONE, presetButton } from "../../src/game/ui/settingsUi";
 import { HAZARDS_BUTTON } from "../../src/game/ui/stageUi";

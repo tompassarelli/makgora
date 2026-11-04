@@ -11,10 +11,13 @@ import { type FixedDelay, MAX_INPUT_DELAY, isFixedDelay } from "../netcode/input
 import { parseDecimal } from "../netcode/journal/decimal";
 import { MAX_BATCH } from "../netcode/journal/transport";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../input/participants";
-import {
-  type MatchState, Phase, createMatchState, firstHumanSlot, humanFighterActive, humanPresent, requestStageSelect, requestStart, returnToCharacters,
-  offeredMatchCharacter, selectCharacter, selectCpuCharacter, selectStage, setStocks, computerActive, cycleSlotMode, setCpuOpponent, setCpuTier, setHitAreas, setPartnerDamage, setTraining, stepPartnerBehaviour,
-} from "../lobby/lobbyState";
+import { type MatchState, Phase, createMatchState, firstHumanSlot, humanFighterActive, humanPresent, offeredMatchCharacter, computerActive, cycleSlotMode } from "../lobby/lobbyState";
+import { selectCharacter, selectCpuCharacter } from "../lobby/characterChoice";
+import { requestStageSelect, returnToCharacters, selectStage } from "../lobby/stageSelect";
+import { setStocks, setCpuOpponent, setCpuTier } from "../lobby/matchRules";
+import { setTraining } from "../lobby/matchMode";
+import { setHitAreas, setPartnerDamage, stepPartnerBehaviour } from "../lobby/trainingSettings";
+import { requestStart } from "../lobby/matchFlow";
 import { isCpuOpponentChoice, isCpuTier, type CpuOpponentChoice, type CpuTier } from "../match/cpuProfiles";
 import { PartnerBehaviour } from "../match/trainingState";
 import { selectableStage } from "../menu/stageCatalog";

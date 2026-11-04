@@ -1,6 +1,8 @@
 import { VOICE_CHECK_SCRIPT, VOICE_LOG_FILE } from "../game/core/gameFiles";
 import { PARTICIPANT_SLOTS } from "../game/input/participants";
-import { Phase, computerActive, cycleSlotMode, firstHumanSlot, selectCpuCharacter, setCpuOpponent, setCpuTier, setTimeLimit } from "../game/lobby/lobbyState";
+import { Phase, computerActive, cycleSlotMode, firstHumanSlot } from "../game/lobby/lobbyState";
+import { selectCpuCharacter } from "../game/lobby/characterChoice";
+import { setCpuOpponent, setCpuTier, setTimeLimit } from "../game/lobby/matchRules";
 import { SELECTABLE_CHARACTERS } from "../game/roster/kits";
 import { at } from "wisp/src/runtime/lookup";
 import { writeLines } from "wisp/src/platform/fileio";

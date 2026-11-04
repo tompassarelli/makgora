@@ -1,7 +1,8 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { at } from "wisp/src/runtime/lookup";
 import { PLAYABLE_CHARACTERS } from "../roster/kits";
-import { RANDOM_FIGHTER, createMatchState, cycleSlotMode, selectCharacter, selectCpuCharacter } from "../lobby/lobbyState";
+import { createMatchState, cycleSlotMode } from "../lobby/lobbyState";
+import { RANDOM_FIGHTER, selectCharacter, selectCpuCharacter } from "../lobby/characterChoice";
 import { createMenuCues, createMenuObservation, menuFrameCues } from "./matchCues";
 
 const CPU = 1;

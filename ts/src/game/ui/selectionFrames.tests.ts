@@ -4,7 +4,7 @@ import { isFeatured } from "../roster/forge";
 import { fighterKey, fighterSlug, PLAYABLE_CHARACTERS } from "../roster/kits";
 import { Character } from "../sim/codes";
 import { hudTitle } from "./duoTitle";
-import { RANDOM_FIGHTER } from "../lobby/lobbyState";
+import { RANDOM_FIGHTER } from "../lobby/characterChoice";
 import { FRIZ_QUADRATA_WIDTHS, textWidth } from "wisp/src/ui/chatLog";
 import { GRID_FIGHTERS, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, nameText, selectGrid, tileLabel, tileNameEms, tileOfCharacter } from "./selectionFrames";
 

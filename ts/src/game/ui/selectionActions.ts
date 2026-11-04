@@ -1,4 +1,5 @@
-import type { MatchMode, MatchState } from "../lobby/lobbyState";
+import type { MatchState } from "../lobby/lobbyState";
+import type { MatchMode } from "../lobby/matchMode";
 import type { RulePreset } from "../lobby/rulePresets";
 import type { RosterTile } from "../menu/selectionDrag";
 import type { ItemKind } from "../sim/codes";

@@ -1,7 +1,8 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";
-import { MATCH_MODES, type MatchMode, type MatchState, matchMode } from "../lobby/lobbyState";
+import { type MatchState } from "../lobby/lobbyState";
+import { MATCH_MODES, type MatchMode, matchMode } from "../lobby/matchMode";
 import { ItemKind, itemBit } from "../sim/codes";
 import { SELECT_LEVELS } from "./selectLevels";
 import type { DelayControl, SelectText } from "./selectionActions";

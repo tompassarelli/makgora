@@ -9,7 +9,8 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, participantActive } from "../.
 import { borrowMatchFrame, captureFrame, executeMatchFrame, hasNetworkRows } from "../../game/match/frameInput";
 import { ownConfirmedState } from "./confirmedState";
 import { beginMomentFrame, keepMomentEnd, momentFrameRan, recordMomentRow } from "../../game/replay/moment";
-import { Phase, beginRematchCountdown, computerActive, humanFighterActive } from "../../game/lobby/lobbyState";
+import { Phase, computerActive, humanFighterActive } from "../../game/lobby/lobbyState";
+import { beginRematchCountdown } from "../../game/lobby/matchFlow";
 import { resultMessage } from "../../game/session/messages";
 import { produceScenarioComputerInput } from "../../game/session/scenarios";
 import { canAttack } from "../../game/sim/conditions";

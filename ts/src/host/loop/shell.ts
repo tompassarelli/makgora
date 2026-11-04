@@ -7,7 +7,9 @@ import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../../g
 import { clearPulse } from "../../game/input/directionalInput";
 import { ownConfirmedState } from "./confirmedState";
 import { startKeyUp } from "../../game/match/controls";
-import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, participantLeft, startComputerChoices, updateConnectedHumans } from "../../game/lobby/lobbyState";
+import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, updateConnectedHumans } from "../../game/lobby/lobbyState";
+import { startComputerChoices } from "../../game/lobby/characterChoice";
+import { participantLeft } from "../../game/lobby/matchOutcome";
 import { chooseScenarioCharacters } from "../../game/session/scenarios";
 import { FRAME_SECONDS } from "../../game/presentation/frameClock";
 import { holdGameSpeed } from "./gameSpeed";

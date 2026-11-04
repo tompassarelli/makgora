@@ -2,7 +2,9 @@
 import { Advantage, type TrainingState } from "../match/trainingState";
 import { PARTICIPANT_SLOTS, participantActive } from "../input/participants";
 import { floorDiv } from "wisp/src/sim/intMath";
-import { MATCH_TICKS_PER_SECOND, type MatchMode, Phase, type MatchState, matchMode, computerActive, fighterActive, holdingStart, humanFighterActive, humanPresent, practiceSelected } from "../lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, computerActive, fighterActive, holdingStart, humanFighterActive, humanPresent } from "../lobby/lobbyState";
+import { practiceSelected } from "../lobby/characterReadiness";
+import { type MatchMode, matchMode } from "../lobby/matchMode";
 import { DownState, LedgeState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { SPECIAL_INPUTS, fighterKit, normalName, specialName } from "../sim/moveNames";

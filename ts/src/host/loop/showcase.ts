@@ -1,6 +1,7 @@
 import { DEFAULT_FIGHTER } from "../../game/roster/kits";
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../../game/input/participants";
-import { Phase, firstHumanSlot, setEndless, setItemsOn, setOrbsOn, setParticipants, setUltimatesOn, stageClock, updateConnectedHumans } from "../../game/lobby/lobbyState";
+import { Phase, firstHumanSlot, setParticipants, stageClock, updateConnectedHumans } from "../../game/lobby/lobbyState";
+import { setEndless, setItemsOn, setOrbsOn, setUltimatesOn } from "../../game/lobby/matchRules";
 import { SHOWCASE_PAD_X, type ShowcasePads, type ShowcaseRequest, applyShowcaseRequest, copyShowcasePads, createShowcasePads, padName, showcaseMask } from "../../game/session/showcase";
 import { STAGE_EDGE_LIGHT_MODEL } from "../../game/presentation/stageEdgeLights";
 import { Character } from "../../game/sim/codes";

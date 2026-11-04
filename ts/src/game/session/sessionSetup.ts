@@ -17,11 +17,12 @@
 
 import { parseDecimal } from "../netcode/journal/decimal";
 import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../input/participants";
-import {
-  type MatchState, Phase, computerActive, cycleSlotMode, humanActive, humanFighterActive, selectCharacter, selectCpuCharacter, setAutomaticRematch,
-  cycleCostume, costumeFor,
-  setTeamBattle, cycleTeam, setHitAreas, setItemsOn, setOrbsOn, setUltimatesOn, setPartnerDamage, setStocks, setTimeLimit, setTraining, stepTrainingSpeed, toggleItemKind,
-} from "../lobby/lobbyState";
+import { type MatchState, Phase, computerActive, cycleSlotMode, humanActive, humanFighterActive, costumeFor } from "../lobby/lobbyState";
+import { selectCharacter, selectCpuCharacter } from "../lobby/characterChoice";
+import { cycleCostume, cycleTeam } from "../lobby/costumeAndTeam";
+import { setAutomaticRematch, setTeamBattle, setItemsOn, setOrbsOn, setUltimatesOn, setStocks, setTimeLimit, toggleItemKind } from "../lobby/matchRules";
+import { setTraining } from "../lobby/matchMode";
+import { setHitAreas, setPartnerDamage, stepTrainingSpeed } from "../lobby/trainingSettings";
 import { selectableStage } from "../menu/stageCatalog";
 import { ITEM_WARNING_FRAMES } from "../match/centreItem";
 import { type Character, ItemKind, itemBit } from "../sim/codes";

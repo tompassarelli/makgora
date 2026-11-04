@@ -1,6 +1,7 @@
 import { isParticipantSlot, type ParticipantSlot } from "../../game/input/participants";
 import { chordComplete } from "../../game/input/pauseChord";
-import { Phase, cancelRematchCountdown, humanActive } from "../../game/lobby/lobbyState";
+import { Phase, humanActive } from "../../game/lobby/lobbyState";
+import { cancelRematchCountdown } from "../../game/lobby/matchFlow";
 import { startKeyUp } from "../../game/match/controls";
 import { clearLeaveHold, leaveHold, pressEscape, releaseEscape, tickLeaveHold } from "../../game/match/leaveHold";
 import { warcraftChatOpen } from "../../platform/editboxJournal";

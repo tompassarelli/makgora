@@ -6,7 +6,8 @@ import { FORGE_FIGHTERS, FORGE_STAGES, fighterStatus, isComingSoon, isFeatured, 
 import { CLASSIC_ROUTES } from "../classic/routes";
 import { CLASSIC_FIGHTS, classicRivals } from "../classic/classic";
 import { drawCpuFighter } from "../match/cpuProfiles";
-import { Phase, createMatchState, nextCpuCharacter, nextMatchCharacter } from "../lobby/lobbyState";
+import { Phase, createMatchState, nextMatchCharacter } from "../lobby/lobbyState";
+import { nextCpuCharacter } from "../lobby/characterChoice";
 import { STAGE_CATALOG, nextStage } from "../menu/stageCatalog";
 import { createStagePool, nextPoolStage, stagePoolCount, togglePoolMode, togglePoolStage } from "../menu/stagePool";
 import { isFeaturedStage, stageShown, stageStatus } from "./forge";
