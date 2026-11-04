@@ -74,14 +74,8 @@ test("the Frozen Throne keeps its two skull pillars, one each side of the throne
   }
 });
 
-test("the Frozen Throne's top stair tier ends on a landing at its own height that runs under the dais [k2 property]", () => {
-  const floes = placedPieces(FROZEN_THRONE_STAGE).filter(piece => piece.model === FLOE && piece.x === 0 && piece.y >= 1300 && piece.y < 2000 && (piece.matrixScale?.[1] ?? 0) >= 2.5);
-  const top = floes.filter(piece => piece.y < 1700).sort((a, b) => b.z - a.z)[0];
-  const landing = floes.find(piece => piece.y > 1800);
-  expect(top).toBeDefined();
-  expect(landing).toBeDefined();
-  expect(landing?.z).toBe(top?.z);
-  expect(landing?.matrixScale?.[2]).toBe(top?.matrixScale?.[2]);
-  const dais = placedPieces(FROZEN_THRONE_STAGE).find(piece => piece.model === FLOE && piece.x === 0 && piece.y === 2020);
-  expect(landing?.y ?? 0).toBeLessThan(dais?.y ?? 0);
+test("the Frozen Throne has no thin free-standing slab between the stair and the dais, and no discrete far shelves below the deck [k2 property]", () => {
+  const floes = placedPieces(FROZEN_THRONE_STAGE).filter(piece => piece.model === FLOE);
+  expect(floes.filter(piece => piece.y >= 1700 && piece.y < 2000)).toEqual([]);
+  expect(floes.filter(piece => piece.z <= -1000)).toEqual([]);
 });
