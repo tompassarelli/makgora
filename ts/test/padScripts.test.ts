@@ -45,4 +45,6 @@ test("the Windows C1 script moves the cursor, picks fighters and a stage, presse
 test("a selection script line the standalone runner would skip is reported, so a misspelt button cannot pass as a pad script [k2 property]", () => {
   expect(selectionScriptProblems("#! select cpu\n60 back\n140 start\n200 click 0.4 0.3\n")).toEqual([]);
   expect(selectionScriptProblems("#! select\n60 bak\n70 click 0.4\nattack 80\n")).toHaveLength(3);
+  expect(selectionScriptProblems("#! select\n300 wheel 0.4 0.3 -2\n310 wheel 0.4 0.3 3\n")).toEqual([]);
+  expect(selectionScriptProblems("#! select\n300 wheel 0.4 0.3\n310 wheel 0.4 0.3 0\n320 wheel 0.4 0.3 1.5\n")).toHaveLength(3);
 });

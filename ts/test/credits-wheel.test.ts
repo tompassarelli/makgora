@@ -1,0 +1,61 @@
+import { expect, test } from "bun:test";
+import { install, startBuild } from "../src/platform/main";
+import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
+import { COMMUNITY_PANEL, CREDITS_PANEL } from "../src/game/ui/infoPopupLayout";
+import { shell } from "../src/host/loop/state";
+import { views } from "../src/host/loop/ui";
+import { passStartControls } from "../scripts/wisp/startControls";
+import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
+import { testHeadless } from "./headless";
+
+const headless = testHeadless(MAKGORA_HEADLESS);
+const NOTCH = 120;
+const middle = (box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number }) => [box.x + box.width / 2, box.y - box.height / 2] as const;
+
+test("a wheel turn over the open Credits popup scrolls it one line a notch, away from the user toward the top, and over the open Community popup or a closed one does nothing [k1 scenario]", () => {
+  const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, [0, 1]);
+  const read = <T>(slot: number, body: () => T): T => {
+    let result: T | undefined;
+    clients.client(slot).run(() => { result = body(); });
+    return result as T;
+  };
+  const credits = (slot: number) => views(shell()).selections[slot].credits;
+  const community = (slot: number) => views(shell()).selections[slot].community;
+  const shown = (slot: number) => clients.client(slot).frames.shownText().join("\n");
+  const turn = (slot: number, notches: number, box = CREDITS_PANEL) => {
+    const [x, y] = middle(box);
+    for (let notch = 0; notch < Math.abs(notches); notch++) expect(clients.wheel(slot, x, y, notches > 0 ? NOTCH : -NOTCH)).toBe(true);
+    clients.frames(2);
+  };
+  clients.start();
+  passStartControls(clients);
+  const [x, y] = middle(CREDITS_PANEL);
+  expect(clients.wheel(0, x, y, NOTCH)).toBe(false);
+  read(0, () => credits(0).open());
+  clients.frames(2);
+  const top = shown(0);
+  turn(0, -3);
+  const scrolled = shown(0);
+  expect(scrolled).not.toBe(top);
+  expect(read(0, () => credits(0).scroll(-1))).toBe(true);
+  expect(read(0, () => credits(0).scroll(1))).toBe(true);
+  turn(0, 1);
+  turn(0, 1);
+  turn(0, 1);
+  expect(shown(0)).toBe(top);
+  turn(0, 1);
+  expect(shown(0)).toBe(top);
+  turn(0, -2);
+  turn(0, -1);
+  expect(shown(0)).toBe(scrolled);
+  expect(read(1, () => credits(1).opened())).toBe(false);
+  expect(clients.wheel(1, x, y, NOTCH)).toBe(false);
+  read(0, () => credits(0).close());
+  read(0, () => community(0).open());
+  clients.frames(2);
+  const community0 = shown(0);
+  turn(0, -2, COMMUNITY_PANEL);
+  expect(shown(0)).toBe(community0);
+  expect(clients.client(0).errors).toEqual([]);
+  expect(clients.client(1).errors).toEqual([]);
+});

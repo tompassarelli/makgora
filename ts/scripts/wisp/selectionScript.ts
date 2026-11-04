@@ -9,7 +9,7 @@ export const ACTIONS: Readonly<Record<string, Action>> = {
   cUp: Action.cUp, cDown: Action.cDown,
 };
 
-/** A script whose first line is this stays on character select instead of starting a match, so a scene check can draw the selection screen. Its other lines are `STEP BUTTON`, which holds that button (attack, special, jump, left and so on) for 3 steps from STEP (up and down press the arrow keys, so they work whatever controls layout the window has saved), and the pad format's mouse steps `STEP pointer X Y` (move the cursor) and `STEP click X Y [FRAMES]` (press the left button at STEP and release it FRAMES later, 1 by default) at X, Y of Warcraft's 0.8 by 0.6 screen, played through the same pointer feed as the window's mouse; `start` and `back` (Esc) work as buttons too, and a `cpu` word on the first line (`#! select cpu`) fills slot 2 with a one-stock Wren Expert so a match ends by itself; a click on Done closes the controls panel that opens first. */
+/** A script whose first line is this stays on character select instead of starting a match, so a scene check can draw the selection screen. Its other lines are `STEP BUTTON`, which holds that button (attack, special, jump, left and so on) for 3 steps from STEP (up and down press the arrow keys, so they work whatever controls layout the window has saved), and the pad format's mouse steps `STEP pointer X Y` (move the cursor) and `STEP click X Y [FRAMES]` (press the left button at STEP and release it FRAMES later, 1 by default) and `STEP wheel X Y DELTA` (turn the wheel DELTA notches at STEP, positive away from the user) at X, Y of Warcraft's 0.8 by 0.6 screen, played through the same pointer feed as the window's mouse; `start` and `back` (Esc) work as buttons too, and a `cpu` word on the first line (`#! select cpu`) fills slot 2 with a one-stock Wren Expert so a match ends by itself; a click on Done closes the controls panel that opens first. */
 export const SELECTION_SCRIPT = "#! select";
 export const CPU_OPPONENT = "cpu";
 export const MENU_BUTTONS = new Set(["start", "back"]);
@@ -32,13 +32,13 @@ export function selectionScriptProblems(script: string): readonly string[] {
     const [step, verb, ...rest] = line.split(/\s+/);
     const where = `selection script line ${index + 1} (${line})`;
     if (!/^\d+$/.test(step ?? "")) problems.push(`${where}: starts with a whole step number`);
-    else if (verb === "click" || verb === "pointer") {
+    else if (verb === "click" || verb === "pointer" || verb === "wheel") {
       try {
         pointerStep(Number(step), verb, rest);
       } catch (error) {
         problems.push(`${where}: ${error instanceof Error ? error.message : String(error)}`);
       }
-    } else if (verb === undefined || rest.length > 0 || (ACTIONS[verb] === undefined && !MENU_BUTTONS.has(verb))) problems.push(`${where}: needs STEP BUTTON, STEP pointer X Y or STEP click X Y [FRAMES]`);
+    } else if (verb === undefined || rest.length > 0 || (ACTIONS[verb] === undefined && !MENU_BUTTONS.has(verb))) problems.push(`${where}: needs STEP BUTTON, STEP pointer X Y, STEP click X Y [FRAMES] or STEP wheel X Y DELTA`);
   });
   return problems;
 }
