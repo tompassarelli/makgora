@@ -667,19 +667,23 @@ export function strikeAlignedRate(character: number, style: number, clip: Readon
   return min(FASTEST_SWING, max(0.0, f32(f32(end - atRecovery) / f32(recovery * FRAME_SECONDS))));
 }
 
-function attackRate(f: Readonly<Fighter>, phase: AttackPhase): number {
-  if (phase === AttackPhase.none) return 1.0;
+function alignedAttackRate(f: Readonly<Fighter>, phase: AttackPhase, clip: Readonly<HeroClip>): number {
   const { style, duration } = f.attack;
-  const aligned = (clip: Readonly<HeroClip>): number => clip.until !== undefined && style !== undefined
+  return clip.until !== undefined && style !== undefined
     ? phase === AttackPhase.startup ? clipRate(clip.until, max(1, attackStartupFrames(style, f.tuning.moves))) : phase === AttackPhase.active ? 0.0 : 1.0
     : (style === undefined ? undefined : strikeAlignedRate(f.character, style, clip, attackStartupFrames(style, f.tuning.moves), characterAttackActiveFrames(f.character, style, f.tuning.moves), duration, phase))
     ?? clipRate(clip.seconds, duration);
+}
+
+function attackRate(f: Readonly<Fighter>, phase: AttackPhase): number {
+  if (phase === AttackPhase.none) return 1.0;
+  const { style } = f.attack;
   const own = clips.ownAttackClip(f.character, style);
-  if (own !== undefined) return aligned(own);
+  if (own !== undefined) return alignedAttackRate(f, phase, own);
 
   if (style === AttackStyle.ledgeAttack) return clipRate(clips.clipFor(f.character, "getUpAttack").seconds, LEDGE_ATTACK_FRAMES);
   const shared = clips.attackPose(style);
-  return shared === undefined ? 1.0 : aligned(clips.clipFor(f.character, shared));
+  return shared === undefined ? 1.0 : alignedAttackRate(f, phase, clips.clipFor(f.character, shared));
 }
 
 function downClipIndex(f: Readonly<Fighter>): number {

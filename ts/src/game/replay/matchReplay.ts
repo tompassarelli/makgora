@@ -37,7 +37,7 @@ import {
 import { parseReplayHeader } from "./replayFormat";
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot } from "./snapshot";
 import { describeDigestDifference, digestDifference, frameDigest } from "./frameDigest";
-import { type Lanes, MODULUS, fieldName, foldFields, foldInteger, foldNumber, foldValue, isFields, keyHash } from "./replayFold";
+import { type Lanes, MODULUS, fieldHash, fieldName, foldFields, foldInteger, foldNumber, foldValue, isFields } from "./replayFold";
 export * from "./replayFormat";
 
 
@@ -371,7 +371,8 @@ function stepFold(fold: PendingFold, world: Readonly<Roster>): boolean {
   if (isFields(fighter)) {
     while (fold.field < fields.length && remaining > 0) {
       const key = at(fields, fold.field++);
-      if (fieldName(key) && key !== "tuning" && key !== "projectileSlots" && key !== "restingGroups") foldValue(fold.lanes, floorMod(base * 31 + keyHash(key), MODULUS), fighter[key], 0);
+      const hash = fieldHash(key);
+      if (hash >= 0 && key !== "tuning" && key !== "projectileSlots" && key !== "restingGroups") foldValue(fold.lanes, floorMod(base * 31 + hash, MODULUS), fighter[key], 0);
       remaining--;
     }
   }

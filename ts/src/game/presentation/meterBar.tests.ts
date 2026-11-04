@@ -1,14 +1,13 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { ULTIMATE_METER_FRAMES } from "../sim/meter";
-import { meterDisplay, ultimatePulse } from "./meterBar";
+import { meterPulse, ultimateFill, ultimatePulse } from "./meterBar";
 
 test("the ultimate bar fills with the meter and pulses only when the ultimate is ready [k2 property]", () => {
   for (const frames of [0, 1800, 3600, 7200]) {
-    const display = meterDisplay(frames, false, 0);
-    assertEquals(display.ultimateBar.fill, frames / ULTIMATE_METER_FRAMES);
-    assertEquals(display.ultimateBar.pulse, 0);
+    assertEquals(ultimateFill(frames), frames / ULTIMATE_METER_FRAMES);
+    assertEquals(meterPulse(false, 0), 0);
   }
-  assertTrue(meterDisplay(ULTIMATE_METER_FRAMES, true, 7).ultimateBar.pulse > 0);
+  assertTrue(meterPulse(true, 7) > 0);
 });
 
 test("the ultimate pulse breathes between a dim and a bright level on a fixed cycle and never reads zero [k2 property]", () => {

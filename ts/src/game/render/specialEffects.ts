@@ -230,16 +230,13 @@ export class SpecialEffects {
   private presentImmolationSound(fighter: Readonly<Fighter>, slot: SpecialSlot, lit: boolean, out: boolean): void {
     const x = this.origin.x + fighter.motion.x;
     const z = this.origin.z + fighter.motion.z;
-    const play = (label: string): void => {
-      this.sounds.playAt(SoundKind.label, label, x, this.origin.y, z);
-    };
     if (lit) {
-      play(IMMOLATE_SOUNDS.start);
+      this.sounds.playAt(SoundKind.label, IMMOLATE_SOUNDS.start, x, this.origin.y, z);
       setSoundPosition(slot.immolationLoop, x, this.origin.y, z);
       playSound(slot.immolationLoop);
     } else if (out) {
       stopSound(slot.immolationLoop, false, true);
-      play(IMMOLATE_SOUNDS.end);
+      this.sounds.playAt(SoundKind.label, IMMOLATE_SOUNDS.end, x, this.origin.y, z);
     } else if (fighter.special.action === SpecialAction.demonHunterImmolate) {
       setSoundPosition(slot.immolationLoop, x, this.origin.y, z);
     }

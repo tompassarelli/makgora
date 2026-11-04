@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import { type MeterFeedback, advanceMeterFeedback, meterDisplay, meterDrainLit, meterFeedback } from "../presentation/meterBar";
+import { type MeterFeedback, advanceMeterFeedback, meterDrainLit, meterFeedback, meterPulse, ultimateFill } from "../presentation/meterBar";
 import type { PlateRect } from "./plateLayout";
 import { createBackdrop } from "./frames";
 import { PANEL_TEXTURE } from "./hudLayout";
@@ -115,17 +115,17 @@ export class MeterBar {
       this.drainShown = drain;
       setFrameVisible(this.drain, drain);
     }
-    const display = meterDisplay(ultimate, ultimateReady, this.tick);
-    const pulse = shown ? display.ultimateBar.pulse : 0;
+    const pulse = shown ? meterPulse(ultimateReady, this.tick) : 0;
     if (pulse !== this.shownPulse) {
       this.shownPulse = pulse;
       setFrameVisible(this.ultimatePulse, pulse > 0);
       if (pulse > 0) setFrameAlpha(this.ultimatePulse, pulse);
     }
     if (!shown) return;
-    if (display.ultimateBar.fill === this.shownUltimate) return;
-    this.shownUltimate = display.ultimateBar.fill;
-    setFrameSize(this.ultimateFill, Math.max(LINE_WIDTH, this.barWidth * display.ultimateBar.fill), this.barHeight);
+    const fill = ultimateFill(ultimate);
+    if (fill === this.shownUltimate) return;
+    this.shownUltimate = fill;
+    setFrameSize(this.ultimateFill, Math.max(LINE_WIDTH, this.barWidth * fill), this.barHeight);
   }
 
   destroy(): void {

@@ -238,7 +238,9 @@ export function drawStage(s: ShellState): void {
 }
 
 function presentWind(s: ShellState, stage: number, frame: number): void {
-  for (const [index, effect] of s.stageWind.entries()) {
+  const wind = s.stageWind;
+  for (let index = 0; index < wind.length; index++) {
+    const effect = at(wind, index);
     const streak = windStreak(stage, frame, index);
     if (streak === undefined) {
       hideEffect(effect, s.origin);

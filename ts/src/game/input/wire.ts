@@ -17,6 +17,13 @@ import { type Direction, type InputRow, copyInput, emptyInput, isInputRow, predi
 
 export const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
 
+const DIGIT_TEXT: string[] = [];
+const DIGIT_VALUE: Record<number, number> = {};
+for (let index = 0; index < ALPHABET.length; index++) {
+  DIGIT_TEXT.push(ALPHABET.charAt(index));
+  DIGIT_VALUE[ALPHABET.charCodeAt(index)] = index;
+}
+
 
 export const INPUT_LAST_FRAME = 2147483646;
 const MAX_EPOCH = 2147483647;
@@ -39,7 +46,7 @@ const Flag = { held: 1, edges: 2, axes: 4, triggers: 8, metadata: 16, throws: 32
 const NARROW_ACTIONS = 64 * 64 * 64 - 1;
 
 
-const validPacket = (epoch: number, firstFrame: number, rows: number) => epoch >= 0 && firstFrame >= 1 && firstFrame <= INPUT_LAST_FRAME
+export const validPacket = (epoch: number, firstFrame: number, rows: number) => epoch >= 0 && firstFrame >= 1 && firstFrame <= INPUT_LAST_FRAME
   && (rows === 1 || rows === 2) && firstFrame <= INPUT_LAST_FRAME - (rows - 1);
 
 export function inputPacket(epoch: number, firstFrame: number, rows: readonly InputRow[]): InputPacket | undefined {
@@ -59,7 +66,7 @@ function digits(value: number, width: number): string {
   let text = "";
   let remaining = value;
   for (let i = 0; i < width; i++) {
-    text = ALPHABET[remaining & 63] + text;
+    text = at(DIGIT_TEXT, remaining & 63) + text;
     remaining = floorDiv(remaining, 64);
   }
   return text;
@@ -71,7 +78,7 @@ function varint(value: number): string {
   do {
     const payload = remaining & 31;
     remaining = floorDiv(remaining, 32);
-    text += ALPHABET[payload | (remaining > 0 ? 32 : 0)];
+    text += at(DIGIT_TEXT, payload | (remaining > 0 ? 32 : 0));
   } while (remaining > 0);
   return text;
 }
@@ -94,28 +101,45 @@ function edgeGroup(pressed: number, released: number): string {
 function encodeRecord(row: Readonly<InputRow>): string {
   let flags = 0;
   let body = "";
-  const group = (flag: number, text: string) => {
-    flags |= flag;
-    body += text;
-  };
-  if (row.held !== 0) group(Flag.held, heldGroup(row.held));
-  if (row.pressed !== 0 || row.released !== 0) group(Flag.edges, edgeGroup(row.pressed, row.released));
+  if (row.held !== 0) {
+    flags |= Flag.held;
+    body += heldGroup(row.held);
+  }
+  if (row.pressed !== 0 || row.released !== 0) {
+    flags |= Flag.edges;
+    body += edgeGroup(row.pressed, row.released);
+  }
   const axes = signedDigit(row.axisX) * 255 + signedDigit(row.axisZ);
-  if (axes !== 0) group(Flag.axes, digits(axes, 3));
+  if (axes !== 0) {
+    flags |= Flag.axes;
+    body += digits(axes, 3);
+  }
   const triggers = row.triggerLeft * 256 + row.triggerRight;
-  if (triggers !== 0) group(Flag.triggers, digits(triggers, 3));
+  if (triggers !== 0) {
+    flags |= Flag.triggers;
+    body += digits(triggers, 3);
+  }
 
   const metadata = directionDigit(row.specialX) + 3 * directionDigit(row.specialZ)
     + 9 * directionDigit(row.dodgeX) + 27 * directionDigit(row.dodgeZ)
     + 81 * directionDigit(row.sdiX) + 243 * directionDigit(row.sdiZ) + 729 * directionDigit(row.ledgeVertical);
-  if (metadata !== 0) group(Flag.metadata, digits(metadata, 2));
+  if (metadata !== 0) {
+    flags |= Flag.metadata;
+    body += digits(metadata, 2);
+  }
   const throws = signedDigit(row.throwX) * 255 + signedDigit(row.throwZ);
-  if (throws !== 0) group(Flag.throws, digits(throws, 3));
+  if (throws !== 0) {
+    flags |= Flag.throws;
+    body += digits(throws, 3);
+  }
   return digits(flags, 1) + body;
 }
 
 export function encodePacket(packet: InputPacket): string {
-  return `I4${digits(packet.rows.length, 1)}${varint(packet.epoch)}${varint(packet.firstFrame)}${packet.rows.map((row) => encodeRecord(row)).join("")}`;
+  const { rows } = packet;
+  let records = "";
+  for (let index = 0; index < rows.length; index++) records += encodeRecord(at(rows, index));
+  return `I4${digits(rows.length, 1)}${varint(packet.epoch)}${varint(packet.firstFrame)}${records}`;
 }
 
 
@@ -138,8 +162,8 @@ class Reader {
 
   digit(): number | undefined {
     if (this.offset >= this.text.length) return undefined;
-    const value = ALPHABET.indexOf(this.text.charAt(this.offset));
-    if (value < 0) return undefined;
+    const value = DIGIT_VALUE[this.text.charCodeAt(this.offset)];
+    if (value === undefined) return undefined;
     this.offset++;
     return value;
   }

@@ -147,8 +147,8 @@ const GROUND_KNOCKBACK_FRICTION_MULTIPLIER = 1.0;
 export function applyMeleeGravity(f: Fighter, share = 1.0): void {
   const velocity = retainedOriginal(f.motion.meleeVelocityZ, f.motion.vz);
   const { gravity, terminalSpeed: terminal } = termsOfPhysics(f.tuning.physics);
-  const shared = (value: number): number => share === 1.0 || velocity > 0.0 ? value : multiplyFloat32(value, share);
-  setMeleeVerticalVelocity(f, max(-heavyFall(f, shared(terminal)), subtractFloat32(velocity, heavyFall(f, shared(gravity)))));
+  const full = share === 1.0 || velocity > 0.0;
+  setMeleeVerticalVelocity(f, max(-heavyFall(f, full ? terminal : multiplyFloat32(terminal, share)), subtractFloat32(velocity, heavyFall(f, full ? gravity : multiplyFloat32(gravity, share)))));
 }
 
 export function moveMeleeVerticalVelocity(f: Fighter): void {

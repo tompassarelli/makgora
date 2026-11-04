@@ -136,6 +136,7 @@ export interface UiObjects {
 
   classic?: ClassicPresentation;
   bossPlate?: BossPlate;
+  controlHits?: Slots<MenuControlHit>;
 }
 
 
@@ -439,9 +440,10 @@ export function settingsOpen(s: Readonly<ShellState>, slot: ParticipantSlot): bo
 
 
 export function menuControlHit(ui: UiObjects, slot: ParticipantSlot): MenuControlHit {
-  return { over(x: number, y: number): boolean { const settings = ui.settings[slot].over(x, y), pause = ui.pause.over(x, y), screen = ui.pauseScreen.over(x, y), results = ui.results.over(x, y);
+  ui.controlHits ??= each((owner): MenuControlHit => ({ over(x: number, y: number): boolean { const settings = ui.settings[owner].over(x, y), pause = ui.pause.over(x, y), screen = ui.pauseScreen.over(x, y), results = ui.results.over(x, y);
     return settings || pause || screen || results;
-  } };
+  } }));
+  return ui.controlHits[slot];
 }
 
 

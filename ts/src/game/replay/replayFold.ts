@@ -34,6 +34,16 @@ export function fieldName(key: unknown): key is string {
 }
 
 
+const FIELD_HASHES: Record<string, number> = {};
+
+export function fieldHash(key: unknown): number {
+  const known = FIELD_HASHES[key as string];
+  if (known !== undefined) return known;
+  const hash = fieldName(key) ? keyHash(key) : -1;
+  FIELD_HASHES[key as string] = hash;
+  return hash;
+}
+
 export const firstCoefficient = (key: number) => key + 1;
 
 export const secondCoefficient = (key: number) => floorMod(key * 7 + 3, MODULUS) + 1;
@@ -114,17 +124,21 @@ export function foldNumber(lanes: Lanes, key: number, value: number): void {
 export const isFields = (value: unknown): value is Readonly<Record<string, unknown>> => typeof value === "object" && value !== null;
 
 export function foldValue(lanes: Lanes, key: number, value: unknown, depth: number): void {
-  if (typeof value === "number") foldNumber(lanes, key, value);
-  else if (typeof value === "boolean") foldInteger(lanes, booleanKey(key), value ? 1 : 0);
-  else if (typeof value === "object" && value !== null && depth < 2) foldFields(lanes, key, value, depth + 1);
+  const kind = typeof value;
+  if (kind === "number") foldNumber(lanes, key, value as number);
+  else if (kind === "boolean") foldInteger(lanes, booleanKey(key), value === true ? 1 : 0);
+  else if (kind === "object" && value !== null && depth < 2) foldRecord(lanes, key, value as Readonly<Record<string, unknown>>, depth + 1);
 }
 
 
 export function foldFields(lanes: Lanes, parent: number, record: unknown, depth: number): void {
-  if (!isFields(record)) return;
-  const fields = record;
+  if (isFields(record)) foldRecord(lanes, parent, record, depth);
+}
+
+function foldRecord(lanes: Lanes, parent: number, fields: Readonly<Record<string, unknown>>, depth: number): void {
   for (const key in fields) {
-    if (!fieldName(key) || (depth === 0 && (key === "tuning" || key === "projectileSlots" || key === "restingGroups"))) continue;
-    foldValue(lanes, floorMod(parent * 31 + keyHash(key), MODULUS), fields[key], depth);
+    const hash = fieldHash(key);
+    if (hash < 0 || (depth === 0 && (key === "tuning" || key === "projectileSlots" || key === "restingGroups"))) continue;
+    foldValue(lanes, floorMod(parent * 31 + hash, MODULUS), fields[key], depth);
   }
 }

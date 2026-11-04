@@ -191,11 +191,15 @@ export type MenuHover = "tile" | "control";
 export const menuHover = (drawn: boolean, overControl: boolean, overTile: boolean): MenuHover | undefined => drawn && overControl ? "control" : overTile ? "tile" : undefined;
 
 // The gauntlet replaces the stock cursor on character select and the bullseye does on stage select; the stock cursor, which the map draws as the gauntlet, only returns where neither is drawn or while a Warcraft menu is open over them. The pointing hand shows over a clickable control; the open hand shows over a roster tile and rests in every menu panel, while the select screen rests on the pointing hand.
-export const menuCursor = (cursorAllowed: boolean, cursorDrawn: boolean, holdingChip: boolean, hover: MenuHover | undefined, panelResting: boolean, stageSelect: boolean, warcraftMenuOpen: boolean): MenuCursor => ({
-  hand: !cursorDrawn || stageSelect || warcraftMenuOpen ? undefined : holdingChip ? "pinch" : hover === "control" ? "point" : hover === "tile" || panelResting ? "fan" : "point",
-  bullseye: cursorDrawn && stageSelect && !warcraftMenuOpen,
-  stock: warcraftMenuOpen || (cursorAllowed && !cursorDrawn),
-});
+// Preallocated: the select panel asks every update, in matches too, and reads the cursor before the next call.
+const CURSOR: { -readonly [K in keyof MenuCursor]: MenuCursor[K] } = { hand: undefined, bullseye: false, stock: false };
+
+export function menuCursor(cursorAllowed: boolean, cursorDrawn: boolean, holdingChip: boolean, hover: MenuHover | undefined, panelResting: boolean, stageSelect: boolean, warcraftMenuOpen: boolean): MenuCursor {
+  CURSOR.hand = !cursorDrawn || stageSelect || warcraftMenuOpen ? undefined : holdingChip ? "pinch" : hover === "control" ? "point" : hover === "tile" || panelResting ? "fan" : "point";
+  CURSOR.bullseye = cursorDrawn && stageSelect && !warcraftMenuOpen;
+  CURSOR.stock = warcraftMenuOpen || (cursorAllowed && !cursorDrawn);
+  return CURSOR;
+}
 
 // F10 wakes Warcraft's cursor from the key event itself, since a single-player Game Menu stops the map's timers and no update runs until it closes; the wake holds until the menu's frames are seen or this many updates pass.
 export const GAME_MENU_WAKE_UPDATES = 30;

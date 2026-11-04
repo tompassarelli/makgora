@@ -265,6 +265,11 @@ function observationFrames(game: Readonly<MatchState>, skill: CpuSkill): number 
  * The computer in `slot` plays its resolved identity and tier under the match seed. Correcting
  * human movement also corrects every computer decision derived from it.
  */
+function heldBy(memory: Readonly<BotMemory>, slot: ParticipantSlot, target: Readonly<Fighter>, frame: number, reactionFrames: number): ParticipantSlot | undefined {
+  for (const candidate of PARTICIPANT_SLOTS) if (candidate !== slot && perceivedHeldFighter(memory, candidate, frame, reactionFrames) === target) return candidate;
+  return undefined;
+}
+
 export function produceComputerInput(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, slot: ParticipantSlot, frame: number, input: Controls, commands: AttackBuffer, skillOverride?: CpuSkill): TechnicalOutcome {
   useMatchSeed(game.matchSeed);
   const opponent = game.cpuResolvedOpponents[slot];
@@ -279,7 +284,7 @@ export function produceComputerInput(game: Readonly<MatchState>, world: Roster, 
   const strategy = runtime.botStrategies[slot];
   if (target !== undefined) {
     const ownObserved = perceivedHeldFighter(runtime.botMemory, slot, frame, reactionFrames);
-    const opponent = PARTICIPANT_SLOTS.find(candidate => candidate !== slot && perceivedHeldFighter(runtime.botMemory, candidate, frame, reactionFrames) === target);
+    const opponent = heldBy(runtime.botMemory, slot, target, frame, reactionFrames);
     if (ownObserved !== undefined && opponent !== undefined) learnBotHabit(strategy, ownObserved, target, opponent, frame - reactionFrames, skill.decision);
     prepareBotRead(strategy, fighter, target, frame, reactionFrames, skill.decision);
   }

@@ -497,11 +497,18 @@ function originalActiveFrame(action: number, grounded: boolean): number {
 }
 
 
+const ORIGINAL_WINDOWS: Record<number, CueWindows> = {};
+
 export function originalCueWindows(action: number, grounded: boolean): CueWindows {
+  const key = action * 2 + (grounded ? 1 : 0);
+  const known = ORIGINAL_WINDOWS[key];
+  if (known !== undefined) return known;
   const first = originalActiveFrame(action, grounded);
   const authoredLast = action === SpecialAction.demonHunterFelRush ? FEL_RUSH_LAST
     : action === SpecialAction.demonHunterImmolate ? DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE - 1 : first;
-  return { startup: { first: 1, last: Math.max(1, first - 1) }, active: { first, last: Math.max(authoredLast, first + ACTIVE_CUE_FRAMES - 1) } };
+  const windows: CueWindows = { startup: { first: 1, last: Math.max(1, first - 1) }, active: { first, last: Math.max(authoredLast, first + ACTIVE_CUE_FRAMES - 1) } };
+  ORIGINAL_WINDOWS[key] = windows;
+  return windows;
 }
 
 
@@ -566,10 +573,27 @@ function originalCueSource(fighter: Readonly<Fighter>, action: number): CueSourc
   return CUE_SOURCE;
 }
 
+interface PhaseStates {
+  readonly active: CueState;
+  readonly startup: CueState;
+  readonly none: CueState;
+}
+
+const PHASE_STATES = new Map<MoveCues, PhaseStates>();
+
+function phaseStates(cues: MoveCues): PhaseStates {
+  const known = PHASE_STATES.get(cues);
+  if (known !== undefined) return known;
+  const states: PhaseStates = { active: { cues, phase: "active" }, startup: { cues, phase: "startup" }, none: { cues, phase: "none" } };
+  PHASE_STATES.set(cues, states);
+  return states;
+}
+
 function cuePhase(cues: MoveCues, windows: CueWindows, frame: number): CueState {
-  if (frame >= windows.active.first && frame <= windows.active.last) return { cues, phase: "active" };
-  if (frame >= windows.startup.first && frame <= windows.startup.last) return { cues, phase: "startup" };
-  return { cues, phase: "none" };
+  const states = phaseStates(cues);
+  if (frame >= windows.active.first && frame <= windows.active.last) return states.active;
+  if (frame >= windows.startup.first && frame <= windows.startup.last) return states.startup;
+  return states.none;
 }
 
 

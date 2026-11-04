@@ -36,10 +36,4 @@ export const ultimatePulse = (tick: number): number => {
   return PULSE_FLOOR + PULSE_RISE * (step < PULSE_STEPS / 2 ? step : PULSE_STEPS - step);
 };
 
-export interface MeterDisplay {
-  readonly ultimateBar: { readonly fill: number; readonly pulse: number };
-}
-
-export const meterDisplay = (ultimate: number, ultimateReady: boolean, tick: number): MeterDisplay => ({
-  ultimateBar: { fill: ultimateFill(ultimate), pulse: ultimateReady ? ultimatePulse(tick) : 0 },
-});
+export const meterPulse = (ultimateReady: boolean, tick: number): number => (ultimateReady ? ultimatePulse(tick) : 0);
