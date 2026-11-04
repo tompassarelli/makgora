@@ -629,7 +629,7 @@ jobs:
             echo "main moved to ${main:0:10} only on paths the train doesn't change or generated records it regenerates or merges: the tested tree lands rebased onto it as ${SHA:0:10}" >> "$GITHUB_STEP_SUMMARY"
           fi
           mkdir -p "$RUNNER_TEMP/autoland"
-          cp ts/scripts/autoland.ts ts/scripts/autolandCore.ts "$RUNNER_TEMP/autoland/"
+          cp ts/scripts/autoland.ts ts/scripts/autolandCore.ts ts/scripts/autolandRebase.ts "$RUNNER_TEMP/autoland/"
           late_cli="$RUNNER_TEMP/autoland/autoland.ts"
           solo_sha="$SHA"
           if [ -n "$TRAIN" ] && [ "${#branches[@]}" = 1 ]; then
