@@ -170,7 +170,7 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`). `-dev hi
   lines (a before/after capture judged by eye, such as `test/native/captures/shield-cap`)
   plans as its held capture frames reached, with no verdict.
 - Voice budget (#30): `bun wisp map build --profile voice-check --out MAP.w3x`
-  starts four Wren Expert computers over three stocks and two minutes as soon
+  starts four Wren Warchief computers over three stocks and two minutes as soon
   as fighter selection opens, paints the drawn stamp on every match frame, and
   at the match's end writes `makgora-voice-log.txt`: each admitted combat
   voice with its frame, the frame drawn that tick, fighter, class, voice slot,
@@ -183,7 +183,7 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`). `-dev hi
   of non-hit voices with no other voice within 150 ms, lies within one frame of the
   moment its frame was drawn.
 - Trailer footage (#363): `bun wisp map build --profile trailer` plays every
-  shot in `src/game/session/trailerShots.ts` in turn as the same seeded Expert
+  shot in `src/game/session/trailerShots.ts` in turn as the same seeded Warchief
   computer match `bun scripts/playtest.ts --repro SEED` plays headless
   (`fieldMatch`), up to the shot's end frame, with the drawn stamp on every
   frame. It plays the shipped pool-predicted match and holds every simulated

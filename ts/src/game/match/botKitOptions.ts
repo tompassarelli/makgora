@@ -241,7 +241,7 @@ function ultimateBaseZ(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>, st
 export function pressUltimate(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, stageFrame: number, skill: CpuSkill, frame: number, input: Controls): boolean {
   const reach = ULTIMATE_REACH[f.character];
   const move = f.tuning.ultimate;
-  if (reach === undefined || move === undefined || reach.far <= 0.0 || skill.tier === "rookie" || skill.kitTenths <= 0) return false;
+  if (reach === undefined || move === undefined || reach.far <= 0.0 || skill.tier === "peon" || skill.kitTenths <= 0) return false;
   if (!ultimateCharged(f) || !canAttack(f) || f.special.action !== SpecialAction.none || f.launch.hitstun > 0) return false;
   const base = ultimateBaseZ(f, move, stage, stageFrame);
   if (base === undefined) return false;

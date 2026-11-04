@@ -256,7 +256,7 @@ export function prepareQuickMatch(game: MatchState, stage = 0, character?: Chara
   const defaults = createMatchState().characterChoices;
   if (game.humanCount === 1 && game.humanFighterMask === game.humanMask && game.computerMask === 0) {
     const partner = PARTICIPANT_SLOTS.find(slot => !humanFighterActive(game, slot));
-    if (partner !== undefined) prepareQuickCpu(game, { opponent: "wren", tier: "rookie" }, typeof character === "number" ? character : character?.[partner] ?? defaults[partner]);
+    if (partner !== undefined) prepareQuickCpu(game, { opponent: "wren", tier: "peon" }, typeof character === "number" ? character : character?.[partner] ?? defaults[partner]);
   }
   for (const slot of PARTICIPANT_SLOTS) {
     if (humanFighterActive(game, slot) && humanPresent(game, slot)) selectCharacter(game, slot, typeof character === "number" ? character : character?.[slot] ?? defaults[slot], offeredMatchCharacter);
@@ -403,7 +403,7 @@ export function prepareQuickPromo(game: MatchState, pair: readonly [Character, C
     while (computerActive(game, slot) !== wanted || (!wanted && humanFighterActive(game, slot))) cycleSlotMode(game, first, slot);
     if (wanted) {
       setCpuOpponent(game, first, slot, "wren");
-      setCpuTier(game, first, slot, "expert");
+      setCpuTier(game, first, slot, "warchief");
       selectCpuCharacter(game, first, slot, pair[slot === 0 ? 0 : 1], offeredMatchCharacter);
     }
   }

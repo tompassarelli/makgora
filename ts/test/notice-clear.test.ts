@@ -52,7 +52,7 @@ function holdNoticeClear(stage: number): void {
   const client = clients.client(0);
   clients.start();
   clients.frames(120);
-  clients.chat(0, `-dev quick cpu wren expert hero illidan stage ${stage} hold`);
+  clients.chat(0, `-dev quick cpu wren warchief hero illidan stage ${stage} hold`);
   let phase = -1;
   for (let frame = 0; frame < 600 && phase !== Phase.match; frame++) {
     clients.frames(1);
@@ -90,7 +90,7 @@ test("the start-hold line on Durotar Skies shares no rectangle with a fighter's 
 test("the start-hold line on Tomb of Sargeras shares no rectangle with a fighter's damage, percent or name tag, the clock or the countdown [k1 scenario]", () => holdNoticeClear(7), 60000);
 
 test("a quick CPU command takes an optional stage and hold in either spelling of the match without changing its fighter or profile [k1 scenario]", () => {
-  const plain = "-dev quick cpu wren expert hero illidan";
+  const plain = "-dev quick cpu wren warchief hero illidan";
   expect(quickMatchCpuStage(plain)).toBeUndefined();
   expect(quickMatchCpuStage(`${plain} stage 7`)).toBe(7);
   expect(quickMatchCpuStage(`${plain} stage 3 hold`)).toBe(3);
@@ -98,7 +98,7 @@ test("a quick CPU command takes an optional stage and hold in either spelling of
   expect(quickMatchCpuHold(plain)).toBe(false);
   expect(quickMatchCpuHold(`${plain} stage 3 hold`)).toBe(true);
   for (const message of [plain, `${plain} stage 3`, `${plain} stage 3 hold`, `${plain} hold`]) {
-    expect(quickMatchCpuProfile(message)).toEqual({ opponent: "wren", tier: "expert" });
+    expect(quickMatchCpuProfile(message)).toEqual({ opponent: "wren", tier: "warchief" });
     expect(quickMatchCpuHero(message)).toBe(quickMatchCpuHero(plain));
   }
   expect(quickMatchCpuHero(plain)).toBeDefined();

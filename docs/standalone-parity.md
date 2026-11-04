@@ -44,7 +44,7 @@ the box that fixes it or the reason it stays. It blocks the player build
 
 - **Entry path.** The standalone window never shows the title, fighter
   selection or settings menus: `createStandaloneSession` runs the developer
-  command `-dev quick cpu wren expert hero illidan` (or the four-fighter setup)
+  command `-dev quick cpu wren warchief hero illidan` (or the four-fighter setup)
   and throws "standalone match did not start" unless the match phase begins
   (makgora:ts/scripts/wisp/standalone.ts). Check: read that function; the
   lobby, selection and settings frames in `ts/src/game/ui/` run in the Warcraft

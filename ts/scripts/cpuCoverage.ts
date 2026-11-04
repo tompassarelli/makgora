@@ -9,5 +9,5 @@ console.log("| Fighter | Matches | Moving frames | Attacks | Kit starts/branches
 console.log("|---|---:|---:|---:|---:|---|---:|---:|---:|---:|---|");
 for (const r of reports) console.log(`| ${r.fighter} | ${r.matches} | ${r.movement} | ${r.attacks} | ${r.kit} | ${Object.values(r.specials).join("/")} | ${r.defense} | ${r.recovery} | ${r.defenseDecisions} | ${r.recoveryDecisions} | ${r.missing.join(", ") || "none"} |`);
 const inactive = reports.filter(report => report.missing.length > 0);
-console.log(`${reports.length} of ${SELECTABLE_CHARACTERS.length} selectable fighters, ${reports.reduce((sum, report) => sum + report.matches, 0)} seeded Wren Expert matches, ${inactive.length} inactive fighters`);
+console.log(`${reports.length} of ${SELECTABLE_CHARACTERS.length} selectable fighters, ${reports.reduce((sum, report) => sum + report.matches, 0)} seeded Wren Warchief matches, ${inactive.length} inactive fighters`);
 process.exitCode = inactive.length > 0 ? 1 : 0;

@@ -65,7 +65,7 @@ const NO_HIT_FRAMES = 3 * MATCH_TICKS_PER_SECOND;
 
 
 
-export const BALANCE_GATE = { fieldLow: 0.45, fieldHigh: 0.55, opponent: "wren", tier: "expert", perPair: 400 } as const;
+export const BALANCE_GATE = { fieldLow: 0.45, fieldHigh: 0.55, opponent: "wren", tier: "warchief", perPair: 400 } as const;
 
 const MATCHUP_LOW = BALANCE_SPEC.matchupLow;
 const MATCHUP_HIGH = BALANCE_SPEC.matchupHigh;
@@ -394,7 +394,7 @@ export function openFieldMatch(a: Character, b: Character, stageName: string, va
 
   if (xs.some((x) => x <= mainDeckLeft(stage) + 40 || x >= mainDeckRight(stage) - 40)) return undefined;
   const opponents = options.opponents ?? ["wren", "wren"];
-  const tiers = options.tiers ?? ["expert", "expert"];
+  const tiers = options.tiers ?? ["warchief", "warchief"];
   const { match, world } = fieldMatch(a, b, { stage, seed, shift, opponents, tiers, stocks: options.stocks, minutes: options.minutes, orbs: options.orbs });
   const controls = options.bufferedAttacks === true ? createBufferedFrameControls() : createFrameControls();
   const produced = options.bufferedAttacks === true ? createBufferedFrameControls() : createFrameControls();
@@ -1101,7 +1101,7 @@ function fieldTable(summaries: readonly FighterSummary[], records: readonly Matc
   const cell = (s: FighterSummary, name: string) => (name === s.fighter ? "-" : `${percent(s.against[name] ?? Number.NaN)} (${s.played[name] ?? 0})`);
   for (const s of summaries) lines.push(`| ${s.fighter} | ${names.map((name) => cell(s, name)).join(" | ")} |`);
   const report = matchupReport(summaries);
-  const verdict = balanceVerdict(summaries, records.flatMap((record) => record.opponents.map((opponent, index) => ({ opponent, tier: record.tiers[index] ?? "expert" }))), report.smallestPlayed);
+  const verdict = balanceVerdict(summaries, records.flatMap((record) => record.opponents.map((opponent, index) => ({ opponent, tier: record.tiers[index] ?? "warchief" }))), report.smallestPlayed);
   const { fieldLow, fieldHigh, opponent, tier, perPair } = BALANCE_GATE;
   lines.push(
     "",
@@ -1176,7 +1176,7 @@ export function balanceTables(summaries: readonly FighterSummary[], probes: Read
   const { winLow, winHigh, spamMax, topMoveMax } = BALANCE_SPEC;
   lines.push(
     "",
-    `Gate (balance.md: win rate ${share(winLow)}-${share(winHigh)}, spam probe at most ${share(spamMax)} against Expert, no move over ${share(topMoveMax)} of damage but a profile's signature move) and balance score (percentage points outside each target, weighted; potential openings per kill and recovery come from their own tools):`,
+    `Gate (balance.md: win rate ${share(winLow)}-${share(winHigh)}, spam probe at most ${share(spamMax)} against Warchief, no move over ${share(topMoveMax)} of damage but a profile's signature move) and balance score (percentage points outside each target, weighted; potential openings per kill and recovery come from their own tools):`,
     "",
     "| Fighter | Archetype | Spam probe (move, win rate, matches) | Gate | Score | Win | Profile | Variety | Top move | Probe | Openings | Recovery | Profile misses |",
     "| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
@@ -1307,7 +1307,7 @@ if (import.meta.main) {
   if (opponents !== undefined && opponents.length !== 2) throw new Error("--opponents takes two names");
   const options: FieldOptions = {
     variants: Number(values.variants ?? 1), seeds: Number(values.seeds ?? 1), seedOffset: Number(values["seed-offset"] ?? 0), stocks: Number(values.stocks ?? 3), minutes: Number(values.minutes ?? 4),
-    ...(tiers === undefined ? {} : { tiers: [tiers[0] ?? "expert", tiers[1] ?? "expert"] as const }),
+    ...(tiers === undefined ? {} : { tiers: [tiers[0] ?? "warchief", tiers[1] ?? "warchief"] as const }),
     ...(opponents === undefined ? {} : { opponents: [opponents[0] ?? "wren", opponents[1] ?? "wren"] as const }),
     ...(fighters === undefined ? {} : { fighters }),
     ...(pairs === undefined ? {} : { pairs }),
@@ -1339,7 +1339,7 @@ if (import.meta.main) {
   });
   const summaries = summarizeField(records);
   if (merged !== undefined) console.log(`Merged from ${values.merge}; the line below describes this command's options, not the shards'.`);
-  console.log(`${records.length} computer matches (${options.stocks} stocks, ${options.minutes}-minute clock, ${options.perPair === undefined ? `${options.variants} spawn variant(s) of ${options.seeds} seed(s) per ordered pair and stage` : `spawn variants and ${options.seeds} seed(s) each until each pair has ${options.perPair} matches`}, computer tiers ${(options.tiers ?? ["expert", "expert"]).join(" and ")}), ${((performance.now() - started) / 1000).toFixed(0)} s; win rate over decisive matches; a self-destruct is a stock lost with no hit taken since the fighter last stood on a deck or held the ledge; the fall-time column counts stocks lost over ${NO_HIT_FRAMES / MATCH_TICKS_PER_SECOND} s after the last hit.`);
+  console.log(`${records.length} computer matches (${options.stocks} stocks, ${options.minutes}-minute clock, ${options.perPair === undefined ? `${options.variants} spawn variant(s) of ${options.seeds} seed(s) per ordered pair and stage` : `spawn variants and ${options.seeds} seed(s) each until each pair has ${options.perPair} matches`}, computer tiers ${(options.tiers ?? ["warchief", "warchief"]).join(" and ")}), ${((performance.now() - started) / 1000).toFixed(0)} s; win rate over decisive matches; a self-destruct is a stock lost with no hit taken since the fighter last stood on a deck or held the ledge; the fall-time column counts stocks lost over ${NO_HIT_FRAMES / MATCH_TICKS_PER_SECOND} s after the last hit.`);
   console.log("");
   console.log(fieldTable(summaries, records));
   console.log(edgePlayLines(records).join("\n"));

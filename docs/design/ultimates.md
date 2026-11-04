@@ -185,7 +185,7 @@ Frames count from the input frame (frame 1 is the first frame after it).
   mark clears on landing so the grounded rules apply from then on.
 - Computer fighters press it at a full ultimate meter when the target is inside the
   move's authored reach (ULTIMATE_REACH), as often as their kit options;
-  Rookie never does, Lich presses it at a target in the air within 600, a
+  Peon never does, Lich presses it at a target in the air within 600, a
   raised shield stops the press, and Cairne presses it at a level foe
   anywhere within 1200, the main deck's width, because his ankh lands at
   centre stage whatever the foe's distance from him. In the air

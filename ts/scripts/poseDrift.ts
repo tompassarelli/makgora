@@ -1,5 +1,5 @@
 // Usage: bun scripts/poseDrift.ts [--frames N] [--only SLUG]
-// Plays each selectable fighter through an Expert CPU match on the real fighter pool with Wisp's effect store, drawing one 1/60 s frame after every
+// Plays each selectable fighter through a Warchief CPU match on the real fighter pool with Wisp's effect store, drawing one 1/60 s frame after every
 // presentation tick as the game does, and reports how far the shown body's clock sits from the clip time the pool jumped it to (in frames), and
 // whether the shown body's global-sequence clock runs. A clip's opening frame cannot be jumped before its start, so it is counted apart and the rest must sit within 0.01 frame.
 import { parseArgs } from "node:util";

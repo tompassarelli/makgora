@@ -35,7 +35,7 @@ export function recoveryTableMarkdown(): string {
     if (profile.opening >= OPENING_MIN) options.push("reaction aerial");
     if (profile.speed <= PROJECTILE_SPEED_MAX) options.push("projectile");
     let returned = 0;
-    for (const guarder of SELECTABLE_CHARACTERS) for (let seed = 0; seed < MIXED_PLANS.length; seed++) if (guardedReturn(character, guarder, seed, "expert").recovered) returned++;
+    for (const guarder of SELECTABLE_CHARACTERS) for (let seed = 0; seed < MIXED_PLANS.length; seed++) if (guardedReturn(character, guarder, seed, "warchief").recovered) returned++;
     const name = fighterKit(character).specials[SpecialSlot.up]?.name ?? "";
     const speed = profile.speed > 200 ? `${profile.speed} (teleport)` : `${profile.speed}`;
     lines.push(`| ${fighterName(character)} | ${name} | ${profile.startup} | ${profile.intangible} | ${speed} | ${route.rise} / ${route.reach} | ${routeControl(character)} | ${profile.opening} | ${options.join(", ")} | ${returned}/${SELECTABLE_CHARACTERS.length * MIXED_PLANS.length} |`);

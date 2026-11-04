@@ -1536,7 +1536,7 @@ stay inside 32-bit integers, so Bun and Warcraft's Lua compute it alike.
   A ground attack starts only if the slide it leaves ends on the deck it
   stands on, and specials that move it (Parry Step) only with room
   to land.
-- Advanced and expert computers pass upward toward a target above and use
+- Warchief computers pass upward toward a target above and use
   full down to drop toward a target below. Computers hold down to mount a
   platform when they want to stand on it, without cancelling a rising aerial.
   Mounting intent does not replace offstage recovery. Lower tiers prefer to
@@ -2502,8 +2502,8 @@ The ledge commitment lock and the seeded win rate measurements are tracked in
 
 ### Computer corner play
 
-Advanced and Expert computers play the corner (makgora:ts/src/game/match/botCorner.ts);
-Rookie, Beginner and Intermediate play it as neutral, unchanged. The corner band
+Warchief computers play the corner (makgora:ts/src/game/match/botCorner.ts);
+Peon and Grunt play it as neutral, unchanged. The corner band
 is the outer 150 units inside each lip of the main deck. All choices read the
 delayed opponent observation, so the #354 reaction floors (14 and 16 frames)
 hold, and every draw is seeded by the match.
@@ -2523,8 +2523,8 @@ hold, and every draw is seeded by the match.
   answers (2 in 10).
 
 Measured over 200 seeded Wren corner situations per offset (ts/test/corner-cpu.test.ts):
-a cornered Expert's median stay in the band is 45 to 50 frames (84 to 102 before);
-Expert edge-cancels 0 to 4 of 17 to 27 near-ledge landings per 200 situations.
+a cornered Warchief's median stay in the band is 45 to 50 frames (84 to 102 before);
+Warchief edge-cancels 0 to 4 of 17 to 27 near-ledge landings per 200 situations.
 
 ### Ledge hang limit (#411)
 
@@ -2541,11 +2541,11 @@ Prior art: Melee, Smash 4 and Ultimate all end a long hang by time, and
 SmashWiki's Edge page lists the limits (Ultimate's is shorter than Melee's
 and falls with damage).
 
-The Expert computer contests a hanger. It stands 60 units inside the deck edge
+The Warchief computer contests a hanger. It stands 60 units inside the deck edge
 facing the ledge, and when the hanger's getup (climb or attack) begins it
 throws a forward tilt that is active as the climber stands up. Ground moves do
 not reach a fighter hanging 90 units below the deck, so the trap covers the
-getup and the hang limit ends a hanger who never moves. Test: the Expert
+getup and the hang limit ends a hanger who never moves. Test: the Warchief
 computer hits a climber within 45 frames of the getup press (input delay 4,
 climb 25, tilt startup and travel about 16).
 
@@ -2635,8 +2635,8 @@ amount never varies.
   for its orb lessons. `-dev meter N` and the tape op `test-meter SLOT PERCENT` set
   the ultimate meter to N percent.
 - **Computers** contest an orb after their reaction delay from the start of
-  the warning, choosing per orb at their judgment: Expert contests every orb,
-  Rookie about one in three (makgora:ts/src/game/match/cpuSkill.ts,
+  the warning, choosing per orb at their judgment: Warchief contests every orb,
+  Peon about one in three (makgora:ts/src/game/match/cpuSkill.ts,
   `contestTenths`). `bun scripts/campingField.ts` from ts/ plays a seeded
   field with the rule `off` and `orbs` and measures how the fighter ahead on
   stocks camps away from the centre.
@@ -2835,7 +2835,7 @@ Expert field.
 gimp and Recoil Shot opening, plus Thrall's and Warden's mixed plans. The
 sweeps check every fighter's recorded gimp, its up-special opening and its
 mixed-return rate. Open: the computer does not yet edge-guard differently at
-higher skill levels. Across the seven fighters sampled, Wren Expert and
-Intermediate killed 0 to 3 of 26 predictable recoveries per fighter. A reactive guard loses to its
+higher skill levels. Across the seven fighters sampled, Wren Warchief and
+Grunt killed 0 to 3 of 26 predictable recoveries per fighter. A reactive guard loses to its
 observation delay, so the computer side needs a read-based design. Its
 45–55% win-rate check belongs to that change.

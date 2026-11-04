@@ -8,7 +8,7 @@ export const winCountChecks = (noErrors: Rule, noImportFailures: Rule): NativeCh
   {
     id: "c46-second-match", closes: "makgora#7 C46 setup: the first Wren match ends and the rematch starts", map: "presentation", session: "c46-win-counts",
     setup: [
-      { chat: "-dev reset" }, { chat: "-dev slots 1 0" }, { chat: "-dev auto-rematch on" }, { chat: `${QUICK_CPU_COMMAND}wren expert` },
+      { chat: "-dev reset" }, { chat: "-dev slots 1 0" }, { chat: "-dev auto-rematch on" }, { chat: `${QUICK_CPU_COMMAND}wren warchief` },
       { receipt: "^SETUP phase=\\d+ human-fighters=1 computers=[1-9]\\d* .* stocks=3 ", client: "a", seconds: 10 },
       { receipt: COMPUTER_WON, client: "a", seconds: 600 },
     ],
@@ -23,6 +23,6 @@ export const winCountChecks = (noErrors: Rule, noImportFailures: Rule): NativeCh
     ],
     capture: [{ kind: "frames", name: "fighter-select-after-two", client: "a" }, { kind: "frames", name: "fighter-select-after-two", client: "b" }],
     pass: [noImportFailures, noErrors, { kind: "receipt", pattern: TWO_WINS_AT_FIGHTER_SELECT, client: "a", min: 1 }, { kind: "receipt", pattern: TWO_WINS_AT_FIGHTER_SELECT, client: "b", min: 1 }],
-    look: "Two one-sided matches against Wren Expert have ended by KO, the second through the automatic rematch; after player 1 cancels the next rematch countdown and picks fighter select from results, both clients' fighter select still holds the computer in slot 2 and shows x2 on its card and no tally on player 1's card, so each win was awarded exactly once to the fixed slot through results, rematch and the return to the menu.",
+    look: "Two one-sided matches against Wren Warchief have ended by KO, the second through the automatic rematch; after player 1 cancels the next rematch countdown and picks fighter select from results, both clients' fighter select still holds the computer in slot 2 and shows x2 on its card and no tally on player 1's card, so each win was awarded exactly once to the fixed slot through results, rematch and the return to the menu.",
   },
 ];

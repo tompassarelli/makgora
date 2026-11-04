@@ -33,7 +33,7 @@ function startMatch(s: ShellState, check: VoiceCheck): void {
   for (const slot of PARTICIPANT_SLOTS) {
     while (!computerActive(s.game, slot)) if (!cycleSlotMode(s.game, actor, slot)) return;
     setCpuOpponent(s.game, actor, slot, "wren");
-    setCpuTier(s.game, actor, slot, "expert");
+    setCpuTier(s.game, actor, slot, "warchief");
     selectCpuCharacter(s.game, actor, slot, at(SELECTABLE_CHARACTERS, slot));
   }
   setTimeLimit(s.game, actor, MATCH_MINUTES);

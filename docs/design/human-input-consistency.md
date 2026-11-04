@@ -15,8 +15,8 @@ Peach. Two-human games of at least one minute only. The dataset starts at
 platinum, so there is no data below it. Measured 9 Oct 2026. Rerun:
 makgora:tools/slippi/README.md.
 
-**Level mapping.** Master → Expert, diamond → Advanced, platinum →
-Intermediate. Beginner and Rookie have no data and keep their guesses.
+**Level mapping.** Master → Warchief and platinum → Grunt (diamond fed the removed Advanced
+tier). Peon has no data and keeps its guesses.
 
 **Reading the numbers.** Times are 60 Hz frames. Inputs are the processed
 stick and the physical buttons in each frame's pre-frame record. States are

@@ -41,7 +41,7 @@ test("a branch pushed minutes ago is kept for its dispatch, and an open pull req
   const ref = { name: "probe/vashj", tip: TIP, headMinutesAgo: 2 };
   expect(retirement(ref, [], new Set()).retire).toBe(false);
   expect(retirement({ ...ref, headMinutesAgo: 240 }, [], new Set(["probe/vashj"])).retire).toBe(false);
-  expect(retirement({ ...ref, headMinutesAgo: 240 }, [{ headBranch: "main", headSha: "c".repeat(40), title: "Balance sha probe/vashj wren expert 400 a pair x" }], new Set()).retire).toBe(false);
+  expect(retirement({ ...ref, headMinutesAgo: 240 }, [{ headBranch: "main", headSha: "c".repeat(40), title: "Balance sha probe/vashj wren warchief 400 a pair x" }], new Set()).retire).toBe(false);
 });
 
 test("a branch whose head is under 3 hours old is kept when no run uses it, and an older one is deleted, whether or not a push event survives [k1 scenario]", async () => {

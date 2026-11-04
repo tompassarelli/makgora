@@ -1,6 +1,6 @@
-# #176: Wren Expert computer behavior through a ground approach, surprise jump,
+# #176: Wren Warchief computer behavior through a ground approach, surprise jump,
 # retreat and projectile. Compare the full computer timeline with headless.
-#! chat -dev quick cpu wren expert hero Illidan
+#! chat -dev quick cpu wren warchief hero Illidan
 # Headless reference, Illidan computer on main: the level-9 computer's
 # opening hits on the ground approach and the surprise jump, on their frames:
 # 6ff360c3a7 (#279 move variety) moved them from 64 and 149: b9cce3e1ed holds both, 6ff360c3a7 does not.

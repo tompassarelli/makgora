@@ -25,7 +25,7 @@ test("two clients over Battle.net latency write r lines whose per-sender latenes
   });
   clients.start();
   clients.frames(MENU_FRAMES);
-  clients.chat(0, "-dev quick cpu wren expert");
+  clients.chat(0, "-dev quick cpu wren warchief");
   let phase = -1;
   for (let frame = 0; frame < LOBBY_FRAMES && phase !== Phase.match; frame++) {
     clients.frames(1);

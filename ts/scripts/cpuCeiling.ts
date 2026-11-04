@@ -41,13 +41,13 @@ export function ceilingRows(data: Data): CeilingRow[] {
   const slugs=SELECTABLE_CHARACTERS.map(fighterSlug);
   return slugs.filter(fighter=>plans.has(fighter)).map(fighter => {
     const plan=plans.get(fighter); if(plan===undefined)throw new Error(`${fighter}: no ceiling plan`);
-    const kinds=[...CPU_OPPONENT_IDS,"execution","judgment","ceiling-expert","advanced","ceiling-field"];
+    const kinds=[...CPU_OPPONENT_IDS,"execution","judgment","ceiling-warchief","grunt","ceiling-field"];
     const complete=kinds.every(kind=>slugs.filter(s=>s!==fighter).every(opponent=>(data.pairs[`${kind}/${fighter}/${opponent}`]??0)>=(kind==="wren"?CEILING_SPEC.wrenPerPair:CPU_OPPONENT_IDS.some(id=>id===kind)?CEILING_SPEC.panelPerPair:kind==="ceiling-field"?CEILING_SPEC.finalPerPair:CEILING_SPEC.finalPerPair)))
       && (data.counts[`depth/${fighter}`]?.played??0)>=CEILING_SPEC.depthMatches;
     const panel = { rook: rate(data,`rook/${fighter}`), ember: rate(data,`ember/${fighter}`), flint: rate(data,`flint/${fighter}`), vale: rate(data,`vale/${fighter}`), kite: rate(data,`kite/${fighter}`), wren: rate(data,`wren/${fighter}`) };
     return {fighter,path:plan.path,panel,
-      expertVsBasic:rate(data,`depth/${fighter}`),expert:rate(data,`wren/${fighter}`),execution:rate(data,`execution/${fighter}`),judgment:rate(data,`judgment/${fighter}`),
-      ceilingVsExpert:rate(data,`ceiling-expert/${fighter}`),advancedVsExpert:rate(data,`advanced/${fighter}`),ceilingVsCeiling:rate(data,`ceiling-field/${fighter}`),complete};
+      fullVsBasic:rate(data,`depth/${fighter}`),warchief:rate(data,`wren/${fighter}`),execution:rate(data,`execution/${fighter}`),judgment:rate(data,`judgment/${fighter}`),
+      ceilingVsWarchief:rate(data,`ceiling-warchief/${fighter}`),gruntVsWarchief:rate(data,`grunt/${fighter}`),ceilingVsCeiling:rate(data,`ceiling-field/${fighter}`),complete};
   });
 }
 
@@ -63,7 +63,7 @@ if (import.meta.main) await Effect.runPromise(Effect.gen(function*() {
       }
       if(values.baseline===undefined)throw new Error("--merge needs the frozen Wren --baseline field");
       const baseline=decodeRecordInput(JSON.parse(readFileSync(values.baseline,"utf8")));
-      if(!baseline.records.every(r=>r.opponents.length===2&&r.opponents.every(id=>id==="wren")&&r.tiers.length===2&&r.tiers.every(tier=>tier==="expert")&&r.skillOverrides===undefined))throw new Error("Baseline must be unmodified Wren Expert on both sides");
+      if(!baseline.records.every(r=>r.opponents.length===2&&r.opponents.every(id=>id==="wren")&&r.tiers.length===2&&r.tiers.every(tier=>tier==="warchief")&&r.skillOverrides===undefined))throw new Error("Baseline must be unmodified Wren Warchief on both sides");
       add(data,baseline.records,"wren");
       const unplanned=unplannedFighters();const table=ceilingTable(ceilingRows(data),data.cpuSeconds)+(unplanned.length===0?"":`\nLeft out, no ceiling plan yet: ${unplanned.join(", ")}.`);console.log(table);if(values.report!==undefined)writeFileSync(values.report,table+"\n");
     },catch:cause=>new CeilingFailure({problem:String(cause)})});
@@ -77,20 +77,20 @@ if (import.meta.main) await Effect.runPromise(Effect.gen(function*() {
       const pairs=(values.pairs??"").split(",").filter(Boolean).map(pair=>{const [a,b]=pair.split(":");if(a===undefined||b===undefined)throw Error(pair);return [named(a),named(b)] as const;});
       for(const pair of pairs){
         for(const id of CPU_OPPONENT_IDS.filter(id=>id!=="wren"))if(owns())add(data,playCpuField({pairs:[pair],opponents:[id,id],perPair:CEILING_SPEC.panelPerPair,seeds:100}),id);
-        const expert=cpuSkill("wren","expert");
-        const modes: readonly [string,CeilingMode][]=[["execution","execution"],["judgment","judgment"],["ceiling-expert","ceiling"],["advanced","expert"]];
+        const warchief=cpuSkill("wren","warchief");
+        const modes: readonly [string,CeilingMode][]=[["execution","execution"],["judgment","judgment"],["ceiling-warchief","ceiling"],["grunt","full"]];
         for(const [kind,mode] of modes)for(const slot of [0,1] as const){
           if(!owns())continue;
-          const skill=kind==="advanced"?cpuSkill("wren","advanced"):ceilingSkill(expert,mode);
+          const skill=kind==="grunt"?cpuSkill("wren","grunt"):ceilingSkill(warchief,mode);
           const records=playCpuField({pairs:[pair],skills:slot===0?[skill,undefined]:[undefined,skill],perPair:CEILING_SPEC.finalPerPair,seeds:100});
           add(data,records,kind,slot);
         }
-        const ceiling=ceilingSkill(expert,"ceiling");if(owns())add(data,playCpuField({pairs:[pair],skills:[ceiling,ceiling],perPair:CEILING_SPEC.finalPerPair,seeds:100}),"ceiling-field");
+        const ceiling=ceilingSkill(warchief,"ceiling");if(owns())add(data,playCpuField({pairs:[pair],skills:[ceiling,ceiling],perPair:CEILING_SPEC.finalPerPair,seeds:100}),"ceiling-field");
         console.error(`Measured ${pair.map(fighterSlug).join(":")}`);
       }
       for(const slug of (values.depth??"").split(",").filter(Boolean)){
         const c=named(slug),plan=plans.get(slug);if(plan===undefined)throw Error(slug);
-        const basic=ceilingSkill(cpuSkill("wren","expert"),"basic",plan.basicMoves);
+        const basic=ceilingSkill(cpuSkill("wren","warchief"),"basic",plan.basicMoves);
         const stages=Object.keys(FIELD_STAGES);
         for(let trial=0;trial<CEILING_SPEC.depthMatches;trial++){
           if(!owns())continue;

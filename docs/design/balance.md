@@ -30,7 +30,7 @@ together.
 ## Gate
 
 A fighter is **balanced** only when all gates hold, with both computers at
-Wren Expert:
+Wren Warchief:
 
 | Rule | Initial value |
 | --- | --- |
@@ -39,7 +39,7 @@ Wren Expert:
 | Defining archetype traits | inside the profile ranges below |
 | Kit values | within the frozen baseline bounds below |
 | Feel | block advantage keeps its sign; kill percent within ±15% of baseline |
-| Spam probe win rate against the Expert field | at most 45% |
+| Spam probe win rate against the Warchief field | at most 45% |
 | Largest single move's share of the fighter's damage | at most 40%, except its signature move |
 
 The win-rate rule is the roster's existing gate (makgora:docs/design/roster.md,
@@ -51,14 +51,14 @@ move, never the measurement.
 
 The full-roster `bun wisp farm balance` run prints the verdict as
 "Balanced (win band, spam probe, move share, matchup, archetype, fixed baseline, feel): passes" or "fails" with each
-failing fighter, rule and number; a Wren Expert run at 400 a pair fails the
+failing fighter, rule and number; a Wren Warchief run at 400 a pair fails the
 run when either this or the win-rate gate fails.
 
 ## Spam probe
 
 Each fighter's spam probe takes its top damage move from the same run's
-field (the move that dealt the most of its damage) and plays the Expert
-field attacking with that move only: the ordinary Expert computer moves,
+field (the move that dealt the most of its damage) and plays the Warchief
+field attacking with that move only: the ordinary Warchief computer moves,
 shields, dodges and recovers (an up special offstage stays), but every other
 attack, special, get-up and ledge attack it chooses is dropped. The move is
 pressed whenever it reaches, a grounded fighter runs toward its target
@@ -67,12 +67,12 @@ until it does, and an aerial is jumped for near the target
 orders on every soak stage, 40 matches a pair (800 a fighter, a 95% interval
 of about +-3.5 points), in the same farm run as the field.
 
-The spammer perceives its target as late as the Expert it plays: it reads the
+The spammer perceives its target as late as the Warchief it plays: it reads the
 target from the same observation history at the perception delay its own
-Wren Expert skill would wait (makgora:ts/scripts/spamPolicy.ts
+Wren Warchief skill would wait (makgora:ts/scripts/spamPolicy.ts
 `perceivedTarget`), so its reach, spacing and facing use the target's old
 position while its own body is read live. The probe models a human mashing
-one move, who reacts late too; zero delay against an Expert that sees 16 or
+one move, who reacts late too; zero delay against a Warchief that sees 16 or
 more frames late measured the asymmetry, not the move. The 45% line and the
 probe's move choice are unchanged, and a fighter still over the line is a
 real failure for the retune (decided 2026-10-30, #790).
@@ -557,7 +557,7 @@ fixed-baseline or feel-lock miss.
 
 ## Player panel and equal skill ceilings (#358)
 
-Every fighter targets a 45–55% mean over all six Expert personalities, with
+Every fighter targets a 45–55% mean over all six Warchief personalities, with
 an equal vote for Rook, Ember, Flint, Vale, Kite and Wren. Each personality's
 fighter rate must be 40–60%. Each personality must share first place on at
 least 1 fighter, and on at most 50% of the roster; ties count for every tied
@@ -579,11 +579,11 @@ that estimate is fallible, so this is a mistake-free judgment profile, not an
 omniscient opponent. The ceiling combines both improvements.
 
 The execution and judgment gains are measured against the same fixed Wren
-Expert field, as is Advanced-to-ceiling headroom. An `execution` or `decision`
+Warchief field, as is Grunt-to-ceiling headroom (the benchmark was Advanced until that tier was removed on 2026-11-04). An `execution` or `decision`
 path needs at least 60% of the positive single-axis gains on its named axis;
 there must be a positive gain. `mixed` needs a gain above 0 on each axis.
 Ceiling versus ceiling targets 45–55% for every fighter. Each fighter's
-Advanced-to-ceiling gain must be positive and within 10 percentage points of
+Grunt-to-ceiling gain must be positive and within 10 percentage points of
 the roster median. The depth margin, axis majority and headroom tolerance are
 initial draft values; `CEILING_SPEC` in balance.ts owns every number here.
 

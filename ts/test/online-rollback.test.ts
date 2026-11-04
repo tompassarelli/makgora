@@ -94,7 +94,7 @@ function play(link: Link, matchFrames: number): Fields[][] {
   });
   clients.start();
   clients.frames(MENU_FRAMES);
-  clients.chat(0, "-dev quick cpu wren expert");
+  clients.chat(0, "-dev quick cpu wren warchief");
   const phase = () => {
     let shown = -1;
     clients.clients[0]?.run(() => { shown = shellState()?.game.phase ?? -1; });

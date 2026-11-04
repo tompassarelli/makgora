@@ -1,5 +1,5 @@
 // Edge-guarding (#387, makgora:docs/gameplay-design.md, recovery and
-// edge-guard rules): at Advanced and Expert, with the opponent off stage
+// edge-guard rules): at Warchief, with the opponent off stage
 // below the deck, the computer runs off the lip to the point the recovery
 // will start from, falls onto it with its fighter's edge-guard tool as the
 // recorded scenarios do (edgeGuardScenarios.ts), and comes back on its own

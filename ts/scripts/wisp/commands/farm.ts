@@ -179,7 +179,7 @@ export const farm: Command = (args) => Effect.gen(function*() {
     const { ref, scratch } = verdict.kind === "dispatch" ? { ref: admitted.sha, scratch: undefined } : yield* resolveRef(admitted.sha, repo);
     const lane = verdict.kind === "dispatch" ? verdict.lane : `farm/${ref.slice(0, 12)}`;
     const inputsFor = (tag: string) => job === "balance"
-      ? { ref, lane, opponent: parsed.values.opponent ?? "wren", tier: parsed.values.tier ?? "expert", "per-pair": parsed.values["per-pair"] ?? "400", seeds: parsed.values.seeds ?? "100", matchups: parsed.values.matchups ?? "", probe: parsed.values.probe ?? "40", tag }
+      ? { ref, lane, opponent: parsed.values.opponent ?? "wren", tier: parsed.values.tier ?? "warchief", "per-pair": parsed.values["per-pair"] ?? "400", seeds: parsed.values.seeds ?? "100", matchups: parsed.values.matchups ?? "", probe: parsed.values.probe ?? "40", tag }
       : job === "perf" ? { ref, lane, runs: JSON.stringify(runs), tag } : job === "memory" ? { ref, lane, minutes: parsed.values.minutes ?? "30", matches: parsed.values.matches ?? "", tag } : { ref, lane, dirs: parsed.values.only?.join(" ") ?? ".", tag };
     const started = performance.now();
     const awaiting = parsed.values.wait === true || scratch !== undefined || job === "perf";

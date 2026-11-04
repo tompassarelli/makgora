@@ -25,15 +25,15 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 
 | # | Fighters (archetype) | Stage | Pad | Frames | Camera | What it shows |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Lich King (bait-and-punish) / Anub'arak (trapper), both Expert CPUs | Frozen Throne (2) | promo-frozen-throne.pad | 230-500 | match camera, HUD hidden | Anub'arak's two strong hits (264, 322) send Lich King out at 89%; he respawns on 481. |
-| 2 | Pit Lord (heavy) / Illidan (rushdown), both Expert CPUs | Hellfire Citadel (14) | promo-hellfire-citadel.pad | 230-520 | match camera, HUD hidden | Pit Lord's heavy strikes (259, 350) knock Illidan out at 80%; respawn on 502. |
-| 3 | Blademaster (bait-and-punish) / Thrall (heavy), both Expert CPUs | Durotar Skies (3) | promo-durotar-skies.pad | 1620-1840 | match camera, HUD hidden | Blademaster at 138% spends his up special 1,300 units offstage (1678) and falls short; respawn on 1819. |
-| 4 | Cairne Bloodhoof (heavy) / Chen Stormstout (bait-and-punish), both Expert CPUs | Ahn'Qiraj (13) | promo-ahnqiraj.pad | 700-980 | match camera, HUD hidden | Chen launches Cairne at 113% (728) and Cairne never makes it back; respawn on 963. |
-| 5 | Sylvanas Windrunner (zoner) / Lich (zoner), both Expert CPUs | Naxxramas (4) | promo-naxxramas.pad | 1440-1590 | match camera, HUD hidden | Sylvanas's strong hit on Lich at 135% (1466) is the knockout; respawn on 1573. |
-| 6 | Warden (rushdown) / Mrgl & Grgl (rushdown), both Expert CPUs | Tomb of Sargeras (7) | promo-tomb-of-sargeras.pad | 800-1040 | match camera, HUD hidden | Warden hits Mrgl & Grgl three times as he tries to recover (829, 857, 906) and takes the stock; respawn on 1019. |
-| 7 | Jaina Proudmoore (zoner) / Rifleman (zoner), both Expert CPUs | Gryphon Aerie (11) | promo-gryphon-aerie.pad | 1660-1980 | match camera, HUD hidden | Edge-guard: Rifleman reaches the ledge (1682), is hit as he climbs (1721, 131%) and loses the stock; respawn on 1964. |
-| 8 | Medivh (mobility trickster) / Malfurion Stormrage (zoner), both Expert CPUs | Nordrassil (10) | promo-nordrassil.pad | 1740-1840 | match camera, HUD hidden | Ledge play: Malfurion hangs on the ledge (1766), Medivh takes a hit to 90% (1783) and Malfurion climbs back (1811). |
-| 9 | Dreadlord (grappler) / Forsaken Paladin (bait-and-punish), both Expert CPUs | Stratholme (6) | promo-stratholme.pad | 1480-1660 | match camera, HUD hidden | Forsaken Paladin recovers to the ledge twice (1502, 1605); Dreadlord punishes the first climb (1543, 94%). |
+| 1 | Lich King (bait-and-punish) / Anub'arak (trapper), both Warchief CPUs | Frozen Throne (2) | promo-frozen-throne.pad | 230-500 | match camera, HUD hidden | Anub'arak's two strong hits (264, 322) send Lich King out at 89%; he respawns on 481. |
+| 2 | Pit Lord (heavy) / Illidan (rushdown), both Warchief CPUs | Hellfire Citadel (14) | promo-hellfire-citadel.pad | 230-520 | match camera, HUD hidden | Pit Lord's heavy strikes (259, 350) knock Illidan out at 80%; respawn on 502. |
+| 3 | Blademaster (bait-and-punish) / Thrall (heavy), both Warchief CPUs | Durotar Skies (3) | promo-durotar-skies.pad | 1620-1840 | match camera, HUD hidden | Blademaster at 138% spends his up special 1,300 units offstage (1678) and falls short; respawn on 1819. |
+| 4 | Cairne Bloodhoof (heavy) / Chen Stormstout (bait-and-punish), both Warchief CPUs | Ahn'Qiraj (13) | promo-ahnqiraj.pad | 700-980 | match camera, HUD hidden | Chen launches Cairne at 113% (728) and Cairne never makes it back; respawn on 963. |
+| 5 | Sylvanas Windrunner (zoner) / Lich (zoner), both Warchief CPUs | Naxxramas (4) | promo-naxxramas.pad | 1440-1590 | match camera, HUD hidden | Sylvanas's strong hit on Lich at 135% (1466) is the knockout; respawn on 1573. |
+| 6 | Warden (rushdown) / Mrgl & Grgl (rushdown), both Warchief CPUs | Tomb of Sargeras (7) | promo-tomb-of-sargeras.pad | 800-1040 | match camera, HUD hidden | Warden hits Mrgl & Grgl three times as he tries to recover (829, 857, 906) and takes the stock; respawn on 1019. |
+| 7 | Jaina Proudmoore (zoner) / Rifleman (zoner), both Warchief CPUs | Gryphon Aerie (11) | promo-gryphon-aerie.pad | 1660-1980 | match camera, HUD hidden | Edge-guard: Rifleman reaches the ledge (1682), is hit as he climbs (1721, 131%) and loses the stock; respawn on 1964. |
+| 8 | Medivh (mobility trickster) / Malfurion Stormrage (zoner), both Warchief CPUs | Nordrassil (10) | promo-nordrassil.pad | 1740-1840 | match camera, HUD hidden | Ledge play: Malfurion hangs on the ledge (1766), Medivh takes a hit to 90% (1783) and Malfurion climbs back (1811). |
+| 9 | Dreadlord (grappler) / Forsaken Paladin (bait-and-punish), both Warchief CPUs | Stratholme (6) | promo-stratholme.pad | 1480-1660 | match camera, HUD hidden | Forsaken Paladin recovers to the ledge twice (1502, 1605); Dreadlord punishes the first climb (1543, 94%). |
 | 10 | Gazlowe (setplay) / Mountain King (heavy) | Gryphon Aerie (11) | tinker-laser.pad | 60-140 | match camera, HUD on | Tinker Laser: the arms glow from the side special (70) and the beam catches Mountain King (92). |
 | 11 | Shadow Hunter (setplay) / Beastmaster (setplay) | Naxxramas (4) | shadow-hunter-hex.pad | 50-320 | match camera, HUD on | Shadow Hunter's Hex (60) shuts down Beastmaster's mashed attacks, a forward smash lands (143-153), then Beastmaster calls Bear (260). |
 | 12 | Peon (grappler) / Grom Hellscream (rushdown) | Blackrock (12) | peon-grab-throw.pad | 40-115 | match camera, HUD on | Peon dashes in, grabs Grom (70) and throws him (84). |
@@ -48,7 +48,7 @@ the 75-second cut in [promotion drafts](promotion-drafts.md), "Trailer edit".
 - Roster: all 26 selectable fighters appear; the six without a promo shot
   (Kael'thas Sunstrider, Grom Hellscream, Gazlowe, Shadow Hunter,
   Beastmaster, Peon) carry the scripted shots.
-- Systems: Expert computers on both sides of every promo shot (the CPU);
+- Systems: Warchief computers on both sides of every promo shot (the CPU);
   knockouts, a failed recovery and edge-guards (shots 1-7); ledge play
   (8, 9); signature specials and a throw (10-12); a Thunder Clap exchange (13); an ultimate
   (14); online with rollback (15).

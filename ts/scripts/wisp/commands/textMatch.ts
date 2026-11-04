@@ -31,7 +31,7 @@ const fighter = (args: readonly string[], name: string, fallback: Character): Ch
 
 export function optionsFrom(args: readonly string[]): TextMatchOptions {
   const [level = DEFAULT_OPTIONS.level] = flagValues(args, "level");
-  if (!isCpuTier(level)) throw new UsageFailure({ problem: `--level ${level} is not a computer level (rookie beginner intermediate advanced expert)` });
+  if (!isCpuTier(level)) throw new UsageFailure({ problem: `--level ${level} is not a computer level (peon grunt warchief)` });
   const frames = flagValues(args, "frames").length === 0 ? undefined : whole(args, "frames", 0);
   return {
     seed: whole(args, "seed", DEFAULT_OPTIONS.seed), stage: flagValues(args, "stage")[0] ?? DEFAULT_OPTIONS.stage,

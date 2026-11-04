@@ -28,7 +28,7 @@ export function calibrationGrowthFailures(rows: readonly CalibrationRow[]): stri
       if (count < previous) failures.push(`${opponent}/${tier}: ${outcome} fell from ${previous} to ${count}`);
       previous = count;
     }
-    if (previous <= first) failures.push(`${opponent}: ${outcome} did not improve from Rookie to Expert`);
+    if (previous <= first) failures.push(`${opponent}: ${outcome} did not improve from Peon to Warchief`);
   }
   let previous = -1;
   for (const tier of CPU_TIERS) {
@@ -72,8 +72,8 @@ export function calibrationReport(revision: string, trials = 10) {
     const dash = collectDashCalibration(tier);
     lines.push(`| ${tier} | ${dash.intervals.length} | ${dashPercentile(dash, 0)} | ${dashPercentile(dash, 1)} | ${dashPercentile(dash, 5)} | ${dashPercentile(dash, 9)} | ${(dash.runs * 3600 / dash.frames).toFixed(2)} |`);
   }
-  const technical = collectTechnicalCalibration("expert");
-  lines.push("", `Expert frame-tight technical inputs: ${technical.inputs}; slips: ${technical.slips} (${(technical.slips * 100 / technical.inputs).toFixed(2)}%); wrong options: ${technical.wrongOptions}.`,
+  const technical = collectTechnicalCalibration("warchief");
+  lines.push("", `Warchief frame-tight technical inputs: ${technical.inputs}; slips: ${technical.slips} (${(technical.slips * 100 / technical.inputs).toFixed(2)}%); wrong options: ${technical.wrongOptions}.`,
     "Turns use repeated legal opposite-side spacing situations through produceComputerInput and actual ground motion; runs count entries into the simulation's run action per minute of those frames. Frame-tight inputs are repeated wavedash air dodges through the production execution step.");
   return { rows, failures, text: lines.join("\n") + "\n" };
 }

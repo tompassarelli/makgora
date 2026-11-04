@@ -41,7 +41,7 @@ export function startNativeSoak(s: ShellState): boolean {
   for (const slot of PARTICIPANT_SLOTS) {
     while (!computerActive(s.game, slot)) if (!cycleSlotMode(s.game, actor, slot)) return false;
     setCpuOpponent(s.game, actor, slot, "wren");
-    setCpuTier(s.game, actor, slot, "expert");
+    setCpuTier(s.game, actor, slot, "warchief");
     selectCpuCharacter(s.game, actor, slot, at(SELECTABLE_CHARACTERS, slot));
   }
   setTimeLimit(s.game, actor, 1);

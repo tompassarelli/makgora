@@ -52,7 +52,7 @@ function firstWolf(gap: number, facing: number, seed: number, foeScript: Foe): n
   match.matchSeed = seed;
   match.cpuOpponents[0] = "wren";
   match.cpuResolvedOpponents[0] = "wren";
-  match.cpuTiers[0] = "expert";
+  match.cpuTiers[0] = "warchief";
   const runtime = createPacingAndPresentation();
   const produced = createFrameControls();
   const executed = createFrameControls();

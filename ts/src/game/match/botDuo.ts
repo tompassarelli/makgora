@@ -24,7 +24,7 @@ const TOSS_PARTNER_REACH = 40.0;
 const TOSS_LIP_BAND = 200.0;
 const ORDER_CHANCE_FRAMES = 20;
 
-const expert = (skill: CpuSkill): boolean => skill.tier === "expert";
+const warchief = (skill: CpuSkill): boolean => skill.tier === "warchief";
 
 function partnerOf(world: Readonly<Roster>, leader: Readonly<Fighter>): Fighter | undefined {
   const { duo } = leader;
@@ -63,7 +63,7 @@ function reviveOrSwap(world: Readonly<Roster>, f: Readonly<Fighter>, partner: Re
     pressDown(input, false);
     return true;
   }
-  if (!expert(skill) || !offstage(f, stage) || f.ledge.state !== LedgeState.none || f.special.fall) return false;
+  if (!warchief(skill) || !offstage(f, stage) || f.ledge.state !== LedgeState.none || f.special.fall) return false;
   if (!partner.motion.grounded || insideLip(stage, partner.motion.x) <= 0.0 || !swapReady(world, f)) return false;
   pressDown(input, false);
   return true;
@@ -93,12 +93,12 @@ export function pressDuoCall(world: Readonly<Roster>, f: Readonly<Fighter>, foe:
   const partner = partnerOf(world, f);
   if (partner === undefined) return false;
   if (f.special.action === SpecialAction.heroDown) {
-    if (f.special.frame >= SWAP_HOLD_FRAMES || !expert(skill) || !offstage(f, stage)) return false;
+    if (f.special.frame >= SWAP_HOLD_FRAMES || !warchief(skill) || !offstage(f, stage)) return false;
     pressDown(input, true);
     return true;
   }
   if (!canAttack(f) || f.launch.hitstun > 0 || f.special.action !== SpecialAction.none) return false;
   if (reviveOrSwap(world, f, partner, foe, stage, skill, input)) return true;
-  if (!expert(skill) || partner.status.out || !f.motion.grounded) return false;
+  if (!warchief(skill) || partner.status.out || !f.motion.grounded) return false;
   return pressOrder(f, partner, foe, stage, frame, input) || pressToss(f, partner, foe, stage, frame, commands);
 }

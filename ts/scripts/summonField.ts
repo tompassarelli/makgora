@@ -143,7 +143,7 @@ if (import.meta.main) {
     options: { summons: { type: "string" }, tier: { type: "string" }, seeds: { type: "string" }, frames: { type: "string" }, opponents: { type: "string" } },
     strict: true,
   });
-  const tier = values.tier ?? "intermediate";
+  const tier = values.tier ?? "grunt";
   if (!isCpuTier(tier)) throw new Error(`no difficulty named ${tier}`);
   const summons = (values.summons?.split(",") ?? Object.keys(SUMMONS)).map((name) => {
     if (!(name in SUMMONS)) throw new Error(`no summon named ${name}`);

@@ -33,7 +33,7 @@ export interface TextMatchOptions {
 
 export const DEFAULT_OPTIONS: TextMatchOptions = {
   seed: 0, stage: "sky-deck", you: selectableCharacterBySlug("blademaster") ?? 3, cpu: selectableCharacterBySlug("rifleman") ?? 1,
-  level: "expert", delay: 4, every: 1, stocks: 3, minutes: 4, frames: undefined,
+  level: "warchief", delay: 4, every: 1, stocks: 3, minutes: 4, frames: undefined,
 };
 
 const REACH = 150;

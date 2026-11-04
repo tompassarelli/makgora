@@ -218,8 +218,8 @@ keeps their /dev/input nodes root-only, so Steam and the desktop never see a
 test pad appear or disappear, and the helpers open a twin node in
 /dev/makgora-pads instead. `--chat=TEXT` types a developer command
 into client A once the helpers run (for example `-dev quick hero lich`, or
-`-dev quick cpu wren expert` for a Wren Expert computer opponent, or
-`-dev quick cpu wren expert hero NAME` to select any roster fighter as that computer
+`-dev quick cpu wren warchief` for a Wren Warchief computer opponent, or
+`-dev quick cpu wren warchief hero NAME` to select any roster fighter as that computer
 through the menu's selection rule). The `cpu-roster-*.pad` scripts cover the
 complete selectable roster in one batch.
 Pad runs set the same trace cutoff in native and headless setup chat: 180
@@ -742,7 +742,7 @@ for it to finish before another timing trial.
 assigned offline pair against an integrity map built from the same revision.
 The pair must be running at its menus with no active game. The command uses
 LAN fresh, observed chat entry, `-dev soak`, and the existing client health
-route; it never starts another pair. Four Expert Wren CPUs play one-stock,
+route; it never starts another pair. Four Warchief Wren CPUs play one-stock,
 one-minute matches with the normal one-second automatic rematch. Fighters
 rotate at results, and the existing stage pool rotates stages without Escape.
 

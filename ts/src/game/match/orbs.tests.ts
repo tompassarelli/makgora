@@ -156,7 +156,7 @@ test("The clock fill is kept through a KO and replays to the same state [k1 scen
 test("Bots take the orb as no objective with orbs off, however close the next orb is [k1 scenario]", () => {
   const off = bout(false);
   const on = bout(true);
-  const skill = cpuSkill("wren", "expert");
+  const skill = cpuSkill("wren", "warchief");
   playTo(off, ORB_INTERVAL_FRAMES - 10);
   playTo(on, ORB_INTERVAL_FRAMES - 10);
   const slots = [0, 1] as const;

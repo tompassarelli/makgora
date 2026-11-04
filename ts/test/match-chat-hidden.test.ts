@@ -26,7 +26,7 @@ test("a match's chat is fully hidden, typing line included, until a line arrives
   clients.frames(30);
   expect(shown(PLACEHOLDER), "select screen shows the typing line").toBe(true);
 
-  clients.chat(0, "-dev quick cpu wren expert hero rifleman");
+  clients.chat(0, "-dev quick cpu wren warchief hero rifleman");
   let phase = -1;
   for (let frame = 0; frame < 600 && phase !== Phase.match; frame++) {
     clients.frames(1);

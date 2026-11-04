@@ -198,7 +198,7 @@ function connects(stage: number, seed: number, facing: number, approach: Approac
   match.matchSeed = seed;
   match.cpuOpponents[1] = "wren";
   match.cpuResolvedOpponents[1] = "wren";
-  match.cpuTiers[1] = "expert";
+  match.cpuTiers[1] = "warchief";
   const runtime = createPacingAndPresentation();
   const produced = createFrameControls();
   const executed = createFrameControls();
@@ -228,14 +228,14 @@ function connectRate(stages: readonly number[], approach: Approach): { hits: num
   return { hits, total };
 }
 
-test("Doom deals damage in at least 70% of fixed gap 300 standing and Wren Expert approaches [k3 measure docs/design/ultimates.md]", () => {
+test("Doom deals damage in at least 70% of fixed gap 300 standing and Wren Warchief approaches [k3 measure docs/design/ultimates.md]", () => {
   for (const approach of ["standing", "moving"] as const) {
     const result = connectRate([0], approach);
     assertEquals(result.hits * 10 >= result.total * 7, true, `${approach}: ${result.hits}/${result.total}`);
   }
 });
 
-sweep("Doom deals damage in at least 70% of fixed gap 300 standing and Wren Expert approaches on every stage [k3 measure docs/design/ultimates.md]", () => {
+sweep("Doom deals damage in at least 70% of fixed gap 300 standing and Wren Warchief approaches on every stage [k3 measure docs/design/ultimates.md]", () => {
   for (const approach of ["standing", "moving"] as const) for (const stage of STAGE_CATALOG) {
     const result = connectRate([stage.id], approach);
     assertEquals(result.hits * 10 >= result.total * 7, true, `${stage.name} ${approach}: ${result.hits}/${result.total}`);

@@ -70,7 +70,7 @@ I'd like feedback on how the fights feel and anything confusing when you start. 
 
 ## Trailer edit: 75 seconds
 
-Use native 1080p60 Expert computer-vs-computer footage in Classic. Keep the match audio. The cut needs actual clips before the trailer gate passes.
+Use native 1080p60 Warchief computer-vs-computer footage in Classic. Keep the match audio. The cut needs actual clips before the trailer gate passes.
 
 | Time | Shot | On-screen words |
 | --- | --- | --- |

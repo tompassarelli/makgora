@@ -2,8 +2,10 @@
 
 Choose an **Opponent** and **Difficulty** independently. The six original
 fictional opponents are **Rook, Ember, Flint, Vale, Kite and Wren**. Each grows
-through exactly five tiers: **Rookie, Beginner, Intermediate, Advanced, Expert**.
-These 30 combinations are authored Mak'gora difficulty settings, with no
+through exactly three tiers: **Peon, Grunt, Warchief** (renamed from Rookie,
+Intermediate and Expert on 2026-11-04, keeping their numbers; the Beginner and
+Advanced tiers were removed, and records dated earlier use the old names).
+These 18 combinations are authored Mak'gora difficulty settings, with no
 claimed equivalence to human ratings or imitation/endorsement of real players.
 Design ownership: [#183](https://github.com/tompassarelli/makgora/issues/183).
 
@@ -17,11 +19,10 @@ Rook becomes better at scrapping and taking initiative, rather than merely
 becoming a more narrowly specialized planner. Ember learns patience, reads
 and defense while retaining an impatient streak.
 
-Rookie leaves obvious openings; Beginner understands basic exchanges;
-Intermediate combines a plan with inconsistent decisions; Advanced punishes
-ordinary mistakes; Expert is extremely hard but beatable. Each identity has
+Peon leaves obvious openings; Grunt combines a plan with inconsistent
+decisions; Warchief is extremely hard but beatable. Each identity has
 its own progression in mechanics, reactions, judgment, adaptation and risk.
-Expert combines excellent primary and secondary skills; persistent habits
+Warchief combines excellent primary and secondary skills; persistent habits
 still leave smaller openings for deliberate conditioning or baiting.
 
 The description and tendency tags below are final menu copy. Tags summarize
@@ -36,20 +37,20 @@ preferences, not an exhaustive list of the opponent's abilities.
 | Kite / `kite` | Changes pace and finds unusual ways through. | Changes routes · Bold choices | Reliable conversions, safe landings, recognizing patterns | Still chooses occasional risky escapes or recoveries |
 | Wren / `wren` | Changes tools to match the fight in front of them. | Flexible choices · Steady pace | Burst pressure, precise defense, exploiting conditioned habits | Falls back to comfortable neutral resets under uncertainty |
 
-### Individually authored five-tier paths
+### Individually authored three-tier paths
 
 Each cell is a complete tier-specific strengths/opening preview. Its **Strong
 at / Watch for** wording is final menu copy. Different paths improve secondary
 skills at different points; they do not apply constant archetype offsets.
 
-| Opponent | Rookie | Beginner | Intermediate | Advanced | Expert |
-| --- | --- | --- | --- | --- | --- |
-| Rook | Strong at: Following a plan. Watch for: Slow answers and mistimed close attacks. | Strong at: Holding useful space. Watch for: Pressure that breaks the setup. | Strong at: Spacing and learning habits. Watch for: Sudden pressure and missed gambles. | Strong at: Reading habits and fighting up close. Watch for: Hesitation at risky openings. | Strong at: Adaptation, spacing and close conversions. Watch for: Baiting caution when a gamble is needed. |
-| Ember | Strong at: Quick approaches. Watch for: Repeated unsafe attacks. | Strong at: Basic pressure and follow-ups. Watch for: Chasing past a safe opening. | Strong at: Sustained pressure and spotting escapes. Watch for: Impatient extensions. | Strong at: Pressure reads and defensive techs. Watch for: A baited extra attack. | Strong at: Fast conversions, reads and pressure resets. Watch for: Impatience after a blocked push. |
-| Flint | Strong at: Practiced movement. Watch for: Repeating a mistimed follow-up. | Strong at: Simple clean strings. Watch for: Starting them at the wrong distance. | Strong at: Execution and reliable punishes. Watch for: Familiar routes after you change habits. | Strong at: Precise movement and matchup choices. Watch for: Conditioning the trusted follow-up. | Strong at: Execution, adaptation and choosing conversions. Watch for: Baiting a rehearsed route. |
-| Vale | Strong at: Blocking obvious attacks. Watch for: Grabs and long waits. | Strong at: Basic whiff punishes. Watch for: Feints that keep the initiative. | Strong at: Defense and proactive grabs. Watch for: Hesitation after a safe reset. | Strong at: Defense, safe approaches and pressure. Watch for: Delayed attacks that restart the wait. | Strong at: Precise punishes and offense from defense. Watch for: Taking initiative while Vale waits for certainty. |
-| Kite | Strong at: Trying different routes. Watch for: Unsafe landings. | Strong at: Changing pace and escaping. Watch for: Dropped conversions. | Strong at: Varied approaches and short conversions. Watch for: Bold recoveries. | Strong at: Pattern reads and reliable follow-ups. Watch for: A risky escape after being cornered. | Strong at: Route changes, precise conversions and reads. Watch for: Recognizing the occasional bold recovery. |
-| Wren | Strong at: Trying attack and defense. Watch for: Long pauses before a reset. | Strong at: Basic answers to several situations. Watch for: Comfortable repeated approaches. | Strong at: Flexible tools and burst pressure. Watch for: Predictable resets under uncertainty. | Strong at: Matchup choices and conditioned punishes. Watch for: Baiting the return to neutral. | Strong at: Adaptation, precise defense and varied pressure. Watch for: Conditioning the preferred neutral reset. |
+| Opponent | Peon | Grunt | Warchief |
+| --- | --- | --- | --- |
+| Rook | Strong at: Following a plan. Watch for: Slow answers and mistimed close attacks. | Strong at: Spacing and learning habits. Watch for: Sudden pressure and missed gambles. | Strong at: Adaptation, spacing and close conversions. Watch for: Baiting caution when a gamble is needed. |
+| Ember | Strong at: Quick approaches. Watch for: Repeated unsafe attacks. | Strong at: Sustained pressure and spotting escapes. Watch for: Impatient extensions. | Strong at: Fast conversions, reads and pressure resets. Watch for: Impatience after a blocked push. |
+| Flint | Strong at: Practiced movement. Watch for: Repeating a mistimed follow-up. | Strong at: Execution and reliable punishes. Watch for: Familiar routes after you change habits. | Strong at: Execution, adaptation and choosing conversions. Watch for: Baiting a rehearsed route. |
+| Vale | Strong at: Blocking obvious attacks. Watch for: Grabs and long waits. | Strong at: Defense and proactive grabs. Watch for: Hesitation after a safe reset. | Strong at: Precise punishes and offense from defense. Watch for: Taking initiative while Vale waits for certainty. |
+| Kite | Strong at: Trying different routes. Watch for: Unsafe landings. | Strong at: Varied approaches and short conversions. Watch for: Bold recoveries. | Strong at: Route changes, precise conversions and reads. Watch for: Recognizing the occasional bold recovery. |
+| Wren | Strong at: Trying attack and defense. Watch for: Long pauses before a reset. | Strong at: Flexible tools and burst pressure. Watch for: Predictable resets under uncertainty. | Strong at: Adaptation, precise defense and varied pressure. Watch for: Conditioning the preferred neutral reset. |
 
 ## Initial decision parameters
 
@@ -73,40 +74,28 @@ exceed 100. Initiative and variance weight preferences, not capability ceilings.
 
 | Opponent | Tier | Reaction frames | Execute % | Judge/Space % | History | Read | Repeat % | Punish % | Initiative/Variance % | Guess % |
 | --- | --- | ---: | ---: | --- | --- | --- | ---: | ---: | --- | ---: |
-| Rook | Rookie | 36 | 45 | 35/55 | 8/4 | 2/60 | 65 | 80 | 25/15 | 15 |
-| Rook | Beginner | 32 | 62 | 52/68 | 12/3 | 3/65 | 50 | 90 | 35/18 | 12 |
-| Rook | Intermediate | 16 | 80 | 75/82 | 20/2 | 4/70 | 35 | 105 | 50/22 | 8 |
-| Rook | Advanced | 15 | 91 | 88/92 | 28/1 | 5/75 | 22 | 115 | 65/28 | 5 |
-| Rook | Expert | 14 | 96 | 96/97 | 32/1 | 5/80 | 15 | 120 | 75/35 | 3 |
-| Ember | Rookie | 30 | 60 | 20/35 | 4/4 | 2/40 | 80 | 35 | 90/70 | 40 |
-| Ember | Beginner | 27 | 72 | 40/52 | 6/3 | 2/50 | 65 | 45 | 90/65 | 30 |
-| Ember | Intermediate | 16 | 84 | 65/72 | 12/2 | 3/60 | 45 | 60 | 90/60 | 20 |
-| Ember | Advanced | 15 | 93 | 82/86 | 20/1 | 4/65 | 32 | 75 | 90/55 | 12 |
-| Ember | Expert | 14 | 97 | 94/95 | 28/1 | 5/75 | 22 | 90 | 88/50 | 8 |
-| Flint | Rookie | 30 | 65 | 25/35 | 4/16 | 2/45 | 80 | 50 | 60/20 | 20 |
-| Flint | Beginner | 27 | 78 | 40/58 | 8/12 | 3/55 | 68 | 65 | 62/22 | 15 |
-| Flint | Intermediate | 16 | 88 | 65/78 | 12/4 | 3/65 | 52 | 80 | 65/25 | 10 |
-| Flint | Advanced | 15 | 95 | 84/90 | 20/2 | 4/70 | 38 | 90 | 70/30 | 7 |
-| Flint | Expert | 14 | 98 | 95/96 | 28/1 | 5/75 | 28 | 100 | 75/35 | 4 |
-| Vale | Rookie | 36 | 50 | 30/45 | 6/4 | 2/65 | 75 | 90 | 15/10 | 10 |
-| Vale | Beginner | 30 | 65 | 50/62 | 10/3 | 3/70 | 60 | 100 | 25/12 | 8 |
-| Vale | Intermediate | 16 | 80 | 72/80 | 16/2 | 4/75 | 42 | 110 | 45/18 | 6 |
-| Vale | Advanced | 15 | 92 | 88/90 | 24/1 | 5/80 | 28 | 115 | 60/25 | 4 |
-| Vale | Expert | 14 | 97 | 96/95 | 32/1 | 5/80 | 20 | 115 | 72/32 | 3 |
-| Kite | Rookie | 36 | 50 | 25/45 | 4/4 | 2/40 | 45 | 40 | 65/90 | 45 |
-| Kite | Beginner | 30 | 65 | 42/60 | 6/3 | 2/50 | 32 | 50 | 65/85 | 35 |
-| Kite | Intermediate | 16 | 82 | 65/75 | 12/2 | 3/60 | 22 | 65 | 68/78 | 25 |
-| Kite | Advanced | 15 | 92 | 84/88 | 20/1 | 4/65 | 12 | 80 | 72/70 | 15 |
-| Kite | Expert | 14 | 96 | 95/96 | 28/1 | 5/75 | 8 | 95 | 78/65 | 9 |
-| Wren | Rookie | 36 | 50 | 30/40 | 4/4 | 2/50 | 70 | 55 | 40/25 | 20 |
-| Wren | Beginner | 30 | 67 | 48/58 | 8/3 | 3/60 | 55 | 70 | 48/28 | 15 |
-| Wren | Intermediate | 16 | 82 | 70/74 | 16/2 | 3/65 | 40 | 85 | 60/35 | 10 |
-| Wren | Advanced | 15 | 93 | 87/89 | 24/1 | 4/70 | 27 | 95 | 70/40 | 7 |
-| Wren | Expert | 14 | 97 | 96/96 | 32/1 | 5/75 | 20 | 105 | 78/45 | 4 |
+| Rook | Peon | 36 | 45 | 35/55 | 8/4 | 2/60 | 65 | 80 | 25/15 | 15 |
+| Rook | Grunt | 16 | 80 | 75/82 | 20/2 | 4/70 | 35 | 105 | 50/22 | 8 |
+| Rook | Warchief | 14 | 96 | 96/97 | 32/1 | 5/80 | 15 | 120 | 75/35 | 3 |
+| Ember | Peon | 30 | 60 | 20/35 | 4/4 | 2/40 | 80 | 35 | 90/70 | 40 |
+| Ember | Grunt | 16 | 84 | 65/72 | 12/2 | 3/60 | 45 | 60 | 90/60 | 20 |
+| Ember | Warchief | 14 | 97 | 94/95 | 28/1 | 5/75 | 22 | 90 | 88/50 | 8 |
+| Flint | Peon | 30 | 65 | 25/35 | 4/16 | 2/45 | 80 | 50 | 60/20 | 20 |
+| Flint | Grunt | 16 | 88 | 65/78 | 12/4 | 3/65 | 52 | 80 | 65/25 | 10 |
+| Flint | Warchief | 14 | 98 | 95/96 | 28/1 | 5/75 | 28 | 100 | 75/35 | 4 |
+| Vale | Peon | 36 | 50 | 30/45 | 6/4 | 2/65 | 75 | 90 | 15/10 | 10 |
+| Vale | Grunt | 16 | 80 | 72/80 | 16/2 | 4/75 | 42 | 110 | 45/18 | 6 |
+| Vale | Warchief | 14 | 97 | 96/95 | 32/1 | 5/80 | 20 | 115 | 72/32 | 3 |
+| Kite | Peon | 36 | 50 | 25/45 | 4/4 | 2/40 | 45 | 40 | 65/90 | 45 |
+| Kite | Grunt | 16 | 82 | 65/75 | 12/2 | 3/60 | 22 | 65 | 68/78 | 25 |
+| Kite | Warchief | 14 | 96 | 95/96 | 28/1 | 5/75 | 8 | 95 | 78/65 | 9 |
+| Wren | Peon | 36 | 50 | 30/40 | 4/4 | 2/50 | 70 | 55 | 40/25 | 20 |
+| Wren | Grunt | 16 | 82 | 70/74 | 16/2 | 3/65 | 40 | 85 | 60/35 | 10 |
+| Wren | Warchief | 14 | 97 | 96/96 | 32/1 | 5/75 | 20 | 105 | 78/45 | 4 |
 
 An execution miss produces a legal dropped or simpler input, including a roll
 in place of jump/wavedash preparation, a neutral aerial in place of a
-directional aerial, or a jab in place of a special. Expert misses 2–5% of
+directional aerial, or a jab in place of a special. Warchief misses 2–5% of
 eligible technical inputs, following each identity’s Execute percentage. A judgment
 miss considers fewer candidates or misjudges observed spacing; it never
 inspects a future action. Bounded history covers neutral approach,
@@ -126,36 +115,35 @@ each additional viable option: retreat, grounded shield, remaining jump and lega
 attack. Reaction measurements report responding and unanswered trials separately
 at the Slippi sample's 40-frame deadline; every responding trial counts, including
 early inputs. The extra choice cost is a guess: the replay sample had no clean
-new-decision response peak. Expert, Advanced and Intermediate use the measured tech-chase curve
+new-decision response peak. Warchief and Grunt use the measured tech-chase curve
 from [human input consistency](human-input-consistency.md), shifted to medians
-21, 22 and 23 frames. Its Expert p5/p10/p25/p90 are 15/16/19/33, with about
+21 and 23 frames. Its Warchief p5/p10/p25/p90 are 15/16/19/33, with about
 6 frames of standard deviation; the endpoint and p75 interpolate the measured
 mean and spread. Each cue draws a percentile under the shared match seed,
 clipped to its answer's floor. These measured curves replace the older guessed
-high-tier base delays. Beginner and Rookie retain their slower guessed floors
-and use the curve's spread above them. Every client and replay draws the same
+high-tier base delays. Peon retains its slower guessed floor
+and uses the curve's spread above them. Every client and replay draws the same
 delay. Horizontal reversals are at least four frames apart.
 The measured tail can outlast a missed grab or a partly spent Sleep; those short
 windows are not guaranteed punishes. The four recorded Rifleman seeds punish
-two missed grabs. The roster still punishes missed grabs more often as Expert
-than Rookie. Sleep's full duration is 160 frames, grounded or airborne. Rollback fixtures
+two missed grabs. The roster still punishes missed grabs more often as Warchief
+than Peon. Sleep's full duration is 160 frames, grounded or airborne. Rollback fixtures
 include 48 frames so the computer acts after the reaction curve's 40-frame tail.
-High-tier matches retain 43 observation frames; a Beginner or Rookie retains
+High-tier matches retain 43 observation frames; a Peon retains
 61 frames for its slower floor plus the curve's tail.
 [#356](https://github.com/tompassarelli/makgora/issues/356) draws each turn’s
 interval from the match seed and the last committed turn. Targets come from
-master, diamond and platinum Slippi replays for Expert, Advanced and
-Intermediate (makgora:docs/design/human-input-consistency.md); Beginner and
-Rookie are guesses. Intended medians are Rookie 8, Beginner 7, Intermediate 7,
-Advanced 7 and Expert 6 frames, and no intended turn holds past 12 frames, since
+master and platinum Slippi replays for Warchief and Grunt
+(makgora:docs/design/human-input-consistency.md); Peon
+is a guess. Intended medians are Peon 8, Grunt 7 and Warchief 6 frames, and no intended turn holds past 12 frames, since
 a 13-frame hold enters run. Faster intended turns incur more late-turn noise,
-scaled by `100 − Execute`. Each turn overshoots into run with chance 44, 32, 11,
-7 and 6 in 10,000 from Rookie through Expert. Expert’s acceptance range is
+scaled by `100 − Execute`. Each turn overshoots into run with chance 44, 11
+and 6 in 10,000 from Peon through Warchief. Warchief’s acceptance range is
 0.4–0.8 unintended runs per minute; each lower tier is at least as high and
-Rookie stays at or below 4. Measured 9 Oct over 120,000 controlled frames a
-tier: 2.85, 2.46, 0.84, 0.78 and 0.63 runs per minute, medians 8, 7, 7, 7 and 6.
+Peon stays at or below 4. Measured 9 Oct over 120,000 controlled frames a
+tier: 2.85, 0.84 and 0.63 runs per minute, medians 8, 7 and 6.
 Frame-tight presses (wavedash air dodges) miss 9 points more
-often than Execute: Expert Wren slips on 11.8% of 6,000 of them (361 wrong
+often than Execute: Warchief Wren slips on 11.8% of 6,000 of them (361 wrong
 options), against measured masters’ 12.5–13%. Braking to neutral remains
 immediate. The computer calibration report prints these tables.
 Prepared sequences and fallible reads can act before a predicted action occurs.
@@ -201,23 +189,21 @@ hitlag frames. The victim's hit duration and elapsed time supply these
 classes, even when the preceding SDI was missed. Attempts pulse every other
 tick; a small separate share points the wrong way.
 
-The [Slippi measurements](human-input-consistency.md) map master to Expert,
-diamond to Advanced and platinum to Intermediate. Rates per 1,000 actual
+The [Slippi measurements](human-input-consistency.md) map master to Warchief
+and platinum to Grunt. Rates per 1,000 actual
 opportunities are:
 
 | Difficulty | No DI, kill percent | No DI, other hits | Wrong DI | Strong SDI missed | Follow-up SDI missed | Wrong SDI, of attempts | Accidental full hop |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Expert | 140 | 180 | 45 | 620 | 880 | 40 | 9 |
-| Advanced | 170 | 200 | 70 | 690 | 880 | 65 | 12 |
-| Intermediate | 180 | 220 | 95 | 690 | 890 | 90 | 16 |
-| Beginner | 240 | 300 | 120 | 780 | 930 | 115 | 24 |
-| Rookie | 320 | 400 | 145 | 860 | 970 | 140 | 36 |
+| Warchief | 140 | 180 | 45 | 620 | 880 | 40 | 9 |
+| Grunt | 180 | 220 | 95 | 690 | 890 | 90 | 16 |
+| Peon | 320 | 400 | 145 | 860 | 970 | 140 | 36 |
 
-Wrong-direction rates, Beginner/Rookie rates and aerial misspacing remain
+Wrong-direction rates, Peon rates and aerial misspacing remain
 guesses. The 33% survival-shortening replay proxy ignores stage position and
 is not the wrong-DI target. For execution `E`, aerial mistakes retain
 `20 + 4 × (100 − E)` per thousand and drift lasts
-`5 + floor((100 − E)/8)` frames. Expert requests 2.8–3.6% aerial mistakes.
+`5 + floor((100 − E)/8)` frames. Warchief requests 2.8–3.6% aerial mistakes.
 A successful intended short hop presses the dedicated short-hop button;
 a mistake holds ordinary jump through squat. A drifting aerial keeps its
 planned gap, but a slip adds 5–11 ticks of inward stick and fast-falls when
@@ -229,14 +215,14 @@ Only delayed opponent position supplies the drift direction.
 The `botExecutionNoise` production-input sweep executes 2,000 of each
 opportunity for every identity and tier, counting absent and wrong DI separately,
 strong and follow-up SDI travel,
-actual takeoff speed and final aerial position. It checks Expert’s issue
+actual takeoff speed and final aerial position. It checks Warchief’s issue
 ranges and monotonic errors at lower tiers. The shield-grab case executes the
-same aerial with correct spacing and an Expert drift mistake.
+same aerial with correct spacing and a Warchief drift mistake.
 
 ## CPU-slot selection
 
 The card retains its fighter portrait/chip and displays a compact summary:
-`CPU 2 · Rook · Intermediate`, followed by **Opponent settings** below the
+`CPU 2 · Rook · Grunt`, followed by **Opponent settings** below the
 chip drag area. Choosing settings never picks up the chip. The slot owner or
 first human can edit; others may open a read-only preview saying **Only the
 slot owner or first player can change this opponent.** Changing fighter
@@ -249,12 +235,12 @@ Open one CPU slot's centered panel over the roster:
 CPU 2 — Opponent settings                         [Close]
 
 Opponent          ‹ Rook         ›
-Difficulty        ‹ Advanced     ›
+Difficulty        ‹ Warchief     ›
 
 Makes a plan, then fights for the space to use it.
 Plans ahead · Controls space
-Strong at: Reading habits and fighting up close.
-Watch for: Hesitation at risky openings.
+Strong at: Adaptation, spacing and close conversions.
+Watch for: Baiting caution when a gamble is needed.
 
 [Done]
 Move: W/R + P/E   Choose: N   Back: U
@@ -269,7 +255,7 @@ P/E up/down, N Choose, U Back; Enter remains Warcraft chat.
 2. Focus starts on Opponent. Up/down visits Opponent, Difficulty, Done.
    Left/right changes the focused value; Choose on a value advances once.
    Opponent cycles Rook, Ember, Flint, Vale, Kite, Wren, Random. Difficulty
-   stops at Rookie/Expert. Changes apply immediately. The description/tags
+   stops at Peon/Warchief. Changes apply immediately. The description/tags
    follow identity; Strong at/Watch for follow both identity and tier.
 3. Choose on Done, Back or Close retains choices, closes the panel and returns
    focus to the settings button. Start closes and consumes its press, so it
@@ -278,7 +264,7 @@ P/E up/down, N Choose, U Back; Enter remains Warcraft chat.
    focus is local. Shared changes refresh an open preview; permission loss
    changes it to read-only.
 
-New CPU slots default to a **Random** fighter and **Random + Intermediate**
+New CPU slots default to a **Random** fighter and **Random + Grunt**
 opponent, so each match brings a different fighter and opponent. Retain choices
 across New Match, fighter/stage changes and automatic rematches in the map
 session; no new cross-session storage is needed. Training **Fight** uses these
@@ -299,14 +285,14 @@ runs choose their own fighters and hide the tile.
 
 Retain the resolved fighter and identity through replay/rollback and reveal
 them in the countdown and results, for example
-`CPU 2 · Thrall · Kite · Intermediate`. New Match and automatic rematches draw
+`CPU 2 · Thrall · Kite · Grunt`. New Match and automatic rematches draw
 both again from the next match seed; repeats are allowed. The selector and card
 continue to show Random until changed.
 
 ## State, implementation and calibration
 
 Use stable opponent IDs `rook`, `ember`, `flint`, `vale`, `kite`, `wren` and tier
-IDs `rookie`, `beginner`, `intermediate`, `advanced`, `expert`, distinct from
+IDs `peon`, `grunt`, `warchief`, distinct from
 copy. Selection records chosen opponent (or Random), tier and whether the fighter
 is Random; match state also
 records resolved opponent and bounded observation/commitment history per CPU.
@@ -319,15 +305,15 @@ independent decision record for each named opponent/tier over #182's shared
 policy. The record supplies execution, judgment, spacing, history capacity /
 update stride, read evidence/confidence, repetition, punish weight, speculative
 guesses, initiative and variance separately from reaction delay. Identity tags
-never dispatch to restricted action sets. The live five-tier/opponent model
+never dispatch to restricted action sets. The live three-tier/opponent model
 replaces level-only selection; migrate in-tree menus, launch requests, training
 Fight, developer setup, reports and fixtures together without an old selector
 or compatibility adapter. General strongest-play diagnostics explicitly select
-**Wren + Expert**, avoiding a silent weaker default.
+**Wren + Warchief**, avoiding a silent weaker default.
 
 [#185](https://github.com/tompassarelli/makgora/issues/185) owns selection and
 player-guide copy. [#186](https://github.com/tompassarelli/makgora/issues/186)
-owns one aggregate calibration report across all 30 combinations: reaction,
+owns one aggregate calibration report across all 18 combinations: reaction,
 execution, judgment/spacing, adaptation after a pattern switch, repetition,
 successful/wrong reads, ahead/behind risk, and proactive/defensive/kit activity.
 Fixtures must show secondary growth as well as dominant tendencies: Rook's
@@ -365,7 +351,7 @@ The command fails insufficient collection, an early reaction, a direction
 reversal inside five frames or any restored-state difference. Close conversions
 play the chosen punish for 60 simulation frames and count actual connections.
 Developmental checks require each named primary/secondary outcome to improve
-from Rookie to Expert without falling between adjacent tiers; Flint's pattern
+from Peon to Warchief without falling between adjacent tiers; Flint's pattern
 switch must improve at every tier. Each identity also faces its named bait:
 Rook's brief speculative opening, Ember's extra pressure attack, Flint's
 conditioned forward tilt, Vale's feinted reset, Kite's guarded ledge escape
@@ -375,8 +361,8 @@ grab. Counts and distributions remain visible when a check fails. Difficulty,
 whole-roster kit use, balance and native parity retain their separate gates.
 
 Use the existing hosted difficulty and field commands for their original
-thresholds (Expert wins at least 95/100 against Rookie; every fighter lies
-within 45–55% against the Wren Expert field at 400 matches per pair), and the
+thresholds (Warchief wins at least 95/100 against Peon; every fighter lies
+within 45–55% against the Wren Warchief field at 400 matches per pair), and the
 existing kit/recovery/gameplan contracts for whole-roster coverage. Reuse a
 passing result only while its covered policy is unchanged. Calibration rows
 change one measured behavior at a time; never retune fighter stats or relax a
@@ -469,12 +455,12 @@ rematches differ without any clock or client-local randomness.
 The seed is what makes win rates measurable: before it, a computer-against-
 computer setup was one fixed match, so a matchup's rate was 0% or 100% per
 setup. `bun scripts/cpuField.ts --seeds N` plays N seeds of each setup and
-`bun scripts/cpuTiers.ts` measures Wren at the five tiers against each other
+`bun scripts/cpuTiers.ts` measures Wren at the three tiers against each other
 (makgora:docs/typescript.md).
 
 The field calls `produceComputerInput`, which delays the observation before
 choosing any response. `PERCEIVED_SKILLS` has zero extra reaction frames only
 inside that already delayed policy, so defense and punish do not wait twice.
-It is not a zero-delay field opponent. Expert strength comes from its existing
+It is not a zero-delay field opponent. Warchief strength comes from its existing
 fallible, conditioned reads and prepared sequences; the reaction change does
 not alter fighter numbers or gameplan weights.

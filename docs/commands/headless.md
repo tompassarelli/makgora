@@ -11,7 +11,7 @@
   and SHA256 of every returned asset for a comparison. `WC3_TEXTURES` reuses extracted PNGs
   (makgora:docs/player-view.md).
 
-- Text match: `bun wisp headless text-match [--seed N] [--you SLUG] [--cpu SLUG] [--level rookie|beginner|intermediate|advanced|expert] [--stage NAME] [--delay N] [--every N] [--frames N] [--stocks N] [--minutes N] [--input FILE]`
+- Text match: `bun wisp headless text-match [--seed N] [--you SLUG] [--cpu SLUG] [--level peon|grunt|warchief] [--stage NAME] [--delay N] [--every N] [--frames N] [--stocks N] [--minutes N] [--input FILE]`
   plays one seeded match in the pure simulation (no Warcraft runtime) where
   fighter A is driven by stdin (or `--input FILE`) and fighter B by a
   computer at `--level`, and prints one compact line per `--every` frames

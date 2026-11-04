@@ -7,7 +7,7 @@ repositories contain code only; maps are distributed on Hive Workshop.
 
 `bun wisp play --standalone` opens Mak'gora in Wisp's native window, and
 `--window chrome` in the Wisp browser player,
-with Illidan against a Wren Expert Rifleman over the normal three stocks and
+with Illidan against a Wren Warchief Rifleman over the normal three stocks and
 seven-minute clock. Keyboard controls and the browser's gamepad controls enter
 the playable map's keyboard sampling. The browser draws the map's models,
 camera, effects and HUD from the headless client and plays its sound cues.

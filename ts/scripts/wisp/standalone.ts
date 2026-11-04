@@ -60,12 +60,12 @@ function addCpuOpponent(game: Parameters<typeof cycleSlotMode>[0]): void {
   cycleSlotMode(game, 0, OPPONENT_SLOT);
   cycleSlotMode(game, 0, OPPONENT_SLOT);
   setCpuOpponent(game, 0, OPPONENT_SLOT, "wren");
-  setCpuTier(game, 0, OPPONENT_SLOT, "expert");
+  setCpuTier(game, 0, OPPONENT_SLOT, "warchief");
   selectCpuCharacter(game, 0, OPPONENT_SLOT, Character.demonHunter);
   setStocks(game, 0, 1);
 }
 
-const QUICK_MATCH = "-dev quick cpu wren expert hero illidan";
+const QUICK_MATCH = "-dev quick cpu wren warchief hero illidan";
 const SELECT_SETTLE_STEPS = 30;
 
 const squashed = (name: string): string => name.toLowerCase().replace(/[^a-z0-9]/g, "");

@@ -21,7 +21,7 @@ test("the -clip chat command saves a moment and the = key does not [k1 scenario]
   const saved = () => [...client.files.keys()].filter(name => name.includes("makgora-repro")).length;
   clients.start();
   clients.frames(120);
-  clients.chat(0, "-dev quick cpu wren expert hero rifleman");
+  clients.chat(0, "-dev quick cpu wren warchief hero rifleman");
   let phase = -1;
   for (let frame = 0; frame < LOBBY_FRAMES && phase !== Phase.match; frame++) {
     clients.frames(1);

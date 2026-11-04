@@ -1,11 +1,11 @@
 import type { CpuSkill } from "./cpuSkill";
 import { AttackStyle } from "../sim/codes";
 
-export type CeilingMode = "expert" | "basic" | "execution" | "judgment" | "ceiling";
+export type CeilingMode = "full" | "basic" | "execution" | "judgment" | "ceiling";
 
 
 export function ceilingSkill(skill: CpuSkill, mode: CeilingMode, basicMoves: readonly number[] = []): CpuSkill {
-  if (mode === "expert") return skill;
+  if (mode === "full") return skill;
   if (mode === "basic") return { ...skill, basicMoves, kitTenths: 0, mixesUp: false, grabsShields: basicMoves.includes(AttackStyle.grab) };
   const execution = mode === "execution" || mode === "ceiling";
   const judgment = mode === "judgment" || mode === "ceiling";

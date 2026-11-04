@@ -62,7 +62,7 @@ export const MAP_PROFILES: Readonly<Record<string, MakgoraMapProfile>> = {
   showcase: { describe: "showcase-profile map from `bun wisp map build --profile showcase`, given with --map, left at fighter select for the -dev showcase verbs", path: join(inputs, "showcase/Mak'gora showcase.w3x"), quick: "" },
 
 
-  keyboard: { describe: "playable input (native-perf profile) rebuilt from this checkout, `-dev quick cpu wren expert` (Wren Expert, three stocks)", path: join(inputs, "keyboard-native-166-20261007/keyboard-native.w3x"), rebuild: "native-perf", quick: `${QUICK_CPU_COMMAND}wren expert` },
+  keyboard: { describe: "playable input (native-perf profile) rebuilt from this checkout, `-dev quick cpu wren warchief` (Wren Warchief, three stocks)", path: join(inputs, "keyboard-native-166-20261007/keyboard-native.w3x"), rebuild: "native-perf", quick: `${QUICK_CPU_COMMAND}wren warchief` },
   underside: { describe: "development map built with scenario underside (makgora:docs/player-view.md), `-dev quick`", path: join(inputs, "stage-model-20261006/Makgora diagnostic underside.w3x"), quick: "-dev quick" },
   "cpu-startup": { describe: "development map rebuilt from this checkout, hosted with one lobby computer and left on fighter select", path: PRESENTATION, rebuild: "main", quick: "", computers: 1 },
   "fighter-select": { describe: "development map rebuilt from this checkout, two players left on fighter select", path: PRESENTATION, rebuild: "main", quick: "" },
@@ -238,16 +238,16 @@ export const MAKGORA_ACCEPT: AcceptSuite = {
         { keys: ["e", "e", "n", "w", "w", "w", "w", "w", "e", "r"], client: "a" },
         { waitMs: 300 },
       ],
-      capture: [{ kind: "frames", name: "rook-advanced-panel", client: "a" }, { kind: "frames", name: "shared-cpu-card", client: "b" }],
+      capture: [{ kind: "frames", name: "rook-warchief-panel", client: "a" }, { kind: "frames", name: "shared-cpu-card", client: "b" }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
-      look: "CPU 3 shows Rook / Advanced with Reading habits and fighting up close; Watch for Hesitation at risky openings. Opponent precedes Difficulty; all panel text and buttons fit the widescreen client. Repeat using mapped stick/D-pad, A and X; retain actual helper menu_emit evidence. Confirm the settings button is below the chip drag target.",
+      look: "CPU 3 shows Rook / Warchief with Adaptation, spacing and close conversions; Watch for Baiting caution when a gamble is needed. Opponent precedes Difficulty; all panel text and buttons fit the widescreen client. Repeat using mapped stick/D-pad, A and X; retain actual helper menu_emit evidence. Confirm the settings button is below the chip drag target.",
     },
     {
       id: "185-cpu-focus-release", closes: "makgora#185 box 5", map: "presentation", session: "cpu-settings",
       setup: [{ keys: ["u", "n", "y"], client: "a" }, { waitMs: 300 }],
       capture: [{ kind: "frames", name: "start-closed-panel", client: "a" }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
-      look: "Back retains Rook / Advanced and returns focused Opponent settings; Choose reopens it. Start closes into fighter selection without starting a match. After release, focused controls and ordinary chip dragging still work; Enter opens Warcraft chat. Check mouse Close and the settings hit target on both 16:9 and the available wider client.",
+      look: "Back retains Rook / Warchief and returns focused Opponent settings; Choose reopens it. Start closes into fighter selection without starting a match. After release, focused controls and ordinary chip dragging still work; Enter opens Warcraft chat. Check mouse Close and the settings hit target on both 16:9 and the available wider client.",
     },
     {
       id: "gear-settings-buttons", closes: "Settings panel Community and Credits art (2026-11-02)", map: "fighter-select", session: "gear-settings",
@@ -424,7 +424,7 @@ export const MAKGORA_ACCEPT: AcceptSuite = {
     {
       id: "c39-wren-match", closes: "makgora#7 C39N setup: the opening quick match's replay is written before the countdown check starts waiting", map: "presentation", session: "c39-countdown",
       setup: [
-        { chat: "-dev reset" }, { chat: "-dev slots 1 0" }, { chat: "-dev auto-rematch on" }, { chat: `${QUICK_CPU_COMMAND}wren expert` },
+        { chat: "-dev reset" }, { chat: "-dev slots 1 0" }, { chat: "-dev auto-rematch on" }, { chat: `${QUICK_CPU_COMMAND}wren warchief` },
         { receipt: "^SETUP phase=\\d+ human-fighters=1 computers=[1-9]\\d* .* stocks=3 ", client: "a", seconds: 10 }, { waitMs: 3000 },
       ],
       pass: [NO_ERRORS, DEV_RECEIPT],
@@ -504,7 +504,7 @@ export const MAKGORA_ACCEPT: AcceptSuite = {
     },
     {
       id: "406-voice-trace", closes: "makgora-dev#406 box 4 (voice cap half)", map: "presentation", session: "406-voices",
-      setup: [{ chat: "-dev reset" }, { chat: "-dev slots 1 14" }, { chat: `${QUICK_CPU_COMMAND}wren expert` }, { waitMs: 8000 }, { keys: ["ctrl+t"], client: "a" }, { waitMs: 7000 }],
+      setup: [{ chat: "-dev reset" }, { chat: "-dev slots 1 14" }, { chat: `${QUICK_CPU_COMMAND}wren warchief` }, { waitMs: 8000 }, { keys: ["ctrl+t"], client: "a" }, { waitMs: 7000 }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "wc3-melee-input-trace.txt on client a holds per-voice lines `frame F class C slot S live L` with every L <= 16.",
     },

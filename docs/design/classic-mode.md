@@ -92,8 +92,8 @@ Each fight is one data entry of the configured-match engine (below).
 
 The player chooses a starting level at fighter selection, in the rules
 drawer: Level 1 to Level N, one per computer tier
-(makgora:docs/design/cpu-profiles.md), so today Level 1 is Rookie and Level 5
-is Expert; the default is Level 2 (Beginner). Every place the player sees it
+(makgora:docs/design/cpu-profiles.md), so today Level 1 is Peon and Level 3
+is Warchief; the default is Level 2 (Grunt). Every place the player sees it
 (the rules pill and summary, the drawer and the results line) names the
 level, never the tier. The fights climb from it: start, start, +1, +1, +2,
 capped at the top level, and the boss's health and strike set from start + 2.
@@ -115,7 +115,7 @@ at one of them.
 - **What a boss is.** Like Master Hand, a boss is not a fighter. It hovers
   over the stage, takes damage from the player's strikes and projectiles, and
   has health instead of stocks: 210 (Lich King), 240 (Archimonde) or 270
-  (Kil'jaeden) at Rookie, plus 30 for each tier above. The player has two
+  (Kil'jaeden) at Peon, plus 30 for each tier above. The player has two
   stocks and five minutes; the boss wins if either runs out.
 - **Boss plate.** A plate in the top-left corner, clear of the clock and
   the player plates, shows the boss's portrait, name, remaining health as a

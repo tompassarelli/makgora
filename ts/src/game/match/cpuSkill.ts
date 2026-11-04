@@ -72,11 +72,11 @@ function mechanics(profile: CpuProfile): CpuSkill {
     kitTenths: floorDiv(profile.executionPercent + 9, 10),
     punishTenths: floorDiv(profile.judgmentPercent + 9, 10),
     punishMisjudge: floorDiv(100 - profile.spacingPercent, 5),
-    platformCancels: profile.tier === "advanced" || profile.tier === "expert",
-    cornerPlay: profile.tier === "advanced" || profile.tier === "expert",
-    edgeCancelTenths: profile.tier === "expert" ? 10 : profile.tier === "advanced" ? 9 : 0,
-    cornerEscapeTenths: profile.tier === "expert" ? 10 : profile.tier === "advanced" ? 8 : 0,
-    edgeGuardTenths: profile.tier === "expert" ? 8 : profile.tier === "advanced" ? 5 : 0,
+    platformCancels: profile.tier === "warchief",
+    cornerPlay: profile.tier === "warchief",
+    edgeCancelTenths: profile.tier === "warchief" ? 10 : 0,
+    cornerEscapeTenths: profile.tier === "warchief" ? 10 : 0,
+    edgeGuardTenths: profile.tier === "warchief" ? 8 : 0,
     contestTenths: floorDiv(profile.judgmentPercent + 9, 10), contestDelay: profile.reactionFrames,
   };
 }
@@ -93,7 +93,7 @@ export function perceivedCpuSkill(opponent: CpuOpponentId, tier: CpuTier): CpuSk
   return at(PERCEIVED_SKILLS, CPU_OPPONENT_IDS.indexOf(opponent) * CPU_TIERS.length + CPU_TIERS.indexOf(tier));
 }
 
-export const FULL_SKILL: CpuSkill = cpuSkill("wren", "expert");
+export const FULL_SKILL: CpuSkill = cpuSkill("wren", "warchief");
 
 /** A guard, tech or ledge answer is already prepared; neutral needs a fresh choice. */
 export function cpuReactionFloor(fighter: Readonly<Fighter>, skill: CpuSkill): number {
@@ -133,6 +133,6 @@ export function cpuReactionFrames(fighter: Readonly<Fighter>, skill: CpuSkill, s
   useMatchSeed(0);
   const reaction = draw.reaction;
   const tier = skill.tier;
-  const offset = tier === "intermediate" ? 2 : tier === "advanced" ? 1 : 0;
-  return tier === "beginner" || tier === "rookie" ? floor + reaction - 14 : Math.max(floor, reaction + offset);
+  const offset = tier === "grunt" ? 2 : 0;
+  return tier === "peon" ? floor + reaction - 14 : Math.max(floor, reaction + offset);
 }

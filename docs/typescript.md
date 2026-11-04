@@ -1,7 +1,7 @@
 # TypeScript in Mak'gora
 
 `bun scripts/cpuCeiling.ts --pairs a:b --depth a,b --json FILE` measures the
-Expert personality panel and final skill profiles. `--merge FILES --baseline
+Warchief personality panel and final skill profiles. `--merge FILES --baseline
 field.json --report TABLE.md` prints the #358 verdicts against the frozen Wren
 field. `bun wisp farm balance` runs these shards after its field and spam probes.
 
@@ -234,11 +234,11 @@ start, `-dev quick`, Ctrl+T, a hot reload through the map's reloader at frame
 and checksum, the first desync, a reload not running, error reports and what
 a player would see wrong in each client's scene report, and exits 1 on any.
 `desync` adds `-dev desync` typed by the second player, which it must report.
-`cpu-expert` plays 5,400 frames against Wren Expert (`-dev quick cpu wren
-expert`) while the first player walks left and right, so the computer's
+`cpu-expert` plays 5,400 frames against Wren Warchief (`-dev quick cpu wren
+warchief`) while the first player walks left and right, so the computer's
 seeded reaction draws run in every client (#354).
 `computer-match` plays 9,000 frames of an idle player against two computers,
-one of them Wren Expert, at 4 stocks, so the computers' seeded defence and
+one of them Wren Warchief, at 4 stocks, so the computers' seeded defence and
 spacing slips (DI, SDI, full hops, drift) run through every client.
 makgora:ts/scripts/wisp/headless.ts declares the natives Mak'gora calls
 on one client only; the desync guard, visual-lifecycle, player-view and
@@ -671,7 +671,7 @@ From makgora:ts/:
   `--per-pair N` plays spawn variants and seeds until every pair has at
   least N matches; the matchup matrix shows each win rate with its match
   count. The table ends with the balance gate's verdict (`BALANCE_GATE`:
-  every fighter 45-55% against the field, Wren Expert, 400 a pair;
+  every fighter 45-55% against the field, Wren Warchief, 400 a pair;
   makgora:docs/design/roster.md, "Balance gate") and the matchup spread,
   reported but not gated.
   `--merge` summarizes earlier `--json` runs instead of playing, so a
@@ -679,7 +679,7 @@ From makgora:ts/:
   Every ordered pair of different selectable fighters, both computers, on
   every soak stage, played in process through frame capture and execution
   (3 stocks, 4-minute clock by default), both computers selected by `--opponents` (wren,wren) and `--tiers`
-  (expert,expert by default). Every computer choice draws under the match seed, so
+  (warchief,warchief by default). Every computer choice draws under the match seed, so
   each of `--seeds N` (1 by default) is another sample of a setup; each
   variant also shifts both spawn points sideways.
   Per fighter it prints win rate over decisive matches against the field and
@@ -695,8 +695,8 @@ From makgora:ts/:
   grab, any dash attack as `dashAttack` and angled forward tilts as the
   forward tilt.
 - `bun scripts/cpuTiers.ts [--matches N] [--top N] [--stocks N]
-  [--minutes N]`: Wren at every pair of five difficulties plays N (20) seeded
-  matches; Expert plays `--top` (100) against Rookie. Fighter pairs and stages
+  [--minutes N]`: Wren at every pair of three difficulties plays N (20) seeded
+  matches; Warchief plays `--top` (100) against Peon. Fighter pairs and stages
   cycle with alternating sides. Reports wins, losses, ties and whether aggregate
   win rates rise through the five tiers. About 0.2 s a match.
 

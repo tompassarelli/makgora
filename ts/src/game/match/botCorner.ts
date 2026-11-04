@@ -1,5 +1,5 @@
 // Corner play (#386, makgora:docs/gameplay-design.md, "The corner belongs
-// to the attacker"): at Advanced and Expert the computer carries an aerial's
+// to the attacker"): at Warchief the computer carries an aerial's
 // landing off the lip the opponent is cornered at, so the edge cancel frees it
 // at once; it presses a cornered opponent instead of resetting to neutral; and
 // cornered itself, it leaves by a readable option.
@@ -63,7 +63,7 @@ export function steerEdgeCancel(f: Fighter, target: Readonly<Fighter> | undefine
   if (inside < 0.0 || inside > CANCEL_REACH) return false;
   if (f.motion.grounded || (f.attack.style === undefined && inside > CARRY_REACH)) return false;
   // Away from a cornered opponent it carries only a fall already drifting out, with a jump left to return
-  // on: some once they fall, or at every chance (Expert) each from the hop's rise.
+  // on: some once they fall, or at every chance (Warchief) each from the hop's rise.
   if (!atLedge(f, target, stage) && (f.jump.remaining <= 0 || f32(f.motion.vx * side) <= 0.0
     || (f.motion.vz > 0.0 && skill.edgeCancelTenths < 10) || !botChance(f.attack.serial, f.character * 7 + side, skill.edgeCancelTenths, 10))) return false;
   // Aim the landing just inside the lip: the slide carries it off before the lag ends.
@@ -160,7 +160,7 @@ export function escapeCorner(f: Fighter, target: Readonly<Fighter>, stage: numbe
   if (!skill.cornerPlay || target.status.out || f.launch.hitstun > 0 || f.special.fall || f.down.state !== DownState.none) return false;
   const side = lipSide(f.motion.x);
   const gap = Math.abs(f32(target.motion.x - f.motion.x));
-  // Every escape (Expert) starts before the opponent closes in: a wider gap still counts as closing.
+  // Every escape (Warchief) starts before the opponent closes in: a wider gap still counts as closing.
   if (gap > (skill.cornerEscapeTenths >= 10 ? EARLY_CLOSING : CLOSING)) return false;
   if (!f.motion.grounded) {
     // A hop out keeps drifting to the centre while it rises over the opponent.

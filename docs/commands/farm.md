@@ -28,7 +28,7 @@
   each pair's newest measured seconds and gives shards 45 minutes, because a
   pair's time moved up to 3.31 times between commits.
   `bun wisp farm balance [--ref REF] [--lane NAME] [--wait]` plays the
-  balance gate's computer field (Wren Expert, 400 a pair; `--opponent`, `--tier`,
+  balance gate's computer field (Wren Warchief, 400 a pair; `--opponent`, `--tier`,
   `--per-pair`, `--seeds`) on GitHub's free hosted runners, a `cpuField
   --pairs` process a core. The plan measures running hosted jobs across the
   owner's recently active public repositories and reserves the time-weighted
@@ -49,7 +49,7 @@
   openings-per-kill and balance-score tables (makgora:docs/design/balance.md).
   Local saved fields use `bun scripts/cpuField.ts --merge FILE`;
   `--seed-offset N` starts a fresh seed range for optimizer holdouts.
-  A Wren Expert run with at least 400 matches per pair fails when the win-rate
+  A Wren Warchief run with at least 400 matches per pair fails when the win-rate
   gate or the balanced gate fails, after publishing the report artifact;
   lower-tier or smaller exploratory fields remain reports.
   `--matchups rifleman:chen-stormstout,lich:chen-stormstout` runs only those

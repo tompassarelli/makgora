@@ -10,17 +10,17 @@ import type { CpuSkill } from "./cpuSkill";
 const sign = (value: number): -1 | 0 | 1 => value < 0 ? -1 : value > 0 ? 1 : 0;
 
 
-export function defenceSlipRates(execution: number, tier: CpuTier = "expert") {
+export function defenceSlipRates(execution: number, tier: CpuTier = "warchief") {
   const missed = 100 - execution;
-  const rank = tier === "expert" ? 0 : tier === "advanced" ? 1 : tier === "intermediate" ? 2 : tier === "beginner" ? 3 : 4;
+  const rank = tier === "warchief" ? 0 : tier === "grunt" ? 2 : 4;
   return {
-    noDiKill: rank === 0 ? 140 : rank === 1 ? 170 : rank === 2 ? 180 : rank === 3 ? 240 : 320,
-    noDiOther: rank === 0 ? 180 : rank === 1 ? 200 : rank === 2 ? 220 : rank === 3 ? 300 : 400,
+    noDiKill: rank === 0 ? 140 : rank === 2 ? 180 : 320,
+    noDiOther: rank === 0 ? 180 : rank === 2 ? 220 : 400,
     wrongDi: 45 + rank * 25,
-    strongSdiMiss: rank === 0 ? 620 : rank <= 2 ? 690 : rank === 3 ? 780 : 860,
-    followupSdiMiss: rank <= 1 ? 880 : rank === 2 ? 890 : rank === 3 ? 930 : 970,
+    strongSdiMiss: rank === 0 ? 620 : rank === 2 ? 690 : 860,
+    followupSdiMiss: rank === 0 ? 880 : rank === 2 ? 890 : 970,
     wrongSdi: 40 + rank * 25,
-    fullHop: rank === 0 ? 9 : rank === 1 ? 12 : rank === 2 ? 16 : rank === 3 ? 24 : 36,
+    fullHop: rank === 0 ? 9 : rank === 2 ? 16 : 36,
     aerial: 20 + missed * 4, driftFrames: 5 + floorDiv(missed, 8),
   };
 }
@@ -30,7 +30,7 @@ type SlipRates = ReturnType<typeof defenceSlipRates>;
 
 const SLIP_RATES: Partial<Record<CpuTier, Record<number, SlipRates>>> = {};
 
-function cachedSlipRates(execution: number, tier: CpuTier = "expert"): Readonly<SlipRates> {
+function cachedSlipRates(execution: number, tier: CpuTier = "warchief"): Readonly<SlipRates> {
   const known = SLIP_RATES[tier] ?? {};
   SLIP_RATES[tier] = known;
   const rates = known[execution] ?? defenceSlipRates(execution, tier);

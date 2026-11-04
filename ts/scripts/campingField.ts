@@ -144,7 +144,7 @@ if (import.meta.main) {
       return character;
     });
     const pairs = fighters.flatMap((a, first) => fighters.slice(first + 1).map(b => [a, b] as const)).filter((_, pair) => pair % (count ?? 1) === index);
-    const tier: CpuTier = values.tier !== undefined && isCpuTier(values.tier) ? values.tier : "expert";
+    const tier: CpuTier = values.tier !== undefined && isCpuTier(values.tier) ? values.tier : "warchief";
     const base: FieldOptions = { pairs, stages: values.stages?.split(",") ?? ["frozen-throne", "hellfire"], seeds: Number(values.seeds ?? 1), tiers: [tier, tier], minutes: Number(values.minutes ?? 4), camp: true };
     const out: Record<string, CampingMatch[]> = {};
     for (const rule of rules) out[rule] = playCpuField({ ...base, ...ruleOptions(rule) }).map(compact);
@@ -155,7 +155,7 @@ if (import.meta.main) {
       const pct = (n: number) => `${(100 * n).toFixed(1)}%`;
       const pp = (n: number) => `${n >= 0 ? "+" : ""}${(100 * n).toFixed(1)}`;
       const off = by.off;
-      console.log(`camping field: ${by[rules[0] ?? "off"]?.length ?? 0} matches per rule (every pair of ${values.fighters?.split(",").length ?? SELECTABLE_CHARACTERS.length} fighters, both sides, stages ${values.stages ?? "frozen-throne,hellfire"}, ${values.seeds ?? 1} seed(s), ${values.tier ?? "expert"} vs ${values.tier ?? "expert"}, ${values.minutes ?? 4} min), ${workers} workers, ${((performance.now() - started) / 1000).toFixed(0)} s`);
+      console.log(`camping field: ${by[rules[0] ?? "off"]?.length ?? 0} matches per rule (every pair of ${values.fighters?.split(",").length ?? SELECTABLE_CHARACTERS.length} fighters, both sides, stages ${values.stages ?? "frozen-throne,hellfire"}, ${values.seeds ?? 1} seed(s), ${values.tier ?? "warchief"} vs ${values.tier ?? "warchief"}, ${values.minutes ?? 4} min), ${workers} workers, ${((performance.now() - started) / 1000).toFixed(0)} s`);
       console.log("| rule | apart | Δ apart vs off (95% CI) | win spread (SD) | Δ spread vs off (95% CI) | win range | camping | orbs/match |");
       console.log("|---|---|---|---|---|---|---|---|");
       for (const rule of rules) {

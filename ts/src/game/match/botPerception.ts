@@ -20,9 +20,7 @@ export const BOT_DIRECTION_MIN_FRAMES = 4;
 // Intended turns stay at most 12 frames: a 13-frame hold enters run; only overshoots run.
 const reversalDeciles: readonly (readonly number[])[] = [
   [5, 5, 6, 7, 8, 8, 9, 10, 11, 12],
-  [4, 5, 6, 6, 7, 7, 8, 9, 11, 12],
   [4, 5, 5, 6, 7, 7, 8, 9, 11, 12],
-  [4, 4, 5, 6, 7, 7, 8, 9, 11, 12],
   [4, 4, 5, 5, 6, 6, 7, 8, 10, 12],
 ];
 
@@ -34,7 +32,7 @@ function botReversalFrames(chosenFrame: number, slot: ParticipantSlot, tier: Cpu
   const speedError = Math.max(0, 7 - intended) * missed;
   const late = botChoice(chosenFrame, slot * 37 + 829, 400) < speedError ? 1 : 0;
   // Rare long holds become actual runs; ordinary timing noise only delays a turn.
-  const runChance = at([44, 32, 11, 7, 6], index);
+  const runChance = at([44, 11, 6], index);
   const overshoot = botChoice(chosenFrame, slot * 37 + 853, 10000) < runChance;
   return overshoot ? 24 + floorDiv(missed, 20) : intended + late;
 }
@@ -731,7 +729,7 @@ export function perceivedOpponent(memory: Readonly<BotMemory>, world: Readonly<R
 }
 
 /** Neutral may brake immediately; it does not shorten the hold before the opposite direction. */
-export function commitBotDirection(memory: BotMemory, slot: ParticipantSlot, frame: number, input: Controls, tier: CpuTier = "expert", policy?: CpuDecisionPolicy): void {
+export function commitBotDirection(memory: BotMemory, slot: ParticipantSlot, frame: number, input: Controls, tier: CpuTier = "warchief", policy?: CpuDecisionPolicy): void {
   const wanted = input.direction;
   const previous = memory.directions[slot];
   if (wanted === 0) return;

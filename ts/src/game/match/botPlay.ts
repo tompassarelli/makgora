@@ -243,7 +243,7 @@ function avoidTeamContact(game: Readonly<MatchState>, world: Readonly<Roster>, s
 }
 
 export function reactionDelay(game: Readonly<MatchState>, world: Readonly<Roster>, runtime: Readonly<BotRuntime>, fighter: Readonly<Fighter>, slot: ParticipantSlot, frame: number, skill: CpuSkill, floor = cpuReactionFloor(fighter, skill)): number {
-  const cue = perceivedOpponent(runtime.botMemory, world, fighter, slot, frame, floor, computerOpponentMask(game, slot), game.stageChoice, skill.tier === "expert");
+  const cue = perceivedOpponent(runtime.botMemory, world, fighter, slot, frame, floor, computerOpponentMask(game, slot), game.stageChoice, skill.tier === "warchief");
   // Only information old enough for this kind of answer may affect its seeded delay.
   const key = cue === undefined ? 0 : cue.attack.serial * 31 + cue.special.action * 17
     + (cue.motion.x < fighter.motion.x ? 1 : 2) + (cue.shield.raised ? 4 : 0)
@@ -251,7 +251,7 @@ export function reactionDelay(game: Readonly<MatchState>, world: Readonly<Roster
   return cpuReactionFrames(fighter, skill, game.matchSeed, slot, key, floor);
 }
 
-const slowTier = (tier: CpuTier | undefined): boolean => tier === "rookie" || tier === "beginner";
+const slowTier = (tier: CpuTier | undefined): boolean => tier === "peon";
 
 function observationFrames(game: Readonly<MatchState>, skill: CpuSkill): number {
   if (slowTier(skill.tier)) return BOT_HISTORY_FRAMES;
@@ -279,7 +279,7 @@ export function produceComputerInput(game: Readonly<MatchState>, world: Roster, 
   const fighter = fighterAt(world, slot);
   const reactionFrames = reactionDelay(game, world, runtime, fighter, slot, frame, skill);
   useMatchSeed(game.matchSeed);
-  const target = fighter.grab.target === undefined || holdsPartner(fighter) ? perceivedOpponent(runtime.botMemory, world, fighter, slot, frame, reactionFrames, computerOpponentMask(game, slot), game.stageChoice, skill.tier === "expert")
+  const target = fighter.grab.target === undefined || holdsPartner(fighter) ? perceivedOpponent(runtime.botMemory, world, fighter, slot, frame, reactionFrames, computerOpponentMask(game, slot), game.stageChoice, skill.tier === "warchief")
     : perceivedHeldFighter(runtime.botMemory, fighter.grab.target, frame, reactionFrames);
   const strategy = runtime.botStrategies[slot];
   if (target !== undefined) {

@@ -195,7 +195,7 @@ test("A computer Peon forward-throws its grab into the carry, walks it to within
     match.phase = Phase.match;
     match.cpuOpponents[0] = "rook";
     match.cpuResolvedOpponents[0] = "rook";
-    match.cpuTiers[0] = "expert";
+    match.cpuTiers[0] = "warchief";
     const side = start > 0.0 ? 1 : -1;
     const peon = createFighter(Character.peon, start, -side);
     const target = createFighter(Character.rifleman, f32(start - f32(side * GAP)), side);

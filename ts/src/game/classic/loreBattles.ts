@@ -66,97 +66,97 @@ const { ko, survive, koWithinClock } = WinCondition;
 
 export const LORE_BATTLES: readonly LoreBattle[] = [
   battle({
-    id: "me-busy", title: "Me Busy, Leave Me Alone", player: C.peon, against: [C.tinker], tier: "rookie", stage: 12,
+    id: "me-busy", title: "Me Busy, Leave Me Alone", player: C.peon, against: [C.tinker], tier: "peon", stage: 12,
     win: survive, minutes: 1, playerStocks: 2, opponentStocks: 2, speaker: "Peon", intro: "Me busy. Leave me alone!",
   }),
   battle({
-    id: "exodus", title: "Exodus of the Horde", player: C.thrall, against: [C.uther], tier: "rookie", stage: 11,
+    id: "exodus", title: "Exodus of the Horde", player: C.thrall, against: [C.uther], tier: "peon", stage: 11,
     win: ko, minutes: 3, playerStocks: 2, opponentStocks: 1, speaker: "Thrall", intro: "The humans have found our camps. Break through, and we sail west!",
   }),
   battle({
-    id: "murlocs-tomb", title: "Mrgl & Grgl's Tomb of Sargeras", player: C.murloc, against: [C.warden], tier: "rookie", stage: 7,
+    id: "murlocs-tomb", title: "Mrgl & Grgl's Tomb of Sargeras", player: C.murloc, against: [C.warden], tier: "peon", stage: 7,
     win: survive, minutes: 1, playerStocks: 2, opponentStocks: 3, speaker: "Mrgl & Grgl", intro: "Mrglglgl! The jailor wants the shiny tomb back!",
   }),
   battle({
-    id: "darkspear", title: "The Darkspear Rescue", player: C.shadowHunter, against: [C.murloc], tier: "beginner", stage: 3,
+    id: "darkspear", title: "The Darkspear Rescue", player: C.shadowHunter, against: [C.murloc], tier: "peon", stage: 3,
     win: ko, minutes: 3, playerStocks: 2, opponentStocks: 2, speaker: "Sen'jin", intro: "Da murlocs be draggin' my people to da sea witch, mon!",
   }),
   battle({
-    id: "thunder-brew", title: "The Brewmaster's Thunder Brew", player: C.chen, against: [C.peon], tier: "beginner", stage: 13,
+    id: "thunder-brew", title: "The Brewmaster's Thunder Brew", player: C.chen, against: [C.peon], tier: "peon", stage: 13,
     win: koWithinClock, minutes: 2, playerStocks: 2, opponentStocks: 2, opponentDamage: 40,
     speaker: "Chen", intro: "Someone drank my thunder brew. Now someone gets a lesson!",
   }),
   battle({
-    id: "culling", title: "The Culling of Stratholme", player: C.uther, against: [C.dreadlord], tier: "beginner", stage: 6,
+    id: "culling", title: "The Culling of Stratholme", player: C.uther, against: [C.dreadlord], tier: "peon", stage: 6,
     win: koWithinClock, minutes: 2, playerStocks: 2, opponentStocks: 1, speaker: "Uther the Lightbringer", intro: "I will not purge this city, Arthas. Its demon answers to me instead.",
   }),
   battle({
-    id: "frostmourne", title: "Frostmourne", player: C.lichKing, against: [C.mountainKing], tier: "beginner", stage: 2,
+    id: "frostmourne", title: "Frostmourne", player: C.lichKing, against: [C.mountainKing], tier: "peon", stage: 2,
     win: ko, minutes: 3, playerStocks: 2, opponentStocks: 2, speaker: "Muradin", intro: "Leave it be, Arthas. Forget this business and lead your men home.",
   }),
   battle({
-    id: "dalaran", title: "The Siege of Dalaran", player: C.lich, against: [C.kaelthas], tier: "intermediate", stage: 4,
+    id: "dalaran", title: "The Siege of Dalaran", player: C.lich, against: [C.kaelthas], tier: "grunt", stage: 4,
     win: survive, minutes: 2, playerStocks: 2, opponentStocks: 3, speaker: "Kel'Thuzad", intro: "Hold the circle until the Book of Medivh calls my master forth!",
   }),
   battle({
-    id: "mannoroth", title: "The Death of Mannoroth", player: C.blademaster, against: [C.pitLord], tier: "intermediate", stage: 13,
+    id: "mannoroth", title: "The Death of Mannoroth", player: C.blademaster, against: [C.pitLord], tier: "grunt", stage: 13,
     win: ko, minutes: 3, playerStocks: 2, opponentStocks: 2, opponentDamage: 30,
     speaker: "Thrall", intro: "The blood curse is broken, Grom. Take your vengeance on Mannoroth!",
   }),
   battle({
-    id: "proudmoore", title: "The Admiral's Landing", player: C.beastmaster, against: [C.jaina, C.mountainKing], tier: "intermediate", stage: 11,
+    id: "proudmoore", title: "The Admiral's Landing", player: C.beastmaster, against: [C.jaina, C.mountainKing], tier: "grunt", stage: 11,
     win: ko, minutes: 3, playerStocks: 3, opponentStocks: 1, speaker: "Rexxar", intro: "Proudmoore's marines burn the Horde's shore. Misha, hunt!",
   }),
   battle({
-    id: "silvermoon", title: "The Gates of Silvermoon", player: C.sylvanas, against: [C.lichKing], tier: "intermediate", stage: 4,
+    id: "silvermoon", title: "The Gates of Silvermoon", player: C.sylvanas, against: [C.lichKing], tier: "grunt", stage: 4,
     win: survive, minutes: 2, playerStocks: 2, opponentStocks: 3, playerDamage: 30,
     speaker: "Sylvanas", intro: "You'll not pass the gates of Silvermoon while I still draw breath!",
   }),
   battle({
-    id: "hyjal-alliance", title: "Mount Hyjal: Jaina's Stand", player: C.jaina, against: [C.lich, C.dreadlord], tier: "advanced", stage: 10,
+    id: "hyjal-alliance", title: "Mount Hyjal: Jaina's Stand", player: C.jaina, against: [C.lich, C.dreadlord], tier: "grunt", stage: 10,
     win: survive, minutes: 2, playerStocks: 3, opponentStocks: 2, speaker: "Jaina", intro: "Rage Winterchill marches on our base. Hold until the Horde is ready!",
   }),
   battle({
-    id: "hyjal-horde", title: "Mount Hyjal: The Horde Holds", player: C.cairne, against: [C.pitLord], tier: "advanced", stage: 10,
+    id: "hyjal-horde", title: "Mount Hyjal: The Horde Holds", player: C.cairne, against: [C.pitLord], tier: "grunt", stage: 10,
     win: survive, minutes: 2, playerStocks: 2, opponentStocks: 3, playerDamage: 40,
     speaker: "Cairne", intro: "Azgalor's fire reaches the totems. Stand fast, my brothers. The Earthmother watches!",
   }),
   battle({
-    id: "skull", title: "The Skull of Gul'dan", player: C.demonHunter, against: [C.dreadlord], tier: "advanced", stage: 14,
+    id: "skull", title: "The Skull of Gul'dan", player: C.demonHunter, against: [C.dreadlord], tier: "grunt", stage: 14,
     win: koWithinClock, minutes: 2, playerStocks: 2, opponentStocks: 2, speaker: "Tichondrius", intro: "Drink of the Skull, night elf, and become what you were meant to be.",
   }),
   battle({
-    id: "maiev", title: "The Hunt for Illidan", player: C.warden, against: [C.demonHunter], tier: "advanced", stage: 7,
+    id: "maiev", title: "The Hunt for Illidan", player: C.warden, against: [C.demonHunter], tier: "grunt", stage: 7,
     win: koWithinClock, minutes: 3, playerStocks: 2, opponentStocks: 2, speaker: "Maiev", intro: "You will not escape me this time, Illidan.",
   }),
   bossBattle("archimonde", "The Battle of Mount Hyjal", C.warden, BossKind.archimonde, 3, 5, 2,
     "The World Tree is mine. Your feeble races will burn with this world!"),
   battle({
-    id: "magtheridon", title: "Lord of Outland", player: C.kaelthas, against: [C.pitLord], tier: "expert", stage: 14,
+    id: "magtheridon", title: "Lord of Outland", player: C.kaelthas, against: [C.pitLord], tier: "warchief", stage: 14,
     win: ko, minutes: 3, playerStocks: 2, opponentStocks: 2, speaker: "Magtheridon", intro: "Illidan sends a blood elf to take my citadel? Hellfire is mine!",
   }),
   bossBattle("kiljaeden", "Kil'jaeden's Ultimatum", C.demonHunter, BossKind.kiljaeden, 4, 5, 2,
     "You have failed me, Illidan. Destroy the Lich King, or know my wrath."),
   battle({
-    id: "frozen-throne", title: "Illidan at the Frozen Throne", player: C.demonHunter, against: [C.lichKing], tier: "expert", stage: 2,
+    id: "frozen-throne", title: "Illidan at the Frozen Throne", player: C.demonHunter, against: [C.lichKing], tier: "warchief", stage: 2,
     win: koWithinClock, minutes: 2, playerStocks: 1, opponentStocks: 1, speaker: "Arthas", intro: "Look at you, Illidan. You failed. And now you die.",
   }),
   bossBattle("ascension", "The Ascension", C.lichKing, BossKind.lichKing, 4, 5, 2,
     "Now, champion. Shatter the ice that binds me, and we shall be one."),
   battle({
-    id: "grom-mannoroth", title: "Grom's Last Stand", player: C.grom, against: [C.pitLord], tier: "expert", stage: 3,
+    id: "grom-mannoroth", title: "Grom's Last Stand", player: C.grom, against: [C.pitLord], tier: "warchief", stage: 3,
     win: koWithinClock, minutes: 3, playerStocks: 1, opponentStocks: 2, playerDamage: 40,
     speaker: "Grom", intro: "Mannoroth, you chained the Warsong with your blood. Gorehowl will cut us free!",
   }),
   bossBattle("hyjal-malfurion", "Mount Hyjal: The Horn of Cenarius", C.malfurion, BossKind.archimonde, 4, 5, 2,
     "Blow your horn, druid. When I reach Nordrassil, the last refuge of your people will burn."),
   battle({
-    id: "anubarak-ascent", title: "The Crypt Lord's Passage", player: C.anubarak, against: [C.demonHunter, C.kaelthas], tier: "expert", stage: 2,
+    id: "anubarak-ascent", title: "The Crypt Lord's Passage", player: C.anubarak, against: [C.demonHunter, C.kaelthas], tier: "warchief", stage: 2,
     win: koWithinClock, minutes: 3, playerStocks: 2, opponentStocks: 1,
     speaker: "Anub'arak", intro: "The usurpers bar the way to Icecrown. Follow me, King Arthas. We shall make a passage through their bones.",
   }),
   battle({
-    id: "medivh-warning", title: "The Guardian's Last Warning", player: C.medivh, against: [C.dreadlord, C.pitLord], tier: "expert", stage: 10,
+    id: "medivh-warning", title: "The Guardian's Last Warning", player: C.medivh, against: [C.dreadlord, C.pitLord], tier: "warchief", stage: 10,
     win: koWithinClock, minutes: 3, playerStocks: 2, opponentStocks: 1,
     speaker: "Medivh", intro: "At Hyjal, human, orc and night elf stand together. Demons, you will find no willing door in me again.",
   }),

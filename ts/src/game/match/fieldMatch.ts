@@ -27,7 +27,7 @@ export function fieldMatch(a: Character, b: Character, rules: FieldMatchRules): 
   match.characterChoices[1] = b;
   match.stageChoice = rules.stage;
   const opponents = rules.opponents ?? ["wren", "wren"];
-  const tiers = rules.tiers ?? ["expert", "expert"];
+  const tiers = rules.tiers ?? ["warchief", "warchief"];
   for (const slot of [0, 1] as const) {
     match.cpuOpponents[slot] = opponents[slot];
     match.cpuResolvedOpponents[slot] = opponents[slot];

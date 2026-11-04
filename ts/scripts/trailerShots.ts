@@ -100,11 +100,11 @@ export function pickShots(candidates: readonly Shot[]): Shot[] {
   return picked.toSorted((left, right) => left.spec.seed - right.spec.seed);
 }
 
-export function playExpert(spec: MatchSpec): MatchRecord {
+export function playWarchief(spec: MatchSpec): MatchRecord {
   const a = selectableCharacterBySlug(spec.a);
   const b = selectableCharacterBySlug(spec.b);
-  if (a === undefined || b === undefined || spec.tier !== "expert") throw new Error(`seed ${spec.seed} is not an Expert computer match`);
-  const record = playCpuMatch(a, b, spec.stage, 0, { tiers: ["expert", "expert"], frameCap: DEFAULT_CONFIG.frameCap, playtest: true, bufferedAttacks: true }, spec.seed);
+  if (a === undefined || b === undefined || spec.tier !== "warchief") throw new Error(`seed ${spec.seed} is not a Warchief computer match`);
+  const record = playCpuMatch(a, b, spec.stage, 0, { tiers: ["warchief", "warchief"], frameCap: DEFAULT_CONFIG.frameCap, playtest: true, bufferedAttacks: true }, spec.seed);
   if (record === undefined) throw new Error(`no spawn for ${spec.stage}`);
   return record;
 }
@@ -128,8 +128,8 @@ export function renderShots(shots: readonly Shot[]): string {
 if (import.meta.main) {
   const { values } = parseArgs({ args: process.argv.slice(2), options: { first: { type: "string" }, count: { type: "string" }, seeds: { type: "string" } }, strict: true });
   const specs = values.seeds === undefined
-    ? planMatches(ROSTER, Number(values.first ?? 0), Number(values.count ?? 400)).filter((spec) => spec.tier === "expert")
+    ? planMatches(ROSTER, Number(values.first ?? 0), Number(values.count ?? 400)).filter((spec) => spec.tier === "warchief")
     : values.seeds.split(",").map((seed) => planMatches(ROSTER, Number(seed), 1)[0]).filter((spec) => spec !== undefined);
-  const candidates = specs.flatMap((spec) => shotsOf(spec, playExpert(spec)));
+  const candidates = specs.flatMap((spec) => shotsOf(spec, playWarchief(spec)));
   console.log(renderShots(values.seeds === undefined ? pickShots(candidates) : candidates.toSorted((left, right) => right.score - left.score)));
 }

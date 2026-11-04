@@ -70,7 +70,7 @@ export function fighterCoverage(index: number, opponent?: Character, choices: re
     for (const slot of PARTICIPANT_SLOTS) {
       game.cpuOpponents[slot] = "wren";
       game.cpuResolvedOpponents[slot] = "wren";
-      game.cpuTiers[slot] = "expert";
+      game.cpuTiers[slot] = "warchief";
     }
     game.phase = Phase.match;
     game.stageChoice = 0;

@@ -22,7 +22,7 @@ on:
         default: "wren"
       tier:
         description: Both computers' difficulty
-        default: "expert"
+        default: "warchief"
       per-pair:
         description: Matches a pair
         default: "400"
@@ -449,7 +449,7 @@ jobs:
           path: ts/timings.json
           retention-days: 30
       - name: Check the required balance gate
-        if: ${{ inputs.matchups == '' && inputs.opponent == 'wren' && inputs.tier == 'expert' && fromJSON(inputs.per-pair) >= 400 }}
+        if: ${{ inputs.matchups == '' && inputs.opponent == 'wren' && inputs.tier == 'warchief' && fromJSON(inputs.per-pair) >= 400 }}
         run: |
           grep -q '^Skill ceiling: pass.' ts/balance/table.md
           grep -q '^Balance gate .*: passes\.' ts/balance/table.md

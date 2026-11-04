@@ -72,8 +72,8 @@ if (import.meta.main) {
     ties.set(b, tiesOf(b) + result.ties);
   }
   console.error(`round robin done, ${((performance.now() - started) / 1000).toFixed(0)} s`);
-  const top = playTiers("expert", "rookie", topMatches, rules);
-  console.log(`${matches} seeded matches per pair of tiers, ${topMatches} for Expert against Rookie (${rules.stocks} stocks, ${rules.minutes}-minute clock, every ordered fighter pair and soak stage in turn), ${((performance.now() - started) / 1000).toFixed(0)} s; win rates over decisive matches.`);
+  const top = playTiers("warchief", "peon", topMatches, rules);
+  console.log(`${matches} seeded matches per pair of tiers, ${topMatches} for Warchief against Peon (${rules.stocks} stocks, ${rules.minutes}-minute clock, every ordered fighter pair and soak stage in turn), ${((performance.now() - started) / 1000).toFixed(0)} s; win rates over decisive matches.`);
   console.log("");
   console.log(`| Difficulty | ${tiers.map((tier) => `vs ${tier}`).join(" | ")} | Wins | Losses | Ties | Win rate vs the other tiers |`);
   console.log(`| ---: |${tiers.map(() => " ---: |").join("")} ---: | ---: | ---: | ---: |`);
@@ -87,5 +87,5 @@ if (import.meta.main) {
   }
   const rising = rates.every((rate, index) => index === 0 || rate > (rates[index - 1] ?? 1));
   console.log("");
-  console.log(`Win rate against the other tiers rises at every tier: ${rising ? "yes" : "no"}. Expert beat tier ${"rookie"} in ${top.wins} of ${topMatches} (${top.losses} losses, ${top.ties} ties).`);
+  console.log(`Win rate against the other tiers rises at every tier: ${rising ? "yes" : "no"}. Warchief beat tier ${"peon"} in ${top.wins} of ${topMatches} (${top.losses} losses, ${top.ties} ties).`);
 }

@@ -103,7 +103,7 @@ function press(f: Readonly<Fighter>, target: Readonly<Fighter>, move: number, fr
 
 
 
-/** The target as the spammer's own computer skill would see it: the same perception delay an Expert's defense waits. */
+/** The target as the spammer's own computer skill would see it: the same perception delay a Warchief's defense waits. */
 export function perceivedTarget(match: Readonly<MatchState>, world: Readonly<Roster>, runtime: Readonly<PacingAndPresentation>, slot: ParticipantSlot, frame: number): Readonly<Fighter> {
   const f = fighterAt(world, slot);
   const skill = cpuSkill(match.cpuResolvedOpponents[slot], match.cpuTiers[slot]);

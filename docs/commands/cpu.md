@@ -2,7 +2,7 @@
 
 - Roster AI coverage: `bun scripts/cpuCoverage.ts` prints movement, attacks,
   kit use, defense and recovery for all selectable fighters over eight
-  seeded Wren Expert matches each; `SWEEPS=1 GAME_TESTS=botCoverage bun scripts/lua-tests.ts`
+  seeded Wren Warchief matches each; `SWEEPS=1 GAME_TESTS=botCoverage bun scripts/lua-tests.ts`
   checks the same report as a sweep (in Lua32), and the suite plays
   one seeded match a fighter.
 
@@ -18,7 +18,7 @@
   -f ref=COMMIT` runs the same report hosted. Procedure and remaining behavior
   gates: makgora:docs/design/cpu-profiles.md, "Calibration report".
 
-- Difficulty report: `gh workflow run cpu-tiers.yml -f ref=COMMIT` measures Wren at every tier pair with `cpuTiers` (20 matches per pair, 100 Expert-vs-Rookie matches). The run summary and `cpu-tiers` artifact hold its table.
+- Difficulty report: `gh workflow run cpu-tiers.yml -f ref=COMMIT` measures Wren at every tier pair with `cpuTiers` (20 matches per pair, 100 Warchief-vs-Peon matches). The run summary and `cpu-tiers` artifact hold its table.
 
 - Release roster: `bun scripts/releaseRoster.ts FIELD.json` (from ts/) writes
   makgora:ts/src/game/sim/heroes/releaseRoster.ts from a gate run's

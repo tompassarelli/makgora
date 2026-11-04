@@ -23,7 +23,7 @@ const RIGHT = 0x27;
 const CPU_EXPERT: Journey = {
   frames: 5400,
   events: [
-    { frame: 30, player: 0, chat: `${QUICK_CPU_COMMAND}wren expert` },
+    { frame: 30, player: 0, chat: `${QUICK_CPU_COMMAND}wren warchief` },
     ...Array.from({ length: 25 }, (_, step) => 200 + step * 200).flatMap(frame => [
       { frame, player: 0, key: RIGHT, meta: 0, down: true },
       { frame: frame + 40, player: 0, key: RIGHT, meta: 0, down: false },
@@ -38,7 +38,7 @@ const COMPUTER_MATCH: Journey = {
   events: [
     { frame: 20, player: 0, chat: `${SLOTS_COMMAND}1 2` },
     { frame: 25, player: 0, chat: `${STOCKS_COMMAND}4` },
-    { frame: 30, player: 0, chat: `${QUICK_CPU_COMMAND}wren expert` },
+    { frame: 30, player: 0, chat: `${QUICK_CPU_COMMAND}wren warchief` },
   ],
 };
 
