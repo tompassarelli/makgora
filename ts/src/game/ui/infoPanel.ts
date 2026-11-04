@@ -1,16 +1,14 @@
 import { f32 } from "wisp/src/sim/f32";
-import { MENU_FONT } from "./hudLayout";
-import { createText, frameMenuPanel, placeTopLeft } from "./frames";
+import { createText, frameMenuPanel, placeTopLeft, sizeText } from "./frames";
 import { type InfoPopupLayout, type PopupBox, windowCount, windowY } from "./infoPopupLayout";
 import { SELECT_LEVELS } from "./selectLevels";
-import { createFrame, createFrameByType, Frame, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, TextAlignment } from "wisp/game/frames";
+import { createFrame, createFrameByType, Frame, setFrameEnabled, setFrameLevel, setFrameSize, setFrameText, setFrameTextAlignment, TextAlignment } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
 export function panelText(parent: Frame, name: string, x: number, y: number, width: number, height: number, size: number, vertical: TextAlignment, horizontal: TextAlignment): Frame {
   const frame = createText(name, parent, 0);
   placeTopLeft(frame, x, y);
-  setFrameSize(frame, width, height);
-  setFrameFont(frame, MENU_FONT, size, 0);
+  sizeText(frame, size, width, height);
   setFrameTextAlignment(frame, vertical, horizontal);
   setFrameEnabled(frame, false);
   return frame;
