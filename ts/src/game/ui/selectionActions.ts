@@ -23,7 +23,7 @@ export interface LobbyNet {
   readonly echoes: readonly string[];
 }
 
-/** Classic's or a Lore Battle's two drawer lines: the start setting and the route. */
+/** Classic's two drawer lines: the start setting and the route. */
 export interface ClassicLines {
   readonly setting: string;
   readonly route: string;

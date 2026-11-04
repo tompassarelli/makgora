@@ -35,7 +35,7 @@ function chooseFighter(game: MatchState, slot: ParticipantSlot, choice: Characte
 
 export const RANDOM_FIGHTER = -1;
 
-export const randomFighterOffered = (game: Readonly<MatchState>): boolean => !game.classic && !game.lore;
+export const randomFighterOffered = (game: Readonly<MatchState>): boolean => !game.classic;
 
 export const cpuFighterRandom = (game: Readonly<MatchState>, slot: number): boolean => isParticipantSlot(slot) && computerActive(game, slot) && game.cpuRandomFighters[slot] && randomFighterOffered(game);
 

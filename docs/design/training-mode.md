@@ -1,7 +1,7 @@
 # Training (#120)
 
 Training is a mode chosen at fighter selection from the top bar's mode list,
-beside Versus, Classic and Lore Battles. A training match has no clock and no lost
+beside Versus and Classic. A training match has no clock and no lost
 stocks; every computer fighter is a training partner that does what the
 player set (stand, shield, crouch, jump, attack or fight) and escapes hits and
 techs the way the player set. The match reports what the player's last move

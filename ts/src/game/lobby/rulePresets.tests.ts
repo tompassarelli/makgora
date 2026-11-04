@@ -3,7 +3,7 @@ import { ALL_ITEMS_MASK, ItemKind } from "../sim/codes";
 import { rulesPillParts } from "../session/messages";
 import { Phase, createMatchState } from "./lobbyState";
 import { setItemsOn, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./matchRules";
-import { MATCH_MODES, chooseMatchMode, matchMode } from "./matchMode";
+import { MATCH_MODES, chooseMatchMode, cycleMatchMode, matchMode } from "./matchMode";
 import { RULE_PRESETS, applyRulePreset } from "./rulePresets";
 
 type Rule = number | boolean;
@@ -68,6 +68,15 @@ test("The rules pill reads the live rules: stocks, time, Ultimates and Items in 
   assertEquals(rulesPillParts(game)[0], "Training");
   chooseMatchMode(game, 0, "classic");
   assertEquals(rulesPillParts(game)[0], "Classic");
-  chooseMatchMode(game, 0, "lore");
-  assertEquals(rulesPillParts(game)[0], "Lore Battle");
+});
+
+test("Mode cycling steps Versus, Training and Classic only, and comes back to Versus after three steps [k2 property]", () => {
+  assertEquals(MATCH_MODES.length, 3);
+  const game = createMatchState();
+  const seen = [matchMode(game)];
+  for (let step = 0; step < 3; step++) {
+    cycleMatchMode(game, 0);
+    seen.push(matchMode(game));
+  }
+  assertEquals(seen.join(" "), "versus training classic versus");
 });

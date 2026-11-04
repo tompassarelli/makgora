@@ -16,7 +16,6 @@ import { stageMusic } from "../../game/presentation/matchAudio";
 import { readyFile, stageDrawnFile } from "../../game/session/journalFiles";
 import { initializeScenario } from "../../game/session/scenarios";
 import { classicIntro } from "../../game/classic/classicText";
-import { loreIntro } from "../../game/classic/loreBattles";
 import { type Scenario, usesPool } from "../../game/session/build";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount } from "../../game/sim/stage";
@@ -70,7 +69,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
   if (wasPaused) pauseMatchPresentation(s, false);
   initializeScenario(scenario, s.game, s.world);
   ui.classic?.beginMatch(s.game);
-  if (s.game.run.active) setStatus(s, s.game.lore ? loreIntro(s.game) : classicIntro(s.game), 5.0);
+  if (s.game.run.active) setStatus(s, classicIntro(s.game), 5.0);
   const { rollback } = s;
   if (rollback !== undefined) {
     rollback.active = beginRollbackEpoch(s, rollback);

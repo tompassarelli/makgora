@@ -90,9 +90,6 @@ export interface MatchState {
   classic: boolean;
   classicTier: number;
 
-  lore: boolean;
-  loreBattle: number;
-
   readonly run: ConfiguredRun;
 }
 
@@ -117,7 +114,7 @@ export function createMatchState(): MatchState {
 
     remainingFrames: 7 * 60 * MATCH_TICKS_PER_SECOND, startHold: 0, matchFrame: 0, timedOut: false, practice: false,
     training: false, trainer: createTrainingState(), items: createMatchItems(), orbs: createMatchOrbs(), ultimatesOff: false,
-    classic: false, classicTier: CLASSIC_TIER_DEFAULT, lore: false, loreBattle: 0, run: createConfiguredRun(),
+    classic: false, classicTier: CLASSIC_TIER_DEFAULT, run: createConfiguredRun(),
   };
 }
 
@@ -258,8 +255,6 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
   copyMatchOrbs(target.orbs, source.orbs);
   target.classic = source.classic;
   target.classicTier = source.classicTier;
-  target.lore = source.lore;
-  target.loreBattle = source.loreBattle;
   copyConfiguredRun(target.run, source.run);
   for (const slot of PARTICIPANT_SLOTS) {
     target.characterChoices[slot] = source.characterChoices[slot];

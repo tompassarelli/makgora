@@ -44,7 +44,7 @@ The live Hive Workshop page is written in [hive-post.md](hive-post.md) (makgora:
 
 **Mak'gora 0.1.0 — a Warcraft III platform fighter**
 
-Pick a Warcraft fighter, fight across floating stages, and knock your opponents out. Created by Tompas, Mak'gora has 26 fighters, Classic graphics, computer opponents, Training, Classic routes and Lore Battles.
+Pick a Warcraft fighter, fight across floating stages, and knock your opponents out. Created by Tompas, Mak'gora has 26 fighters, Classic graphics, computer opponents, Training and Classic routes.
 
 This is the first public version; it's early, expect rough edges, tell us what feels off. Send feedback through [Mak'gora GitHub Issues](https://github.com/tompassarelli/makgora/issues), including your Warcraft version, fighters, stage and what happened. A short clip helps.
 
@@ -52,7 +52,7 @@ This is the first public version; it's early, expect rough edges, tell us what f
 
 ## Discord announcement
 
-Mak'gora 0.1.0 is the first public version of my Warcraft III platform fighter: 26 Warcraft fighters, Classic graphics, computer opponents, Training, Classic routes and Lore Battles. It's early, expect rough edges, tell us what feels off.
+Mak'gora 0.1.0 is the first public version of my Warcraft III platform fighter: 26 Warcraft fighters, Classic graphics, computer opponents, Training and Classic routes. It's early, expect rough edges, tell us what feels off.
 
 [Download the map from Hive Workshop](https://www.hiveworkshop.com/) and start with Training; the player guide covers install, controls and bug clips.
 
@@ -62,7 +62,7 @@ Please send feedback to [Mak'gora GitHub Issues](https://github.com/tompassarell
 
 **Title:** Mak'gora 0.1.0: a platform fighter inside Warcraft III
 
-I've made Mak'gora, a Warcraft III platform fighter with 26 Warcraft fighters, floating stages, computer opponents, Training, Classic routes and Lore Battles. This public version uses Classic graphics.
+I've made Mak'gora, a Warcraft III platform fighter with 26 Warcraft fighters, floating stages, computer opponents, Training and Classic routes. This public version uses Classic graphics.
 
 This is the first public version; it's early, expect rough edges, tell us what feels off. [Download from Hive Workshop](https://www.hiveworkshop.com/) and start with Training; the player guide covers install, controls and bug clips.
 

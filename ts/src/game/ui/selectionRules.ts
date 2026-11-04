@@ -159,7 +159,7 @@ function presentClassic(rules: RuleFrames, lines: ClassicLines): void {
   setMenuText(rules.route, lines.route);
 }
 
-const HEADINGS = { versus: "Match Rules", training: "Training Partner", classic: "Classic Run", lore: "Lore Battle" } as const;
+const HEADINGS = { versus: "Match Rules", training: "Training Partner", classic: "Classic Run" } as const;
 
 export function presentRules(rules: RuleFrames, game: Readonly<MatchState>, classic: ClassicLines | undefined): void {
   const mode = matchMode(game);
@@ -167,7 +167,7 @@ export function presentRules(rules: RuleFrames, game: Readonly<MatchState>, clas
   showAll(rules.versus, mode === "versus");
   for (const control of rules.itemKinds) showControl(control, mode === "versus");
   showAll(rules.training, mode === "training");
-  showAll(rules.classicFrames, mode === "classic" || mode === "lore");
+  showAll(rules.classicFrames, mode === "classic");
   if (mode === "versus") presentVersus(rules, game);
   else if (mode === "training") presentTraining(rules, game);
   else if (classic !== undefined) presentClassic(rules, classic);
@@ -213,9 +213,9 @@ export const delayLit = (frames: DelayFrames, delay: DelayControl): readonly (re
 ];
 
 export function rulesKey(game: Readonly<MatchState>, classic: ClassicLines | undefined): string {
-  const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, classic: classicRun, lore } = game;
+  const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, classic: classicRun } = game;
   const lines = classic === undefined ? "" : `${classic.setting}\n${classic.route}`;
-  return `${lore ? "1" : "0"} ${classicRun ? "1" : "0"} ${formatInt(stockCount)} ${formatInt(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${formatInt(trainer.behaviour)} ${formatInt(trainer.escape)} ${formatInt(trainer.tech)} ${formatInt(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${formatInt(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${formatInt(items.enabledMask)} ${formatInt(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"} ${game.forge ? "1" : "0"} ${lines}`;
+  return `${classicRun ? "1" : "0"} ${formatInt(stockCount)} ${formatInt(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${formatInt(trainer.behaviour)} ${formatInt(trainer.escape)} ${formatInt(trainer.tech)} ${formatInt(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${formatInt(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${formatInt(items.enabledMask)} ${formatInt(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"} ${game.forge ? "1" : "0"} ${lines}`;
 }
 
 type RuleHandlers = { readonly [K in RuleButton["kind"]]: (actions: SelectionActions, participantId: number, button: Extract<RuleButton, { kind: K }>) => void };

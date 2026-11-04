@@ -11,7 +11,7 @@ Researched 8 Oct 2026.
 
 Classic offers the 21 fighters with finished routes. Grom, Anub’arak,
 Malfurion and Medivh remain available in other modes while their
-Classic routes and Lore Battles are pending.
+Classic routes are pending.
 
 The source of truth for the routes is makgora:ts/src/game/classic/routes.ts;
 makgora:ts/src/game/classic/classic.tests.ts checks that every fighter in the Classic selector
@@ -171,7 +171,7 @@ synchronized event, calling the fight's start when it ends.
 
 ## Configured matches
 
-Classic and Lore Battles share one engine
+Classic runs on one engine
 (makgora:ts/src/game/classic/runState.ts and configuredMatch.ts): a
 configured match is one data entry naming the player's fighter (or the one
 chosen), the opponents with their named computer and tier, the stage, rule
@@ -182,8 +182,7 @@ list's last entry, and the transmission before it. The engine puts an entry
 into the ordinary settings and stage load, starts its fighters with the
 entry's stocks and damage, judges the win condition, and keeps the run's
 time, damage taken and continues as synchronized match state. A run restores
-the menu's settings when it ends. Lore Battles (#305) is a list of entries
-played through the same calls; classic.tests.ts plays one such entry, built
+the menu's settings when it ends. classic.tests.ts plays one such entry, built
 from data alone, to its survive condition.
 
 `-dev classic NAME` starts a fighter's run from fighter selection and `-dev

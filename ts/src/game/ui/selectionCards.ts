@@ -53,7 +53,7 @@ export function menuFocusList(game: Readonly<MatchState>, participantId: number)
     for (const slot of PARTICIPANT_SLOTS) if (canChooseComputer(game, participantId, slot)) focus.push({ kind: "team", slot });
   }
   focus.push({ kind: "mainMenu", slot: participantId }, { kind: "mode", slot: participantId });
-  if (!game.training && !game.classic && !game.lore) focus.push({ kind: "teamBattle", slot: participantId });
+  if (!game.training && !game.classic) focus.push({ kind: "teamBattle", slot: participantId });
   focus.push({ kind: "rules", slot: participantId }, { kind: "guide", slot: participantId }, { kind: "gear", slot: participantId });
   return focus;
 }

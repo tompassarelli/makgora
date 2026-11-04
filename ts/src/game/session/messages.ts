@@ -12,7 +12,6 @@ import { fighterName } from "../roster/kits";
 import { classicResultHelp, classicResultMessage, classicLevel, levelName } from "../classic/classicText";
 import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, cpuProfileLabel } from "../match/cpuProfiles";
 import { TEAM_NAMES } from "../sim/teams";
-import { LORE_BATTLES, loreBattle, loreResultHelp, loreResultMessage } from "../classic/loreBattles";
 import { partnerBehaviourSetting, stockSetting, timeSetting } from "../ui/ruleText";
 
 
@@ -34,7 +33,7 @@ export function matchStartNotice(game: Readonly<MatchState>): string {
 }
 
 export function resultMessage(game: Readonly<MatchState>): string {
-  if (game.run.active) return game.lore ? loreResultMessage(game) : classicResultMessage(game);
+  if (game.run.active) return classicResultMessage(game);
   const winner = game.winner === undefined ? undefined : game.teamBattle ? `${TEAM_NAMES[game.teamChoices[game.winner]]} Team` : fighterLabel(game, game.winner);
   if (game.interrupted) return winner === undefined ? "Match ended because a player left." : `${winner} wins by forfeit.`;
   if (winner !== undefined) return `${winner} wins!`;
@@ -44,7 +43,7 @@ export function resultMessage(game: Readonly<MatchState>): string {
 const confirmControl = (start: StartControl) => (start === "Start" ? "Start" : "Y");
 
 function rematchStatus(game: Readonly<MatchState>, start: StartControl): string {
-  if (game.run.active) return game.lore ? loreResultHelp(game, confirmControl(start)) : classicResultHelp(game, confirmControl(start));
+  if (game.run.active) return classicResultHelp(game, confirmControl(start));
   if (game.rematchCountdown > 0) return "Press any button to stop the rematch.";
   const present = PARTICIPANT_SLOTS.filter(slot => humanPresent(game, slot));
   const ready = present.filter(slot => game.rematchReadiness[slot]);
@@ -62,7 +61,6 @@ export const orbsSetting = (on: boolean) => `Orbs: ${on ? "On" : "Off"}`;
 
 export function rulesSummary(game: Readonly<MatchState>): string {
   if (game.classic) return `Classic · starts at ${levelName(classicLevel(game))}`;
-  if (game.lore) return `Lore Battle · ${loreBattle(game.loreBattle)?.title ?? ""}`;
   if (game.training) return "Training · No time limit";
   if (practiceSelected(game)) return "Practice · No time limit";
   const rules = game.endless ? "Endless" : `${stockSetting(game.stockCount)}  ·  ${timeSetting(game.timeLimitMinutes)}`;
@@ -73,7 +71,6 @@ export function rulesSummary(game: Readonly<MatchState>): string {
 /** The select bar's rules pill: the live rules, short enough for one line. */
 export function rulesPillParts(game: Readonly<MatchState>): readonly string[] {
   if (game.classic) return ["Classic", levelName(classicLevel(game))];
-  if (game.lore) return ["Lore Battle", `${game.loreBattle + 1}/${LORE_BATTLES.length}`];
   if (game.training) return ["Training", partnerBehaviourSetting(game.trainer.behaviour)];
   const rules = game.endless ? ["Endless"] : [stockSetting(game.stockCount), game.timeLimitMinutes === 0 ? "No timer" : timeSetting(game.timeLimitMinutes)];
   return [...rules, ...(game.ultimatesOff ? [] : ["Ultimates"]), ...(game.items.on ? ["Items"] : [])];
@@ -119,7 +116,7 @@ export function trainingReadout(state: Readonly<TrainingState>): string {
 }
 
 
-export const MODE_LABELS: Readonly<Record<MatchMode, string>> = { versus: "VERSUS", training: "TRAINING", classic: "CLASSIC", lore: "LORE BATTLES" };
+export const MODE_LABELS: Readonly<Record<MatchMode, string>> = { versus: "VERSUS", training: "TRAINING", classic: "CLASSIC" };
 export const selectionModeLabel = (game: Readonly<MatchState>): string => MODE_LABELS[matchMode(game)];
 export const MOVES_HEADER = "MOVES";
 

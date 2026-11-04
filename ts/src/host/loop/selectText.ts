@@ -3,15 +3,9 @@ import type { MatchMode } from "../../game/lobby/matchMode";
 import type { ClassicLines, SelectText } from "../../game/ui/selectionActions";
 import { MODE_LABELS, rulesPillParts, selectionModeLabel } from "../../game/session/messages";
 import { classicRouteSummary, classicTierSetting } from "../../game/classic/classicText";
-import { loreBattle, loreBattleSetting, loreBattleSummary } from "../../game/classic/loreBattles";
-import { loreClears } from "../../game/classic/loreClears";
 
 function classicLines(game: Readonly<MatchState>, fighter: number): ClassicLines {
-  const { classicTier, lore, loreBattle: battle } = game;
-  if (!lore) return { setting: classicTierSetting(classicTier), route: classicRouteSummary(fighter) };
-  const clears = loreClears();
-  const chosen = loreBattle(battle);
-  return { setting: loreBattleSetting(battle, chosen !== undefined && clears.has(chosen.id)), route: loreBattleSummary(battle, clears.count()) };
+  return { setting: classicTierSetting(game.classicTier), route: classicRouteSummary(fighter) };
 }
 
 /** The select bar's words from match flow and Classic progress, which the ui layer may not read itself. */

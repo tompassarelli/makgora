@@ -23,7 +23,6 @@ import { PartnerBehaviour } from "../match/trainingState";
 import { selectableStage } from "../menu/stageCatalog";
 import { REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
 import type { Character } from "../sim/codes";
-import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { MATCH_CHARACTERS, fighterName, fighterKey, fighterSlug } from "../roster/kits";
 import { costumeIndex, costumesFor } from "../roster/costumes";
 import { isScenario, type Scenario } from "./build";
@@ -298,30 +297,6 @@ export function classicDevRequest(message: string): { readonly character: Charac
   return character === undefined ? undefined : { character, boss: false };
 }
 
-
-export const LORE_COMMAND = "-dev lore ";
-
-export function loreDevRequest(message: string, battles: number): number | undefined {
-  if (!message.startsWith(LORE_COMMAND)) return undefined;
-  const battle = commandInteger(message.substring(LORE_COMMAND.length));
-  return battle !== undefined && battle >= 1 && battle <= battles ? battle : undefined;
-}
-
-
-export const LORE_WIN_COMMAND = "-dev lore win";
-
-export function winLoreBattle(game: MatchState, world: Roster): boolean {
-  const { run } = game;
-  if (!game.lore || !run.active || game.phase !== Phase.match) return false;
-  for (const slot of PARTICIPANT_SLOTS) {
-    if (slot === run.player || !isActive(world, slot)) continue;
-    const { status } = fighterAt(world, slot);
-    status.stocks = 0;
-    status.out = true;
-  }
-  run.boss.health = 0;
-  return true;
-}
 
 
 export const QUICK_TRAINING_COMMAND = "-dev quick training";

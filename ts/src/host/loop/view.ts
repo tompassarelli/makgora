@@ -64,7 +64,7 @@ import { drawStageScenery, presentDrifters } from "./stageScenery";
 import { probeCamera } from "./responseProbe";
 import { clockSeconds } from "./trace";
 import { frameCaptureStage } from "../../platform/captureStage";
-import { markLoreClear, presentMatchPanels, presentMessages, updateSlotHud } from "./viewHud";
+import { presentMatchPanels, presentMessages, updateSlotHud } from "./viewHud";
 import { presentHydra, presentSlot, presentStageMotion } from "./viewPresentation";
 import { createEffect, destroyEffect, Effect, EffectAnimation, playEffectAnimation, setEffectAlpha, setEffectColor, setEffectMatrixScale, setEffectPosition, setEffectScale, setEffectYaw } from "wisp/game/effects";
 import { clearTextMessages, createFrameByType, Frame, FramePoint, originFrame, OriginFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameFont, setFrameSize, setFrameTextAlignment, TextAlignment } from "wisp/game/frames";
@@ -555,7 +555,6 @@ export function renderUi(s: ShellState): void {
   const showMatch = !paused && !pauseHudHidden(s) && !selecting && !(local !== undefined && ui.settings[local].isOpen());
   for (const slot of PARTICIPANT_SLOTS) updateSlotHud(s, ui, slot, game, selecting, paused, menu.title, showMatch);
   presentMatchPanels(s, game, ui, showMatch, local, localKeys);
-  markLoreClear(game);
   presentMessages(s, game, ui, showMatch, paused, selecting, local, localFighter);
   ui.stage.update(game, s.stageLoad?.carded === true);
   hideWarcraftChat();

@@ -2663,7 +2663,7 @@ amount never varies.
   for half a second (presentation/orbLook.ts `sightOrb`).
 - **Rule.** Orbs are off by default since 2 Nov 2026; the stage menu's "Orbs:
   On/Off" button, or `-dev orbs on|off`, turns them on. They never appear in
-  Training or in Classic and lore runs, and the tutorial hangs its own orb
+  Training or in Classic runs, and the tutorial hangs its own orb
   for its orb lessons. `-dev meter N` and the tape op `test-meter SLOT PERCENT` set
   the ultimate meter to N percent.
 - **Computers** contest an orb after their reaction delay from the start of

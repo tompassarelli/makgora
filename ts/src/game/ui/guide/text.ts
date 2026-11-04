@@ -104,11 +104,9 @@ export const MODES = {
   versus: "Versus: fight players and computers with the rules on this screen.",
   training: "Training: practise on a partner you set up; no stocks or timer.",
   classic: "Classic: a run of fights that ends with a boss.",
-  lore: "Lore Battles: story fights against set opponents.",
 } as const;
 
-export const MODE_LIST_HELP = "Mode: open the list to choose Versus, Training, Classic or Lore Battles.";
+export const MODE_LIST_HELP = "Mode: open the list to choose Versus, Training, or Classic.";
 export const CLASSIC_LEVEL_HELP = "Level: the level this Classic run starts at, from 1 to the hardest; each fight climbs from it, and it stays fixed once the run starts.";
-export const LORE_BATTLE_HELP = "Battle: choose which lore battle to fight.";
 
 export const PAUSE_KEYS = { controls: [CONTROLS_PANEL_KEY, "Show controls"], warcraftMenu: [WARCRAFT_MENU_KEY, "Warcraft menu"] } as const;

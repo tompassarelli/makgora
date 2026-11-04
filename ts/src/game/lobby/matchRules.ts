@@ -6,7 +6,7 @@ import { canChooseComputer, humanActive, type MatchState, Phase } from "./lobbyS
 export const settingRules = (game: Readonly<MatchState>, slot: number): boolean => game.phase === Phase.characterMenu && humanActive(game, slot);
 
 export function setTeamBattle(game: MatchState, actor: number, on: boolean): void {
-  if (settingRules(game, actor) && !game.training && !game.classic && !game.lore) game.teamBattle = on;
+  if (settingRules(game, actor) && !game.training && !game.classic) game.teamBattle = on;
 }
 
 export function setFriendlyFire(game: MatchState, actor: number, on: boolean): void {

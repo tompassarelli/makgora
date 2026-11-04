@@ -343,9 +343,9 @@ one row of a few clusters with the rarely used settings one click deeper
 (progressive disclosure), after a mockup he had made. Left to right:
 
 1. `< MENU`: the title screen, as the old Main menu button.
-2. The mode (`VERSUS`, `TRAINING`, `CLASSIC` or `LORE BATTLES`) with an arrow,
+2. The mode (`VERSUS`, `TRAINING` or `CLASSIC`) with an arrow,
    and attached to it the `FFA`/`TEAMS` toggle (Team Battle; Versus only).
-   The mode list holds exactly the four modes the game has, each with one line
+   The mode list holds exactly the three modes the game has, each with one line
    on what it is and a check on the current one, then Team Battle and, while
    it is on, Friendly Fire.
 3. The rules pill, centred and the widest item: the live rules in one line
@@ -355,7 +355,7 @@ one row of a few clusters with the rarely used settings one click deeper
    count and time steppers, Ultimates, Items, Endless play, Automatic rematch,
    the Speed and Heavy item toggles while items are on, and Reset default; in
    Training the partner's behaviour, drift, tech and damage, hit areas and game
-   speed; in Classic the starting level and the route; in Lore Battles the battle and the route.
+   speed; in Classic the starting level and the route.
 4. `Guide` with the `F2` key: Controls & Bindings (the controls and keyboard
    screen, as F2), Character Move List and How to Play (the tutorial menu).
 5. The plain gear icon, opening SETTINGS: the input
@@ -398,7 +398,7 @@ and down pick a row, left and right step it and Attack presses it, and Special
 closes it. F2 and Y keep their keys.
 
 The bar's words that come from match flow and Classic progress (the mode
-label, the pill, the mode names and Classic's and Lore Battles' lines) are
+label, the pill, the mode names and Classic's lines) are
 written by the host through `SelectText` (makgora:ts/src/host/loop/selectText.ts),
 because the ui layer may not read session or Classic state itself.
 

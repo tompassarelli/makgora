@@ -14,7 +14,6 @@ import { resultChoicesOpen } from "../../game/lobby/matchFlow";
 import type { Fighter } from "../../game/sim/fighter";
 import type { ParticipantSlot } from "../../game/input/participants";
 import type { KeyBindings } from "../../game/input/keyBindings";
-import { loreClears } from "../../game/classic/loreClears";
 import { bossDefinition } from "../../game/classic/bosses";
 import { type UiObjects, layoutHuds, menuControlHit } from "./ui";
 import { localDevice, localPreview } from "./keyboardPreview";
@@ -43,11 +42,6 @@ export function presentMatchPanels(s: ShellState, game: MatchState, ui: UiObject
   ui.classic?.updateCard(game);
   const boss = game.run.active ? bossDefinition(game.run.boss.kind) : undefined;
   ui.bossPlate?.update(showMatch && boss !== undefined && game.phase === Phase.match, boss?.name ?? "", boss?.portrait ?? "", game.run.boss.health, game.run.boss.maxHealth);
-}
-
-export function markLoreClear(game: MatchState): void {
-  const cleared = game.lore && game.phase === Phase.result && game.run.active && game.run.cleared ? game.run.current : undefined;
-  if (cleared !== undefined && localSlot() === game.run.player) loreClears().mark(cleared.id);
 }
 
 export function updateSlotHud(s: ShellState, ui: UiObjects, slot: ParticipantSlot, game: MatchState, selecting: boolean, paused: boolean, menuTitle: boolean, showMatch: boolean): void {

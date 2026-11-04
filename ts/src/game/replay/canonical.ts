@@ -163,10 +163,6 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
     bool("match.classic", true);
     int("match.classicTier", match.classicTier);
   }
-  if (match.lore) {
-    bool("match.lore", true);
-    int("match.loreBattle", match.loreBattle);
-  }
   if (match.run.active) writeConfiguredRun(match.run, int, bool, real, (name, value) => sink.text(`|${name}=${value}`));
   int("runtime.simulationFrame", runtime.simulationFrame);
   for (const slot of PARTICIPANT_SLOTS) real(`runtime.botAttackDelays[${slot}]`, runtime.botAttackDelays[slot]);

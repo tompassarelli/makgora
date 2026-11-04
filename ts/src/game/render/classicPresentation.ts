@@ -230,7 +230,7 @@ export class ClassicPresentation {
 
 
   updateCard(game: Readonly<MatchState>): void {
-    const shown = game.phase === Phase.result && game.run.active && game.run.cleared && !game.lore;
+    const shown = game.phase === Phase.result && game.run.active && game.run.cleared;
     setFrameVisible(this.card, shown);
     if (!shown) return;
     const ending = classicEnding(game);

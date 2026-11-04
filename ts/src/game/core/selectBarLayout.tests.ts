@@ -94,7 +94,7 @@ test("Each framed box has its own art at its own size, one image per style and s
 test("Every rule's hover help fits its framed panel in at most four lines, in a size the art build makes, as wide as the largest panel's text needs and at least the drawer button text size [k2 property]", () => {
   const sizes = new Set(barArt().filter(item => item.style === "Panel").map(item => barArtName("Panel", item)));
   const game = createMatchState();
-  const variants = [game, { ...game, training: true }, { ...game, classic: true }, { ...game, lore: true }];
+  const variants = [game, { ...game, training: true }, { ...game, classic: true }];
   for (const variant of variants) {
     for (const name of Object.keys(RULE_BUTTONS) as RuleName[]) {
       for (const offline of [1, 2]) {

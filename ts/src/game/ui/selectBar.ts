@@ -28,7 +28,6 @@ const MODE_TEXT: Readonly<Record<MatchMode, string>> = {
   versus: "Fight players and computers",
   training: "Practise on a partner you set up",
   classic: "A run of fights ending with a boss",
-  lore: "Story fights against set opponents",
 };
 
 const PANEL_OF: Readonly<Partial<Record<BarItem, BarPanel>>> = { mode: "mode", rules: "rules", guide: "guide", gear: "gear" };
@@ -426,7 +425,7 @@ export class SelectBar {
   private presentRules(view: BarView, lit: Lit): void {
     const { game } = view;
     const mode = matchMode(game);
-    const classic = mode === "classic" || mode === "lore" ? this.text.classicLines(game, view.fighter) : undefined;
+    const classic = mode === "classic" ? this.text.classicLines(game, view.fighter) : undefined;
     const key = rulesKey(game, classic);
     if (key !== this.shownKey) {
       this.shownKey = key;

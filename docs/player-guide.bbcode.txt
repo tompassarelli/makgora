@@ -132,8 +132,6 @@ Training: practise on a partner you set up; no stocks or timer.
 
 Classic: a run of fights that ends with a boss.
 
-Lore Battles: story fights against set opponents.
-
 [B]How to play[/B]
 
 Stocks: each fighter has a few lives (stocks). Hits raise damage %, and the higher it is the farther a hit sends you. Fly past the edge of the screen and you lose a stock; the last fighter with stocks wins.

@@ -280,7 +280,7 @@ match resolves it; dropping the chip on a fighter (or stepping left/right past
 the roster's ends with the card focused) fixes the fighter, and returning it to
 Random restores the draw. At match start each Random CPU fighter is drawn
 uniformly from the playable roster with the shared match seed and a salt
-separate from the opponent's, never client-local randomness. Classic and Lore
+separate from the opponent's, never client-local randomness. Classic
 runs choose their own fighters and hide the tile.
 
 Retain the resolved fighter and identity through replay/rollback and reveal

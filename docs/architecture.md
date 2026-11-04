@@ -26,7 +26,7 @@ A module may import only the modules in its "may use" column. Sim code never rea
 | render | `ts/src/game/render/` | Warcraft-native effects and sound playback | presentation, sim, core, Wisp map |
 | ui | `ts/src/game/ui/`, `ts/src/game/menu/` | Frames, menus, selection screens | lobby, roster, render, presentation, core |
 | session | `ts/src/game/session/` | Session, playback, dev settings, match record writer | match, replay, lobby, ui, netcode, presentation, render, roster, core |
-| classic | `ts/src/game/classic/` | Classic mode routes and lore battles | session, match, lobby, roster, core |
+| classic | `ts/src/game/classic/` | Classic mode routes | session, match, lobby, roster, core |
 | host | `ts/src/platform/` (`*Main.ts` entries, `shell/` live loop) | Map entry points; view, keys, rollback tick | everything above, Wisp map |
 
 Known breaks still in the tree (removed by slices, never copied): `fighters/*/kit.ts` importing generated clips (S5), sim importing `input/participants.ts` (S12), `sim/testDuel.ts` importing match (S9).
