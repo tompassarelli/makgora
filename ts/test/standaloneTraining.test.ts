@@ -3,7 +3,7 @@ import { Phase } from "../src/game/lobby/lobbyState";
 import { shell } from "../src/host/loop/state";
 import { NEUTRAL_INPUT, createStandaloneSession, standaloneArguments } from "../scripts/wisp/standalone";
 
-test("--start training opens the standalone in a training match", async () => {
+test("--start training opens the standalone in a training match [k1 scenario]", async () => {
   expect(standaloneArguments(["--start", "training"]).start).toBe("training");
   const session = await createStandaloneSession({ start: "training" });
   try {
