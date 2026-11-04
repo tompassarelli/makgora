@@ -400,6 +400,11 @@ transport (wisp#110) both call it.
   button and profiles save only keys; a profile saved with an old delay code
   loads its keys and drops the code. Each client proposes Auto from its
   measured echo, with no ceiling (see *Rollback window and no delay cap*).
+  Tom kept this on 5 Nov 2026 against an offline-only low-latency option:
+  reaction play (shielding a move on sight, punishing a whiff) and the
+  computer tiers' reaction frames are tuned around 2 frames, so a 0-frame
+  offline mode would make computers easier and offline practice unlike
+  online, for about 33 ms that only offline-only players would gain.
   Local matches use the default.
 - **Host-set delay (Tom, 29 Oct 2026):** the host, the first human slot,
   may set the lobby's input delay; this reverses the 20 Oct rule for the
