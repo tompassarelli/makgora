@@ -2,7 +2,8 @@ import { expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { NEUTRAL_INPUT, createStandaloneSession, standaloneArguments } from "../scripts/wisp/standalone";
+import { NEUTRAL_INPUT, createStandaloneSession } from "../scripts/wisp/standalone";
+import { standaloneArguments } from "../scripts/wisp/standaloneArguments";
 import { Phase } from "../src/game/lobby/lobbyState";
 
 const PROMPT = "Start tutorial";

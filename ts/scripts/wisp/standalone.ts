@@ -1,55 +1,32 @@
-import { devCommandsOf, devQuery } from "./devArguments";
-import type { StandaloneGame, StandaloneInput, StandaloneSession } from "wisp/scripts/wisp/standalone";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import type { StandaloneInput, StandaloneSession } from "wisp/scripts/wisp/standalone";
 import type { MapEntry } from "wisp/src/headless/client";
 import { createKeyFeed } from "wisp/src/headless/keyInput";
 import { createPointerFeed } from "wisp/src/headless/pointer";
-import { Effect } from "effect";
-import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
-import { RenderFailure } from "wisp/scripts/wisp/headlessRender";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { nativeDeclarations } from "./nativeDeclarations";
 import { customMapData } from "wisp/scripts/wisp/headlessInput";
 import { describeDigestDifference, digestDifference, frameDigest } from "../../src/game/replay/frameDigest";
-import { Action } from "../../src/game/input/actions";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
 import { Phase, cycleSlotMode } from "../../src/game/lobby/lobbyState";
 import { selectCharacter, selectCpuCharacter } from "../../src/game/lobby/characterChoice";
 import { setCpuOpponent, setCpuTier, setStocks } from "../../src/game/lobby/matchRules";
+
 import { fighterAt, isActive } from "../../src/game/sim/roster";
 import { Character } from "../../src/game/sim/codes";
-import { STAGE_CATALOG, type StageTile } from "../../src/game/menu/stageCatalog";
+import { type StageTile } from "../../src/game/menu/stageCatalog";
 import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { QUICK_TRAINING_COMMAND } from "../../src/game/session/devSettings";
-import { DIZZY_MODEL } from "../../src/host/loop/fighterBody";
-import { preloadFighterModels, preloadFighterTextures } from "../../src/game/render/fighterPreload";
-import { preloadMatchModels } from "../../src/game/render/matchPreload";
-import { preloadHudTextures } from "../../src/game/ui/hudPreload";
-import { preloadMenuTextures } from "../../src/game/ui/menuPreload";
-import { SELECTABLE_CHARACTERS } from "../../src/game/roster/kits";
-import { cueModels } from "./cueModels";
-import { preloadModels, preloadSkies } from "../../src/game/presentation/stagePreload";
 import { PREDICTED_HEADLESS, MAKGORA_HEADLESS } from "./headless";
 import { deliverKey } from "./deliverKey";
-import { headlessRender, playerRender } from "./headlessRender";
-import { createNetStandalone, makgoraMapHash } from "./net";
 import { CPU_OPPONENT, SELECTION_SCRIPT, selectionPointer, selectionPresses } from "./selectionScript";
 import { heldKeys, scriptedKeys } from "./standaloneKeys";
+import { type StandaloneStart } from "./standaloneArguments";
 
 export const NEUTRAL_INPUT: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
 
-
-
-
-
-
 const FOUR_FIGHTERS = ["-dev slots 1 14", "-dev fighter 2 Blademaster", "-dev fighter 3 Illidan", "-dev fighter 4 Warden", "-dev time 2"];
 const FOUR_FIGHTER_STOCKS = 99;
-
-
-export type StandaloneStart = "match" | "training" | "select" | "results";
 
 const offersPrompt = (start: StandaloneStart, savedFiles: string | undefined, tutorialOffer: boolean): boolean => tutorialOffer && (start !== "select" || savedFiles !== undefined);
 
@@ -70,15 +47,6 @@ function addCpuOpponent(game: Parameters<typeof cycleSlotMode>[0]): void {
 
 const QUICK_MATCH = "-dev quick cpu wren warchief hero illidan";
 const SELECT_SETTLE_STEPS = 30;
-
-const squashed = (name: string): string => name.toLowerCase().replace(/[^a-z0-9]/g, "");
-
-/** The stage tile a `--stage` name picks, read without case, spaces or punctuation, so "tomb-of-sargeras" is Tomb of Sargeras. */
-export function stageNamed(name: string): StageTile {
-  const found = STAGE_CATALOG.find(stage => squashed(stage.name) === squashed(name));
-  if (found === undefined) throw new Error(`--stage names no stage: ${name}; the stages are ${STAGE_CATALOG.map(stage => stage.name).join(", ")}`);
-  return found.id;
-}
 
 export interface StandaloneSessionOptions {
   readonly script?: string;
@@ -223,122 +191,3 @@ export async function createStandaloneSession(options: StandaloneSessionOptions 
     throw error;
   }
 }
-
-/** Every model and interface image a match can show on any selectable stage with any selectable fighter, so the native window reads them in, and remasters them, while the player is in the menus. */
-export const standalonePreload = () => ({
-  preloadModels: [...new Set([DIZZY_MODEL, ...preloadFighterModels(), ...preloadModels(), ...preloadSkies(), ...preloadMatchModels(), ...cueModels(SELECTABLE_CHARACTERS)])],
-  preloadTextures: [...new Set([...preloadHudTextures(), ...preloadMenuTextures(), ...preloadFighterTextures()])],
-});
-
-export const makgoraStandalone = (render: StandaloneGame["render"]): StandaloneGame => ({
-  title: "Mak'gora",
-  render: { ...render, ...standalonePreload() },
-  create: createStandaloneSession,
-  net: { mapHash: makgoraMapHash, create: createNetStandalone },
-});
-
-const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only", "--no-tutorial-offer"]);
-const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests", "--storage", "--stage", "--dev"]);
-
-export function standaloneArguments(args: readonly string[], window: "chrome" | "native" = "native") {
-  let frames: number | undefined, rollback: number | undefined;
-  let presentation: MapBuild["presentation"] | undefined;
-  const flags = new Set<string>(), texts = new Map<string, string>();
-  const captureFrames: number[] = [];
-  for (let index = 0; index < args.length; index++) {
-    const arg = String(args[index]);
-    if (arg === "--standalone") continue;
-    if (FLAGS.has(arg)) { flags.add(arg); continue; }
-    if (!TEXT_OPTIONS.has(arg) && arg !== "--frames" && arg !== "--rollback" && arg !== "--capture-frames" && arg !== "--presentation") throw new Error(`unknown standalone option: ${arg}`);
-    const value = args[++index];
-    if (value === undefined || value.startsWith("--")) throw new Error(`${arg} needs a value`);
-    if (TEXT_OPTIONS.has(arg)) texts.set(arg, value);
-    else if (arg === "--presentation") {
-      if (value !== "native" && value !== "pool-confirmed" && value !== "pool-predicted") throw new Error("--presentation needs native, pool-confirmed or pool-predicted");
-      presentation = value;
-    } else if (arg === "--frames") {
-      if (!/^\d+$/.test(value) || Number(value) < 1) throw new Error("--frames needs a positive frame count");
-      frames = Number(value);
-    } else if (arg === "--rollback") {
-      if (!/^\d+$/.test(value) || Number(value) < 1) throw new Error("--rollback needs a positive frame count");
-      rollback = Number(value);
-    } else {
-      if (!/^\d+(,\d+)*$/.test(value)) throw new Error("--capture-frames needs comma-separated frame numbers");
-      captureFrames.push(...value.split(",").map(Number));
-    }
-  }
-  const startOptions = startArguments(texts);
-  const devCommands = devCommandsOf(texts.get("--dev"));
-  const script = texts.get("--script"), digests = digestsOf(texts, window), out = texts.get("--out"), map = texts.get("--map"), storage = texts.get("--storage"), headless = flags.has("--headless"), fourFighters = flags.has("--four-fighters");
-  if (headless && (frames === undefined || (out === undefined && window === "chrome"))) throw new Error(window === "native" ? "--headless needs --frames N" : "--headless needs --frames N and --out DIR");
-  const playerAssets = playerAssetsOf(flags.has("--player-assets-only"), map);
-  if (fourFighters && script !== undefined) throw new Error("--four-fighters plays its own inputs; drop --script");
-  const stageName = texts.get("--stage");
-  if (stageName !== undefined && !fourFighters) throw new Error("--stage picks the --four-fighters match's stage; add --four-fighters");
-  const stage = stageName === undefined ? undefined : stageNamed(stageName);
-  return { ...(fourFighters ? { fourFighters } : {}), ...(flags.has("--no-tutorial-offer") ? { noTutorialOffer: true } : {}), devCommands, ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }), ...(storage === undefined ? {} : { storage }), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
-}
-
-function digestsOf(texts: ReadonlyMap<string, string>, window: "chrome" | "native"): { readonly digests?: string } {
-  const digests = texts.get("--digests");
-  if (digests !== undefined && window !== "native") throw new Error("--digests is written by the native window; drop --window chrome");
-  return digests === undefined ? {} : { digests };
-}
-
-function startArguments(texts: ReadonlyMap<string, string>): { readonly start?: StandaloneStart; readonly chosen?: string } {
-  const start = texts.get("--start"), chosen = texts.get("--chosen");
-  if (start !== undefined && start !== "match" && start !== "training" && start !== "select" && start !== "results") throw new Error("--start needs match, training, select or results");
-  if (chosen !== undefined && start !== "select") throw new Error("--chosen needs --start select");
-  return { ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }) };
-}
-
-function playerAssetsOf(playerAssetsOnly: boolean, map: string | undefined): { readonly playerAssets?: { readonly map: string } } {
-  if (map === undefined) {
-    if (playerAssetsOnly) throw new Error("--player-assets-only reads the map's files; add --map MAP.w3x");
-    return {};
-  }
-  if (!playerAssetsOnly) throw new Error("--map is read only with --player-assets-only");
-  return { playerAssets: { map } };
-}
-
-// a compiled player embeds its entrypoints as .js
-const NATIVE_GAME_MODULE = join(import.meta.dir, import.meta.path.endsWith(".ts") ? "nativeGame.ts" : "nativeGame.js");
-
-export const standalonePlay: Command = (args) => Effect.gen(function*() {
-  const { runStandalone, standaloneEmulatedCallsArgument, standaloneNetArguments, standaloneWindowArgument } = yield* Effect.tryPromise({ try: () => import("wisp/scripts/wisp/standalone"), catch: (cause) => new RenderFailure({ cause }) });
-  const net = standaloneNetArguments(args);
-  if (typeof net === "string") return yield* new UsageFailure({ problem: net });
-  const windowed = standaloneWindowArgument(net.rest);
-  if (typeof windowed === "string") return yield* new UsageFailure({ problem: windowed });
-  const counted = standaloneEmulatedCallsArgument(windowed.rest);
-  if (typeof counted === "string") return yield* new UsageFailure({ problem: counted });
-  const options = yield* Effect.try({ try: () => standaloneArguments(counted.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
-  const { playerAssets, start, chosen, digests, storage, stage, rollback, fourFighters, noTutorialOffer, devCommands, ...run } = options;
-  const match = { ...(fourFighters === true ? { fourFighters } : {}), ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }) };
-  const game = makgoraStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
-  const query = new URLSearchParams();
-  if (playerAssets !== undefined) query.set("map", playerAssets.map);
-  if (options.start !== undefined) query.set("start", options.start);
-  if (!options.headless) query.set("save", "1");
-  if (chosen !== undefined) query.set("chosen", chosen);
-  if (noTutorialOffer === true) query.set("noTutorialOffer", "1");
-  if (options.presentation !== undefined) query.set("presentation", options.presentation);
-  if (options.fourFighters === true) query.set("fourFighters", "1");
-  if (options.stage !== undefined) query.set("stage", String(options.stage));
-  if (options.rollback !== undefined) query.set("rollback", String(options.rollback));
-  devQuery(query, devCommands);
-  if (digests !== undefined) query.set("digests", digests);
-  const compiled = !import.meta.path.endsWith(".ts");
-  if (compiled) process.env.MAKGORA_NATIVE_QUERY = query.toString();
-  if (windowed.window === "native") process.env.WISP_WINDOW_SNAPSHOTS ??= join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "makgora/evidence");
-  const nativeModule = query.size === 0 || compiled ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
-  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...match, ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }), ...(noTutorialOffer === true ? { tutorialOffer: false } : {}), devCommands }) }, {
-    ...run,
-    reforged: storage === undefined ? {} : { storage },
-    ...(playerAssets === undefined ? {} : { gpuLease: false }),
-    ...(counted.emulatedCalls === undefined ? {} : { emulatedCalls: counted.emulatedCalls }),
-    ...(net.net === undefined ? {} : { net: net.net }),
-    window: windowed.window,
-    ...(windowed.window === "native" ? { nativeGame: { module: nativeModule, export: "MAKGORA_NATIVE_GAME" } } : {}),
-  });
-});

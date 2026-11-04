@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { NEUTRAL_INPUT, createStandaloneSession, stageNamed } from "../scripts/wisp/standalone";
+import { NEUTRAL_INPUT, createStandaloneSession } from "../scripts/wisp/standalone";
+import { stageNamed } from "../scripts/wisp/standaloneArguments";
 
 const FRAMES = 240;
 const DEPTH = 8;

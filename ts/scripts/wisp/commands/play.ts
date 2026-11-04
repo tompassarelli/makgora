@@ -250,7 +250,7 @@ export const play: Command = (args) => Effect.gen(function*() {
     return yield* makePlay(declaration, gameFilesLayer, tools, makgoraWatch.pipe(Layer.provide(platformLayer())))(args);
   }
   if (args.includes("--standalone")) {
-    const { standalonePlay } = yield* Effect.tryPromise({ try: () => import("../standalone"), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
+    const { standalonePlay } = yield* Effect.tryPromise({ try: () => import("../standalonePlay"), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
     return yield* standalonePlay(args);
   }
   if (args.includes("--install-green")) {

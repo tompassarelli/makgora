@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { standalonePreload } from "../scripts/wisp/standalone";
+import { standalonePreload } from "../scripts/wisp/standaloneGame";
 import { WHITE_FIGHTER_MODELS } from "../src/generated/assets/whiteFighterModels";
 import * as impacts from "../src/game/assets/impactAssetInfo";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";

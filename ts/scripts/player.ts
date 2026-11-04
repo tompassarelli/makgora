@@ -44,7 +44,7 @@ const teardown: Teardown = (exit) => {
   process.exit(1);
 };
 
-const { standalonePlay } = await import("./wisp/standalone");
+const { standalonePlay } = await import("./wisp/standalonePlay");
 const { platformLayer } = await import("wisp/scripts/platform/layer");
 BunRuntime.runMain(standalonePlay(playerArguments(chosen.map, chosen.rest)).pipe(
   Effect.provide(Layer.merge(BunServices.layer, platformLayer())),

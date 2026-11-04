@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { standaloneArguments } from "../scripts/wisp/standalone";
+import { standaloneArguments } from "../scripts/wisp/standaloneArguments";
 
 test("player assets need a map and a map needs player assets [k2 property]", () => {
   expect(standaloneArguments(["--map", "Mak'gora.w3x", "--player-assets-only"]).playerAssets).toEqual({ map: "Mak'gora.w3x" });
