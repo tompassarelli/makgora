@@ -113,46 +113,6 @@ Strong and weak hits (frames are active frames, damage uncharged):
 | Forward smash (signature) | Position | sweetspot, frames 15-17, 12.2% | sourspot, frames 15-17, 9.2% | The blade's far edge: a hunter who strikes at her reach. |
 | Up smash | Position | sweetspot, frames 7-9, 18% | sourspot, frames 7-16, 15% |  |
 
-## Kel'Thuzad
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Frost Nova | A slow orb that chills; press again to burst it where it is. |
-| Side special | Death and Decay | A rotting field ahead that strikes twice, small then strong; walk or jump out. |
-| Up special | Spectral Ascent | A steerable rise, then a helpless fall. |
-| Down special | Frost Armor (Dark Ritual) | A shell that takes the knockback of one light hit and chills the attacker; press again for Dark Ritual: shatter it in a burst. |
-| Jab, repeated | Chilling Touch | A slap, then a freezing palm on a second jab. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-| Ultimate | Frost Wyrm | A frost wyrm sweeps straight ahead at body height. Jump or shield it. |
-
-Ground movement: walk 1.44, initial dash 1.71, run 1.98; run from dash frame 14.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-| Forward smash (signature) | Position | sweetspot, frames 18-20, 19.2% | sourspot, frames 18-20, 13.4% | Frost bursts at the staff's tip, so a caster who keeps distance kills at range. |
-
-## Uther
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Holy Light | A column of light bursts one step ahead and heals you a little when it hits. It punishes a whiff, so place it where they will be. |
-| Side special | Devotion Aura | Advance behind a golden aura that shrugs off light hits, then bash with the hammer. Grabs and heavy blows break through; a shield stops you. |
-| Up special | Hammer of the Righteous | A rising two-handed hammer arc you can steer a little, then a helpless fall. |
-| Down special | Divine Shield | A golden bubble turns aside strikes and missiles for a moment. You cannot act inside it, and a grab breaks it. |
-| Jab, repeated | Haft and Gauntlet | A check with the hammer's haft, then a gauntlet backhand. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-| Ultimate | Resurrection | Golden light gathers around him, then rings of it rise on both sides, heal him and throw everyone near him upward. Shield or roll away during the gathering. |
-
-Ground movement: walk 1.38, initial dash 1.63, run 1.89; run from dash frame 14.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-| Forward smash (signature) | Position | sweetspot, frames 18-20, 18% | sourspot, frames 18-20, 12% | The hammer's head carries the Light; the haft only shoves. |
-
 ## Mal'Ganis
 
 | Input | Name | What it does |
@@ -213,26 +173,6 @@ Strong and weak hits (frames are active frames, damage uncharged):
 | --- | --- | --- | --- | --- |
 | Forward smash (signature) | Position | sweetspot, frames 27-30, 26.4% | sourspot, frames 27-30, 20% | The cleaver's far edge: the demon lord's huge reach is the point. |
 
-## Rexxar
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Wild Axes | Throw two axes that fly straight out and vanish at the end of their travel. |
-| Side special | Summon Bear (Stampede) | Call Bear; press again and it roars, charges far ahead and mauls for heavy knockback while three thunder lizards stampede. |
-| Up special | Summon Hawk (Hawk Lift, Hawk Dive) | Call Hawk, then command a fast dive that stuns whoever it strikes. In the air, Hawk carries him up. |
-| Down special | Summon Quilbeast (Quill Volley) | Set a large Quilbeast firing position; press again for a three-quill volley from it. |
-| Jab, repeated | Twin Axes | Both axe hilts, then a shoulder that shoves, on repeated jabs. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-| Ultimate | Stampede | His pack stampedes past: a low quilbeast, a bear, then a high hawk. Jump, shield, then stay low. |
-
-Ground movement: walk 1.55, initial dash 1.84, run 2.13; run from dash frame 14.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-| Forward smash (signature) | Position | sweetspot, frames 21-24, 15.9% | sourspot, frames 21-24, 11.1% | The axe head bites; the haft only shoves. |
-
 ## Arthas
 
 | Input | Name | What it does |
@@ -285,6 +225,209 @@ Strong and weak hits (frames are active frames, damage uncharged):
 | Move | Axis | Strong hit | Weak hit | Why |
 | --- | --- | --- | --- | --- |
 | Forward smash (signature) | Timing | clean, frames 20-20, 18.4% | late, frames 21-22, 12.9% | The Doomhammer lands its full weight only on impact; the follow-through is a weak shove. |
+
+## Chen
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Breath of Fire | Breathe a long, fanning cone of flame; a soaked foe takes extra damage and burns. |
+| Side special | Body Slam | Belly-charge forward; stop at the first body or shield and pop the foe up. A miss leaves him open. |
+| Up special | Storm Rise | Rise in a crackling storm, then open the parasol: float and steer, hold down to close it and up to open it again, and swing one aerial before falling helplessly. |
+| Down special | Brew Keg (Keg Toss) | Pour ale into the keg in three glugs, then press special to lob it; a fuller keg slows and soaks longer and feeds Breath of Fire more. |
+| Jab, repeated | Staggering Three | A palm, a staff butt and a belly check on repeated jabs. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+| Ultimate | Storm, Earth and Fire | He calls Earth, Storm and Fire one after another. Earth draws foes in and breaks on one hit; Storm sends cyclones and Wind Walks away when struck; Fire bursts twice. Hit Earth, outlast them or keep away. |
+
+Ground movement: walk 1.16, initial dash 1.90, run 2.20; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+| Forward air (signature) | Position | sweetspot, frames 14-15, 14.4% | sourspot, frames 14-30, 4.3% | The drunken flying kick crackles with storm only at the heel the frame it lands; the leg and the lingering kick only shove. |
+| Down air | Position | sweetspot, frames 14-16, 10.8% | sourspot, frames 14-18, 6.5% | The keg's base drives a foe straight down; the rim and a late slam only knock them away. |
+
+## Peon
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Gold Sack (Gold Sack Bonk, Gold Sack Store) | Hold to stuff gold into the sack and release to bonk: a tap bonks at once, a longer hold bonks harder, and a full sack lunges forward and kills. Shield keeps the charge for the next press. |
+| Side special | Log Heave | Grab a huge log by its end and heave it up and over, on the ground or once in the air: its far end pops a foe up and back toward the Peon; the butt end barely moves them. |
+| Up special | Worksite Launch | Vault toward the stage, then fall helpless. |
+| Down special | Rest | Nap on the spot: a point-blank frame-2 jolt launches straight up and kills early, then the Peon sleeps for nearly four seconds. |
+| Jab, repeated | Work Work | A quick haft tap followed by a short axe chop. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+| Ultimate | Tower Rush | He builds five Orc watch towers in quick succession across the stage; each shoots arrows at the nearest foe for about three seconds, then crumbles. Break a tower, shield or dodge the arrows, or hit him while he builds. |
+
+Ground movement: walk 1.16, initial dash 1.38, run 1.60; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+| Forward smash (signature) | Position | sweetspot, frames 22-23, 20.5% | sourspot, frames 22-24, 14.3% | The pick bites hardest at its point, like a swing at the mine. |
+
+## Kael'thas
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Pyroblast | A slow, heavy fireball he steers with the stick for longer than most while he stands rooted; special or shield lets it go. Steered back into him it launches him along its flight. It hits hard and cracks shields, but a miss leaves him open. One at a time. |
+| Side special | Flame Strike | Hold to send a fire orb forward that gathers speed and climbs or sinks with the stick; release, touch or timeout erupts the pillar of fire where it is, and the pillar lingers and burns. One at a time. |
+| Up special | Phoenix | Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing. |
+| Down special | Banish | A green beam from his outstretched hand: whoever it touches turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell. |
+| Jab, repeated | Verdant Touch | A palm check, then a sphere shove on a second tap. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+| Ultimate | Summon Phoenix | Embers gather behind him and a phoenix rises at his shoulder, follows him and burns anyone near it. Break it or keep away from its flames. |
+
+Ground movement: walk 1.25, initial dash 1.48, run 1.72; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+| Forward smash (signature) | Position | sweetspot, frames 14-16, 16% | sourspot, frames 14-16, 11.2% | The arcane blast bursts at its far edge; the palm itself only shoves, so the mage kills by spacing. |
+
+## Mrgl & Grgl
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Net | Throw a net that slows the first enemy it reaches. With Grgl in step and near, both nets are wider and root the foe for a few hits. Shield it or jump it. |
+| Side special | Belly Slide | Belly-slide forward into a hit, and Grgl follows five frames later. A raised shield stops the slide. |
+| Up special | Tidal Surf | Ride a wave upward and steer it, carrying a Grgl within reach to the full height, then fall helpless. |
+| Down special | Mrglglgl! | Tap to make Grgl hold his ground, facing the nearest foe, and tap again to bring him back. With Grgl down, call him back at 0% beside Mrgl, once a stock. A hit while calling cancels it unspent. |
+| Jab, repeated | Claw Flurry | Two quick stabs, then a flurry of fin slaps while the button is held. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+| Ultimate | Mrglglgl Stampede | He blows a conch and a swarm of murlocs pours across the ground. Jump over it or shield. |
+
+Ground movement: walk 1.60, initial dash 2.00, run 2.30; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+| Neutral air (signature) | Timing | clean, frames 3-4, 5% | late, frames 5-8, 3.5% | A flailing spin strongest at its first slap; the rest is a scrappy weak wall. |
+
+## Archimonde
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Finger of Death | A glowing ring locks onto the foe and burns hotter for half a second, then a lightning column as wide as the ring strikes it. Step off the ring, or punish his long cast up close. |
+| Side special | Rain of Fire | A burning ring marks where each of two fire pillars will land, near then far, and each pillar is as tall as the sky. Leave the rings, or rush in under his cast. |
+| Up special | Fel Ascent | He rises a short way on a column of fel fire that burns anyone below, then falls helpless. Guard the ledge against him. |
+| Down special | Bash | Two hammer-fists into the ground: the first holds a grounded foe close by in place, the second launches them out of the hold; in the air the first drives them down. Shield it or jump it. |
+| Jab, repeated | Contempt | A back-handed claw, then a fist for anyone still standing there. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+| Ultimate | Rain of Chaos | Fel circles mark the foe and the ground on both sides of them; three infernals crash down one after another. Leave the circles. |
+
+Ground movement: walk 1.28, initial dash 1.52, run 1.76; run from dash frame 16.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+| Forward smash (signature) | Position | sweetspot, frames 22-24, 21% | sourspot, frames 22-24, 14% | The fel claws at the end of the slam crush; the forearms only shove. |
+
+## Stitches
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Meat Hook (Meat Hook Throw, Meat Hook Store) | Hold to wind the hook up and release to throw: a tap flings it a short way, a full hold about twice as far, and for a moment after the release the stick angles the throw up or down. It catches the first foe it reaches and reels them into his hands. A shield stops it, and a miss leaves him wide open. Shield keeps the charge for the next press. Thrown in the air, the first hook of each jump that reaches the ledge ahead reels him onto it. |
+| Side special | Stitches' Charge | A belly-first rush that shrugs off light hits and bowls the foe over. Shield it or hit him hard. |
+| Up special | Hook Swing | He flings the hook up and ahead: if it bites the ledge it reels him there; otherwise he hops a short way and falls helpless. |
+| Down special | Rot | Toggle: a stinking cloud around him burns and slows anyone close, and bleeds him while it lasts. Moving on the ground with it on, he leaves rot on the floor that goes on burning and slowing foes who cross it for three seconds after he has passed. Keep out of it. |
+| Jab, repeated | Fresh Cuts | A cleaver poke, then a shove of his belly. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+| Ultimate | Dismember | He raises the cleaver, then lunges: a caught foe is pinned and carved for a long moment while he heals. Shield or dodge the lunge. |
+
+Ground movement: walk 1.12, initial dash 1.33, run 1.54; run from dash frame 16.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+| Forward smash (signature) | Position | sweetspot, frames 20-22, 21% | sourspot, frames 20-22, 13.6% | The cleaver's edge carves; the haft only clubs, so he kills by spacing the blade. |
+
+## Ragnaros
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Summon Lava Spawn | Calls one lava spawn that lobs fireballs at the nearest foe for twelve seconds. It walks after him on its floor, sinks and resurfaces beside him when he submerges, and re-forms beside him when he leaves its floor. After five of its fireballs land it splits once into two. It can be hit and killed, and its fireballs reflect. Pressing again while it is out does nothing. |
+| Side special | Submerge | He sinks into the ground and resurfaces at the newest crater his Lava Raze left in the last three seconds, or a short step ahead if there is none. Underground he cannot be hit, and he comes up with a small pop-up hit. |
+| Up special | Lava Surf | Ride a flow of lava, steered by the stick in any direction, burning foes along the way, then fall helpless. |
+| Down special | Lava Raze | A glowing crack opens in the ground and erupts in lava. Down, or no direction, opens it one step ahead; down and forward, two; a quarter-circle from down through down and forward to forward, three. It erupts at his own height, so in the air or past a ledge it can erupt in mid-air, with no crack before it or scorch after it. The eruption throws foes away from its centre. |
+| Jab, repeated | Stand-in Jab | Two quick strikes ahead. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+
+Ground movement: walk 1.60, initial dash 1.90, run 2.20; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+
+# In the Forge
+
+These fighters are still in development and show on character select only with Show the Forge on (the Controls screen). Their moves can change or be placeholders.
+
+## Kel'Thuzad
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Frost Nova | A slow orb that chills; press again to burst it where it is. |
+| Side special | Death and Decay | A rotting field ahead that strikes twice, small then strong; walk or jump out. |
+| Up special | Spectral Ascent | A steerable rise, then a helpless fall. |
+| Down special | Frost Armor (Dark Ritual) | A shell that takes the knockback of one light hit and chills the attacker; press again for Dark Ritual: shatter it in a burst. |
+| Jab, repeated | Chilling Touch | A slap, then a freezing palm on a second jab. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+| Ultimate | Frost Wyrm | A frost wyrm sweeps straight ahead at body height. Jump or shield it. |
+
+Ground movement: walk 1.44, initial dash 1.71, run 1.98; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+| Forward smash (signature) | Position | sweetspot, frames 18-20, 19.2% | sourspot, frames 18-20, 13.4% | Frost bursts at the staff's tip, so a caster who keeps distance kills at range. |
+
+## Uther
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Holy Light | A column of light bursts one step ahead and heals you a little when it hits. It punishes a whiff, so place it where they will be. |
+| Side special | Devotion Aura | Advance behind a golden aura that shrugs off light hits, then bash with the hammer. Grabs and heavy blows break through; a shield stops you. |
+| Up special | Hammer of the Righteous | A rising two-handed hammer arc you can steer a little, then a helpless fall. |
+| Down special | Divine Shield | A golden bubble turns aside strikes and missiles for a moment. You cannot act inside it, and a grab breaks it. |
+| Jab, repeated | Haft and Gauntlet | A check with the hammer's haft, then a gauntlet backhand. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+| Ultimate | Resurrection | Golden light gathers around him, then rings of it rise on both sides, heal him and throw everyone near him upward. Shield or roll away during the gathering. |
+
+Ground movement: walk 1.38, initial dash 1.63, run 1.89; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+| Forward smash (signature) | Position | sweetspot, frames 18-20, 18% | sourspot, frames 18-20, 12% | The hammer's head carries the Light; the haft only shoves. |
+
+## Rexxar
+
+| Input | Name | What it does |
+| --- | --- | --- |
+| Neutral special | Wild Axes | Throw two axes that fly straight out and vanish at the end of their travel. |
+| Side special | Summon Bear (Stampede) | Call Bear; press again and it roars, charges far ahead and mauls for heavy knockback while three thunder lizards stampede. |
+| Up special | Summon Hawk (Hawk Lift, Hawk Dive) | Call Hawk, then command a fast dive that stuns whoever it strikes. In the air, Hawk carries him up. |
+| Down special | Summon Quilbeast (Quill Volley) | Set a large Quilbeast firing position; press again for a three-quill volley from it. |
+| Jab, repeated | Twin Axes | Both axe hilts, then a shoulder that shoves, on repeated jabs. |
+| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
+| Ultimate | Stampede | His pack stampedes past: a low quilbeast, a bear, then a high hawk. Jump, shield, then stay low. |
+
+Ground movement: walk 1.55, initial dash 1.84, run 2.13; run from dash frame 14.
+
+Strong and weak hits (frames are active frames, damage uncharged):
+
+| Move | Axis | Strong hit | Weak hit | Why |
+| --- | --- | --- | --- | --- |
+| Forward smash (signature) | Position | sweetspot, frames 21-24, 15.9% | sourspot, frames 21-24, 11.1% | The axe head bites; the haft only shoves. |
 
 ## Jaina
 
@@ -346,47 +489,6 @@ Strong and weak hits (frames are active frames, damage uncharged):
 | --- | --- | --- | --- | --- |
 | Forward smash (signature) | Position | sweetspot, frames 30-33, 20.1% | sourspot, frames 30-33, 15.3% | The halberd's head carries the earth's weight; the haft only shoves. |
 
-## Chen
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Breath of Fire | Breathe a long, fanning cone of flame; a soaked foe takes extra damage and burns. |
-| Side special | Body Slam | Belly-charge forward; stop at the first body or shield and pop the foe up. A miss leaves him open. |
-| Up special | Storm Rise | Rise in a crackling storm, then open the parasol: float and steer, hold down to close it and up to open it again, and swing one aerial before falling helplessly. |
-| Down special | Brew Keg (Keg Toss) | Pour ale into the keg in three glugs, then press special to lob it; a fuller keg slows and soaks longer and feeds Breath of Fire more. |
-| Jab, repeated | Staggering Three | A palm, a staff butt and a belly check on repeated jabs. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-| Ultimate | Storm, Earth and Fire | He calls Earth, Storm and Fire one after another. Earth draws foes in and breaks on one hit; Storm sends cyclones and Wind Walks away when struck; Fire bursts twice. Hit Earth, outlast them or keep away. |
-
-Ground movement: walk 1.16, initial dash 1.90, run 2.20; run from dash frame 14.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-| Forward air (signature) | Position | sweetspot, frames 14-15, 14.4% | sourspot, frames 14-30, 4.3% | The drunken flying kick crackles with storm only at the heel the frame it lands; the leg and the lingering kick only shove. |
-| Down air | Position | sweetspot, frames 14-16, 10.8% | sourspot, frames 14-18, 6.5% | The keg's base drives a foe straight down; the rim and a late slam only knock them away. |
-
-## Peon
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Gold Sack (Gold Sack Bonk, Gold Sack Store) | Hold to stuff gold into the sack and release to bonk: a tap bonks at once, a longer hold bonks harder, and a full sack lunges forward and kills. Shield keeps the charge for the next press. |
-| Side special | Log Heave | Grab a huge log by its end and heave it up and over, on the ground or once in the air: its far end pops a foe up and back toward the Peon; the butt end barely moves them. |
-| Up special | Worksite Launch | Vault toward the stage, then fall helpless. |
-| Down special | Rest | Nap on the spot: a point-blank frame-2 jolt launches straight up and kills early, then the Peon sleeps for nearly four seconds. |
-| Jab, repeated | Work Work | A quick haft tap followed by a short axe chop. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-| Ultimate | Tower Rush | He builds five Orc watch towers in quick succession across the stage; each shoots arrows at the nearest foe for about three seconds, then crumbles. Break a tower, shield or dodge the arrows, or hit him while he builds. |
-
-Ground movement: walk 1.16, initial dash 1.38, run 1.60; run from dash frame 14.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-| Forward smash (signature) | Position | sweetspot, frames 22-23, 20.5% | sourspot, frames 22-24, 14.3% | The pick bites hardest at its point, like a swing at the mine. |
-
 ## Gazlowe
 
 | Input | Name | What it does |
@@ -406,46 +508,6 @@ Strong and weak hits (frames are active frames, damage uncharged):
 | Move | Axis | Strong hit | Weak hit | Why |
 | --- | --- | --- | --- | --- |
 | Forward smash (signature) | Position | sweetspot, frames 17-20, 16.3% | sourspot, frames 17-20, 11.4% | The claw clamps hardest at full extension; the arm only pushes. |
-
-## Kael'thas
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Pyroblast | A slow, heavy fireball he steers with the stick for longer than most while he stands rooted; special or shield lets it go. Steered back into him it launches him along its flight. It hits hard and cracks shields, but a miss leaves him open. One at a time. |
-| Side special | Flame Strike | Hold to send a fire orb forward that gathers speed and climbs or sinks with the stick; release, touch or timeout erupts the pillar of fire where it is, and the pillar lingers and burns. One at a time. |
-| Up special | Phoenix | Rise as a phoenix and steer the flight while its flames burn down; then helpless. Struck in flight, he falls as an egg and hatches on landing. |
-| Down special | Banish | A green beam from his outstretched hand: whoever it touches turns ethereal, untouchable by attacks and grabs but unable to attack, grab or shield, and takes more damage from every spell. |
-| Jab, repeated | Verdant Touch | A palm check, then a sphere shove on a second tap. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-| Ultimate | Summon Phoenix | Embers gather behind him and a phoenix rises at his shoulder, follows him and burns anyone near it. Break it or keep away from its flames. |
-
-Ground movement: walk 1.25, initial dash 1.48, run 1.72; run from dash frame 14.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-| Forward smash (signature) | Position | sweetspot, frames 14-16, 16% | sourspot, frames 14-16, 11.2% | The arcane blast bursts at its far edge; the palm itself only shoves, so the mage kills by spacing. |
-
-## Mrgl & Grgl
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Net | Throw a net that slows the first enemy it reaches. With Grgl in step and near, both nets are wider and root the foe for a few hits. Shield it or jump it. |
-| Side special | Belly Slide | Belly-slide forward into a hit, and Grgl follows five frames later. A raised shield stops the slide. |
-| Up special | Tidal Surf | Ride a wave upward and steer it, carrying a Grgl within reach to the full height, then fall helpless. |
-| Down special | Mrglglgl! | Tap to make Grgl hold his ground, facing the nearest foe, and tap again to bring him back. With Grgl down, call him back at 0% beside Mrgl, once a stock. A hit while calling cancels it unspent. |
-| Jab, repeated | Claw Flurry | Two quick stabs, then a flurry of fin slaps while the button is held. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-| Ultimate | Mrglglgl Stampede | He blows a conch and a swarm of murlocs pours across the ground. Jump over it or shield. |
-
-Ground movement: walk 1.60, initial dash 2.00, run 2.30; run from dash frame 14.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-| Neutral air (signature) | Timing | clean, frames 3-4, 5% | late, frames 5-8, 3.5% | A flailing spin strongest at its first slap; the rest is a scrappy weak wall. |
 
 ## Grom
 
@@ -548,26 +610,6 @@ Strong and weak hits (frames are active frames, damage uncharged):
 | --- | --- | --- | --- | --- |
 | Forward smash (signature) | Position | sweetspot, frames 21-23, 21.6% | sourspot, frames 21-23, 15.1% | The wave breaks at the water spear's tip; the shaft only pushes, so she kills at its full reach. |
 
-## Archimonde
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Finger of Death | A glowing ring locks onto the foe and burns hotter for half a second, then a lightning column as wide as the ring strikes it. Step off the ring, or punish his long cast up close. |
-| Side special | Rain of Fire | A burning ring marks where each of two fire pillars will land, near then far, and each pillar is as tall as the sky. Leave the rings, or rush in under his cast. |
-| Up special | Fel Ascent | He rises a short way on a column of fel fire that burns anyone below, then falls helpless. Guard the ledge against him. |
-| Down special | Bash | Two hammer-fists into the ground: the first holds a grounded foe close by in place, the second launches them out of the hold; in the air the first drives them down. Shield it or jump it. |
-| Jab, repeated | Contempt | A back-handed claw, then a fist for anyone still standing there. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-| Ultimate | Rain of Chaos | Fel circles mark the foe and the ground on both sides of them; three infernals crash down one after another. Leave the circles. |
-
-Ground movement: walk 1.28, initial dash 1.52, run 1.76; run from dash frame 16.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-| Forward smash (signature) | Position | sweetspot, frames 22-24, 21% | sourspot, frames 22-24, 14% | The fel claws at the end of the slam crush; the forearms only shove. |
-
 ## Tyrande
 
 | Input | Name | What it does |
@@ -588,26 +630,6 @@ Strong and weak hits (frames are active frames, damage uncharged):
 | --- | --- | --- | --- | --- |
 | Forward smash (signature) | Position | sweetspot, frames 14-16, 16% | sourspot, frames 14-16, 12% | Moonlight gathers at the bow's tip; the grip only pushes, so she kills at full reach. |
 
-## Stitches
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Meat Hook (Meat Hook Throw, Meat Hook Store) | Hold to wind the hook up and release to throw: a tap flings it a short way, a full hold about twice as far, and for a moment after the release the stick angles the throw up or down. It catches the first foe it reaches and reels them into his hands. A shield stops it, and a miss leaves him wide open. Shield keeps the charge for the next press. Thrown in the air, the first hook of each jump that reaches the ledge ahead reels him onto it. |
-| Side special | Stitches' Charge | A belly-first rush that shrugs off light hits and bowls the foe over. Shield it or hit him hard. |
-| Up special | Hook Swing | He flings the hook up and ahead: if it bites the ledge it reels him there; otherwise he hops a short way and falls helpless. |
-| Down special | Rot | Toggle: a stinking cloud around him burns and slows anyone close, and bleeds him while it lasts. Moving on the ground with it on, he leaves rot on the floor that goes on burning and slowing foes who cross it for three seconds after he has passed. Keep out of it. |
-| Jab, repeated | Fresh Cuts | A cleaver poke, then a shove of his belly. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-| Ultimate | Dismember | He raises the cleaver, then lunges: a caught foe is pinned and carved for a long moment while he heals. Shield or dodge the lunge. |
-
-Ground movement: walk 1.12, initial dash 1.33, run 1.54; run from dash frame 16.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-| Forward smash (signature) | Position | sweetspot, frames 20-22, 21% | sourspot, frames 20-22, 13.6% | The cleaver's edge carves; the haft only clubs, so he kills by spacing the blade. |
-
 ## Akama
 
 | Input | Name | What it does |
@@ -616,24 +638,6 @@ Strong and weak hits (frames are active frames, damage uncharged):
 | Side special | Lunge | A short rush with a strike at the end. A shield stops the rush. |
 | Up special | Shadow Step | Dissolve into shadow and slip the way the stick points, then slash on arrival. Still holding special as he reappears, he lingers to aim and slips once more, shorter, in a new direction. Two steps at most, then a helpless fall. |
 | Down special | Burst | A blast on both sides of him. Stay out of reach or shield it. |
-| Jab, repeated | Stand-in Jab | Two quick strikes ahead. |
-| Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
-
-Ground movement: walk 1.60, initial dash 1.90, run 2.20; run from dash frame 14.
-
-Strong and weak hits (frames are active frames, damage uncharged):
-
-| Move | Axis | Strong hit | Weak hit | Why |
-| --- | --- | --- | --- | --- |
-
-## Ragnaros
-
-| Input | Name | What it does |
-| --- | --- | --- |
-| Neutral special | Summon Lava Spawn | Calls one lava spawn that lobs fireballs at the nearest foe for twelve seconds. It walks after him on its floor, sinks and resurfaces beside him when he submerges, and re-forms beside him when he leaves its floor. After five of its fireballs land it splits once into two. It can be hit and killed, and its fireballs reflect. Pressing again while it is out does nothing. |
-| Side special | Submerge | He sinks into the ground and resurfaces at the newest crater his Lava Raze left in the last three seconds, or a short step ahead if there is none. Underground he cannot be hit, and he comes up with a small pop-up hit. |
-| Up special | Lava Surf | Ride a flow of lava, steered by the stick in any direction, burning foes along the way, then fall helpless. |
-| Down special | Lava Raze | A glowing crack opens in the ground and erupts in lava. Down, or no direction, opens it one step ahead; down and forward, two; a quarter-circle from down through down and forward to forward, three. It erupts at his own height, so in the air or past a ledge it can erupt in mid-air, with no crack before it or scorch after it. The eruption throws foes away from its centre. |
 | Jab, repeated | Stand-in Jab | Two quick strikes ahead. |
 | Edge-guard tool | Down air | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |
 

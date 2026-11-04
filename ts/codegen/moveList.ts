@@ -8,6 +8,7 @@ import { SPECIAL_INPUTS, fighterKit, normalName } from "../src/game/sim/moveName
 import { WORLD_UNITS_PER_MELEE_UNIT, authoredTuning } from "../src/game/sim/tuning";
 import { EdgeGuardTool, edgeGuardTool } from "../src/game/match/edgeGuardScenarios";
 import { SIGNATURE_STRONG_HIT, strongHitReason, strongHitRows } from "../src/game/sim/strongHitTable";
+import { isFeatured } from "../src/game/roster/forge";
 
 export const output = "../docs/move-list.md";
 
@@ -52,7 +53,10 @@ export function moveListMarkdown(): string {
     "\"Ground states and the stick map\").",
   ];
   const units = (value: number) => (value / WORLD_UNITS_PER_MELEE_UNIT).toFixed(2);
-  for (const character of SELECTABLE_CHARACTERS) {
+  const forge = SELECTABLE_CHARACTERS.filter((character) => !isFeatured(character));
+  const order = [...SELECTABLE_CHARACTERS.filter(isFeatured), ...forge];
+  for (const character of order) {
+    if (character === forge[0]) lines.push("", "# In the Forge", "", "These fighters are still in development and show on character select only with Show the Forge on (the Controls screen). Their moves can change or be placeholders.");
     const kit = fighterKit(character);
     lines.push("", `## ${fighterName(character)}`, "", "| Input | Name | What it does |", "| --- | --- | --- |");
     kit.specials.forEach((special, slot) => {

@@ -2,7 +2,7 @@
 
 # Player guide
 
-Requires Warcraft III 3.0 and a keyboard; nothing else to install. Download the map from [Hive Workshop](https://www.hiveworkshop.com/threads/makgora-0-1-0.375492/), put it in the Warcraft III Maps folder and open it from Custom Games. Public 0.1 uses the Classic look. Set Graphics to Classic and restart Warcraft III after changing it.
+Requires Warcraft III 3.0 and a keyboard; nothing else to install. Download the map from [Hive Workshop](https://www.hiveworkshop.com/threads/makgora.375492/), put it in the Warcraft III Maps folder and open it from Custom Games. Mak'gora uses the Classic look. Set Graphics to Classic and restart Warcraft III after changing it.
 
 A controller is optional: the Mak'gora controller helper turns its buttons and sticks into its own pad keys, which work with any Controls layout. The default Melee pad layout uses A to attack, B for specials, X/Y to jump, RB to grab and LB for Strong; Tom's pad layout uses A to attack, X for specials, Y to jump, B to grab, LB to short hop and RB for Strong. In both, either trigger shields or air-dodges and Start pauses.
 
