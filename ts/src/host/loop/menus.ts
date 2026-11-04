@@ -10,13 +10,13 @@ import { pressKey } from "../../game/input/playerKeys";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import {
   DEFAULT_RESULT_PICK, Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, shownResultPick, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
-  setTeamBattle, setFriendlyFire, cycleTeam, cycleCostume, requestStageSelect, requestStart, setAutomaticRematch, setForgeShown, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, chooseMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
+  setTeamBattle, setFriendlyFire, cycleTeam, cycleCostume, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, chooseMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setOrbsOn, setStocks, setTimeLimit, updateConnectedHumans,
   type MatchState, START_HOLD_FRAMES, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
 } from "../../game/lobby/lobbyState";
 import { resetMomentRecorder } from "../../game/replay/moment";
-import { applyRulePreset } from "../../game/lobby/rulePresets";
+import { applyRulePreset, setForgeShown } from "../../game/lobby/rulePresets";
 import { resetPacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { clearObservedActions } from "../../game/match/step";
 import { clearAttackBuffer } from "../../game/input/attackBuffer";

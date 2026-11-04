@@ -429,7 +429,7 @@ export function returnToCharacters(game: MatchState, slot: number): void {
 }
 
 
-const settingRules = (game: Readonly<MatchState>, slot: number): boolean => game.phase === Phase.characterMenu && humanActive(game, slot);
+export const settingRules = (game: Readonly<MatchState>, slot: number): boolean => game.phase === Phase.characterMenu && humanActive(game, slot);
 
 export function setTeamBattle(game: MatchState, actor: number, on: boolean): void {
   if (settingRules(game, actor) && !game.training && !game.classic && !game.lore) game.teamBattle = on;
@@ -589,10 +589,6 @@ export function setCpuTier(game: MatchState, actor: number, computer: number, ti
 
 export function setAutomaticRematch(game: MatchState, slot: number, automatic: boolean): void {
   if (settingRules(game, slot)) game.automaticRematch = automatic;
-}
-
-export function setForgeShown(game: MatchState, slot: number, shown: boolean): void {
-  if (settingRules(game, slot)) game.forge = shown;
 }
 
 

@@ -1,5 +1,5 @@
 import { ITEM_KINDS, itemBit } from "../sim/codes";
-import { type MatchState, setAutomaticRematch, setEndless, setForgeShown, setItemsOn, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./lobbyState";
+import { type MatchState, setAutomaticRematch, setEndless, setItemsOn, settingRules, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./lobbyState";
 
 export type RulePreset = "standard" | "tourney" | "party" | "endless";
 
@@ -23,6 +23,10 @@ export const RULE_PRESETS: Readonly<Record<RulePreset, PresetRules>> = {
 };
 
 export const PRESET_NAMES: Readonly<Record<RulePreset, string>> = { standard: "Reset default", tourney: "Tourney", party: "Party", endless: "Endless" };
+
+export function setForgeShown(game: MatchState, slot: number, shown: boolean): void {
+  if (settingRules(game, slot)) game.forge = shown;
+}
 
 export function applyRulePreset(game: MatchState, slot: number, preset: RulePreset): void {
   const rules = RULE_PRESETS[preset];
