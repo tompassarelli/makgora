@@ -146,3 +146,67 @@ On Battle.net the cost is the held callbacks, not the frame time. At a 160 ms
 round trip Auto now agrees 1 where it used to agree 2. The host can still
 raise the delay, and error correction raises the next match's delay when
 prediction holds. Battle.net is not the competitive path (Tom, 2026-10-30).
+
+## Universal delay 0 against 1, measured before any decision (makgora#1122 part 10, 2026-11-05)
+
+Nothing here changes the shipped delay (1 in both builds); the numbers are for
+Tom's choice between 0 and 1.
+
+### Online cost, native window
+
+Command, on the laptop (whiterabbit) under perf-window's quiet native lease:
+`bun scripts/perf-window.ts --here --resolution 2880x1920 --preset High --stage
+Blackrock --online 0,150,300 --jitter 10 --input-delay 0`, smoothing on. The
+match is deterministic, so the counts compare directly with part 7's delay-1
+smoothing runs. Every run agreed delay 0 (table column "input delay 0 / 7").
+Each pair is host + join; per minute is over the 75 s match.
+
+- 0 ms: drawn jumps 1 (1 + 0), 0.8 per minute; corrections over 20 units 8 (4 + 4);
+  depth p50/p99/max 2/2/2 and 1/2/2; held 0. Delay 1 at 0 ms rolled back to depth 1
+  with 1 correction (part 3).
+- 150 ms: drawn jumps 11 (7 + 4), 8.8 per minute, against 3 (2.4 per minute) at
+  delay 1; corrections 109 (69 + 40) against 87; depth 6/6/6 and 5/6/6 against
+  5/5/5 and 4/5/5; held 0 at both.
+- 300 ms: drawn jumps 34 (28 + 6), 27 per minute, against 49 (39 per minute) at
+  delay 1; corrections 105 (57 + 48) against 127; depth 7/7/7 and 6/7/7 at both;
+  held at the window edge 1488 against 1116. Fewer jumps here go with more
+  steps held at the edge, where prediction stops instead of guessing.
+- Every delay: rollbacks per second 2.80 / 3.72 and mispredicted frames per
+  second 5.60 / 4.65, the same as delay 1 (the scripted taps set both); 75
+  checksums compared, 0 mismatches.
+- Worker frame p99/max: pending. Other sessions' native windows ran beside this
+  run (load 5 to 9), so its timings are void and are re-taken with delay 1 back
+  to back.
+
+### Lua32 cost, Warcraft build
+
+`PERF_INPUT_DELAY=N bun wisp perf playable-human-four --samples --out FILE`,
+then `bun wisp perf budget FILE`, Battle.net's measured turn model, laptop under
+a moderate lease; predicted Warcraft milliseconds, so independent of load.
+Budget: p99 ≤ 10 ms, worst ≤ 14 ms, catch-up callback ≤ 10 ms. Four peers each.
+
+- Delay 0: rollbacks/s 8.17, 8.03, 7.97, 8.10; depth 6/7/7, 5/7/7, 5/7/7, 6/7/7;
+  held 855, 846, 850, 852 of 1800; p99 7.80, 7.93, 7.92, 7.92 ms; worst 8.42,
+  8.75, 8.43, 9.76 ms; worst catch-up 8.19, 8.75, 8.36, 9.56 ms; no desync.
+- Delay 1 (same tree, same run): rollbacks/s 8.40, 8.43, 8.33, 8.23; depth 5/7/7
+  on all four; held 1001, 999, 995, 984; p99 8.11, 7.96, 8.10, 8.03 ms; worst
+  9.26, 8.52, 9.27, 9.31 ms; worst catch-up 8.28, 8.34, 8.72, 8.29 ms; no desync.
+
+Delay 0 fits the gate: worst 9.76 ms against 14, p99 under 8. Its tightest
+figure is one catch-up callback at 9.56 ms against the 10 ms budget.
+
+### Computers at delay 0
+
+`computerLead` = max(0, 2 − delay) = 2: every tier answers the same cue two
+frames sooner than at 2 (computerLead.tests.ts, Bun and Lua32). The lowest
+reaction any tier draws is 14 frames (Warchief's floor and the curve's
+minimum; Grunt ≥ 16, Peon ≥ 30), so the lead never takes a reaction below 12,
+and nothing clamps. The tiers stay as tuned.
+
+### Offline feel check
+
+`--dev "delay 0"` on `bun wisp play --standalone` and the native-window
+launcher plays offline at 0: a development delay is any fixed delay from 0, and
+the build's floor bounds only Auto and peer proposals. inputFlash.test.ts
+shows the flash lighting one frame sooner at 0 than at 1. `--dev "delay 0"`
+and the default (1) can be played back to back.
