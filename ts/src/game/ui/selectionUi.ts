@@ -60,7 +60,7 @@ import { MainMenuButton } from "./mainMenuButton";
 import { CommunityMenu } from "./communityMenu";
 import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffer, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offerTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
-import { ROSTER_TILES, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, forgeMark, label, placeTile, selectGrid, showTile, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
+import { ROSTER_TILES, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, dimComingSoon, forgeMark, label, placeTile, selectGrid, showTile, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, acceptsClick, cardPalette, cardRowShown, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
 import { type RuleButton, applyRuleButton } from "./selectionRules";
 import { FIXED_DELAY, type LobbyNet, type SelectText, type SelectionActions } from "./selectionActions";
@@ -181,6 +181,7 @@ export class SelectionPanel {
       const tileFrame = art(root, `MeleeTile${name}`, MENU_STYLE.borderTexture, 0.0, 0.0, f32(grid.cellWidth), f32(grid.cellHeight));
       const tilePortraitFrame = art(root, `MeleeTilePortrait${name}`, portraitTexture(characterOfTile(choice), true), 0.0, 0.0, 0.0, 0.0);
       const tileName = label(root, `MeleeTileName${name}`, 0.0, 0.0, f32(grid.cellWidth), f32(grid.cellHeight), TILE_NAME_SIZE);
+      dimComingSoon(tilePortraitFrame, choice);
       setMenuText(tileName, tileLabel(choice));
       this.tiles.push([tileFrame, tilePortraitFrame, tileName]);
       this.tilePortraits.push(tilePortraitFrame);

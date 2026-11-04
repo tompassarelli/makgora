@@ -1,7 +1,7 @@
 import { CLASSIC_CHARACTERS, classicRoute } from "../classic/routes";
 import { type StagePool, createStagePool, copyStagePool, nextPoolStage, consumePoolStage, togglePoolMode, togglePoolStage } from "../menu/stagePool";
 import { PLAYABLE_CHARACTERS, isMatchCharacter, nextCharacterIn, DEFAULT_FIGHTER } from "../roster/kits";
-import { shownFighters } from "../roster/forge";
+import { isComingSoon, shownFighters } from "../roster/forge";
 import { type CostumeTint, costumeIndex, costumeOf, costumesFor } from "../roster/costumes";
 import { costumeSystem } from "../roster/costumeSwitch";
 import { RANDOM_STAGE, selectableStageChoice } from "../menu/stageCatalog";
@@ -302,8 +302,12 @@ export function characterReady(game: Readonly<MatchState>, slot: number): boolea
   return isParticipantSlot(slot) && fighterActive(game, slot) && game.characterReadiness[slot] && (computerActive(game, slot) || humanPresent(game, slot));
 }
 
-export function selectableMatchCharacter(game: Readonly<MatchState>, choice: number): choice is Character {
+export function offeredMatchCharacter(game: Readonly<MatchState>, choice: number): choice is Character {
   return isMatchCharacter(choice) && (!game.classic || classicRoute(choice) !== undefined);
+}
+
+export function selectableMatchCharacter(game: Readonly<MatchState>, choice: number): choice is Character {
+  return offeredMatchCharacter(game, choice) && !isComingSoon(choice);
 }
 
 export function nextMatchCharacter(game: Readonly<MatchState>, current: number | undefined, direction: number): Character {

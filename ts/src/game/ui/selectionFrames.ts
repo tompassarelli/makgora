@@ -9,9 +9,9 @@ import { fighterPortrait } from "../roster/looks";
 import { Character } from "../sim/codes";
 import { createBackdrop, createText, placeTopLeft, sizeText } from "./frames";
 import { SELECT_GRID_ORDER } from "./selectionLayout";
-import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
+import { type MatchState, RANDOM_FIGHTER, offeredMatchCharacter, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
 import { createFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
-import { fighterShown, fighterStatus } from "../roster/forge";
+import { COMING_SOON, fighterShown, fighterStatus, isComingSoon } from "../roster/forge";
 import { FORGE_ICON } from "./ruleText";
 import { formatInt, parseInt, textLength, toReal } from "wisp/game/text";
 
@@ -135,7 +135,7 @@ export const tileOffered = (game: Readonly<MatchState>, tile: RosterTile): boole
 
 export function tileLabel(tile: RosterTile): string {
   const fighter = GRID_FIGHTERS[tile];
-  return fighter === undefined ? nameText(RANDOM_FIGHTER) : TILE_NAMES[fighter] ?? nameText(fighter);
+  return fighter === undefined ? nameText(RANDOM_FIGHTER) : isComingSoon(fighter) ? COMING_SOON : TILE_NAMES[fighter] ?? nameText(fighter);
 }
 
 export function placeTile(grid: Readonly<RosterGrid>, tile: RosterTile, frames: readonly Frame[] | undefined, mark: Frame | undefined, button: Frame | undefined): void {
@@ -160,7 +160,9 @@ export function placeTile(grid: Readonly<RosterGrid>, tile: RosterTile, frames: 
 
 export const FORGE_MARK = "|cffff8c1aFORGE|r";
 
-export const tileShown = (game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean): boolean => tileOffered(game, tile) && fighterShown(characterOfTile(tile), forgeShown);
+const tileListed = (game: Readonly<MatchState>, tile: RosterTile): boolean => tile === RANDOM_FIGHTER_TILE ? randomFighterOffered(game) : offeredMatchCharacter(game, characterOfTile(tile));
+
+export const tileShown = (game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean): boolean => tileListed(game, tile) && fighterShown(characterOfTile(tile), forgeShown);
 
 export const tileMarked = (game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean): boolean => tileShown(game, tile, forgeShown) && fighterStatus(characterOfTile(tile)) === "forge";
 
@@ -187,4 +189,10 @@ export function forgeMark(parent: Frame, name: string, tile: RosterTile, grid: R
   const mark = art(parent, name, FORGE_ICON, 0.0, 0.0, size, size);
   setFrameVisible(mark, false);
   return mark;
+}
+
+export const COMING_SOON_ALPHA = 90;
+
+export function dimComingSoon(portrait: Frame, tile: RosterTile): void {
+  if (tile !== RANDOM_FIGHTER_TILE && isComingSoon(characterOfTile(tile))) setFrameAlpha(portrait, COMING_SOON_ALPHA);
 }

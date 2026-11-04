@@ -8,7 +8,7 @@ import { SPECIAL_INPUTS, fighterKit, normalName } from "../src/game/sim/moveName
 import { WORLD_UNITS_PER_MELEE_UNIT, authoredTuning } from "../src/game/sim/tuning";
 import { EdgeGuardTool, edgeGuardTool } from "../src/game/match/edgeGuardScenarios";
 import { SIGNATURE_STRONG_HIT, strongHitReason, strongHitRows } from "../src/game/sim/strongHitTable";
-import { isFeatured } from "../src/game/roster/forge";
+import { isComingSoon, isFeatured } from "../src/game/roster/forge";
 
 export const output = "../docs/move-list.md";
 
@@ -53,7 +53,8 @@ export function moveListMarkdown(): string {
     "\"Ground states and the stick map\").",
   ];
   const units = (value: number) => (value / WORLD_UNITS_PER_MELEE_UNIT).toFixed(2);
-  const forge = SELECTABLE_CHARACTERS.filter((character) => !isFeatured(character));
+  const forge = SELECTABLE_CHARACTERS.filter((character) => !isFeatured(character) && !isComingSoon(character));
+  const comingSoon = SELECTABLE_CHARACTERS.filter(isComingSoon);
   const order = [...SELECTABLE_CHARACTERS.filter(isFeatured), ...forge];
   for (const character of order) {
     if (character === forge[0]) lines.push("", "# In the Forge", "", "These fighters are still in development and show on character select only with the Forge match rule on. Their moves can change or be placeholders.");
@@ -83,6 +84,10 @@ export function moveListMarkdown(): string {
       const weak = `${row.position ? "sourspot" : "late"}, frames ${row.weakFirst}-${row.weakLast}, ${percent(row.weakDamage)}`;
       lines.push(`| ${normalName(row.style)}${signature} | ${row.position ? "Position" : "Timing"} | ${strong} | ${weak} | ${cell(strongHitReason(character, row.style) ?? "")} |`);
     }
+  }
+  if (comingSoon.length > 0) {
+    lines.push("", "## Coming soon", "", "These Forge fighters show on character select, dimmed and not yet pickable, with the Forge match rule on; their own moves are not built yet.", "");
+    for (const character of comingSoon) lines.push(`- ${fighterName(character)}`);
   }
   return `${lines.join("\n")}\n`;
 }

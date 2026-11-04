@@ -2,7 +2,7 @@ import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/te
 import { at } from "wisp/src/runtime/lookup";
 import { Character } from "../sim/codes";
 import { PLAYABLE_CHARACTERS, SELECTABLE_CHARACTERS, fighterSlug } from "./kits";
-import { FORGE_FIGHTERS, FORGE_STAGES, fighterStatus, isFeatured, setForgeRoster, shownFighters } from "./forge";
+import { FORGE_FIGHTERS, FORGE_STAGES, fighterStatus, isComingSoon, isFeatured, setForgeRoster, shownFighters } from "./forge";
 import { CLASSIC_ROUTES } from "../classic/routes";
 import { CLASSIC_FIGHTS, classicRivals } from "../classic/classic";
 import { drawCpuFighter } from "../match/cpuProfiles";
@@ -75,11 +75,12 @@ test("the shipped Forge names 18 roster fighters, features the other 16 and ever
   assertFalse(randomDraws().some(character => !isFeatured(character)));
 });
 
-test("with every fighter and stage featured, select, cycling, CPU Random, Classic and the stage pool offer the whole roster [k2 property]", () => {
+test("with every fighter and stage featured, select, cycling, CPU Random, Classic and the stage pool offer the whole roster but its coming-soon fighters [k2 property]", () => {
   withForge([], [], () => {
     assertEquals(visibleGrid(false).length, GRID_FIGHTERS.length);
-    assertEquals(cycled(false).length, PLAYABLE_CHARACTERS.length);
-    assertEquals(shownFighters(PLAYABLE_CHARACTERS).length, PLAYABLE_CHARACTERS.length);
+    const offered = PLAYABLE_CHARACTERS.filter(character => !isComingSoon(character)).length;
+    assertEquals(cycled(false).length, offered);
+    assertEquals(shownFighters(PLAYABLE_CHARACTERS).length, offered);
     const planned: number[] = [];
     for (const route of CLASSIC_ROUTES) for (const plan of route.fights) for (const rival of plan.rivals) planned.push(rival);
     assertEquals(classicRivalSet().join(","), planned.join(","));

@@ -1,5 +1,5 @@
 import { Character } from "../sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "./kits";
+import { SELECTABLE_CHARACTERS, fighterSlug, heroDefinition } from "./kits";
 
 export type ForgeStatus = "featured" | "forge";
 
@@ -43,8 +43,10 @@ export const isFeaturedStage = (stage: number): boolean => stageStatus(stage) ==
 export const fighterShown = (character: number, forgeShown: boolean): boolean => forgeShown || isFeatured(character);
 export const stageShown = (stage: number, forgeShown: boolean): boolean => forgeShown || isFeaturedStage(stage);
 
+export const COMING_SOON = "Coming soon";
+export const isComingSoon = (character: number): boolean => heroDefinition(character)?.comingSoon === true;
+
 export function shownFighters(choices: readonly Character[], forgeShown = false): readonly Character[] {
-  if (forgeShown) return choices;
-  const shown = choices.filter(character => isFeatured(character));
+  const shown = choices.filter(character => !isComingSoon(character) && (forgeShown || isFeatured(character)));
   return shown.length === 0 ? choices.slice(0, 1) : shown;
 }

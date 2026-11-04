@@ -113,6 +113,7 @@ export interface HeroDefinition {
 
 
   readonly complete: boolean;
+  readonly comingSoon?: true | undefined;
   readonly moves: FighterMoves;
   readonly specials?: FighterSpecials | undefined;
 

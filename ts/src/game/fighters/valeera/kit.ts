@@ -3,6 +3,6 @@ import type { HeroDefinition } from "../../sim/heroes/hero";
 import { standinHero } from "../standin/kit";
 
 export const VALEERA_HERO: HeroDefinition = standinHero({
-  character: Character.valeera, name: "Valeera",
+  character: Character.valeera, name: "Valeera", comingSoon: true,
   effects: { bolt: "Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrikeMissile.mdx", burst: "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx" },
 });

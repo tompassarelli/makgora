@@ -15,15 +15,16 @@ export interface StandinIdentity {
   readonly up?: SpecialKit | undefined;
   readonly down?: SpecialKit | undefined;
   readonly gameplan?: FighterGameplan | undefined;
+  readonly comingSoon?: true | undefined;
 }
 
-export function standinHero({ character, name, displayName, effects, neutral, side, up, down, gameplan }: StandinIdentity): HeroDefinition {
+export function standinHero({ character, name, displayName, effects, neutral, side, up, down, gameplan, comingSoon }: StandinIdentity): HeroDefinition {
   const shared = standinSpecials(character, effects);
   return {
     character, name, displayName: displayName ?? name,
     purpose: "Work-in-progress stand-in: a plain middleweight moveset until his own kit lands",
     weakness: "No signature tools yet: every move is the shared stand-in's",
-    complete: true,
+    complete: true, comingSoon,
     moves: standinMoves(character), specials: { ...shared, neutral: neutral ?? shared.neutral, side: side ?? shared.side, up: up ?? shared.up, down: down ?? shared.down }, gameplan: gameplan ?? STANDIN_GAMEPLAN,
     jab: { name: "Stand-in Jab", description: "Two quick strikes ahead." },
   };
