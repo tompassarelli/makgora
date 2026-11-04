@@ -31,7 +31,9 @@ export function lagSpikeDelivery(base: SyncDelivery, spikes: LagSpikes, senders:
 interface DepthShell {
   readonly rollback?: {
     readonly window: number;
-    readonly net: { readonly depths: readonly number[] };
+    readonly delay: number;
+    readonly predictionHeld: boolean;
+    readonly net: { readonly depths: readonly number[]; manual: number };
     readonly schedule: InputSchedule;
   };
 }
@@ -66,4 +68,29 @@ export function deepestRollback(client: HeadlessClient): { readonly window: numb
     if (count > 0) deepest = depth;
   }
   return { window: rollback.window, deepest, corrections };
+}
+
+export function forceInputDelay(client: HeadlessClient, delay: number): void {
+  const rollback = rollbackOf(client);
+  if (rollback === undefined) throw new Error(`p${client.slot} has no rollback session to take input delay ${delay}`);
+  rollback.net.manual = delay;
+}
+
+export function rollbackState(client: HeadlessClient): { readonly delay: number; readonly held: boolean; readonly depths: readonly number[] } | undefined {
+  const rollback = rollbackOf(client);
+  return rollback === undefined ? undefined : { delay: rollback.delay, held: rollback.predictionHeld, depths: rollback.net.depths };
+}
+
+export function depthRanks(depths: readonly number[]): { readonly rollbacks: number; readonly p50: number; readonly p99: number; readonly max: number } {
+  const rollbacks = depths.reduce((total, count) => total + count, 0);
+  const rankOf = (percent: number) => {
+    const wanted = Math.max(1, Math.ceil((percent * rollbacks) / 100));
+    let seen = 0;
+    for (let depth = 0; depth < depths.length; depth++) {
+      seen += depths[depth] ?? 0;
+      if (seen >= wanted) return depth;
+    }
+    return 0;
+  };
+  return { rollbacks, p50: rankOf(50), p99: rankOf(99), max: rankOf(100) };
 }

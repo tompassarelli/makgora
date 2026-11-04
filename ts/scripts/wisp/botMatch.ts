@@ -9,6 +9,7 @@ import { declineTutorial, passStartControls } from "./startControls";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { deliverKey } from "./deliverKey";
+import { forceInputDelay } from "./rollbackSpike";
 import type { PerfMeasure } from "wisp/src/headless/luaPerf";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
@@ -29,6 +30,8 @@ interface BotMatch {
   readonly stagger?: number;
 
   readonly everyRowChanges?: boolean;
+
+  readonly inputDelay?: number;
 }
 
 
@@ -219,6 +222,7 @@ export function playBotMatch(clients: Lockstep, match: BotMatch, frames: number,
     const game = gameOf(client);
     game.stockCount = 3;
     game.timeLimitMinutes = 1;
+    if (match.inputDelay !== undefined) forceInputDelay(client, match.inputDelay);
   }
   clients.press(0, Key.y);
   until("the match", () => gameOf(host).phase === Phase.match);

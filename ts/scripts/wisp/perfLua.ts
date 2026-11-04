@@ -22,7 +22,7 @@ import { profileRun } from "./censusProfile";
 import type { LuaHeadlessMap } from "wisp/src/headless/lua";
 import type { SyncDelivery } from "wisp/src/headless/lockstep";
 import { MAKGORA_NOOPS, makgoraNativeBehavior } from "./headlessNatives";
-import { DEEP_ROLLBACK_SPIKES, confirmedLag, deepestRollback, framesRun, lagSpikeDelivery } from "./rollbackSpike";
+import { DEEP_ROLLBACK_SPIKES, confirmedLag, deepestRollback, depthRanks, framesRun, lagSpikeDelivery, rollbackState } from "./rollbackSpike";
 import { CATCH_UP_FRAMES } from "../../src/game/session/playback";
 
 declare const arg: Readonly<Record<number, string | undefined>>;
@@ -36,7 +36,10 @@ const computer = SELECTABLE_CHARACTERS.find((character) => run === `bot-${fighte
 const capturing = run === "native-perf-four";
 const deep = run === "rollback-four" || capturing;
 const CAPTURE_SETTLE_FRAMES = 30;
-const humans = run === "playable-duel" ? HUMAN_DUEL : run === "playable-human-four" ? HUMAN_FOUR : deep ? { ...HUMAN_FOUR, everyRowChanges: true } : undefined;
+const delayText = os.getenv("PERF_INPUT_DELAY");
+const inputDelay = delayText === undefined ? undefined : Number(delayText);
+const tape = run === "playable-duel" ? HUMAN_DUEL : run === "playable-human-four" ? HUMAN_FOUR : deep ? { ...HUMAN_FOUR, everyRowChanges: true } : undefined;
+const humans = tape === undefined || inputDelay === undefined ? tape : { ...tape, inputDelay };
 const bot = humans ?? (run === "bot" ? BOT_THREE : run === "bot-four" || run === "playable-bot-four" ? BOT_FOUR : computer !== undefined ? botMatchAgainst(computer) : undefined);
 const censusFighter = SELECTABLE_CHARACTERS.find((character) => run === `census-${fighterSlug(character)}`);
 const censusStage = run.startsWith("census-stage-") ? Number(run.substring("census-stage-".length)) : undefined;
@@ -87,8 +90,12 @@ else if (bot !== undefined) {
     const ran = clients.clients.map(() => ({ confirmed: 0, speculative: 0 }));
     const indebted = clients.clients.map((): number | undefined => undefined);
     const cleared = clients.clients.map((): number[] => []);
+    const held = clients.clients.map(() => 0);
+    let callbacks = 0;
     let requested = false;
     const played = () => {
+      callbacks++;
+      clients.clients.forEach((client, index) => { if (rollbackState(client)?.held === true) held[index] = (held[index] ?? 0) + 1; });
       if (capturing && !requested) {
         requested = true;
         clients.chat(0, `-dev capture ${Number(framesText) - CAPTURE_SETTLE_FRAMES}`);
@@ -111,7 +118,14 @@ else if (bot !== undefined) {
         ran[index] = now;
       });
     };
-    const result = playBotMatch(clients, bot, Number(framesText), measure, build, deep ? played : undefined);
+    const tallied = deep || inputDelay !== undefined;
+    const result = playBotMatch(clients, bot, Number(framesText), measure, build, tallied ? played : undefined);
+    if (tallied) clients.clients.forEach((client, index) => {
+      const state = rollbackState(client);
+      if (state === undefined) return;
+      const ranks = depthRanks(state.depths);
+      depths.push(`p${client.slot} delay ${state.delay} rollbacks ${ranks.rollbacks} in ${callbacks} callbacks (${(ranks.rollbacks * 60 / Math.max(1, callbacks)).toFixed(2)}/s) depth p50/p99/max ${ranks.p50}/${ranks.p99}/${ranks.max} held ${held[index] ?? 0}`);
+    });
     if (!deep) return result;
     const lines = [...result.lines];
     if (capturing) lines.push(...writeCapture(clients, depths));
