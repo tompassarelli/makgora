@@ -214,7 +214,8 @@ minutes, short enough to retry a failed Warchief run immediately.
 - **Decided rivals:** Illidan → Arthas, Mal'Ganis → Arthas; **Decided
   (leaning):** Arthas → Mal'Ganis; **Interim:** Jaina → Arthas, and Garrosh
   later; **Proposed:** Uther → Arthas. Garrosh is not in the game yet; he is a
-  strong candidate for a new fighter and would take several rival slots.
+  strong candidate for a new fighter and would take several rival slots. Jaina
+  and Uther are Forge fighters and have no row until they are promoted.
 - **Lead default: no hidden extra fight.** Melee's Crazy Hand (a fight gated on
   speed and no deaths) would put a shared opponent after the personal finale,
   against the principle above, and would split what "a clear" means. Speed and
@@ -228,14 +229,16 @@ unlocked), keeping the story at one premise sentence and one rival line.
 
 ## Per-character tables
 
-The tables cover every pickable fighter: the release roster without the
-Coming soon stand-ins (Whitemane, Valeera). The source of truth will be
-`ts/src/game/arcade/tables.ts` and its test, written by the tables box; this section is the
-authored content it starts from. Fighters are named as players see them
-(Samuro is the Blademaster, Mannoroth the Pit Lord, Rokhan the Shadow Hunter,
-Gazlowe the Goblin Tinker, Stitches the Butcher, Arthas the Lich King,
-Kel'Thuzad the Lich, Mal'Ganis the Dreadlord, Maiev the Warden, Rexxar the
-Beastmaster, Muradin the Mountain King).
+**Decided (Tom, 2026-11-05):** Arcade covers featured fighters only. The tables
+have one row per featured fighter (16 today) and none for a Forge fighter or a
+Coming soon stand-in. The source of truth is
+`ts/src/game/arcade/tables.ts`, with the faction and friend rules in
+`ts/src/game/arcade/factions.ts` and the rules enforced by
+`ts/src/game/arcade/tables.tests.ts`; this section is the authored content
+they were written from. Fighters are named as players see them (Samuro is the
+Blademaster, Mannoroth the Pit Lord, Rokhan the Shadow Hunter, Stitches the
+Butcher, Arthas the Lich King, Mal'Ganis the Dreadlord, Maiev the Warden,
+Muradin the Mountain King).
 
 ### Factions and the friend rule
 
@@ -272,33 +275,33 @@ west in Reign of Chaos).
 
 ### Forge fighters in a run
 
-The menus feature only the fighters Tom endorsed; the rest are in the Forge,
-and computer Random, the stage pool and Classic's opponents use featured
-fighters only, whatever the Forge rule (Tom, 2026-11-04;
-makgora:docs/gameplay-design.md, "The Forge"). Arcade keeps that rule, so
-the tables are written lore-first and resolved at run time:
+The menus feature only the fighters Tom endorsed; the rest are in the Forge
+(makgora:docs/gameplay-design.md, "The Forge"), and computer Random, the stage
+pool and Classic's opponents use featured fighters only (Tom, 2026-11-04).
 
-- An elite duo with a Forge member is skipped. Every fighter's pool holds at
-  least two all-featured duos, so stage 3 and stage 6 always have one each.
-  A lore duo waiting on the Forge is kept in the pool and starts being drawn
-  the day its fighters are featured.
-- An ally in the Forge is replaced by the featured stand-in the table names, a
-  friend picked by hand.
-- **Lead default: two narrow exceptions,** each because the alternative breaks
-  a Decided rule. Ragnaros has no featured friend at all, so Onyxia plays as
-  his ally from the Forge rather than giving him an ally from outside the ally
-  map. A rival is the one fixed opponent and is never replaced: every featured
-  fighter's rival is featured (the test checks it), and three Forge fighters'
-  rivals are in the Forge (Kel'Thuzad → Jaina, Rexxar → Jaina, Tyrande →
-  Sylvanas), which can only happen with the Forge on, since only then can the
-  player pick them.
-- Moving a fighter into or out of the Forge is still one line in
-  makgora:ts/src/game/roster/forge.ts; the test then names any table that no
-  longer resolves.
+- **Decided (Tom, 2026-11-05).** Arcade keeps that rule without exception for
+  the player and the opponents: a Forge fighter has no row, is not pickable in
+  Arcade, and is never an ally, elite or rival. Promoting a fighter out of the
+  Forge means adding its row then; its faction is already in `factions.ts`.
+- **Decided (Tom, 2026-11-05): one exception.** Onyxia is Ragnaros's fixed
+  ally, the only Forge fighter Arcade uses (Tom called them an alliance, and no
+  featured fighter is Ragnaros's friend).
+- The test reads the live list in
+  makgora:ts/src/game/roster/forge.ts. Every featured fighter has exactly one
+  row, no Forge fighter has a row, no Forge fighter appears in a pool, as an
+  ally or as a rival except Onyxia beside Ragnaros, and every pool holds at least
+  two duos. So moving a fighter out of the Forge fails the test until its row
+  is added, and moving a featured fighter into the Forge fails it until its row
+  and every mention of it are gone.
+- The rows below were first written for all 31 pickable fighters; the Forge
+  rows (Kel'Thuzad, Uther, Rexxar, Jaina, Sylvanas, Cairne, Gazlowe, Grom,
+  Malfurion, Medivh, Anub'arak, Lady Vashj, Tyrande, Akama and Onyxia) and
+  every Forge duo and stand-in note were dropped, and an ally who was a Forge
+  fighter is now the featured stand-in the earlier rows named.
 
 ### Featured enemy duos
 
-The all-featured duos the tables draw on; each pool below names them by code.
+The duos the tables draw on; each pool below names them by code.
 
 - **L1** Mal'Ganis and Mannoroth: two of the Burning Legion's commanders.
 - **L2** Mal'Ganis and Archimonde: the dreadlords served Archimonde's
@@ -311,51 +314,33 @@ The all-featured duos the tables draw on; each pool below names them by code.
 - **S1** Arthas and Stitches: the Lich King and the Scourge's abominations.
 - **I1** Illidan and Kael'thas: Illidan's army takes Outland and races Arthas
   to Icecrown (The Frozen Throne).
-- **A1** Muradin and Maiev: Alliance champions (Onyxia's pool only, below).
 
 ### The tables
 
-"Ally" names the lore ally, then "plays: X" when the lore ally is in the
-Forge and X stands in. A pool lists its duos; lore duos with a Forge member
-are in italics and wait for the Forge.
+"Ally" names the fighter's fixed computer ally on stage 6.
 
 | Fighter | Ally | Elite pool | Rival | Rival's source | Line before the fight |
 | --- | --- | --- | --- | --- | --- |
-| Illidan | Kael'thas (Kael's blood elves join Illidan, TFT "Lord of Outland") | L1, L2, *Maiev and Malfurion (they hunt Illidan through Lordaeron, TFT)* | Arthas (**Decided**) | Their duel at Icecrown, TFT's last mission | "I came for the Frozen Throne, Arthas, and you are sitting on it." |
-| Samuro | Thrall (he fights for Thrall's Durotar, TFT) | S1, L2, *Uther and Muradin (the Alliance of the Second War)* | Mannoroth | The Burning Blade drank Mannoroth's blood, which made the clan the Legion's blade | "Your blood made my clan a weapon, demon. Now the blade turns." |
-| Muradin | Uther; plays: Maiev | H1, S1, L3 | Mal'Ganis | Muradin's expedition hunted Mal'Ganis in Northrend and lost Arthas to that hunt (RoC) | "I lost a prince chasing you across Northrend, dreadlord. You'll answer for him." |
-| Maiev | Malfurion (the Sentinels and Watchers hunt Illidan together, TFT); plays: Muradin | L1, S1, *Lady Vashj and Kael'thas (Illidan's allies on her trail, TFT)* | Illidan | Ten thousand years as his jailer; she hunts him from the Broken Isles to Outland (TFT) | "Ten thousand years I kept you, Betrayer. A few more will not trouble me." |
-| Kel'Thuzad | Arthas (Arthas raised him in the Sunwell, RoC) | I1, L1, *Uther and Muradin (the Silver Hand and Ironforge against the plague)* | Jaina (Forge) | The Kirin Tor cast him out; Jaina is Antonidas's apprentice and hunted him with Arthas (RoC) | "The Kirin Tor cast me out, apprentice. Your master's city fell to me. So will you." |
-| Uther | Jaina (**Decided** as the spec's example of a sound pair); plays: Muradin | H1, L1, *Kel'Thuzad and Mal'Ganis (the cult and its dreadlord spread the plague, RoC)* | Arthas (**Proposed** in the spec) | Arthas killed Uther outside Andorhal | "I trained you, Arthas. I will not let that sword finish what you started." |
-| Mal'Ganis | Archimonde (the dreadlords served his invasion, RoC) | I1, H1, *Uther and Muradin (they fought his Scourge in Lordaeron and Northrend, RoC)* | Arthas (**Decided**) | Arthas killed him in Northrend with Frostmourne | "You turned my own gift on me, prince. The nathrezim do not forget." |
-| Rokhan | Chen (both join Rexxar, TFT) | S1, L1, *Uther and Muradin (the Alliance against the Horde's trolls, Second War)* | Kael'thas | The troll and high elf enmity of the Troll Wars; the Darkspear are jungle trolls, so the grudge is racial, not tribal | "Trolls remember Quel'Thalas, elf. Rokhan settle it today." |
-| Mannoroth | Archimonde (the Legion's lieutenants) | H2, I1, *Malfurion and Tyrande (the War of the Ancients)* | Thrall | Thrall's Horde broke the blood pact, and Grom killed Mannoroth at its end (RoC) | "Your people drank my blood, Warchief. Every orc of yours still owes it." |
-| Rexxar | Rokhan (TFT bonus campaign) | S1, L3, *Onyxia and Ragnaros (Rexxar slew the black dragon Searinox in Dustwallow Marsh, TFT bonus)* | Jaina (Forge) | Rexxar defends Durotar from Kul Tiras's fleet under Jaina's father and storms Theramore while she stands aside (TFT bonus) | "Your father's fleet came for Durotar. Theramore will answer for it." |
-| Arthas | Anub'arak (TFT "Path of the Damned"); plays: Stitches | I1, H1, *Uther and Jaina (the friends he left at Stratholme, RoC)* | Mal'Ganis (**Decided, leaning**) | The dreadlord Arthas hunted to Northrend after Stratholme | "I crossed an ocean to end you, Mal'Ganis. Frostmourne is hungry." |
-| Thrall | Cairne (**Decided, leaning**, the spec's example); plays: Samuro | S1, L2, *Uther and Muradin (the Alliance that ran the internment camps)* | Mannoroth (**Interim**: Garrosh later) | Mannoroth's blood chained the orcs to the Legion until Thrall's Horde broke it (RoC) | "Your blood chained my people, demon. The Horde is free, and I will prove it." |
-| Jaina | Uther (**Decided** example pair); plays: Muradin | L1, L3, *Kel'Thuzad and Stitches (the plague of Lordaeron, RoC)* | Arthas (**Interim**: Garrosh later) | She left him at Stratholme and watched him fall (RoC) | "I still remember who you were, Arthas. That's why I have to stop you." |
-| Sylvanas | Thrall (the Forsaken join his Horde, WoW) | L1, L2, *Kel'Thuzad and Anub'arak (the Scourge she broke from, TFT)* | Arthas | Arthas killed her at Quel'Thalas and raised her as a banshee (RoC) | "You made me this, Arthas. Now face what you made." |
-| Cairne | Thrall (the tauren join the Horde, RoC) | L1, S1, *Muradin and Jaina (Ironforge's dig at Bael Modan in tauren land, WoW, and Theramore)* | Archimonde (**Interim**: Garrosh later, who killed him in mak'gora) | The tauren held Mount Hyjal against Archimonde (RoC) | "The Earth Mother's land will not feed your Legion, Defiler." |
-| Chen | Rokhan (both join Rexxar, TFT) | S1, L3, *Onyxia and Ragnaros (Searinox, as for Rexxar)* | Muradin | No lore duel: a brewing rivalry between the Stormstout brewery and Ironforge's Thunderbrew | "Ironforge calls its ale the finest in the world. We settle it, then we share a barrel." |
-| Peon | Gazlowe (goblins helped the Horde build Orgrimmar); plays: Samuro | S1, L1, *Malfurion and Tyrande (the Warsong lumber camps in Ashenvale, RoC)* | Thrall | Every peon works for the Warchief; this one wants the job | "Me done with work work. Me take your job, Warchief." |
-| Gazlowe | Peon (as above) | S1, L3, *Malfurion and Tyrande (goblin logging in Ashenvale, WoW)* | Muradin | Goblin sappers and zeppelins against dwarven demolition squads and gnomish flying machines (Warcraft II) | "Dwarven engineering? Cute. Let me show you a real explosion." |
-| Kael'thas | Lady Vashj (her naga free Kael, TFT "A Dark Covenant"); plays: Illidan | L1, L2, *Maiev and Malfurion (they fight Kael and Illidan in Lordaeron, TFT)* | Arthas | Arthas killed Kael's father and burned the Sunwell (RoC) | "You murdered my father and burned the Sunwell. Quel'Thalas sends its answer." |
-| Mrgl & Grgl | Lady Vashj (the mur'gul serve the naga, TFT); plays: Illidan | H1, S1, *Maiev and Tyrande (the night elves on the Broken Isles, TFT)* | Rokhan | Darkspear trolls and murlocs share the Echo Isles and Durotar's coast (WoW) | "Mrrgl mrgl! Mrglglgl!" (The shore is ours, troll!) |
-| Grom | Thrall (RoC) | L2, S1, *Malfurion and Tyrande (Ashenvale, RoC "Cry of the Warsong")* | Mannoroth | Grom killed Mannoroth and freed the orcs of his blood (RoC) | "You took our souls for your blood. Gorehowl takes them back." |
-| Malfurion | Tyrande (RoC); plays: Maiev | L3, S1, *Grom and Peon (the Warsong lumber camps, RoC)* | Illidan | He imprisoned his brother for ten thousand years and fights him again in TFT | "I chained you once to save this world, brother. I will do it again." |
-| Medivh | Jaina (the Prophet sends her west, RoC); plays: Thrall | L1, S1 | Archimonde | The Legion possessed Medivh; as the Prophet he united the races against Archimonde at Hyjal (RoC) | "I opened the door for your master once, Archimonde. Today I close it." |
-| Anub'arak | Arthas (TFT "Path of the Damned") | H1, L1, *Kael'thas and Lady Vashj (Illidan's army at Icecrown, TFT)* | Illidan | He guards Arthas's road to Icecrown against Illidan's army (TFT) | "The Frozen Throne lies beneath my ice, Betrayer. You will not reach it." |
-| Lady Vashj | Illidan (her naga answer him on the Broken Isles, TFT) | S1, L1, *Malfurion and Tyrande (the night elves who hunt her lord, TFT)* | Maiev | Maiev hunts Illidan through the naga's Broken Isles (TFT) | "You hunted my lord across the Broken Isles, jailor. The tide turns." |
-| Archimonde | Mannoroth (the Legion's lieutenants) | H2, S1, *Jaina and Tyrande (the defenders of Hyjal, RoC)* | Thrall | Thrall's orcs broke the Legion's blood pact and held Hyjal against him (RoC) | "Your Horde broke its pact with the Legion, orc. I have come to collect." |
-| Tyrande | Malfurion (RoC); plays: Maiev | L3, S1, *Grom and Peon (the Warsong lumber camps, RoC)* | Sylvanas (Forge) | Sylvanas burned Teldrassil (Battle for Azeroth) | "You burned Teldrassil and my people with it. Elune grants you no mercy." |
-| Stitches | Kel'Thuzad (the Lich's abominations, Naxxramas); plays: Arthas | H1, H2, *Uther and Jaina (the Alliance that burned the plague out of Lordaeron, RoC)* | Muradin | Muradin leads the Alliance assault on Icecrown Citadel, whose Plagueworks stitch the Scourge's abominations (Wrath of the Lich King) | "Little dwarf. Big hammer. Stitches has hook for both." |
-| Akama | Illidan (his Broken join Illidan in Outland, TFT) | L1, S1, *Grom and Samuro (orc clans that slaughtered the draenei under the blood curse, Warcraft lore)* | Archimonde | One of the two eredar lords who took Sargeras's bargain, which drove the draenei from Argus | "The eredar took Argus from my people, Defiler. The Broken have long memories." |
-| Ragnaros | Onyxia (Deathwing's Cataclysm), from the Forge by the exception above | H1, H2, *Malfurion and Tyrande (the Cenarion assault on the Firelands, Cataclysm)* | Muradin | The Dark Iron emperor summoned Ragnaros in the War of the Three Hammers to break Ironforge's Bronzebeards, Muradin's clan | "The Bronzebeards still stand? Then the Dark Irons' work is unfinished." |
-| Onyxia | Ragnaros (Deathwing's Cataclysm) | H2, A1, *Rexxar and Rokhan (Searinox, as for Rexxar)* | Thrall | The Horde slew her and hung her head in Orgrimmar at the Warchief's order (WoW) | "You hung my head over Orgrimmar's gate, Warchief. I have come for yours." |
+| Illidan | Kael'thas (Kael's blood elves join Illidan, The Frozen Throne, Lord of Outland) | L1, L2 | Arthas | Their duel at Icecrown, The Frozen Throne's last mission | "I came for the Frozen Throne, Arthas, and you are sitting on it." |
+| Samuro | Thrall (he fights for Thrall's Durotar, The Frozen Throne) | S1, L2 | Mannoroth | The Burning Blade drank Mannoroth's blood, which made the clan the Legion's blade | "Your blood made my clan a weapon, demon. Now the blade turns." |
+| Muradin | Maiev | H1, S1, L3 | Mal'Ganis | Muradin's expedition hunted Mal'Ganis in Northrend and lost Arthas to that hunt (Reign of Chaos) | "I lost a prince chasing you across Northrend, dreadlord. You'll answer for him." |
+| Maiev | Muradin | L1, S1 | Illidan | Ten thousand years as his jailer; she hunts him from the Broken Isles to Outland (The Frozen Throne) | "Ten thousand years I kept you, Betrayer. A few more will not trouble me." |
+| Mal'Ganis | Archimonde (the dreadlords served his invasion, Reign of Chaos) | I1, H1 | Arthas | Arthas killed him in Northrend with Frostmourne | "You turned my own gift on me, prince. The nathrezim do not forget." |
+| Rokhan | Chen (both join Rexxar, The Frozen Throne) | S1, L1 | Kael'thas | The troll and high elf enmity of the Troll Wars; the Darkspear are jungle trolls, so the grudge is racial, not tribal | "Trolls remember Quel'Thalas, elf. Rokhan settle it today." |
+| Mannoroth | Archimonde (the Legion's lieutenants) | H2, I1 | Thrall | Thrall's Horde broke the blood pact, and Grom killed Mannoroth at its end (Reign of Chaos) | "Your people drank my blood, Warchief. Every orc of yours still owes it." |
+| Arthas | Stitches | I1, H1 | Mal'Ganis | The dreadlord Arthas hunted to Northrend after Stratholme | "I crossed an ocean to end you, Mal'Ganis. Frostmourne is hungry." |
+| Thrall | Samuro (Samuro fights for Thrall's Durotar, The Frozen Throne) | S1, L2 | Mannoroth | Mannoroth's blood chained the orcs to the Legion until Thrall's Horde broke it (Reign of Chaos); interim, Garrosh later | "Your blood chained my people, demon. The Horde is free, and I will prove it." |
+| Chen | Rokhan (both join Rexxar, The Frozen Throne) | S1, L3 | Muradin | No lore duel: a brewing rivalry between the Stormstout brewery and Ironforge's Thunderbrew | "Ironforge calls its ale the finest in the world. We settle it, then we share a barrel." |
+| Peon | Samuro | S1, L1 | Thrall | Every peon works for the Warchief; this one wants the job | "Me done with work work. Me take your job, Warchief." |
+| Kael'thas | Illidan (Kael's blood elves join Illidan, The Frozen Throne, Lord of Outland) | L1, L2 | Arthas | Arthas killed Kael's father and burned the Sunwell (Reign of Chaos) | "You murdered my father and burned the Sunwell. Quel'Thalas sends its answer." |
+| Mrgl & Grgl | Illidan (the naga's mur'gul served in Illidan's army, The Frozen Throne) | H1, S1 | Rokhan | Darkspear trolls and murlocs share the Echo Isles and Durotar's coast (World of Warcraft) | "Mrrgl mrgl! Mrglglgl! (The shore is ours, troll!)" |
+| Archimonde | Mannoroth (the Legion's lieutenants) | H2, S1 | Thrall | Thrall's orcs broke the Legion's blood pact and held Hyjal against him (Reign of Chaos) | "Your Horde broke its pact with the Legion, orc. I have come to collect." |
+| Stitches | Arthas | H1, H2 | Muradin | Muradin leads the Alliance assault on Icecrown Citadel, whose Plagueworks stitch the Scourge's abominations (Wrath of the Lich King) | "Little dwarf. Big hammer. Stitches has hook for both." |
+| Ragnaros | Onyxia (Deathwing's Cataclysm; the one Forge fighter Arcade uses, since no featured fighter is Ragnaros's friend) | H1, H2 | Muradin | The Dark Iron emperor summoned Ragnaros in the War of the Three Hammers to break Ironforge's Bronzebeards, Muradin's clan | "The Bronzebeards still stand? Then the Dark Irons' work is unfinished." |
 
-Rival count: Arthas is the rival of 6 fighters (3 set by the spec), Thrall
-of 4 (the Warchief everyone climbs toward), Muradin of 4. No rival is shared
-by more than a fifth of the roster, so the finale stays personal.
+Rival count: Arthas, Thrall and Muradin are each the rival of 3 fighters,
+Mal'Ganis and Mannoroth of 2, and Illidan, Kael'thas and Rokhan of 1. No rival
+is shared by more than a fifth of the roster, so the finale stays personal.
 
 ## Score
 
