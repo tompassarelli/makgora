@@ -93,6 +93,20 @@ const NET_FOUR_FIGHTERS = ["-dev slots 3 12", "-dev fighter 2 Blademaster", "-de
 const NET_FOUR_FIGHTER_STOCKS = 99;
 const BEAT_SPACING = 17;
 
+/** Presses the bot beat for one slot: each frame lets go of a held key the beat no longer holds, holds the next, and taps its tap key, which `release` lets go after the frame. */
+function beatPresser(key: (key: number, down: boolean) => void, keys: (frame: number) => readonly [tap: number, held: number]) {
+  let held = 0;
+  const press = (frame: number): number => {
+    const [tap, hold] = keys(frame);
+    if (held !== hold && held !== 0) key(held, false);
+    if (held !== hold && hold !== 0) key(hold, true);
+    if (tap !== 0) key(tap, true);
+    held = hold;
+    return tap;
+  };
+  return Object.assign(press, { release: (tap: number) => { if (tap !== 0) key(tap, false); } });
+}
+
 export async function createNetStandalone(link: LockstepLink, slot: number, humans: number, options: { readonly script?: string; readonly fourFighters?: NetFourFighters } = {}): Promise<StandaloneNetSession> {
   const runtime = installHeadless(PREDICTED_HEADLESS, nativeDeclarations());
   try {
@@ -109,7 +123,12 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
     const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import("../../src/host/loop/menus");
     const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import("./botMatch");
     const fourFighters = options.fourFighters;
-    let beatHeld = 0;
+    const beat = fourFighters === undefined ? undefined : beatPresser((key, down) => lockstep.key(slot, key, 0, down), (frame) => botBeatKeys(frame + slot * BEAT_SPACING));
+    const startFourFighters = (state: State, { stage }: NetFourFighters) => {
+      for (const command of NET_FOUR_FIGHTERS) applyDeveloperCommand(state, 0, command);
+      state.game.stockCount = NET_FOUR_FIGHTER_STOCKS;
+      startQuickMatch(state, stage, undefined, Character.demonHunter, NET_FOUR_FIGHTER_STOCKS);
+    };
     const scripted = options.script === undefined ? undefined : padInputs(padEdges(options.script).edges, slot);
     const chat = (options.script ?? "").split("\n").map((line) => line.trim()).filter((line) => line.startsWith("#! chat ")).map((line) => line.substring(8));
     let latest: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
@@ -138,12 +157,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
             presses.attach(shell());
             setHumanCount(shell().game, humans);
             for (const command of chat) applyDeveloperCommand(shell(), command.startsWith("-dev fighter ") && Number(command.split(" ")[2]) <= 2 ? Number(command.split(" ")[2]) - 1 : 0, command);
-            if (fourFighters !== undefined) {
-              const state = shell();
-              for (const command of NET_FOUR_FIGHTERS) applyDeveloperCommand(state, 0, command);
-              state.game.stockCount = NET_FOUR_FIGHTER_STOCKS;
-              startQuickMatch(state, fourFighters.stage, undefined, Character.demonHunter, NET_FOUR_FIGHTER_STOCKS);
-            }
+            if (fourFighters !== undefined) startFourFighters(shell(), fourFighters);
           });
           console.error(`net: fighter selection with ${humans} players at frame ${lockstep.frame}`);
         }
@@ -151,15 +165,8 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
           if (!lockstep.click(slot, DONE_X, DONE_Y)) throw new Error(`net: slot ${slot} has no Done button under the pointer`);
           controlsClosed = true;
         }
-        let tap = 0;
-        if (fourFighters !== undefined && lockstep.frame > SETUP_FRAME) {
-          const [beatTap, hold] = botBeatKeys(lockstep.frame + slot * BEAT_SPACING);
-          if (beatHeld !== hold && beatHeld !== 0) lockstep.key(slot, beatHeld, 0, false);
-          if (beatHeld !== hold && hold !== 0) lockstep.key(slot, hold, 0, true);
-          if (beatTap !== 0) lockstep.key(slot, beatTap, 0, true);
-          beatHeld = hold;
-          tap = beatTap;
-        } else if (lockstep.frame >= SETUP_FRAME) {
+        const tap = beat !== undefined && lockstep.frame > SETUP_FRAME ? beat(lockstep.frame) : 0;
+        if (beat === undefined && lockstep.frame >= SETUP_FRAME) {
           const next = heldKeys(scripted === undefined ? latest : scripted(lockstep.frame - SETUP_FRAME + 1));
           for (const key of held) if (!next.has(key)) lockstep.key(slot, key, 0, false);
           for (const key of next) if (!held.has(key)) {
@@ -177,7 +184,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
         const simStart = performance.now();
         lockstep.frames(1);
         net.stepped(performance.now() - simStart);
-        if (tap !== 0) lockstep.key(slot, tap, 0, false);
+        beat?.release(tap);
         presses.poll(tick);
         presses.drawn(tick, lastPhase === Phase.match);
         if (client.errors.length > 0) throw new Error(client.errors.join("\n"));
