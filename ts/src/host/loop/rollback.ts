@@ -47,6 +47,7 @@ import { pollPad, recordPadRow } from "./analogPad";
 import { beginRealFrames, pauseRealFrames, realFramesDue, realSeconds } from "./realFrames";
 import { beginNetEpoch, matchDelay, noteDepth, notePop, noteReceived, noteSent, noteVisible, requestFor } from "./netDelay";
 import { type EasedTick, clearCorrectionEase, easeCorrections, noteEaseBefore } from "./correctionEase";
+import { flashPress } from "./inputFlash";
 import { localElapsed } from "wisp/game/clock";
 import { eventPlayer, playerSlot } from "wisp/game/players";
 import { sendSync, syncData } from "wisp/game/sync";
@@ -270,6 +271,7 @@ function observeSpeculativeFrame(frame: number, local: Readonly<InputRow>): void
   holdPresentedCapture(s);
   const rollback = s.rollback;
   if (rollback !== undefined) presentPredictedHits(s, frame, rollback.speculative.world, rollback.speculative.runtime);
+  if (s.build.devConsole) flashPress(frame, local.pressed, s.dev.flash);
   const slot = localSlot();
   if (rollback === undefined || !isParticipantSlot(slot) || !probeRecording(s.probe)) return;
   const { epoch, schedule } = rollback;

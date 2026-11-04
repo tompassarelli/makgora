@@ -8,6 +8,7 @@ import type { MapBuild } from "../../src/game/session/build";
 import type { StageTile } from "../../src/game/menu/stageCatalog";
 import { type StandaloneStart, createStandaloneSession, makgoraStandalone } from "./standalone";
 import { createNetStandalone } from "./net";
+import { devCommandsOf } from "./devArguments";
 import { MEASURED_FROM } from "../perfWindowTable";
 
 livePortraits.enabled = true;
@@ -22,6 +23,7 @@ const presentation = (query.get("presentation") ?? undefined) as MapBuild["prese
 const digestFile = query.get("digests") ?? undefined;
 const stage = query.get("stage"), rollback = query.get("rollback");
 const inputDelay = process.env.MAKGORA_ONLINE_INPUT_DELAY ?? null;
+const devCommands = devCommandsOf(query.get("dev") ?? undefined);
 const match = { ...(query.get("fourFighters") === null ? {} : { fourFighters: true }), ...(stage === null ? {} : { stage: Number(stage) as StageTile }), ...(rollback === null ? {} : { rollback: Number(rollback) }) };
 const savedFiles = query.get("save") === null ? undefined : join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "makgora/native-files");
 
@@ -41,7 +43,7 @@ export const MAKGORA_NATIVE_GAME = {
     create: async (...[link, slot, humans, options]: Parameters<typeof createNetStandalone>) => marksMeasured(await createNetStandalone(link, slot, humans, { ...options, ...(match.fourFighters === true ? { fourFighters: { stage: match.stage ?? (0 as StageTile), ...(inputDelay === null ? {} : { inputDelay: Number(inputDelay) }) } } : {}) })),
   },
   create: async (session: Parameters<typeof createStandaloneSession>[0]) => {
-    const created = marksMeasured(await createStandaloneSession({ ...session, ...match, start, ...(presentation === undefined ? {} : { presentation }), ...(savedFiles === undefined ? {} : { savedFiles }), ...(chosen === undefined ? {} : { chosen }), ...(tutorialOffer ? {} : { tutorialOffer }) }));
+    const created = marksMeasured(await createStandaloneSession({ ...session, ...match, start, ...(presentation === undefined ? {} : { presentation }), ...(savedFiles === undefined ? {} : { savedFiles }), ...(chosen === undefined ? {} : { chosen }), ...(tutorialOffer ? {} : { tutorialOffer }), devCommands }));
     if (digestFile === undefined) return created;
     const rows: string[] = [];
     return {

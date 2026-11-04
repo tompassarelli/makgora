@@ -1,3 +1,4 @@
+import { devCommandsOf, devQuery } from "./devArguments";
 import type { StandaloneGame, StandaloneInput, StandaloneSession } from "wisp/scripts/wisp/standalone";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -90,10 +91,11 @@ export interface StandaloneSessionOptions {
   readonly savedFiles?: string;
   /** Whether a first-time player is offered the tutorial on character select; `--no-tutorial-offer` turns it off so a live window opens on the menu with nothing in front. */
   readonly tutorialOffer?: boolean;
+  readonly devCommands?: readonly string[];
 }
 
 export async function createStandaloneSession(options: StandaloneSessionOptions = {}): Promise<StandaloneSession & { frame(): number; finished(): boolean; digest(): { readonly frame: number; readonly digest: string }; difference(recorded: string): string; replayed(): number }> {
-  const { script, presentation, fourFighters = false, stage = 0, rollback = 0, start = "match", chosen, savedFiles, tutorialOffer = true } = options;
+  const { script, presentation, fourFighters = false, stage = 0, rollback = 0, start = "match", chosen, savedFiles, tutorialOffer = true, devCommands = [] } = options;
   const scripted = script?.startsWith(SELECTION_SCRIPT) === true;
   const selection = scripted || start === "select";
   const driven = script !== undefined && !scripted;
@@ -146,6 +148,7 @@ export async function createStandaloneSession(options: StandaloneSessionOptions 
     });
     else if (selection) client.run(() => { if (asksForCpu(script)) addCpuOpponent(shell().game as unknown as Parameters<typeof cycleSlotMode>[0]); });
     else if (script === undefined) client.run(() => {
+      devCommands.forEach(command => applyDeveloperCommand(shell(), 0, `-dev ${command}`));
       applyDeveloperCommand(shell(), 0, start === "training" ? QUICK_TRAINING_COMMAND : QUICK_MATCH);
       if (start === "results") for (const slot of PARTICIPANT_SLOTS) if (isActive(shell().world, slot)) fighterAt(shell().world, slot).status.stocks = 1;
     });
@@ -233,7 +236,7 @@ export const makgoraStandalone = (render: StandaloneGame["render"]): StandaloneG
 });
 
 const FLAGS = new Set(["--headless", "--four-fighters", "--player-assets-only", "--no-tutorial-offer"]);
-const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests", "--storage", "--stage"]);
+const TEXT_OPTIONS = new Set(["--script", "--map", "--out", "--start", "--chosen", "--digests", "--storage", "--stage", "--dev"]);
 
 export function standaloneArguments(args: readonly string[], window: "chrome" | "native" = "native") {
   let frames: number | undefined, rollback: number | undefined;
@@ -263,6 +266,7 @@ export function standaloneArguments(args: readonly string[], window: "chrome" | 
     }
   }
   const startOptions = startArguments(texts);
+  const devCommands = devCommandsOf(texts.get("--dev"));
   const script = texts.get("--script"), digests = digestsOf(texts, window), out = texts.get("--out"), map = texts.get("--map"), storage = texts.get("--storage"), headless = flags.has("--headless"), fourFighters = flags.has("--four-fighters");
   if (headless && (frames === undefined || (out === undefined && window === "chrome"))) throw new Error(window === "native" ? "--headless needs --frames N" : "--headless needs --frames N and --out DIR");
   const playerAssets = playerAssetsOf(flags.has("--player-assets-only"), map);
@@ -270,7 +274,7 @@ export function standaloneArguments(args: readonly string[], window: "chrome" | 
   const stageName = texts.get("--stage");
   if (stageName !== undefined && !fourFighters) throw new Error("--stage picks the --four-fighters match's stage; add --four-fighters");
   const stage = stageName === undefined ? undefined : stageNamed(stageName);
-  return { ...(fourFighters ? { fourFighters } : {}), ...(flags.has("--no-tutorial-offer") ? { noTutorialOffer: true } : {}), ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }), ...(storage === undefined ? {} : { storage }), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
+  return { ...(fourFighters ? { fourFighters } : {}), ...(flags.has("--no-tutorial-offer") ? { noTutorialOffer: true } : {}), devCommands, ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }), ...(storage === undefined ? {} : { storage }), ...startOptions, ...playerAssets, ...(script === undefined ? {} : { script }), ...digests, ...(presentation === undefined ? {} : { presentation }), ...(out === undefined ? {} : { out }), ...(frames === undefined ? {} : { frames }), headless, ...(captureFrames.length === 0 ? {} : { captureFrames }) };
 }
 
 function digestsOf(texts: ReadonlyMap<string, string>, window: "chrome" | "native"): { readonly digests?: string } {
@@ -307,7 +311,7 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   const counted = standaloneEmulatedCallsArgument(windowed.rest);
   if (typeof counted === "string") return yield* new UsageFailure({ problem: counted });
   const options = yield* Effect.try({ try: () => standaloneArguments(counted.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
-  const { playerAssets, start, chosen, digests, storage, stage, rollback, fourFighters, noTutorialOffer, ...run } = options;
+  const { playerAssets, start, chosen, digests, storage, stage, rollback, fourFighters, noTutorialOffer, devCommands, ...run } = options;
   const match = { ...(fourFighters === true ? { fourFighters } : {}), ...(stage === undefined ? {} : { stage }), ...(rollback === undefined ? {} : { rollback }) };
   const game = makgoraStandalone(playerAssets === undefined ? headlessRender() : yield* playerRender(playerAssets.map).pipe(Effect.mapError((cause) => new RenderFailure({ cause }))));
   const query = new URLSearchParams();
@@ -320,12 +324,13 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
   if (options.fourFighters === true) query.set("fourFighters", "1");
   if (options.stage !== undefined) query.set("stage", String(options.stage));
   if (options.rollback !== undefined) query.set("rollback", String(options.rollback));
+  devQuery(query, devCommands);
   if (digests !== undefined) query.set("digests", digests);
   const compiled = !import.meta.path.endsWith(".ts");
   if (compiled) process.env.MAKGORA_NATIVE_QUERY = query.toString();
   if (windowed.window === "native") process.env.WISP_WINDOW_SNAPSHOTS ??= join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "makgora/evidence");
   const nativeModule = query.size === 0 || compiled ? NATIVE_GAME_MODULE : `${NATIVE_GAME_MODULE}?${query}`;
-  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...match, ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }), ...(noTutorialOffer === true ? { tutorialOffer: false } : {}) }) }, {
+  return yield* runStandalone({ ...game, create: (session) => createStandaloneSession({ ...session, ...(options.presentation === undefined ? {} : { presentation: options.presentation }), ...match, ...(start === undefined ? {} : { start }), ...(chosen === undefined ? {} : { chosen }), ...(noTutorialOffer === true ? { tutorialOffer: false } : {}), devCommands }) }, {
     ...run,
     reforged: storage === undefined ? {} : { storage },
     ...(playerAssets === undefined ? {} : { gpuLease: false }),

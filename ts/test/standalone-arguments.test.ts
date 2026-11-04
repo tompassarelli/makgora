@@ -31,3 +31,9 @@ test("--storage names the Warcraft III: Reforged folder Wisp looks at first [k2 
   expect(() => standaloneArguments(["--storage"])).toThrow("--storage needs a value");
   expect(() => standaloneArguments(["--storage", "--headless"])).toThrow("--storage needs a value");
 });
+
+test("--dev lists the developer commands the window applies before its match starts, split on semicolons [k2 property]", () => {
+  expect(standaloneArguments(["--dev", "delay 1;flash on"], "native").devCommands).toEqual(["delay 1", "flash on"]);
+  expect(standaloneArguments([]).devCommands).toEqual([]);
+  expect(() => standaloneArguments(["--dev"])).toThrow("--dev needs a value");
+});

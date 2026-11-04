@@ -36,6 +36,8 @@ export interface DevSettings {
 
   batch: number;
 
+  flash: boolean;
+
 
 
 
@@ -56,6 +58,13 @@ function commandInteger(text: string): number | undefined {
 }
 
 
+function flashCommand(settings: DevSettings, message: string): string | undefined {
+  if (message !== "-dev flash on" && message !== "-dev flash off") return undefined;
+  settings.flash = message === "-dev flash on";
+  return `dev: input flash ${settings.flash ? "on" : "off"}`;
+}
+
+
 export function applyDevCommand(settings: DevSettings, message: string): string | undefined {
   if (message === "-dev show") return describeDevSettings(settings);
   if (message.startsWith("-dev rb ")) {
@@ -70,6 +79,8 @@ export function applyDevCommand(settings: DevSettings, message: string): string 
     settings.delay = value;
     return describeDevSettings(settings);
   }
+  const flash = flashCommand(settings, message);
+  if (flash !== undefined) return flash;
   if (message.startsWith("-dev batch ")) {
     const value = commandInteger(message.substring(11));
     if (value === undefined || value < 1 || value > MAX_BATCH) return `dev: batch must be 1-${MAX_BATCH}`;

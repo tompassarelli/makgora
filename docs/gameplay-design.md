@@ -439,6 +439,15 @@ transport (wisp#110) both call it.
   delay" in place of the laggy-connection line, so the host knows to raise
   it for the next game. On a development build the host can also type
   `-dev hostdelay N` or `-dev hostdelay auto`, which sends the same message.
+  A development build plays the delay `-dev delay N` sets for the next match
+  (0 up to the same limit; `-dev show` lists it) instead of its build's, so
+  the native window's 1 frame can be played against 2 and the Warcraft
+  build's 2 against 1; the native window takes it before the match starts
+  as `--dev "delay 2"`, and player builds ignore it. `-dev flash
+  on` lights a block in the screen's top-left corner on the sim frame whose
+  input row carries a new press (after input delay), held 8 frames, which
+  Wisp's press-latency harness watches to time press to display exactly
+  (`latency press --flash`, wisp#244); it is off until asked for.
 - **Rollback window and no delay cap (Tom, 29 Oct 2026, #679):** a
   correction never replays more than 7 frames, Slippi's window, so every
   build's prediction window is 7 (first set at 8, then lowered the same
