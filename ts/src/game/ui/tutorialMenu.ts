@@ -72,6 +72,12 @@ export function tutorialKeyButton(action: Action): TutorialButton | undefined {
   return undefined;
 }
 
+export function answerTutorialKey(action: Action, click: (button: TutorialButton) => void): boolean {
+  const button = tutorialKeyButton(action);
+  if (button !== undefined) click(button);
+  return true;
+}
+
 // Whether the prompt is still open after the button.
 export function pressTutorialButton(button: TutorialButton, actions: SelectionActions, participantId: number, markSeen: () => void): boolean {
   if (button.kind === "tutorialOpen") return true;

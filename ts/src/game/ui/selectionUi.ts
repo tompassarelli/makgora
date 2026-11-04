@@ -21,7 +21,6 @@ import {
   validTeams,
   characterFor,
   characterReady,
-  choosingFighter,
   fighterActive,
   fighterMask,
   hasUnassignedHuman,
@@ -60,7 +59,7 @@ import { CreditsMenu } from "./creditsMenu";
 import { fighterShown } from "../roster/forge";
 import { MainMenuButton } from "./mainMenuButton";
 import { CommunityMenu } from "./communityMenu";
-import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffer, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offerTutorial, pressTutorialButton, tutorialAvailable, tutorialKeyButton, tutorialSeen } from "./tutorialMenu";
+import { NOT_NOW_LABEL, TUTORIAL_OFFER, type TutorialButton, acceptsTutorialOffer, type TutorialMenuFrames, createTutorialMenu, showTutorialLesson, markTutorialSeen, offerTutorial, pressTutorialButton, tutorialAvailable, answerTutorialKey, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, createBackdrop, createSyncTrigger, createText, createWindowBackdrop, fitToWindow, gameUi, highlightText, placeTopLeft, setMenuText, sizeText } from "./frames";
 import { ROSTER_TILES, TILE_NAME_SIZE, art, characterOfTile, decodeSlot, decodeTile, dimComingSoon, forgeMark, label, placeTile, selectGrid, showTile, modeBox, portraitTexture, tileLabel, tileOfCharacter, tileOffered } from "./selectionFrames";
 import { type CardButton, type CardFrames, type MenuFocus, acceptsClick, cardPalette, cardRowShown, createCard, menuFocusList, pointedCard, presentCardChip, presentCardCostume, presentCardCpu, presentCardStatus, presentCardTag, presentCardTeam } from "./selectionCards";
@@ -397,7 +396,7 @@ export class SelectionPanel {
 
   private choosing(): Readonly<MatchState> | undefined {
     const { game } = this;
-    return this.settingsOpen ? undefined : choosingFighter(game, this.participantId);
+    return game === undefined || game.phase !== Phase.characterMenu || this.settingsOpen || !humanActive(game, this.participantId) ? undefined : game;
   }
 
   private openCpuSettings(slot: number): void {
@@ -448,7 +447,7 @@ export class SelectionPanel {
       return true;
     }
     if (infoPopupAction([this.credits, this.community], action)) return true;
-    if (this.tutorialOpen) return this.answerTutorial(tutorialKeyButton(action));
+    if (this.tutorialOpen) return answerTutorialKey(action, button => this.click(button, playerOf(this.participantId)));
     if (this.bar.opened() !== undefined) return this.barAction(game, action);
     return this.focusAction(game, action);
   }
@@ -474,11 +473,6 @@ export class SelectionPanel {
     if (target.kind === "mode" || target.kind === "rules" || target.kind === "guide" || target.kind === "gear") return this.openFocus(target.kind, action);
     if (target.kind === "mainMenu" || target.kind === "settings") return this.pressMenuButton(target, action);
     return this.chooseFocus(game, target, action);
-  }
-
-  private answerTutorial(button: TutorialButton | undefined): boolean {
-    if (button !== undefined) this.click(button, playerOf(this.participantId));
-    return true;
   }
 
   private pressMenuButton(target: MenuFocus, action: Action): boolean {
