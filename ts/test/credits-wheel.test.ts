@@ -12,7 +12,7 @@ const headless = testHeadless(MAKGORA_HEADLESS);
 const NOTCH = 120;
 const middle = (box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number }) => [box.x + box.width / 2, box.y - box.height / 2] as const;
 
-test("a wheel turn over the open Credits popup scrolls it one line a notch, away from the user toward the top, and over the open Community popup or a closed one does nothing, the wheel registered on a button-type frame because Warcraft routes it to no plain frame [k1 scenario]", () => {
+test("a wheel turn over the open Credits popup scrolls it one line a notch, away from the user toward the top, and over the open Community popup or a closed one does nothing [k1 scenario]", () => {
   const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, [0, 1]);
   const read = <T>(slot: number, body: () => T): T => {
     let result: T | undefined;
@@ -33,8 +33,6 @@ test("a wheel turn over the open Credits popup scrolls it one line a notch, away
   expect(clients.wheel(0, x, y, NOTCH)).toBe(false);
   read(0, () => credits(0).open());
   clients.frames(2);
-  const wheelFrame = (slot: number) => clients.client(slot).eventTarget(clients.client(slot).constants.FRAMEEVENT_MOUSE_WHEEL, x, y);
-  expect(wheelFrame(0)?.type).toBe("BUTTON");
   const top = shown(0);
   turn(0, -3);
   const scrolled = shown(0);

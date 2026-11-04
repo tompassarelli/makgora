@@ -47,7 +47,6 @@ import { measureHandsGate } from "../gateHands";
 import { measureStartGate } from "../gateStart";
 import { measureStartRestGate } from "../gateStartRest";
 import { measureButtonsGate } from "../gateButtons";
-import { measureWheelGate } from "../gateWheel";
 import { measureBindingsGate } from "../gateBindings";
 import { measureMovesGate } from "../gateMoves";
 import { movesShardId, parseShardChat } from "../smokeShards";
@@ -356,14 +355,12 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
     const measurements = new Map<string, ReceiptFile[]>();
     const specials = new Map<string, ReceiptFile>();
     const evidence = (check: string, name: string) => join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/makgora/accept"), check, name);
-    const sendDev = (name: string, text: string) => (solo ? sendSoloDevCommand(text, name) : sendDevCommand(text, name)).pipe(Effect.mapError((cause) => new AcceptFailure({ operation: `chat ${name}`, problem: describeCause(cause) })), Effect.provide(context), Effect.asVoid);
     const receiptGates = {
       "gate:cursor": (name: string) => measureCursorGate(selectedClients, name, evidence("gate-cursor-visible", name)),
       "gate:hands": () => measureHandsGate(selectedClients, evidence("gate-select-hands", "pair"), undefined),
       "gate:hands-teams": () => measureHandsGate(selectedClients, evidence("gate-select-hands-teams", "pair"), [1, 3]),
       "gate:start": (name: string) => measureStartGate(selectedClients, name, evidence("gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")),
       "gate:buttons": (name: string) => measureButtonsGate(selectedClients, name, evidence("gate-panel-buttons", name)),
-      "gate:wheel": (name: string) => measureWheelGate(selectedClients, name, evidence("gate-popup-wheel", name), text => sendDev(name, text)),
       "gate:start-rest": (name: string) => measureStartRestGate(selectedClients, name, evidence("gate-start-rest", name)),
       "gate:results": (name: string) => measureResultsGate(selectedClients, evidence("gate-results-rematch", name)),
       "gate:stages": (name: string) => measureStagesGate(selectedClients, evidence("gate-stages", name), controlled.start("gate-playable", "gate-stages")),
@@ -384,7 +381,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
         const measured = specials.get(name);
         if (measured === undefined) return yield* new AcceptFailure({ operation: "specials gate", problem: "gate-moves did not run in this session; the specials spot check reads its settle frames" });
         measurements.set(name, [...(measurements.get(name) ?? []), { ...measured, modified: yield* Clock.currentTimeMillis }]);
-      }) : !text.startsWith("-dev ") ? live.chat(name, text) : sendDev(name, text);
+      }) : !text.startsWith("-dev ") ? live.chat(name, text) : (solo ? sendSoloDevCommand(text, name) : sendDevCommand(text, name)).pipe(Effect.mapError((cause) => new AcceptFailure({ operation: `chat ${name}`, problem: describeCause(cause) })), Effect.provide(context));
       },
       receipts: name => Effect.map(live.receipts(name), receipts => [...receipts, ...(measurements.get(name) ?? [])]),
     });

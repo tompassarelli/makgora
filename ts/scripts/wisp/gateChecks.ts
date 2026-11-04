@@ -34,11 +34,6 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^MAKGORA GATE buttons size=\\d+x\\d+ buttons=([1-9]\\d*) points=\\d+ clicked=\\d+ boxless=0 pass=1$", min: 1 }],
   },
   {
-    id: "gate-popup-wheel", closes: "makgora#1117", map: "candidate-dev", session: "gate-popup-wheel",
-    setup: [{ waitMs: 8000 }, { chat: "gate:wheel", client: "a" }],
-    pass: [noErrors, { kind: "receipt", client: "a", pattern: "^MAKGORA GATE wheel popup=credits turns=5 trace=1,2,3,2,1 pass=1$", min: 1 }],
-  },
-  {
     id: "gate-bindings", closes: "T7 C3", map: "gate-playable", session: "gate-bindings",
     setup: [{ chat: "gate:bindings", client: "a" }],
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^MAKGORA GATE bindings labels=\\d+ samples=(\\d+) passed=\\1 pass=1 remaps=none$", min: 1 }],

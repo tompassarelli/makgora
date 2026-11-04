@@ -3,7 +3,6 @@ import { ButtonClicks } from "./frames";
 import { InfoPanelState } from "./infoPanelState";
 import { type InfoPopupBody, infoPopup } from "./infoPanel";
 import { PopupWheel } from "./infoPopupWheel";
-import { recordWheel } from "./wheelLog";
 import { COMMUNITY_PANEL, INFO_POPUP_SIZE, type InfoPopupLayout, infoPopupLayout } from "./infoPopupLayout";
 import { destroyFrame, Frame, setFrameVisible } from "wisp/game/frames";
 import { Player, player as playerOf } from "wisp/game/players";
@@ -25,7 +24,7 @@ export class CommunityMenu {
     const layout = communityLayout();
     const popup = infoPopup(owner, `MeleeCommunityMenu${suffix}`, layout, COMMUNITY_TITLE, true);
     this.root = popup.root;
-    this.wheel = new PopupWheel(`ui.community.${suffix}.wheel`, [popup.wheel, popup.close], (delta, turner) => this.turn(delta, turner));
+    this.wheel = new PopupWheel(`ui.community.${suffix}.wheel`, popup.root, (delta, turner) => this.turn(delta, turner));
     this.body = popup.body;
     this.state = new InfoPanelState(layout.maxFirst);
     this.clicks.add(popup.close, { kind: "communityClose" }, "Close", "native", layout.close);
@@ -45,9 +44,7 @@ export class CommunityMenu {
   }
 
   private turn(delta: number, turner: Player): void {
-    if (turner !== playerOf(this.participantId) || !this.state.isOpen) return;
-    this.scroll(delta);
-    recordWheel("community", delta, this.state.first);
+    if (turner === playerOf(this.participantId) && this.state.isOpen) this.scroll(delta);
   }
 
   private shut(): boolean {

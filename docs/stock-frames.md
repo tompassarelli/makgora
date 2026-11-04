@@ -70,18 +70,3 @@ On 2026-11-03 on gex45 it passed at 1920x1080 (`capture-classic-1080`) and at
 355 of 355 points clicked. On a build with the two startup calls removed it
 failed at 2880x1920 naming Done (`ui.settings.0.click#561:close`) at points 2
 to 5 of 5 (makgora#1047).
-
-## The mouse wheel on the info popups
-
-Warcraft delivers `FRAMEEVENT_MOUSE_WHEEL` only to a mouse-enabled frame type
-under the cursor. On 2026-11-04 the accept check `gate-popup-wheel`
-(makgora:ts/scripts/wisp/gateWheel.ts, map `candidate-dev`) opened the Credits
-popup through `-dev popup credits` on a Classic pair and sent real wheel events
-with xdotool: over the popup's plain FRAME the map's own wheel log
-(`makgora-dev-wheel-pSLOT.txt`, written only after that command) counted 0 of 5
-turns, while over its Close button, a button type, it counted both turns. Each
-popup therefore carries an invisible BUTTON over its panel, below Close, and
-registers the wheel on that button and on Close; the check then passed with
-five turns over the body logged as first lines 1,2,3,2,1 (makgora#1117). The
-headless backend routes a wheel to any frame that registered it, so
-`test/credits-wheel.test.ts` asserts the registered frame's type instead.

@@ -7,7 +7,7 @@ import { eventPlayer, Player } from "wisp/game/players";
 export class PopupWheel {
   private trigger: Events | undefined;
 
-  constructor(private readonly name: string, private readonly frames: readonly Frame[], handle: (delta: number, turner: Player) => void) {
+  constructor(private readonly name: string, private readonly frame: Frame, handle: (delta: number, turner: Player) => void) {
     this.bindHandler(handle);
   }
 
@@ -19,7 +19,7 @@ export class PopupWheel {
     if (this.trigger !== undefined) return;
     this.trigger = createEvents();
     onEvents(this.trigger, trampoline(this.name));
-    for (const frame of this.frames) addFrameEvent(this.trigger, frame, FrameEvent.mouseWheel);
+    addFrameEvent(this.trigger, this.frame, FrameEvent.mouseWheel);
   }
 
   disarm(): void {
