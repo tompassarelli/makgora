@@ -7,6 +7,7 @@ import { livePortraits } from "../../src/game/ui/liveCard";
 import type { MapBuild } from "../../src/game/session/build";
 import type { StageTile } from "../../src/game/menu/stageCatalog";
 import { type StandaloneStart, createStandaloneSession, makgoraStandalone } from "./standalone";
+import { createNetStandalone } from "./net";
 import { MEASURED_FROM } from "../perfWindowTable";
 
 livePortraits.enabled = true;
@@ -23,16 +24,23 @@ const stage = query.get("stage"), rollback = query.get("rollback");
 const match = { ...(query.get("fourFighters") === null ? {} : { fourFighters: true }), ...(stage === null ? {} : { stage: Number(stage) as StageTile }), ...(rollback === null ? {} : { rollback: Number(rollback) }) };
 const savedFiles = query.get("save") === null ? undefined : join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "makgora/native-files");
 
+const marksMeasured = <S extends { step(...args: never[]): void }>(session: S): S => {
+  const warmup = Number(process.env.WISP_WINDOW_WARMUP_FRAMES ?? 0);
+  if (warmup <= 0) return session;
+  const step = session.step.bind(session);
+  let steps = 0;
+  return { ...session, step: (...args: Parameters<S["step"]>) => { if (++steps === warmup + 1) console.error(MEASURED_FROM); step(...args); } };
+};
+const base = makgoraStandalone(playerMap === null ? headlessRender() : await Effect.runPromise(playerRender(playerMap)));
+
 export const MAKGORA_NATIVE_GAME = {
-  ...makgoraStandalone(playerMap === null ? headlessRender() : await Effect.runPromise(playerRender(playerMap))),
+  ...base,
+  net: {
+    ...base.net,
+    create: async (...[link, slot, humans, options]: Parameters<typeof createNetStandalone>) => marksMeasured(await createNetStandalone(link, slot, humans, { ...options, ...(match.fourFighters === true ? { fourFighters: { stage: match.stage ?? (0 as StageTile) } } : {}) })),
+  },
   create: async (session: Parameters<typeof createStandaloneSession>[0]) => {
-    const created = await createStandaloneSession({ ...session, ...match, start, ...(presentation === undefined ? {} : { presentation }), ...(savedFiles === undefined ? {} : { savedFiles }), ...(chosen === undefined ? {} : { chosen }), ...(tutorialOffer ? {} : { tutorialOffer }) });
-    const warmup = Number(process.env.WISP_WINDOW_WARMUP_FRAMES ?? 0);
-    if (warmup > 0) {
-      const step = created.step;
-      let steps = 0;
-      created.step = (input) => { if (++steps === warmup + 1) console.error(MEASURED_FROM); step(input); };
-    }
+    const created = marksMeasured(await createStandaloneSession({ ...session, ...match, start, ...(presentation === undefined ? {} : { presentation }), ...(savedFiles === undefined ? {} : { savedFiles }), ...(chosen === undefined ? {} : { chosen }), ...(tutorialOffer ? {} : { tutorialOffer }) }));
     if (digestFile === undefined) return created;
     const rows: string[] = [];
     return {

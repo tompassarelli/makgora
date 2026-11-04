@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { MEASURED_FROM, logFigures, presetTable, spreadOf } from "../scripts/perfWindowTable";
+import { MEASURED_FROM, logFigures, onlineFigures, onlineTable, presetTable, spreadOf } from "../scripts/perfWindowTable";
 
 const spread = (p50: number, p99: number, max: number) => ({ p50, p99, max });
 const pressure = { psiStart: 31, psiEnd: 44, loadStart: 85, loadEnd: 97 };
@@ -27,4 +27,17 @@ test("a run's log gives late scenes and ticks/s from every pulse but the first, 
   expect(logFigures("").workerGcPausesMs).toEqual([]);
   expect(spreadOf([3, 1, 2])).toEqual(spread(2, 3, 3));
   expect(spreadOf([])).toBeUndefined();
+});
+
+test("an online window's log gives its rollback depth from the map's playback line and the agreed round trip, delay and checksums from its summary line, and the table counts rollbacks per second of match [k2 property]", () => {
+  const text = [
+    "net: fighter selection with 2 players at frame 30",
+    `net: rollback ${JSON.stringify({ window: 12, delay: 2, depth: { n: 900, p50: 7, p95: 9, p99: 10, max: 12 }, lead: { n: 1, p50: 0, p95: 0, p99: 0, max: 0 }, leadInsideWindow: 1, stalls: 0 })}`,
+    JSON.stringify({ fps: 59, net: { checksumsCompared: 44, mismatches: 0, rttMs: 301, delay: 10 } }),
+  ].join("\n");
+  const online = onlineFigures(text);
+  expect(online).toEqual({ depth: { n: 900, p50: 7, p95: 9, p99: 10, max: 12 } as never, delay: 2, window: 12, checksumsCompared: 44, mismatches: 0, rttMs: 301 });
+  const lines = onlineTable([{ label: "Blackrock 300 ms join", matchFrames: 4500, online, log }, { label: "Blackrock 0 ms host", matchFrames: 4500, online: onlineFigures(""), log }]).split("\n");
+  expect(lines[2]).toBe("| Blackrock 300 ms join | 301 | 2 / 12 | 7 / 10 / 12 | 12.00 | 2 / 5 / 5 | 44 | 0 |");
+  expect(lines[3]).toBe("| Blackrock 0 ms host | – | – | – | – | 2 / 5 / 5 | – | – |");
 });

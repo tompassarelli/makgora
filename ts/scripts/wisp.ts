@@ -54,13 +54,13 @@ const COMMANDS: Record<string, { readonly usage: string; readonly load: () => Pr
   repro: { usage: "repro FILE [--view] [--test NAME] [--shrink [--out FILE]] [--frame N --out FILE] [--diff-frame N|previous]", load: async () => (await import("./wisp/commands/repro")).repro },
   replay: { usage: "replay FILE [--out JOINED]", load: async () => (await import("./wisp/commands/replay")).replay },
   net: {
-    usage: "net host [--port N | --relay REGION|ADDRESS:PORT [--humans N]] | join CODE|ADDRESS:PORT | pair [--relay local --humans N] --script FILE.pad --frames N [--delay FRAMES] [--freeze-at F] [--quit-at F] [--rtt MS] [--loss P] [--seed N] | proxy --listen PORT --to ADDRESS:PORT [--rtt MS] [--loss P]   (one slot per process over Wisp's UDP lockstep; wisp:docs/network-model.md)",
+    usage: "net host [--port N | --relay REGION|ADDRESS:PORT [--humans N]] | join CODE|ADDRESS:PORT | pair [--relay local --humans N] --script FILE.pad --frames N [--delay FRAMES] [--freeze-at F] [--quit-at F] [--rtt MS] [--loss P] [--seed N] [--jitter MS] | pair --relay local --window native --out DIR --four-fighters [--stage NAME] --frames N [--rtt MS] [--jitter MS]   (two native windows) | proxy --listen PORT --to ADDRESS:PORT [--rtt MS] [--loss P]   (one slot per process over Wisp's UDP lockstep; wisp:docs/network-model.md)",
     load: async () => (await import("wisp/scripts/wisp/commands/net")).makeNet(async (args) => {
       const { flagValues } = await import("wisp/scripts/wisp/command");
       const [script] = flagValues(args, "script");
       if (script === undefined) throw new Error("net needs --script FILE.pad");
       return (await import("./wisp/net")).padNetGame(await Bun.file(script).text());
-    }, "Mak'gora", ["script"]),
+    }, "Mak'gora", ["script", "four-fighters", "stage"], ["play", "--standalone", "--window", "native"]),
   },
   "net-accept": { usage: "net-accept --out DIR [--four-fighters] [--matches 20] [--frames 7200] [--jobs 3] [--rtts 0,60,120] [--loss 0.01] [--seed 112]   (wisp#112: full three-stock matches between two processes through the delay and loss proxy; checksums and rollback depth per round trip)", load: async () => (await import("./wisp/commands/netAccept")).netAccept },
   pad: { usage: "pad SCRIPT --helper BINARY --build BUILD --out DIR --app-id a=ID --app-id b=ID [--chat=TEXT] [--map MAP.w3x [--retries N]] [--clients-file FILE] | pad SCRIPT --headless --helper BINARY --out DIR [--chat=TEXT] [--compare NATIVE_DIR] [--replay-arrivals NATIVE_DIR] [--render DIR --frames N...] | pad SCRIPT|DIR... --helper BINARY --out DIR (--map MAP.w3x [--pairs N | --pair K... | --clients-file FILE] [--fresh-each] [--hot] | --headless) [--headless-jobs N]   (timed virtual-pad edges through the real helpers; native vs headless parity; scripts/integrity/padScript.ts)", load: async () => (await import("./wisp/commands/pad")).padCommand },

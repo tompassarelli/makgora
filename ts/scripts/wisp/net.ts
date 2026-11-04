@@ -10,6 +10,8 @@ import { type InputSchedule, acceptedInput, remoteAccepted } from "../../src/gam
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { nativeDeclarations } from "./nativeDeclarations";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
+import type { StageTile } from "../../src/game/menu/stageCatalog";
+import { Character } from "../../src/game/sim/codes";
 import type { MapBuild } from "../../src/game/session/build";
 import { PREDICTED_HEADLESS } from "./headless";
 import { heldKeys } from "./standaloneKeys";
@@ -84,10 +86,17 @@ export async function makgoraMapHash(): Promise<string> {
 const PHASE_NAMES = new Map<number, string>(Object.entries(Phase).map(([name, value]) => [value, name]));
 
 /** One player of a hosted or joined match: both humans meet at fighter selection, and each presses its window's input or its pad script. */
-export async function createNetStandalone(link: LockstepLink, slot: number, humans: number, options: { readonly script?: string } = {}): Promise<StandaloneNetSession> {
+/** The online benchmark (wisp#229): makgora#888's four-fighter match with the two humans in slots 1 and 2 and computers in 3 and 4, each human pressing the bot beat. */
+export interface NetFourFighters { readonly stage: StageTile }
+
+const NET_FOUR_FIGHTERS = ["-dev slots 3 12", "-dev fighter 2 Blademaster", "-dev fighter 3 Illidan", "-dev fighter 4 Warden", "-dev time 2"];
+const NET_FOUR_FIGHTER_STOCKS = 99;
+const BEAT_SPACING = 17;
+
+export async function createNetStandalone(link: LockstepLink, slot: number, humans: number, options: { readonly script?: string; readonly fourFighters?: NetFourFighters } = {}): Promise<StandaloneNetSession> {
   const runtime = installHeadless(PREDICTED_HEADLESS, nativeDeclarations());
   try {
-    interface State { readonly game: { readonly phase: number; readonly humanFighterMask: number; readonly computerMask: number } }
+    interface State { readonly game: { readonly phase: number; readonly humanFighterMask: number; readonly computerMask: number; stockCount: number } }
     const { shell }: { shell(): State & NetcodeShell } = await import("../../src/host/loop/state");
     const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import("../../src/host/loop/diagnostics");
     const { handMeasuredRtt, measuredDelay }: { handMeasuredRtt(net: object, rttMs: number): number; measuredDelay(window: number, rttMs: number): number } = await import("../../src/host/loop/netDelay");
@@ -97,6 +106,10 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
     const lockstep = runtime.clients({ install: () => main.install(build), start: () => main.startBuild(build) }, [slot], { humans: Array.from({ length: humans }, (_, member) => member), link, keepCalls: 0 });
     const client = lockstep.client(slot);
     const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import("../../src/host/loop/developerCommands");
+    const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import("../../src/host/loop/menus");
+    const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import("./botMatch");
+    const fourFighters = options.fourFighters;
+    let beatHeld = 0;
     const scripted = options.script === undefined ? undefined : padInputs(padEdges(options.script).edges, slot);
     const chat = (options.script ?? "").split("\n").map((line) => line.trim()).filter((line) => line.startsWith("#! chat ")).map((line) => line.substring(8));
     let latest: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
@@ -125,6 +138,12 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
             presses.attach(shell());
             setHumanCount(shell().game, humans);
             for (const command of chat) applyDeveloperCommand(shell(), command.startsWith("-dev fighter ") && Number(command.split(" ")[2]) <= 2 ? Number(command.split(" ")[2]) - 1 : 0, command);
+            if (fourFighters !== undefined) {
+              const state = shell();
+              for (const command of NET_FOUR_FIGHTERS) applyDeveloperCommand(state, 0, command);
+              state.game.stockCount = NET_FOUR_FIGHTER_STOCKS;
+              startQuickMatch(state, fourFighters.stage, undefined, Character.demonHunter, NET_FOUR_FIGHTER_STOCKS);
+            }
           });
           console.error(`net: fighter selection with ${humans} players at frame ${lockstep.frame}`);
         }
@@ -132,7 +151,15 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
           if (!lockstep.click(slot, DONE_X, DONE_Y)) throw new Error(`net: slot ${slot} has no Done button under the pointer`);
           controlsClosed = true;
         }
-        if (lockstep.frame >= SETUP_FRAME) {
+        let tap = 0;
+        if (fourFighters !== undefined && lockstep.frame > SETUP_FRAME) {
+          const [beatTap, hold] = botBeatKeys(lockstep.frame + slot * BEAT_SPACING);
+          if (beatHeld !== hold && beatHeld !== 0) lockstep.key(slot, beatHeld, 0, false);
+          if (beatHeld !== hold && hold !== 0) lockstep.key(slot, hold, 0, true);
+          if (beatTap !== 0) lockstep.key(slot, beatTap, 0, true);
+          beatHeld = hold;
+          tap = beatTap;
+        } else if (lockstep.frame >= SETUP_FRAME) {
           const next = heldKeys(scripted === undefined ? latest : scripted(lockstep.frame - SETUP_FRAME + 1));
           for (const key of held) if (!next.has(key)) lockstep.key(slot, key, 0, false);
           for (const key of next) if (!held.has(key)) {
@@ -147,7 +174,10 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
         }
         typed = [];
         tick++;
+        const simStart = performance.now();
         lockstep.frames(1);
+        net.stepped(performance.now() - simStart);
+        if (tap !== 0) lockstep.key(slot, tap, 0, false);
         presses.poll(tick);
         presses.drawn(tick, lastPhase === Phase.match);
         if (client.errors.length > 0) throw new Error(client.errors.join("\n"));
@@ -159,6 +189,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
         });
       },
       frame: () => lockstep.frame,
+      stages: () => net.stages(),
       checksum: () => {
         let checksum = "";
         client.run(() => { checksum = confirmedChecksum(shell()); });
@@ -186,6 +217,7 @@ interface NetcodeShell {
     readonly playback: {
       reconcile(...args: [unknown, unknown, unknown, { readonly runtime: { readonly simulationFrame: number } }]): "unchanged" | "rejected" | { readonly replayedFrom: number };
       catchUp(...args: unknown[]): boolean;
+      repair(...args: unknown[]): number | "rejected";
     };
   } | undefined;
 }
@@ -199,15 +231,23 @@ const percentiles = (values: readonly number[]) => {
 /** Rollback depth per correction, prediction stalls and the remote's lead, read off the map's own rollback playback (wisp#112). */
 function netcodeStats() {
   const depths: number[] = [], leads: number[] = [];
-  let stalls = 0, window = 0, delay = 0, read: (() => { readonly speculative: number; readonly confirmed: number }) | undefined;
+  let stalls = 0, window = 0, delay = 0, stepMs = 0, rollbackMs = 0, read: (() => { readonly speculative: number; readonly confirmed: number }) | undefined;
   return {
     attach(state: NetcodeShell, slot: number) {
       const rollback = state.rollback;
       if (rollback === undefined) throw new Error("net: the build has no rollback");
       const { playback, schedule } = rollback;
-      const reconcile = playback.reconcile.bind(playback), catchUp = playback.catchUp.bind(playback);
+      const reconcile = playback.reconcile.bind(playback), catchUp = playback.catchUp.bind(playback), repair = playback.repair.bind(playback);
+      playback.repair = (...args) => {
+        const began = performance.now();
+        const repaired = repair(...args);
+        rollbackMs += performance.now() - began;
+        return repaired;
+      };
       playback.reconcile = (...args) => {
+        const began = performance.now();
         const result = reconcile(...args);
+        rollbackMs += performance.now() - began;
         if (typeof result === "object") depths.push(args[3].runtime.simulationFrame - result.replayedFrom + 1);
         return result;
       };
@@ -222,6 +262,14 @@ function netcodeStats() {
         delay = rollback.delay;
         return { speculative: schedule.nextSpeculative, confirmed: remoteAccepted(schedule, slot) };
       };
+    },
+    /** A step's whole time, rollbacks included; `stages` hands out the sum since it was last read, split into the sim and the rollbacks' replays. */
+    stepped(ms: number) { stepMs += ms; },
+    stages() {
+      const stages = { sim: Math.max(0, stepMs - rollbackMs), rollback: rollbackMs };
+      stepMs = 0;
+      rollbackMs = 0;
+      return stages;
     },
     sample() {
       if (read === undefined) return;
