@@ -69,6 +69,8 @@ export interface RollbackPlayback {
   repeatedComputerDecisions(): number;
 
   rerunComputerDecisions(): number;
+
+  mispredictedFrames(): number;
 }
 
 

@@ -227,12 +227,13 @@ interface NetcodeShell {
     readonly active: boolean;
     readonly window: number;
     readonly delay: number;
-    readonly net: { readonly popCounts: readonly number[]; readonly manual: number };
+    readonly net: { readonly popCounts: readonly number[]; readonly visibleCounts: readonly number[]; readonly manual: number };
     readonly schedule: InputSchedule;
     readonly playback: {
       reconcile(...args: [unknown, unknown, unknown, { readonly runtime: { readonly simulationFrame: number } }]): "unchanged" | "rejected" | { readonly replayedFrom: number };
       catchUp(...args: unknown[]): boolean;
       repair(...args: unknown[]): number | "rejected";
+      mispredictedFrames(): number;
     };
   } | undefined;
 }
@@ -243,19 +244,20 @@ const percentiles = (values: readonly number[]) => {
   return { n: sorted.length, p50: at(0.5), p95: at(0.95), p99: at(0.99), max: sorted.at(-1) ?? 0 };
 };
 
+interface Over { readonly over: number; readonly max: number }
+
 /** Rollback depth per correction, prediction stalls and the remote's lead, read off the map's own rollback playback (wisp#112). */
 function netcodeStats() {
   const depths: number[] = [], leads: number[] = [];
-  let stalls = 0, window = 0, delay = 0, stepMs = 0, rollbackMs = 0, pops: (() => { readonly over: number; readonly max: number }) | undefined, read: (() => { readonly speculative: number; readonly confirmed: number }) | undefined;
+  let stalls = 0, window = 0, delay = 0, stepMs = 0, rollbackMs = 0, mispredicted: (() => number) | undefined, pops: (() => { readonly pops: Over; readonly visible: Over }) | undefined, read: (() => { readonly speculative: number; readonly confirmed: number }) | undefined;
   return {
     attach(state: NetcodeShell, slot: number, popUnits: number) {
       const rollback = state.rollback;
       if (rollback === undefined) throw new Error("net: the build has no rollback");
-      pops = () => {
-        const counts = rollback.net.popCounts;
-        return { over: counts.reduce((sum, count, units) => units > popUnits ? sum + count : sum, 0), max: Math.max(0, counts.findLastIndex((count) => count > 0)) };
-      };
+      const over = (counts: readonly number[]): Over => ({ over: counts.reduce((sum, count, units) => units > popUnits ? sum + count : sum, 0), max: Math.max(0, counts.findLastIndex((count) => count > 0)) });
+      pops = () => ({ pops: over(rollback.net.popCounts), visible: over(rollback.net.visibleCounts) });
       const { playback, schedule } = rollback;
+      mispredicted = () => playback.mispredictedFrames();
       const reconcile = playback.reconcile.bind(playback), catchUp = playback.catchUp.bind(playback), repair = playback.repair.bind(playback);
       playback.repair = (...args) => {
         const began = performance.now();
@@ -297,7 +299,7 @@ function netcodeStats() {
     },
     report: () => {
       const insideWindow = leads.filter((lead) => lead <= window).length;
-      return { window, delay, depth: percentiles(depths), lead: percentiles(leads), leadInsideWindow: leads.length === 0 ? 1 : insideWindow / leads.length, stalls, ...(pops === undefined ? {} : { pops: pops() }) };
+      return { window, delay, depth: percentiles(depths), lead: percentiles(leads), leadInsideWindow: leads.length === 0 ? 1 : insideWindow / leads.length, stalls, ...(pops === undefined ? {} : pops()), ...(mispredicted === undefined ? {} : { mispredicted: mispredicted() }) };
     },
   };
 }

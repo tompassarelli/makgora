@@ -8,6 +8,11 @@ import type { Character } from "../../game/sim/codes";
 import type { Fighter } from "../../game/sim/fighter";
 import type { MatchCamera } from "../../game/sim/matchCamera";
 
+export interface DrawShift {
+  x: number;
+  z: number;
+}
+
 interface DrawnBody {
   readonly character: Character;
   readonly pool: FighterPoolPresentation | undefined;
@@ -17,9 +22,11 @@ interface DrawnBody {
   readonly draw: FighterDraw;
 }
 
-/** Fits the fighter's draw once and presents the body, white flash, meter rim and parasol from it; `body` shows the pool body, `posed` the overlays. */
-export function presentDrawnBody(renderers: DrawnBody, fighter: Readonly<Fighter> | undefined, body: boolean, posed: Readonly<Fighter> | undefined, pose: Readonly<FighterPose>, stage: number, frame: number, matchFrame: number, camera: Readonly<MatchCamera>, ultimatesOff: boolean): void {
+/** Fits the fighter's draw once, moved by `shift`, and presents the body, white flash, meter rim and parasol from it; `body` shows the pool body, `posed` the overlays. */
+export function presentDrawnBody(renderers: DrawnBody, fighter: Readonly<Fighter> | undefined, body: boolean, posed: Readonly<Fighter> | undefined, pose: Readonly<FighterPose>, stage: number, frame: number, matchFrame: number, camera: Readonly<MatchCamera>, ultimatesOff: boolean, shift: Readonly<DrawShift>): void {
   const drawn = fighter !== undefined && fitFighterDraw(renderers.draw, renderers.character, fighter, pose, stage, frame, matchFrame);
+  renderers.draw.x += shift.x;
+  renderers.draw.z += shift.z;
   if (renderers.pool !== undefined) {
     if (fighter !== undefined && body) renderers.pool.present(fighter, renderers.draw, drawn, frame);
     else renderers.pool.hide();

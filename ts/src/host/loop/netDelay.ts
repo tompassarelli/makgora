@@ -13,7 +13,6 @@ import { NET_INDICATOR_TOP } from "../../game/ui/hudLayout";
 import type { DelayControl, LobbyNet } from "../../game/ui/selectionActions";
 import { at } from "wisp/src/runtime/lookup";
 import { type MachineRate, machineRate, noteMachineSecond } from "wisp/src/netcode/rate";
-import { type Roster, isActive } from "../../game/sim/roster";
 import { LEDGER_MARK, handleLedger, receiveLedgerReport, takeLedgerReport } from "./handleLedger";
 import { createEvents, onEvents } from "wisp/game/events";
 import { Frame, setFrameSize, setFrameText, setFrameVisible } from "wisp/game/frames";
@@ -67,9 +66,8 @@ export interface NetDelay {
   replayedFrom: number;
   replayedDepth: number;
   deepest: number;
-  readonly popX: number[];
-  readonly popZ: number[];
   readonly popCounts: number[];
+  readonly visibleCounts: number[];
   popMax: number;
   popOver: number;
   readonly correction: DelayCorrection;
@@ -86,7 +84,7 @@ export function createNetDelay(window: number, floor: FixedDelay): NetDelay {
     proposals: [floor, floor, floor, floor], slotEchoMs: [-1, -1, -1, -1], slotFps: [-1, -1, -1, -1], slotSlow: [false, false, false, false], rate: machineRate(), sentFps: -1, sentSlow: false, depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: floor, depth: 0, shownDepth: 0,
     indicator: undefined, shownText: "", arrivals: [0, 0, 0, 0], lateSum: [0, 0, 0, 0], lateMax: [0, 0, 0, 0],
     echoes: 0, echoSum: 0, echoMax: 0, corrections: 0, replayed: 0, rollbacks: 0, replayedFrom: -1, replayedDepth: 0, deepest: 0,
-    popX: [0, 0, 0, 0], popZ: [0, 0, 0, 0], popCounts: Array.from({ length: POP_BUCKETS }, () => 0), popMax: 0, popOver: 0, manual: AUTO_DELAY,
+    popCounts: Array.from({ length: POP_BUCKETS }, () => 0), visibleCounts: Array.from({ length: POP_BUCKETS }, () => 0), popMax: 0, popOver: 0, manual: AUTO_DELAY,
   };
 }
 
@@ -306,27 +304,17 @@ export function noteDepth(net: NetDelay, depth: number, from: number): void {
   net.depths[bucket] = at(net.depths, bucket) + 1;
 }
 
-export function notePopBefore(net: NetDelay, world: Readonly<Roster>): void {
-  for (let slot = 0; slot < net.popX.length; slot++) {
-    const motion = world.fighters[slot]?.motion;
-    net.popX[slot] = motion === undefined ? 0 : motion.x;
-    net.popZ[slot] = motion === undefined ? 0 : motion.z;
-  }
-}
-
-export function notePop(net: NetDelay, world: Readonly<Roster>): void {
-  let pop = 0;
-  for (let slot = 0; slot < net.popX.length; slot++) {
-    const motion = world.fighters[slot]?.motion;
-    if (motion === undefined || !isActive(world, slot)) continue;
-    const dx = motion.x - at(net.popX, slot);
-    const dz = motion.z - at(net.popZ, slot);
-    pop = Math.max(pop, Math.floor(Math.sqrt(dx * dx + dz * dz)));
-  }
+export function notePop(net: NetDelay, pop: number): void {
   net.popMax = Math.max(net.popMax, pop);
   if (pop > POP_UNITS) net.popOver++;
   const bucket = Math.min(pop, net.popCounts.length - 1);
   net.popCounts[bucket] = at(net.popCounts, bucket) + 1;
+}
+
+export function noteVisible(net: NetDelay, units: number): void {
+  if (units <= 0) return;
+  const bucket = Math.min(units, net.visibleCounts.length - 1);
+  net.visibleCounts[bucket] = at(net.visibleCounts, bucket) + 1;
 }
 
 function proposeDelay(net: NetDelay, players: number, active: boolean, inMatch: boolean, delay: number): void {

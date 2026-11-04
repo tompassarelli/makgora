@@ -23,6 +23,7 @@ import { createMatchCamera, type MatchCamera } from "../../game/sim/matchCamera"
 import type { HeldCamera } from "./heldCamera";
 import { type FixedDelay, type InputSchedule, PENDING_CAPACITY, inputSchedule } from "../../game/netcode/inputSchedule";
 import { type NetDelay, createNetDelay } from "./netDelay";
+import { type CorrectionEase, createCorrectionEase } from "./correctionEase";
 import { InputBatch } from "../../game/netcode/inputBatch";
 import type { KeyboardMailbox } from "../../game/netcode/journal/keyboard";
 import type { MatchLifecycle } from "../../game/netcode/journal/lifecycle";
@@ -200,6 +201,7 @@ export interface Rollback {
   readonly net: NetDelay;
   readonly schedule: InputSchedule;
   readonly playback: RollbackPlayback;
+  readonly ease: CorrectionEase;
   readonly speculative: SpeculativeMatch;
   readonly seed: ReplayState;
   readonly accepted: ParticipantInputs;
@@ -426,7 +428,7 @@ function journal(ingress: JournalIngress, editbox: EditboxIngress | undefined): 
 function rollback(mode: ShadowInputMode, playback: RollbackPlayback, editbox: EditboxIngress | undefined): Rollback {
   return {
     mode, active: false, epoch: 0, delay: mode.delay, window: mode.rollback, batch: DEFAULT_BATCH, net: createNetDelay(mode.rollback, mode.delay),
-    schedule: inputSchedule(), playback,
+    schedule: inputSchedule(), playback, ease: createCorrectionEase(),
     speculative: { world: speculativeRoster(), game: createMatchState(), controls: createBufferedFrameControls(), runtime: createPacingAndPresentation() },
     seed: createReplaySnapshot(), accepted: participantInputs(), sendFailed: false,
     keyboard: mode.kind === "keyboard"

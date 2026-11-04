@@ -1,6 +1,7 @@
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { type MatchState, Phase } from "../../game/lobby/lobbyState";
 import type { Roster } from "../../game/sim/roster";
+import type { CorrectionEase } from "./correctionEase";
 import { type ShellState, activeRollback } from "./state";
 
 export interface PresentedMatch {
@@ -8,6 +9,7 @@ export interface PresentedMatch {
   readonly world: Roster;
   readonly runtime: PacingAndPresentation;
   readonly playing: boolean;
+  readonly ease: Readonly<CorrectionEase> | undefined;
 }
 
 
@@ -16,12 +18,13 @@ type Presented = { -readonly [K in keyof PresentedMatch]: PresentedMatch[K] };
 // Preallocated: every Lua callback asks for it several times, and each caller reads it before the next call.
 let presented: Presented | undefined;
 
-function present(game: MatchState, world: Roster, runtime: PacingAndPresentation, playing: boolean): PresentedMatch {
-  if (presented === undefined) return presented = { game, world, runtime, playing };
+function present(game: MatchState, world: Roster, runtime: PacingAndPresentation, playing: boolean, ease?: Readonly<CorrectionEase>): PresentedMatch {
+  if (presented === undefined) return presented = { game, world, runtime, playing, ease };
   presented.game = game;
   presented.world = world;
   presented.runtime = runtime;
   presented.playing = playing;
+  presented.ease = ease;
   return presented;
 }
 
@@ -30,7 +33,7 @@ export function presentedMatch(s: ShellState): PresentedMatch {
   const confirmedPlaying = s.game.phase === Phase.match;
   if (s.build.presentation === "pool-predicted" && rollback !== undefined && confirmedPlaying) {
     const { speculative } = rollback;
-    return present(speculative.game, speculative.world, speculative.runtime, speculative.game.phase === Phase.match);
+    return present(speculative.game, speculative.world, speculative.runtime, speculative.game.phase === Phase.match, rollback.ease);
   }
   return present(s.game, s.world, s.runtime, confirmedPlaying);
 }

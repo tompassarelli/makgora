@@ -39,6 +39,7 @@ export class ShadowInputPlayback {
   private readonly corrections = new ReplayCorrections();
   private readonly changedFrom: Slots<number> = [0, 0, 0, 0];
   private current: number | undefined;
+  mispredictedFrames = 0;
   // The schedule's accepted packets at the last reconciliation: no row can differ until it changes.
   private reconciledPackets: number | undefined;
 
@@ -158,10 +159,12 @@ export class ShadowInputPlayback {
         continue;
       }
       let changed = 0;
+      let mispredicted = false;
       for (const slot of PARTICIPANT_SLOTS) {
         if (!humanActive(match, slot) || frame < this.changedFrom[slot]) continue;
         const accepted = acceptedInput(schedule, slot, frame);
         if (accepted !== undefined) {
+          if (slot !== localPlayer && !sameInput(stored.network[slot], accepted)) mispredicted = true;
           copyInput(actual[slot], accepted);
         } else if (slot === localPlayer) {
           copyNetworkRow(stored, slot, actual[slot]);
@@ -170,6 +173,7 @@ export class ShadowInputPlayback {
         }
         if (!sameInput(stored.network[slot], actual[slot])) changed |= 1 << slot;
       }
+      if (mispredicted) this.mispredictedFrames++;
       // A row that ran on the inputs it keeps changes nothing in history.amend; one now wholly accepted only stops being correctable.
       let allAccepted = true;
       if (frame > known) for (const slot of PARTICIPANT_SLOTS) if (allAccepted && slot !== localPlayer && humanActive(match, slot) && acceptedInput(schedule, slot, frame) === undefined) allAccepted = false;

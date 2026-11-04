@@ -45,7 +45,8 @@ import { visualCaptureStopBefore } from "../../game/session/visualCapture";
 import { samplePad } from "../../game/input/padCapture";
 import { pollPad, recordPadRow } from "./analogPad";
 import { beginRealFrames, pauseRealFrames, realFramesDue, realSeconds } from "./realFrames";
-import { beginNetEpoch, matchDelay, noteDepth, notePop, notePopBefore, noteReceived, noteSent, requestFor } from "./netDelay";
+import { beginNetEpoch, matchDelay, noteDepth, notePop, noteReceived, noteSent, noteVisible, requestFor } from "./netDelay";
+import { type EasedTick, clearCorrectionEase, easeCorrections, noteEaseBefore } from "./correctionEase";
 import { localElapsed } from "wisp/game/clock";
 import { eventPlayer, playerSlot } from "wisp/game/players";
 import { sendSync, syncData } from "wisp/game/sync";
@@ -283,6 +284,8 @@ function noteWaiting(rollback: Rollback, waiting: number, notice: number): void 
 }
 
 
+const eased: EasedTick = { pop: 0, visible: 0 };
+
 export function rollbackTick(s: ShellState, rollback: Rollback): void {
   const { schedule, epoch, keyboard, journal, speculative } = rollback;
   const { trace, probe } = s;
@@ -292,6 +295,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   if (keyboard !== undefined && (s.game.phase !== Phase.match || s.session.paused)) pauseRealFrames(keyboard.real);
   if (s.game.phase !== Phase.match) {
     if (keyboard !== undefined) sendBatch(s, rollback, keyboard);
+    clearCorrectionEase(rollback.ease);
     noteWaiting(rollback, 0, 0);
     return;
   }
@@ -311,7 +315,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   }
   const stopAt = journal === undefined ? undefined : stopFrame(journal.barrier);
   const pendingBefore = rollback.playback.pendingRepair(epoch);
-  notePopBefore(rollback.net, speculative.world);
+  noteEaseBefore(rollback.ease, speculative.world);
   const slot = localSlot();
   beginFrameSection(RECONCILE_SECTION);
   const reconciled = rollback.playback.reconcile(schedule, epoch, slot, speculative);
@@ -349,8 +353,11 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     return;
   }
   rollback.repairedFrames = repaired;
-  if ((reconciled !== "unchanged" || pendingBefore !== undefined) && rollback.playback.pendingRepair(epoch) === undefined) {
-    notePop(rollback.net, speculative.world);
+  const corrected = (reconciled !== "unchanged" || pendingBefore !== undefined) && rollback.playback.pendingRepair(epoch) === undefined;
+  easeCorrections(rollback.ease, speculative.world, corrected, eased);
+  noteVisible(rollback.net, eased.visible);
+  if (corrected) {
+    notePop(rollback.net, eased.pop);
     traceInput(trace, `repaired through ${speculative.runtime.simulationFrame}`);
   }
   let steps = 0;

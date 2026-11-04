@@ -106,6 +106,10 @@ class ReplayHistoryPlayback implements RollbackPlayback {
     return this.rerunBefore + this.history.rerunComputerDecisions();
   }
 
+  mispredictedFrames(): number {
+    return this.playback.mispredictedFrames;
+  }
+
   private bind(match: SpeculativeMatch): MutableReplayState {
     if (this.state === undefined) {
       this.state = { world: match.world, match: match.game, controls: match.controls, runtime: match.runtime };

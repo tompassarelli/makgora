@@ -1,4 +1,5 @@
-import { presentDrawnBody } from "./fighterDrawView";
+import { type DrawShift, presentDrawnBody } from "./fighterDrawView";
+import { presentedMatch } from "./presentedMatch";
 import { type MatchState, Phase } from "../../game/lobby/lobbyState";
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../../game/input/participants";
@@ -73,6 +74,8 @@ export function presentSlot(s: ShellState, ui: UiObjects, slot: ParticipantSlot,
   presentSlotOverlays(s, ui, slot, fighter, live, playing, runtime);
 }
 
+const shift: DrawShift = { x: 0, z: 0 };
+
 function presentSlotBody(s: ShellState, ui: UiObjects, slot: ParticipantSlot, game: MatchState, fighter: Readonly<Fighter> | undefined, live: Readonly<Fighter> | undefined, runtime: PacingAndPresentation, drawn: number, matchFrame: number, roared: boolean, mark: FighterAgency): void {
   const renderers = ui.fighters[slot];
   if (s.game.phase === Phase.result) {
@@ -80,7 +83,10 @@ function presentSlotBody(s: ShellState, ui: UiObjects, slot: ParticipantSlot, ga
     if (body !== undefined) showBody(body.unit, false);
   }
   const posed = ui.match.posing === slot ? undefined : live;
-  if (renderers !== undefined) presentDrawnBody(renderers, fighter, game.phase !== Phase.result && ui.match.posing !== slot, posed, runtime.poses[slot], game.stageChoice, runtime.simulationFrame, matchFrame, game.camera, game.ultimatesOff);
+  const ease = presentedMatch(s).ease;
+  shift.x = ease?.x[slot] ?? 0;
+  shift.z = ease?.z[slot] ?? 0;
+  if (renderers !== undefined) presentDrawnBody(renderers, fighter, game.phase !== Phase.result && ui.match.posing !== slot, posed, runtime.poses[slot], game.stageChoice, runtime.simulationFrame, matchFrame, game.camera, game.ultimatesOff, shift);
   renderers?.goldSack?.present(posed, game.stageChoice);
   renderers?.shurikenGlow?.present(posed, game.stageChoice);
   renderers?.spheres?.present(posed, runtime.simulationFrame, s.session.paused);
