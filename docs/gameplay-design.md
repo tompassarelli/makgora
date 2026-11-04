@@ -393,19 +393,35 @@ delay feels the same in every mode, so practice transfers. The pure policy is
 makgora:ts/src/game/netcode/delayPolicy.ts; the Warcraft map and Wisp's own
 transport (wisp#110) both call it.
 
-- **Default 2 frames (33 ms)** against computers, in local versus and online,
-  as in Slippi.
+- **Default per build (Tom, 5 Nov 2026, makgora#1122):** the native window
+  plays at 1 frame (17 ms) against computers and alone, and online Auto never
+  goes below 1; the Warcraft build stays at 2 frames (33 ms) offline and as
+  Auto's floor until part 8 of makgora#1122 measures its Lua rollback cost.
+  Each build plays the same floor offline and online. Tom asked for the
+  native window to answer a press about as fast as Slippi does offline, and
+  part 3's online run found 1 frame holds up: at 150 ms no frame held at the
+  window edge, the step worker's p99 stayed at 4.3 to 4.4 ms and corrections
+  were 87 against 83 at 2 frames (south 1d1b4dd6). The build's delay
+  (`NATIVE_PLAYABLE_BUILD` and `PLAYABLE_BUILD` in
+  makgora:ts/src/game/session/currentBuild.ts) is the delay policy's floor.
 - **No per-player setting.** Tom decided, 20 Oct 2026, that delay is
   universal and never a player choice, so the Controls screen has no delay
   button and profiles save only keys; a profile saved with an old delay code
   loads its keys and drops the code. Each client proposes Auto from its
   measured echo, with no ceiling (see *Rollback window and no delay cap*).
-  Tom kept this on 5 Nov 2026 against an offline-only low-latency option:
-  reaction play (shielding a move on sight, punishing a whiff) and the
-  computer tiers' reaction frames are tuned around 2 frames, so a 0-frame
-  offline mode would make computers easier and offline practice unlike
-  online, for about 33 ms that only offline-only players would gain.
-  Local matches use the default.
+  Local matches use the build's default. The computer tiers were tuned at 2
+  frames, and a computer's input skips the delay a human press waits
+  through (makgora:ts/src/game/match/frameInput.ts produces it for the frame
+  being stepped), so a human answers the computer in their reaction plus the
+  delay while the computer answers in its reaction alone. Below 2 every
+  computer therefore reacts as many frames sooner as the delay is below 2
+  (`computerLead`, makgora:ts/src/game/core/computerLead.ts): at 1 frame both
+  sides gain the same frame and the gap the tiers were tuned at holds. At 2
+  or more the match carries no lead, so earlier replays and the Warcraft
+  build keep their state. This replaces the earlier 5 Nov note
+  (a1c89cec8d), which kept 2 frames offline because a lower delay would make
+  the computers easier: the lead keeps the tiers, and each build plays one
+  floor offline and online.
 - **Host-set delay (Tom, 29 Oct 2026):** the host, the first human slot,
   may set the lobby's input delay; this reverses the 20 Oct rule for the
   host only, and delay stays one value for everyone. Character select's
@@ -430,13 +446,13 @@ transport (wisp#110) both call it.
   tells the players. This restates the design after the first attempt
   (31e70dffbe, reverted) added a fixed 10-frame turn tail to the ping target,
   which put a 160 ms match at about 12 frames and felt slow. So:
-  - The ping target keeps 0.2's form, max(2, one-way frames − R), with no
-    turn tail; the lobby takes the highest proposal, and error correction
+  - The ping target keeps 0.2's form, max(F, one-way frames − R), with no
+    turn tail, where F is the build's floor (1 native, 2 Warcraft); the lobby takes the highest proposal, and error correction
     raises and slowly lowers it.
   - R, the rollback budget, is 4 (6 before): the target leaves about 3 of
     the window's 7 frames free for rows later than the mean trip, closer to
     how Slippi players play. Settled on a steady trip, Auto is 2 frames at
-    100 and 200 ms, 5 at 300 ms, 11 at 500 ms, 26 at 1000 ms and 56 at
+    100 and 200 ms (1 at 100 ms on the native window), 5 at 300 ms, 11 at 500 ms, 26 at 1000 ms and 56 at
     2000 ms. R is the knob to lower further if the 7-frame window holds too
     often: each frame off R adds a frame of delay and frees one more frame of
     the window for late rows.

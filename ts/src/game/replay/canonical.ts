@@ -21,6 +21,7 @@ import type { Fighter } from "../sim/fighter";
 import { CONTROL_FIELDS, fighterAt, isActive } from "../sim/roster";
 import { writeTrainingState } from "../match/trainingState";
 import { writeConfiguredRun } from "../classic/runState";
+import { writeComputerLead } from "../core/computerLead";
 import { CPU_OPPONENT_CHOICES, CPU_OPPONENT_IDS, CPU_TIERS } from "../match/cpuProfiles";
 import { botStrategyValues } from "../match/botStrategy";
 import type { ReplayState } from "./snapshot";
@@ -148,6 +149,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
   if (match.startHold !== 0) int("match.startHold", match.startHold);
   writeMatchItems(match.items, int, bool);
   if (match.ultimatesOff) bool("match.ultimatesOff", true);
+  writeComputerLead(match, int);
   writeMatchOrbs(match.orbs, int, bool);
   bool("match.timedOut", match.timedOut);
   bool("match.practice", match.practice);

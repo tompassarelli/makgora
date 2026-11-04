@@ -75,6 +75,7 @@ function firstMatchDifference(e: Readonly<MatchState>, a: Readonly<MatchState>):
   for (const key of ["only", "selectedMask", "remainingMask"] as const) if (e.stagePool[key] !== a.stagePool[key]) return `match.stagePool.${key}`;
   if (e.hazards !== a.hazards) return "match.hazards";
   if (e.ultimatesOff !== a.ultimatesOff) return "match.ultimatesOff";
+  if (e.computerLead !== a.computerLead) return "match.computerLead";
 
   if (e.winner !== a.winner) return "match.winner";
   if (e.teamBattle !== a.teamBattle) return "match.teamBattle";

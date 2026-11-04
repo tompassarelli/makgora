@@ -12,9 +12,10 @@ export interface DelayControl {
   readonly canLess: boolean;
   readonly canMore: boolean;
   readonly note: string;
+  readonly offline: number;
 }
 
-export const FIXED_DELAY: DelayControl = { frames: 2, high: false, auto: true, adjustable: false, canLess: false, canMore: false, note: "" };
+export const FIXED_DELAY: DelayControl = { frames: 2, high: false, auto: true, adjustable: false, canLess: false, canMore: false, note: "", offline: 2 };
 
 export interface LobbyNet {
   readonly delay: DelayControl;

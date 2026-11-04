@@ -495,8 +495,8 @@ export function installShell(): void {
 
   if (s !== undefined && s.moment === undefined) s.moment = momentSaves();
   if (s !== undefined && s.replay === undefined) s.replay = replayRecording();
-  const rollback: { net?: netDelay.NetDelay; readonly mode: { readonly rollback: number } } | undefined = s?.rollback;
-  if (rollback !== undefined && rollback.net === undefined) rollback.net = netDelay.createNetDelay(rollback.mode.rollback);
+  const rollback: { net?: netDelay.NetDelay; readonly mode: { readonly rollback: number; readonly delay: number } } | undefined = s?.rollback;
+  if (rollback !== undefined && rollback.net === undefined) rollback.net = netDelay.createNetDelay(rollback.mode.rollback, rollback.mode.delay);
 
   if (s !== undefined && s.drawnStage === undefined) view.drawStage(s);
 }

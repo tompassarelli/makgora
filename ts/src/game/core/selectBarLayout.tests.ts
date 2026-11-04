@@ -97,9 +97,11 @@ test("Every rule's hover help fits its framed panel in at most four lines, in a 
   const variants = [game, { ...game, training: true }, { ...game, classic: true }, { ...game, lore: true }];
   for (const variant of variants) {
     for (const name of Object.keys(RULE_BUTTONS) as RuleName[]) {
-      const text = ruleHelp(name, variant);
-      assertFalse(helpTooLong(text));
-      assertTrue(sizes.has(barArtName("Panel", helpBox(text))));
+      for (const offline of [1, 2]) {
+        const text = ruleHelp(name, variant, offline);
+        assertFalse(helpTooLong(text));
+        assertTrue(sizes.has(barArtName("Panel", helpBox(text))));
+      }
     }
   }
   assertTrue(helpBox("x").width >= f32(0.38));

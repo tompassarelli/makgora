@@ -788,7 +788,7 @@ export class SelectionPanel {
 
   private showHelp(game: Readonly<MatchState>, x: number, y: number): void {
     const name = this.drag.dragging === undefined ? hoveredRule(game, this.bar.opened(), x, y) : undefined;
-    const text = name === undefined ? "" : ruleHelp(name, game);
+    const text = name === undefined ? "" : ruleHelp(name, game, this.net.delay.offline);
     if (text === this.shownHelp) return;
     this.shownHelp = text;
     setFrameVisible(this.help, name !== undefined);

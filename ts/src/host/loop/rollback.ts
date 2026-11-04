@@ -27,6 +27,7 @@ import { pacedStop, resetPauseBarrier, settlePace, stopFrame } from "../../game/
 import { confirmedBudget, keyboardCatchesUp, ownFrames, repairBudget, speculativeBudget } from "../../game/session/playback";
 import { wholeRepairCost } from "../../game/replay/history";
 import { queueLocalRows } from "../../game/session/localInput";
+import { setComputerLead } from "../../game/core/computerLead";
 import { applyFrame, presentPredictedHits } from "./frame";
 import { ownConfirmedState } from "./confirmedState";
 import { noteCallbackClockRemoteRow, noteCallbackClockRow } from "./callbackClock";
@@ -80,6 +81,7 @@ export function beginRollbackEpoch(s: ShellState, rollback: Rollback): boolean {
   rollback.epoch++;
   const devDelay = s.build.devConsole && s.dev.delay !== rollback.mode.delay;
   rollback.delay = rollback.keyboard === undefined || devDelay ? s.dev.delay : matchDelay(rollback.net, s.game);
+  setComputerLead(s.game, rollback.delay);
   beginNetEpoch(rollback.net);
   rollback.window = s.dev.rollback;
   rollback.batch = s.dev.batch;

@@ -1,11 +1,11 @@
 import type { MatchState } from "../lobby/lobbyState";
 import { RULE_BUTTONS, type RuleName, rulePanel } from "./ruleButtons";
 import { type BarPanel, barBoxContains } from "../core/selectBarLayout";
-import { CLASSIC_LEVEL_HELP, FRIENDLY_FIRE_HELP, INPUT_DELAY_HELP, ITEM_RULE_HELP, LORE_BATTLE_HELP, MATCH_RULE_HELP, MODES, MODE_LIST_HELP, TRAINING_RULE_HELP } from "./guide/text";
+import { CLASSIC_LEVEL_HELP, FRIENDLY_FIRE_HELP, ITEM_RULE_HELP, LORE_BATTLE_HELP, MATCH_RULE_HELP, MODES, MODE_LIST_HELP, TRAINING_RULE_HELP, inputDelayHelp } from "./guide/text";
 
 const versus = (game: Readonly<MatchState>): boolean => !game.training && !game.classic && !game.lore;
 
-const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_RULE_HELP, ...ITEM_RULE_HELP, ...TRAINING_RULE_HELP, friendlyFire: FRIENDLY_FIRE_HELP, inputDelay: INPUT_DELAY_HELP };
+const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic" | "inputDelay">, string>> = { ...MATCH_RULE_HELP, ...ITEM_RULE_HELP, ...TRAINING_RULE_HELP, friendlyFire: FRIENDLY_FIRE_HELP };
 
 const SHOWN_IN: Readonly<Record<string, (game: Readonly<MatchState>) => boolean>> = {
   ...Object.fromEntries(Object.keys(MATCH_RULE_HELP).map(name => [name, versus])),
@@ -39,7 +39,8 @@ function modeHelp(game: Readonly<MatchState>): string {
 }
 
 
-export function ruleHelp(name: RuleName, game: Readonly<MatchState>): string {
+export function ruleHelp(name: RuleName, game: Readonly<MatchState>, offlineDelay: number): string {
+  if (name === "inputDelay") return inputDelayHelp(offlineDelay);
   if (name === "training") return modeHelp(game);
   if (name === "easierClassic" || name === "harderClassic") return game.lore ? LORE_BATTLE_HELP : CLASSIC_LEVEL_HELP;
   return HELP[name];

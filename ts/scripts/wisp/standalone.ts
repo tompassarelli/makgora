@@ -17,7 +17,7 @@ import { Phase, cycleSlotMode, selectCharacter, selectCpuCharacter, setCpuOppone
 import { fighterAt, isActive } from "../../src/game/sim/roster";
 import { Character } from "../../src/game/sim/codes";
 import { STAGE_CATALOG, type StageTile } from "../../src/game/menu/stageCatalog";
-import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
+import { NATIVE_DRIVER_BUILD, NATIVE_PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { QUICK_TRAINING_COMMAND } from "../../src/game/session/devSettings";
 import { DIZZY_MODEL } from "../../src/host/loop/fighterBody";
@@ -118,7 +118,7 @@ export async function createStandaloneSession(options: StandaloneSessionOptions 
     const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import("./botMatch");
     const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import("../../src/host/loop/menus");
     const { createForcedReplay, replayLatest }: { createForcedReplay(depth: number): object; replayLatest(replay: object, state: State): number } = await import("../../src/host/loop/forcedReplay");
-    const build = { ...PLAYABLE_BUILD, devConsole: true, ...(presentation === undefined ? {} : { presentation }) };
+    const build = { ...NATIVE_PLAYABLE_BUILD, devConsole: true, ...(presentation === undefined ? {} : { presentation }) };
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import("../../src/platform/main");
     const driverApi: { nativeDriverCommand(text: string): void; installMakgoraNativeDriver(): void; startMakgoraNativeDriver(): void } | undefined = !driven ? undefined : await import("../../src/platform/nativeDriver");
     const driverBuild = { ...NATIVE_DRIVER_BUILD, ...(presentation === undefined ? {} : { presentation }) };

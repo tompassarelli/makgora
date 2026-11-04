@@ -1,10 +1,11 @@
 import { assertEquals, assertLessThan, test } from "wisp/src/runtime/testing";
 import { AUTO_DELAY, agreedDelay, autoDelay, delayPolicy, observeRtt, rttEstimate, stepManualDelay } from "wisp/src/netcode/delay";
-import { PLAYABLE_BUILD } from "../../game/session/currentBuild";
+import { NATIVE_PLAYABLE_BUILD, PLAYABLE_BUILD } from "../../game/session/currentBuild";
 import { createMatchState, setHumanCount, setParticipants } from "../../game/lobby/lobbyState";
 import { delayLabel, delayStepTarget } from "../../game/ui/selectionRules";
 import { MAX_INPUT_DELAY } from "../../game/netcode/inputSchedule";
-import { createNetDelay, hostDelayFrom, lobbyNet, matchDelay } from "./netDelay";
+import { ruleHelp } from "../../game/ui/ruleHelp";
+import { createNetDelay, hostDelayFrom, lobbyNet, matchDelay, measuredDelay } from "./netDelay";
 
 const window = PLAYABLE_BUILD.input.kind === "keyboard" ? PLAYABLE_BUILD.input.rollback : 0;
 
@@ -29,7 +30,7 @@ test("online rollback repairs at most 7 frames with 4 frames of rollback budget 
 test("a host-set input delay overrides Auto for every client, including values above 60, and only the host can set it [k3 measure #679]", () => {
   const game = createMatchState();
   setHumanCount(game, 2);
-  const clients = [createNetDelay(window), createNetDelay(window)];
+  const clients = [createNetDelay(window, 2), createNetDelay(window, 2)];
   for (const net of clients) {
     net.proposals[0] = 3;
     net.proposals[1] = 26;
@@ -55,7 +56,7 @@ const stepOf = (target: ReturnType<typeof delayStepTarget>): number => target?.k
 const gearDelay = (humans: number, computers: number, local: number, manual = AUTO_DELAY) => {
   const game = createMatchState();
   setParticipants(game, (1 << humans) - 1, ((1 << computers) - 1) << humans);
-  const net = createNetDelay(window);
+  const net = createNetDelay(window, 2);
   net.proposals[0] = 2;
   net.proposals[1] = 2;
   if (manual !== AUTO_DELAY) hostDelayFrom(net, game, 0, manual);
@@ -104,4 +105,47 @@ test("The delay label reads Input delay with its frames, in red when high and di
   assertEquals(delayLabel(gearDelay(1, 2, 0)), "|cff8c95a3Input delay: |r|cff8c95a32|r|cff8c95a3 frames|r");
   assertEquals(delayLabel(gearDelay(3, 0, 0)), "|cffeee4ccInput delay: |r|cffffcc002|r|cffeee4cc frames|r");
   assertEquals(delayLabel(gearDelay(3, 0, 0, 40)).includes("|cffff404040|r"), true);
+});
+
+const buildDelay = (build: typeof PLAYABLE_BUILD): number => build.input.kind === "keyboard" ? build.input.delay : -1;
+
+const offlineGear = (floor: number, computers: number) => {
+  const game = createMatchState();
+  setParticipants(game, 1, ((1 << computers) - 1) << 1);
+  const net = createNetDelay(window, floor);
+  return { net, game, delay: lobbyNet(net, game, 0).delay };
+};
+
+test("The native window plays at 1 frame of input delay against computers and alone and the Warcraft build at 2, and each gear note and rule help names its own number [k3 measure #1122]", () => {
+  assertEquals(buildDelay(NATIVE_PLAYABLE_BUILD), 1);
+  assertEquals(buildDelay(PLAYABLE_BUILD), 2);
+  for (const build of [NATIVE_PLAYABLE_BUILD, PLAYABLE_BUILD]) {
+    const floor = buildDelay(build);
+    const versusComputers = offlineGear(floor, 2);
+    assertEquals(matchDelay(versusComputers.net, versusComputers.game), floor);
+    assertEquals([versusComputers.delay.frames, versusComputers.delay.offline, versusComputers.delay.adjustable].join(), `${floor},${floor},false`);
+    assertEquals(versusComputers.delay.note, `Fixed at ${floor} vs computers`);
+    assertEquals(offlineGear(floor, 0).delay.note, `Fixed at ${floor} when playing alone`);
+    assertEquals(ruleHelp("inputDelay", versusComputers.game, versusComputers.delay.offline).endsWith(`Offline it is fixed at ${floor}.`), true);
+  }
+});
+
+test("Online Auto floors at the build's delay: 1 on the native window and 2 on Warcraft at 100 ms, both 5 at 300 ms, and the host's number still overrides it on the native window [k3 measure #1122]", () => {
+  assertEquals(measuredDelay(window, 1, 0), 1);
+  assertEquals(measuredDelay(window, 1, 100), 1);
+  assertEquals(measuredDelay(window, 2, 100), 2);
+  assertEquals(measuredDelay(window, 1, 300), 5);
+  assertEquals(measuredDelay(window, 2, 300), 5);
+  const game = createMatchState();
+  setHumanCount(game, 2);
+  const net = createNetDelay(window, 1);
+  assertEquals(matchDelay(net, game), 1);
+  net.proposals[1] = 0;
+  assertEquals(matchDelay(net, game), 1);
+  for (const manual of [0, 2, 9]) {
+    hostDelayFrom(net, game, 0, manual);
+    assertEquals(matchDelay(net, game), manual);
+  }
+  hostDelayFrom(net, game, 0, AUTO_DELAY);
+  assertEquals(matchDelay(net, game), 1);
 });

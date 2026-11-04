@@ -425,7 +425,7 @@ function journal(ingress: JournalIngress, editbox: EditboxIngress | undefined): 
 
 function rollback(mode: ShadowInputMode, playback: RollbackPlayback, editbox: EditboxIngress | undefined): Rollback {
   return {
-    mode, active: false, epoch: 0, delay: mode.delay, window: mode.rollback, batch: DEFAULT_BATCH, net: createNetDelay(mode.rollback),
+    mode, active: false, epoch: 0, delay: mode.delay, window: mode.rollback, batch: DEFAULT_BATCH, net: createNetDelay(mode.rollback, mode.delay),
     schedule: inputSchedule(), playback,
     speculative: { world: speculativeRoster(), game: createMatchState(), controls: createBufferedFrameControls(), runtime: createPacingAndPresentation() },
     seed: createReplaySnapshot(), accepted: participantInputs(), sendFailed: false,

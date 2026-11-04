@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import type { captureScene } from "wisp/scripts/wisp/headlessRender";
 import { Phase } from "../../src/game/lobby/lobbyState";
-import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
+import { NATIVE_PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { type Character } from "../../src/game/sim/codes";
 import { fighterKey, fighterName } from "../../src/game/roster/kits";
@@ -30,7 +30,7 @@ export async function createResultSession(winner: Character, loser: Character): 
     const { views }: { views(state: State): { readonly match: { readonly resultFrames: number } } } = await import(join(loop, "ui.ts"));
     const { fighterAt }: { fighterAt(world: unknown, slot: number): { readonly status: { stocks: number; out: boolean } } } = await import(join(import.meta.dir, "../../src/game/sim/roster.ts"));
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(import.meta.dir, "../../src/platform/main.ts"));
-    const build = { ...PLAYABLE_BUILD, devConsole: true };
+    const build = { ...NATIVE_PLAYABLE_BUILD, devConsole: true };
     const clients = runtime.clients({ install: () => main.install(build), start: () => main.startBuild(build) }, [0], { keepCalls: 0 });
     clients.start();
     clients.frames(30);

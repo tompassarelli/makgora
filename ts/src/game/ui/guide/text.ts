@@ -1,3 +1,4 @@
+import { formatInt } from "wisp/game/text";
 import { Action } from "../../input/actions";
 import { type KeyBindings, PRESET_NAMES, keyFor, keyLabel, presetOf } from "../../input/keyBindings";
 import { ITEM_INTERVAL_MAX_SECONDS, ITEM_INTERVAL_MIN_SECONDS } from "../../match/centreItem";
@@ -97,7 +98,7 @@ export const TRAINING_RULE_HELP = {
 
 export const FRIENDLY_FIRE_HELP = "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams.";
 
-export const INPUT_DELAY_HELP = "Input delay: frames a press waits before it acts, the same for every player. Online, Auto follows the slowest connection and the host can press − or + to set a number, or Auto to go back. Against computers it is fixed at 2.";
+export const inputDelayHelp = (offline: number): string => `Input delay: frames a press waits before it acts, the same for every player. Online, Auto follows the slowest connection and the host can press − or + to set a number, or Auto to go back. Offline it is fixed at ${formatInt(offline)}.`;
 
 export const MODES = {
   versus: "Versus: fight players and computers with the rules on this screen.",

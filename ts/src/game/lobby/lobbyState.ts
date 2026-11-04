@@ -21,6 +21,7 @@ import { STAGE_AT_REST } from "../sim/stage";
 
 import { type ConfiguredRun, copyConfiguredRun, createConfiguredRun } from "../classic/runState";
 import { PARTNER_BEHAVIOURS, PARTNER_DAMAGE_MAX, PARTNER_DAMAGE_STEP, PARTNER_ESCAPES, PARTNER_TECHS, TRAINING_SPEEDS, type TrainingState, clearTrainingReadout, copyTrainingState, createTrainingState } from "../match/trainingState";
+import { copyComputerLead } from "../core/computerLead";
 
 
 export const Phase = { characterMenu: 0, stageMenu: 1, match: 2, result: 3 } as const;
@@ -91,6 +92,8 @@ export interface MatchState {
 
   ultimatesOff: boolean;
   readonly orbs: MatchOrbs;
+
+  computerLead?: number;
 
   classic: boolean;
   classicTier: number;
@@ -276,6 +279,7 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
   copyTrainingState(target.trainer, source.trainer);
   copyMatchItems(target.items, source.items);
   target.ultimatesOff = source.ultimatesOff;
+  copyComputerLead(target, source);
   copyMatchOrbs(target.orbs, source.orbs);
   target.classic = source.classic;
   target.classicTier = source.classicTier;

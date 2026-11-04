@@ -4,7 +4,7 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type MatchState, cpuSlot, firstHumanSlot, humanActive, humanCount } from "../../game/lobby/lobbyState";
 import {
-  AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HELD_ERROR_CALLBACKS, type RttEstimate, agreedDelay, chosenDelay, connectionPoor, correctDelay,
+  AUTO_DELAY, type DelayCorrection, type DelayPolicy, HELD_ERROR_CALLBACKS, ROLLBACK_BUDGET, type RttEstimate, agreedDelay, connectionPoor, correctDelay,
   autoDelay, correctedDelay, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, resetRtt, rttEstimate, smoothedRttMs, stepManualDelay,
 } from "wisp/src/netcode/delay";
 import { type FixedDelay, MAX_INPUT_DELAY, PENDING_CAPACITY, isFixedDelay } from "../../game/netcode/inputSchedule";
@@ -79,11 +79,11 @@ export interface NetDelay {
   manual: number;
 }
 
-export function createNetDelay(window: number): NetDelay {
-  const policy = delayPolicy(window, MAX_INPUT_DELAY);
+export function createNetDelay(window: number, floor: FixedDelay): NetDelay {
+  const policy = delayPolicy(window, MAX_INPUT_DELAY, ROLLBACK_BUDGET, floor);
   return {
-    policy, correction: delayCorrection(policy), second: { held: 0, arrivals: 0, deep: 0 }, pingDelay: DEFAULT_DELAY, measured: false, estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
-    proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], slotEchoMs: [-1, -1, -1, -1], slotFps: [-1, -1, -1, -1], slotSlow: [false, false, false, false], rate: machineRate(), sentFps: -1, sentSlow: false, depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
+    policy, correction: delayCorrection(policy), second: { held: 0, arrivals: 0, deep: 0 }, pingDelay: floor, measured: false, estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
+    proposals: [floor, floor, floor, floor], slotEchoMs: [-1, -1, -1, -1], slotFps: [-1, -1, -1, -1], slotSlow: [false, false, false, false], rate: machineRate(), sentFps: -1, sentSlow: false, depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: floor, depth: 0, shownDepth: 0,
     indicator: undefined, shownText: "", arrivals: [0, 0, 0, 0], lateSum: [0, 0, 0, 0], lateMax: [0, 0, 0, 0],
     echoes: 0, echoSum: 0, echoMax: 0, corrections: 0, replayed: 0, rollbacks: 0, replayedFrom: -1, replayedDepth: 0, deepest: 0,
     popX: [0, 0, 0, 0], popZ: [0, 0, 0, 0], popCounts: Array.from({ length: POP_BUCKETS }, () => 0), popMax: 0, popOver: 0, manual: AUTO_DELAY,
@@ -93,7 +93,7 @@ export function createNetDelay(window: number): NetDelay {
 export const isOnline = (game: Readonly<MatchState>): boolean => humanCount(game) > 1;
 
 export function requestFor(net: Readonly<NetDelay>, game: Readonly<MatchState>, slot: number): number {
-  return isOnline(game) ? at(net.proposals, slot) : DEFAULT_DELAY;
+  return isOnline(game) ? at(net.proposals, slot) : net.policy.floor;
 }
 
 function humanRequests(net: Readonly<NetDelay>, game: Readonly<MatchState>): number[] {
@@ -102,11 +102,11 @@ function humanRequests(net: Readonly<NetDelay>, game: Readonly<MatchState>): num
   return requests;
 }
 
-export const autoMatchDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>): number => agreedDelay(humanRequests(net, game));
+export const autoMatchDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>): number => agreedDelay(humanRequests(net, game), net.policy.floor);
 
 export function matchDelay(net: Readonly<NetDelay>, game: Readonly<MatchState>): FixedDelay {
-  const chosen = chosenDelay(humanRequests(net, game), isOnline(game) ? net.manual : AUTO_DELAY);
-  return isFixedDelay(chosen) ? chosen : DEFAULT_DELAY;
+  const chosen = isOnline(game) ? net.manual : AUTO_DELAY;
+  return chosen !== AUTO_DELAY && isFixedDelay(chosen) ? chosen : autoMatchDelay(net, game);
 }
 
 export const isHost = (game: Readonly<MatchState>, slot: number): boolean => isOnline(game) && firstHumanSlot(game) === slot;
@@ -135,7 +135,7 @@ export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>, lo
 const delayNote = (net: Readonly<NetDelay>, game: Readonly<MatchState>, adjustable: boolean, online: boolean): string => {
   if (adjustable) return net.manual === AUTO_DELAY ? "Auto follows the slowest connection" : `Set by you; Auto would be ${formatInt(autoMatchDelay(net, game))}`;
   if (online) return "Set by the host";
-  return cpuSlot(game) === undefined ? `Fixed at ${formatInt(DEFAULT_DELAY)} when playing alone` : `Fixed at ${formatInt(DEFAULT_DELAY)} vs computers`;
+  return cpuSlot(game) === undefined ? `Fixed at ${formatInt(net.policy.floor)} when playing alone` : `Fixed at ${formatInt(net.policy.floor)} vs computers`;
 };
 
 export function delayControl(net: Readonly<NetDelay>, game: Readonly<MatchState>, local: number, frames: number): DelayControl {
@@ -143,7 +143,7 @@ export function delayControl(net: Readonly<NetDelay>, game: Readonly<MatchState>
   const adjustable = isHost(game, local);
   return {
     frames, high: highDelay(frames), auto: !online || net.manual === AUTO_DELAY, adjustable,
-    canLess: adjustable && frames > 0, canMore: adjustable && frames < net.policy.ceiling, note: delayNote(net, game, adjustable, online),
+    canLess: adjustable && frames > 0, canMore: adjustable && frames < net.policy.ceiling, note: delayNote(net, game, adjustable, online), offline: net.policy.floor,
   };
 }
 
@@ -225,10 +225,10 @@ export function handMeasuredRtt(net: NetDelay, rttMs: number): number {
 }
 
 /** The delay `handMeasuredRtt` will set, for a caller that must report it before the map's state exists. */
-export function measuredDelay(window: number, rttMs: number): number {
+export function measuredDelay(window: number, floor: FixedDelay, rttMs: number): number {
   const estimate = rttEstimate();
   observeRtt(estimate, rttMs);
-  return autoDelay(delayPolicy(window, MAX_INPUT_DELAY), estimate);
+  return autoDelay(delayPolicy(window, MAX_INPUT_DELAY, ROLLBACK_BUDGET, floor), estimate);
 }
 
 export function beginNetEpoch(net: NetDelay): void {
@@ -397,7 +397,7 @@ export function receiveDelayProposal(net: NetDelay, game: Readonly<MatchState>):
   }
   if (message.ping >= 0 && !net.measured && eventPlayer() === localPlayer()) observeRtt(net.estimate, floorDiv((net.ticks - message.ping) * 100, 3));
   if (slot < 0 || slot >= net.proposals.length) return;
-  if (isFixedDelay(message.delay)) net.proposals[slot] = Math.max(DEFAULT_DELAY, message.delay);
+  if (isFixedDelay(message.delay)) net.proposals[slot] = Math.max(net.policy.floor, message.delay);
   if (message.echo >= 0) net.slotEchoMs[slot] = message.echo;
   if (message.fps >= 0) net.slotFps[slot] = message.fps;
   net.slotSlow[slot] = message.slow;
