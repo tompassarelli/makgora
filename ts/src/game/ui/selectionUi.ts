@@ -1,3 +1,4 @@
+import { infoPopupAction } from "./infoPopupKeys";
 import { SELECT_LEVELS } from "./selectLevels";
 import { nextCpuCharacter, nextMatchCharacter, shownFighter } from "../lobby/lobbyState";
 import { RULE_BUTTONS, rulePanel } from "./ruleButtons";
@@ -20,6 +21,7 @@ import {
   validTeams,
   characterFor,
   characterReady,
+  choosingFighter,
   fighterActive,
   fighterMask,
   hasUnassignedHuman,
@@ -395,7 +397,7 @@ export class SelectionPanel {
 
   private choosing(): Readonly<MatchState> | undefined {
     const { game } = this;
-    return game === undefined || game.phase !== Phase.characterMenu || this.settingsOpen || !humanActive(game, this.participantId) ? undefined : game;
+    return this.settingsOpen ? undefined : choosingFighter(game, this.participantId);
   }
 
   private openCpuSettings(slot: number): void {
@@ -445,21 +447,10 @@ export class SelectionPanel {
       this.cpuFocus = cpuMenuFocus(this.cpuFocus, action, () => this.closeCpuSettings(), (row, direction) => this.stepCpu(row, direction));
       return true;
     }
-    if (this.credits.opened() || this.community.opened()) return this.infoAction(action);
+    if (infoPopupAction([this.credits, this.community], action)) return true;
     if (this.tutorialOpen) return this.answerTutorial(tutorialKeyButton(action));
     if (this.bar.opened() !== undefined) return this.barAction(game, action);
     return this.focusAction(game, action);
-  }
-
-  private infoAction(action: Action): boolean {
-    if (action === Action.moveUp || action === Action.moveDown) {
-      const delta = action === Action.moveUp ? -1 : 1;
-      if (!this.credits.scroll(delta)) this.community.scroll(delta);
-    } else if (action === Action.attack || action === Action.special) {
-      this.credits.close();
-      this.community.close();
-    }
-    return true;
   }
 
   private barAction(game: Readonly<MatchState>, action: Action): boolean {

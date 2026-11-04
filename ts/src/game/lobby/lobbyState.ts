@@ -137,6 +137,8 @@ export function humanCount(game: Readonly<MatchState>): number {
   for (const slot of PARTICIPANT_SLOTS) if (humanActive(game, slot)) count++;
   return count;
 }
+export const choosingFighter = (game: Readonly<MatchState> | undefined, slot: number): Readonly<MatchState> | undefined =>
+  game !== undefined && game.phase === Phase.characterMenu && humanActive(game, slot) ? game : undefined;
 export const humanPresent = (game: Readonly<MatchState>, slot: number): boolean => humanActive(game, slot) && !participantActive(game.departedMask, slot);
 export const humanFighterActive = (game: Readonly<MatchState>, slot: number): boolean => {
   const mask = game.humanFighterMask;
