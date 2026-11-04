@@ -90,27 +90,30 @@ export interface OnlineFigures {
   /** The map's input delay and rollback window, in frames. */
   readonly delay?: number;
   readonly window?: number;
+  readonly stalls?: number;
+  readonly pops?: { readonly over: number; readonly max: number };
 }
 
 export function onlineFigures(log: string): OnlineFigures {
   const rollback = /^net: rollback (\{.*\})$/m.exec(log)?.[1];
   const summary = log.split("\n").reverse().find(line => line.startsWith("{") && line.includes("\"net\":"));
-  const map = rollback === undefined ? undefined : JSON.parse(rollback) as { depth: NonNullable<OnlineFigures["depth"]>; delay: number; window: number };
+  const map = rollback === undefined ? undefined : JSON.parse(rollback) as { depth: NonNullable<OnlineFigures["depth"]>; delay: number; window: number; stalls: number; pops?: NonNullable<OnlineFigures["pops"]> };
   const net = summary === undefined ? undefined : (JSON.parse(summary) as { net?: { checksumsCompared: number; mismatches: number; rttMs: number } }).net;
-  return { ...(map === undefined ? {} : { depth: map.depth, delay: map.delay, window: map.window }), ...(net === undefined ? {} : { checksumsCompared: net.checksumsCompared, mismatches: net.mismatches, rttMs: net.rttMs }) };
+  return { ...(map === undefined ? {} : { depth: map.depth, delay: map.delay, window: map.window, stalls: map.stalls, ...(map.pops === undefined ? {} : { pops: map.pops }) }), ...(net === undefined ? {} : { checksumsCompared: net.checksumsCompared, mismatches: net.mismatches, rttMs: net.rttMs }) };
 }
 
 export interface OnlineRun { readonly label: string; readonly matchFrames: number; readonly online: OnlineFigures; readonly log: LogFigures }
 
 /** The netcode beside the timing table: per window, the round trip and delay the peers agreed, rollback depth, rollbacks per second of match, late scenes and the checksums the peers compared. */
 export function onlineTable(runs: readonly OnlineRun[]): string {
-  const head = ["Window", "measured round trip ms", "input delay / rollback window", "rollback depth p50 / p99 / max", "rollbacks/s", "late / 300 ticks p50 / p99 / max", "checksums compared", "mismatches"];
+  const head = ["Window", "measured round trip ms", "input delay / rollback window", "rollback depth p50 / p99 / max", "rollbacks/s", "held at window edge", "corrections over 20 units / largest", "late / 300 ticks p50 / p99 / max", "checksums compared", "mismatches"];
   const rows = runs.map(({ label, matchFrames, online, log }) => [
     label, online.rttMs?.toFixed(0) ?? "–", online.delay === undefined ? "–" : `${online.delay} / ${online.window ?? "–"}`,
     online.depth === undefined ? "–" : `${online.depth.p50} / ${online.depth.p99} / ${online.depth.max}`,
     online.depth === undefined ? "–" : (online.depth.n / (matchFrames / 60)).toFixed(2),
+    online.stalls?.toFixed(0) ?? "–", online.pops === undefined ? "–" : `${online.pops.over} / ${online.pops.max}`,
     cell(spreadOf(log.lateScenes), 0), online.checksumsCompared?.toFixed(0) ?? "–", online.mismatches?.toFixed(0) ?? "–",
   ]);
   const line = (cells: readonly string[]) => `| ${cells.join(" | ")} |`;
-  return [line(head), line(head.map(() => "---")), ...rows.map(line), "", "Rollback depth and rollbacks/s count every correction of the whole match, warmup included; late scenes are per five-second pulse after the warmup."].join("\n");
+  return [line(head), line(head.map(() => "---")), ...rows.map(line), "", "Rollback depth and rollbacks/s count every correction of the whole match, warmup included; held counts the steps whose prediction stopped at the window edge; a correction over 20 units is a rollback that moved a fighter more than 20 world units; late scenes are per five-second pulse after the warmup."].join("\n");
 }

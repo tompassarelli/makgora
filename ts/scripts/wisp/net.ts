@@ -87,7 +87,10 @@ const PHASE_NAMES = new Map<number, string>(Object.entries(Phase).map(([name, va
 
 /** One player of a hosted or joined match: both humans meet at fighter selection, and each presses its window's input or its pad script. */
 /** The online benchmark (wisp#229): makgora#888's four-fighter match with the two humans in slots 1 and 2 and computers in 3 and 4, each human pressing the bot beat. */
-export interface NetFourFighters { readonly stage: StageTile }
+export interface NetFourFighters {
+  readonly stage: StageTile;
+  readonly inputDelay?: number;
+}
 
 const NET_FOUR_FIGHTERS = ["-dev slots 3 12", "-dev fighter 2 Blademaster", "-dev fighter 3 Illidan", "-dev fighter 4 Warden", "-dev time 2"];
 const NET_FOUR_FIGHTER_STOCKS = 99;
@@ -113,7 +116,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
     interface State { readonly game: { readonly phase: number; readonly humanFighterMask: number; readonly computerMask: number; stockCount: number } }
     const { shell }: { shell(): State & NetcodeShell } = await import("../../src/host/loop/state");
     const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import("../../src/host/loop/diagnostics");
-    const { handMeasuredRtt, measuredDelay }: { handMeasuredRtt(net: object, rttMs: number): number; measuredDelay(window: number, rttMs: number): number } = await import("../../src/host/loop/netDelay");
+    const { POP_UNITS, handMeasuredRtt, hostDelayFrom, measuredDelay }: { POP_UNITS: number; handMeasuredRtt(net: object, rttMs: number): number; hostDelayFrom(net: object, game: State["game"], sender: number, manual: number): void; measuredDelay(window: number, rttMs: number): number } = await import("../../src/host/loop/netDelay");
     const { setHumanCount }: { setHumanCount(game: State["game"], count: number): void } = await import("../../src/game/lobby/lobbyState");
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import("../../src/platform/main");
     const build: MapBuild = { ...PLAYABLE_BUILD, devConsole: true };
@@ -124,8 +127,13 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
     const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import("./botMatch");
     const fourFighters = options.fourFighters;
     const beat = fourFighters === undefined ? undefined : beatPresser((key, down) => lockstep.key(slot, key, 0, down), (frame) => botBeatKeys(frame + slot * BEAT_SPACING));
-    const startFourFighters = (state: State, { stage }: NetFourFighters) => {
+    const startFourFighters = (state: State & NetcodeShell, { stage, inputDelay }: NetFourFighters) => {
       for (const command of NET_FOUR_FIGHTERS) applyDeveloperCommand(state, 0, command);
+      if (inputDelay !== undefined) {
+        if (state.rollback === undefined) throw new Error("net: --input-delay needs the rollback build");
+        hostDelayFrom(state.rollback.net, state.game, 0, inputDelay);
+        if (state.rollback.net.manual !== inputDelay) throw new Error(`net: the host cannot set input delay ${inputDelay}`);
+      }
       state.game.stockCount = NET_FOUR_FIGHTER_STOCKS;
       startQuickMatch(state, stage, undefined, Character.demonHunter, NET_FOUR_FIGHTER_STOCKS);
     };
@@ -151,7 +159,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, huma
       step: () => {
         if (lockstep.frame === SETUP_FRAME) {
           client.run(() => {
-            net.attach(shell(), slot);
+            net.attach(shell(), slot, POP_UNITS);
             const { rollback } = shell();
             if (measuredRtt !== undefined && rollback !== undefined) handMeasuredRtt(rollback.net, measuredRtt);
             presses.attach(shell());
@@ -219,7 +227,7 @@ interface NetcodeShell {
     readonly active: boolean;
     readonly window: number;
     readonly delay: number;
-    readonly net: object;
+    readonly net: { readonly popCounts: readonly number[]; readonly manual: number };
     readonly schedule: InputSchedule;
     readonly playback: {
       reconcile(...args: [unknown, unknown, unknown, { readonly runtime: { readonly simulationFrame: number } }]): "unchanged" | "rejected" | { readonly replayedFrom: number };
@@ -238,11 +246,15 @@ const percentiles = (values: readonly number[]) => {
 /** Rollback depth per correction, prediction stalls and the remote's lead, read off the map's own rollback playback (wisp#112). */
 function netcodeStats() {
   const depths: number[] = [], leads: number[] = [];
-  let stalls = 0, window = 0, delay = 0, stepMs = 0, rollbackMs = 0, read: (() => { readonly speculative: number; readonly confirmed: number }) | undefined;
+  let stalls = 0, window = 0, delay = 0, stepMs = 0, rollbackMs = 0, pops: (() => { readonly over: number; readonly max: number }) | undefined, read: (() => { readonly speculative: number; readonly confirmed: number }) | undefined;
   return {
-    attach(state: NetcodeShell, slot: number) {
+    attach(state: NetcodeShell, slot: number, popUnits: number) {
       const rollback = state.rollback;
       if (rollback === undefined) throw new Error("net: the build has no rollback");
+      pops = () => {
+        const counts = rollback.net.popCounts;
+        return { over: counts.reduce((sum, count, units) => units > popUnits ? sum + count : sum, 0), max: Math.max(0, counts.findLastIndex((count) => count > 0)) };
+      };
       const { playback, schedule } = rollback;
       const reconcile = playback.reconcile.bind(playback), catchUp = playback.catchUp.bind(playback), repair = playback.repair.bind(playback);
       playback.repair = (...args) => {
@@ -285,7 +297,7 @@ function netcodeStats() {
     },
     report: () => {
       const insideWindow = leads.filter((lead) => lead <= window).length;
-      return { window, delay, depth: percentiles(depths), lead: percentiles(leads), leadInsideWindow: leads.length === 0 ? 1 : insideWindow / leads.length, stalls };
+      return { window, delay, depth: percentiles(depths), lead: percentiles(leads), leadInsideWindow: leads.length === 0 ? 1 : insideWindow / leads.length, stalls, ...(pops === undefined ? {} : { pops: pops() }) };
     },
   };
 }

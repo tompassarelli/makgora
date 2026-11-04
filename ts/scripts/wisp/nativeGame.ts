@@ -21,6 +21,7 @@ const tutorialOffer = query.get("noTutorialOffer") === null;
 const presentation = (query.get("presentation") ?? undefined) as MapBuild["presentation"];
 const digestFile = query.get("digests") ?? undefined;
 const stage = query.get("stage"), rollback = query.get("rollback");
+const inputDelay = process.env.MAKGORA_ONLINE_INPUT_DELAY ?? null;
 const match = { ...(query.get("fourFighters") === null ? {} : { fourFighters: true }), ...(stage === null ? {} : { stage: Number(stage) as StageTile }), ...(rollback === null ? {} : { rollback: Number(rollback) }) };
 const savedFiles = query.get("save") === null ? undefined : join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "makgora/native-files");
 
@@ -37,7 +38,7 @@ export const MAKGORA_NATIVE_GAME = {
   ...base,
   net: {
     ...base.net,
-    create: async (...[link, slot, humans, options]: Parameters<typeof createNetStandalone>) => marksMeasured(await createNetStandalone(link, slot, humans, { ...options, ...(match.fourFighters === true ? { fourFighters: { stage: match.stage ?? (0 as StageTile) } } : {}) })),
+    create: async (...[link, slot, humans, options]: Parameters<typeof createNetStandalone>) => marksMeasured(await createNetStandalone(link, slot, humans, { ...options, ...(match.fourFighters === true ? { fourFighters: { stage: match.stage ?? (0 as StageTile), ...(inputDelay === null ? {} : { inputDelay: Number(inputDelay) }) } } : {}) })),
   },
   create: async (session: Parameters<typeof createStandaloneSession>[0]) => {
     const created = marksMeasured(await createStandaloneSession({ ...session, ...match, start, ...(presentation === undefined ? {} : { presentation }), ...(savedFiles === undefined ? {} : { savedFiles }), ...(chosen === undefined ? {} : { chosen }), ...(tutorialOffer ? {} : { tutorialOffer }) }));

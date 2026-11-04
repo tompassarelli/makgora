@@ -8,7 +8,7 @@ import { ProcessFailure, runProcess } from "./hostProcess";
 import { captureRoute, runOnCaptureHost } from "./nativeCaptureHost";
 import { type OnlineRun, PERF_PRESETS, PERF_STAGES, type PerfPreset, type Pressure, type StageRun, type StandaloneFigures, logFigures, onlineFigures, onlineTable, presetTable } from "./perfWindowTable";
 
-const USAGE = "usage: bun scripts/perf-window.ts [--preset Low|Medium|High|Ultra]... [--stage NAME]... [--frames N] [--warmup N] [--rollback N | --online RTT_MS,... [--jitter MS]] [--resolution WIDTHxHEIGHT] [--here] [--out DIR]";
+const USAGE = "usage: bun scripts/perf-window.ts [--preset Low|Medium|High|Ultra]... [--stage NAME]... [--frames N] [--warmup N] [--rollback N | --online RTT_MS,... [--jitter MS] [--input-delay FRAMES]] [--resolution WIDTHxHEIGHT] [--here] [--out DIR]";
 const PLAYER = "perf-window";
 const RUN_SECONDS = 600;
 const DRAIN_PSI = 5;
@@ -24,7 +24,7 @@ class PerfWindowFailure extends Schema.TaggedError<PerfWindowFailure, { readonly
 
 function argumentsOf(args: readonly string[]) {
   const presets: PerfPreset[] = [], stages: string[] = [];
-  let frames = 3600, warmup = 900, rollback: number | undefined, online: number[] | undefined, jitter = 10, resolution = "1920x1080", here = false, inside = false, out = join(project, "build/perf-window", new Date().toISOString().replace(/[:.]/g, "-"));
+  let frames = 3600, warmup = 900, rollback: number | undefined, online: number[] | undefined, inputDelay: number | undefined, jitter = 10, resolution = "1920x1080", here = false, inside = false, out = join(project, "build/perf-window", new Date().toISOString().replace(/[:.]/g, "-"));
   for (let index = 0; index < args.length; index++) {
     const flag = args[index];
     if (flag === "--here") { here = true; continue; }
@@ -41,12 +41,14 @@ function argumentsOf(args: readonly string[]) {
     else if (flag === "--rollback" && /^\d+$/.test(value) && Number(value) > 0) rollback = Number(value);
     else if (flag === "--online" && /^\d+(,\d+)*$/.test(value)) online = value.split(",").map(Number);
     else if (flag === "--jitter" && /^\d+$/.test(value)) jitter = Number(value);
+    else if (flag === "--input-delay" && /^\d+$/.test(value)) inputDelay = Number(value);
     else if (flag === "--out") out = resolve(value);
     else if (flag === "--resolution" && /^\d+x\d+$/.test(value)) resolution = value;
     else throw new Error(USAGE);
   }
   if (online !== undefined && rollback !== undefined) throw new Error("--online plays real rollbacks; drop --rollback");
-  return { presets: presets.length === 0 ? [...PERF_PRESETS] : presets, stages: stages.length === 0 ? [...PERF_STAGES] : stages, frames, warmup, rollback, online, jitter, resolution, here, inside, out };
+  if (inputDelay !== undefined && online === undefined) throw new Error("--input-delay sets the host's delay for --online; add --online");
+  return { presets: presets.length === 0 ? [...PERF_PRESETS] : presets, stages: stages.length === 0 ? [...PERF_STAGES] : stages, frames, warmup, rollback, online, inputDelay, jitter, resolution, here, inside, out };
 }
 
 const skillScript = (skill: string, script: string) => runProcess(ChildProcess.make("agents", ["path", skill])).pipe(Effect.map((path) => join(dirname(path), script)));
@@ -84,11 +86,11 @@ function readFigures(file: string, problem: string | undefined): StandaloneFigur
 }
 
 const main = Effect.gen(function*() {
-  const { presets, stages, frames, warmup, rollback, online, jitter, resolution, here, inside, out } = yield* Effect.try({ try: () => argumentsOf(process.argv.slice(2)), catch: (cause) => new PerfWindowFailure({ problem: String(cause) }) });
+  const { presets, stages, frames, warmup, rollback, online, inputDelay, jitter, resolution, here, inside, out } = yield* Effect.try({ try: () => argumentsOf(process.argv.slice(2)), catch: (cause) => new PerfWindowFailure({ problem: String(cause) }) });
   if (!here && captureRoute(hostname()) === "ship") {
     yield* runOnCaptureHost({
       project, script: "scripts/perf-window.ts",
-      args: folders => [...presets.flatMap(preset => ["--preset", preset]), ...stages.flatMap(stage => ["--stage", stage]), "--frames", String(frames), "--warmup", String(warmup), ...(rollback === undefined ? [] : ["--rollback", String(rollback)]), ...(online === undefined ? [] : ["--online", online.join(","), "--jitter", String(jitter)]), "--resolution", resolution, "--out", folders.out],
+      args: folders => [...presets.flatMap(preset => ["--preset", preset]), ...stages.flatMap(stage => ["--stage", stage]), "--frames", String(frames), "--warmup", String(warmup), ...(rollback === undefined ? [] : ["--rollback", String(rollback)]), ...(online === undefined ? [] : ["--online", online.join(","), "--jitter", String(jitter)]), ...(inputDelay === undefined ? [] : ["--input-delay", String(inputDelay)]), "--resolution", resolution, "--out", folders.out],
       send: [],
       fetchInto: out,
     }).pipe(Effect.mapError(cause => new PerfWindowFailure({ problem: cause.message })));
@@ -117,9 +119,9 @@ const main = Effect.gen(function*() {
     const onlineRuns: OnlineRun[] = [];
     if (online !== undefined) for (const stage of stages) for (const rtt of online) {
       const psiStart = hostPsi();
-      const dir = join(out, preset, stage.replace(/[^A-Za-z0-9]+/g, "-"), `online-${rtt}ms`);
+      const dir = join(out, preset, stage.replace(/[^A-Za-z0-9]+/g, "-"), `online-${rtt}ms${inputDelay === undefined ? "" : `-delay${inputDelay}`}`);
       const path = rtt === 0 ? [] : ["--rtt", String(rtt), "--jitter", String(jitter)];
-      const pair = ["env", "BUN_JSC_logGC=1", `WISP_WINDOW_WARMUP_FRAMES=${warmup}`, process.execPath, "scripts/wisp.ts", "net", "pair", "--relay", "local", "--humans", "2", "--window", "native", "--out", dir, "--four-fighters", "--stage", stage, "--frames", String(frames + warmup), ...path];
+      const pair = ["env", "BUN_JSC_logGC=1", `WISP_WINDOW_WARMUP_FRAMES=${warmup}`, ...(inputDelay === undefined ? [] : [`MAKGORA_ONLINE_INPUT_DELAY=${inputDelay}`]), process.execPath, "scripts/wisp.ts", "net", "pair", "--relay", "local", "--humans", "2", "--window", "native", "--out", dir, "--four-fighters", "--stage", stage, "--frames", String(frames + warmup), ...path];
       const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + 30), "--", process.execPath, helper, "run", ...ONLINE_LEASE, "--beside-native", PLAYER, "--owner", PLAYER, "--timeout-seconds", String(RUN_SECONDS), "--", ...pair];
       const loadStart = loadavg()[0] ?? 0;
       console.error(`perf-window: ${preset} ${stage} online ${rtt} ms → ${dir}`);
@@ -129,7 +131,7 @@ const main = Effect.gen(function*() {
       const pressure: Pressure = { psiStart, psiEnd: hostPsi(), loadStart, loadEnd: loadavg()[0] ?? 0 };
       for (const window of ONLINE_WINDOWS) {
         const log = (() => { try { return readFileSync(join(dir, `${window}.log`), "utf8"); } catch { return ""; } })();
-        const label = `${stage} ${rtt} ms ${window}`;
+        const label = `${stage} ${rtt} ms${inputDelay === undefined ? "" : ` delay ${inputDelay}`} ${window}`;
         runs.push({ stage: label, figures: readFigures(join(dir, window, "standalone.json"), ran.code === 0 ? undefined : `exit ${ran.code}, see ${join(dir, "run.log")}`), log: logFigures(log), pressure });
         onlineRuns.push({ label, matchFrames: frames + warmup, online: onlineFigures(log), log: logFigures(log) });
       }
@@ -149,7 +151,7 @@ const main = Effect.gen(function*() {
     }
     tables.push(presetTable(preset, runs), ...(onlineRuns.length === 0 ? [] : [onlineTable(onlineRuns)]));
   }
-  const markdown = [`Four-fighter native window, ${frames} frames per stage after ${warmup} warmup frames${rollback === undefined ? "" : `, --rollback ${rollback}`}${online === undefined ? "" : `, online: two native windows through a local relay, the joiner behind a delay proxy at each round trip with ${jitter} ms jitter (none at 0 ms)`}, ${resolution} private desktop on ${hostname()}, under one quiet native lease that drained batch work to CPU PSI some avg10 ${drainedTo}% (${drainedAfter} s) before the first run.`, "", ...tables].join("\n\n") + "\n";
+  const markdown = [`Four-fighter native window, ${frames} frames per stage after ${warmup} warmup frames${rollback === undefined ? "" : `, --rollback ${rollback}`}${online === undefined ? "" : `, online: two native windows through a local relay, the joiner behind a delay proxy at each round trip with ${jitter} ms jitter (none at 0 ms)${inputDelay === undefined ? ", input delay the lobby's Auto" : `, input delay set by the host to ${inputDelay}`}`}, ${resolution} private desktop on ${hostname()}, under one quiet native lease that drained batch work to CPU PSI some avg10 ${drainedTo}% (${drainedAfter} s) before the first run.`, "", ...tables].join("\n\n") + "\n";
   writeFileSync(join(out, "perf-window.md"), markdown);
   console.log(markdown);
 });
