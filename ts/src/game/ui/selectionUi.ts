@@ -446,8 +446,20 @@ export class SelectionPanel {
       return true;
     }
     if (this.tutorialOpen) return this.answerTutorial(tutorialKeyButton(action));
+    if (this.credits.opened() || this.community.opened()) return this.infoAction(action);
     if (this.bar.opened() !== undefined) return this.barAction(game, action);
     return this.focusAction(game, action);
+  }
+
+  private infoAction(action: Action): boolean {
+    if (action === Action.moveUp || action === Action.moveDown) {
+      const delta = action === Action.moveUp ? -1 : 1;
+      if (!this.credits.scroll(delta)) this.community.scroll(delta);
+    } else if (action === Action.attack || action === Action.special) {
+      this.credits.close();
+      this.community.close();
+    }
+    return true;
   }
 
   private barAction(game: Readonly<MatchState>, action: Action): boolean {

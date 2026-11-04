@@ -9,18 +9,28 @@ export interface PopupBox {
   readonly height: number;
 }
 
-export interface PopupRow extends PopupBox {
+/** A wrapped body line: `drop` is how far its top lies below the first line's top, paragraph gaps included. */
+export interface PopupLine {
   readonly text: string;
+  readonly drop: number;
 }
 
-/** One info popup laid out on the settings popup's frame: title above the header rail, wrapped body rows between the rails, Close under the footer rail. */
+/** One info popup laid out on the settings popup's frame: title above the header rail, wrapped body lines between the rails (a window of them shows, scrolled by first line), Close under the footer rail. */
 export interface InfoPopupLayout {
   readonly panel: PopupBox;
   readonly title: PopupBox;
   readonly headerRule: number;
   readonly footerRule: number;
   readonly size: number;
-  readonly rows: readonly PopupRow[];
+  readonly left: number;
+  readonly width: number;
+  readonly lineHeight: number;
+  readonly lines: readonly PopupLine[];
+  readonly slots: number;
+  readonly maxFirst: number;
+  readonly bodyTop: number;
+  readonly room: number;
+  readonly inset: number;
   readonly close: PopupBox;
 }
 
@@ -35,26 +45,45 @@ const SIDE_MARGIN = f32(0.025);
 const RAIL_GAP = f32(0.008);
 const LINE_SPACING = f32(1.4);
 const PARAGRAPH_GAP = f32(0.5);
-const SIZE_STEP = f32(0.0005);
-const MIN_SIZE = f32(0.007);
 const CLOSE_WIDTH = f32(0.16);
 const CLOSE_HEIGHT = f32(0.028);
 const TITLE_HEIGHT = f32(0.03);
 
 const lineHeight = (size: number): number => f32(size * LINE_SPACING);
 
-function wrapRows(paragraphs: readonly string[], size: number, width: number): readonly (readonly string[])[] {
+function wrapLines(paragraphs: readonly string[], size: number, width: number): PopupLine[] {
   const room = f32(width / size);
-  return paragraphs.map(paragraph => wrapChat(paragraph, room, room, FRIZ_QUADRATA_WIDTHS));
+  const step = lineHeight(size);
+  const lines: PopupLine[] = [];
+  let drop = 0;
+  paragraphs.forEach((paragraph, index) => {
+    if (index > 0) drop = f32(drop + f32(PARAGRAPH_GAP * step));
+    for (const text of wrapChat(paragraph, room, room, FRIZ_QUADRATA_WIDTHS)) {
+      lines.push({ text, drop });
+      drop = f32(drop + step);
+    }
+  });
+  return lines;
 }
 
-function bodyHeight(wrapped: readonly (readonly string[])[], size: number): number {
-  let rows = 0;
-  for (const paragraph of wrapped) rows += paragraph.length;
-  return f32(f32(rows * lineHeight(size)) + f32(Math.max(0, wrapped.length - 1) * f32(PARAGRAPH_GAP * lineHeight(size))));
+/** How many lines show from line `first` down: those that end within `room` of the first line's top. */
+export function windowCount(layout: Pick<InfoPopupLayout, "lines" | "lineHeight" | "room">, first: number): number {
+  const { lines } = layout;
+  const origin = lines[first]?.drop ?? 0;
+  let count = 0;
+  for (let index = first; index < lines.length; index++) {
+    const line = lines[index];
+    if (line === undefined || f32(f32(line.drop - origin) + layout.lineHeight) > layout.room) break;
+    count++;
+  }
+  return count;
 }
 
-/** Lays `paragraphs` out inside `panel`, at `size` or the largest smaller font size whose rows all fit between the rails. */
+/** The top edge of line `index` while line `first` leads the window. */
+export const windowY = (layout: InfoPopupLayout, first: number, index: number): number =>
+  f32(f32(layout.bodyTop - layout.inset) - f32((layout.lines[index]?.drop ?? 0) - (layout.lines[first]?.drop ?? 0)));
+
+/** Lays `paragraphs` out inside `panel` at `size`; a body taller than the space between the rails scrolls, one that fits is centred when `centred`. */
 export function infoPopupLayout(panel: PopupBox, paragraphs: readonly string[], size: number, centred: boolean): InfoPopupLayout {
   const inner = f32(panel.height - f32(2 * MENU_FRAME_BAND));
   const backingTop = f32(panel.y - MENU_FRAME_BAND);
@@ -63,37 +92,36 @@ export function infoPopupLayout(panel: PopupBox, paragraphs: readonly string[], 
   const footerRule = railY(FOOTER_RAIL_TOP);
   const left = f32(panel.x + SIDE_MARGIN);
   const width = f32(panel.width - f32(2 * SIDE_MARGIN));
-  const top = f32(headerRule - RAIL_GAP);
-  const room = f32(f32(top - footerRule) - RAIL_GAP);
-  let fitted = size;
-  let wrapped = wrapRows(paragraphs, fitted, width);
-  while (bodyHeight(wrapped, fitted) > room && fitted > MIN_SIZE) {
-    fitted = f32(fitted - SIZE_STEP);
-    wrapped = wrapRows(paragraphs, fitted, width);
-  }
-  const line = lineHeight(fitted);
-  const rows: PopupRow[] = [];
-  let y = centred ? f32(top - f32(f32(room - bodyHeight(wrapped, fitted)) / 2)) : top;
-  wrapped.forEach((paragraph, index) => {
-    if (index > 0) y = f32(y - f32(PARAGRAPH_GAP * line));
-    for (const text of paragraph) {
-      rows.push({ ...box(left, y, width, line), text });
-      y = f32(y - line);
+  const bodyTop = f32(headerRule - RAIL_GAP);
+  const room = f32(f32(bodyTop - footerRule) - RAIL_GAP);
+  const line = lineHeight(size);
+  const lines = wrapLines(paragraphs, size, width);
+  const last = lines[lines.length - 1];
+  const height = last === undefined ? 0 : f32(last.drop + line);
+  const base = { panel, headerRule, footerRule, size, left, width, lineHeight: line, lines, bodyTop, room } as const;
+  let slots = 0;
+  let maxFirst = 0;
+  for (let first = 0; first < lines.length; first++) {
+    const count = windowCount(base, first);
+    slots = Math.max(slots, count);
+    if (first + count >= lines.length) {
+      maxFirst = first;
+      break;
     }
-  });
+  }
   const headerTop = railY(HEADER_RAIL_TOP);
   const footerBottom = railY(FOOTER_RAIL_BOTTOM);
   const panelBottom = f32(panel.y - panel.height);
   return {
-    panel,
+    ...base,
+    slots,
+    maxFirst,
+    inset: centred && maxFirst === 0 ? f32(f32(room - height) / 2) : 0,
     title: box(left, f32(backingTop - f32(f32(f32(backingTop - headerTop) - TITLE_HEIGHT) / 2)), width, TITLE_HEIGHT),
-    headerRule,
-    footerRule,
-    size: fitted,
-    rows,
     close: box(f32(f32(panel.x + f32(panel.width / 2)) - f32(CLOSE_WIDTH / 2)), f32(footerBottom - f32(f32(f32(f32(footerBottom - panelBottom) - MENU_FRAME_BAND) - CLOSE_HEIGHT) / 2)), CLOSE_WIDTH, CLOSE_HEIGHT),
   };
 }
 
+export const INFO_POPUP_SIZE = f32(0.0135);
 export const CREDITS_PANEL = box(f32(0.02), f32(0.59), f32(0.76), f32(0.58));
 export const COMMUNITY_PANEL = box(f32(0.18), f32(0.48), f32(0.44), f32(0.36));

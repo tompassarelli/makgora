@@ -1,21 +1,20 @@
-import { f32 } from "wisp/src/sim/f32";
 import { COMMUNITY_TITLE, communityParagraphs } from "./community";
 import { ButtonClicks } from "./frames";
 import { InfoPanelState } from "./infoPanelState";
-import { infoPopup } from "./infoPanel";
-import { COMMUNITY_PANEL, type InfoPopupLayout, infoPopupLayout } from "./infoPopupLayout";
+import { type InfoPopupBody, infoPopup } from "./infoPanel";
+import { COMMUNITY_PANEL, INFO_POPUP_SIZE, type InfoPopupLayout, infoPopupLayout } from "./infoPopupLayout";
 import { destroyFrame, Frame, setFrameVisible } from "wisp/game/frames";
 import { Player, player as playerOf } from "wisp/game/players";
 
-export const COMMUNITY_SIZE = f32(0.0135);
-export const communityLayout = (): InfoPopupLayout => infoPopupLayout(COMMUNITY_PANEL, communityParagraphs(), COMMUNITY_SIZE, true);
+export const communityLayout = (): InfoPopupLayout => infoPopupLayout(COMMUNITY_PANEL, communityParagraphs(), INFO_POPUP_SIZE, true);
 
 export type CommunityButton = { kind: "communityOpen" } | { kind: "communityClose" };
 
 export class CommunityMenu {
   readonly root: Frame;
   onOpen: () => void = () => {};
-  private readonly state = new InfoPanelState();
+  private readonly state: InfoPanelState;
+  private readonly body: InfoPopupBody;
   private readonly clicks: ButtonClicks<CommunityButton>;
 
   constructor(owner: Frame, opener: Frame, suffix: string, private readonly participantId: number) {
@@ -23,6 +22,8 @@ export class CommunityMenu {
     const layout = communityLayout();
     const popup = infoPopup(owner, `MeleeCommunityMenu${suffix}`, layout, COMMUNITY_TITLE, true);
     this.root = popup.root;
+    this.body = popup.body;
+    this.state = new InfoPanelState(layout.maxFirst);
     this.clicks.add(popup.close, { kind: "communityClose" }, "Close", "native", layout.close);
     setFrameVisible(this.root, false);
     this.clicks.add(opener, { kind: "communityOpen" }, undefined, "native");
@@ -40,7 +41,14 @@ export class CommunityMenu {
 
   open(): void {
     this.state.open();
+    this.body.showFrom(0);
     this.onOpen();
+  }
+
+  scroll(delta: number): boolean {
+    if (!this.state.scroll(delta)) return false;
+    this.body.showFrom(this.state.first);
+    return true;
   }
 
   opened(): boolean {
