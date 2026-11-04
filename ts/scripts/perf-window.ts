@@ -50,7 +50,9 @@ const skillScript = (skill: string, script: string) => runProcess(ChildProcess.m
 
 const Probe = Schema.Struct({ decision: Schema.String, reason: Schema.String, cpuSomeAvg10: Schema.optional(Schema.Finite) });
 
-const probeGpu = (helper: string) => runProcess(ChildProcess.make(process.execPath, [helper, "probe", "--class", "gpu", "--owner", PLAYER])).pipe(
+const GAME_LEASE = ["--class", "gpu", "--memory-gib", "4", "--cpus", "4"];
+
+const probeGpu = (helper: string) => runProcess(ChildProcess.make(process.execPath, [helper, "probe", ...GAME_LEASE, "--owner", PLAYER])).pipe(
   Effect.flatMap((text) => Schema.decodeEffect(Schema.fromJsonString(Probe))(text.split("\n").at(-1) ?? "")),
   Effect.mapError((cause) => new PerfWindowFailure({ problem: `machine-capacity probe gave no decision: ${cause.message}` })),
   Effect.filterOrFail((probe) => probe.reason !== "DEFER_GAMING", () => new PerfWindowFailure({ problem: "DEFER_GAMING: the gpu lease is held for gaming; perf-window starts when `north capacity gaming status` reads off" })),
@@ -111,7 +113,7 @@ const main = Effect.gen(function*() {
       const psiStart = hostPsi();
       const dir = join(out, preset, stage.replace(/[^A-Za-z0-9]+/g, "-"));
       const play = ["env", "BUN_JSC_logGC=1", `WISP_WINDOW_WARMUP_FRAMES=${warmup}`, process.execPath, "scripts/wisp.ts", "play", "--standalone", "--window", "native", "--four-fighters", "--stage", stage, "--frames", String(frames + warmup), "--out", dir, "--emulated-calls", join(dir, "emulated-calls.json"), ...(rollback === undefined ? [] : ["--rollback", String(rollback)])];
-      const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + 30), "--", process.execPath, helper, "run", "--class", "gpu", "--beside-native", PLAYER, "--owner", PLAYER, "--timeout-seconds", String(RUN_SECONDS), "--", ...play];
+      const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + 30), "--", process.execPath, helper, "run", ...GAME_LEASE, "--beside-native", PLAYER, "--owner", PLAYER, "--timeout-seconds", String(RUN_SECONDS), "--", ...play];
       const loadStart = loadavg()[0] ?? 0;
       console.error(`perf-window: ${preset} ${stage} → ${dir}`);
       const ran = yield* runLogged(command, { XDG_CONFIG_HOME: config, WISP_PLAYER: PLAYER });
