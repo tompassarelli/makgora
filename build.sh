@@ -17,7 +17,7 @@ private_build_root=$(realpath -m -- "$private_assets/build")
 case "$private_build_root" in "$project_dir"|"$project_dir"/*) echo 'Private build inputs must be outside the checkout.' >&2; exit 2;; esac
 output=$(realpath -m -- "${WC3_BUILD_OUTPUT:-$private_build_root/$map_name.w3x}")
 [[ "$output" == "$private_build_root/"*.w3x ]] || { echo 'WC3_BUILD_OUTPUT must be a .w3x path under the private build directory.' >&2; exit 2; }
-bun=${WC3_BUN:-/nix/store/216mr46yy8xspaydgapjhf4a21y643ji-bun-1.4.2/bin/bun}
+bun=${WC3_BUN:-/nix/store/7py3q3rn0qbcyzwqk6mdbyd8r1m9x54r-bun-1.4.4/bin/bun}
 
 packager="$project_dir/build/tools/map-pack"
 if [[ ! -x "$packager" ]]; then

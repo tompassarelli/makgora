@@ -54,7 +54,7 @@ jobs:
           sparse-checkout: ts/scripts
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.4.2
+          bun-version: 1.4.4
       - id: sweep
         run: |
           set -euo pipefail
@@ -172,7 +172,7 @@ jobs:
       - if: steps.lanes.outputs.any == 'true'
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.4.2
+          bun-version: 1.4.4
       - if: steps.lanes.outputs.any == 'true'
         run: bun install --frozen-lockfile
         working-directory: ts
