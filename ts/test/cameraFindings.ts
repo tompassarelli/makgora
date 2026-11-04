@@ -1,5 +1,6 @@
 
 import type { HeadlessClient } from "wisp/src/headless/client";
+import { screenHeight, screenWidth } from "wisp/game/frames";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
 import { Phase } from "../src/game/lobby/lobbyState";
 import { cameraPoint } from "../src/game/presentation/arenaCamera";
@@ -15,8 +16,8 @@ export class CameraFindings {
   observe(client: HeadlessClient): { readonly detector: string; readonly text: string }[] {
     const s = shell();
     if (s.game.phase !== Phase.match && s.game.phase !== Phase.result) return [];
-    const height = BlzGetLocalClientHeight();
-    const aspect = height > 0 ? BlzGetLocalClientWidth() / height : 16 / 9;
+    const height = screenHeight();
+    const aspect = height > 0 ? screenWidth() / height : 16 / 9;
     const previous = this.out.get(client) ?? new Map<number, boolean>();
     this.out.set(client, previous);
     const findings: { detector: string; text: string }[] = [];

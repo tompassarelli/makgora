@@ -7,15 +7,11 @@ import { on, trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
 import { MENU_STYLE, NATIVE_TEXT_BASE } from "./hudLayout";
 import { createEvents, destroyEvents, Events, onEvents } from "wisp/game/events";
-import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, Frame, frameEnabled, FrameEvent, FramePoint, frameVisible, namedFrame, originFrame, OriginFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTexture } from "wisp/game/frames";
+import { addFrameEvent, createFrameByType, eventFrame, eventFrameEvent, Frame, frameEnabled, frameId, FrameEvent, FramePoint, frameVisible, namedFrame, originFrame, OriginFrame, screenHeight, screenWidth, setFrameAbsPoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameScale, setFrameSize, setFrameText, setFrameTexture } from "wisp/game/frames";
 import { eventPlayer, localPlayer, Player, player as playerOf, playerSlot } from "wisp/game/players";
 import { addSyncEvent, syncData } from "wisp/game/sync";
 import { toReal } from "wisp/game/text";
 import { recordSweepClick, registerSweepButton, sweepActive, targetKind, unregisterSweepButtons } from "./buttonSweep";
-
-declare global {
-  function GetHandleId(handle: Frame): number;
-}
 
 
 export type MenuControls = "journal" | "keyboard";
@@ -190,7 +186,7 @@ export class ButtonClicks<T> {
   bindHandler(handle: (target: T, clicker: Player) => void, hover = this.hover): void {
     this.hover = hover;
     on(this.name, () => {
-      const id = GetHandleId(eventFrame());
+      const id = frameId(eventFrame());
       const clicker = eventPlayer();
       for (const button of this.buttons) {
         if (button.id !== id) continue;
@@ -220,7 +216,7 @@ export class ButtonClicks<T> {
       addFrameEvent(this.trigger, frame, FrameEvent.mouseEnter);
       addFrameEvent(this.trigger, frame, FrameEvent.mouseLeave);
     }
-    this.buttons.push({ id: GetHandleId(frame), label: registerSweepButton(this.name, targetKind(target), frame, box), frame, target, box });
+    this.buttons.push({ id: frameId(frame), label: registerSweepButton(this.name, targetKind(target), frame, box), frame, target, box });
     return frame;
   }
 

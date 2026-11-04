@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { frameEnabled, originFrame, OriginFrame } from "wisp/game/frames";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { STOCK_FRAME_COUNTS } from "../src/host/loop/stockFrames";
@@ -37,7 +38,7 @@ test("startup leaves Warcraft's four system buttons enabled, so F10 still opens 
   clients.frames(120);
   const enabled: boolean[] = [];
   clients.client(0).run(() => {
-    for (let index = 0; index < 4; index++) enabled.push(BlzFrameGetEnable(BlzGetOriginFrame(ORIGIN_FRAME_SYSTEM_BUTTON, index)));
+    for (let index = 0; index < 4; index++) enabled.push(frameEnabled(originFrame(OriginFrame.systemButton, index)));
   });
   expect(enabled).toEqual([true, true, true, true]);
 });

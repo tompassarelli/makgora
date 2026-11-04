@@ -32,44 +32,25 @@ function releaseId(id: number): void {
 
 export const liveSoakHandles = (): number => state().live.size;
 
+type Native = (this: void, ...args: unknown[]) => unknown;
+
+const MADE = ["CreateUnit", "CreateTimer", "CreateTrigger", "AddSpecialEffect", "AddSpecialEffectLoc", "AddSpecialEffectTarget", "CreateSound", "CreateSoundFromLabel"];
+
+const MADE_IN_FRAME: Readonly<Record<string, number>> = { BlzCreateFrame: 1, BlzCreateSimpleFrame: 1, BlzCreateFrameByType: 2 };
+
+const RELEASED = ["RemoveUnit", "DestroyTimer", "DestroyTrigger", "DestroyEffect", "KillSoundWhenDone"];
+
 export function installSoakHandles(): void {
   if (state().installed) return;
   state().installed = true;
   const natives = globalThis as Record<string, unknown>;
-  const createUnit = CreateUnit;
-  const removeUnit = RemoveUnit;
-  const createTimer = CreateTimer;
-  const destroyTimer = DestroyTimer;
-  const createTrigger = CreateTrigger;
-  const destroyTrigger = DestroyTrigger;
-  const addEffect = AddSpecialEffect;
-  const addEffectLoc = AddSpecialEffectLoc;
-  const addEffectTarget = AddSpecialEffectTarget;
-  const destroyEffect = DestroyEffect;
-  const createSound = CreateSound;
-  const createSoundLabel = CreateSoundFromLabel;
-  const killSound = KillSoundWhenDone;
-  const stopSound = StopSound;
-  const createFrame = BlzCreateFrame;
-  const createSimpleFrame = BlzCreateSimpleFrame;
-  const createFrameType = BlzCreateFrameByType;
-  const destroyFrame = BlzDestroyFrame;
-  natives.CreateUnit = (...args: Parameters<typeof CreateUnit>) => made(createUnit(...args));
-  natives.RemoveUnit = (value: unit) => { released(value); removeUnit(value); };
-  natives.CreateTimer = () => made(createTimer());
-  natives.DestroyTimer = (value: timer) => { released(value); destroyTimer(value); };
-  natives.CreateTrigger = () => made(createTrigger());
-  natives.DestroyTrigger = (value: trigger) => { released(value); destroyTrigger(value); };
-  natives.AddSpecialEffect = (...args: Parameters<typeof AddSpecialEffect>) => made(addEffect(...args));
-  natives.AddSpecialEffectLoc = (...args: Parameters<typeof AddSpecialEffectLoc>) => made(addEffectLoc(...args));
-  natives.AddSpecialEffectTarget = (...args: Parameters<typeof AddSpecialEffectTarget>) => made(addEffectTarget(...args));
-  natives.DestroyEffect = (value: effect) => { released(value); destroyEffect(value); };
-  natives.CreateSound = (...args: Parameters<typeof CreateSound>) => made(createSound(...args));
-  natives.CreateSoundFromLabel = (...args: Parameters<typeof CreateSoundFromLabel>) => made(createSoundLabel(...args));
-  natives.KillSoundWhenDone = (value: sound) => { released(value); killSound(value); };
-  natives.StopSound = (value: sound, killWhenDone: boolean, fadeOut: boolean) => { if (killWhenDone) released(value); stopSound(value, killWhenDone, fadeOut); };
-  natives.BlzCreateFrame = (name: string, owner: framehandle, priority: number, context: number) => made(createFrame(name, owner, priority, context), owner);
-  natives.BlzCreateSimpleFrame = (name: string, owner: framehandle, context: number) => made(createSimpleFrame(name, owner, context), owner);
-  natives.BlzCreateFrameByType = (kind: string, name: string, owner: framehandle, inherits: string, context: number) => made(createFrameType(kind, name, owner, inherits, context), owner);
-  natives.BlzDestroyFrame = (value: framehandle) => { released(value, true); destroyFrame(value); };
+  const wrap = (name: string, around: (call: Native) => Native): void => {
+    const call = natives[name];
+    if (typeof call === "function") natives[name] = around(call as Native);
+  };
+  for (const name of MADE) wrap(name, (call) => (...args) => made(call(...args) as handle));
+  for (const [name, owner] of Object.entries(MADE_IN_FRAME)) wrap(name, (call) => (...args) => made(call(...args) as framehandle, args[owner] as framehandle));
+  for (const name of RELEASED) wrap(name, (call) => (value) => { released(value as handle); call(value); });
+  wrap("StopSound", (call) => (value, killWhenDone, fadeOut) => { if (killWhenDone === true) released(value as handle); call(value, killWhenDone, fadeOut); });
+  wrap("BlzDestroyFrame", (call) => (value) => { released(value as handle, true); call(value); });
 }

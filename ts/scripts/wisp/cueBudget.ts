@@ -9,6 +9,7 @@ import { Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "../hostProcess";
 import { installHeadless } from "wisp/scripts/wisp/headless";
+import { CameraField, setCameraField, setCameraPosition } from "wisp/game/view";
 import { captureScene, renderScenes, type DrawnPose, type RenderScene } from "wisp/scripts/wisp/headlessRender";
 import { MAKGORA_HEADLESS } from "./headless";
 import { headlessRender } from "./headlessRender";
@@ -230,13 +231,13 @@ export function sparkScenes(move: CueMove): { readonly scenes: RenderScene[]; re
       const renderer = combat;
       client.run(() => {
         renderer.present(impacts, tick, impacts, true, near);
-        SetCameraField(CAMERA_FIELD_ROTATION, ARENA_CAMERA.rotation, 0.0);
-        SetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, ARENA_CAMERA.angleOfAttack, 0.0);
-        SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, near.distance, 0.0);
-        SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + 100.0, 0.0);
-        SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(near, MATCH_CAMERA_ASPECT), 0.0);
-        SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0, { distance: near.distance, z: 100.0 }), 0.0);
-        SetCameraPosition(origin.x + victim.motion.x, origin.y);
+        setCameraField(CameraField.rotation, ARENA_CAMERA.rotation, 0.0);
+        setCameraField(CameraField.angleOfAttack, ARENA_CAMERA.angleOfAttack, 0.0);
+        setCameraField(CameraField.targetDistance, near.distance, 0.0);
+        setCameraField(CameraField.zOffset, FLOOR_HEIGHT + 100.0, 0.0);
+        setCameraField(CameraField.fieldOfView, cameraFieldOfView(near, MATCH_CAMERA_ASPECT), 0.0);
+        setCameraField(CameraField.farZ, arenaFarZ(0, { distance: near.distance, z: 100.0 }), 0.0);
+        setCameraPosition(origin.x + victim.motion.x, origin.y);
       });
       advanceImpacts(impacts);
       clients.frames(1);
@@ -281,13 +282,13 @@ const near = createMatchCamera();
 extremeCamera(near, 0, MATCH_CAMERA_ASPECT, "near");
 
 function aimNear(x: number, z: number): void {
-  SetCameraField(CAMERA_FIELD_ROTATION, ARENA_CAMERA.rotation, 0.0);
-  SetCameraField(CAMERA_FIELD_ANGLE_OF_ATTACK, ARENA_CAMERA.angleOfAttack, 0.0);
-  SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, near.distance, 0.0);
-  SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + z + 100.0, 0.0);
-  SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(near, MATCH_CAMERA_ASPECT), 0.0);
-  SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0, { distance: near.distance, z: z + 100.0 }), 0.0);
-  SetCameraPosition(x, PLAYABLE_BOUNDS.centreY);
+  setCameraField(CameraField.rotation, ARENA_CAMERA.rotation, 0.0);
+  setCameraField(CameraField.angleOfAttack, ARENA_CAMERA.angleOfAttack, 0.0);
+  setCameraField(CameraField.targetDistance, near.distance, 0.0);
+  setCameraField(CameraField.zOffset, FLOOR_HEIGHT + z + 100.0, 0.0);
+  setCameraField(CameraField.fieldOfView, cameraFieldOfView(near, MATCH_CAMERA_ASPECT), 0.0);
+  setCameraField(CameraField.farZ, arenaFarZ(0, { distance: near.distance, z: z + 100.0 }), 0.0);
+  setCameraPosition(x, PLAYABLE_BOUNDS.centreY);
 }
 
 function orbScenes(): ReturnType<typeof cueScenes> {

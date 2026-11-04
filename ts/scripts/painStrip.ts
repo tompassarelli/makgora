@@ -65,21 +65,15 @@ export function painShots(entry: MapEntry, characters: readonly number[], screen
         let pending: RenderScene | undefined;
         const journey = { frames: LAST_OBSERVED + 1, events: [...QUIET_ARENA.map((chat, step) => ({ frame: CHAT_FRAME - 10 + step, player: 0, chat })), { frame: CHAT_FRAME, player: 0, chat: `-dev pain ${height} ${strength} ${fighterKey(character)}` }] };
         const lockstep = runtime.clients(entry, [0, 1], { keepCalls: 1, screen, files: () => files });
-        const painFrames = new Map<number, boolean>();
-        const [observed] = lockstep.clients;
-        if (observed !== undefined) {
-          const setCameraField = observed.natives["SetCameraField"] as (...args: unknown[]) => unknown;
-          observed.natives["SetCameraField"] = (...args: unknown[]) => {
-            const shell = shellState();
-            const victim = shell === undefined ? undefined : fighterAt(shell.world, 0);
-            painFrames.set(observed.frame, shell?.runtime.poses[0]?.clipIndex === expectedClip && victim?.visuals.hitHeight === Math.floor(index / 3) && victim.visuals.hitStrength === index % 3 && victim.launch.hitstun > 0);
-            return setCameraField(...args);
-          };
-        }
         playHeadless(lockstep, journey, "pain-strip", undefined, { observationFrames: frames, observe: (running, frame) => {
           const client = running.clients[0];
           if (client === undefined) return;
-          const shown = painFrames.get(client.frame) === true;
+          let shown = false;
+          client.run(() => {
+            const shell = shellState();
+            const victim = shell === undefined ? undefined : fighterAt(shell.world, 0);
+            shown = shell?.runtime.poses[0]?.clipIndex === expectedClip && victim?.visuals.hitHeight === Math.floor(index / 3) && victim.visuals.hitStrength === index % 3 && victim.launch.hitstun > 0;
+          });
           if (hitFrame === undefined && shown) hitFrame = frame;
           if (hitFrame === undefined || !holding) return;
           if (!shown) { holding = false; return; }
