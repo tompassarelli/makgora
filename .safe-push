@@ -1,5 +1,3 @@
-[landing]
-	queue = lock
 [land]
 	publish = farm/
 	check = . :: cd ts && bun scripts/landingFarm.ts

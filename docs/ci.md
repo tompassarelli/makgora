@@ -32,7 +32,7 @@ Tom asked for small changes to reach main in one to two minutes rather than
 about six, by checking before landing only what a change can affect and
 running the full suite on main afterwards (2026-10-29), then for a gameplay
 change to land in 90 s or less (#689). So `safe-push --to main` lands a local
-lane straight on main (the repository's .safe-push sets `landing.queue = lock`;
+lane straight on main (the lander lands it: the repository's .safe-push sets no `landing.queue`;
 Autoland still lands cloud workers' `claude/**` pushes), and the landing gate
 runs on the farm, not on the landing machine, with the lock held only to
 fetch, rebase, scan and push:
