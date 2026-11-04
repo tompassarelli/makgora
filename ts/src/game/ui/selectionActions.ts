@@ -51,6 +51,7 @@ export interface SelectionActions {
   changeCostume(participantId: number, fighterSlot: number, direction: -1 | 1): void;
   toggleEndless(participantId: number): void;
   toggleAutomaticRematch(participantId: number): void;
+  toggleForge(participantId: number): void;
   toggleItems(participantId: number): void;
   toggleUltimates(participantId: number): void;
   toggleItemKind(participantId: number, kind: ItemKind): void;

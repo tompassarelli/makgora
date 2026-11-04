@@ -71,6 +71,8 @@ export interface MatchState {
 
   automaticRematch: boolean;
 
+  forge: boolean;
+
   rematchCountdown: number;
   remainingFrames: number;
 
@@ -117,7 +119,7 @@ export function createMatchState(): MatchState {
     resultPicks: [ResultPick.characters, ResultPick.characters, ResultPick.characters, ResultPick.characters],
     teamBattle: false, friendlyFire: false, teamChoices: [0, 1, 0, 1],
     departedMask: 0, interrupted: false, humanMask: 1, humanFighterMask: 1, humanCount: 1, computerMask: 0,
-    stageChoice: 2, hazards: true, stageResolved: false, stagePool: createStagePool(), winner: undefined, stockCount: 3, timeLimitMinutes: 7, endless: false, automaticRematch: false, rematchCountdown: 0,
+    stageChoice: 2, hazards: true, stageResolved: false, stagePool: createStagePool(), winner: undefined, stockCount: 3, timeLimitMinutes: 7, endless: false, automaticRematch: false, forge: false, rematchCountdown: 0,
 
     remainingFrames: 7 * 60 * MATCH_TICKS_PER_SECOND, startHold: 0, matchFrame: 0, timedOut: false, practice: false,
     training: false, trainer: createTrainingState(), items: createMatchItems(), orbs: createMatchOrbs(), ultimatesOff: false,
@@ -260,6 +262,7 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
   target.timeLimitMinutes = source.timeLimitMinutes;
   target.endless = source.endless;
   target.automaticRematch = source.automaticRematch;
+  target.forge = source.forge;
   target.rematchCountdown = source.rematchCountdown;
   target.remainingFrames = source.remainingFrames;
   target.matchSeed = source.matchSeed;
@@ -303,8 +306,8 @@ export function selectableMatchCharacter(game: Readonly<MatchState>, choice: num
   return isMatchCharacter(choice) && (!game.classic || classicRoute(choice) !== undefined);
 }
 
-export function nextMatchCharacter(game: Readonly<MatchState>, current: number | undefined, direction: number, forgeShown = false): Character {
-  return nextCharacterIn(shownFighters(game.classic ? CLASSIC_CHARACTERS.filter(character => PLAYABLE_CHARACTERS.includes(character)) : PLAYABLE_CHARACTERS, forgeShown), current, direction);
+export function nextMatchCharacter(game: Readonly<MatchState>, current: number | undefined, direction: number): Character {
+  return nextCharacterIn(shownFighters(game.classic ? CLASSIC_CHARACTERS.filter(character => PLAYABLE_CHARACTERS.includes(character)) : PLAYABLE_CHARACTERS, game.forge), current, direction);
 }
 
 export function selectCharacter(game: MatchState, slot: number, choice: number): void {
@@ -336,9 +339,9 @@ export function selectCpuCharacter(game: MatchState, actor: number, slot: number
   game.characterReadiness[slot] = true;
 }
 
-export function nextCpuCharacter(game: Readonly<MatchState>, slot: number, direction: number, forgeShown = false): number {
-  if (!randomFighterOffered(game)) return nextMatchCharacter(game, characterFor(game, slot), direction, forgeShown);
-  const choices = shownFighters(PLAYABLE_CHARACTERS, forgeShown);
+export function nextCpuCharacter(game: Readonly<MatchState>, slot: number, direction: number): number {
+  if (!randomFighterOffered(game)) return nextMatchCharacter(game, characterFor(game, slot), direction);
+  const choices = shownFighters(PLAYABLE_CHARACTERS, game.forge);
   const last = choices.length - 1;
   const index = cpuFighterRandom(game, slot) ? (direction > 0 ? -1 : last + 1) : choices.indexOf(game.characterChoices[slot] ?? DEFAULT_FIGHTER);
   const next = index + (direction > 0 ? 1 : -1);
@@ -586,6 +589,10 @@ export function setCpuTier(game: MatchState, actor: number, computer: number, ti
 
 export function setAutomaticRematch(game: MatchState, slot: number, automatic: boolean): void {
   if (settingRules(game, slot)) game.automaticRematch = automatic;
+}
+
+export function setForgeShown(game: MatchState, slot: number, shown: boolean): void {
+  if (settingRules(game, slot)) game.forge = shown;
 }
 
 

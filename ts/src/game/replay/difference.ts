@@ -110,6 +110,7 @@ function firstMatchDifference(e: Readonly<MatchState>, a: Readonly<MatchState>):
   if (e.timeLimitMinutes !== a.timeLimitMinutes) return "match.timeLimitMinutes";
   if (e.endless !== a.endless) return "match.endless";
   if (e.automaticRematch !== a.automaticRematch) return "match.automaticRematch";
+  if (e.forge !== a.forge) return "match.forge";
   if (e.rematchCountdown !== a.rematchCountdown) return "match.rematchCountdown";
   if (e.remainingFrames !== a.remainingFrames) return "match.remainingFrames";
   if (e.matchSeed !== a.matchSeed) return "match.matchSeed";

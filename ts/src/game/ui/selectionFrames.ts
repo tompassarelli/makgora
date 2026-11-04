@@ -12,7 +12,7 @@ import { SELECT_GRID_ORDER } from "./selectionLayout";
 import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
 import { createFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { fighterShown, fighterStatus } from "../roster/forge";
-import { FORGE_ICON } from "./forgeSetting";
+import { FORGE_ICON } from "./ruleText";
 import { formatInt, parseInt, textLength, toReal } from "wisp/game/text";
 
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);

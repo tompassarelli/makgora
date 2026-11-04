@@ -1,5 +1,5 @@
 import { ITEM_KINDS, itemBit } from "../sim/codes";
-import { type MatchState, setAutomaticRematch, setEndless, setItemsOn, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./lobbyState";
+import { type MatchState, setAutomaticRematch, setEndless, setForgeShown, setItemsOn, setStocks, setTimeLimit, setUltimatesOn, toggleItemKind } from "./lobbyState";
 
 export type RulePreset = "standard" | "tourney" | "party" | "endless";
 
@@ -11,11 +11,12 @@ export interface PresetRules {
   readonly ultimates?: boolean;
   readonly endless?: boolean;
   readonly automaticRematch?: boolean;
+  readonly forge?: boolean;
 }
 
 /** Each preset sets only the rules it names; `standard` is a fresh lobby's rules, the drawer's Reset default. */
 export const RULE_PRESETS: Readonly<Record<RulePreset, PresetRules>> = {
-  standard: { stocks: 3, minutes: 7, items: false, everyItem: true, ultimates: true, endless: false, automaticRematch: false },
+  standard: { stocks: 3, minutes: 7, items: false, everyItem: true, ultimates: true, endless: false, automaticRematch: false, forge: false },
   tourney: { stocks: 4, minutes: 8, items: false, ultimates: true, endless: false },
   party: { items: true, everyItem: true, ultimates: true, endless: false },
   endless: { endless: true, ultimates: true },
@@ -32,4 +33,5 @@ export function applyRulePreset(game: MatchState, slot: number, preset: RulePres
   if (rules.ultimates !== undefined) setUltimatesOn(game, slot, rules.ultimates);
   if (rules.endless !== undefined) setEndless(game, slot, rules.endless);
   if (rules.automaticRematch !== undefined) setAutomaticRematch(game, slot, rules.automaticRematch);
+  if (rules.forge !== undefined) setForgeShown(game, slot, rules.forge);
 }

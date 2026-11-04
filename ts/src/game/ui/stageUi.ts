@@ -21,7 +21,6 @@ import { BAR_BAND_TEXTURE, BAR_KEYS, BAR_LINE_TEXTURE, STAGE_BAR, barTexture } f
 import { BAR_LINE, BAR_STRIP, type ScreenBox, STAGE_LIST_BOX, STAGE_PREVIEW_BOX } from "../core/selectScreenLayout";
 import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, labelControl, litControl } from "./barFrames";
 import { FORGE_MARK, art } from "./selectionFrames";
-import { forgeShown } from "./forgeSetting";
 import { isFeaturedStage, stageShown, stageStatus } from "../roster/forge";
 import { destroyEvents, Events } from "wisp/game/events";
 import { createFrame, createFrameByType, destroyFrame, Frame, namedFrame, screenHeight, screenWidth, setFrameEnabled, setFrameFont, setFrameLevel, setFrameSize, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
@@ -317,7 +316,7 @@ export class StagePanel {
     }
     fitToWindow(this.backdrop);
     fitBandToWindow(this.band, BAR_STRIP);
-    this.showForge(forgeShown());
+    this.showForge(game.forge);
     let x = f32(stageTileLeft(game.stageChoice) + f32(STAGE_TILE.width / 2));
     let y = f32(stageTileTop(game.stageChoice) - f32(STAGE_TILE.height / 2));
     const width = toReal(screenWidth());
@@ -326,7 +325,7 @@ export class StagePanel {
       const pointerAtX = pointerX(toReal(inputPointerX()), width, height);
       const pointerAtY = pointerY(toReal(inputPointerY()), height);
       const dropped = updateStageDrag(this.drag, mouseDown(MouseButton.left), pointerAtX, pointerAtY, game.stageChoice);
-      if (dropped !== undefined && stageShown(dropped, forgeShown())) sendSync("stage-drop", formatInt(dropped));
+      if (dropped !== undefined && stageShown(dropped, game.forge)) sendSync("stage-drop", formatInt(dropped));
       if (this.drag.gesture?.kind === "carry") {
         x = pointerAtX;
         y = pointerAtY;

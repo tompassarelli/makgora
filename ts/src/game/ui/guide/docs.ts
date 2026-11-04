@@ -17,7 +17,7 @@ const w = (action: Action): string => k("wasd", action);
 export const GUIDE_INTRO: readonly string[] = [
   "Requires Warcraft III 3.0 and a keyboard; nothing else to install. Download the map from [Hive Workshop](https://www.hiveworkshop.com/threads/makgora.375492/), put it in the Warcraft III Maps folder and open it from Custom Games. Mak'gora uses the Classic look. Set Graphics to Classic and restart Warcraft III after changing it.",
   `A controller is optional: the Mak'gora controller helper turns its buttons and sticks into its own pad keys, which work with any Controls layout. The default Melee pad layout uses A to attack, B for specials, X/Y to jump, RB to grab and LB for Strong; Tom's pad layout uses A to attack, X for specials, Y to jump, B to grab, LB to short hop and RB for Strong. In both, either trigger shields or air-dodges and Start pauses.`,
-  `The game has character and stage selection, ${guideFighters().length} fighters, computer opponents, floating platforms, blast zones, stocks, rematches and configurable controls. Every fighter's specials and ultimate are listed by name in the [move list](move-list.md). More fighters are in the Forge, still in development: turn on Show the Forge on the Controls screen to see them.`,
+  `The game has character and stage selection, ${guideFighters().length} fighters, computer opponents, floating platforms, blast zones, stocks, rematches and configurable controls. Every fighter's specials and ultimate are listed by name in the [move list](move-list.md). More fighters are in the Forge, still in development: turn on Forge in the Match Rules to see them.`,
 ];
 
 export const GUIDE_SECTIONS: readonly GuideSection[] = [
@@ -27,7 +27,7 @@ export const GUIDE_SECTIONS: readonly GuideSection[] = [
     `New players can open the Tutorial at fighter select: ${LESSONS.length} short lessons with a training partner (${LESSONS.map(({ name }) => name).join(", ")}). Pick any lesson to play it again.`,
   ] },
   { title: "Rules", paragraphs: [
-    "At fighter selection, the rules pill in the middle of the top bar shows the rules; click it (or move the menu focus to it and press Attack) to open the rules drawer, where any player can change Stocks, Time, Ultimates, Items, Endless and Automatic rematch, pick a preset (Tourney, Party, Endless) or Reset default. Hover a rule to read what it does.",
+    "At fighter selection, the rules pill in the middle of the top bar shows the rules; click it (or move the menu focus to it and press Attack) to open the rules drawer, where any player can change Stocks, Time, Ultimates, Items, Endless, Automatic rematch and Forge, pick a preset (Tourney, Party, Endless) or Reset default. Hover a rule to read what it does.",
     ...Object.values(MATCH_RULE_HELP).filter((text, at, all) => all.indexOf(text) === at),
   ] },
   { title: "Training", paragraphs: [

@@ -76,7 +76,7 @@ const HEADING = f32(0.02);
 
 /** The panels each bar item opens, under the bar. */
 export const BAR_PANELS: Readonly<Record<BarPanel, BarBox>> = {
-  rules: box(f32(f32(RULES.x + f32(RULES.width / 2)) - f32(DRAWER_WIDTH / 2)), PANEL_TOP, DRAWER_WIDTH, panelHeight(ROW, [ROW, ROW, ROW, ROW, ROW, ROW])),
+  rules: box(f32(f32(RULES.x + f32(RULES.width / 2)) - f32(DRAWER_WIDTH / 2)), PANEL_TOP, DRAWER_WIDTH, panelHeight(ROW, [ROW, ROW, ROW, ROW, ROW, ROW, ROW])),
   mode: box(MODE.x, PANEL_TOP, f32(0.22), panelHeight(HEADING, [MODE_ROW, MODE_ROW, MODE_ROW, MODE_ROW, ROW, ROW])),
   guide: box(f32(right(GUIDE) - f32(0.2)), PANEL_TOP, f32(0.2), panelHeight(HEADING, [ROW, ROW, ROW])),
   gear: box(f32(right(GEAR) - f32(0.28)), PANEL_TOP, f32(0.28), panelHeight(HEADING, GEAR_HEIGHTS)),
@@ -120,7 +120,7 @@ const wideStep = (index: number) => {
   return { less, value: box(right(less), y, f32(more.x - right(less)), ROW), more };
 };
 
-/** The rules drawer's rows: Versus presets, stocks, time and four toggles; the item kinds under them while items are on. */
+/** The rules drawer's rows: Versus presets, stocks, time and five toggles; the item kinds under them while items are on. */
 export const DRAWER_ROWS = {
   reset: box(f32(f32(DRAWER_INNER.x + DRAWER_INNER.width) - f32(0.09)), f32(DRAWER.y - PANEL_PAD), f32(0.09), ROW),
   presets: [drawerThird(0, 0), drawerThird(0, 1), drawerThird(0, 2)],
@@ -130,8 +130,9 @@ export const DRAWER_ROWS = {
   items: drawerHalf(3, 1),
   endless: drawerHalf(4, 0),
   automaticRematch: drawerHalf(4, 1),
-  itemSpeed: drawerHalf(5, 0),
-  itemHeavy: drawerHalf(5, 1),
+  forge: drawerHalf(5, 0),
+  itemSpeed: drawerHalf(6, 0),
+  itemHeavy: drawerHalf(6, 1),
 } as const;
 
 /** The drawer's rows in Training: four partner steppers, then hit areas and game speed. */

@@ -6,14 +6,16 @@ import type { ClassicLines, DelayControl, SelectionActions } from "./selectionAc
 import { type BarBox, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, TRAINING_ROWS, panelHeading } from "../core/selectBarLayout";
 import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, enableControl, labelControl, showControl } from "./barFrames";
 import { setMenuText } from "./frames";
+import { art } from "./selectionFrames";
+import { f32 } from "wisp/src/sim/f32";
 import {
-  automaticRematchSetting, endlessSetting, hitAreasSetting, itemKindSetting, itemsSetting, partnerBehaviourSetting, partnerDamageSetting, partnerEscapeSetting, partnerTechSetting,
+  FORGE_ICON, automaticRematchSetting, endlessSetting, forgeSetting, hitAreasSetting, itemKindSetting, itemsSetting, partnerBehaviourSetting, partnerDamageSetting, partnerEscapeSetting, partnerTechSetting,
   stockSetting, timeSetting, trainingSpeedSetting, ultimatesSetting,
 } from "./ruleText";
 import { Frame, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { formatInt } from "wisp/game/text";
 
-export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
+export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" } | { kind: "forge" }
   | { kind: "items" } | { kind: "ultimates" } | { kind: "itemKind"; item: ItemKind } | { kind: "matchMode"; mode: MatchMode } | { kind: "partner"; setting: TrainingSetting; direction: -1 | 1 } | { kind: "hitAreas" } | { kind: "speed" }
   | { kind: "classicTier"; direction: -1 | 1 } | { kind: "inputDelay"; step: -1 | 0 | 1 } | { kind: "preset"; preset: RulePreset };
 
@@ -36,7 +38,8 @@ export interface RuleFrames {
   readonly reset: BarControl;
   readonly stocks: Stepper;
   readonly time: Stepper;
-  readonly toggles: { readonly ultimates: BarControl; readonly items: BarControl; readonly endless: BarControl; readonly automaticRematch: BarControl };
+  readonly toggles: { readonly ultimates: BarControl; readonly items: BarControl; readonly endless: BarControl; readonly automaticRematch: BarControl; readonly forge: BarControl };
+  readonly forgeIcon: Frame;
   readonly itemKinds: readonly [BarControl, BarControl];
   readonly partner: Readonly<Record<TrainingSetting, Stepper>>;
   readonly hitAreas: BarControl;
@@ -47,6 +50,9 @@ export interface RuleFrames {
   readonly training: RuleGroup;
   readonly classicFrames: RuleGroup;
 }
+
+const FORGE_ICON_SIZE = f32(0.017);
+const FORGE_ICON_INSET = f32(0.008);
 
 const PRESETS: readonly RulePreset[] = ["tourney", "party", "endless"];
 
@@ -81,7 +87,9 @@ export function createRulesDrawer(drawer: Frame, suffix: string, add: AddRule): 
     items: pressable(drawer, add, name("Items"), DRAWER_ROWS.items, { kind: "items" }, ""),
     endless: pressable(drawer, add, name("Endless"), DRAWER_ROWS.endless, { kind: "endless" }, ""),
     automaticRematch: pressable(drawer, add, name("Rematch"), DRAWER_ROWS.automaticRematch, { kind: "automaticRematch" }, ""),
+    forge: pressable(drawer, add, name("Forge"), DRAWER_ROWS.forge, { kind: "forge" }, ""),
   };
+  const forgeIcon = art(drawer, name("ForgeIcon"), FORGE_ICON, f32(DRAWER_ROWS.forge.x + FORGE_ICON_INSET), f32(DRAWER_ROWS.forge.y - f32(f32(DRAWER_ROWS.forge.height - FORGE_ICON_SIZE) / 2)), FORGE_ICON_SIZE, FORGE_ICON_SIZE);
   const itemKinds: [BarControl, BarControl] = [
     pressable(drawer, add, name("ItemSpeed"), DRAWER_ROWS.itemSpeed, { kind: "itemKind", item: ItemKind.speed }, ""),
     pressable(drawer, add, name("ItemHeavy"), DRAWER_ROWS.itemHeavy, { kind: "itemKind", item: ItemKind.heavy }, ""),
@@ -97,8 +105,8 @@ export function createRulesDrawer(drawer: Frame, suffix: string, add: AddRule): 
   const trainingSteps = steps(partner.behaviour, partner.escape, partner.tech, partner.damage);
   const classicSteps = steps(classic);
   return {
-    heading, presets, reset, stocks, time, toggles, itemKinds, partner, hitAreas, speed, classic, route,
-    versus: { controls: [...presets, reset, ...versusSteps.controls, toggles.ultimates, toggles.items, toggles.endless, toggles.automaticRematch], texts: [stockLabel, timeLabel, ...versusSteps.texts] },
+    heading, presets, reset, stocks, time, toggles, forgeIcon, itemKinds, partner, hitAreas, speed, classic, route,
+    versus: { controls: [...presets, reset, ...versusSteps.controls, toggles.ultimates, toggles.items, toggles.endless, toggles.automaticRematch, toggles.forge], texts: [forgeIcon, stockLabel, timeLabel, ...versusSteps.texts] },
     training: { controls: [...trainingSteps.controls, hitAreas, speed], texts: trainingSteps.texts },
     classicFrames: { controls: classicSteps.controls, texts: [...classicSteps.texts, route] },
   };
@@ -125,6 +133,7 @@ function presentVersus(rules: RuleFrames, game: Readonly<MatchState>): void {
   onOff(rules.toggles.items, itemsSetting(items.on), items.on);
   onOff(rules.toggles.endless, endlessSetting(endless), endless);
   onOff(rules.toggles.automaticRematch, automaticRematchSetting(automaticRematch), automaticRematch);
+  onOff(rules.toggles.forge, forgeSetting(game.forge), game.forge);
   rules.itemKinds.forEach((control, index) => {
     const kind = index === 0 ? ItemKind.speed : ItemKind.heavy;
     const on = (items.enabledMask & itemBit(kind)) !== 0;
@@ -205,7 +214,7 @@ export const delayLit = (frames: DelayFrames, delay: DelayControl): readonly (re
 export function rulesKey(game: Readonly<MatchState>, classic: ClassicLines | undefined): string {
   const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, classic: classicRun, lore } = game;
   const lines = classic === undefined ? "" : `${classic.setting}\n${classic.route}`;
-  return `${lore ? "1" : "0"} ${classicRun ? "1" : "0"} ${formatInt(stockCount)} ${formatInt(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${formatInt(trainer.behaviour)} ${formatInt(trainer.escape)} ${formatInt(trainer.tech)} ${formatInt(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${formatInt(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${formatInt(items.enabledMask)} ${formatInt(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"} ${lines}`;
+  return `${lore ? "1" : "0"} ${classicRun ? "1" : "0"} ${formatInt(stockCount)} ${formatInt(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${formatInt(trainer.behaviour)} ${formatInt(trainer.escape)} ${formatInt(trainer.tech)} ${formatInt(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${formatInt(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${formatInt(items.enabledMask)} ${formatInt(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"} ${game.forge ? "1" : "0"} ${lines}`;
 }
 
 type RuleHandlers = { readonly [K in RuleButton["kind"]]: (actions: SelectionActions, participantId: number, button: Extract<RuleButton, { kind: K }>) => void };
@@ -217,6 +226,7 @@ const RULE_HANDLERS: RuleHandlers = {
   time: (actions, id, button) => actions.changeTime(id, button.direction),
   endless: (actions, id) => actions.toggleEndless(id),
   automaticRematch: (actions, id) => actions.toggleAutomaticRematch(id),
+  forge: (actions, id) => actions.toggleForge(id),
   items: (actions, id) => actions.toggleItems(id),
   ultimates: (actions, id) => actions.toggleUltimates(id),
   itemKind: (actions, id, button) => actions.toggleItemKind(id, button.item),

@@ -56,7 +56,7 @@ export function moveListMarkdown(): string {
   const forge = SELECTABLE_CHARACTERS.filter((character) => !isFeatured(character));
   const order = [...SELECTABLE_CHARACTERS.filter(isFeatured), ...forge];
   for (const character of order) {
-    if (character === forge[0]) lines.push("", "# In the Forge", "", "These fighters are still in development and show on character select only with Show the Forge on (the Controls screen). Their moves can change or be placeholders.");
+    if (character === forge[0]) lines.push("", "# In the Forge", "", "These fighters are still in development and show on character select only with the Forge match rule on. Their moves can change or be placeholders.");
     const kit = fighterKit(character);
     lines.push("", `## ${fighterName(character)}`, "", "| Input | Name | What it does |", "| --- | --- | --- |");
     kit.specials.forEach((special, slot) => {

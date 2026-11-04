@@ -55,7 +55,6 @@ import { PLAYABLE_CHARACTERS, nextSelectableCharacter, DEFAULT_FIGHTER } from ".
 import { MOVES_HEADER, movesPage } from "../session/messages";
 import { Character } from "../sim/codes";
 import { CreditsMenu } from "./creditsMenu";
-import { forgeShown } from "./forgeSetting";
 import { fighterShown } from "../roster/forge";
 import { MainMenuButton } from "./mainMenuButton";
 import { CommunityMenu } from "./communityMenu";
@@ -120,7 +119,7 @@ export class SelectionPanel {
   private gameMenuWake = 0;
 
   private readonly chips: RosterChip[] = PARTICIPANT_SLOTS.map(() => ({ choice: 0, placed: false }));
-  private laidOutForge = forgeShown();
+  private laidOutForge = false;
   private readonly roster: Roster = { grid: selectGrid(this.laidOutForge), selectable: 0, chips: this.chips };
 
   private game: Readonly<MatchState> | undefined;
@@ -508,8 +507,8 @@ export class SelectionPanel {
     }
     if (action === Action.moveLeft || action === Action.moveRight) {
       const direction = action === Action.moveLeft ? -1 : 1;
-      if (target.slot === this.participantId) this.actions.selectChoice(this.participantId, nextMatchCharacter(game, characterFor(game, target.slot), direction, forgeShown()));
-      else this.actions.selectCpuChoice(this.participantId, target.slot, nextCpuCharacter(game, target.slot, direction, forgeShown()));
+      if (target.slot === this.participantId) this.actions.selectChoice(this.participantId, nextMatchCharacter(game, characterFor(game, target.slot), direction));
+      else this.actions.selectCpuChoice(this.participantId, target.slot, nextCpuCharacter(game, target.slot, direction));
       return true;
     }
     if (action === Action.attack && this.menuFocus !== undefined) {
@@ -599,7 +598,7 @@ export class SelectionPanel {
 
   private sendPlacement({ slot, tile }: Placement): void {
     const game = this.choosing();
-    if (game === undefined || !fighterShown(characterOfTile(tile), forgeShown())) return;
+    if (game === undefined || !fighterShown(characterOfTile(tile), game.forge)) return;
     if (slot === this.participantId && humanFighterActive(game, slot)) sendSync("fighter-drop", formatInt(tile));
     else if (canChooseComputer(game, this.participantId, slot)) sendSync("cpu-fighter-drop", `${formatInt(slot)}${formatInt(tile)}`);
   }
@@ -727,7 +726,7 @@ export class SelectionPanel {
     return false;
   }
 
-  // Local presentation: each client lays out only the fighters it shows, so picks travel as roster tiles, never grid cells.
+  // Picks travel as roster tiles, never grid cells, so a pick is the same fighter whichever grid the Forge rule lays out.
   private layTiles(): void {
     const grid = this.roster.grid;
     for (let tile = 0; tile < this.tiles.length; tile++) placeTile(grid, tile, this.tiles[tile], this.forgeMarks[tile], this.tileButtons[tile]);
@@ -736,7 +735,7 @@ export class SelectionPanel {
   }
 
   private showTiles(game: Readonly<MatchState>): void {
-    const forge = forgeShown();
+    const forge = game.forge;
     if (forge !== this.laidOutForge) {
       this.laidOutForge = forge;
       this.roster.grid = selectGrid(forge);

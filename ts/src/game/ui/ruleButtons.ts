@@ -14,6 +14,7 @@ export const RULE_BUTTONS = {
   moreTime: DRAWER_ROWS.time.more,
   endless: DRAWER_ROWS.endless,
   automaticRematch: DRAWER_ROWS.automaticRematch,
+  forge: DRAWER_ROWS.forge,
   items: DRAWER_ROWS.items,
   ultimates: DRAWER_ROWS.ultimates,
   itemSpeed: DRAWER_ROWS.itemSpeed,

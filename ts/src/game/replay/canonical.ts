@@ -139,6 +139,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
   int("match.timeLimitMinutes", match.timeLimitMinutes);
   bool("match.endless", match.endless);
   bool("match.automaticRematch", match.automaticRematch);
+  if (match.forge) bool("match.forge", true);
   int("match.rematchCountdown", match.rematchCountdown);
   int("match.remainingFrames", match.remainingFrames);
   int("match.matchSeed", match.matchSeed);

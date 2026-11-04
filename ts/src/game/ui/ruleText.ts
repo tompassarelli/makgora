@@ -4,6 +4,8 @@ export const stockSetting = (count: number) => (count === 1 ? "1 Stock" : `${cou
 export const timeSetting = (minutes: number) => (minutes === 0 ? "No time limit" : `${minutes}:00`);
 export const endlessSetting = (endless: boolean) => `Endless play: ${endless ? "On" : "Off"}`;
 export const automaticRematchSetting = (automatic: boolean) => `Automatic rematch: ${automatic ? "On" : "Off"}`;
+export const forgeSetting = (shown: boolean) => `Forge: ${shown ? "On" : "Off"}`;
+export const FORGE_ICON = "ReplaceableTextures\\CommandButtons\\BTNHammer.blp";
 export const itemsSetting = (on: boolean) => `Items: ${on ? "On" : "Off"}`;
 export const ultimatesSetting = (on: boolean) => `Ultimates: ${on ? "On" : "Off"}`;
 export const itemKindSetting = (kind: ItemKind, on: boolean) => `${kind === ItemKind.speed ? "Speed" : "Heavy"} item: ${on ? "On" : "Off"}`;

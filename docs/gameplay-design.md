@@ -1200,21 +1200,22 @@ fighters the same day. The Forge list is makgora:ts/src/game/roster/forge.ts:
 fighter or stage in or out of the Forge is adding or deleting one line there;
 `isFeatured`, `fighterStatus` and `stageStatus` answer for other code.
 
-With the local setting Show the Forge off (Controls settings, saved in this
-client's own file and never sent), character and stage select hide Forge
-entries; with it on they appear with an orange FORGE mark. CPU Random, the
-stage pool and Classic rivals use featured entries only, whatever the setting,
-so every client draws the same; a Classic fight whose planned rivals are all
-in the Forge takes a featured stand-in. An opponent's Forge pick is still
-accepted and fought online, because the setting filters only local menus.
+With the Forge match rule off (the rules drawer's "Forge" toggle, default Off and
+reset by Reset default; Tom moved it there from the Controls screen on 4
+November 2026), character and stage select hide Forge entries; with it on
+they appear with the stock Hammer badge. The rule is shared lobby state, so
+the host's value reaches every client and all clients lay out the same grid.
+CPU Random, the stage pool and Classic rivals use featured entries only,
+whatever the rule; a Classic fight whose planned rivals are all in the Forge
+takes a featured stand-in.
 
 Character select lays out only the fighters it shows (`selectGrid` in
 makgora:ts/src/game/ui/selectionFrames.ts): with the setting off the featured
 fighters and Random fill a compact grid in roster order with no gaps, and with
-it on every fighter does, so two clients may draw different grids. Picks
+it on every fighter does. Picks
 travel as roster tiles, fixed by `SELECT_GRID_ORDER` and the same on every
-client, never as grid cells. A player token on a fighter this client hides
-rests on its player card.
+client, never as grid cells. A player token on a fighter the grid hides rests
+on its player card.
 
 ### Expansion roster defaults
 

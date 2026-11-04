@@ -367,7 +367,7 @@ Strong and weak hits (frames are active frames, damage uncharged):
 
 # In the Forge
 
-These fighters are still in development and show on character select only with Show the Forge on (the Controls screen). Their moves can change or be placeholders.
+These fighters are still in development and show on character select only with the Forge match rule on. Their moves can change or be placeholders.
 
 ## Kel'Thuzad
 

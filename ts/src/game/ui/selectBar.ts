@@ -323,6 +323,7 @@ export class SelectBar {
       toggle(rules.toggles.items, { kind: "items" }),
       toggle(rules.toggles.endless, { kind: "endless" }),
       toggle(rules.toggles.automaticRematch, { kind: "automaticRematch" }),
+      toggle(rules.toggles.forge, { kind: "forge" }),
       ...kinds,
       { controls: [rules.reset], press: { kind: "preset", preset: "standard" } },
     ];
@@ -435,7 +436,7 @@ export class SelectBar {
     for (const stepper of steppers) for (const control of [stepper.less, stepper.more]) lit(control, false);
     for (const control of [...rules.presets, rules.reset]) lit(control, false);
     const toggles: readonly (readonly [BarControl, boolean])[] = [
-      [rules.toggles.ultimates, !game.ultimatesOff], [rules.toggles.items, game.items.on], [rules.toggles.endless, game.endless], [rules.toggles.automaticRematch, game.automaticRematch],
+      [rules.toggles.ultimates, !game.ultimatesOff], [rules.toggles.items, game.items.on], [rules.toggles.endless, game.endless], [rules.toggles.automaticRematch, game.automaticRematch], [rules.toggles.forge, game.forge],
       [rules.itemKinds[0], (game.items.enabledMask & itemBit(ItemKind.speed)) !== 0], [rules.itemKinds[1], (game.items.enabledMask & itemBit(ItemKind.heavy)) !== 0],
       [rules.hitAreas, game.trainer.showHitAreas], [rules.speed, game.trainer.speed !== 1],
     ];

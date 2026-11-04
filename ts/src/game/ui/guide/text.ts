@@ -71,6 +71,7 @@ export const MATCH_RULE_HELP = {
   moreTime: TIME_HELP,
   endless: "Endless play: no stocks are lost and there is no timer. Fight freely; pause, then hold Esc for a second (or hold L, R and A and press Start) to leave.",
   automaticRematch: "Automatic rematch: when a match ends, the same fighters and rules start again after a short countdown.",
+  forge: "Forge: also show the fighters and stages still in development, marked with a hammer, on every player’s character and stage select. Random, computer picks and Classic use finished fighters only.",
   items: `Items: a power-up appears at centre stage every ${ITEM_INTERVAL_MIN_SECONDS}–${ITEM_INTERVAL_MAX_SECONDS} s after a 10 s countdown. Touch it and press Attack to grab it.`,
   ultimates: `Ultimates: with a full meter bar, Attack + Special unleashes your fighter's ultimate. The bar fills from the match clock: full ${METER_SECONDS} s after the start and after each use. With Orbs on, only the orb that appears above centre stage every ${ORB_SECONDS} s fills it, half a bar each. Off: no ultimates; Attack + Special is the ordinary special.`,
 } as const;

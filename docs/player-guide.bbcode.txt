@@ -6,7 +6,7 @@ Requires Warcraft III 3.0 and a keyboard; nothing else to install. Download the 
 
 A controller is optional: the Mak'gora controller helper turns its buttons and sticks into its own pad keys, which work with any Controls layout. The default Melee pad layout uses A to attack, B for specials, X/Y to jump, RB to grab and LB for Strong; Tom's pad layout uses A to attack, X for specials, Y to jump, B to grab, LB to short hop and RB for Strong. In both, either trigger shields or air-dodges and Start pauses.
 
-The game has character and stage selection, 16 fighters, computer opponents, floating platforms, blast zones, stocks, rematches and configurable controls. Every fighter's specials and ultimate are listed by name in the [URL=https://github.com/tompassarelli/makgora/blob/main/docs/move-list.md]move list[/URL]. More fighters are in the Forge, still in development: turn on Show the Forge on the Controls screen to see them.
+The game has character and stage selection, 16 fighters, computer opponents, floating platforms, blast zones, stocks, rematches and configurable controls. Every fighter's specials and ultimate are listed by name in the [URL=https://github.com/tompassarelli/makgora/blob/main/docs/move-list.md]move list[/URL]. More fighters are in the Forge, still in development: turn on Forge in the Match Rules to see them.
 
 [B]Keyboard controls[/B]
 [TABLE]
@@ -42,7 +42,7 @@ New players can open the Tutorial at fighter select: 10 short lessons with a tra
 
 [B]Rules[/B]
 
-At fighter selection, the rules pill in the middle of the top bar shows the rules; click it (or move the menu focus to it and press Attack) to open the rules drawer, where any player can change Stocks, Time, Ultimates, Items, Endless and Automatic rematch, pick a preset (Tourney, Party, Endless) or Reset default. Hover a rule to read what it does.
+At fighter selection, the rules pill in the middle of the top bar shows the rules; click it (or move the menu focus to it and press Attack) to open the rules drawer, where any player can change Stocks, Time, Ultimates, Items, Endless, Automatic rematch and Forge, pick a preset (Tourney, Party, Endless) or Reset default. Hover a rule to read what it does.
 
 Team Battle: choose each fighter’s red, blue, teal or purple team. At least two teams must join; the last team standing wins.
 
@@ -53,6 +53,8 @@ Time limit: the match ends when it runs out. Lower it to “No time limit” to 
 Endless play: no stocks are lost and there is no timer. Fight freely; pause, then hold Esc for a second (or hold L, R and A and press Start) to leave.
 
 Automatic rematch: when a match ends, the same fighters and rules start again after a short countdown.
+
+Forge: also show the fighters and stages still in development, marked with a hammer, on every player’s character and stage select. Random, computer picks and Classic use finished fighters only.
 
 Items: a power-up appears at centre stage every 30–60 s after a 10 s countdown. Touch it and press Attack to grab it.
 

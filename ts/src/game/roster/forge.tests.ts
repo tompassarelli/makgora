@@ -24,11 +24,12 @@ function visibleGrid(forgeShown: boolean): number[] {
 
 function cycled(forgeShown: boolean): number[] {
   const game = createMatchState();
+  game.forge = forgeShown;
   const seen: number[] = [];
-  let current: number = nextMatchCharacter(game, undefined, 1, forgeShown);
+  let current: number = nextMatchCharacter(game, undefined, 1);
   for (let step = 0; step < PLAYABLE_CHARACTERS.length; step++) {
     if (!seen.includes(current)) seen.push(current);
-    current = nextMatchCharacter(game, current, 1, forgeShown);
+    current = nextMatchCharacter(game, current, 1);
   }
   return seen;
 }
