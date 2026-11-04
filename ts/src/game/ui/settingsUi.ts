@@ -32,7 +32,7 @@ import { CONTROLS_CAPTURE_HINT, CONTROLS_REBIND_HINT } from "./guide/text";
 import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
 import { PREVIEW_ROW_LIT_TEXTURE } from "./inputPreview";
-import { forgeSettingText, forgeShown, toggleForgeShown } from "./forgeSetting";
+import { FORGE_ICON, forgeSettingText, forgeShown, toggleForgeShown } from "./forgeSetting";
 import { createEvents, destroyEvents, Events, onEvents } from "wisp/game/events";
 import { addFrameEvent, createFrame, createFrameByType, destroyFrame, eventFrameEvent, eventFrameText, Frame, FrameEvent, FramePoint, setFrameAlpha, setFrameEnabled, setFrameFocus, setFrameFont, setFrameLevel, setFramePoint, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTextLimit, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { eventPlayer, localPlayer, Player, player as playerOf } from "wisp/game/players";
@@ -82,6 +82,18 @@ export const KEYBOARD_BUTTON = { x: LEFT, y: BOTTOM_Y, width: f32(0.22), height:
 export const STICK_JUMP_BUTTON = { x: LEFT, y: OPTIONS_Y, width: f32(0.18), height: BOTTOM_HEIGHT } as const;
 export const C_STICK_TILT_BUTTON = { x: f32(LEFT + f32(0.184)), y: OPTIONS_Y, width: f32(0.22), height: BOTTOM_HEIGHT } as const;
 export const FORGE_BUTTON = { x: f32(LEFT + f32(0.408)), y: OPTIONS_Y, width: f32(0.2), height: BOTTOM_HEIGHT } as const;
+const FORGE_ICON_SIZE = f32(0.017);
+
+function forgeIcon(parent: Frame, name: string, participantId: number): Frame {
+  const icon = createBackdrop(name, parent, participantId);
+  setFrameTexture(icon, FORGE_ICON, 0, true);
+  setFrameSize(icon, FORGE_ICON_SIZE, FORGE_ICON_SIZE);
+  setFramePoint(icon, FramePoint.left, parent, FramePoint.left, f32(0.008), 0.0);
+  setFrameEnabled(icon, false);
+  setFrameLevel(icon, 33);
+  return icon;
+}
+
 const BIND_BUTTON = { x: f32(RIGHT - f32(0.15)), y: below(f32(0.107)), width: f32(0.15), height: f32(0.022) } as const;
 const DIM_KEY = 105;
 const LIT_KEY = 255;
@@ -236,7 +248,9 @@ export class SettingsPanel {
     this.keyboardButton = button("MeleeSettingsKeyboard", KEYBOARD_BUTTON, "", { kind: "keyboard" }).label;
     this.stickJumpButton = button("MeleeSettingsStickJump", STICK_JUMP_BUTTON, "", { kind: "stickJump" }).label;
     this.cStickTiltButton = button("MeleeSettingsCStickTilt", C_STICK_TILT_BUTTON, "", { kind: "cStickTilt" }).label;
-    this.forgeButton = button("MeleeSettingsForge", FORGE_BUTTON, "", { kind: "forge" }).label;
+    const forge = button("MeleeSettingsForge", FORGE_BUTTON, "", { kind: "forge" });
+    this.forgeButton = forge.label;
+    forgeIcon(forge.art, `MeleeSettingsForgeIcon${suffix}`, participantId);
     button("MeleeSettingsSave", SAVE_BUTTON, "Save", { kind: "save" });
     button("MeleeSettingsClose", PICKER_DONE, "Done", { kind: "close" });
     this.bindButton = button("MeleeSettingsBind", BIND_BUTTON, "", { kind: "bindUnbound" });

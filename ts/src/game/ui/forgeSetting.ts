@@ -1,6 +1,7 @@
 import { readChunks, writeChunks } from "wisp/src/platform/fileio";
 
 const FORGE_FILE = "MakgoraShowForge.pld";
+export const FORGE_ICON = "ReplaceableTextures\\CommandButtons\\BTNHammer.blp";
 const ON = "1";
 
 declare global {

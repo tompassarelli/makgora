@@ -12,6 +12,7 @@ import { SELECT_GRID_ORDER } from "./selectionLayout";
 import { type MatchState, RANDOM_FIGHTER, randomFighterOffered, selectableMatchCharacter } from "../lobby/lobbyState";
 import { createFrame, Frame, setFrameAlpha, setFrameEnabled, setFrameSize, setFrameText, setFrameTextAlignment, setFrameTexture, setFrameVisible, TextAlignment } from "wisp/game/frames";
 import { fighterShown, fighterStatus } from "../roster/forge";
+import { FORGE_ICON } from "./forgeSetting";
 import { formatInt, parseInt, textLength, toReal } from "wisp/game/text";
 
 export const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
@@ -163,12 +164,14 @@ export const tileShown = (game: Readonly<MatchState>, tile: RosterTile, forgeSho
 
 export const tileMarked = (game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean): boolean => tileShown(game, tile, forgeShown) && fighterStatus(characterOfTile(tile)) === "forge";
 
-const FORGE_MARK_SIZE = f32(0.0062);
+const FORGE_BADGE_SIZE = f32(0.016);
+const FORGE_BADGE_INSET = f32(0.004);
 
 export function placeForgeMark(mark: Frame, x: number, y: number, grid: Readonly<RosterGrid>): void {
   const scale = f32(grid.scale);
-  placeTopLeft(mark, x + TILE_NAME_INSET * scale, y - f32(0.004) * scale);
-  sizeText(mark, FORGE_MARK_SIZE, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.012) * scale);
+  const size = f32(FORGE_BADGE_SIZE * scale);
+  placeTopLeft(mark, f32(f32(x + f32(grid.cellWidth)) - f32(size + f32(FORGE_BADGE_INSET * scale))), f32(y - f32(FORGE_BADGE_INSET * scale)));
+  setFrameSize(mark, size, size);
 }
 
 export function showTile(game: Readonly<MatchState>, tile: RosterTile, forgeShown: boolean, frames: readonly Frame[] | undefined, mark: Frame | undefined, button: Frame | undefined): void {
@@ -180,9 +183,8 @@ export function showTile(game: Readonly<MatchState>, tile: RosterTile, forgeShow
 
 export function forgeMark(parent: Frame, name: string, tile: RosterTile, grid: Readonly<RosterGrid>): Frame | undefined {
   if (fighterStatus(characterOfTile(tile)) !== "forge") return undefined;
-  const scale = f32(grid.scale);
-  const mark = label(parent, name, TILE_NAME_INSET * scale, -f32(0.004) * scale, f32(grid.cellWidth) - 2 * TILE_NAME_INSET * scale, f32(0.012) * scale, FORGE_MARK_SIZE);
-  setFrameText(mark, FORGE_MARK);
+  const size = f32(FORGE_BADGE_SIZE * f32(grid.scale));
+  const mark = art(parent, name, FORGE_ICON, 0.0, 0.0, size, size);
   setFrameVisible(mark, false);
   return mark;
 }

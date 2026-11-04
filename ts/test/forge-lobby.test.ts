@@ -8,8 +8,8 @@ import { Character } from "../src/game/sim/codes";
 import { fighterAt } from "../src/game/sim/roster";
 import { fighterStatus } from "../src/game/roster/forge";
 import { type RosterGrid, cellRect, laidOut } from "../src/game/menu/selectionGrid";
-import { selectGrid, tileOfCharacter } from "../src/game/ui/selectionFrames";
-import { setForgeShown } from "../src/game/ui/forgeSetting";
+import { RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, selectGrid, tileLabel, tileOfCharacter } from "../src/game/ui/selectionFrames";
+import { FORGE_ICON, setForgeShown } from "../src/game/ui/forgeSetting";
 import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
 import { declineTutorial, passStartControls } from "../scripts/wisp/startControls";
@@ -34,7 +34,7 @@ function value<T>(client: HeadlessClient, body: () => T): T {
 const tileFrame = (client: HeadlessClient, kind: "Portrait" | "Forge", tile: number) =>
   client.frames.snapshot().find(frame => frame.name === `MeleeTile${kind}${client.slot}_${tile}`);
 
-test("a player with Show the Forge on picks a Forge fighter on the full grid while the other player picks on the compact grid with it off, and both clients fight both picks with no divergence [k1 scenario]", () => {
+test("a player with Show the Forge on picks a Forge fighter on the full grid while the other player picks on the compact grid with it off, and only the full grid's Forge tiles carry the Hammer badge, and both clients fight both picks with no divergence [k1 scenario]", () => {
   expect(fighterStatus(FORGE_FIGHTER)).toBe("forge");
   expect(fighterStatus(FEATURED_FIGHTER)).toBe("featured");
   const [full, compact] = [selectGrid(true), selectGrid(false)];
@@ -51,6 +51,14 @@ test("a player with Show the Forge on picks a Forge fighter on the full grid whi
   expect(tileFrame(a, "Portrait", tile)?.visible).toBe(true);
   expect(tileFrame(a, "Forge", tile)?.visible).toBe(true);
   expect(tileFrame(b, "Portrait", tile)?.visible).toBe(false);
+  for (let grid = 0; grid < ROSTER_TILES; grid++) {
+    const forge = grid !== RANDOM_FIGHTER_TILE && fighterStatus(characterOfTile(grid)) === "forge";
+    expect(tileFrame(a, "Forge", grid)?.visible ?? false, tileLabel(grid)).toBe(forge);
+    expect(tileFrame(b, "Forge", grid)?.visible ?? false, tileLabel(grid)).toBe(false);
+    if (forge) expect(tileFrame(a, "Forge", grid)?.texture).toBe(FORGE_ICON);
+  }
+  for (const fighter of [Character.whitemane, Character.valeera]) expect(tileFrame(a, "Forge", tileOfCharacter(fighter))?.visible).toBe(true);
+  expect(a.frames.snapshot().find(frame => frame.name === `MeleeSettingsForgeIcon${a.slot}`)?.texture).toBe(FORGE_ICON);
   for (const slot of [0, 1]) clients.press(slot, Key.n);
   clients.frames(5);
   const [x, y] = centre(full, FORGE_FIGHTER);
