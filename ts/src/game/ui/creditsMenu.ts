@@ -1,13 +1,14 @@
-import { SELECT_LEVELS } from "./selectLevels";
 import { f32 } from "wisp/src/sim/f32";
-import { CREDITS_TITLE, creditsBody } from "./credits";
-import { ButtonClicks, createBackdrop, placeTopLeft, styleMenuPanel } from "./frames";
+import { CREDITS_TITLE, creditsParagraphs } from "./credits";
+import { ButtonClicks } from "./frames";
 import { InfoPanelState } from "./infoPanelState";
-import { panelButton, panelText } from "./infoPanel";
-import { destroyFrame, Frame, setFrameLevel, setFrameSize, setFrameText, setFrameVisible, TextAlignment } from "wisp/game/frames";
+import { infoPopup } from "./infoPanel";
+import { CREDITS_PANEL, type InfoPopupLayout, infoPopupLayout } from "./infoPopupLayout";
+import { destroyFrame, Frame, setFrameVisible } from "wisp/game/frames";
 import { Player, player as playerOf } from "wisp/game/players";
 
-const CLOSE_BOX = { x: f32(0.32), y: f32(0.115), width: f32(0.16), height: f32(0.035) } as const;
+export const CREDITS_SIZE = f32(0.0105);
+export const creditsLayout = (version: string): InfoPopupLayout => infoPopupLayout(CREDITS_PANEL, creditsParagraphs(version), CREDITS_SIZE, false);
 
 export type CreditsButton = { kind: "creditsOpen" } | { kind: "creditsClose" };
 
@@ -19,14 +20,10 @@ export class CreditsMenu {
 
   constructor(owner: Frame, opener: Frame, suffix: string, version: string, private readonly participantId: number) {
     this.clicks = new ButtonClicks(`ui.credits.${suffix}.click`, (target, clicker) => this.click(target, clicker));
-    this.root = createBackdrop(`MeleeCreditsMenu${suffix}`, owner, 0);
-    styleMenuPanel(this.root, `MeleeCreditsPanel${suffix}`);
-    placeTopLeft(this.root, f32(0.1), f32(0.53));
-    setFrameSize(this.root, f32(0.6), f32(0.46));
-    setFrameLevel(this.root, SELECT_LEVELS.credits);
-    setFrameText(panelText(this.root, `MeleeCreditsTitle${suffix}`, f32(0.11), f32(0.52), f32(0.58), f32(0.03), f32(0.018), TextAlignment.middle, TextAlignment.center), CREDITS_TITLE);
-    setFrameText(panelText(this.root, `MeleeCreditsBody${suffix}`, f32(0.12), f32(0.485), f32(0.56), f32(0.34), f32(0.0105), TextAlignment.top, TextAlignment.left), creditsBody(version));
-    this.clicks.add(panelButton(this.root, CLOSE_BOX.x, CLOSE_BOX.y, CLOSE_BOX.width, CLOSE_BOX.height, "Close"), { kind: "creditsClose" }, "Close", "native", CLOSE_BOX);
+    const layout = creditsLayout(version);
+    const popup = infoPopup(owner, `MeleeCreditsMenu${suffix}`, layout, CREDITS_TITLE, false);
+    this.root = popup.root;
+    this.clicks.add(popup.close, { kind: "creditsClose" }, "Close", "native", layout.close);
     setFrameVisible(this.root, false);
     this.clicks.add(opener, { kind: "creditsOpen" }, undefined, "native");
   }

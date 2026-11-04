@@ -1,9 +1,9 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
-import { DISCORD_INVITE, GITHUB_PAGE, communityBody, discordInviteLine } from "./community";
+import { DISCORD_INVITE, GITHUB_PAGE, communityParagraphs, discordInviteLine } from "./community";
 import { InfoPanelState } from "./infoPanelState";
 
 test("The Community panel text holds the GitHub page and Discord invite read from the shared source, and Close or Escape closes it [k2 property]", () => {
-  const body = communityBody();
+  const body = communityParagraphs().join("\n");
   assertTrue(body.includes(GITHUB_PAGE));
   assertTrue(body.includes(DISCORD_INVITE));
   assertEquals(GITHUB_PAGE, "github.com/tompassarelli/makgora");

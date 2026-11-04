@@ -39,8 +39,8 @@ export function creditPlain(markdown: string): string {
 
 export const creditsVersionLine = (version: string): string => `${GAME_TITLE} ${version}`;
 
-export function creditsBody(version: string): string {
-  return [creditsVersionLine(version), ...CREDITS_MARKDOWN.map(line => creditPlain(line))].join("|n|n");
+export function creditsParagraphs(version: string): readonly string[] {
+  return [creditsVersionLine(version), ...CREDITS_MARKDOWN.map(line => creditPlain(line))];
 }
 
 export const creditsSection = (): string => ["## Credits", ...CREDITS_MARKDOWN.map(line => `- ${line}`)].join("\n");

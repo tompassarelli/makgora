@@ -1,13 +1,14 @@
-import { SELECT_LEVELS } from "./selectLevels";
 import { f32 } from "wisp/src/sim/f32";
-import { COMMUNITY_TITLE, communityBody } from "./community";
-import { ButtonClicks, createBackdrop, placeTopLeft, styleMenuPanel } from "./frames";
+import { COMMUNITY_TITLE, communityParagraphs } from "./community";
+import { ButtonClicks } from "./frames";
 import { InfoPanelState } from "./infoPanelState";
-import { panelButton, panelText } from "./infoPanel";
-import { destroyFrame, Frame, setFrameLevel, setFrameSize, setFrameText, setFrameVisible, TextAlignment } from "wisp/game/frames";
+import { infoPopup } from "./infoPanel";
+import { COMMUNITY_PANEL, type InfoPopupLayout, infoPopupLayout } from "./infoPopupLayout";
+import { destroyFrame, Frame, setFrameVisible } from "wisp/game/frames";
 import { Player, player as playerOf } from "wisp/game/players";
 
-const CLOSE_BOX = { x: f32(0.32), y: f32(0.305), width: f32(0.16), height: f32(0.03) } as const;
+export const COMMUNITY_SIZE = f32(0.0135);
+export const communityLayout = (): InfoPopupLayout => infoPopupLayout(COMMUNITY_PANEL, communityParagraphs(), COMMUNITY_SIZE, true);
 
 export type CommunityButton = { kind: "communityOpen" } | { kind: "communityClose" };
 
@@ -19,14 +20,10 @@ export class CommunityMenu {
 
   constructor(owner: Frame, opener: Frame, suffix: string, private readonly participantId: number) {
     this.clicks = new ButtonClicks(`ui.community.${suffix}.click`, (target, clicker) => this.click(target, clicker));
-    this.root = createBackdrop(`MeleeCommunityMenu${suffix}`, owner, 0);
-    styleMenuPanel(this.root, `MeleeCommunityPanel${suffix}`);
-    placeTopLeft(this.root, f32(0.2), f32(0.47));
-    setFrameSize(this.root, f32(0.4), f32(0.2));
-    setFrameLevel(this.root, SELECT_LEVELS.community);
-    setFrameText(panelText(this.root, `MeleeCommunityTitle${suffix}`, f32(0.21), f32(0.46), f32(0.38), f32(0.03), f32(0.018), TextAlignment.middle, TextAlignment.center), COMMUNITY_TITLE);
-    setFrameText(panelText(this.root, `MeleeCommunityBody${suffix}`, f32(0.215), f32(0.428), f32(0.37), f32(0.1), f32(0.0135), TextAlignment.top, TextAlignment.center), communityBody());
-    this.clicks.add(panelButton(this.root, CLOSE_BOX.x, CLOSE_BOX.y, CLOSE_BOX.width, CLOSE_BOX.height, "Close"), { kind: "communityClose" }, "Close", "native", CLOSE_BOX);
+    const layout = communityLayout();
+    const popup = infoPopup(owner, `MeleeCommunityMenu${suffix}`, layout, COMMUNITY_TITLE, true);
+    this.root = popup.root;
+    this.clicks.add(popup.close, { kind: "communityClose" }, "Close", "native", layout.close);
     setFrameVisible(this.root, false);
     this.clicks.add(opener, { kind: "communityOpen" }, undefined, "native");
   }
