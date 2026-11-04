@@ -445,8 +445,8 @@ export class SelectionPanel {
       this.cpuFocus = cpuMenuFocus(this.cpuFocus, action, () => this.closeCpuSettings(), (row, direction) => this.stepCpu(row, direction));
       return true;
     }
-    if (this.tutorialOpen) return this.answerTutorial(tutorialKeyButton(action));
     if (this.credits.opened() || this.community.opened()) return this.infoAction(action);
+    if (this.tutorialOpen) return this.answerTutorial(tutorialKeyButton(action));
     if (this.bar.opened() !== undefined) return this.barAction(game, action);
     return this.focusAction(game, action);
   }

@@ -32,7 +32,7 @@ import { deliverKey } from "./deliverKey";
 import { headlessRender, playerRender } from "./headlessRender";
 import { createNetStandalone, makgoraMapHash } from "./net";
 import { CPU_OPPONENT, SELECTION_SCRIPT, selectionPointer, selectionPresses } from "./selectionScript";
-import { heldKeys } from "./standaloneKeys";
+import { heldKeys, scriptedKeys } from "./standaloneKeys";
 
 export const NEUTRAL_INPUT: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
 
@@ -183,7 +183,7 @@ export async function createStandaloneSession(options: StandaloneSessionOptions 
           if (reading !== undefined) feedPointer(reading);
           if (!scripted && input.pointer !== undefined) feedPointer(input.pointer);
           if (!scripted && input.keys !== undefined) feedKeys(input.keys);
-          const next = heldKeys(scripted ? { buttons: presses.filter(press => now >= press.step && now < press.step + 3).map(press => press.button), axisX: 0, axisY: 0 } : input);
+          const next = scripted ? scriptedKeys(presses.filter(press => now >= press.step && now < press.step + 3).map(press => press.button)) : heldKeys(input);
           for (const key of held) if (!next.has(key)) deliverKey(client, 0, key, 0, false);
           for (const key of next) if (!held.has(key)) deliverKey(client, 0, key, 0, true);
           held = next;

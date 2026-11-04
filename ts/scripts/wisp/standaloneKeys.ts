@@ -19,3 +19,14 @@ export function heldKeys(input: StandaloneInput): Set<number> {
   }
   return held;
 }
+
+const ARROW_KEYS: Readonly<Record<string, number>> = { up: 0x26, down: 0x28 };
+
+export function scriptedKeys(buttons: readonly string[]): Set<number> {
+  const held = heldKeys({ buttons: buttons.filter(button => ARROW_KEYS[button] === undefined), axisX: 0, axisY: 0 });
+  for (const button of buttons) {
+    const arrow = ARROW_KEYS[button];
+    if (arrow !== undefined) held.add(arrow);
+  }
+  return held;
+}
