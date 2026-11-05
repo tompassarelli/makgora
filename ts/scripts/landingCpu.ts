@@ -11,7 +11,7 @@ const STAGES: ReadonlyArray<readonly [RegExp, Stage]> = [
   [/\bnorth mutant verify\b|scripts\/mutantTests\.ts/, "mutant verification"],
   [/\bbun install\b|effect-tsgo|\.githooks\/post-/, "dependency sync"],
   [/(^|\/)gh /, "farm dispatch and poll"],
-  [/\bnorth (language-gate|dep-gate|review-gate|stale-revert|denylist|landed-tree|provenance)\b|code-health|gitleaks|python3 -|agent-instruction/, "gates and scans"],
+  [/\bnorth (language-gate|dep-gate|review-gate|stale-revert|denylist|landed-tree|provenance)\b|code-health|betterleaks|python3 -|agent-instruction/, "gates and scans"],
   [/^git\b|\/git(-[a-z-]+)? /, "git"],
 ];
 const LANDING_FARM = /scripts\/landingFarm\.ts/;
