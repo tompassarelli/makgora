@@ -72,3 +72,15 @@ a second build of the same hash waits on `window-library.lock` and finds the lib
 Tom's `bun wisp play --standalone --window native` then opens it without a cargo build.
 The script reads the resolver from the pinned package's `host/window/library.ts` by path, because the
 package exports no window entry.
+
+## Native window in the launcher
+
+`makgora-native.desktop` is the "Mak'gora Native" entry in rofi's drun list: it opens
+Mak'gora's standalone native window (`bun wisp play --standalone --start select`, the
+Rust window library above) at character select. Its launcher `makgora-native` runs from
+its own detached worktree `~/code/makgora/worktrees/native-play`, which it moves to
+`origin/main` and installs packages in at each launch, so a game in progress never has
+its tree moved by the watcher's checkout. Offline it plays the tree it has. To install:
+
+    git -C ~/code/makgora/main worktree add --detach ~/code/makgora/worktrees/native-play origin/main
+    sed "s|@HOME@|$HOME|g" tools/tom-build/makgora-native.desktop > ~/.local/share/applications/makgora-native.desktop

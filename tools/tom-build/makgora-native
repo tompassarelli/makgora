@@ -1,0 +1,4 @@
+#!/bin/sh
+tree="$HOME/code/makgora/worktrees/native-play"
+git -C "$tree" fetch -q origin main && git -C "$tree" checkout -q --detach FETCH_HEAD
+cd "$tree/ts" && bun install --frozen-lockfile >/dev/null && exec bun wisp play --standalone --start select "$@"

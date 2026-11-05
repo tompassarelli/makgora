@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Mak'gora Native
+Comment=Mak'gora in Wisp's native window, from the newest main
+Exec=@HOME@/code/makgora/worktrees/native-play/tools/tom-build/makgora-native
+Icon=@HOME@/.local/share/makgora-build-inputs/makgora-client/current/icon.png
+Terminal=false
+Categories=Game;
+Keywords=makgora;wisp;native;
