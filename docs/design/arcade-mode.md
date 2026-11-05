@@ -379,7 +379,7 @@ A run lands around 9,000 to 14,000; a perfect run cannot reach 2³¹.
   the cache, as Lore Battles' clears did. Only the run owner's client writes,
   and the file never feeds simulation state. The native window keeps the same
   file in `~/.local/state/makgora/native-files` when it is a live window
-  (makgora:docs/commands/play.md); a headless or capture window keeps nothing.
+  (makgora:docs/commands/play.md); a headless or capture window keeps nothing. The file is one line per fighter, `slug,rank,peon,grunt,warchief`, fighters joined by `|`, each tier `score:seconds` or `-`; a file that does not parse reads as empty (`ts/src/game/arcade/arcadeRecords.ts`, scoring in `score.ts`).
 - **Proposed** and not built without Tom: a hall of fame for Warchief clears and
   any online leaderboard. They publish player results to a server, so they are
   decisions for Tom on #1130.
