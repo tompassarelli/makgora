@@ -3,8 +3,8 @@ import { type MatchState } from "../lobby/lobbyState";
 import { type MatchMode, matchMode } from "../lobby/matchMode";
 import { PRESET_NAMES, type RulePreset } from "../lobby/rulePresets";
 import { ItemKind, itemBit } from "../sim/codes";
-import type { ClassicLines, DelayControl, SelectionActions } from "./selectionActions";
-import { type BarBox, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, TRAINING_ROWS, panelHeading } from "../core/selectBarLayout";
+import type { ArcadeLines, DelayControl, SelectionActions } from "./selectionActions";
+import { type BarBox, ARCADE_ROWS, DRAWER_ROWS, GEAR_ROWS, TRAINING_ROWS, panelHeading } from "../core/selectBarLayout";
 import { BAR_COLOURS, BAR_SMALL_TEXT, BAR_TEXT, type BarControl, barControl, barText, enableControl, labelControl, showControl } from "./barFrames";
 import { setMenuText } from "./frames";
 import { art } from "./selectionFrames";
@@ -18,7 +18,7 @@ import { formatInt } from "wisp/game/text";
 
 export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" } | { kind: "forge" }
   | { kind: "items" } | { kind: "ultimates" } | { kind: "itemKind"; item: ItemKind } | { kind: "matchMode"; mode: MatchMode } | { kind: "partner"; setting: TrainingSetting; direction: -1 | 1 } | { kind: "hitAreas" } | { kind: "speed" }
-  | { kind: "classicTier"; direction: -1 | 1 } | { kind: "inputDelay"; step: -1 | 0 | 1 } | { kind: "preset"; preset: RulePreset };
+  | { kind: "arcadeTier"; direction: -1 | 1 } | { kind: "inputDelay"; step: -1 | 0 | 1 } | { kind: "preset"; preset: RulePreset };
 
 export type AddRule = (frame: Frame, target: RuleButton, box: BarBox) => Frame;
 
@@ -45,11 +45,11 @@ export interface RuleFrames {
   readonly partner: Readonly<Record<TrainingSetting, Stepper>>;
   readonly hitAreas: BarControl;
   readonly speed: BarControl;
-  readonly classic: Stepper;
+  readonly arcade: Stepper;
   readonly route: Frame;
   readonly versus: RuleGroup;
   readonly training: RuleGroup;
-  readonly classicFrames: RuleGroup;
+  readonly arcadeFrames: RuleGroup;
 }
 
 const FORGE_ICON_SIZE = f32(0.017);
@@ -99,17 +99,17 @@ export function createRulesDrawer(drawer: Frame, suffix: string, add: AddRule): 
   const partner = { behaviour: partnerRow("behaviour"), escape: partnerRow("escape"), tech: partnerRow("tech"), damage: partnerRow("damage") };
   const hitAreas = pressable(drawer, add, name("HitAreas"), TRAINING_ROWS.hitAreas, { kind: "hitAreas" }, "");
   const speed = pressable(drawer, add, name("Speed"), TRAINING_ROWS.speed, { kind: "speed" }, "");
-  const classic = stepper(drawer, add, name("Classic"), CLASSIC_ROWS.tier, direction => ({ kind: "classicTier", direction }), BAR_TEXT);
-  const route = barText(drawer, name("Route"), CLASSIC_ROWS.route, BAR_SMALL_TEXT, TextAlignment.left);
+  const arcade = stepper(drawer, add, name("Arcade"), ARCADE_ROWS.tier, direction => ({ kind: "arcadeTier", direction }), BAR_TEXT);
+  const route = barText(drawer, name("Route"), ARCADE_ROWS.route, BAR_SMALL_TEXT, TextAlignment.left);
   const steps = (...all: Stepper[]): RuleGroup => ({ controls: all.flatMap(s => [s.less, s.more]), texts: all.map(s => s.value) });
   const versusSteps = steps(stocks, time);
   const trainingSteps = steps(partner.behaviour, partner.escape, partner.tech, partner.damage);
-  const classicSteps = steps(classic);
+  const arcadeSteps = steps(arcade);
   return {
-    heading, presets, reset, stocks, time, toggles, forgeIcon, itemKinds, partner, hitAreas, speed, classic, route,
+    heading, presets, reset, stocks, time, toggles, forgeIcon, itemKinds, partner, hitAreas, speed, arcade, route,
     versus: { controls: [...presets, reset, ...versusSteps.controls, toggles.ultimates, toggles.items, toggles.endless, toggles.automaticRematch, toggles.forge], texts: [forgeIcon, stockLabel, timeLabel, ...versusSteps.texts] },
     training: { controls: [...trainingSteps.controls, hitAreas, speed], texts: trainingSteps.texts },
-    classicFrames: { controls: classicSteps.controls, texts: [...classicSteps.texts, route] },
+    arcadeFrames: { controls: arcadeSteps.controls, texts: [...arcadeSteps.texts, route] },
   };
 }
 
@@ -154,23 +154,23 @@ function presentTraining(rules: RuleFrames, game: Readonly<MatchState>): void {
   onOff(rules.speed, trainingSpeedSetting(trainer.speed), trainer.speed !== 1);
 }
 
-function presentClassic(rules: RuleFrames, lines: ClassicLines): void {
-  setMenuText(rules.classic.value, `${BAR_COLOURS.gold}${lines.setting}|r`);
+function presentArcade(rules: RuleFrames, lines: ArcadeLines): void {
+  setMenuText(rules.arcade.value, `${BAR_COLOURS.gold}${lines.setting}|r`);
   setMenuText(rules.route, lines.route);
 }
 
-const HEADINGS = { versus: "Match Rules", training: "Training Partner", classic: "Classic Run" } as const;
+const HEADINGS = { versus: "Match Rules", training: "Training Partner", arcade: "Arcade Run" } as const;
 
-export function presentRules(rules: RuleFrames, game: Readonly<MatchState>, classic: ClassicLines | undefined): void {
+export function presentRules(rules: RuleFrames, game: Readonly<MatchState>, arcade: ArcadeLines | undefined): void {
   const mode = matchMode(game);
   setMenuText(rules.heading, `${BAR_COLOURS.gold}${HEADINGS[mode]}|r`);
   showAll(rules.versus, mode === "versus");
   for (const control of rules.itemKinds) showControl(control, mode === "versus");
   showAll(rules.training, mode === "training");
-  showAll(rules.classicFrames, mode === "classic");
+  showAll(rules.arcadeFrames, mode === "arcade");
   if (mode === "versus") presentVersus(rules, game);
   else if (mode === "training") presentTraining(rules, game);
-  else if (classic !== undefined) presentClassic(rules, classic);
+  else if (arcade !== undefined) presentArcade(rules, arcade);
 }
 
 export interface DelayFrames {
@@ -212,10 +212,10 @@ export const delayLit = (frames: DelayFrames, delay: DelayControl): readonly (re
   [frames.auto, delay.adjustable && delay.auto, delay.adjustable], [frames.stepper.less, false, delay.canLess], [frames.stepper.more, false, delay.canMore],
 ];
 
-export function rulesKey(game: Readonly<MatchState>, classic: ClassicLines | undefined): string {
-  const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, classic: classicRun } = game;
-  const lines = classic === undefined ? "" : `${classic.setting}\n${classic.route}`;
-  return `${classicRun ? "1" : "0"} ${formatInt(stockCount)} ${formatInt(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${formatInt(trainer.behaviour)} ${formatInt(trainer.escape)} ${formatInt(trainer.tech)} ${formatInt(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${formatInt(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${formatInt(items.enabledMask)} ${formatInt(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"} ${game.forge ? "1" : "0"} ${lines}`;
+export function rulesKey(game: Readonly<MatchState>, arcade: ArcadeLines | undefined): string {
+  const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, arcade: arcadeRun } = game;
+  const lines = arcade === undefined ? "" : `${arcade.setting}\n${arcade.route}`;
+  return `${arcadeRun ? "1" : "0"} ${formatInt(stockCount)} ${formatInt(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${formatInt(trainer.behaviour)} ${formatInt(trainer.escape)} ${formatInt(trainer.tech)} ${formatInt(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${formatInt(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${formatInt(items.enabledMask)} ${formatInt(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"} ${game.forge ? "1" : "0"} ${lines}`;
 }
 
 type RuleHandlers = { readonly [K in RuleButton["kind"]]: (actions: SelectionActions, participantId: number, button: Extract<RuleButton, { kind: K }>) => void };
@@ -232,7 +232,7 @@ const RULE_HANDLERS: RuleHandlers = {
   ultimates: (actions, id) => actions.toggleUltimates(id),
   itemKind: (actions, id, button) => actions.toggleItemKind(id, button.item),
   matchMode: (actions, id, button) => actions.chooseMatchMode(id, button.mode),
-  classicTier: (actions, id, button) => actions.stepClassicTier(id, button.direction),
+  arcadeTier: (actions, id, button) => actions.stepArcadeTier(id, button.direction),
   partner: (actions, id, button) => actions.stepTraining(id, button.setting, button.direction),
   hitAreas: (actions, id) => actions.toggleHitAreas(id),
   speed: (actions, id) => actions.stepSpeed(id),

@@ -234,3 +234,8 @@ the foreground. Its state is in ~/.local/state/padbridge/service.txt;
 its log is `journalctl --user -u padbridge`.
 
 Controller layouts: `bun wisp controller layout melee|z-jump|tom`. melee (the default) is Melee's buttons by function: A attack, B special, X and Y jump, RB grab, no tilt or short-hop button; z-jump makes RB jump and X grab; tom is Tom's own (LB short hop, RT shield, right stick tilts, L3 unbound). Both triggers shield by default. The client Controller page also chooses the layout, tap jump and full or light shield for each trigger. These choices stay in the controller service settings across restarts. A running service changes immediately; a stopped service reads the saved choice at its next start.
+
+`bun wisp play --standalone --start select --script test/native/pads/arcade-warchief-stage2.pad`
+walks character select into Arcade at the Warchief tier and plays the first
+stage, then the second, with the stage title on screen; `-dev arcade STAGE NAME`
+starts a run at a stage (makgora:docs/commands/fresh.md).

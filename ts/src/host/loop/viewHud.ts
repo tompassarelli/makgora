@@ -14,7 +14,6 @@ import { resultChoicesOpen } from "../../game/lobby/matchFlow";
 import type { Fighter } from "../../game/sim/fighter";
 import type { ParticipantSlot } from "../../game/input/participants";
 import type { KeyBindings } from "../../game/input/keyBindings";
-import { bossDefinition } from "../../game/classic/bosses";
 import { type UiObjects, layoutHuds, menuControlHit } from "./ui";
 import { localDevice, localPreview } from "./keyboardPreview";
 import { type ShellState, activeRollback, localSlot, playsOnKeyboard } from "./state";
@@ -39,9 +38,7 @@ export function presentMatchPanels(s: ShellState, game: MatchState, ui: UiObject
   if (ui.preview.laidFor !== preview) layoutHuds(s, preview);
   const keys = s.participants[local ?? 0].keys;
   ui.preview.update(showMatch && preview && game.phase === Phase.match && local !== undefined, s.participants[local ?? 0].bindings, localDevice(s), key => keyDown(keys, key));
-  ui.classic?.updateCard(game);
-  const boss = game.run.active ? bossDefinition(game.run.boss.kind) : undefined;
-  ui.bossPlate?.update(showMatch && boss !== undefined && game.phase === Phase.match, boss?.name ?? "", boss?.portrait ?? "", game.run.boss.health, game.run.boss.maxHealth);
+  ui.arcadeCard?.update(game);
 }
 
 export function updateSlotHud(s: ShellState, ui: UiObjects, slot: ParticipantSlot, game: MatchState, selecting: boolean, paused: boolean, menuTitle: boolean, showMatch: boolean): void {

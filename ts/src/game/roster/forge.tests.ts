@@ -3,8 +3,9 @@ import { at } from "wisp/src/runtime/lookup";
 import { Character } from "../sim/codes";
 import { PLAYABLE_CHARACTERS, SELECTABLE_CHARACTERS, fighterSlug } from "./kits";
 import { FORGE_FIGHTERS, FORGE_STAGES, fighterStatus, isComingSoon, isFeatured, setForgeRoster, shownFighters } from "./forge";
-import { CLASSIC_ROUTES } from "../classic/routes";
-import { CLASSIC_FIGHTS, classicRivals } from "../classic/classic";
+import { ARCADE_CHARACTERS } from "../arcade/tables";
+import { arcadePlan } from "../arcade/plan";
+import { StageKind } from "../arcade/spine";
 import { drawCpuFighter } from "../match/cpuProfiles";
 import { Phase, createMatchState, nextMatchCharacter } from "../lobby/lobbyState";
 import { nextCpuCharacter } from "../lobby/characterChoice";
@@ -42,10 +43,10 @@ function randomDraws(): number[] {
   return drawn;
 }
 
-function classicRivalSet(): number[] {
-  const rivals: number[] = [];
-  for (const route of CLASSIC_ROUTES) for (let fight = 0; fight < CLASSIC_FIGHTS - 1; fight++) for (const rival of classicRivals(route, fight)) rivals.push(rival);
-  return rivals;
+function arcadeOpponentSet(fighter: Character): number[] {
+  const opponents: number[] = [];
+  for (let seed = 0; seed < 60; seed++) for (const stage of arcadePlan(fighter, seed)) if (stage.kind === StageKind.hallway) opponents.push(...stage.opponents);
+  return opponents;
 }
 
 function poolDraws(): number[] {
@@ -64,40 +65,38 @@ function withForge(fighters: readonly string[], stages: readonly number[], body:
   }
 }
 
-test("the shipped Forge names 18 roster fighters, features the other 16 and every stage, and each featured Classic route fills its ladder from featured rivals [k2 property]", () => {
+test("the shipped Forge names 18 roster fighters, features the other 16 and every stage, and each featured Arcade run draws only featured opponents, never the player [k2 property]", () => {
   for (const slug of FORGE_FIGHTERS) assertTrue(SELECTABLE_CHARACTERS.some(character => fighterSlug(character) === slug));
   assertEquals(SELECTABLE_CHARACTERS.filter(character => !isFeatured(character)).length, FORGE_FIGHTERS.length);
   assertEquals(SELECTABLE_CHARACTERS.filter(character => isFeatured(character)).length, SELECTABLE_CHARACTERS.length - FORGE_FIGHTERS.length);
   assertEquals(STAGE_CATALOG.filter(stage => isFeaturedStage(stage.id)).length, STAGE_CATALOG.length - FORGE_STAGES.length);
-  for (const route of CLASSIC_ROUTES) for (let fight = 0; fight < CLASSIC_FIGHTS - 1; fight++) {
-    const rivals = classicRivals(route, fight);
-    assertTrue(rivals.length > 0 && rivals.every(character => isFeatured(character)) && !rivals.includes(route.fighter));
+  for (const fighter of ARCADE_CHARACTERS) {
+    const opponents = arcadeOpponentSet(fighter);
+    assertTrue(opponents.length > 0 && opponents.every(character => isFeatured(character)) && !opponents.includes(fighter));
   }
   assertFalse(randomDraws().some(character => !isFeatured(character)));
 });
 
-test("with every fighter and stage featured, select, cycling, CPU Random, Classic and the stage pool offer the whole roster but its coming-soon fighters [k2 property]", () => {
+test("with every fighter and stage featured, select, cycling, CPU Random, Arcade and the stage pool offer the whole roster but its coming-soon fighters [k2 property]", () => {
   withForge([], [], () => {
     assertEquals(visibleGrid(false).length, GRID_FIGHTERS.length);
     const offered = PLAYABLE_CHARACTERS.filter(character => !isComingSoon(character)).length;
     assertEquals(cycled(false).length, offered);
     assertEquals(shownFighters(PLAYABLE_CHARACTERS).length, offered);
-    const planned: number[] = [];
-    for (const route of CLASSIC_ROUTES) for (const plan of route.fights) for (const rival of plan.rivals) planned.push(rival);
-    assertEquals(classicRivalSet().join(","), planned.join(","));
+    for (const fighter of ARCADE_CHARACTERS) assertTrue(arcadeOpponentSet(fighter).length > 0);
     assertEquals(stagePoolCount(createStagePool()), STAGE_CATALOG.length);
     for (let tile = 0; tile < GRID_FIGHTERS.length; tile++) assertFalse(tileMarked(createMatchState(), tile, true));
   });
 });
 
-test("a Forge fighter and stage stay off select, cycling, CPU Random, Classic and the stage pool with the option off, and show marked with it on [k2 property]", () => {
+test("a Forge fighter and stage stay off select, cycling, CPU Random, Arcade and the stage pool with the option off, and show marked with it on [k2 property]", () => {
   withForge([fighterSlug(FORGE_FIGHTER)], [FORGE_STAGE], () => {
     assertEquals(fighterStatus(FORGE_FIGHTER), "forge");
     assertFalse(visibleGrid(false).includes(FORGE_FIGHTER));
     assertEquals(visibleGrid(false).length, GRID_FIGHTERS.length - 1);
     assertFalse(cycled(false).includes(FORGE_FIGHTER));
     assertFalse(randomDraws().includes(FORGE_FIGHTER));
-    assertFalse(classicRivalSet().includes(FORGE_FIGHTER));
+    for (const fighter of ARCADE_CHARACTERS) if (fighter !== FORGE_FIGHTER) assertFalse(arcadeOpponentSet(fighter).includes(FORGE_FIGHTER));
     const game = createMatchState();
     game.phase = Phase.characterMenu;
     for (let step = 0, current = nextCpuCharacter(game, 1, 1); step < PLAYABLE_CHARACTERS.length; step++, current = nextCpuCharacter(game, 1, 1)) assertTrue(current !== FORGE_FIGHTER);

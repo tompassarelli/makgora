@@ -18,7 +18,7 @@ client that still cannot leave it.
   applies the stage look before the first match draw, avoiding midmatch chat.
   Omitted options keep current defaults.
   Ending any quick-start command with ` |cine off` hides the KO wash's cine filter in that match (local presentation; `-dev reset` restores it), for wisp#75's cine on/off fidelity captures.
-  `-dev classic NAME` starts that fighter's Classic run and `-dev classic boss NAME` its boss battle (makgora:docs/design/classic-mode.md).
+  `-dev arcade NAME` starts that fighter's Arcade run and `-dev arcade STAGE NAME` starts it at stage STAGE, 1 to 8 (makgora:docs/design/arcade-mode.md).
   `-dev quick offstage hero NAME` starts the #189 recovery check at x=700, z=300 on Frozen Throne with jumps spent.
   The named variant uses the normal CPU selection rule.
   `-dev pain HEIGHT STRENGTH FIGHTER` starts the #181 mirror capture fixture:

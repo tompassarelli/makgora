@@ -49,9 +49,7 @@ import { drivePartners } from "./partnerDrive";
 import { advanceDuoStocks } from "../fighters/murloc/duoStocks";
 import { holdPairPercents, sharePairPercents } from "../sim/duoPercent";
 
-import { bossClock, collectBossContacts, strikeBoss } from "../classic/bosses";
-import { applyConfiguredStart, settleConfiguredMatch, trackConfiguredFrame } from "../classic/configuredMatch";
-import { BossKind } from "../classic/runState";
+import { applyConfiguredStart, settleConfiguredMatch, trackConfiguredFrame } from "../arcade/configuredMatch";
 import { advanceTrainingReadout, captureTrainingBefore, resetTrainingPositions } from "./training";
 import { advanceTutorial, beginLesson, captureTutorialBefore, tutorialOn } from "./tutorial";
 import { duoRole } from "../sim/fighter";
@@ -103,15 +101,6 @@ export function initializeMatchFighters(game: Readonly<MatchState>, world: Roste
 
 const matchEnded = (game: Readonly<MatchState>): boolean => game.phase === Phase.result;
 
-
-function resolveBossFight(game: MatchState, world: Roster): void {
-  const { run } = game;
-  if (game.phase !== Phase.match) return;
-  const playerOut = !isActive(world, run.player) || fighterAt(world, run.player).status.stocks <= 0;
-  if (run.boss.health > 0 && !playerOut) return;
-  game.winner = run.boss.health <= 0 && !playerOut ? run.player : undefined;
-  game.phase = Phase.result;
-}
 
 export function matchSpawnX(slot: number, participantMask = 0): number {
   if (participantMask !== 0) {
@@ -233,8 +222,6 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   beginDamageContacts();
   collectLavaContacts(world, stage, stageFrame);
   collectHydraContacts(world, stage, game.matchFrame);
-  const bossFight = game.run.active && game.run.boss.kind !== BossKind.none;
-  if (bossFight && !holdingStart(game)) collectBossContacts(game.run.boss, world, bossClock(game.matchFrame, game.startHold), game.run.player);
   advanceGrabs(world, controls.inputs);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot) || wasGrabbed[slot]) continue;
@@ -275,7 +262,6 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot)) prepareBansheeContacts(fighterAt(world, slot));
   resolveHeroGuards(world);
   resolveAttacks(world, stage);
-  if (bossFight) strikeBoss(game.run.boss, world, bossClock(game.matchFrame, game.startHold), game.run.player);
   advanceSpecials(world, stage, stageFrame, controls.inputs);
   updateProjectiles(world, stage, stageFrame);
   advancePlacedObjects(world, stage, stageFrame);
@@ -309,8 +295,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
       copyAttackBuffer(controls.commands[slot], scope.after.controls.commands[slot]);
     }
   }
-  if (bossFight) resolveBossFight(game, world);
-  else resolveStocks(game, world);
+  resolveStocks(game, world);
   // The camera follows from itself, the stage and the fighters it frames, so an earlier run that stepped them and framed the same ones reached it; training may move fighters after it.
   if (earlier !== undefined && !game.training && earlier.match.phase === Phase.match && earlier.match.stageChoice === game.stageChoice && sameCameraSubjects(world, earlier.world)) copyMatchCamera(game.camera, earlier.match.camera);
   else advanceMatchCamera(game.camera, world, game.stageChoice);

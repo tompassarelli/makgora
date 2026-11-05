@@ -9,7 +9,7 @@ import { firstSpecialEffectDifference } from "../presentation/specialEffectState
 import { firstSummonDifference } from "../presentation/summonState";
 import { fighterAt, isActive } from "../sim/roster";
 import { firstTrainingDifference } from "../match/trainingState";
-import { firstRunDifference } from "../classic/runState";
+import { firstRunDifference } from "../arcade/runState";
 import { firstItemsDifference } from "../match/items";
 import { firstOrbsDifference } from "../sim/orbState";
 import { firstBotMemoryDifference, sameBotMemory } from "../match/botPerception";
@@ -101,8 +101,8 @@ function firstMatchDifference(e: Readonly<MatchState>, a: Readonly<MatchState>):
   if (e.training !== a.training) return "match.training";
   const training = firstTrainingDifference(e.trainer, a.trainer);
   if (training !== undefined) return training;
-  if (e.classic !== a.classic) return "match.classic";
-  if (e.classicTier !== a.classicTier) return "match.classicTier";
+  if (e.arcade !== a.arcade) return "match.arcade";
+  if (e.arcadeTier !== a.arcadeTier) return "match.arcadeTier";
   const run = firstRunDifference(e.run, a.run);
   if (run !== undefined) return run;
   if (e.stockCount !== a.stockCount) return "match.stockCount";

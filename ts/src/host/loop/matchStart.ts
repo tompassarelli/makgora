@@ -15,7 +15,7 @@ import { beginModelSoundEpoch, confirmModelSounds } from "../../game/render/mode
 import { stageMusic } from "../../game/presentation/matchAudio";
 import { readyFile, stageDrawnFile } from "../../game/session/journalFiles";
 import { initializeScenario } from "../../game/session/scenarios";
-import { classicIntro } from "../../game/classic/classicText";
+import { arcadeIntro } from "../../game/arcade/arcadeText";
 import { type Scenario, usesPool } from "../../game/session/build";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount } from "../../game/sim/stage";
@@ -68,8 +68,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
   if (stageSettings?.view !== undefined) s.viewExtreme = stageSettings.view === "off" ? undefined : stageSettings.view;
   if (wasPaused) pauseMatchPresentation(s, false);
   initializeScenario(scenario, s.game, s.world);
-  ui.classic?.beginMatch(s.game);
-  if (s.game.run.active) setStatus(s, classicIntro(s.game), 5.0);
+  if (s.game.run.active) setStatus(s, arcadeIntro(s.game), 5.0);
   const { rollback } = s;
   if (rollback !== undefined) {
     rollback.active = beginRollbackEpoch(s, rollback);

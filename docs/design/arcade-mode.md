@@ -42,8 +42,8 @@ reworking the engine, since all of them are data).
   the dominant power. Every race has been conquered by the Horde or recruited
   into a war band, and everyone fights to rise and, at the top, become
   Warchief. One sentence covers the whole roster and the tier names.
-- **Lead default.** The sentence, shown on the Arcade mode's rule help and
-  under the first stage's title: "The Horde won the world, and now every race
+- **Lead default.** The sentence, shown in the player guide's mode list and
+  under the first stage's title (the hover help for the mode holds only four lines, so it keeps one short line): "The Horde won the world, and now every race
   fights up through the war bands for the right to challenge the Warchief."
 - Lore note: mak'gora is the orcish honour duel and has been used to
   challenge a sitting Warchief (Cairne challenged Garrosh in Cataclysm).

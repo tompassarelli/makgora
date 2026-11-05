@@ -72,7 +72,7 @@ export const MATCH_RULE_HELP = {
   moreTime: TIME_HELP,
   endless: "Endless play: no stocks are lost and there is no timer. Fight freely; pause, then hold Esc for a second (or hold L, R and A and press Start) to leave.",
   automaticRematch: "Automatic rematch: when a match ends, the same fighters and rules start again after a short countdown.",
-  forge: "Forge: also show the fighters and stages still in development, marked with a hammer, on every player’s character and stage select. Random, computer picks and Classic use finished fighters only.",
+  forge: "Forge: also show the fighters and stages still in development, marked with a hammer, on every player’s character and stage select. Random, computer picks and Arcade use finished fighters only.",
   items: `Items: a power-up appears at centre stage every ${ITEM_INTERVAL_MIN_SECONDS}–${ITEM_INTERVAL_MAX_SECONDS} s after a 10 s countdown. Touch it and press Attack to grab it.`,
   ultimates: `Ultimates: with a full meter bar, Attack + Special unleashes your fighter's ultimate. The bar fills from the match clock: full ${METER_SECONDS} s after the start and after each use. With Orbs on, only the orb that appears above centre stage every ${ORB_SECONDS} s fills it, half a bar each. Off: no ultimates; Attack + Special is the ordinary special.`,
 } as const;
@@ -103,10 +103,11 @@ export const inputDelayHelp = (offline: number): string => `Input delay: frames 
 export const MODES = {
   versus: "Versus: fight players and computers with the rules on this screen.",
   training: "Training: practise on a partner you set up; no stocks or timer.",
-  classic: "Classic: a run of fights that ends with a boss.",
+  arcade: "Arcade: a fixed run of eight fights that ends on your rival. The Horde won the world, and now every race fights up through the war bands for the right to challenge the Warchief.",
 } as const;
 
-export const MODE_LIST_HELP = "Mode: open the list to choose Versus, Training, or Classic.";
-export const CLASSIC_LEVEL_HELP = "Level: the level this Classic run starts at, from 1 to the hardest; each fight climbs from it, and it stays fixed once the run starts.";
+export const ARCADE_MODE_HELP = "Arcade: a fixed run of eight fights ending on your rival.";
+export const MODE_LIST_HELP = "Mode: open the list to choose Versus, Training, or Arcade.";
+export const ARCADE_TIER_HELP = "Tier: Peon, Grunt or Warchief sets every computer fighter's skill for the whole run. Peon and Grunt replay a lost stage; Warchief ends the run on a loss.";
 
 export const PAUSE_KEYS = { controls: [CONTROLS_PANEL_KEY, "Show controls"], warcraftMenu: [WARCRAFT_MENU_KEY, "Warcraft menu"] } as const;

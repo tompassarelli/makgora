@@ -147,6 +147,8 @@ export const ARCADE_TABLES: readonly ArcadeTable[] = [
   },
 ];
 
-export function arcadeTable(fighter: Character): ArcadeTable | undefined {
+export function arcadeTable(fighter: number): ArcadeTable | undefined {
   return ARCADE_TABLES.find(table => table.fighter === fighter);
 }
+
+export const ARCADE_CHARACTERS: readonly Character[] = ARCADE_TABLES.map(table => table.fighter);

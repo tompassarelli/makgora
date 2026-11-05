@@ -56,7 +56,7 @@ Endless play: no stocks are lost and there is no timer. Fight freely; pause, the
 
 Automatic rematch: when a match ends, the same fighters and rules start again after a short countdown.
 
-Forge: also show the fighters and stages still in development, marked with a hammer, on every player’s character and stage select. Random, computer picks and Classic use finished fighters only.
+Forge: also show the fighters and stages still in development, marked with a hammer, on every player’s character and stage select. Random, computer picks and Arcade use finished fighters only.
 
 Items: a power-up appears at centre stage every 30–60 s after a 10 s countdown. Touch it and press Attack to grab it.
 
@@ -132,7 +132,7 @@ Versus: fight players and computers with the rules on this screen.
 
 Training: practise on a partner you set up; no stocks or timer.
 
-Classic: a run of fights that ends with a boss.
+Arcade: a fixed run of eight fights that ends on your rival. The Horde won the world, and now every race fights up through the war bands for the right to challenge the Warchief.
 
 ## How to play
 

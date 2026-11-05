@@ -14,7 +14,7 @@ import { recallCharacter } from "../../game/lobby/characterReadiness";
 import { cycleTeam, cycleCostume } from "../../game/lobby/costumeAndTeam";
 import { changeStagePoolMode, changeStagePoolStage, requestStageSelect, returnToCharacters, selectStage, setHazards } from "../../game/lobby/stageSelect";
 import { setTeamBattle, setFriendlyFire, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setItemsOn, setUltimatesOn, toggleItemKind, setOrbsOn, setStocks, setTimeLimit } from "../../game/lobby/matchRules";
-import { setTraining, chooseMatchMode, stepClassicTier } from "../../game/lobby/matchMode";
+import { setTraining, chooseMatchMode, stepArcadeTier } from "../../game/lobby/matchMode";
 import { setHitAreas, setPartnerDamage, stepPartnerBehaviour, stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson } from "../../game/lobby/trainingSettings";
 import { resultChoicesOpen, cancelRematchCountdown, confirmRematch, requestStart, tickRematchCountdown } from "../../game/lobby/matchFlow";
 import { resetMomentRecorder } from "../../game/replay/moment";
@@ -35,7 +35,7 @@ import { isFeaturedStage } from "../../game/roster/forge";
 import { nextMatchCharacter } from "../../game/lobby/lobbyState";
 import { stepCpuOpponent, stepCpuTier } from "../../game/match/cpuProfiles";
 import { traceSelectionState } from "./diagnostics";
-import { ClassicStep, continueClassic, quitClassic, skipToClassicBoss, startClassic } from "../../game/classic/classic";
+import { ArcadeStep, continueArcade, quitArcade, skipToArcadeStage, startArcade } from "../../game/arcade/arcade";
 import { clearParticipantInputs, controlsAvailable, currentComputerMask, currentHumanMask } from "./inputs";
 import { startMatch } from "./matchStart";
 import { SELECT_TEXT } from "./selectText";
@@ -98,8 +98,8 @@ export function confirm(s: ShellState, slot: ParticipantSlot, clicked = false): 
     s.pauseSelection = createMatchState();
     copyMatchState(s.pauseSelection, game);
   }
-  if (game.phase === Phase.characterMenu && game.classic) {
-    if (!startClassic(game, slot)) return;
+  if (game.phase === Phase.characterMenu && game.arcade) {
+    if (!startArcade(game, slot)) return;
     for (const panel of views(s).settings) panel.close();
     requestStageLoad(s, slot);
   } else if (game.phase === Phase.characterMenu) {
@@ -111,10 +111,10 @@ export function confirm(s: ShellState, slot: ParticipantSlot, clicked = false): 
   } else if (game.phase === Phase.stageMenu) {
     requestStageLoad(s, slot);
   } else if (game.phase === Phase.result && game.run.active) {
-    const step = continueClassic(game, slot);
-    if (step === ClassicStep.none) return;
+    const step = continueArcade(game, slot);
+    if (step === ArcadeStep.none) return;
     setStatus(s, "", 0.0);
-    if (step === ClassicStep.fight) requestStageLoad(s, slot);
+    if (step === ArcadeStep.fight) requestStageLoad(s, slot);
     else {
       updateConnectedHumans(game, currentHumanMask(game.departedMask));
       makePreview(s);
@@ -151,7 +151,7 @@ export function back(s: ShellState, slot: ParticipantSlot): void {
   if (!controlsAvailable(s, slot) || stageLoading(s)) return;
   if (s.game.phase === Phase.characterMenu) views(s).selections[slot].recallHeld();
   else if (s.game.phase === Phase.stageMenu) returnToCharacters(s.game, slot);
-  else if (s.game.phase === Phase.result && quitClassic(s.game, slot)) {
+  else if (s.game.phase === Phase.result && quitArcade(s.game, slot)) {
     setStatus(s, "", 0.0);
     makePreview(s);
   } else if (s.game.phase === Phase.result) cancelRematchCountdown(s.game, slot);
@@ -190,16 +190,16 @@ export function startQuickMatch(s: ShellState, stage = 0, scenario: Scenario = s
 }
 
 
-export function startDevClassic(s: ShellState, character: Character, boss: boolean): void {
+export function startDevArcade(s: ShellState, character: Character, stage: number): void {
   const first = firstHumanSlot(s.game);
   if (first === undefined || s.game.phase !== Phase.characterMenu || stageLoading(s)) return;
   selectCharacter(s.game, first, character);
   s.game.training = false;
-  s.game.classic = true;
+  s.game.arcade = true;
   s.pauseSelection = createMatchState();
   copyMatchState(s.pauseSelection, s.game);
-  if (!startClassic(s.game, first)) return;
-  if (boss) skipToClassicBoss(s.game);
+  if (!startArcade(s.game, first)) return;
+  if (stage > 1) skipToArcadeStage(s.game, stage);
   for (const panel of views(s).settings) panel.close();
   requestStageLoad(s, first);
 }
@@ -307,9 +307,9 @@ export function panelActions(): PanelActions {
       applyRulePreset: (participant, preset) => withSlot(participant, (s, slot) => {
         if (controlsAvailable(s, slot)) applyRulePreset(s.game, slot, preset);
       }),
-      stepClassicTier: (participant, direction) => withSlot(participant, (s, slot) => {
+      stepArcadeTier: (participant, direction) => withSlot(participant, (s, slot) => {
         if (!controlsAvailable(s, slot)) return;
-        stepClassicTier(s.game, slot, direction);
+        stepArcadeTier(s.game, slot, direction);
       }),
       stepTraining: (participant, setting, direction) => withSlot(participant, (s, slot) => {
         if (!controlsAvailable(s, slot)) return;

@@ -10,10 +10,6 @@ import type { Character } from "../sim/codes";
 import type { ParticipantSlot } from "../input/participants";
 
 
-export const BossKind = { none: 0, lichKing: 1, archimonde: 2, kiljaeden: 3 } as const;
-export type BossKind = (typeof BossKind)[keyof typeof BossKind];
-
-
 export const WinCondition = {
 
   ko: 0,
@@ -21,8 +17,6 @@ export const WinCondition = {
   survive: 1,
 
   koWithinClock: 2,
-
-  defeatBoss: 3,
 } as const;
 export type WinCondition = (typeof WinCondition)[keyof typeof WinCondition];
 
@@ -51,11 +45,9 @@ export interface ConfiguredMatch {
   readonly playerDamage: number;
   readonly hazards: boolean;
   readonly win: WinCondition;
-  readonly boss: BossKind;
-
-  readonly bossHealth: number;
-
   readonly last: boolean;
+
+  readonly reactionLead: number;
 
   readonly speaker: string;
   readonly intro: string;
@@ -64,22 +56,6 @@ export interface ConfiguredMatch {
 export const RunOutcome = { none: 0, won: 1, lost: 2 } as const;
 export type RunOutcome = (typeof RunOutcome)[keyof typeof RunOutcome];
 
-
-export interface BossState {
-  kind: BossKind;
-  health: number;
-  maxHealth: number;
-
-  strike: number;
-  aimX: number;
-
-  hitMask: number;
-
-  lastSerial: number;
-  lastWindow: number;
-
-  flash: number;
-}
 
 export interface ConfiguredRun {
   active: boolean;
@@ -91,6 +67,8 @@ export interface ConfiguredRun {
   fight: number;
 
   tier: number;
+
+  seed: number;
   outcome: RunOutcome;
 
   cleared: boolean;
@@ -106,44 +84,14 @@ export interface ConfiguredRun {
   savedMinutes: number;
   savedHazards: boolean;
   savedItems: boolean;
-  readonly boss: BossState;
-}
-
-export function createBossState(): BossState {
-  return { kind: BossKind.none, health: 0, maxHealth: 0, strike: -1, aimX: 0.0, hitMask: 0, lastSerial: -1, lastWindow: 0, flash: 0 };
 }
 
 export function createConfiguredRun(): ConfiguredRun {
   return {
-    active: false, current: undefined, player: 0, fighter: 1, fight: 0, tier: 0, outcome: RunOutcome.none, cleared: false,
+    active: false, current: undefined, player: 0, fighter: 1, fight: 0, tier: 0, seed: 0, outcome: RunOutcome.none, cleared: false,
     frames: 0, damageTaken: 0.0, lastDamage: 0.0, continues: 0,
     savedHumanFighters: 0, savedComputers: 0, savedStocks: 3, savedMinutes: 7, savedHazards: true, savedItems: false,
-    boss: createBossState(),
   };
-}
-
-export function resetBossState(boss: BossState, kind: BossKind, health: number): void {
-  boss.kind = kind;
-  boss.health = health;
-  boss.maxHealth = health;
-  boss.strike = -1;
-  boss.aimX = 0.0;
-  boss.hitMask = 0;
-  boss.lastSerial = -1;
-  boss.lastWindow = 0;
-  boss.flash = 0;
-}
-
-function copyBossState(target: BossState, source: Readonly<BossState>): void {
-  target.kind = source.kind;
-  target.health = source.health;
-  target.maxHealth = source.maxHealth;
-  target.strike = source.strike;
-  target.aimX = source.aimX;
-  target.hitMask = source.hitMask;
-  target.lastSerial = source.lastSerial;
-  target.lastWindow = source.lastWindow;
-  target.flash = source.flash;
 }
 
 export function copyConfiguredRun(target: ConfiguredRun, source: Readonly<ConfiguredRun>): void {
@@ -154,6 +102,7 @@ export function copyConfiguredRun(target: ConfiguredRun, source: Readonly<Config
   target.fighter = source.fighter;
   target.fight = source.fight;
   target.tier = source.tier;
+  target.seed = source.seed;
   target.outcome = source.outcome;
   target.cleared = source.cleared;
   target.frames = source.frames;
@@ -166,11 +115,9 @@ export function copyConfiguredRun(target: ConfiguredRun, source: Readonly<Config
   target.savedMinutes = source.savedMinutes;
   target.savedHazards = source.savedHazards;
   target.savedItems = source.savedItems;
-  copyBossState(target.boss, source.boss);
 }
 
-const INT_FIELDS = ["player", "fighter", "fight", "tier", "outcome", "frames", "continues", "savedHumanFighters", "savedComputers", "savedStocks", "savedMinutes"] as const;
-const BOSS_INT_FIELDS = ["kind", "health", "maxHealth", "strike", "hitMask", "lastSerial", "lastWindow", "flash"] as const;
+const INT_FIELDS = ["player", "fighter", "fight", "tier", "seed", "outcome", "frames", "continues", "savedHumanFighters", "savedComputers", "savedStocks", "savedMinutes"] as const;
 
 
 export function writeConfiguredRun(
@@ -185,8 +132,6 @@ export function writeConfiguredRun(
   bool("match.run.savedItems", run.savedItems);
   real("match.run.damageTaken", run.damageTaken);
   real("match.run.lastDamage", run.lastDamage);
-  for (const key of BOSS_INT_FIELDS) int(`match.run.boss.${key}`, run.boss[key]);
-  real("match.run.boss.aimX", run.boss.aimX);
 }
 
 export function firstRunDifference(expected: Readonly<ConfiguredRun>, actual: Readonly<ConfiguredRun>): string | undefined {
@@ -198,7 +143,7 @@ export function firstRunDifference(expected: Readonly<ConfiguredRun>, actual: Re
   if (expected.savedItems !== actual.savedItems) return "match.run.savedItems";
   if (expected.damageTaken !== actual.damageTaken) return "match.run.damageTaken";
   if (expected.lastDamage !== actual.lastDamage) return "match.run.lastDamage";
-  for (const key of BOSS_INT_FIELDS) if (expected.boss[key] !== actual.boss[key]) return `match.run.boss.${key}`;
-  if (expected.boss.aimX !== actual.boss.aimX) return "match.run.boss.aimX";
   return undefined;
 }
+
+export const reactionLead = (run: Readonly<ConfiguredRun>): number => run.active ? run.current?.reactionLead ?? 0 : 0;

@@ -27,7 +27,7 @@ export type AddBarTarget = (frame: Frame, target: BarTarget, box: BarBox | undef
 const MODE_TEXT: Readonly<Record<MatchMode, string>> = {
   versus: "Fight players and computers",
   training: "Practise on a partner you set up",
-  classic: "A run of fights ending with a boss",
+  arcade: "Eight fights ending on your rival",
 };
 
 const PANEL_OF: Readonly<Partial<Record<BarItem, BarPanel>>> = { mode: "mode", rules: "rules", guide: "guide", gear: "gear" };
@@ -312,7 +312,7 @@ export class SelectBar {
       });
       return [partner("behaviour"), partner("escape"), partner("tech"), partner("damage"), toggle(rules.hitAreas, { kind: "hitAreas" }), toggle(rules.speed, { kind: "speed" })];
     }
-    if (mode !== "versus") return [{ controls: [rules.classic.less, rules.classic.more], step: direction => ({ kind: "classicTier", direction }) }];
+    if (mode !== "versus") return [{ controls: [rules.arcade.less, rules.arcade.more], step: direction => ({ kind: "arcadeTier", direction }) }];
     const presets: PadRow[] = (["tourney", "party", "endless"] as const).map((preset, index) => ({ controls: [rules.presets[index] ?? rules.reset], press: { kind: "preset", preset } }));
     const kinds: PadRow[] = game.items.on ? [toggle(rules.itemKinds[0], { kind: "itemKind", item: ItemKind.speed }), toggle(rules.itemKinds[1], { kind: "itemKind", item: ItemKind.heavy })] : [];
     return [
@@ -425,14 +425,14 @@ export class SelectBar {
   private presentRules(view: BarView, lit: Lit): void {
     const { game } = view;
     const mode = matchMode(game);
-    const classic = mode === "classic" ? this.text.classicLines(game, view.fighter) : undefined;
-    const key = rulesKey(game, classic);
+    const arcade = mode === "arcade" ? this.text.arcadeLines(game, view.fighter) : undefined;
+    const key = rulesKey(game, arcade);
     if (key !== this.shownKey) {
       this.shownKey = key;
-      presentRules(this.rules, game, classic);
+      presentRules(this.rules, game, arcade);
     }
     const { rules } = this;
-    const steppers = [rules.stocks, rules.time, rules.partner.behaviour, rules.partner.escape, rules.partner.tech, rules.partner.damage, rules.classic];
+    const steppers = [rules.stocks, rules.time, rules.partner.behaviour, rules.partner.escape, rules.partner.tech, rules.partner.damage, rules.arcade];
     for (const stepper of steppers) for (const control of [stepper.less, stepper.more]) lit(control, false);
     for (const control of [...rules.presets, rules.reset]) lit(control, false);
     const toggles: readonly (readonly [BarControl, boolean])[] = [

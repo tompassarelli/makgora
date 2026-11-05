@@ -4,7 +4,7 @@ import { RULE_BUTTONS, type RuleName, rulePanel } from "../ui/ruleButtons";
 import { ruleHelp } from "../ui/ruleHelp";
 import { createMatchState } from "../lobby/lobbyState";
 import {
-  BAR_ORDER, BAR_PANELS, type BarArtStyle, type BarBox, type BarPanel, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, GUIDE_ROWS, MODE_ROWS, SELECT_BAR, TRAINING_ROWS, barArt, barArtName, barBoxContains, HELP_MAX_LINES, helpBox, helpTooLong,
+  BAR_ORDER, BAR_PANELS, type BarArtStyle, type BarBox, type BarPanel, ARCADE_ROWS, DRAWER_ROWS, GEAR_ROWS, GUIDE_ROWS, MODE_ROWS, SELECT_BAR, TRAINING_ROWS, barArt, barArtName, barBoxContains, HELP_MAX_LINES, helpBox, helpTooLong,
 } from "./selectBarLayout";
 import { BAR_STRIP } from "./selectScreenLayout";
 
@@ -46,7 +46,7 @@ test("Every bar panel opens under the bar inside the screen, and its rows lie in
         DRAWER_ROWS.time.label, DRAWER_ROWS.time.less, DRAWER_ROWS.time.value, DRAWER_ROWS.time.more, DRAWER_ROWS.ultimates, DRAWER_ROWS.items, DRAWER_ROWS.endless, DRAWER_ROWS.automaticRematch,
         DRAWER_ROWS.itemSpeed, DRAWER_ROWS.itemHeavy],
       Object.values(TRAINING_ROWS).flatMap(row => "less" in row ? [row.less, row.value, row.more] : [row]),
-      [CLASSIC_ROWS.tier.less, CLASSIC_ROWS.tier.value, CLASSIC_ROWS.tier.more, CLASSIC_ROWS.route],
+      [ARCADE_ROWS.tier.less, ARCADE_ROWS.tier.value, ARCADE_ROWS.tier.more, ARCADE_ROWS.route],
     ],
     mode: [[...MODE_ROWS.modes, MODE_ROWS.teamBattle, MODE_ROWS.friendlyFire], [...MODE_ROWS.modes, MODE_ROWS.teamToggle, MODE_ROWS.friendlyToggle]],
     guide: [[GUIDE_ROWS.controls, GUIDE_ROWS.moves, GUIDE_ROWS.tutorial]],
@@ -94,7 +94,7 @@ test("Each framed box has its own art at its own size, one image per style and s
 test("Every rule's hover help fits its framed panel in at most four lines, in a size the art build makes, as wide as the largest panel's text needs and at least the drawer button text size [k2 property]", () => {
   const sizes = new Set(barArt().filter(item => item.style === "Panel").map(item => barArtName("Panel", item)));
   const game = createMatchState();
-  const variants = [game, { ...game, training: true }, { ...game, classic: true }];
+  const variants = [game, { ...game, training: true }, { ...game, arcade: true }];
   for (const variant of variants) {
     for (const name of Object.keys(RULE_BUTTONS) as RuleName[]) {
       for (const offline of [1, 2]) {

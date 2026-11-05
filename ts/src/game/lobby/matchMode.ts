@@ -1,6 +1,6 @@
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { CPU_TIERS } from "../match/cpuProfiles";
-import { classicRouted, computerActive, type MatchState, nextMatchCharacter, Phase } from "./lobbyState";
+import { arcadeRouted, computerActive, type MatchState, nextMatchCharacter, Phase } from "./lobbyState";
 import { settingRules } from "./matchRules";
 
 export function setTraining(game: MatchState, slot: number, training: boolean): void {
@@ -8,7 +8,7 @@ export function setTraining(game: MatchState, slot: number, training: boolean): 
   game.training = training;
   if (training) {
     game.teamBattle = false;
-    game.classic = false;
+    game.arcade = false;
   }
   if (!training) game.trainer.lesson = -1;
 }
@@ -16,12 +16,12 @@ export function setTraining(game: MatchState, slot: number, training: boolean): 
 export function cycleMatchMode(game: MatchState, slot: number): void {
   if (!settingRules(game, slot)) return;
   game.teamBattle = false;
-  if (game.classic) game.classic = false;
+  if (game.arcade) game.arcade = false;
   else if (game.training) {
     game.training = false;
-    game.classic = true;
+    game.arcade = true;
     for (const player of PARTICIPANT_SLOTS) {
-      if (!classicRouted(game.characterChoices[player])) {
+      if (!arcadeRouted(game.characterChoices[player])) {
         game.characterChoices[player] = nextMatchCharacter(game, undefined, 1);
         game.characterReadiness[player] = false;
       }
@@ -29,16 +29,16 @@ export function cycleMatchMode(game: MatchState, slot: number): void {
   } else game.training = true;
 }
 
-export type MatchMode = "versus" | "training" | "classic";
-export const MATCH_MODES: readonly MatchMode[] = ["versus", "training", "classic"];
-export const matchMode = (game: Readonly<MatchState>): MatchMode => game.classic ? "classic" : game.training ? "training" : "versus";
+export type MatchMode = "versus" | "training" | "arcade";
+export const MATCH_MODES: readonly MatchMode[] = ["versus", "training", "arcade"];
+export const matchMode = (game: Readonly<MatchState>): MatchMode => game.arcade ? "arcade" : game.training ? "training" : "versus";
 
 export function chooseMatchMode(game: MatchState, slot: number, mode: MatchMode): void {
   for (let step = 0; step < MATCH_MODES.length && matchMode(game) !== mode; step++) cycleMatchMode(game, slot);
 }
 
-export function stepClassicTier(game: MatchState, slot: number, direction: number): void {
-  if (settingRules(game, slot) && game.classic && !game.run.active) game.classicTier = Math.max(0, Math.min(CPU_TIERS.length - 1, game.classicTier + direction));
+export function stepArcadeTier(game: MatchState, slot: number, direction: number): void {
+  if (settingRules(game, slot) && game.arcade && !game.run.active) game.arcadeTier = Math.max(0, Math.min(CPU_TIERS.length - 1, game.arcadeTier + direction));
 }
 
 export function endConfiguredRun(game: MatchState): void {

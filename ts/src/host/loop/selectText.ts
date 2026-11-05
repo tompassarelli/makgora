@@ -1,14 +1,14 @@
 import type { MatchState } from "../../game/lobby/lobbyState";
 import type { MatchMode } from "../../game/lobby/matchMode";
-import type { ClassicLines, SelectText } from "../../game/ui/selectionActions";
+import type { ArcadeLines, SelectText } from "../../game/ui/selectionActions";
 import { MODE_LABELS, rulesPillParts, selectionModeLabel } from "../../game/session/messages";
-import { classicRouteSummary, classicTierSetting } from "../../game/classic/classicText";
+import { arcadeRouteSummary, arcadeTierSetting } from "../../game/arcade/arcadeText";
 
-function classicLines(game: Readonly<MatchState>, fighter: number): ClassicLines {
-  return { setting: classicTierSetting(game.classicTier), route: classicRouteSummary(fighter) };
+function arcadeLines(game: Readonly<MatchState>, fighter: number): ArcadeLines {
+  return { setting: arcadeTierSetting(game.arcadeTier), route: arcadeRouteSummary(fighter) };
 }
 
-/** The select bar's words from match flow and Classic progress, which the ui layer may not read itself. */
+/** The select bar's words from match flow and Arcade progress, which the ui layer may not read itself. */
 export const SELECT_TEXT: SelectText = {
   modeLabel(game: Readonly<MatchState>): string {
     return selectionModeLabel(game);
@@ -19,7 +19,7 @@ export const SELECT_TEXT: SelectText = {
   rulesPill(game: Readonly<MatchState>): readonly string[] {
     return rulesPillParts(game);
   },
-  classicLines(game: Readonly<MatchState>, fighter: number): ClassicLines {
-    return classicLines(game, fighter);
+  arcadeLines(game: Readonly<MatchState>, fighter: number): ArcadeLines {
+    return arcadeLines(game, fighter);
   },
 };

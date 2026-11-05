@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { CLASSIC_CHARACTERS, CLASSIC_ROUTES } from "../src/game/classic/routes";
+import { ARCADE_CHARACTERS, ARCADE_TABLES } from "../src/game/arcade/tables";
 import { HOME_STAGES } from "../src/game/menu/homeStages";
 import { FIGHTER_OBJECT_ORDER } from "../src/game/objectData";
 import { RIFLEMAN_MODEL_FILE } from "../src/game/presentation/fighterAssetInfo";
@@ -11,11 +11,11 @@ import { MAP_PORTRAITS, ORIGINAL_CLIP_MODELS, SCRIPT_MODELS } from "../scripts/w
 
 const RIFLEMAN = Character.rifleman;
 
-test("The base Rifleman is on no selectable, computer, Random, Classic or home-stage list and the map carries none of his tiles, cards, portraits, stock icons, model, clips or object data [k3 measure docs/design/roster.md]", () => {
+test("The base Rifleman is on no selectable, computer, Random, Arcade or home-stage list and the map carries none of his tiles, cards, portraits, stock icons, model, clips or object data [k3 measure docs/design/roster.md]", () => {
   expect(HARNESS_ONLY_FIGHTERS).toEqual([RIFLEMAN]);
   expect(shipsInMap(RIFLEMAN)).toBe(false);
-  for (const list of [SELECTABLE_CHARACTERS, PLAYABLE_CHARACTERS, RENDERED_FIGHTERS, GRID_FIGHTERS, SELECT_GRID_ORDER, CLASSIC_CHARACTERS, FIGHTER_OBJECT_ORDER]) expect(list).not.toContain(RIFLEMAN);
-  for (const route of CLASSIC_ROUTES) for (const fight of route.fights) expect(fight.rivals).not.toContain(RIFLEMAN);
+  for (const list of [SELECTABLE_CHARACTERS, PLAYABLE_CHARACTERS, RENDERED_FIGHTERS, GRID_FIGHTERS, SELECT_GRID_ORDER, ARCADE_CHARACTERS, FIGHTER_OBJECT_ORDER]) expect(list).not.toContain(RIFLEMAN);
+  for (const table of ARCADE_TABLES) expect([table.ally, table.rival, ...table.elites.flatMap((duo) => duo.members)]).not.toContain(RIFLEMAN);
   expect(HOME_STAGES.map((home) => home.character)).not.toContain(RIFLEMAN);
   expect([...SCRIPT_MODELS, ...ORIGINAL_CLIP_MODELS, ...MAP_PORTRAITS].filter((path) => path.toLowerCase().includes(fighterRenderName(RIFLEMAN).toLowerCase()))).toEqual([]);
   expect(SCRIPT_MODELS).not.toContain(RIFLEMAN_MODEL_FILE);

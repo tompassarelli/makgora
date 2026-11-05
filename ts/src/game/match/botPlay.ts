@@ -22,6 +22,7 @@ import { botChance, botChoice, useMatchSeed } from "./botRandom";
 import type { CpuTier } from "./cpuProfiles";
 import { type CpuSkill, cpuSkill, cpuReactionFloor, cpuReactionFrames, perceivedCpuSkill } from "./cpuSkill";
 import { computerLead } from "../core/computerLead";
+import { reactionLead } from "../arcade/runState";
 import { FAST_BOT_HISTORY_FRAMES, BOT_HISTORY_FRAMES, type BotMemory, observeOpponents, perceivedOpponent, perceivedHeldFighter, commitBotDirection, samePerception } from "./botPerception";
 import { chooseDefense } from "./botDefense";
 import { burnedMove, keepClearOfBurn, punishBlockedBurn } from "./botBurn";
@@ -249,7 +250,7 @@ export function reactionDelay(game: Readonly<MatchState>, world: Readonly<Roster
   const key = cue === undefined ? 0 : cue.attack.serial * 31 + cue.special.action * 17
     + (cue.motion.x < fighter.motion.x ? 1 : 2) + (cue.shield.raised ? 4 : 0)
     + (cue.motion.grounded ? 8 : 0) + cue.ledge.state * 64 + cue.down.state * 256;
-  return cpuReactionFrames(fighter, skill, game.matchSeed, slot, key, floor) - computerLead(game);
+  return cpuReactionFrames(fighter, skill, game.matchSeed, slot, key, floor) - computerLead(game) - reactionLead(game.run);
 }
 
 const slowTier = (tier: CpuTier | undefined): boolean => tier === "peon";
@@ -307,7 +308,7 @@ const negativeZero = (value: number): boolean => value === 0 && 1 / value < 0;
 /**
  * Whether produceComputerInput for `slot` at `frame` reads the same state as
  * it did from `before`, so it decides the same. It reads the match seed, the
- * slot's identity and tier, its computer lead, training, the stage and its clock, the time
+ * slot's identity and tier, its computer lead and the run's reaction lead, training, the stage and its clock, the time
  * limit, the slot's own fighter, its perceived sample and committed
  * direction, its strategy, its attack delay and the orb it contests;
  * a new read joins this list.
@@ -317,7 +318,7 @@ export function sameComputerInputs(game: Readonly<MatchState>, world: Readonly<R
   if (game.training || before.training || game.teamBattle || before.teamBattle || world.mask !== beforeWorld.mask) return false;
   const opponent = game.cpuResolvedOpponents[slot];
   const tier = game.cpuTiers[slot];
-  if (opponent !== before.cpuResolvedOpponents[slot] || tier !== before.cpuTiers[slot] || game.matchSeed !== before.matchSeed || computerLead(game) !== computerLead(before)) return false;
+  if (opponent !== before.cpuResolvedOpponents[slot] || tier !== before.cpuTiers[slot] || game.matchSeed !== before.matchSeed || computerLead(game) !== computerLead(before) || reactionLead(game.run) !== reactionLead(before.run)) return false;
   if (game.stageChoice !== before.stageChoice || stageClock(game) !== stageClock(before)) return false;
   if (game.timeLimitMinutes !== before.timeLimitMinutes || game.remainingFrames !== before.remainingFrames) return false;
   const fighter = fighterAt(world, slot);

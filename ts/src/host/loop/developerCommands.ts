@@ -12,7 +12,7 @@ import { setHitAreas } from "../../game/lobby/trainingSettings";
 import { setMeterPercent } from "../../game/sim/meter";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { costumeOf } from "../../game/roster/costumes";
-import { METER_COMMAND, captureRequest, classicDevRequest, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuHold, quickMatchCpuProfile, quickMatchCpuStage, quickMatchHero, quickHeroCostume, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPairCostumes, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
+import { METER_COMMAND, captureRequest, arcadeDevRequest, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuHold, quickMatchCpuProfile, quickMatchCpuStage, quickMatchHero, quickHeroCostume, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPairCostumes, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
 import { fighterKey } from "../../game/roster/kits";
 import { devReceiptFile } from "../../game/session/journalFiles";
 import { applyFighterSetup } from "../../game/session/fighterSetup";
@@ -34,7 +34,7 @@ import { applyShowcaseCommand } from "./showcase";
 import { applyCaptureCommand, clearCaptureStage } from "./captureStage";
 import { showcaseRequest } from "../../game/session/showcase";
 import { clearVisualCapture, configureVisualCapture } from "../../game/session/visualCapture";
-import { resetToStartingSelection, startDevClassic, startQuickMatch } from "./menus";
+import { resetToStartingSelection, startDevArcade, startQuickMatch } from "./menus";
 import { makePreview } from "./preview";
 import { type ShellState, localSlot } from "./state";
 import { AUTO_DELAY } from "wisp/src/netcode/delay";
@@ -138,8 +138,8 @@ function developerRequests(s: ShellState, actor: number, message: string) {
 
   const setup = applySetupCommand(s.game, actor, message);
   if (setup === `dev: stage ${s.game.stageChoice}` && s.game.phase === Phase.characterMenu) s.dev.stageChoice = s.game.stageChoice;
-  const classic = classicDevRequest(message);
-  return { fighterSetup, promo, quickStage, quickHero, quickPair, recoveryHero, offstageHero, painHero, quickCpu, fighterHide, showcase, setup, classic };
+  const arcade = arcadeDevRequest(message);
+  return { fighterSetup, promo, quickStage, quickHero, quickPair, recoveryHero, offstageHero, painHero, quickCpu, fighterHide, showcase, setup, arcade };
 }
 
 type DeveloperRequests = ReturnType<typeof developerRequests>;
@@ -166,7 +166,7 @@ function popupReceipt(s: ShellState, actor: number, message: string): string | u
 }
 
 function sessionReceipt(s: ShellState, actor: number, message: string, requests: DeveloperRequests): string | undefined {
-  const { fighterSetup, showcase, classic } = requests;
+  const { fighterSetup, showcase, arcade } = requests;
   if (fighterSetup !== undefined) return fighterSetup;
   const capture = captureRequest(message);
   if (capture !== undefined) return applyCaptureCommand(s, capture);
@@ -175,9 +175,9 @@ function sessionReceipt(s: ShellState, actor: number, message: string, requests:
   if (message.startsWith(HOST_DELAY_COMMAND)) return hostDelayCommand(s, actor, message.substring(HOST_DELAY_COMMAND.length));
   if (message === "-dev soak") return startNativeSoak(s) ? "dev: native soak four CPUs" : "dev: native soak requires an integrity map at selection";
   if (showcase !== undefined) return applyShowcaseCommand(s, showcase, () => applyDeveloperCommand(s, actor, RESET_COMMAND));
-  if (classic !== undefined) {
-    const receipt = `dev: classic ${fighterKey(classic.character)}${classic.boss ? " boss" : ""}`;
-    startDevClassic(s, classic.character, classic.boss);
+  if (arcade !== undefined) {
+    const receipt = `dev: arcade ${fighterKey(arcade.character)}${arcade.stage === 1 ? "" : ` stage ${arcade.stage}`}`;
+    startDevArcade(s, arcade.character, arcade.stage);
     return receipt;
   }
   if (message.startsWith("-dev shield-energy ")) return shieldEnergyReceipt(s, message);

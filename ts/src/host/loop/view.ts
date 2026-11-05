@@ -425,7 +425,6 @@ export function renderPersistentPresentation(s: ShellState): void {
   presentHydra(s, drawn, world, game, playing);
   const ui = views(s);
   if (playing) markAgency(ui, world, stage, matchFrame, s.controls, (activeRollback(s)?.repairedFrames ?? 0) > 0);
-  ui.classic?.present(game);
   ui.combat.present(runtime.impacts, runtime.simulationFrame, s.runtime.impacts, playing, s.camera);
   const roared = roaring(world, playing);
   for (const slot of PARTICIPANT_SLOTS) {
@@ -492,13 +491,6 @@ export function lockArenaCamera(s: ShellState): void {
   frameCaptureStage(s.capture, s.camera, game.phase === Phase.match, game.stageChoice, aspect);
   const { x: centerX, y: centerY } = s.origin;
   const framing = s.camera;
-  if (game.phase === Phase.match && game.run.active && game.run.boss.kind !== 0 && !s.session.paused) {
-
-    framing.x = 0.0;
-    framing.z = 160.0;
-    framing.distance = 1450.0;
-    framing.tangent = 0.2679491937160492;
-  }
   finalCamera(framing, game.stageChoice);
   probeCamera(s.probe, game.camera, framing, centerX, FLOOR_HEIGHT);
   const duration = s.cameraTween === true && game.phase === Phase.match && !s.session.paused ? FRAME_SECONDS : 0.0;

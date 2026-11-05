@@ -1,19 +1,19 @@
 import type { MatchState } from "../lobby/lobbyState";
 import { RULE_BUTTONS, type RuleName, rulePanel } from "./ruleButtons";
 import { type BarPanel, barBoxContains } from "../core/selectBarLayout";
-import { CLASSIC_LEVEL_HELP, FRIENDLY_FIRE_HELP, ITEM_RULE_HELP, MATCH_RULE_HELP, MODES, MODE_LIST_HELP, TRAINING_RULE_HELP, inputDelayHelp } from "./guide/text";
+import { ARCADE_MODE_HELP, ARCADE_TIER_HELP, FRIENDLY_FIRE_HELP, ITEM_RULE_HELP, MATCH_RULE_HELP, MODES, MODE_LIST_HELP, TRAINING_RULE_HELP, inputDelayHelp } from "./guide/text";
 
-const versus = (game: Readonly<MatchState>): boolean => !game.training && !game.classic;
+const versus = (game: Readonly<MatchState>): boolean => !game.training && !game.arcade;
 
-const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic" | "inputDelay">, string>> = { ...MATCH_RULE_HELP, ...ITEM_RULE_HELP, ...TRAINING_RULE_HELP, friendlyFire: FRIENDLY_FIRE_HELP };
+const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierArcade" | "harderArcade" | "inputDelay">, string>> = { ...MATCH_RULE_HELP, ...ITEM_RULE_HELP, ...TRAINING_RULE_HELP, friendlyFire: FRIENDLY_FIRE_HELP };
 
 const SHOWN_IN: Readonly<Record<string, (game: Readonly<MatchState>) => boolean>> = {
   ...Object.fromEntries(Object.keys(MATCH_RULE_HELP).map(name => [name, versus])),
   ...Object.fromEntries(Object.keys(ITEM_RULE_HELP).map(name => [name, (game: Readonly<MatchState>) => versus(game) && game.items.on])),
   ...Object.fromEntries(Object.keys(TRAINING_RULE_HELP).map(name => [name, (game: Readonly<MatchState>) => game.training])),
   friendlyFire: (game) => versus(game) && game.teamBattle,
-  easierClassic: (game) => game.classic,
-  harderClassic: (game) => game.classic,
+  easierArcade: (game) => game.arcade,
+  harderArcade: (game) => game.arcade,
 };
 
 const ruleShown = (name: RuleName, game: Readonly<MatchState>): boolean => SHOWN_IN[name]?.(game) ?? true;
@@ -31,16 +31,14 @@ export function hoveredRule(game: Readonly<MatchState>, open: BarPanel | undefin
 
 
 function modeHelp(game: Readonly<MatchState>): string {
-  const current = game.classic ? "Classic: a run of fights that ends with a boss."
-    : game.training ? "Training: practise on a partner you set up; no stocks or timer."
-    : "Versus: fight players and computers with the rules on this screen.";
-  return `Mode: open the list to choose Versus, Training, or Classic. ${current}`;
+  const current = game.arcade ? ARCADE_MODE_HELP : game.training ? MODES.training : MODES.versus;
+  return `Mode: open the list to choose Versus, Training, or Arcade. ${current}`;
 }
 
 
 export function ruleHelp(name: RuleName, game: Readonly<MatchState>, offlineDelay: number): string {
   if (name === "inputDelay") return inputDelayHelp(offlineDelay);
   if (name === "training") return modeHelp(game);
-  if (name === "easierClassic" || name === "harderClassic") return CLASSIC_LEVEL_HELP;
+  if (name === "easierArcade" || name === "harderArcade") return ARCADE_TIER_HELP;
   return HELP[name];
 }

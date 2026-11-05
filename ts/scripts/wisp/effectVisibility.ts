@@ -32,12 +32,6 @@ import { headlessRender } from "./headlessRender";
 import { locateStorage, readStockBuild, type RenderAssetOptions } from "./renderAssetStore";
 import { heroLook } from "../../src/game/roster/looks";
 import { meterCueFit, meterCueMoves } from "../../src/game/presentation/meterCues";
-import {
-  COLUMN_FIRE_MODEL, COLUMN_FIRE_SCALE, FINGER_CHARGE_MODEL, FINGER_CHARGE_SCALE, FINGER_IMPACT_FRAMES, FINGER_IMPACT_MODEL, FINGER_IMPACT_SCALE, FIRE_BURST_FRAMES, FIRE_BURST_MODEL, FIRE_BURST_SCALE,
-  RAIN_OF_FIRE_FRAMES, RAIN_OF_FIRE_MODEL, RAIN_OF_FIRE_SCALE, SHOCKWAVE_FRAMES, SHOCKWAVE_MODEL, SHOCKWAVE_PILLAR_SCALE, SHOCKWAVE_SWEEP, SHOCKWAVE_TRAIL_MODEL, SHOCKWAVE_TRAIL_SCALE,
-} from "../../src/game/presentation/bossSpellArt";
-import { bossDefinition } from "../../src/game/classic/bosses";
-import { BossKind } from "../../src/game/classic/runState";
 
 /** How one move shows one model in Classic: the sequence and seek it plays, its time scale, and whether its anchor travels. */
 export interface EffectUse {
@@ -269,22 +263,6 @@ export function projectileUse(character: Character, fighter: string, move: strin
   return { ...base, sequence, seconds: 0, timeScale: 1 };
 }
 
-const bossTell = (name: string): number => (bossDefinition(BossKind.archimonde)?.strikes ?? []).find((strike) => strike.name === name)?.tell ?? 0;
-const bossUse = (move: string, model: string, scale: number, frames: number): EffectUse => ({ fighter: "archimonde-boss", move, kind: "presentation effect", model, sequence: undefined, seconds: 0, timeScale: 1, travels: false, anchored: "fighter", scale, lifetime: frames / 60 });
-/** Archimonde's three strikes, each a fresh effect created on its frame and destroyed after its lifetime; a growing effect is judged at its smallest scale. */
-export function bossSpellUses(): EffectUse[] {
-  const tell = bossTell, use = bossUse;
-  return [
-    use("Rain of Fire column fire tell", COLUMN_FIRE_MODEL, COLUMN_FIRE_SCALE.from, tell("Rain of Fire")),
-    use("Rain of Fire meteors", RAIN_OF_FIRE_MODEL, RAIN_OF_FIRE_SCALE, RAIN_OF_FIRE_FRAMES),
-    use("Rain of Fire impact", FIRE_BURST_MODEL, FIRE_BURST_SCALE, FIRE_BURST_FRAMES),
-    use("Finger of Death charge tell", FINGER_CHARGE_MODEL, FINGER_CHARGE_SCALE.from, tell("Finger of Death")),
-    use("Finger of Death impact", FINGER_IMPACT_MODEL, FINGER_IMPACT_SCALE, FINGER_IMPACT_FRAMES),
-    use("Doom's Shockwave path tell", SHOCKWAVE_TRAIL_MODEL, SHOCKWAVE_TRAIL_SCALE.from, Math.ceil(tell("Doom's Shockwave") * (1 - SHOCKWAVE_SWEEP))),
-    use("Doom's Shockwave fire pillars", SHOCKWAVE_MODEL, SHOCKWAVE_PILLAR_SCALE, SHOCKWAVE_FRAMES),
-  ];
-}
-
 /** Every effect any fighter's move shows in Classic. */
 export function effectUses(): EffectUse[] {
   const uses: EffectUse[] = [];
@@ -349,7 +327,6 @@ export function effectUses(): EffectUse[] {
   for (const [move, model] of [["Howl of Terror fear", HOWL_TARGET_MODEL], ["Howl of Terror resist", RESIST_FLASH_MODEL]] as const) uses.push(supplemental(fighterSlug(Character.pitLord), move, model, "terrorPresentation playback requires an observed frame trace"));
   for (const [move, model] of [["raised skeleton", "Units\\Undead\\Skeleton\\Skeleton.mdx"], ["raised burst", "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx"], ["Defile boundary", IMPACT_DEFILE_MODEL], ["Defile frost", "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx"]] as const) uses.push(supplemental(fighterSlug(Character.lichKing), move, model, "projectilePresentation supplemental playback is unmodeled"));
   uses.push(supplemental(fighterSlug(Character.lich), "Death and Decay ground", IMPACT_DEFILE_MODEL, "projectilePresentation supplemental playback is unmodeled"));
-  uses.push(...bossSpellUses());
   const seen = new Set<string>();
   return uses.filter((use) => {
     const key = JSON.stringify(use);
@@ -373,10 +350,6 @@ export const EFFECT_CALIBRATION: readonly CalibrationCase[] = [
   { expect: "visible", evidence: "native Classic 3.0.1.24371 capture effects-native-24371-20261022 blademaster-cues frame 278", use: { fighter: "blademaster", move: "neutral-special Wind Cutter projectile", kind: "projectile", model: "Abilities\\Weapons\\WingedSerpentMissile\\WingedSerpentMissile.mdx", travels: true, anchored: "projectile", scale: 1, lifetime: 0.4, anchor: "projectile", sequence: "stand", seconds: 0, timeScale: 1 } },
   { expect: "visible", evidence: "native Classic 3.0.1.24371 capture effects-native-24371-20261022 blademaster-cues frame 362", use: cueUse("blademaster", "down-special Mirror Image startup", "special cue", { model: "Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", anchor: "body", scale: 1, sequence: "birth", seconds: Math.fround(0.2) }) },
   { expect: "visible", evidence: "native Classic 3.0.1.24371 capture effects-native-24371-20261022 blademaster-cues frames 452 and 457, blademaster-late-cues frame 682", use: cueUse("blademaster", "up-special Rising Whirlwind active", "special cue", { model: "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx", anchor: "body", scale: Math.fround(0.6), sequence: "stand", seconds: Math.fround(0.2) }) },
-  { expect: "flagged", cause: "only flat ground output", evidence: "the 2026-11-03 Warcraft-client capture of Archimonde's rework drew nothing on the Rain of Fire columns while FlameStrikeTarget stood there (95debe28dd^)", use: bossUse("Rain of Fire column fire tell (95debe28dd^)", "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdx", Math.fround(0.5), bossTell("Rain of Fire")) },
-  { expect: "visible", evidence: "the Warcraft-client capture of 95debe28dd showed a burning fire on each Rain of Fire column", use: bossUse("Rain of Fire column fire tell (95debe28dd)", "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx", Math.fround(0.3), bossTell("Rain of Fire")) },
-  { expect: "visible", evidence: "the Warcraft-client capture of 95debe28dd showed a Doom fire tower on each Rain of Fire column at the hit", use: bossUse("Rain of Fire impact (95debe28dd)", "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", Math.fround(0.7), 40) },
-  { expect: "visible", evidence: "the Warcraft-client capture of 95debe28dd showed a fire jet at each Doom's Shockwave trail point", use: bossUse("Doom's Shockwave fire pillars (95debe28dd)", "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx", Math.fround(1.2), 60) },
   { expect: "visible", evidence: "the 2026-11-04 Warcraft-client capture edge-on/before of 11b8ac28e7 (reel uther R41, frames 49 to 60) drew DevotionAura as a clear blue rune at Uther's feet through the side-special startup and active", use: cueUse("uther", "side-special Devotion Aura startup", "special cue", { model: "Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", anchor: "feet", scale: Math.fround(1.6), sequence: "stand", seconds: Math.fround(0.2) }) },
   { expect: "visible", evidence: "the 2026-11-04 Warcraft-client capture edge-on/before of 11b8ac28e7 (reel uther R41, frames 49 to 60) drew DevotionAura as a clear blue rune at Uther's feet through the side-special startup and active", use: cueUse("uther", "side-special Devotion Aura active", "special cue", { model: "Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdx", anchor: "feet", scale: Math.fround(1.6), sequence: "stand", seconds: Math.fround(0.2) }) },
   { expect: "visible", evidence: "the 2026-11-04 Warcraft-client capture edge-on/before of 11b8ac28e7 (reel dreadlord R41, frames 50 to 62) drew DarkSummonTarget as clear green rings on the Dreadlord's body through Bat Ascension", use: cueUse("dreadlord", "up-special Bat Ascension active", "special cue", { model: "Abilities\\Spells\\Undead\\DarkSummoning\\DarkSummonTarget.mdx", anchor: "body", scale: Math.fround(0.6), sequence: "stand", seconds: Math.fround(0.2) }) },

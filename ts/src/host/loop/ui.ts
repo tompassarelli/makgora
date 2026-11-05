@@ -63,8 +63,7 @@ import { fighterEmpoweredAura } from "../../game/presentation/empoweredAuraLook"
 import { BodyFlash } from "../../game/render/bodyFlash";
 import { MeterGlow } from "../../game/render/meterGlow";
 import { type FighterDraw, createFighterDraw } from "../../game/presentation/fighterDraw";
-import { ClassicPresentation } from "../../game/render/classicPresentation";
-import { BossPlate } from "../../game/ui/bossPlate";
+import { ArcadeCard } from "../../game/render/arcadeCard";
 import { PauseMenu } from "../../game/ui/pauseMenu";
 import { PauseScreen } from "../../game/ui/pauseScreen";
 import { InputPreview } from "../../game/ui/inputPreview";
@@ -134,8 +133,7 @@ export interface UiObjects {
 
   elements: ElementEffects;
 
-  classic?: ClassicPresentation;
-  bossPlate?: BossPlate;
+  arcadeCard?: ArcadeCard;
   controlHits?: Slots<MenuControlHit>;
 }
 
@@ -201,8 +199,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     sounds: modelSoundPresentation(s.origin, combat.sounds),
     match: new MatchPresentation(s.origin, results),
     elements: new ElementEffects(s.origin),
-    classic: new ClassicPresentation(s.origin),
-    bossPlate: new BossPlate(),
+    arcadeCard: new ArcadeCard(),
   };
   combat.costumeOf = (slot) => {
     if (!isParticipantSlot(slot)) return 0;
@@ -385,14 +382,8 @@ function rebindMatchPanels(s: ShellState, ui: UiObjects): void {
     ui.elements.destroy();
     ui.elements = new ElementEffects(s.origin);
   } else bindPrototype(ui.elements, ElementEffects.prototype);
-  const retainedClassic: { readonly classic?: { readonly cast?: unknown } } = ui;
-  if (ui.classic === undefined) ui.classic = new ClassicPresentation(s.origin);
-  else if (retainedClassic.classic?.cast === undefined) {
-    ui.classic.destroy();
-    ui.classic = new ClassicPresentation(s.origin);
-  } else bindPrototype(ui.classic, ClassicPresentation.prototype);
-  if (ui.bossPlate === undefined) ui.bossPlate = new BossPlate();
-  else bindPrototype(ui.bossPlate, BossPlate.prototype);
+  if (ui.arcadeCard === undefined) ui.arcadeCard = new ArcadeCard();
+  else bindPrototype(ui.arcadeCard, ArcadeCard.prototype);
 }
 
 function rebindFighterRenderers(renderers: FighterRenderers): void {
@@ -465,7 +456,6 @@ export function clearMatchEffects(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.spheres?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.flight?.hide();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.empoweredAura?.hide();
-  ui.classic?.endMatch();
 }
 
 export function pauseEffects(s: ShellState, paused: boolean): void {

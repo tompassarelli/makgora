@@ -7,7 +7,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, participantActive } from "../i
 import { type MatchState, Phase } from "../lobby/lobbyState";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { BossKind, type ConfiguredMatch, RunOutcome, WinCondition, resetBossState } from "./runState";
+import { type ConfiguredMatch, RunOutcome, WinCondition } from "./runState";
 
 
 
@@ -82,7 +82,6 @@ export function applyConfiguredMatch(game: MatchState, entry: ConfiguredMatch): 
   game.stageChoice = entry.stage;
   game.stageResolved = true;
   game.rematchReadiness.fill(false);
-  resetBossState(run.boss, entry.boss, entry.boss === BossKind.none ? 0 : entry.bossHealth);
   game.phase = Phase.stageMenu;
 }
 
@@ -116,7 +115,6 @@ function configuredOutcome(game: Readonly<MatchState>, world: Readonly<Roster>):
   switch (entry.win) {
     case WinCondition.survive: return alive && (game.timedOut || won) ? RunOutcome.won : RunOutcome.lost;
     case WinCondition.koWithinClock: return won && !game.timedOut ? RunOutcome.won : RunOutcome.lost;
-    case WinCondition.defeatBoss: return alive && run.boss.health <= 0 ? RunOutcome.won : RunOutcome.lost;
     default: return won ? RunOutcome.won : RunOutcome.lost;
   }
 }

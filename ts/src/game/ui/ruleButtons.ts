@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { cardDown, cardRight, cardSize } from "../menu/selectionDrag";
-import { type BarBox, type BarPanel, CLASSIC_ROWS, DRAWER_ROWS, GEAR_ROWS, MODE_ROWS, SELECT_BAR, TRAINING_ROWS } from "../core/selectBarLayout";
+import { type BarBox, type BarPanel, ARCADE_ROWS, DRAWER_ROWS, GEAR_ROWS, MODE_ROWS, SELECT_BAR, TRAINING_ROWS } from "../core/selectBarLayout";
 
 export type RuleBox = BarBox;
 
@@ -31,8 +31,8 @@ export const RULE_BUTTONS = {
   moreDamage: TRAINING_ROWS.damage.more,
   hitAreas: TRAINING_ROWS.hitAreas,
   speed: TRAINING_ROWS.speed,
-  easierClassic: CLASSIC_ROWS.tier.less,
-  harderClassic: CLASSIC_ROWS.tier.more,
+  easierArcade: ARCADE_ROWS.tier.less,
+  harderArcade: ARCADE_ROWS.tier.more,
 } as const;
 
 export type RuleName = keyof typeof RULE_BUTTONS;

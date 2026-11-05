@@ -20,7 +20,7 @@ import { writeMatchOrbs } from "../sim/orbState";
 import type { Fighter } from "../sim/fighter";
 import { CONTROL_FIELDS, fighterAt, isActive } from "../sim/roster";
 import { writeTrainingState } from "../match/trainingState";
-import { writeConfiguredRun } from "../classic/runState";
+import { writeConfiguredRun } from "../arcade/runState";
 import { writeComputerLead } from "../core/computerLead";
 import { CPU_OPPONENT_CHOICES, CPU_OPPONENT_IDS, CPU_TIERS } from "../match/cpuProfiles";
 import { botStrategyValues } from "../match/botStrategy";
@@ -159,9 +159,9 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
     writeTrainingState(match.trainer, int, bool, real);
   }
 
-  if (match.classic) {
-    bool("match.classic", true);
-    int("match.classicTier", match.classicTier);
+  if (match.arcade) {
+    bool("match.arcade", true);
+    int("match.arcadeTier", match.arcadeTier);
   }
   if (match.run.active) writeConfiguredRun(match.run, int, bool, real, (name, value) => sink.text(`|${name}=${value}`));
   int("runtime.simulationFrame", runtime.simulationFrame);

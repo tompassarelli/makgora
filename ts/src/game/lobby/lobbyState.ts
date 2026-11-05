@@ -1,4 +1,4 @@
-import { CLASSIC_CHARACTERS, classicRoute } from "../classic/routes";
+import { ARCADE_CHARACTERS, arcadeTable } from "../arcade/tables";
 import { type StagePool, createStagePool, copyStagePool } from "../menu/stagePool";
 import { PLAYABLE_CHARACTERS, isMatchCharacter, nextCharacterIn, DEFAULT_FIGHTER } from "../roster/kits";
 import { isComingSoon, shownFighters } from "../roster/forge";
@@ -12,7 +12,7 @@ import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, ty
 import { type MatchItems, copyMatchItems, createMatchItems } from "../match/items";
 import { type Team } from "../sim/teams";
 import { STAGE_AT_REST } from "../sim/stage";
-import { type ConfiguredRun, copyConfiguredRun, createConfiguredRun } from "../classic/runState";
+import { type ConfiguredRun, copyConfiguredRun, createConfiguredRun } from "../arcade/runState";
 import { type TrainingState, copyTrainingState, createTrainingState } from "../match/trainingState";
 import { copyComputerLead } from "../core/computerLead";
 
@@ -25,7 +25,7 @@ export const DEFAULT_RESULT_PICK: ResultPick = ResultPick.rematch;
 export const shownResultPick = (focus: readonly number[] | undefined, slot: number): number => focus?.[slot] ?? DEFAULT_RESULT_PICK;
 export const MATCH_TICKS_PER_SECOND = 60;
 
-export const CLASSIC_TIER_DEFAULT = 1;
+export const ARCADE_TIER_DEFAULT = 1;
 
 export interface MatchState {
   readonly camera: MatchCamera;
@@ -87,8 +87,8 @@ export interface MatchState {
 
   computerLead?: number;
 
-  classic: boolean;
-  classicTier: number;
+  arcade: boolean;
+  arcadeTier: number;
 
   readonly run: ConfiguredRun;
 }
@@ -114,7 +114,7 @@ export function createMatchState(): MatchState {
 
     remainingFrames: 7 * 60 * MATCH_TICKS_PER_SECOND, startHold: 0, matchFrame: 0, timedOut: false, practice: false,
     training: false, trainer: createTrainingState(), items: createMatchItems(), orbs: createMatchOrbs(), ultimatesOff: false,
-    classic: false, classicTier: CLASSIC_TIER_DEFAULT, run: createConfiguredRun(),
+    arcade: false, arcadeTier: ARCADE_TIER_DEFAULT, run: createConfiguredRun(),
   };
 }
 
@@ -253,8 +253,8 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
   target.ultimatesOff = source.ultimatesOff;
   copyComputerLead(target, source);
   copyMatchOrbs(target.orbs, source.orbs);
-  target.classic = source.classic;
-  target.classicTier = source.classicTier;
+  target.arcade = source.arcade;
+  target.arcadeTier = source.arcadeTier;
   copyConfiguredRun(target.run, source.run);
   for (const slot of PARTICIPANT_SLOTS) {
     target.characterChoices[slot] = source.characterChoices[slot];
@@ -279,7 +279,7 @@ export function characterReady(game: Readonly<MatchState>, slot: number): boolea
 }
 
 export function offeredMatchCharacter(game: Readonly<MatchState>, choice: number): choice is Character {
-  return isMatchCharacter(choice) && (!game.classic || classicRoute(choice) !== undefined);
+  return isMatchCharacter(choice) && (!game.arcade || arcadeTable(choice) !== undefined);
 }
 
 export function selectableMatchCharacter(game: Readonly<MatchState>, choice: number): choice is Character {
@@ -287,7 +287,7 @@ export function selectableMatchCharacter(game: Readonly<MatchState>, choice: num
 }
 
 export function nextMatchCharacter(game: Readonly<MatchState>, current: number | undefined, direction: number): Character {
-  return nextCharacterIn(shownFighters(game.classic ? CLASSIC_CHARACTERS.filter(character => PLAYABLE_CHARACTERS.includes(character)) : PLAYABLE_CHARACTERS, game.forge), current, direction);
+  return nextCharacterIn(shownFighters(game.arcade ? ARCADE_CHARACTERS : PLAYABLE_CHARACTERS, game.forge), current, direction);
 }
 
 export type CharacterOffer = (game: Readonly<MatchState>, choice: number) => choice is Character;
@@ -312,4 +312,4 @@ export const START_HOLD_FRAMES = 3 * MATCH_TICKS_PER_SECOND;
 
 export const holdingStart = (game: Readonly<MatchState>): boolean => game.phase === Phase.match && game.startHold > 0 && game.matchFrame <= game.startHold;
 
-export const classicRouted = (character: number): boolean => classicRoute(character) !== undefined;
+export const arcadeRouted = (character: number): boolean => arcadeTable(character) !== undefined;

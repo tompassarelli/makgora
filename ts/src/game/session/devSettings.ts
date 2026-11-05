@@ -288,13 +288,15 @@ export function prepareQuickMatch(game: MatchState, stage = 0, character?: Chara
 }
 
 
-export const CLASSIC_COMMAND = "-dev classic ";
+export const ARCADE_COMMAND = "-dev arcade ";
 
-export function classicDevRequest(message: string): { readonly character: Character; readonly boss: boolean } | undefined {
-  const boss = heroAfter(message, `${CLASSIC_COMMAND}boss `);
-  if (boss !== undefined) return { character: boss, boss: true };
-  const character = heroAfter(message, CLASSIC_COMMAND);
-  return character === undefined ? undefined : { character, boss: false };
+export function arcadeDevRequest(message: string): { readonly character: Character; readonly stage: number } | undefined {
+  const rest = message.startsWith(ARCADE_COMMAND) ? message.substring(ARCADE_COMMAND.length) : undefined;
+  if (rest === undefined) return undefined;
+  const space = rest.indexOf(" ");
+  const stage = space < 0 ? undefined : commandInteger(rest.substring(0, space));
+  const character = heroAfter(`${ARCADE_COMMAND}${space < 0 ? rest : rest.substring(space + 1)}`, ARCADE_COMMAND);
+  return character === undefined || (space >= 0 && stage === undefined) ? undefined : { character, stage: stage ?? 1 };
 }
 
 
