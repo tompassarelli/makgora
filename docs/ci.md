@@ -31,15 +31,19 @@ such a rehash into a measured move reads as a pair regression (#197).
 Tom asked for small changes to reach main in one to two minutes rather than
 about six, by checking before landing only what a change can affect and
 running the full suite on main afterwards (2026-10-29), then for a gameplay
-change to land in 90 s or less (#689). So `safe-push --to main` lands a local
-lane straight on main (the lander lands it: the repository's .safe-push sets no `landing.queue`;
-Autoland still lands cloud workers' `claude/**` pushes), and the landing gate
-runs on the farm, not on the landing machine, with the lock held only to
-fetch, rebase, scan and push:
+change to land in 90 s or less (#689), then for landing in seconds with every
+slow check after the push, as north does (2026-11-06). So `safe-push --to main`
+queues a local lane on the lander, which pushes main after only the scans and
+the seconds-long `land.check` lines (the lander runs them here, `land.check-local`;
+Autoland still lands cloud workers' `claude/**` pushes with the older gate),
+then runs every `land.after` line on each landed batch; a red run is bisected
+to its first red lane, which the lander reverts through its queue and hands
+back to its author with `Follows:` (north:docs/rationale/landing-train.md).
 
-1. **Before landing.** `safe-push --to main` runs the repository's one
-   `land.check` (.safe-push) before it takes the landing lock, in place of the
-   pre-push hook: makgora:ts/scripts/landingFarm.ts picks the farm-test.yml
+1. **After the push.** The suite parity check (makgora:ts/scripts/suiteParity.ts, a tenth of a second)
+   is the one `land.check` before the push. The `land.after` line for everything else runs
+   makgora:ts/scripts/landingFarm.ts on the landed batch, in place of the
+   pre-push hook, and it picks the farm-test.yml
    groups the lane's diff against main reaches (`landingGroups` in
    makgora:ts/scripts/landingChecks.ts, which names every check, its command
    and the paths that reach it; the Lua parity checks and the frame budgets wait
@@ -53,8 +57,7 @@ fetch, rebase, scan and push:
    locomotion lock, strike moments, animation jitter, map-build inputs) cannot
    run on a hosted runner, so they run on the landing machine beside the farm
    run; the log names each with the reason (`landing local:`), and each farm
-   result with its groups and run (`landing farm:`). A failing check refuses
-   the landing, printing the summary's failing tests and checks. A group that
+   result with its groups and run (`landing farm:`). A failing check turns the after run red, printing the summary's failing tests and checks, and the lander reverts the first red lane. A group that
    passed is remembered by the hash of its inputs (makgora:ts/scripts/landingInputs.ts:
    the group, the checks it runs and the blob of every tracked file their reach
    rules match), in the pre-push cache here and as a `farm-pass-GROUP-HASH`
@@ -62,10 +65,7 @@ fetch, rebase, scan and push:
    suite and main's CI reuse it too, logging "GROUP reused: it passed before on inputs HASH"), so a retry or a
    rebase onto a moved main reruns only the groups whose files changed. The
    clean-room group's inputs are every tracked file (the clean room reads any
-   path), so it reruns on each change. When origin main moves while
-   a run is in flight on files the lane also changes, the landing reruns it on
-   the rebased tree, up to three times, then under the lock; a move on other
-   files keeps the verdict, since main's full suite runs after each landing. A
+   path), so it reruns on each change. A
    raw `git push` to main, which skips safe-push, still runs the pre-push hook's
    local gate (`landingSelection`, makgora:ts/scripts/landingRun.ts `here`).
    `LAND_FULL_SUITE=1 safe-push --to main` forces every group.

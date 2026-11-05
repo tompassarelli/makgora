@@ -1,9 +1,11 @@
 [land]
 	publish = farm/
-	check = . :: cd ts && bun install --frozen-lockfile && bun scripts/landingFarm.ts
-	check = controller/,tools/makgora-tools/,structure.toml :: north code-health habits --repo .
-	check = controller/ :: cd controller && RUSTC_WRAPPER= nix-shell -I nixpkgs=flake:nixpkgs/e1d7762c24208983d0e55130ad215501883d608b -p cargo clippy rustc stdenv.cc cmake pkg-config libxkbcommon udev --run 'cargo clippy --all-targets --locked -- -D warnings'
-	check = tools/makgora-tools/ :: cd tools/makgora-tools && RUSTC_WRAPPER= nix-shell -I nixpkgs=flake:nixpkgs/e1d7762c24208983d0e55130ad215501883d608b -p cargo clippy rustc stdenv.cc --run 'cargo clippy --all-targets --locked -- -D warnings'
+	check-local = true
+	check = .github/workflows/farm-test.yml,.github/workflows/autoland.yml,ts/scripts/suiteParity.ts,ts/scripts/prePush.ts :: cd ts && bun scripts/suiteParity.ts
+	after = . :: cd ts && bun install --frozen-lockfile && bun scripts/landingFarm.ts
+	after = controller/,tools/makgora-tools/,structure.toml :: north code-health habits --repo .
+	after = controller/ :: cd controller && RUSTC_WRAPPER= nix-shell -I nixpkgs=flake:nixpkgs/e1d7762c24208983d0e55130ad215501883d608b -p cargo clippy rustc stdenv.cc cmake pkg-config libxkbcommon udev --run 'cargo clippy --all-targets --locked -- -D warnings'
+	after = tools/makgora-tools/ :: cd tools/makgora-tools && RUSTC_WRAPPER= nix-shell -I nixpkgs=flake:nixpkgs/e1d7762c24208983d0e55130ad215501883d608b -p cargo clippy rustc stdenv.cc --run 'cargo clippy --all-targets --locked -- -D warnings'
 [ci]
 	budget = farm-test.yml 600
 [mutant]
