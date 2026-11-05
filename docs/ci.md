@@ -97,6 +97,8 @@ back to its author with `Follows:` (north:docs/rationale/landing-train.md).
    sheriff and the "main is red" issue (see Sheriff); the lane whose
    landing first failed owns the fix.
 
+Measured 2026-11-06 4:32 to 4:34 AM, the first four landings after the lander resumed with this gate (ff5e918597, 5eae1ea7ff, 9cae27b77d, f980b2c0a5): queue to main took 16, 12, 14 and 13 s by the lander's done tickets (`~/.local/state/north/land-queue/*/done`, queue time from the ticket name), and `safe-push --to main` returned after 5 s. The same gate before this change ran the farm and the private-store checks before the queue (minutes on the farm). A clean-room-only after-push run passed in 45 s; a red after-push run is bisected by the lander, and a rate-limited or cancelled one exits 75 and reverts nothing.
+
 What reaches each check:
 
 - A shared root (the lockfiles, `package.json`, tsconfigs, `ts/plugins`,
