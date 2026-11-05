@@ -5,7 +5,7 @@ import { expect, test } from "bun:test";
 import { Effect } from "effect";
 import { GROUPS, type Group, landingGroups } from "../scripts/landingChecks";
 import { groupInputKey } from "../scripts/landingInputs";
-import { type FarmRunner, checksVerdict, exitCodeFor, landOnFarm, localChecks } from "../scripts/landingFarm";
+import { type FarmRunner, cancelledOnly, checksVerdict, exitCodeFor, landOnFarm, localChecks } from "../scripts/landingFarm";
 import { checksFor } from "../scripts/prePush";
 import { directoryCache } from "../scripts/prePush";
 
@@ -73,4 +73,13 @@ test("a rate-limited or unavailable GitHub exits 75 for the lander to treat as t
   expect(exitCodeFor("HTTP 503 for run 1")).toBe(75);
   expect(exitCodeFor("GitHub is rate-limiting requests")).toBe(75);
   expect(exitCodeFor("FAIL parity tapes\nlanding farm: failure on abc: url")).toBe(1);
+});
+
+test("a farm run GitHub cancelled is not a failing check, and one with a failed check beside a cancelled one is [k2 property]", () => {
+  const run = (conclusion: string, ...jobs: readonly [string, string][]) => ({ status: "completed", conclusion, jobs: jobs.map(([name, result]) => ({ name, status: "completed", conclusion: result })) });
+  expect(cancelledOnly(run("cancelled"), ["corpus"])).toBe(true);
+  expect(cancelledOnly(run("failure", ["corpus", "cancelled"], ["static", "success"]), ["corpus", "static"])).toBe(true);
+  expect(cancelledOnly(run("failure", ["corpus", "cancelled"], ["static", "failure"]), ["corpus", "static"])).toBe(false);
+  expect(cancelledOnly(run("failure", ["corpus", "failure"]), ["corpus"])).toBe(false);
+  expect(exitCodeFor("landing farm: GitHub cancelled the run, not a check: https://github.com/x/y/actions/runs/1")).toBe(75);
 });

@@ -22,7 +22,7 @@ const RETRY = "10 seconds";
 const PASSING = new Set(["success", "skipped"]);
 const RUN_URL = /\/actions\/runs\/(\d+)/;
 const TRANSIENT = /HTTP (403|404|429|50[234])/;
-const GITHUB_UNAVAILABLE = /HTTP (403|429|50[234])|rate.?limit/i;
+const GITHUB_UNAVAILABLE = /HTTP (403|429|50[234])|rate.?limit|GitHub cancelled/i;
 const INFRASTRUCTURE_EXIT = 75;
 
 /** A landing's verdict from the check jobs alone, since the merge job only summarises them: failed once one fails, passed once all pass. */
@@ -33,6 +33,13 @@ export function checksVerdict(state: RunState, groups: readonly Group[] = GROUPS
   if (state.status === "completed") return state.conclusion === "success" ? "passed" : "failed";
   return "pending";
 }
+
+/** A run its jobs were cancelled (a sweep, a superseding run) says nothing about the lane. */
+export const cancelledOnly = (state: RunState, groups: readonly Group[]): boolean => {
+  const failed = state.jobs.filter(({ name, status, conclusion }) => (groups as readonly string[]).includes(name) && status === "completed" && !PASSING.has(conclusion));
+  if (state.conclusion === "cancelled") return true;
+  return failed.length > 0 && failed.every(({ conclusion }) => conclusion === "cancelled");
+};
 
 const dispatchRun = (repo: string, inputs: Readonly<Record<string, string>> & { readonly tag: string }, workflowRef: string) => Effect.gen(function*() {
   const printed = yield* run(["gh", "workflow", "run", WORKFLOW, "-R", repo, "--ref", workflowRef, ...Object.entries(inputs).flatMap(([name, value]) => ["-f", `${name}=${value}`])]);
@@ -92,6 +99,7 @@ const farmRun: FarmRunner = (head, base, groups, full) => Effect.scoped(Effect.g
   const seconds = ((performance.now() - started) / 1000).toFixed(0);
   if (verdict === "passed") return yield* Console.error(`landing farm: ${groups.join(", ")} passed on ${ref.slice(0, 12)} (${seconds} s): ${found.url}`);
   const state = yield* waitFor(repo, found.databaseId);
+  if (cancelledOnly(state, groups)) return yield* new FarmFailure({ problem: `landing farm: GitHub cancelled the run, not a check: ${found.url}` });
   const folder = mkdtempSync(join(tmpdir(), "landing-farm-"));
   const detail = yield* run(["gh", "run", "download", String(found.databaseId), "-R", repo, "-n", "farm-test-summary", "-D", folder]).pipe(
     Effect.flatMap(() => Schema.decodeEffect(Summary)(readFileSync(join(folder, "summary.json"), "utf8"))),
