@@ -31,6 +31,7 @@ why = "full Bun suite belongs on the farm"
 [[command]]
 pattern = ["bun", "scripts/lua-tests.ts"]
 narrowing = []
+narrowing_env = ["GAME_TESTS", "GAME_MODULES"]
 farm = "bun wisp farm test --ref <sha> --wait"
 why = "full Lua32 suite belongs on the farm"
 
