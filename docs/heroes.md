@@ -181,8 +181,6 @@ fighter state: rollback copies them, replay difference compares them, and the
 canonical replay text includes them for fighters with a hero kit (the ultimate meter
 for every fighter).
 
-The shared contracts are in `ts/src/game/sim/heroSpecials.tests.ts`.
-
 ## Presentation
 
 - In the playable build (pooled presentation) a hero draws from its clip

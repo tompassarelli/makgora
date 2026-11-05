@@ -1255,10 +1255,7 @@ row and any shape-exception rows go in the same change. The only Forge
 coverage kept is what protects players who turn the Forge toggle on: the map
 loads and builds with every fighter, the fighter spawns and has its costumes
 and move list, and matches stay deterministic and in sync (the playtest,
-soak and native-smoke tools, the select and lobby tests). `ts/test/forge-gates.test.ts`
-fails when a script or test lists the whole roster without using the helper
-unless it is on its named correctness allowlist, and shows that removing a
-slug from `FORGE_FIGHTERS` adds the fighter to the balance plan.
+soak and native-smoke tools, the select and lobby tests).
 
 Character select lays out only the fighters it shows (`selectGrid` in
 makgora:ts/src/game/ui/selectionFrames.ts): with the setting off the featured

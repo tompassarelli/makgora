@@ -1599,8 +1599,7 @@ scales by the horizontal stick magnitude, while acceleration adds the signed
 base to the stick times the multiplier. Fox, Falco and Captain Falcon share the
 base 0.02 Melee units/frame ("Air Mobility B", character-attributes.csv); Mak'gora's authored full-stick
 acceleration stores base plus multiplier. Full horizontal keyboard rows,
-including keyboard diagonals, keep the existing full-rate drift. The
-input-row fixture is `ts/src/game/sim/analogAirDrift.tests.ts`.
+including keyboard diagonals, keep the existing full-rate drift.
 
 After the frame's collision, a fighter that is falling, jumping, tumbling
 past hitstun, or in a wall or ceiling recovery past its hang checks it;

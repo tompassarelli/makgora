@@ -39,7 +39,6 @@ push velocity persists across frames: the existing position snapshots capture
 the whole result for rollback. Melee's =0.1 and=1.4
 adjust and cap depth-plane movement; this side-view game has no depth movement.
 
-`ts/src/game/match/pushPhysicsContracts.tests.ts` runs the production match
-path in Bun and Lua32. The `push-physics` acceptance tape records walking
+The `push-physics` acceptance tape records walking
 body overlap and damage-dependent shield contact with corrected predictions
 and rollbacks for `bun wisp parity tapes`.
