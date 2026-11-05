@@ -77,10 +77,17 @@ package exports no window entry.
 
 `makgora-native.desktop` is the "Mak'gora Native" entry in rofi's drun list: it opens
 Mak'gora's standalone native window (`bun wisp play --standalone --start select`, the
-Rust window library above) at character select. Its launcher `makgora-native` runs from
-its own detached worktree `~/code/makgora/worktrees/native-play`, which it moves to
-`origin/main` and installs packages in at each launch, so a game in progress never has
-its tree moved by the watcher's checkout. Offline it plays the tree it has. To install:
+Rust window library above) at character select. The entry runs `makgora-native` from the
+main checkout, which plays from its own detached worktree `~/code/makgora/worktrees/native-play`:
 
-    git -C ~/code/makgora/main worktree add --detach ~/code/makgora/worktrees/native-play origin/main
+- It creates the worktree when it is missing and locks it, because lane-gc retires an
+  unlocked worktree that is clean, on main and idle 3 hours.
+- Unless a game from it is already running, it moves the worktree to `origin/main` and runs
+  `bun install`, so each launch plays the newest main and a running game never has its tree
+  moved, by the watcher's checkout or by a second launch. Offline it plays the tree it has.
+- It logs each launch to `~/.local/state/makgora/native-play.log` and shows a desktop
+  notification naming that log when the worktree, the install or the game fails.
+
+To install the entry:
+
     sed "s|@HOME@|$HOME|g" tools/tom-build/makgora-native.desktop > ~/.local/share/applications/makgora-native.desktop

@@ -1,4 +1,30 @@
 #!/bin/sh
-tree="$HOME/code/makgora/worktrees/native-play"
-git -C "$tree" fetch -q origin main && git -C "$tree" checkout -q --detach FETCH_HEAD
-cd "$tree/ts" && bun install --frozen-lockfile >/dev/null && exec bun wisp play --standalone --start select "$@"
+repo="$HOME/code/makgora"
+tree="$repo/worktrees/native-play"
+state="${XDG_STATE_HOME:-$HOME/.local/state}/makgora"
+log="$state/native-play.log"
+mkdir -p "$state" || exit 1
+fail() {
+  notify-send -a "Mak'gora Native" "Mak'gora Native didn't start" "$1. Log: $log"
+  exit 1
+}
+exec 9>"$state/native-play.lock"
+if flock -n -x 9; then
+  exec >"$log" 2>&1
+  if [ ! -d "$tree" ]; then
+    git -C "$repo/main" worktree add --detach "$tree" origin/main || fail "Could not create $tree"
+  fi
+  git -C "$repo/main" worktree lock --reason "Mak'gora Native launcher (tools/tom-build/makgora-native)" "$tree" 2>/dev/null
+  if git -C "$tree" fetch -q origin main && git -C "$tree" checkout -q --detach FETCH_HEAD; then
+    echo "playing origin/main $(git -C "$tree" rev-parse --short HEAD)"
+  else
+    echo "kept $(git -C "$tree" rev-parse --short HEAD): could not move to origin/main"
+  fi
+  (cd "$tree/ts" && bun install --frozen-lockfile) || fail "bun install failed in $tree/ts"
+else
+  exec >>"$log" 2>&1
+  echo "a game is already running from $tree; playing it as it is"
+fi
+flock -s 9
+cd "$tree/ts" || fail "No $tree/ts"
+bun wisp play --standalone --start select "$@" || fail "The game exited with an error"
