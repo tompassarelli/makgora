@@ -1,5 +1,7 @@
 # Online plan: real-path measurements
 
+Owners: makgora#1122
+
 ## One match through the deployed Singapore relay (makgora#833, 2026-10-30)
 
 The laptop hosted slot 0 and gex45 joined slot 1 through the sgp relay on Nexus

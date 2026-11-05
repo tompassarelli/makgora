@@ -1,5 +1,7 @@
 # Melee parity plan
 
+Owners: makgora#311
+
 Tom found combos weak, especially at low percent (neutral air into grab), and
 set the direction on 2026-10-26: first a clean, verified Melee-parity
 baseline, tagged so any later deviation can be reverted to Melee's handling;
