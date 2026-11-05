@@ -18,6 +18,14 @@ export const tierName = (tier: number): string => {
 };
 export const shownTier = (game: Readonly<MatchState>): number => (game.run.active ? game.run.tier : game.arcadeTier);
 
+const TIER_GUIDANCE: readonly string[] = [
+  "New to fighting games, or to this fighter? Start here.",
+  "You've played platform fighters, but not this fighter.",
+  "You know fighting games and this fighter. No continues.",
+];
+
+export const arcadeGuidance = (game: Readonly<MatchState>): string => game.arcade ? at(TIER_GUIDANCE, Math.max(0, Math.min(WARCHIEF_TIER, game.arcadeTier))) : "";
+
 export const arcadeTierSetting = (tier: number): string => `Arcade tier: ${tierName(tier)}`;
 
 export function arcadeRouteSummary(character: number): string {

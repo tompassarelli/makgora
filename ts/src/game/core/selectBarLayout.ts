@@ -145,10 +145,11 @@ export const TRAINING_ROWS = {
   speed: drawerHalf(4, 1),
 } as const;
 
-/** The drawer's rows in Arcade: the tier, then the route. */
+/** The drawer's rows in Arcade: the tier, the guidance line under it, then the route. */
 export const ARCADE_ROWS = {
   tier: wideStep(0),
-  route: box(DRAWER_INNER.x, drawerRow(1), DRAWER_INNER.width, f32(f32(4 * ROW) + f32(3 * ROW_GAP))),
+  guidance: box(DRAWER_INNER.x, drawerRow(1), DRAWER_INNER.width, ROW),
+  route: box(DRAWER_INNER.x, drawerRow(2), DRAWER_INNER.width, f32(f32(3 * ROW) + f32(2 * ROW_GAP))),
 } as const;
 
 const MODE_PANEL = BAR_PANELS.mode;

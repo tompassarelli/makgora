@@ -5,13 +5,14 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS } from "../input/participants";
-import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, costumeFor } from "../lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, Phase, type MatchState, costumeFor, firstHumanSlot } from "../lobby/lobbyState";
 import { costumeClipModel } from "../roster/costumes";
 import { type Character, DuoRole } from "../sim/codes";
 import { duoRole } from "../sim/fighter";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { PARTNER_COSTUME } from "../presentation/model/costume";
 import { bodyModelScale } from "../presentation/fighterScale";
+import { tierVoice } from "../presentation/tierVoice";
 import { MatchCue, MENU_MUSIC, cueSound, interfaceSoundPaths, presentationSoundPaths, readyVoice, victoryAnimation, victoryMusic, warcryVoice } from "../presentation/matchAudio";
 import {
   type ResultsView, clearMatchTally, confirmedFrameCues, createCueObservation, createMatchTally, createMenuCues, createMenuObservation,
@@ -192,10 +193,12 @@ export class MatchPresentation {
       }
     }
     menuFrameCues(this.menu, game, hover, this.menuCues);
-    const { hover: hovered, confirm, fighters } = this.menuCues;
+    const { hover: hovered, confirm, tier, fighters } = this.menuCues;
     if (hovered) this.cue(MatchCue.hover);
     if (confirm || fighters.length > 0) this.cue(MatchCue.confirm);
     for (const slot of fighters) this.voice(slot, readyVoice(game.characterChoices[slot]));
+    const player = firstHumanSlot(game);
+    if (tier && player !== undefined) this.voice(player, tierVoice(game.characterChoices[player], game.arcadeTier));
   }
 
 

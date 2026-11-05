@@ -2,10 +2,10 @@ import type { MatchState } from "../../game/lobby/lobbyState";
 import type { MatchMode } from "../../game/lobby/matchMode";
 import type { ArcadeLines, SelectText } from "../../game/ui/selectionActions";
 import { MODE_LABELS, rulesPillParts, selectionModeLabel } from "../../game/session/messages";
-import { arcadeRouteSummary, arcadeTierSetting } from "../../game/arcade/arcadeText";
+import { arcadeGuidance, arcadeRouteSummary, arcadeTierSetting } from "../../game/arcade/arcadeText";
 
 function arcadeLines(game: Readonly<MatchState>, fighter: number): ArcadeLines {
-  return { setting: arcadeTierSetting(game.arcadeTier), route: arcadeRouteSummary(fighter) };
+  return { setting: arcadeTierSetting(game.arcadeTier), guidance: arcadeGuidance(game), route: arcadeRouteSummary(fighter) };
 }
 
 /** The select bar's words from match flow and Arcade progress, which the ui layer may not read itself. */

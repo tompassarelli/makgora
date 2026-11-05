@@ -128,6 +128,8 @@ export function resultRows(game: Readonly<MatchState>, world: Readonly<Roster>, 
 export interface MenuObservation {
   phase: Phase;
   stage: number;
+  arcade: boolean;
+  arcadeTier: number;
   hover: number | undefined;
   readonly choices: Slots<number>;
   readonly ready: Slots<boolean>;
@@ -135,18 +137,19 @@ export interface MenuObservation {
 }
 
 export function createMenuObservation(): MenuObservation {
-  return { phase: Phase.characterMenu, stage: 0, hover: undefined, choices: [0, 0, 0, 0], ready: [false, false, false, false], random: [false, false, false, false] };
+  return { phase: Phase.characterMenu, stage: 0, arcade: false, arcadeTier: 0, hover: undefined, choices: [0, 0, 0, 0], ready: [false, false, false, false], random: [false, false, false, false] };
 }
 
 
 export interface MenuCues {
   hover: boolean;
   confirm: boolean;
+  tier: boolean;
   readonly fighters: ParticipantSlot[];
 }
 
 export function createMenuCues(): MenuCues {
-  return { hover: false, confirm: false, fighters: [] };
+  return { hover: false, confirm: false, tier: false, fighters: [] };
 }
 
 
@@ -164,6 +167,7 @@ function pickCue(before: Readonly<MenuObservation>, game: Readonly<MatchState>, 
 export function menuFrameCues(before: MenuObservation, game: Readonly<MatchState>, hover: number | undefined, cues: MenuCues): void {
   cues.hover = false;
   cues.confirm = false;
+  cues.tier = false;
   cues.fighters.length = 0;
   const { phase } = game;
   if (phase === Phase.characterMenu && before.phase === Phase.characterMenu) {
@@ -171,11 +175,14 @@ export function menuFrameCues(before: MenuObservation, game: Readonly<MatchState
       pickCue(before, game, slot, cues);
     }
     if (hover !== undefined && hover !== before.hover) cues.hover = true;
+    if (game.arcade && before.arcade && !game.run.active && game.arcadeTier !== before.arcadeTier) cues.tier = true;
   }
   if (phase === Phase.stageMenu && before.phase === Phase.stageMenu && game.stageChoice !== before.stage) cues.hover = true;
   if (phase === Phase.stageMenu && before.phase === Phase.characterMenu) cues.confirm = true;
   before.phase = phase;
   before.stage = game.stageChoice;
+  before.arcade = game.arcade;
+  before.arcadeTier = game.arcadeTier;
   before.hover = hover;
   for (const slot of PARTICIPANT_SLOTS) {
     before.choices[slot] = game.characterChoices[slot];

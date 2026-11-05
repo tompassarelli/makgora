@@ -46,7 +46,7 @@ test("Every bar panel opens under the bar inside the screen, and its rows lie in
         DRAWER_ROWS.time.label, DRAWER_ROWS.time.less, DRAWER_ROWS.time.value, DRAWER_ROWS.time.more, DRAWER_ROWS.ultimates, DRAWER_ROWS.items, DRAWER_ROWS.endless, DRAWER_ROWS.automaticRematch,
         DRAWER_ROWS.itemSpeed, DRAWER_ROWS.itemHeavy],
       Object.values(TRAINING_ROWS).flatMap(row => "less" in row ? [row.less, row.value, row.more] : [row]),
-      [ARCADE_ROWS.tier.less, ARCADE_ROWS.tier.value, ARCADE_ROWS.tier.more, ARCADE_ROWS.route],
+      [ARCADE_ROWS.tier.less, ARCADE_ROWS.tier.value, ARCADE_ROWS.tier.more, ARCADE_ROWS.guidance, ARCADE_ROWS.route],
     ],
     mode: [[...MODE_ROWS.modes, MODE_ROWS.teamBattle, MODE_ROWS.friendlyFire], [...MODE_ROWS.modes, MODE_ROWS.teamToggle, MODE_ROWS.friendlyToggle]],
     guide: [[GUIDE_ROWS.controls, GUIDE_ROWS.moves, GUIDE_ROWS.tutorial]],

@@ -23,9 +23,10 @@ export interface LobbyNet {
   readonly echoes: readonly string[];
 }
 
-/** Arcade's two drawer lines: the start setting and the route. */
+/** Arcade's three drawer lines: the start setting, the guidance under the tier and the route. */
 export interface ArcadeLines {
   readonly setting: string;
+  readonly guidance: string;
   readonly route: string;
 }
 

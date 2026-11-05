@@ -306,7 +306,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Neutral special: Multi-Shot | FrostArrowLaunch | FrostArrowHit | FrostArrowHit + CrushingWaveDamage | WoodMediumBashMetal |  |
 | Side special: Tidal Serpent | CrushingWave | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | WoodMediumBashMetal |  |
 | Up special: Tidal Surge | CrushingWave | CrushingWaveDamage | CrushingWaveDamage + CrushingWaveDamage | WoodMediumBashMetal |  |
-| Down special: Mana Shield | ManaShieldCastSound | FrostArmor | FrostArmor + CrushingWaveDamage | WoodMediumBashMetal |  |
+| Down special: Mana Shield |  | FrostArmor | FrostArmor + CrushingWaveDamage | WoodMediumBashMetal |  |
 
 ## Archimonde
 
@@ -370,3 +370,24 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 
 | Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
 | --- | --- | --- | --- | --- | --- |
+
+## Sally Whitemane
+
+| Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
+| --- | --- | --- | --- | --- | --- |
+
+## Valeera
+
+| Move | Perform | Weak hit | Strong hit | Shield hit | Voice |
+| --- | --- | --- | --- | --- | --- |
+
+## Arcade tier voice
+
+Played on the character select when Arcade's tier changes, in the chosen fighter's race flavour: a worker line for Peon, a soldier line for Grunt, a hero line for Warchief. Each is a stock Ready line the Warcraft III install ships, referenced by path at run time and never imported.
+
+| Race | Peon | Grunt | Warchief |
+| --- | --- | --- | --- |
+| Human | PeasantReady1 | FootmanReady1 | HeroMountainKingReady1 |
+| NightElf | WispReady1 | ArcherReady1 | HeroDemonHunterReady1 |
+| Orc | PeonReady1 | GruntReady1 | HeroBladeMasterReady1 |
+| Undead | AcolyteReady1 | GhoulReady1 | HeroLichReady1 |

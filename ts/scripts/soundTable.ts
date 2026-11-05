@@ -1,6 +1,9 @@
 import { join } from "node:path";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
 import { SPECIAL_INPUTS, fighterKit, normalName } from "../src/game/sim/moveNames";
+import { CPU_TIERS } from "../src/game/match/cpuProfiles";
+import { tierVoice } from "../src/game/presentation/tierVoice";
+import { RACES, fighterRace } from "../src/game/roster/races";
 import { type SoundLayer, isSpecialMove, moveSound, soundedMoves, specialMove } from "../src/game/presentation/moveSounds";
 
 export const SOUND_TABLE_PATH = join(import.meta.dir, "../../docs/design/sound-table.md");
@@ -39,6 +42,11 @@ export function soundTableMarkdown(): string {
       const name = kit.specials[slot]?.name ?? "";
       lines.push(`| ${SPECIAL_INPUTS[slot]}: ${name} | ${cell(row.perform)} | ${cell(row.hit)} | ${cell(row.strong)} | ${cell(row.shield)} | ${row.voice === undefined ? "" : cell([row.voice])} |`);
     }
+  }
+  lines.push("", "## Arcade tier voice", "", "Played on the character select when Arcade's tier changes, in the chosen fighter's race flavour: a worker line for Peon, a soldier line for Grunt, a hero line for Warchief. Each is a stock Ready line the Warcraft III install ships, referenced by path at run time and never imported.", "", `| Race | ${CPU_TIERS.map(tier => `${tier.charAt(0).toUpperCase()}${tier.slice(1)}`).join(" | ")} |`, `| --- | ${CPU_TIERS.map(() => "---").join(" | ")} |`);
+  for (const race of RACES) {
+    const fighter = SELECTABLE_CHARACTERS.find(candidate => fighterRace(candidate) === race);
+    if (fighter !== undefined) lines.push(`| ${race} | ${CPU_TIERS.map((_, tier) => short(tierVoice(fighter, tier))).join(" | ")} |`);
   }
   return `${lines.join("\n")}\n`;
 }

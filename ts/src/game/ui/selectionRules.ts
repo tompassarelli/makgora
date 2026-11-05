@@ -46,6 +46,7 @@ export interface RuleFrames {
   readonly hitAreas: BarControl;
   readonly speed: BarControl;
   readonly arcade: Stepper;
+  readonly guidance: Frame;
   readonly route: Frame;
   readonly versus: RuleGroup;
   readonly training: RuleGroup;
@@ -100,16 +101,17 @@ export function createRulesDrawer(drawer: Frame, suffix: string, add: AddRule): 
   const hitAreas = pressable(drawer, add, name("HitAreas"), TRAINING_ROWS.hitAreas, { kind: "hitAreas" }, "");
   const speed = pressable(drawer, add, name("Speed"), TRAINING_ROWS.speed, { kind: "speed" }, "");
   const arcade = stepper(drawer, add, name("Arcade"), ARCADE_ROWS.tier, direction => ({ kind: "arcadeTier", direction }), BAR_TEXT);
+  const guidance = barText(drawer, name("Guidance"), ARCADE_ROWS.guidance, BAR_SMALL_TEXT, TextAlignment.left);
   const route = barText(drawer, name("Route"), ARCADE_ROWS.route, BAR_SMALL_TEXT, TextAlignment.left);
   const steps = (...all: Stepper[]): RuleGroup => ({ controls: all.flatMap(s => [s.less, s.more]), texts: all.map(s => s.value) });
   const versusSteps = steps(stocks, time);
   const trainingSteps = steps(partner.behaviour, partner.escape, partner.tech, partner.damage);
   const arcadeSteps = steps(arcade);
   return {
-    heading, presets, reset, stocks, time, toggles, forgeIcon, itemKinds, partner, hitAreas, speed, arcade, route,
+    heading, presets, reset, stocks, time, toggles, forgeIcon, itemKinds, partner, hitAreas, speed, arcade, guidance, route,
     versus: { controls: [...presets, reset, ...versusSteps.controls, toggles.ultimates, toggles.items, toggles.endless, toggles.automaticRematch, toggles.forge], texts: [forgeIcon, stockLabel, timeLabel, ...versusSteps.texts] },
     training: { controls: [...trainingSteps.controls, hitAreas, speed], texts: trainingSteps.texts },
-    arcadeFrames: { controls: arcadeSteps.controls, texts: [...arcadeSteps.texts, route] },
+    arcadeFrames: { controls: arcadeSteps.controls, texts: [...arcadeSteps.texts, guidance, route] },
   };
 }
 
@@ -156,6 +158,7 @@ function presentTraining(rules: RuleFrames, game: Readonly<MatchState>): void {
 
 function presentArcade(rules: RuleFrames, lines: ArcadeLines): void {
   setMenuText(rules.arcade.value, `${BAR_COLOURS.gold}${lines.setting}|r`);
+  setMenuText(rules.guidance, lines.guidance);
   setMenuText(rules.route, lines.route);
 }
 
@@ -214,7 +217,7 @@ export const delayLit = (frames: DelayFrames, delay: DelayControl): readonly (re
 
 export function rulesKey(game: Readonly<MatchState>, arcade: ArcadeLines | undefined): string {
   const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, arcade: arcadeRun } = game;
-  const lines = arcade === undefined ? "" : `${arcade.setting}\n${arcade.route}`;
+  const lines = arcade === undefined ? "" : `${arcade.setting}\n${arcade.guidance}\n${arcade.route}`;
   return `${arcadeRun ? "1" : "0"} ${formatInt(stockCount)} ${formatInt(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${formatInt(trainer.behaviour)} ${formatInt(trainer.escape)} ${formatInt(trainer.tech)} ${formatInt(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${formatInt(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${formatInt(items.enabledMask)} ${formatInt(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"} ${game.forge ? "1" : "0"} ${lines}`;
 }
 

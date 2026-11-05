@@ -6,6 +6,7 @@ import { IMPORTED_MENU_MUSIC, IMPORTED_STAGE_MUSIC } from "../assets/importedMus
 import { IMPORTED_MURLOC_GURGLE } from "../assets/importedVoiceInfo";
 import { Character } from "../sim/codes";
 import { type StageTile, selectableStage } from "../menu/stageCatalog";
+import { tierVoicePaths } from "./tierVoice";
 
 
 export const MatchCue = {
@@ -238,13 +239,13 @@ export const victoryAnimation = (character: Character): string => VICTORY_ANIMAT
 
 
 export function interfaceSoundPaths(characters: readonly Character[]): string[] {
-  const paths = cueSoundPaths();
+  const paths = [...cueSoundPaths(), ...tierVoicePaths()];
   for (const character of characters) paths.push(readyVoice(character), warcryVoice(character));
   return paths.filter((path, index) => paths.indexOf(path) === index);
 }
 
 export function presentationSoundPaths(characters: readonly Character[], stages: readonly StageTile[]): string[] {
-  const paths = [...cueSoundPaths(), MENU_MUSIC, ...VICTORY_MUSIC];
+  const paths = [...cueSoundPaths(), ...tierVoicePaths(), MENU_MUSIC, ...VICTORY_MUSIC];
   for (const stage of stages) paths.push(stageMusic(stage));
   for (const character of characters) paths.push(readyVoice(character), warcryVoice(character));
   if (characters.includes(Character.peon)) paths.push(JOB_DONE_VOICE);
