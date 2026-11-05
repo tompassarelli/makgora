@@ -30,8 +30,8 @@ const FROZEN_THRONE: StageScenery = {
   sky: STAGE_SKY_MODELS[2] ?? "",
 
   fog: { start: 5000.0, end: 11000.0, red: 0.15625, green: 0.28125, blue: 0.453125 },
-  heightFog: { start: 5000.0, end: 11000.0, density: 0.25, heightStart: -1500.0, heightEnd: -200.0, maxDensity: 0.5, drawOverSky: false },
-  floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [58, 82, 120] },
+  heightFog: { start: 3300.0, end: 8000.0, density: 0.5, heightStart: -1600.0, heightEnd: -300.0, maxDensity: 0.75, drawOverSky: false },
+  floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [34, 48, 74] },
   pieces: [
     { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -557.0, scale: 1.0, yaw: 270.0, matrixScale: [7.0, 3.5, 2.5], color: [40, 54, 78], still: true },
     { model: "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx", x: 0.0, y: 2100.0, z: -481.0, scale: 1.0, yaw: 270.0, matrixScale: [6.25, 3.125, 2.5], color: [44, 58, 82], still: true },
