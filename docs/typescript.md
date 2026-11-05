@@ -47,7 +47,8 @@ makgora:ts/scripts/wisp/mapInputs.ts, project paths and naming in
 makgora:ts/scripts/wisp/project.ts, and game-specific commands, assets,
 replay corpora and native acceptance journeys.
 
-To update to Wisp's current published `main`, run from makgora:ts/:
+To update to Wisp's current published `main`, run from makgora:ts/ in a
+worktree (the updater refuses the primary checkout):
 
 ```sh
 bun run update:wisp

@@ -16,6 +16,10 @@ const project = resolve(import.meta.dir, "..");
 const run = (args: [string, ...string[]], cwd = project) => runProcess(ChildProcess.make(args[0], args.slice(1), { cwd, stderr: "inherit" }));
 const Revision = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/));
 const main = Effect.gen(function*() {
+const [gitDir, commonDir] = (yield* run(["git", "rev-parse", "--path-format=absolute", "--git-dir", "--git-common-dir"])).split("\n");
+if (gitDir === commonDir) {
+  throw new Error(`update:wisp rewrites ts/package.json, ts/wisp.lock and ts/vendor/, so it refuses the primary checkout ${resolve(project, "..")}; run it in a worktree and land the pin`);
+}
 mkdirSync(resolve(project, "vendor"), { recursive: true });
 mkdirSync(resolve(project, "build"), { recursive: true });
 const work = yield* Effect.acquireRelease(
