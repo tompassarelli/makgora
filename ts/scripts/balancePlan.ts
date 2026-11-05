@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
 import { decoded, FarmFailure, run } from "wisp/scripts/wisp/farm";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
+import { gatedSlugs } from "../src/game/roster/forge";
 import { runnerAdmission } from "./farmAdmission";
 import { runStepOutputs } from "./stepOutputs";
 import { JOB_SECONDS, measuredSeconds, ofKind, shardWork, type Work } from "./balanceShards";
@@ -37,11 +37,13 @@ const timingSamples = (repo: string, keys: readonly string[]) => Effect.acquireU
   (folder) => Effect.sync(() => rmSync(folder, { recursive: true, force: true })),
 );
 
+export const balanceMatchups = (slugs: readonly string[] = gatedSlugs()): string[] => slugs.flatMap((a, index) => slugs.slice(index + 1).map((b) => `${a}:${b}`));
+
 const main = Effect.gen(function*() {
   const repo = process.env.GITHUB_REPOSITORY;
   if (repo === undefined) return yield* new FarmFailure({ problem: "balancePlan needs GITHUB_REPOSITORY" });
-  const slugs = SELECTABLE_CHARACTERS.map(fighterSlug);
-  const allPairs = slugs.flatMap((a, index) => slugs.slice(index + 1).map((b) => `${a}:${b}`));
+  const slugs = gatedSlugs();
+  const allPairs = balanceMatchups(slugs);
   const requested = (process.env.MATCHUPS ?? "").split(",").filter(Boolean);
   if (requested.some((pair) => !allPairs.includes(pair))) return yield* new FarmFailure({ problem: "Unknown or reversed fighter matchup" });
   const pairs = requested.length === 0 ? allPairs : allPairs.filter((pair) => requested.includes(pair));

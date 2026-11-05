@@ -1,6 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { SELECTABLE_CHARACTERS, fighterName } from "../roster/kits";
+import { fighterName } from "../roster/kits";
+import { gatedFighters } from "../roster/forge";
 import type { Character } from "./codes";
 import { type Fighter, PLATFORM_DROP_INPUT_WINDOW, createFighter } from "./fighter";
 import { setWorldMotionValue } from "./motion";
@@ -80,7 +81,7 @@ function where(character: Character, at: Deck, fast: boolean, name: string): str
 
 function passesEverywhere(inputs: readonly (readonly [string, Readonly<Controls>])[]): void {
   check(passDecks().length > 0, "no fixed pass-through decks found");
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     for (const at of passDecks()) {
       for (const fast of [false, true]) {
         for (const [name, input] of inputs) {
@@ -98,7 +99,7 @@ function passesEverywhere(inputs: readonly (readonly [string, Readonly<Controls>
 }
 
 function landsEverywhere(name: string, input: Readonly<Controls>): void {
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     for (const at of passDecks()) {
       for (const fast of [false, true]) check(cross(character, at, fast, input, false).landed, `${where(character, at, fast, name)} passed through`);
     }

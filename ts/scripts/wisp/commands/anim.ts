@@ -16,6 +16,7 @@ import type { Character } from "../../../src/game/sim/codes";
 import { ACCENT_SECONDS, ACCENT_SEQUENCE, CUE_FRONT } from "../../../src/game/render/hitAreaEffects";
 import { DISJOINT_CUES } from "../../../src/game/presentation/disjointCues";
 import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/game/roster/kits";
+import { gatedFighters } from "../../../src/game/roster/forge";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../../src/game/sim/matchCamera";
 import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
@@ -134,7 +135,7 @@ const parseFlags = (args: readonly string[], allowed: readonly string[]) => {
 };
 
 const selectFighters = (names: readonly string[] | undefined) => Effect.gen(function*() {
-  if (names === undefined) return SELECTABLE_CHARACTERS;
+  if (names === undefined) return gatedFighters();
   const chosen = names.map((name) => SELECTABLE_CHARACTERS.find((character) => fighterSlug(character) === name.toLowerCase() || fighterName(character).toLowerCase() === name.toLowerCase()));
   const missing = names.filter((_, index) => chosen[index] === undefined);
   if (missing.length > 0) return yield* new UsageFailure({ problem: `no fighter named ${missing.join(", ")}; use a slug such as ${fighterSlug(SELECTABLE_CHARACTERS[0] ?? 1)}` });

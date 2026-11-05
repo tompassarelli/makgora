@@ -1241,6 +1241,25 @@ CPU Random, the stage pool and Classic rivals use featured entries only,
 whatever the rule; a Classic fight whose planned rivals are all in the Forge
 takes a featured stand-in.
 
+Forge fighters are out of balance testing, balance and per-fighter quality
+gates, and single-player content (Arcade tables, rivals and routes) until
+promoted (decided 2026-11-05): a fighter in the Forge is in development, so
+nothing spends effort on it or gates on it. `gatedFighters()` and
+`gatedSlugs()` in forge.ts are the featured fighters, and every balance script
+and baseline (`balancePlan`, `balanceKit`, `balanceBaseline.json`, `cpuField`,
+`cpuTiers`, `cpuCoverage`, `cpuCeiling`, `agencySweep`, `wisp perf census`) and
+per-fighter quality tool or test iterates them instead of the whole roster;
+`balanceBaseline.json` holds featured fighters only. Promotion is deleting the slug from `FORGE_FIGHTERS`, which
+folds the fighter into all of those at once; its baseline entry, Arcade table
+row and any shape-exception rows go in the same change. The only Forge
+coverage kept is what protects players who turn the Forge toggle on: the map
+loads and builds with every fighter, the fighter spawns and has its costumes
+and move list, and matches stay deterministic and in sync (the playtest,
+soak and native-smoke tools, the select and lobby tests). `ts/test/forge-gates.test.ts`
+fails when a script or test lists the whole roster without using the helper
+unless it is on its named correctness allowlist, and shows that removing a
+slug from `FORGE_FIGHTERS` adds the fighter to the balance plan.
+
 Character select lays out only the fighters it shows (`selectGrid` in
 makgora:ts/src/game/ui/selectionFrames.ts): with the setting off the featured
 fighters and Random fill a compact grid in roster order with no gaps, and with

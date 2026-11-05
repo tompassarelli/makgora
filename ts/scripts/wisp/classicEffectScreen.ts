@@ -1,5 +1,6 @@
 import type { Frame } from "wisp/scripts/wisp/frameProbe";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/roster/kits";
+import { fighterSlug } from "../../src/game/roster/kits";
+import { gatedFighters } from "../../src/game/roster/forge";
 import { effectSourceDigest, effectUses, effectUseDigest } from "./effectVisibility";
 
 export interface PixelBox { readonly x: number; readonly y: number; readonly width: number; readonly height: number }
@@ -25,7 +26,7 @@ const projectileKey = (use: typeof projectileUses[number]) => `${use.fighter}:${
 const SCREEN_PROJECTILES = projectileUses.map(projectileKey);
 const projectileFrames = new Map(projectileUses.map(use => [projectileKey(use), Math.round((use.lifetime ?? 0) * 60)]));
 export const screenRequiredFrames = (move: string) => Math.max(1, projectileFrames.get(move) ?? 1);
-export const SCREEN_MOVES = [...new Set([...SELECTABLE_CHARACTERS.flatMap(character => ["neutral-special", "side-special", "up-special", "down-special", "ultimate"].map(move => `${fighterSlug(character)}:${move}`)), ...SCREEN_PROJECTILES])];
+export const SCREEN_MOVES = [...new Set([...gatedFighters().flatMap(character => ["neutral-special", "side-special", "up-special", "down-special", "ultimate"].map(move => `${fighterSlug(character)}:${move}`)), ...SCREEN_PROJECTILES])];
 export const SCREEN_CHANNEL_DELTA = 24;
 export const SCREEN_LEAK_DELTA = 96;
 

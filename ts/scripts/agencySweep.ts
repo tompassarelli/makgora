@@ -23,7 +23,8 @@ import { type Fighter, createFighter } from "../src/game/sim/fighter";
 import { attackStartupFrames } from "../src/game/sim/moves";
 import { seatMurlocPartners } from "../src/game/fighters/murloc/duo";
 import { createRoster, fighterAt } from "../src/game/sim/roster";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
+import { fighterName } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { type AgencyReport, ESCAPE_FRAMES, type Loop, TIGHT_ESCAPE, agencyLetters, analyzeAgency, runFrame, sameGameplay, snapshotOf } from "./agency";
 import { exportComparisons } from "./moveComparisons";
 
@@ -33,7 +34,7 @@ interface Entry {
 }
 
 
-export const FIGHTERS: readonly Entry[] = SELECTABLE_CHARACTERS.map((character) => ({ name: fighterName(character), character }));
+export const FIGHTERS: readonly Entry[] = gatedFighters().map((character) => ({ name: fighterName(character), character }));
 const nameOf = (character: number) => FIGHTERS.find((entry) => entry.character === character)?.name ?? "fighter";
 
 const PERCENTS = Array.from({ length: 16 }, (_, index) => index * 10);

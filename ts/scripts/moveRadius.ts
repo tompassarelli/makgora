@@ -5,7 +5,8 @@ import { AttackStyle, type Character } from "../src/game/sim/codes";
 import { attackCapsule, emptyCapsule } from "../src/game/sim/geometry/contactGeometry";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { fighterShield } from "../src/game/sim/heroes/heroBodies";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
+import { fighterSlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { attackDurationFramesForGrounding } from "../src/game/sim/moves";
 import { authoredTuning } from "../src/game/sim/tuning";
 
@@ -112,7 +113,7 @@ export function largestRadius(character: Character, style: AttackStyle, grounded
 export interface RadiusRow { readonly fighter: string; readonly move: MoveType; readonly radius: number; readonly shield: number; readonly relative: number; readonly band: Band; readonly pass: boolean }
 
 export function rosterRadii(bands = meleeBands()): RadiusRow[] {
-  return SELECTABLE_CHARACTERS.flatMap((character) => {
+  return gatedFighters().flatMap((character) => {
     const shield = fighterShield(character);
     if (shield === undefined) throw new Error(`${fighterSlug(character)} has no shield in heroBodies.ts`);
     return MOVE_TYPES.flatMap((type) => {
@@ -137,7 +138,8 @@ export interface RadiusCheck { readonly failures: readonly RadiusRow[]; readonly
 
 export function checkRadii(rows: readonly RadiusRow[], exceptions: readonly RadiusException[]): RadiusCheck {
   const failing = rows.filter((r) => !r.pass);
-  const excepted = exceptions.flatMap((e) => e.moves.map((move) => ({ fighter: e.fighter, move })));
+  const gated = new Set(rows.map((r) => r.fighter));
+  const excepted = exceptions.filter((e) => gated.has(e.fighter)).flatMap((e) => e.moves.map((move) => ({ fighter: e.fighter, move })));
   const same = (a: ExceptedMove, b: ExceptedMove): boolean => a.fighter === b.fighter && a.move === b.move;
   return {
     failures: failing.filter((r) => !excepted.some((e) => same(e, r))),

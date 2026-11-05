@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { createWhiteGlowState, whiteGlowAlpha } from "../presentation/whiteGlow";
 import { AttackStyle, type Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
-import { SELECTABLE_CHARACTERS } from "../roster/kits";
+import { gatedFighters } from "../roster/forge";
 import { authoredHitRegion, emptyHitRegion } from "./hitRegions";
 import { SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER, SMASH_MAX_HOLD_FRAMES, smashDamageMultiplier } from "./moves";
 import { advanceSolo, controls } from "./testWorld";
@@ -42,7 +42,7 @@ test("Smash charge: the multiplier grows over 60 frames to 1.3671x, and frames h
 
 test("Smash charge: every fighter's forward, up and down smash charges 60 frames, holds at full charge to frame 180 with the charge glow showing, then releases by itself; releasing earlier keeps the frame's multiplier [k3 measure #328]", () => {
   assertEquals(SMASH_MAX_HOLD_FRAMES, 180);
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     for (const style of SMASHES) {
       const name = `${character}/${style}`;
       const full = hold(character, style, SMASH_MAX_HOLD_FRAMES + 30);

@@ -1,5 +1,6 @@
 import { AttackStyle, type Character, GroundAction } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
+import { fighterSlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { authoredTuning, WORLD_UNITS_PER_MELEE_UNIT } from "../src/game/sim/tuning";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { attackDurationFramesForGrounding } from "../src/game/sim/moves";
@@ -69,4 +70,4 @@ export function judgeDashAttack(d: DashAttack): DashAttackRow {
   };
 }
 
-export const rosterDashAttacks = (): DashAttackRow[] => SELECTABLE_CHARACTERS.map((c) => judgeDashAttack(ourDashAttack(c)));
+export const rosterDashAttacks = (): DashAttackRow[] => gatedFighters().map((c) => judgeDashAttack(ourDashAttack(c)));

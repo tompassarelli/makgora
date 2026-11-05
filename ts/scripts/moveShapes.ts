@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Schema } from "effect";
 import { AttackStyle, type Character } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
+import { fighterSlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { authoredTuning } from "../src/game/sim/tuning";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { authoredHurtboxes, HurtState, type HurtPart } from "../src/game/sim/hurtboxes";
@@ -105,7 +106,7 @@ export function judge(fighter: string, direction: Direction, jab: number, smash:
 }
 
 export function rosterShapes(): Row[] {
-  return SELECTABLE_CHARACTERS.flatMap((character) => {
+  return gatedFighters().flatMap((character) => {
     const jab = attackStartupFrames(AttackStyle.jab, authoredTuning(character).moves) + 1;
     const table = readLinkTable(character);
     return DIRECTIONS.map((d) => judge(fighterSlug(character), d.name, jab, moveShape(character, d.smash), moveShape(character, d.tilt), table && linkOptions(table, `${d.name} smash`, `${d.name} tilt`)));
@@ -129,6 +130,6 @@ export function check(rows: readonly Row[], exceptions: readonly ShapeException[
   return {
     failures: failing.filter((v) => !exceptions.some((e) => sameMove(e, v))),
     excused: failing.filter((v) => exceptions.some((e) => sameMove(e, v))),
-    stale: exceptions.filter((e) => !failing.some((v) => sameMove(e, v))),
+    stale: exceptions.filter((e) => rows.some((r) => r.fighter === e.fighter) && !failing.some((v) => sameMove(e, v))),
   };
 }

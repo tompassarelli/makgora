@@ -17,6 +17,7 @@ import { Action } from "../../../src/game/input/actions";
 import { playComboRoute } from "../../../src/game/match/comboRoute";
 import { Character } from "../../../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName } from "../../../src/game/roster/kits";
+import { gatedFighters } from "../../../src/game/roster/forge";
 import { type FighterSummary, MAX_CONVERSIONS, OPENERS, OPPONENTS, PERCENTS, POSITIONS, type RouteRecord, type UnitReport, fighterNamed, summarize } from "../../comboExplorer";
 import { type AdvantageRow, TARGETS, type ZeroToDeath, advantagePage, unmet } from "../../advantageState";
 import { admit } from "../../heavyCapacity";
@@ -226,7 +227,7 @@ const decodeRows = (text: string) => Effect.forEach(text.split("\n").filter((lin
 const readText = (file: string) => Effect.tryPromise({ try: () => Bun.file(file).text(), catch: failure });
 
 const writeAdvantage = (all: readonly AdvantageRow[], measured: readonly AdvantageRow[]) => Effect.gen(function* () {
-  const order = SELECTABLE_CHARACTERS.map(fighterName);
+  const order = gatedFighters().map(fighterName);
   const weight = (row: AdvantageRow) => TARGETS.findIndex((target) => target.weight === row.target);
   const sorted = [...all].sort((x, y) => order.indexOf(x.fighter) - order.indexOf(y.fighter) || weight(x) - weight(y));
   yield* Effect.tryPromise({
@@ -272,7 +273,7 @@ const zeroToDeath = (attackers: readonly Character[], jobs: number) => Effect.ge
 
 const mergeAdvantage = (files: readonly string[]) => Effect.gen(function* () {
   const rows = (yield* Effect.forEach(files, (file) => readText(file).pipe(Effect.flatMap(decodeRows)))).flat();
-  const expected = SELECTABLE_CHARACTERS.flatMap((attacker) => TARGETS.map((target) => `${fighterName(attacker)} ${target.weight}`)).sort();
+  const expected = gatedFighters().flatMap((attacker) => TARGETS.map((target) => `${fighterName(attacker)} ${target.weight}`)).sort();
   const found = rows.map((row) => `${row.fighter} ${row.target}`).sort();
   if (found.join("\n") !== expected.join("\n")) return yield* new CombosFailure({ problem: `the merged rows are ${found.length} of the ${expected.length} fighter and target rows, not each exactly once` });
   yield* writeAdvantage(rows, rows);
@@ -318,7 +319,7 @@ const linkObjectives = (all: readonly ComboObjective[], attackers: readonly Char
 });
 
 const throwRoles = (declarations: readonly ThrowDeclaration[], attackers: readonly Character[], jobs: number) => Effect.gen(function* () {
-  const undeclared = SELECTABLE_CHARACTERS.map(fighterName).filter((name) => !declarations.some((declaration) => declaration.fighter === name));
+  const undeclared = gatedFighters().map(fighterName).filter((name) => !declarations.some((declaration) => declaration.fighter === name));
   const unknown = [...new Set(declarations.map((declaration) => declaration.fighter).filter((fighter) => fighterNamed(fighter) === undefined))];
   const coverage = [...coverageProblems(declarations), ...undeclared.map((name) => `${name} declares no throw roles`), ...unknown.map((name) => `${name} is not a selectable fighter`)];
   const units: ThrowRoleUnit[] = declarations.flatMap((declaration) => {
@@ -406,7 +407,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const names = parsed.fighter ?? [];
-  const attackers = names.length === 0 ? SELECTABLE_CHARACTERS : names.map(fighterNamed);
+  const attackers = names.length === 0 ? gatedFighters() : names.map(fighterNamed);
   const unknown = names.filter((_, index) => attackers[index] === undefined);
   if (unknown.length > 0) return yield* new UsageFailure({ problem: `--fighter takes ${[...SELECTABLE_CHARACTERS, ...FIXTURE_FIGHTERS].map(fighterName).join(", ")}; not ${unknown.join(", ")}` });
   const jobs = Number(parsed.jobs ?? "6");
@@ -450,7 +451,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
       const allUnits = [...kept, ...reports];
       await Bun.write(unitsFile, allUnits.map((unit) => JSON.stringify(unit)).join("\n") + "\n");
       const all = [...new Set(allUnits.map((unit) => unit.attacker))].map((fighter) => summarize(fighter, allUnits.filter((unit) => unit.attacker === fighter)));
-      const order = SELECTABLE_CHARACTERS.map(fighterName);
+      const order = gatedFighters().map(fighterName);
       all.sort((x, y) => order.indexOf(x.fighter) - order.indexOf(y.fighter));
       const compact = Object.fromEntries(all.map((summary) => [summary.fighter, {
         openingsPerKill: summary.openingsPerKill, multiHitOpeningsPerKill: summary.multiHitOpeningsPerKill, openingsWithReads: summary.openingsWithReads,

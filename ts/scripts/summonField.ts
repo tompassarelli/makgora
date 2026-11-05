@@ -18,7 +18,8 @@ import { companionReady } from "../src/game/sim/specials/engine";
 import { runningHeroSpecial } from "../src/game/sim/specials/runningMove";
 import { CompanionMode, SpecialSlot } from "../src/game/sim/specials/schema";
 import { heroStatusBlocksActions } from "../src/game/sim/heroStatus";
-import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
+import { fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { type Controls, copyControls, createRoster, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 
@@ -150,7 +151,7 @@ if (import.meta.main) {
     return name as Summon;
   });
   const opponents = values.opponents === undefined
-    ? SELECTABLE_CHARACTERS.filter((c) => fighterSlug(c) !== "beastmaster")
+    ? gatedFighters().filter((c) => fighterSlug(c) !== "beastmaster")
     : values.opponents.split(",").map((slug) => {
       const c = selectableCharacterBySlug(slug);
       if (c === undefined) throw new Error(`no fighter named ${slug}`);

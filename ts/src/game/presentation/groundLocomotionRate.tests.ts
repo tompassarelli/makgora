@@ -1,6 +1,6 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { min } from "../core/numbers";
-import { SELECTABLE_CHARACTERS } from "../roster/kits";
+import { gatedFighters } from "../roster/forge";
 import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { groundLocomotionClip, FIRELORD_BOB_RATE_CAP, groundLocomotionRate, groundLocomotionRateCap, GROUND_LOCOMOTION_RATE_CAP, uncappedGroundLocomotionRate } from "./fighterLocomotion";
@@ -13,7 +13,7 @@ const SPEEDS = [
 ] as const;
 
 test("no fighter's walk, run or dash clip plays faster than the ground rate cap, and a rate under it is untouched [k2 property]", () => {
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     const fighter = createFighter(character, 0.0, 1);
     for (const { motion, speed } of SPEEDS) {
       fighter.motion.vx = speed(fighter.tuning.physics);

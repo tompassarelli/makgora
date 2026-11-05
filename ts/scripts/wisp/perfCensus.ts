@@ -18,6 +18,7 @@ import { type Command, UsageFailure, describeCause, flagValues } from "wisp/scri
 import { PerfFailure, type PerfProject, measureRun } from "wisp/scripts/wisp/commands/perf";
 import { WARCRAFT_COST, nativeFrameCost } from "wisp/src/headless/nativeCost";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/roster/kits";
+import { gatedFighters } from "../../src/game/roster/forge";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { CENSUS_PARTNER, CENSUS_STAGE } from "./census";
 import { stockLua } from "./luaRuntimes";
@@ -254,7 +255,7 @@ export const census = (project: CensusProject): Command => (args) => Effect.gen(
   if (!(limit > 0) || !(jobs >= 1) || unknown.length > 0) return yield* new UsageFailure({ problem: `perf census takes --fighter NAME (${known.join(", ")}), --stage ID, --rise-ms MS, --jobs N, --functions, --out FILE and --pairs FILE` });
   const everything = fighters.length === 0 && stages.length === 0;
   const runs = [
-    ...(everything ? known : fighters).map((name) => `census-${name}`),
+    ...(everything ? gatedFighters().map(fighterSlug) : fighters).map((name) => `census-${name}`),
     ...(everything ? STAGE_CATALOG.map((stage) => String(stage.id)).filter((id) => id !== String(CENSUS_STAGE)) : stages).map((id) => `census-stage-${id}`),
   ];
   yield* compile(project.map.config);

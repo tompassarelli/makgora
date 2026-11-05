@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Console, Effect, Schema } from "effect";
 import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/command";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../../../src/game/roster/kits";
+import { fighterSlug } from "../../../src/game/roster/kits";
+import { gatedFighters } from "../../../src/game/roster/forge";
 import { currentKit } from "../../balanceKit";
 import { currentFeel } from "../../balanceFeel";
 import { type Direction, type Intent, type ProfileMatch, contradictions, profiles } from "../../strengthProfile";
@@ -22,7 +23,7 @@ const directionOf = (x: number, z: number): Direction => z < -0.3 ? "bottom" : M
 
 function moveDirections(): (fighter: string, move: number) => Direction | undefined {
   const table = new Map<string, Direction>();
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     const fighter = fighterSlug(character);
     const values = currentKit(character).values;
     const feel = currentFeel(character);

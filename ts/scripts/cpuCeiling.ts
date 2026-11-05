@@ -4,7 +4,8 @@ import { Effect, Schema } from "effect";
 import { cpuSkill } from "../src/game/match/cpuSkill";
 import { ceilingSkill, type CeilingMode } from "../src/game/match/cpuCeilingProfiles";
 import { CPU_OPPONENT_IDS } from "../src/game/match/cpuProfiles";
-import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
+import { fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { CEILING_SPEC } from "./balance";
 import { ceilingTable, readCeilingPlans, type CeilingRow } from "./ceiling";
 import { FIELD_STAGES, playCpuField, playCpuMatch } from "./cpuField";
@@ -35,10 +36,10 @@ const add = (data: Data, records: readonly { readonly fighters: readonly string[
   }
 };
 const rate = (data: Data, key: string) => {const c=data.counts[key];return c===undefined||c.wins+c.losses===0?NaN:c.wins/(c.wins+c.losses);};
-export const unplannedFighters = (): string[] => {const plans=readCeilingPlans();return SELECTABLE_CHARACTERS.map(fighterSlug).filter(fighter=>!plans.has(fighter));};
+export const unplannedFighters = (): string[] => {const plans=readCeilingPlans();return gatedFighters().map(fighterSlug).filter(fighter=>!plans.has(fighter));};
 export function ceilingRows(data: Data): CeilingRow[] {
   const plans = readCeilingPlans();
-  const slugs=SELECTABLE_CHARACTERS.map(fighterSlug);
+  const slugs=gatedFighters().map(fighterSlug);
   return slugs.filter(fighter=>plans.has(fighter)).map(fighter => {
     const plan=plans.get(fighter); if(plan===undefined)throw new Error(`${fighter}: no ceiling plan`);
     const kinds=[...CPU_OPPONENT_IDS,"execution","judgment","ceiling-warchief","grunt","ceiling-field"];

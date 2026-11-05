@@ -1,6 +1,7 @@
 import { Character } from "../src/game/sim/codes";
 import { SpecialForm, SpecialSlot, specialForm, specialKit } from "../src/game/sim/specials/schema";
-import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../src/game/roster/kits";
+import { fighterName, heroDefinition } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { fighterKit } from "../src/game/sim/moveNames";
 import { upSpecialRoute } from "../src/game/match/recoveryEnvelope";
 import { EDGE_GUARD_SCENARIOS, EdgeGuardTool, MIXED_PLANS, OPENING_MIN, edgeGuardTool, guardedReturn, playScenario, recoveryProfile } from "../src/game/match/edgeGuardScenarios";
@@ -24,7 +25,7 @@ export function recoveryTableMarkdown(): string {
     "| Fighter | Up special | Startup | Intangible | Top speed | Rise / reach | Route control | Opening | Beaten by | Mixed returns |",
     "|---|---|---:|---:|---:|---:|---|---:|---|---:|",
   ];
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     const profile = recoveryProfile(character);
     const route = upSpecialRoute(character, 100);
     const scenario = EDGE_GUARD_SCENARIOS[character];
@@ -35,10 +36,10 @@ export function recoveryTableMarkdown(): string {
     if (profile.opening >= OPENING_MIN) options.push("reaction aerial");
     if (profile.speed <= PROJECTILE_SPEED_MAX) options.push("projectile");
     let returned = 0;
-    for (const guarder of SELECTABLE_CHARACTERS) for (let seed = 0; seed < MIXED_PLANS.length; seed++) if (guardedReturn(character, guarder, seed, "warchief").recovered) returned++;
+    for (const guarder of gatedFighters()) for (let seed = 0; seed < MIXED_PLANS.length; seed++) if (guardedReturn(character, guarder, seed, "warchief").recovered) returned++;
     const name = fighterKit(character).specials[SpecialSlot.up]?.name ?? "";
     const speed = profile.speed > 200 ? `${profile.speed} (teleport)` : `${profile.speed}`;
-    lines.push(`| ${fighterName(character)} | ${name} | ${profile.startup} | ${profile.intangible} | ${speed} | ${route.rise} / ${route.reach} | ${routeControl(character)} | ${profile.opening} | ${options.join(", ")} | ${returned}/${SELECTABLE_CHARACTERS.length * MIXED_PLANS.length} |`);
+    lines.push(`| ${fighterName(character)} | ${name} | ${profile.startup} | ${profile.intangible} | ${speed} | ${route.rise} / ${route.reach} | ${routeControl(character)} | ${profile.opening} | ${options.join(", ")} | ${returned}/${gatedFighters().length * MIXED_PLANS.length} |`);
   }
   return lines.join("\n");
 }

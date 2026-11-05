@@ -3,7 +3,8 @@ import { min } from "../src/game/core/numbers";
 import { DRAWN_STRIDES } from "../src/game/presentation/drawnStrideInfo";
 import { groundLocomotionClip, groundLocomotionRate, groundLocomotionRateCap } from "../src/game/presentation/fighterLocomotion";
 import { IllidanLocomotion } from "../src/game/presentation/illidanMotion";
-import { lookCharacter, SELECTABLE_CHARACTERS } from "../src/game/roster/kits";
+import { lookCharacter } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { Character } from "../src/game/sim/codes";
 import { createFighter } from "../src/game/sim/fighter";
 
@@ -17,7 +18,7 @@ const FOOT_SLIDE_TOLERANCE = 0.15;
 const MAIEV_STOCK_WALK = 2, MAIEV_AUTHORED_RUN = 78;
 const ILLIDAN_STOCK_WALK = 119, ILLIDAN_STOCK_RUN = 120;
 
-const groundCharacters = SELECTABLE_CHARACTERS.filter((candidate) => !FLOATERS.includes(candidate));
+const groundCharacters = gatedFighters().filter((candidate) => !FLOATERS.includes(candidate));
 
 function measure(character: Character, { motion, gait, speed }: (typeof GAITS)[number]) {
   const fighter = createFighter(character, 0.0, 1);

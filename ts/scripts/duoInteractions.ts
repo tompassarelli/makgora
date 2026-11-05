@@ -6,7 +6,8 @@ import { Phase, createMatchState } from "../src/game/lobby/lobbyState";
 import { adaptInput } from "../src/game/match/inputAdapter";
 import { initializeMatchFighters, stepMatch } from "../src/game/match/step";
 import { type ReplayState, createReplaySnapshot } from "../src/game/replay/snapshot";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
+import { fighterName } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { AttackStyle, Character, ContactKind, DuoOrder, GrabAction } from "../src/game/sim/codes";
 import { observeDamageContacts, queueDamageContact } from "../src/game/sim/contacts";
 import {
@@ -60,7 +61,7 @@ export interface DuoFoe {
   readonly name: string;
 }
 
-export const DUO_FOES: readonly DuoFoe[] = [Character.rifleman, ...SELECTABLE_CHARACTERS].map((character) => ({ character, name: fighterName(character) }));
+export const DUO_FOES: readonly DuoFoe[] = [Character.rifleman, ...gatedFighters()].map((character) => ({ character, name: fighterName(character) }));
 
 interface Finding {
   reached: boolean;

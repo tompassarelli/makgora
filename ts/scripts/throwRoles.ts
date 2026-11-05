@@ -6,7 +6,8 @@
 import { DownState } from "../src/game/sim/codes";
 import { canAttack } from "../src/game/sim/conditions";
 import { fighterAt } from "../src/game/sim/roster";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
+import { fighterName } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { type FighterEntry, type Move, VICTIM_CHOICES, comboRow, openingState } from "./comboTrees";
 import { Timeline } from "./interactions";
 
@@ -20,7 +21,7 @@ const TECH_OPTIONS = ["tech in place", "tech left", "tech right", "missed tech"]
 const DI_NAMES = [...new Set(VICTIM_CHOICES.map((choice) => choice.di.name))];
 const HORIZON = 120;
 
-export const THROW_FIGHTERS: readonly FighterEntry[] = SELECTABLE_CHARACTERS.map((character) => {
+export const THROW_FIGHTERS: readonly FighterEntry[] = gatedFighters().map((character) => {
   const name = fighterName(character);
   return { character, name, slug: name.toLowerCase().replaceAll(" ", "-") };
 });

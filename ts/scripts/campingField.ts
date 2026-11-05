@@ -4,7 +4,8 @@ import { ChildProcess } from "effect/process";
 import { parseArgs } from "node:util";
 import { runProcess } from "./hostProcess";
 import { type FieldOptions, type MatchRecord, playCpuField } from "./cpuField";
-import { SELECTABLE_CHARACTERS, selectableCharacterBySlug } from "../src/game/roster/kits";
+import { selectableCharacterBySlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { isCpuTier, type CpuTier } from "../src/game/match/cpuProfiles";
 
 export const CAMPING_RULES = ["off", "orbs"] as const;
@@ -138,7 +139,7 @@ if (import.meta.main) {
   });
   if (values.shard !== undefined) {
     const [index, count] = values.shard.split("/").map(Number);
-    const fighters = values.fighters === undefined ? SELECTABLE_CHARACTERS : values.fighters.split(",").map(slug => {
+    const fighters = values.fighters === undefined ? gatedFighters() : values.fighters.split(",").map(slug => {
       const character = selectableCharacterBySlug(slug);
       if (character === undefined) throw new Error(`no fighter ${slug}`);
       return character;
@@ -155,7 +156,7 @@ if (import.meta.main) {
       const pct = (n: number) => `${(100 * n).toFixed(1)}%`;
       const pp = (n: number) => `${n >= 0 ? "+" : ""}${(100 * n).toFixed(1)}`;
       const off = by.off;
-      console.log(`camping field: ${by[rules[0] ?? "off"]?.length ?? 0} matches per rule (every pair of ${values.fighters?.split(",").length ?? SELECTABLE_CHARACTERS.length} fighters, both sides, stages ${values.stages ?? "frozen-throne,hellfire"}, ${values.seeds ?? 1} seed(s), ${values.tier ?? "warchief"} vs ${values.tier ?? "warchief"}, ${values.minutes ?? 4} min), ${workers} workers, ${((performance.now() - started) / 1000).toFixed(0)} s`);
+      console.log(`camping field: ${by[rules[0] ?? "off"]?.length ?? 0} matches per rule (every pair of ${values.fighters?.split(",").length ?? gatedFighters().length} fighters, both sides, stages ${values.stages ?? "frozen-throne,hellfire"}, ${values.seeds ?? 1} seed(s), ${values.tier ?? "warchief"} vs ${values.tier ?? "warchief"}, ${values.minutes ?? 4} min), ${workers} workers, ${((performance.now() - started) / 1000).toFixed(0)} s`);
       console.log("| rule | apart | Δ apart vs off (95% CI) | win spread (SD) | Δ spread vs off (95% CI) | win range | camping | orbs/match |");
       console.log("|---|---|---|---|---|---|---|---|");
       for (const rule of rules) {

@@ -10,7 +10,8 @@ import { copyFighterState } from "../src/generated/state/fighterState";
 import { Character, SpecialAction } from "../src/game/sim/codes";
 import { createFighter, type Fighter } from "../src/game/sim/fighter";
 import { runningHeroSpecial } from "../src/game/sim/specials/runningMove";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
+import { fighterName } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { setWorldMotionValue } from "../src/game/sim/motion";
 import { fighterAt } from "../src/game/sim/roster";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP } from "../src/game/sim/specials";
@@ -151,13 +152,13 @@ export function aerialDownTable(): string {
     `|---|---|${AERIAL_DOWN_SETUPS.map(() => "---").join("|")}|`];
   let dead = 0;
   let presses = 0;
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     const rows = AERIAL_DOWN_SETUPS.map((_, setup) => aerialDownSpecial(character, setup));
     presses += rows.length;
     dead += rows.filter(deadInput).length;
     lines.push(`| ${fighterName(character)} | ${AERIAL_DOWN_CHOICES[character] ?? "—"} | ${rows.map(cell).join(" | ")} |`);
   }
-  lines.push("", `${SELECTABLE_CHARACTERS.length} fighters, ${presses} presses, ${dead} dead inputs.`);
+  lines.push("", `${gatedFighters().length} fighters, ${presses} presses, ${dead} dead inputs.`);
   return lines.join("\n");
 }
 

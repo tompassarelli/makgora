@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { judgeDashAttack, ourDashAttack } from "../scripts/dashAttackShapes";
-import { SELECTABLE_CHARACTERS } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { AttackStyle, Character } from "../src/game/sim/codes";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { authoredHurtboxes } from "../src/game/sim/hurtboxes";
@@ -31,7 +31,7 @@ test("Peon's trip-and-dive meets Melee's dash-attack rule, travel and end lag in
 });
 
 test("Peon's dive reaches into the middle half of the roster's dash attacks, well past the old chop's 79 [k3 measure docs/design/peasant.md]", () => {
-  const all = SELECTABLE_CHARACTERS.map(reach).filter(Number.isFinite).sort((a, b) => a - b);
+  const all = gatedFighters().map(reach).filter(Number.isFinite).sort((a, b) => a - b);
   const quartile = (q: number) => all[Math.round(q * (all.length - 1))]!;
   const peon = reach(Character.peon);
   expect(peon).toBeGreaterThanOrEqual(110);

@@ -8,7 +8,7 @@
 import { parseArgs } from "node:util";
 import { CPU_TIERS, type CpuTier } from "../src/game/match/cpuProfiles";
 import type { Character } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { FIELD_STAGES, playCpuMatch } from "./cpuField";
 import { runAdmitted } from "./heavyCapacity";
 
@@ -20,8 +20,8 @@ export interface TierResult {
   readonly ties: number;
 }
 
-const PAIRS: readonly (readonly [Character, Character])[] = SELECTABLE_CHARACTERS.flatMap((a) =>
-  SELECTABLE_CHARACTERS.filter((b) => b !== a).map((b) => [a, b] as const));
+const PAIRS: readonly (readonly [Character, Character])[] = gatedFighters().flatMap((a) =>
+  gatedFighters().filter((b) => b !== a).map((b) => [a, b] as const));
 const STAGES = Object.keys(FIELD_STAGES);
 
 

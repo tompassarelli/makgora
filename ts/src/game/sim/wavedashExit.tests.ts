@@ -1,7 +1,7 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { copyFighterState, sameFighterState } from "../../generated/state/fighterState";
-import { SELECTABLE_CHARACTERS } from "../roster/kits";
+import { gatedFighters } from "../roster/forge";
 import { Character, GroundAction } from "./codes";
 import { AIR_DODGE_LANDING_LAG } from "./down";
 import { type Fighter, createFighter } from "./fighter";
@@ -50,7 +50,7 @@ function walksOut(run: Run, stick: Stick, frames: number): number[] {
 }
 
 test("Holding the wavedash direction through its landing lag walks out toward walk speed and never dashes [k1 scenario]", () => {
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     for (const stick of [keyboard, FULL]) {
       const run = wavedash(stick, held, character);
       const walkSpeed = run.f.tuning.physics.walkSpeed;

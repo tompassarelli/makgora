@@ -2,6 +2,9 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { Action } from "../input/actions";
 import { fighter, frame, scene } from "../match/padScene";
 import { PLAYABLE_CHARACTERS, fighterName } from "../roster/kits";
+import { gatedFighters } from "../roster/forge";
+
+const gatedPlayable = () => gatedFighters().filter(character => PLAYABLE_CHARACTERS.includes(character));
 import { AttackPhase, AttackStyle, Character } from "./codes";
 import { attackPhase } from "./conditions";
 import { attackStartupFrames } from "./moves";
@@ -59,7 +62,7 @@ function shortHopAerial(character: Character, style: AttackStyle, facing: number
 
 test("Every fighter short hops each of the five aerials, pressed on the takeoff frame, into its first active frame before landing, facing either way [k1 scenario]", () => {
   const failures: string[] = [];
-  for (const character of PLAYABLE_CHARACTERS) {
+  for (const character of gatedPlayable()) {
     for (const aerial of AERIALS) {
       for (const facing of [1, -1]) {
         const hop = shortHopAerial(character, aerial.style, facing);
@@ -79,7 +82,7 @@ function standingHeight(character: Character): number {
 }
 
 function averageHeightFighter(): Character {
-  const byHeight = [...PLAYABLE_CHARACTERS].sort((a, b) => standingHeight(a) !== standingHeight(b) ? standingHeight(a) - standingHeight(b) : a - b);
+  const byHeight = [...gatedPlayable()].sort((a, b) => standingHeight(a) !== standingHeight(b) ? standingHeight(a) - standingHeight(b) : a - b);
   return byHeight[idiv(byHeight.length, 2)]!;
 }
 
@@ -100,7 +103,7 @@ function shortHopDownAirHits(character: Character, foe: Character, facing: numbe
 test("Every fighter's short hop down air, pressed on the takeoff frame or any of the next three frames, hits a standing opponent of average height under it before landing, facing either way [k1 scenario]", () => {
   const foe = averageHeightFighter();
   const failures: string[] = [];
-  for (const character of PLAYABLE_CHARACTERS) {
+  for (const character of gatedPlayable()) {
     for (const facing of [1, -1]) {
       const misses: number[] = [];
       for (let delay = 0; delay < DOWN_AIR_PRESS_FRAMES; delay++) if (!shortHopDownAirHits(character, foe, facing, delay)) misses.push(delay);

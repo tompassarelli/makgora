@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { AttackStyle, Character, GrabAction, ProjectileKind } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
+import { fighterSlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { authoredTuning } from "../src/game/sim/tuning";
 import { attackDurationFramesForGrounding, attackLandingLag, attackStartupFrames, characterAttackActiveFrames, grabActionDuration, grabContactFrame, isAerialAttack } from "../src/game/sim/moves";
 import { emptyHitRegion, authoredHitRegion, authoredHitRegionCount } from "../src/game/sim/hitRegions";
@@ -218,7 +219,7 @@ export function universalRows(): MoveRow[] {
 }
 
 export function rosterRows(framesOnly = false): MoveRow[] {
-  return [...universalRows(), ...SELECTABLE_CHARACTERS.flatMap((character) => fighterRows(character, framesOnly))];
+  return [...universalRows(), ...gatedFighters().flatMap((character) => fighterRows(character, framesOnly))];
 }
 
 export function envelopeExemptions(): EnvelopeExemption[] {

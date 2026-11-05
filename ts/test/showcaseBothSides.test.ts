@@ -2,7 +2,8 @@ import { expect, test } from "bun:test";
 import { join } from "node:path";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { MAKGORA_HEADLESS } from "../scripts/wisp/headless";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
+import { fighterSlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { AttackStyle } from "../src/game/sim/codes";
 import type { MoveRegion } from "../src/game/sim/heroMoves";
 import { fighterAt } from "../src/game/sim/roster";
@@ -12,7 +13,7 @@ import { showcaseFixtures } from "../src/platform/captureFixtures";
 
 const centreX = (region: MoveRegion): number => (region.hit.minX + region.hit.maxX) * 0.5;
 
-const sharedOpening = SELECTABLE_CHARACTERS.flatMap(character => Object.entries(authoredTuning(character).moves?.normals ?? {}).flatMap(([style, move]) => {
+const sharedOpening = gatedFighters().flatMap(character => Object.entries(authoredTuning(character).moves?.normals ?? {}).flatMap(([style, move]) => {
   const ahead = move.regions.filter(region => centreX(region) > 0.0), behind = move.regions.filter(region => centreX(region) < 0.0);
   const together = ahead.length > 0 && behind.length > 0 && Math.min(...ahead.map(region => region.firstFrame)) === Math.min(...behind.map(region => region.firstFrame));
   return together && Math.max(...behind.map(region => region.lastFrame)) > Math.min(...behind.map(region => region.firstFrame)) ? [{ character, style: Number(style) }] : [];
@@ -73,7 +74,7 @@ test("a crossed row strikes the foe from the front, then from behind, in the hea
 }, 60_000);
 
 test("a released special with hit regions stands the foe inside its furthest strike, not at the default spacing [k1 scenario]", () => {
-  const rows = showcaseRows(SELECTABLE_CHARACTERS.find(character => fighterSlug(character) === "peon") ?? SELECTABLE_CHARACTERS[0]!).filter(({ move }) => move.slot === "neutral_b" && move.release !== undefined);
+  const rows = showcaseRows(gatedFighters().find(character => fighterSlug(character) === "peon") ?? gatedFighters()[0]!).filter(({ move }) => move.slot === "neutral_b" && move.release !== undefined);
   expect(rows.length).toBe(2);
   for (const { move } of rows) {
     expect(move.gap).toBeGreaterThan(0);

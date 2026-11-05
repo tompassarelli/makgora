@@ -1,7 +1,7 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { sweep } from "../core/sweep";
-import { SELECTABLE_CHARACTERS } from "../roster/kits";
+import { gatedFighters } from "../roster/forge";
 import { AttackStyle, Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { groundState } from "./groundMovement";
@@ -74,7 +74,7 @@ test("Dash attack ledge: Blademaster's dash attack from a full run 2 units short
 });
 
 sweep("Dash attack ledge: every fighter's dash attack from a full run toward either ledge at 2, 30, 90 and 180 units, stick held toward it, plays its whole animation and ends on stage, at the ledge from the two nearest [k1 scenario]", () => {
-  for (const fighter of SELECTABLE_CHARACTERS) {
+  for (const fighter of gatedFighters()) {
     for (const side of [1, -1] as const) {
       for (const gap of GAPS) checkDashAttack(fighter, side, gap);
     }

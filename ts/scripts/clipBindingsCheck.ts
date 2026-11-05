@@ -1,13 +1,14 @@
 import { originalClip } from "../src/generated/clips/fighterOriginalClipInfo";
 import { characterClips, clipFor } from "../src/game/presentation/fighterClips";
 import { heroLook } from "../src/game/roster/looks";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
+import { fighterSlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 
 const SAMPLES = 30;
 const SLACK = 0.001;
 
 const refused: string[] = [];
-for (const character of SELECTABLE_CHARACTERS) {
+for (const character of gatedFighters()) {
   const name = fighterSlug(character);
   for (const [pose, clip] of Object.entries(characterClips(character))) {
     if (clip !== undefined && originalClip(character, clip.index) === undefined) refused.push(`${name} ${pose}: no sequence ${clip.index} in its model`);

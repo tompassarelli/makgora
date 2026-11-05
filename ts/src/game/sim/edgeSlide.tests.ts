@@ -1,6 +1,7 @@
 import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { SELECTABLE_CHARACTERS, fighterName } from "../roster/kits";
+import { fighterName } from "../roster/kits";
+import { gatedFighters } from "../roster/forge";
 import { type Character, LedgeState } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import type { Controls, Roster } from "./roster";
@@ -101,7 +102,7 @@ function check(problems: string[], ok: boolean, s: Slide, tag: string, what: str
 
 const report = (problems: readonly string[]): void => assertEquals(problems.slice(0, 5).join("\n"), "");
 
-for (const character of SELECTABLE_CHARACTERS) {
+for (const character of gatedFighters()) {
   test(`Wavedash edge: ${fighterName(character)}'s waveland in lag stops in a teeter at an edge he faces unless the stick is held toward it, and slides off an edge at his back with its speed, grabbing the main deck's ledge unless down is held, in both facings on every stage [k1 scenario]`, () => {
     const problems: string[] = [];
     let counts = { teeters: 0, forwards: 0, grabs: 0, falls: 0, held: 0 };

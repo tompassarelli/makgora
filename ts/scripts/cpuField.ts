@@ -37,7 +37,8 @@ import { AttackStyle, type Character, DownState, GrabAction, LedgeState, Special
 import { type Fighter } from "../src/game/sim/fighter";
 import { observeDamageContacts } from "../src/game/sim/contacts";
 import { heroStatusBlocksActions } from "../src/game/sim/heroStatus";
-import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
+import { fighterSlug, selectableCharacterBySlug } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { type Roster, copyControls, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 import soak from "./wisp/soak";
@@ -647,7 +648,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
 
 
 export function playCpuField(options: FieldOptions = {}, progress?: (done: number, total: number) => void): MatchRecord[] {
-  const fighters = options.fighters ?? SELECTABLE_CHARACTERS;
+  const fighters = options.fighters ?? gatedFighters();
   const stages = options.stages ?? Object.keys(FIELD_STAGES);
   const perPair = options.perPair;
   const variants = perPair === undefined ? options.variants ?? 1 : SHIFTS.length;
@@ -868,7 +869,7 @@ function moveUsage(records: readonly MatchRecord[], fighter: string): MoveUse[] 
 
 
 export function fighterMoveUsage(character: Character, options: FieldOptions = {}): MoveUse[] {
-  const fighters = options.fighters ?? SELECTABLE_CHARACTERS;
+  const fighters = options.fighters ?? gatedFighters();
   const stages = options.stages ?? Object.keys(FIELD_STAGES);
   const records: MatchRecord[] = [];
   for (const other of fighters) {
@@ -1204,7 +1205,7 @@ export function balanceTables(summaries: readonly FighterSummary[], probes: Read
     const term = (value: number | undefined) => (value === undefined ? "-" : value.toFixed(1));
     lines.push(`| ${summary.fighter} | ${profile?.archetype ?? "no profile"} | ${probe === undefined ? "not run" : `${probe.move} ${share(probe.winRate)} (${probe.matches})`} | ${gate.balanced ? "balanced" : gate.failures.length > 0 ? `fails: ${gate.failures.join("; ")}` : "probe not run"} | ${score.total.toFixed(1)} | ${term(score.win)} | ${term(score.profile)} | ${term(score.variety)} | ${term(score.spam)} | ${term(score.probe)} | ${term(score.openings)} | ${term(score.recovery)} | ${score.misses.join(", ")} |`);
   }
-  const roster = SELECTABLE_CHARACTERS.map(fighterSlug);
+  const roster = gatedFighters().map(fighterSlug);
   const complete = summaries.length === roster.length && summaries.every(summary => roster.every(name => name === summary.fighter || (summary.played[name] ?? 0) >= BALANCE_SPEC.matchupMatches));
   if (!complete) failing.push("whole field incomplete (every roster matchup requires 400 matches)");
   failing.push(...bounds, ...feel);
@@ -1287,7 +1288,7 @@ if (import.meta.main) {
   }
   const owns = partitionWork(values.partition);
   if (values.partition !== undefined && probeFighter === undefined) throw new Error("--partition requires --probe-fighter");
-  const probePairs = probeFighter === undefined ? undefined : SELECTABLE_CHARACTERS.filter((other) => other !== probeFighter).map((other) => [probeFighter, other] as const).filter(() => owns());
+  const probePairs = probeFighter === undefined ? undefined : gatedFighters().filter((other) => other !== probeFighter).map((other) => [probeFighter, other] as const).filter(() => owns());
   const pairs = probePairs ?? values.pairs?.split(",").map((pair) => {
     const [a, b, extra] = pair.split(":");
     if (a === undefined || b === undefined || extra !== undefined || a === b) throw new Error(`--pairs takes pairs of different fighters, like illidan:rifleman; not ${pair}`);
@@ -1318,7 +1319,7 @@ if (import.meta.main) {
   };
   if (values["ledge-rule"] !== undefined && values["ledge-rule"] !== "melee") throw new Error("--ledge-rule takes melee");
   if (values.merge === undefined) {
-    const pairCount = pairs?.length ?? ((fighters ?? SELECTABLE_CHARACTERS).length * ((fighters ?? SELECTABLE_CHARACTERS).length - 1)) / 2;
+    const pairCount = pairs?.length ?? ((fighters ?? gatedFighters()).length * ((fighters ?? gatedFighters()).length - 1)) / 2;
     if (pairCount > 1 && admitsThroughHelper()) {
       const sameOf = (two: readonly string[] | undefined, flag: string) => two !== undefined && two[0] === two[1] ? ` ${flag} ${two[0]}` : "";
       console.error(`GitHub's free runners play this sweep in about 4 minutes and leave this machine free: bun wisp farm balance${pairs === undefined ? "" : ` --matchups ${values.pairs}`}${sameOf(opponents, "--opponent")}${sameOf(tiers, "--tier")}${values["per-pair"] === undefined ? "" : ` --per-pair ${values["per-pair"]}`}${values.seeds === undefined ? "" : ` --seeds ${values.seeds}`} --wait`);

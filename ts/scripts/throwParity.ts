@@ -4,7 +4,8 @@ import { Character, DownState, GrabAction } from "../src/game/sim/codes";
 import { canAttack } from "../src/game/sim/conditions";
 import type { Fighter } from "../src/game/sim/fighter";
 import { authoredThrowEffect } from "../src/game/sim/grabs";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
+import { fighterName } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { TUMBLE_KNOCKBACK, contactKnockback, fixedHitKnockback } from "../src/game/sim/knockback";
 import { WORLD_UNITS_PER_MELEE_UNIT, authoredTuning } from "../src/game/sim/tuning";
 import { type Move, moveOption } from "./comboTrees";
@@ -98,7 +99,7 @@ export function ourThrow(character: Character, name: ThrowName, percent: number)
 
 export function ourThrows(progress?: (line: string) => void): ThrowRow[] {
   const rows: ThrowRow[] = [];
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     for (const name of THROWS) {
       if (name === "forward" && authoredTuning(character).moves?.carry !== undefined) continue;
       for (const percent of PARITY_PERCENTS) rows.push(ourThrow(character, name, percent));

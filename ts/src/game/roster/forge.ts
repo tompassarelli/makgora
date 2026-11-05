@@ -50,3 +50,6 @@ export function shownFighters(choices: readonly Character[], forgeShown = false)
   const shown = choices.filter(character => !isComingSoon(character) && (forgeShown || isFeatured(character)));
   return shown.length === 0 ? choices.slice(0, 1) : shown;
 }
+
+export const gatedFighters = (): readonly Character[] => SELECTABLE_CHARACTERS.filter(character => isFeatured(character));
+export const gatedSlugs = (): readonly string[] => gatedFighters().map(character => fighterSlug(character));

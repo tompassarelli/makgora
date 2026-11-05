@@ -6,7 +6,8 @@
 
 import { Action } from "../src/game/input/actions";
 import { Character } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
+import { fighterName } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { surfaceLeft, surfaceRight, surfaceZ } from "../src/game/sim/stage";
 import { fighter, frameRows, scene } from "../src/game/match/padScene";
 
@@ -91,7 +92,7 @@ export interface PlatformAdvantage {
 }
 
 
-export function platformAdvantages(characters: readonly Character[] = SELECTABLE_CHARACTERS): PlatformAdvantage[] {
+export function platformAdvantages(characters: readonly Character[] = gatedFighters()): PlatformAdvantage[] {
   const rows: PlatformAdvantage[] = [];
   for (const above of characters) {
     for (const below of characters) {

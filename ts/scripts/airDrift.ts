@@ -8,7 +8,8 @@
 import { Action } from "../src/game/input/actions";
 import { AttackStyle, type Character } from "../src/game/sim/codes";
 import type { Fighter } from "../src/game/sim/fighter";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
+import { fighterName } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "../src/game/sim/tuning";
 import { fighter, frame, scene, solo, type Scene } from "../src/game/match/padScene";
 import { copyReplayState } from "../src/game/replay/snapshot";
@@ -146,7 +147,7 @@ export function rosterTable(): string[] {
     `| Fighter | Air speed | Air acceleration | Air friction | Jump momentum × | Jump initial | Jump cap | Dash-jump takeoff | Run-jump takeoff | Cross-up from ${units(CROSS_UP_DISTANCE)} |`,
     "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
   ];
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     const p = fighter(solo(0, character)).tuning.physics;
     const dash = dashJump(character, CROSS_UP_DASH_FRAMES);
     const run = dashJump(character, 24);

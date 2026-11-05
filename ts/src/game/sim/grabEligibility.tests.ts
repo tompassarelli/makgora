@@ -3,7 +3,8 @@ import { sweep } from "../core/sweep";
 import { Action } from "../input/actions";
 import { type Scene, fighter, frame, scene } from "../match/padScene";
 import { captureReplaySnapshot, createReplaySnapshot, restoreReplaySnapshot } from "../replay/snapshot";
-import { SELECTABLE_CHARACTERS, fighterName } from "../roster/kits";
+import { fighterName } from "../roster/kits";
+import { gatedFighters } from "../roster/forge";
 import { AttackStyle, Character, DownState, HeroStatusGroup, HeroStatusKind, LedgeState } from "./codes";
 import { isDownDamageState, isIntangible } from "./conditions";
 import type { Fighter } from "./fighter";
@@ -116,7 +117,7 @@ function checkFighter(character: Character): void {
   assertEquals(failures.join("\n"), "");
 }
 
-for (const character of SELECTABLE_CHARACTERS) {
+for (const character of gatedFighters()) {
   sweep(`After any of ${fighterName(character)}'s attacks, specials and throws, a grab that reaches the foe connects unless the foe is knocked down [k1 scenario]`, () => checkFighter(character));
 }
 

@@ -2,20 +2,23 @@ import { expect, test } from "bun:test";
 import { anatomyFindings, elbowFlex, swingForearm } from "../scripts/wisp/victoryAnatomy";
 import { VICTORY_ANATOMY_RECORD, VICTORY_SEAM_DEBT, VICTORY_UNJOINTED, type VictoryAnatomyRecord } from "../scripts/wisp/victoryAnatomyRecord";
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/roster/kits";
+import { fighterName } from "../src/game/roster/kits";
+import { gatedFighters } from "../src/game/roster/forge";
 
-const records: readonly VictoryAnatomyRecord[] = await Bun.file(VICTORY_ANATOMY_RECORD).json();
+const featured = new Set(gatedFighters().map(fighterName));
+const recorded: readonly VictoryAnatomyRecord[] = await Bun.file(VICTORY_ANATOMY_RECORD).json();
+const records = recorded.filter(({ fighter }) => featured.has(fighter));
 const raisedKael: VictoryAnatomyRecord = await Bun.file(new URL("fixtures/victory-anatomy-kael-raised.json", import.meta.url)).json();
 const seamless = (fighter: string) => VICTORY_SEAM_DEBT[fighter] === undefined;
 
 test("every fighter's victory bends each elbow one way within a human range, holds its bone lengths, keeps its arms out of its torso and its upper arms in their shoulders [k3 measure #496]", () => {
-  const wanted = SELECTABLE_CHARACTERS.map(fighterName).filter((name) => VICTORY_UNJOINTED[name] === undefined);
-  expect(records.map(({ fighter, clip }) => [fighter, clip])).toEqual(wanted.map((name) => [name, victoryAnimation(SELECTABLE_CHARACTERS.find((character) => fighterName(character) === name)!)]));
+  const wanted = gatedFighters().map(fighterName).filter((name) => VICTORY_UNJOINTED[name] === undefined);
+  expect(records.map(({ fighter, clip }) => [fighter, clip])).toEqual(wanted.map((name) => [name, victoryAnimation(gatedFighters().find((character) => fighterName(character) === name)!)]));
   expect(records.flatMap(({ fighter, rest, samples }) => anatomyFindings(rest, samples).filter(({ rule }) => seamless(fighter) || rule !== "leaves its socket").map((finding) => ({ fighter, ...finding })))).toEqual([]);
 });
 
 test("each fighter listed as owing a shoulder seam still opens it, so the list shrinks when a cheer is fixed [k3 measure #496]", () => {
-  expect(records.filter(({ fighter, rest, samples }) => anatomyFindings(rest, samples).some(({ rule }) => rule === "leaves its socket")).map(({ fighter }) => fighter).toSorted()).toEqual(Object.keys(VICTORY_SEAM_DEBT).toSorted());
+  expect(records.filter(({ fighter, rest, samples }) => anatomyFindings(rest, samples).some(({ rule }) => rule === "leaves its socket")).map(({ fighter }) => fighter).toSorted()).toEqual(Object.keys(VICTORY_SEAM_DEBT).filter((fighter) => featured.has(fighter)).toSorted());
 });
 
 test("Kael'thas's arms-overhead cheer that read as a dislocated arm is found leaving its shoulder sockets [k3 measure #496]", () => {

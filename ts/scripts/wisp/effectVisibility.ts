@@ -7,7 +7,8 @@ import { type model as mdx } from "wisp/vendor/war3-model.mjs";
 import { parseModelMDX } from "wisp/scripts/wisp/models";
 import { selectSequence } from "wisp/src/game/native/animation";
 import { Character } from "../../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug, heroDefinition } from "../../src/game/roster/kits";
+import { fighterSlug, heroDefinition } from "../../src/game/roster/kits";
+import { gatedFighters } from "../../src/game/roster/forge";
 import { HERO_CUES, fighterMoveCues, fighterBranchCues, fighterCueList } from "../../src/game/presentation/specialCues";
 import type { Cue } from "../../src/game/presentation/cue";
 import { ATTACK_CUES } from "../../src/game/presentation/attackCues";
@@ -266,7 +267,7 @@ export function projectileUse(character: Character, fighter: string, move: strin
 /** Every effect any fighter's move shows in Classic. */
 export function effectUses(): EffectUse[] {
   const uses: EffectUse[] = [];
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     const fighter = fighterSlug(character);
     const cues = HERO_CUES[character];
     for (const slot of SPECIAL_SLOTS) {
@@ -302,7 +303,7 @@ export function effectUses(): EffectUse[] {
     }
   }
   const supplemental = (fighter: string, move: string, model: string, playbackUnknown: string): EffectUse => ({ fighter, move, kind: "presentation effect", model, sequence: undefined, seconds: 0, timeScale: 1, travels: false, anchored: "fighter", playbackUnknown });
-  for (const character of SELECTABLE_CHARACTERS) {
+  for (const character of gatedFighters()) {
     const fighter = fighterSlug(character);
     if (heroDefinition(character) === undefined) for (const model of fighterProjectileModels(character)) if (!uses.some((use) => use.fighter === fighter && use.kind === "projectile" && use.model === model)) uses.push(supplemental(fighter, "legacy projectile", model, "legacy projectile playback requires an observed frame trace"));
     for (let kind = 0; kind < IMPACT_KIND_COUNT; kind++) uses.push({ fighter, move: `common impact ${kind}`, kind: "impact", model: impactModel(kind), sequence: impactAnimation(kind), seconds: impactStartSeconds(kind), timeScale: 1, travels: false, anchored: "fighter", scale: impactModelScale(kind) });
