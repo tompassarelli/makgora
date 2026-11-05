@@ -299,6 +299,15 @@ pool and Classic's opponents use featured fighters only (Tom, 2026-11-04).
   every Forge duo and stand-in note were dropped, and an ally who was a Forge
   fighter is now the featured stand-in the earlier rows named.
 
+### Decided pairings for Forge fighters
+
+Rows for Forge fighters wait for their promotion; these pairings are already
+decided, so the row is written this way the day either fighter is featured.
+
+- **Decided (Tom, 2026-11-05).** Malfurion and Tyrande are each other's ally.
+  Both are in the Forge and have no row now. They are night elves, so they are
+  friends under the friend rule, and Malfurion's lore source is Reign of Chaos.
+
 ### Featured enemy duos
 
 The duos the tables draw on; each pool below names them by code.
