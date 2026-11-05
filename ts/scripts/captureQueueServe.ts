@@ -9,6 +9,7 @@ import { reuseStore } from "wisp/scripts/wisp/mapReuse";
 import { builtMapKey } from "./captureQueueRemote";
 import { queueOnLaptop } from "./captureQueueLaptop";
 import { lanState, pairDefaults } from "./captureQueuePair";
+import { CAPACITY_HOST } from "./capacityHost";
 import { fanGroups } from "./captureQueueFan";
 import { peerSpec } from "./captureQueuePeers";
 import { pairAgentStatus } from "./pairAgentStatus";
