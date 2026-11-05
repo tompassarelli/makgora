@@ -117,7 +117,7 @@ const warmPool = (settings: Settings, log: ReturnType<typeof logTo>, logFile: st
   const child = yield* Effect.acquireRelease(
     attempt("start the warm pool", () => {
       const fd = openSync(logFile, "a");
-      const spawned = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(settings.pair), "--pool-profile", "visual", "--desktop", settings.desktop, "--capacity", settings.capacity, "--queue", "--owner", "capture-queue", "--owner-pid", String(process.pid), "--release-idle", "0"], { cwd: settings.checkout.ts, stdin: "ignore", stdout: fd, stderr: fd });
+      const spawned = Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(settings.pair), "--pool-profile", "visual", "--desktop", settings.desktop, "--capacity-bin", settings.capacity, "--queue", "--owner", "capture-queue", "--owner-pid", String(process.pid), "--release-idle", "0"], { cwd: settings.checkout.ts, stdin: "ignore", stdout: fd, stderr: fd });
       closeSync(fd);
       return spawned;
     }),
@@ -209,7 +209,7 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     for (const job of group.jobs) pads.set(job.id, yield* movePads(join(directory, `reel-${index}`), job, join(directory, `pads-${index}`)));
     const fixtures = new Map([...pads].map(([id, rows]) => [id, rows.map(row => row.fixture)]));
     const map = join(directory, `g${index}.w3x`);
-    yield* spawnLogged(["bun", settings.capacity, "session", "--class", "moderate", "--owner", `capture-queue-build-${batch}`, "--", "bun", "scripts/nativeCapture.ts", "build", "--out", map, "--name", `Mak'gora capture queue ${batch} g${index}`, ...group.jobs.map(job => join(directory, `pads-${index}`, job.id))], sourceTs, logFile);
+    yield* spawnLogged([settings.capacity, ...CAPACITY_HOST.slice(1), "session", "--class", "moderate", "--owner", `capture-queue-build-${batch}`, "--", "bun", "scripts/nativeCapture.ts", "build", "--out", map, "--name", `Mak'gora capture queue ${batch} g${index}`, ...group.jobs.map(job => join(directory, `pads-${index}`, job.id))], sourceTs, logFile);
     const manifest = `${map.replace(/\.w3x$/, "")}.captures.json`;
     const identity = yield* attempt("read the map manifest", () => JSON.parse(readFileSync(manifest, "utf8")) as { readonly mapSha256: string; readonly sourceRevision: string; readonly fixtures: readonly { readonly name: string; readonly frames: readonly number[] }[] });
     yield* log({ step: "map build", group: index, lanes: group.jobs.map(job => job.lane), fixtures: [...fixtures.values()].flat().length, seconds: seconds(built), mapSha256: identity.mapSha256, sourceRevision: identity.sourceRevision });
@@ -218,7 +218,7 @@ const captureGroup = <R>(settings: Settings, batch: string, group: Group, index:
     const leased = yield* pairReady;
     yield* log({ step: "lease", group: index, host: leased.remote?.name ?? hostname(), pair: leased.pair, lanes: group.jobs.map(job => job.lane) });
     const captured = performance.now();
-    const ran = yield* (leased.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(leased.pair), "--desktop", leased.desktop, "--capacity", leased.capacity, "--clients-file", leased.clientsFile, "--client", leased.client, "--install", leased.install, "--minutes", String(captureMinutes(identity.fixtures.length))], settings.checkout.ts, logFile)
+    const ran = yield* (leased.remote === undefined ? spawnLogged([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", join(directory, `native-${index}`), "--pair", String(leased.pair), "--desktop", leased.desktop, "--capacity-bin", leased.capacity, "--clients-file", leased.clientsFile, "--client", leased.client, "--install", leased.install, "--minutes", String(captureMinutes(identity.fixtures.length))], settings.checkout.ts, logFile)
       : captureThere(leased.remote, { batch, index, directory, logFile, manifest, plan, log, minutes: captureMinutes(identity.fixtures.length) }, leased.pair, leased.client)).pipe(Effect.result);
     yield* log({ step: "capture", group: index, host: leased.remote?.name ?? hostname(), seconds: seconds(captured) });
     const frames = join(directory, `native-${index}`, `g${index}`);
@@ -269,7 +269,7 @@ const settingsOf = (args: readonly string[], checkout: Checkout): Settings | und
   const pair = Number(option(args, "--pair"));
   if (!Number.isInteger(pair) || pair < 0) return undefined;
   const own = pairDefaults(pair, option(args, "--client"));
-  return { pair, client: own.client, checkout, desktop: option(args, "--desktop") ?? own.desktop, capacity: option(args, "--capacity") ?? own.capacity, clientsFile: option(args, "--clients-file") ?? own.clientsFile, install: option(args, "--install") ?? own.install };
+  return { pair, client: own.client, checkout, desktop: option(args, "--desktop") ?? own.desktop, capacity: option(args, "--capacity-bin") ?? own.capacity, clientsFile: option(args, "--clients-file") ?? own.clientsFile, install: option(args, "--install") ?? own.install };
 };
 
 type Hosts = "local" | "any";
@@ -317,7 +317,7 @@ export const serve = (given: readonly string[]) => Effect.scoped(Effect.gen(func
   const settings = local === undefined || leased === undefined || leased.host === hostname() ? local : { ...local, remote: { name: leased.host } };
   const once = args.includes("--once");
   const idleMinutes = Number(option(args, "--idle-minutes") ?? "30");
-  if (settings === undefined || !Number.isFinite(idleMinutes) || idleMinutes < 0 || !Number.isInteger(maxPairs) || maxPairs < 1) return yield* new UsageFailure({ problem: "anim capture serve [--pair K|auto] [--hosts local|any] [--max-pairs N] [--once] [--idle-minutes N] [--client NAME] [--install DIR] [--clients-file FILE] [--desktop SH] [--capacity HELPER]" });
+  if (settings === undefined || !Number.isFinite(idleMinutes) || idleMinutes < 0 || !Number.isInteger(maxPairs) || maxPairs < 1) return yield* new UsageFailure({ problem: "anim capture serve [--pair K|auto] [--hosts local|any] [--max-pairs N] [--once] [--idle-minutes N] [--client NAME] [--install DIR] [--clients-file FILE] [--desktop SH] [--capacity-bin NORTH_PROGRAM]" });
   yield* attempt("create the queue", () => mkdirSync(queueDirectory("batches"), { recursive: true }));
   const poolLog = join(queueDirectory("batches"), `pool-${settings.pair}.log`);
   let pool: Bun.Subprocess | undefined;

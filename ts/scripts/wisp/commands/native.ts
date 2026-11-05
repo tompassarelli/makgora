@@ -8,6 +8,7 @@ import { Effect, Fiber, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { runProcess } from "../../hostProcess";
+import { CAPACITY_HOST } from "../../capacityHost";
 import { type Box, Plan, parseBoxes, planBoxes, shardBatch, type Batch } from "../nativePlan";
 import { alive, readClaim } from "wisp/scripts/wisp/lan/pool";
 const attempt = <A>(f: () => A) => Effect.try({ try: f, catch: cause => new UsageFailure({ problem: String(cause) }) });
@@ -83,8 +84,8 @@ const runShard = (batch: Batch, shard: ReturnType<typeof shardBatch>[number], ou
       }
       yield* save(subPath, { version: 1, sourceRevision: revision, rows });
     }
-    command = ["native-capture", "batch", "--plan", subPath, "--out", dir, "--pair", String(shard.pair), "--desktop", config.desktop ?? "", "--capacity", config.capacity ?? "", "--clients-file", batch.clients === "pool" ? join(state, `pair-${shard.pair}`, "clients.json") : batch.clients, "--client", config.client ?? "a", "--install", config.install ?? "", ...(batch.clients === "pool" ? [] : ["--signed-in"])];
-    if (!dry && (config.install === undefined || batch.clients === "pool" && (config.desktop === undefined || config.capacity === undefined))) return yield* new UsageFailure({ problem: "capture batch needs --executor-config with install, plus desktop and capacity for offline pools" });
+    command = ["native-capture", "batch", "--plan", subPath, "--out", dir, "--pair", String(shard.pair), "--desktop", config.desktop ?? "", "--capacity-bin", config.capacity ?? CAPACITY_HOST[0], "--clients-file", batch.clients === "pool" ? join(state, `pair-${shard.pair}`, "clients.json") : batch.clients, "--client", config.client ?? "a", "--install", config.install ?? "", ...(batch.clients === "pool" ? [] : ["--signed-in"])];
+    if (!dry && (config.install === undefined || batch.clients === "pool" && config.desktop === undefined)) return yield* new UsageFailure({ problem: "capture batch needs --executor-config with install, plus desktop for offline pools" });
   }
   console.log(`${batch.id} ${batch.kind} pair ${shard.pair}: bun wisp ${command.map(arg => JSON.stringify(arg)).join(" ")}`);
   if (!dry) {
@@ -107,9 +108,7 @@ const runNative = (file: string, out: string, values: NativeOptions) => Effect.g
   const build = (batch: Batch) => Effect.gen(function*() {
     if (existsSync(batch.map)) return;
     if (batch.executor === "capture") return yield* new UsageFailure({ problem: `build the manifest's capture map before running: ${batch.map}` });
-    const skill = config.capacity === undefined ? yield* runProcess(ChildProcess.make("agents", ["path", "machine-capacity"])) : undefined;
-    const capacity = config.capacity ?? join(dirname(skill ?? ""), "scripts/machine-capacity.mjs");
-    yield* runProcess(ChildProcess.make(process.execPath, [capacity, "run", "--class", "moderate", "--owner", "native-planner-build", "--timeout-seconds", "1200", "--", process.execPath, "scripts/wisp.ts", ...plannerMapBuild(batch)], { cwd: resolve(import.meta.dir, "../../..") }));
+    yield* runProcess(ChildProcess.make(config.capacity ?? CAPACITY_HOST[0], [...CAPACITY_HOST.slice(1), "run", "--class", "moderate", "--owner", "native-planner-build", "--timeout-seconds", "1200", "--", process.execPath, "scripts/wisp.ts", ...plannerMapBuild(batch)], { cwd: resolve(import.meta.dir, "../../..") }));
   });
   for (const [index, batch] of plan.batches.entries()) {
     const identity = dry ? JSON.stringify(batch) : yield* attempt(() => {

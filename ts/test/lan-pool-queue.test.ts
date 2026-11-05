@@ -23,7 +23,9 @@ const sandbox = () => {
   writeFileSync(join(bin, "pw-dump"), "#!/bin/sh\nexit 0\n");
   writeFileSync(join(bin, "pw-cli"), "#!/bin/sh\nexit 1\n");
   writeFileSync(join(bin, "systemctl"), `#!/bin/sh\nexec "$WISP_TEST_BUN" "${join(fixtures, "systemctl.ts")}" "$@"\n`);
-  for (const tool of ["pw-dump", "pw-cli", "systemctl"]) chmodSync(join(bin, tool), 0o755);
+  const capacity = join(bin, "north");
+  writeFileSync(capacity, `#!/bin/sh\nexec "$WISP_TEST_BUN" "${join(fixtures, "capacity.ts")}" "$@"\n`);
+  for (const tool of ["pw-dump", "pw-cli", "systemctl", "north"]) chmodSync(join(bin, tool), 0o755);
   // An empty stand-in for the LAN plugin: the pool only checks that the plugin is installed, and nothing here loads it.
   const plugin = join(folder, ".local/share/wisp-private/lan");
   mkdirSync(plugin, { recursive: true });
@@ -79,7 +81,7 @@ test("two makgora sessions waiting on a held pair get it one at a time, in the o
       await Bun.sleep(50);
     }
   };
-  const session = (name: string, hold: readonly string[] = ["--seconds", String(HELD_SECONDS)]) => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(PAIR), "--capacity", join(fixtures, "capacity.ts"), "--desktop", join(fixtures, "desktop.sh"), "--wait", "0", ...hold], {
+  const session = (name: string, hold: readonly string[] = ["--seconds", String(HELD_SECONDS)]) => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(PAIR), "--capacity-bin", join(env.HOME, "bin/north"), "--desktop", join(fixtures, "desktop.sh"), "--wait", "0", ...hold], {
     cwd: ts, env: { ...env, NORTH_FLEET_SESSION: name }, stdout: "pipe", stderr: "pipe",
   });
 

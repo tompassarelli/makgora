@@ -12,7 +12,7 @@ import { ChildProcess } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
 import { FETCH_HINT, buildOnce } from "./buildInputs";
-import { capacityHelper } from "../heavyCapacity";
+import { CAPACITY_HOST } from "../capacityHost";
 import { withLock } from "./fileLock";
 import { type BuildNameProblem } from "./buildName";
 import * as buildNameOf from "./buildName";
@@ -136,11 +136,10 @@ const helperTarget = join(inputsRoot, "play-helper-target");
 
 
 const buildHelper = (lane: string, helper: string) => withLock(join(locks, "play-helper-target.lock"), "Waiting for another controller helper build", Effect.gen(function*() {
-  const capacity = capacityHelper;
   // The pinned padbridge service comes from the plug-in's git dependency (controller/Cargo.toml).
   const build = (target: string) => `cargo build --release --locked --jobs 2 --target-dir '${helperTarget}' ${target}`;
   yield* run(join(lane, "controller"), ["nix-shell", "-p", "stdenv.cc", "cmake", "pkg-config", "libxkbcommon", "udev", "--run",
-    `PATH=${join(homedir(), ".rustup/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin")}:$PATH bun '${capacity}' run --class tom --owner makgora:play-helper --timeout-seconds 900 -- sh -c "${build("--bin wc3-journal")} && ${build("-p padbridge --bin padbridge")}"`]);
+    `PATH=${join(homedir(), ".rustup/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin")}:$PATH ${CAPACITY_HOST.join(" ")} run --class tom --owner makgora:play-helper --timeout-seconds 900 -- sh -c "${build("--bin wc3-journal")} && ${build("-p padbridge --bin padbridge")}"`]);
 
   yield* tryPlay(() => {
     mkdirSync(dirname(helper), { recursive: true });

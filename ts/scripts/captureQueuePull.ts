@@ -44,7 +44,7 @@ export const pull = (job: Pull, ts: string) => Effect.gen(function*() {
   const ran = yield* Effect.tryPromise({
     try: async () => {
       const fd = openSync(logFile, "a");
-      const child = Bun.spawn([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", frames, "--pair", String(job.pair), "--desktop", own.desktop, "--capacity", own.capacity, "--clients-file", own.clientsFile, "--client", own.client, "--install", own.install, "--minutes", String(job.minutes)], { cwd: ts, stdin: "ignore", stdout: fd, stderr: fd });
+      const child = Bun.spawn([process.execPath, "scripts/nativeCapture.ts", "batch", "--plan", plan, "--out", frames, "--pair", String(job.pair), "--desktop", own.desktop, "--capacity-bin", own.capacity, "--clients-file", own.clientsFile, "--client", own.client, "--install", own.install, "--minutes", String(job.minutes)], { cwd: ts, stdin: "ignore", stdout: fd, stderr: fd });
       closeSync(fd);
       const code = await child.exited;
       if (code !== 0) throw new Error(`batch exited ${code}`);

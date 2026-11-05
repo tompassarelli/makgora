@@ -4,17 +4,9 @@
 
 
 
-import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { readFileSync } from "node:fs";
 import { Effect, Schema } from "effect";
-
-const capacityHelperCandidates = [
-  join(homedir(), ".claude/skills/machine-capacity/scripts/machine-capacity.mjs"),
-  join(homedir(), "code/north/main/harness/skills/machine-capacity/scripts/machine-capacity.mjs"),
-];
-
-export const capacityHelper = capacityHelperCandidates.find((path) => existsSync(path)) ?? capacityHelperCandidates[0]!;
+import { CAPACITY_HOST } from "./capacityHost";
 
 
 export function insideCapacityScope(): boolean {
@@ -26,7 +18,7 @@ export function insideCapacityScope(): boolean {
 }
 
 
-export const admitsThroughHelper = () => existsSync(capacityHelper) && !insideCapacityScope();
+export const admitsThroughHelper = () => Bun.which(CAPACITY_HOST[0]) !== null && !insideCapacityScope();
 
 class CapacityFailure extends Schema.TaggedError<CapacityFailure, { readonly brand: unique symbol }>()("CapacityFailure", { problem: Schema.String }) {}
 
@@ -39,7 +31,7 @@ class CapacityFailure extends Schema.TaggedError<CapacityFailure, { readonly bra
 export type CapacityClass = "moderate" | "heavy" | "critical" | "tom";
 
 export const admitted = (capacityClass: CapacityClass, owner: string, timeoutSeconds: number, command: readonly string[]): string[] => admitsThroughHelper()
-  ? [process.execPath, capacityHelper, "run", "--class", capacityClass, "--owner", owner, "--timeout-seconds", String(timeoutSeconds), "--", ...command]
+  ? [...CAPACITY_HOST, "run", "--class", capacityClass, "--owner", owner, "--timeout-seconds", String(timeoutSeconds), "--", ...command]
   : [...command];
 
 // Bun.spawn's default env is the environment the process started with, not process.env as changed since.

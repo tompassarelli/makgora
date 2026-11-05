@@ -67,7 +67,7 @@ const stopPool = (child: Bun.Subprocess) => Effect.gen(function*() {
   }
 });
 
-export const poolArguments = (pair: number, desktop: string, capacity: string, network: boolean, owner?: string) => ["lan", "pool", "--foreground", "--queue", "--release-idle", "0", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity, ...(owner === undefined ? [] : ["--owner", owner]), ...(network ? ["--network"] : [])];
+export const poolArguments = (pair: number, desktop: string, capacity: string, network: boolean, owner?: string) => ["lan", "pool", "--foreground", "--queue", "--release-idle", "0", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity-bin", capacity, ...(owner === undefined ? [] : ["--owner", owner]), ...(network ? ["--network"] : [])];
 
 const poolScope = (pair: number, desktop: string, capacity: string, solo: boolean, network: boolean, owner: string | undefined) => Effect.gen(function*() {
   const scope = yield* Scope.fork(yield* Effect.scope);
@@ -154,7 +154,7 @@ export const nativeCaptureBatch = (args: readonly string[], beforePoolCloses: Ef
   const out = option(args, "--out");
   const pair = Number(option(args, "--pair") ?? "0");
   const desktop = option(args, "--desktop");
-  const capacity = option(args, "--capacity");
+  const capacity = option(args, "--capacity-bin");
   const clientsFile = option(args, "--clients-file");
   const client = option(args, "--client");
   const install = option(args, "--install");
@@ -163,7 +163,7 @@ export const nativeCaptureBatch = (args: readonly string[], beforePoolCloses: Ef
   const solo = args.includes("--solo");
   const network = args.includes("--network");
   const owner = option(args, "--owner");
-  if (planPath === undefined || out === undefined || desktop === undefined || capacity === undefined || clientsFile === undefined || client === undefined || install === undefined || !Number.isInteger(pair) || !Number.isFinite(minutes) || minutes < 1 || (solo && args.includes("--signed-in")) || (network && !solo)) return yield* new CaptureBatchFailure({ problem: "usage: batch --plan capture-batch.json --out DIR --pair K --desktop PRIVATE_DESKTOP_SH --capacity MACHINE_CAPACITY_HELPER --clients-file FILE --client NAME --install DIR [--offline-build 3.0.0.24268|3.0.1.24371] [--minutes N] [--owner LEASE_OWNER] [--solo [--network] | --signed-in]" });
+  if (planPath === undefined || out === undefined || desktop === undefined || capacity === undefined || clientsFile === undefined || client === undefined || install === undefined || !Number.isInteger(pair) || !Number.isFinite(minutes) || minutes < 1 || (solo && args.includes("--signed-in")) || (network && !solo)) return yield* new CaptureBatchFailure({ problem: "usage: batch --plan capture-batch.json --out DIR --pair K --desktop PRIVATE_DESKTOP_SH --capacity-bin NORTH_PROGRAM --clients-file FILE --client NAME --install DIR [--offline-build 3.0.0.24268|3.0.1.24371] [--minutes N] [--owner LEASE_OWNER] [--solo [--network] | --signed-in]" });
   const planText = yield* Effect.try({ try: () => readFileSync(planPath, "utf8"), catch: cause => new CaptureBatchFailure({ problem: `read ${planPath}: ${String(cause)}` }) });
   const plan = yield* Schema.decodeEffect(planSchema)(planText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: `decode ${planPath}: ${String(cause)}` })));
   yield* Effect.try({ try: () => mkdirSync(out, { recursive: true }), catch: cause => new CaptureBatchFailure({ problem: `create ${out}: ${String(cause)}` }) });

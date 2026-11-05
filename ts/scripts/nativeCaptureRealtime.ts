@@ -50,7 +50,7 @@ export const leaseOwner = (pid = process.pid) => `realtime-${pid}`;
 
 /** The capture batch's arguments: a pair this run leased is started by a pool under the lease's owner name, because the pool refuses a pair leased to another owner and a run outside a fleet session has no session id to match instead. */
 export const batchArguments = (out: string, pair: number, own: ReturnType<typeof pairDefaults>, minutes: string, leasedTo: string | undefined) => [
-  "--plan", join(out, "maps", "capture-batch.json"), "--out", join(out, "out"), "--pair", String(pair), "--desktop", own.desktop, "--capacity", own.capacity, "--clients-file", own.clientsFile, "--client", own.client, "--install", own.install, "--minutes", minutes,
+  "--plan", join(out, "maps", "capture-batch.json"), "--out", join(out, "out"), "--pair", String(pair), "--desktop", own.desktop, "--capacity-bin", own.capacity, "--clients-file", own.clientsFile, "--client", own.client, "--install", own.install, "--minutes", minutes,
   ...(leasedTo === undefined ? [] : ["--owner", leasedTo]),
 ];
 

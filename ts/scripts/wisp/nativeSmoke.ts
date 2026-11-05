@@ -7,7 +7,8 @@ import { ChildProcess } from "effect/process";
 import { UsageFailure, flagValues } from "wisp/scripts/wisp/command";
 import { quietNativeSessionArgs } from "wisp/scripts/wisp/quietNativeCapacity";
 import { fighterName, PLAYABLE_CHARACTERS } from "../../src/game/roster/kits";
-import { capacityHelper, admitsThroughHelper } from "../heavyCapacity";
+import { admitsThroughHelper } from "../heavyCapacity";
+import { CAPACITY_HOST } from "../capacityHost";
 import { stopBunProcess } from "../hostProcess";
 import { pairRestartFile, restartDroppedPairInto } from "./commands/lanPoolUnit";
 import { userSessionEnv } from "./commands/nativeUnit";
@@ -76,7 +77,8 @@ export const LEASE_WAIT_SECONDS = 120;
 
 const quietLease = (owner: string) => Effect.gen(function*() {
   if (!admitsThroughHelper()) return;
-  const handle = yield* ChildProcess.make(process.execPath, [...quietNativeSessionArgs(capacityHelper, owner)], { env: userSessionEnv(process.getuid?.() ?? 0), extendEnv: true, stdin: "ignore", stdout: "ignore", stderr: "pipe", forceKillAfter: "5 seconds" });
+  const [command = "", ...quietArgs] = quietNativeSessionArgs(CAPACITY_HOST[0], owner);
+  const handle = yield* ChildProcess.make(command, quietArgs, { env: userSessionEnv(process.getuid?.() ?? 0), extendEnv: true, stdin: "ignore", stdout: "ignore", stderr: "pipe", forceKillAfter: "5 seconds" });
   const reserved = yield* Deferred.make<void>();
   yield* handle.stderr.pipe(
     Stream.decodeText(), Stream.splitLines,
