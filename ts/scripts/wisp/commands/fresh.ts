@@ -150,9 +150,6 @@ export const devChatInput = (command: string): readonly InputAction[] => [
   { kind: "keys", keys: ["Return"] },
 ];
 
-// A quick match or reset writes its receipt only once its stage has built, which took up to 18 s on a loaded native host.
-const DEV_RECEIPT_SECONDS = 45;
-
 export const sendDevCommand = (command: string, clientName?: string) => Effect.gen(function*() {
   const clients = yield* Clients;
   const files = yield* GameFiles;
@@ -180,7 +177,7 @@ export const sendDevCommand = (command: string, clientName?: string) => Effect.g
         return undefined;
       })),
     );
-    const receipt = yield* waitFor(client, `${command} receipt for slot ${slot}`, DEV_RECEIPT_SECONDS, observe).pipe(
+    const receipt = yield* waitFor(client, `${command} receipt for slot ${slot}`, 4, observe).pipe(
       Effect.catchTag("DesktopFailure", (timeout): Effect.Effect<never, DesktopFailure | MalformedGameFile> =>
         problem === undefined ? Effect.fail(timeout) : Effect.fail(problem)),
     );
