@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import { arcadeEnding } from "../arcade/arcadeText";
+import { arcadeEnding } from "./arcadeText";
 import { type MatchState, Phase } from "../lobby/lobbyState";
 import { fighterPortrait } from "../roster/looks";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "../ui/frames";

@@ -145,5 +145,3 @@ export function firstRunDifference(expected: Readonly<ConfiguredRun>, actual: Re
   if (expected.lastDamage !== actual.lastDamage) return "match.run.lastDamage";
   return undefined;
 }
-
-export const reactionLead = (run: Readonly<ConfiguredRun>): number => run.active ? run.current?.reactionLead ?? 0 : 0;

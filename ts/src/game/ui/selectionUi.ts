@@ -450,8 +450,7 @@ export class SelectionPanel {
   private focusAction(game: Readonly<MatchState>, action: Action): boolean {
     const focus = menuFocusList(game, this.participantId);
     if (focus.length === 0) return false;
-    let index = focus.findIndex(item => item.kind === this.menuFocus?.kind && item.slot === this.menuFocus.slot);
-    if (index < 0) index = 0;
+    const index = Math.max(0, focus.findIndex(item => item.kind === this.menuFocus?.kind && item.slot === this.menuFocus.slot));
     if (action === Action.moveUp || action === Action.moveDown) {
       this.menuFocus = focus[floorMod(index + (action === Action.moveUp ? -1 : 1), focus.length)];
       return true;

@@ -3,7 +3,7 @@ import { Phase, createMatchState } from "../lobby/lobbyState";
 import { stepArcadeTier } from "../lobby/matchMode";
 import { CPU_TIERS } from "../match/cpuProfiles";
 import { rulesPillParts, rulesSummary } from "../session/messages";
-import { reactionLead } from "./runState";
+import { reactionLead } from "../core/computerLead";
 import { ARCADE_STAGES, ARCADE_SPINE, StageKind } from "./spine";
 import { ARCADE_CHARACTERS, arcadeTable } from "./tables";
 import { arcadePlan, homeArena } from "./plan";

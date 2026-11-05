@@ -63,7 +63,7 @@ import { fighterEmpoweredAura } from "../../game/presentation/empoweredAuraLook"
 import { BodyFlash } from "../../game/render/bodyFlash";
 import { MeterGlow } from "../../game/render/meterGlow";
 import { type FighterDraw, createFighterDraw } from "../../game/presentation/fighterDraw";
-import { ArcadeCard } from "../../game/render/arcadeCard";
+import { ArcadeCard } from "../../game/arcade/arcadeCard";
 import { PauseMenu } from "../../game/ui/pauseMenu";
 import { PauseScreen } from "../../game/ui/pauseScreen";
 import { InputPreview } from "../../game/ui/inputPreview";

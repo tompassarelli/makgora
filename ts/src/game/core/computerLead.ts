@@ -20,3 +20,10 @@ export function copyComputerLead(target: LeadHolder, source: Readonly<LeadHolder
 export function writeComputerLead(game: Readonly<LeadHolder>, int: (name: string, value: number) => void): void {
   if (game.computerLead !== undefined) int("match.computerLead", game.computerLead);
 }
+
+interface RunLeadHolder {
+  readonly active: boolean;
+  readonly current: { readonly reactionLead: number } | undefined;
+}
+
+export const reactionLead = (run: Readonly<RunLeadHolder>): number => run.active ? run.current?.reactionLead ?? 0 : 0;

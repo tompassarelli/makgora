@@ -76,7 +76,7 @@ may_use = ["snapshot", "sim", "fighter-kit", "input", "core", "generated"]
 
 [[module]]
 name = "roster"
-paths = ["ts/src/game/roster/**", "ts/src/game/objectData.ts", "ts/src/game/menu/stageCatalog.ts"]
+paths = ["ts/src/game/roster/**", "ts/src/game/objectData.ts", "ts/src/game/menu/stageCatalog.ts", "ts/src/game/arcade/tables.ts"]
 responsibility = "The only all-fighter and all-stage registries."
 may_use = ["fighter-kit", "fighter-look", "ai", "sim", "core", "generated"]
 
@@ -150,16 +150,16 @@ responsibility = "Frames, menus and selection screens."
 may_use = ["render", "presentation", "fighter-look", "lobby", "roster", "match", "sim", "input", "core", "generated"]
 
 [[module]]
+name = "arcade"
+paths = ["ts/src/game/arcade/**"]
+responsibility = "Arcade mode: the run engine, its fixed stage spine, draws, its text and the ending card."
+may_use = ["ui", "match", "lobby", "roster", "ai", "sim", "core", "generated"]
+
+[[module]]
 name = "session"
 paths = ["ts/src/game/session/**", "ts/src/game/shell/**"]
 responsibility = "Session setup, playback, dev settings and the match record writer."
-may_use = ["ui", "render", "presentation", "fighter-look", "replay", "netcode", "match", "lobby", "roster", "ai", "snapshot", "sim", "input", "core", "generated"]
-
-[[module]]
-name = "arcade"
-paths = ["ts/src/game/arcade/**"]
-responsibility = "Arcade mode: the run engine, its fixed stage spine, draws and per-fighter tables."
-may_use = ["session", "ui", "match", "lobby", "roster", "sim", "core", "generated"]
+may_use = ["arcade", "ui", "render", "presentation", "fighter-look", "replay", "netcode", "match", "lobby", "roster", "ai", "snapshot", "sim", "input", "core", "generated"]
 
 [[module]]
 name = "host"

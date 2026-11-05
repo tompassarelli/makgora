@@ -21,8 +21,7 @@ import { chooseAttack, lastChoicePassedForVariety, smashChargeGoal } from "./bot
 import { botChance, botChoice, useMatchSeed } from "./botRandom";
 import type { CpuTier } from "./cpuProfiles";
 import { type CpuSkill, cpuSkill, cpuReactionFloor, cpuReactionFrames, perceivedCpuSkill } from "./cpuSkill";
-import { computerLead } from "../core/computerLead";
-import { reactionLead } from "../arcade/runState";
+import { computerLead, reactionLead } from "../core/computerLead";
 import { FAST_BOT_HISTORY_FRAMES, BOT_HISTORY_FRAMES, type BotMemory, observeOpponents, perceivedOpponent, perceivedHeldFighter, commitBotDirection, samePerception } from "./botPerception";
 import { chooseDefense } from "./botDefense";
 import { burnedMove, keepClearOfBurn, punishBlockedBurn } from "./botBurn";

@@ -16,7 +16,7 @@ A module may import only the modules in its "may use" column. Sim code never rea
 | fighter-kit | `ts/src/game/fighters/<slug>/` (`kit.ts`, `moves.ts`, `specials.ts`), shared helpers in `ts/src/game/sim/heroes/` | One fighter's gameplay data and special hooks | sim, core |
 | snapshot | `ts/src/game/replay/{canonical,kitCanonical,specialCanonical,fighterState,difference,history,snapshot}.ts` | Canonical text (state, kit and special writers), state hash, copy/compare/diff, rollback ring | sim, core |
 | ai | `ts/src/game/match/bot*.ts`, `match/cpu*.ts`, `fighters/<slug>/gameplan.ts` | Bots, perception, gameplans, edge-guard scenarios | sim, snapshot, input, core |
-| roster | `ts/src/game/roster/kits.ts`, `menu/stageCatalog.ts` | The only all-fighter and all-stage lists | fighter-kit, ai, core |
+| roster | `ts/src/game/roster/kits.ts`, `menu/stageCatalog.ts`, `arcade/tables.ts` | The only all-fighter and all-stage lists | fighter-kit, ai, core |
 | lobby | `ts/src/game/lobby/lobbyState.ts`, `ts/src/game/menu/` | Slots, humans/CPU, character/stage select, teams, stock/timer choice | roster, core |
 | match | `ts/src/game/match/` | Match step, stocks/teams/meter rules, training | sim, snapshot, ai, roster, lobby, input, core |
 | replay | `ts/src/game/replay/` (tapes, moments, viewer) | Replay files, tapes, moments, viewer driver | match, snapshot, sim, input, core |
@@ -25,8 +25,8 @@ A module may import only the modules in its "may use" column. Sim code never rea
 | presentation | `ts/src/game/presentation/` | Pose/clip choice, cue and sound selection; pure, no natives | fighter-look, roster, match, sim, snapshot, core |
 | render | `ts/src/game/render/` | Warcraft-native effects and sound playback | presentation, sim, core, Wisp map |
 | ui | `ts/src/game/ui/`, `ts/src/game/menu/` | Frames, menus, selection screens | lobby, roster, render, presentation, core |
-| session | `ts/src/game/session/` | Session, playback, dev settings, match record writer | match, replay, lobby, ui, netcode, presentation, render, roster, core |
-| arcade | `ts/src/game/arcade/` | Arcade run engine, stage spine, per-fighter tables | session, match, lobby, roster, core |
+| arcade | `ts/src/game/arcade/` | Arcade run engine, stage spine, draws, run text, ending card | ui, match, lobby, roster, ai, core |
+| session | `ts/src/game/session/` | Session, playback, dev settings, match record writer | arcade, match, replay, lobby, ui, netcode, presentation, render, roster, core |
 | host | `ts/src/platform/` (`*Main.ts` entries, `shell/` live loop) | Map entry points; view, keys, rollback tick | everything above, Wisp map |
 
 Known breaks still in the tree (removed by slices, never copied): `fighters/*/kit.ts` importing generated clips (S5), sim importing `input/participants.ts` (S12), `sim/testDuel.ts` importing match (S9).
