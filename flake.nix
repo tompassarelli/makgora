@@ -1,13 +1,16 @@
 {
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
-  outputs = { self, nixpkgs }:
+  outputs =
+    { self, nixpkgs }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
       addonPin = pkgs.lib.trim (builtins.readFile ./tools/animations/mdl-exporter4.pin);
-    in {
+    in
+    {
       packages.${system}.selection-fonts = pkgs.dejavu_fonts;
+      formatter.${system} = pkgs.nixfmt-tree.override { settings.global.excludes = [ "repos/**" ]; };
       devShells.${system}.default = pkgs.mkShell {
         packages = [ pkgs.blender ];
         shellHook = ''
