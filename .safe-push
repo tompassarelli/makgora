@@ -14,3 +14,8 @@
 [after-landing]
 	check = "standalone-parity :: cd ts && bun wisp parity standalone test/native/pads/cpu-expert.pad --presentation native || { echo 'This landing moved the sim off the native recording of test/native/pads/cpu-expert.pad at the first divergent frame above. If the landing was an intended gameplay change, re-record the pad in the native client on a LAN pair and replace its native recording in ts/test/corpus with bun wisp parity corpus keep; if not, fix the drift.'; exit 1; }"
 	check = release-assets :: cd ts && bun scripts/releaseAssets.ts
+[test-admission]
+	contract = lua-determinism :: the map's Lua must give every client the same result for the same inputs
+	contract = netcode-replay :: a recorded match or pad replays to the same frames
+	contract = file-or-wire-format :: a format Warcraft III, a client or a past build writes or reads
+	contract = engine-limits :: a Warcraft III engine limit the map must stay inside, such as handle, string or frame budgets
