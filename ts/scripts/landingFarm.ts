@@ -18,9 +18,12 @@ export const localChecks = (checks: readonly Check[]): Check[] => checks.filter(
 
 const WORKFLOW = "farm-test.yml";
 const POLL = "3 seconds";
+const RETRY = "10 seconds";
 const PASSING = new Set(["success", "skipped"]);
 const RUN_URL = /\/actions\/runs\/(\d+)/;
-const TRANSIENT = /HTTP (404|50[234])/;
+const TRANSIENT = /HTTP (403|404|429|50[234])/;
+const GITHUB_UNAVAILABLE = /HTTP (403|429|50[234])|rate.?limit/i;
+const INFRASTRUCTURE_EXIT = 75;
 
 /** A landing's verdict from the check jobs alone, since the merge job only summarises them: failed once one fails, passed once all pass. */
 export function checksVerdict(state: RunState, groups: readonly Group[] = GROUPS): "passed" | "failed" | "pending" {
@@ -71,7 +74,7 @@ const awaitChecks = (repo: string, id: number, groups: readonly Group[]) => Effe
   for (;;) {
     const verdict = checksVerdict(yield* fetchRunState(repo, id, token).pipe(
       // GitHub answers 404 for a just-dispatched run's jobs until it lists them, and a passing 502, 503 or 504 under load.
-      Effect.retry({ while: (failure) => TRANSIENT.test(failure.message), schedule: Schedule.spaced(POLL).pipe(Schedule.upTo({ duration: "1 minute" })) }),
+      Effect.retry({ while: (failure) => TRANSIENT.test(failure.message), schedule: Schedule.spaced(RETRY).pipe(Schedule.upTo({ duration: "10 minutes" })) }),
     ), groups);
     if (verdict !== "pending") return verdict;
     yield* Effect.sleep(POLL);
@@ -129,11 +132,15 @@ export const landOnFarm = (base: string, head: string, { farm: farmer, cache, li
   yield* Effect.all([farm, runChecks(here, laptop)], { concurrency: "unbounded", discard: true });
 });
 
+/** Exit 75 when GitHub, not the lane, failed to answer, so the lander treats the run as transient instead of reverting a lane for a rate limit. */
+export const exitCodeFor = (message: string): number => (GITHUB_UNAVAILABLE.test(message) ? INFRASTRUCTURE_EXIT : 1);
+
 if (import.meta.main) {
   const exit = await Effect.runPromiseExit(landOnFarm(process.env.SAFE_PUSH_LAND_BASE || "", process.env.SAFE_PUSH_LAND_HEAD || "HEAD"));
   if (Exit.isFailure(exit)) {
     const failure = Exit.findErrorOption(exit);
-    console.error(Option.isSome(failure) ? (failure.value as Error).message : String(exit.cause));
-    process.exit(1);
+    const message = Option.isSome(failure) ? (failure.value as Error).message : String(exit.cause);
+    console.error(message);
+    process.exit(exitCodeFor(message));
   }
 }

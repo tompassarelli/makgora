@@ -5,7 +5,7 @@ import { expect, test } from "bun:test";
 import { Effect } from "effect";
 import { GROUPS, type Group, landingGroups } from "../scripts/landingChecks";
 import { groupInputKey } from "../scripts/landingInputs";
-import { type FarmRunner, checksVerdict, landOnFarm, localChecks } from "../scripts/landingFarm";
+import { type FarmRunner, checksVerdict, exitCodeFor, landOnFarm, localChecks } from "../scripts/landingFarm";
 import { checksFor } from "../scripts/prePush";
 import { directoryCache } from "../scripts/prePush";
 
@@ -65,4 +65,12 @@ test("a landing passes once every check job passes, without the merge job, and f
   expect(checksVerdict(only(["corpus", "success"], ["static", "success"]), named)).toBe("passed");
   expect(checksVerdict(only(["corpus", "success"]), named)).toBe("pending");
   expect(checksVerdict(only(["corpus", "failure"], ["static", ""]), named)).toBe("failed");
+});
+
+test("a rate-limited or unavailable GitHub exits 75 for the lander to treat as transient, and a failing check exits 1 [k2 property]", () => {
+  expect(exitCodeFor("HTTP 403 for run 42112065121/jobs?per_page=100")).toBe(75);
+  expect(exitCodeFor("HTTP 429 for run 1/jobs")).toBe(75);
+  expect(exitCodeFor("HTTP 503 for run 1")).toBe(75);
+  expect(exitCodeFor("GitHub is rate-limiting requests")).toBe(75);
+  expect(exitCodeFor("FAIL parity tapes\nlanding farm: failure on abc: url")).toBe(1);
 });
