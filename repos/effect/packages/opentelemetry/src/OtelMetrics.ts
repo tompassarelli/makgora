@@ -80,32 +80,22 @@ export const registerProducer = (
   }
 ): Effect.Effect<Array<any>, never, Scope.Scope> =>
   Effect.acquireRelease(
-    Effect.suspend(() => {
+    Effect.sync(() => {
       const reader = metricReader()
       const readers: Array<MetricReader> = Array.isArray(reader) ? reader : [reader] as any
-      const bound: Array<MetricReader> = []
-      try {
-        for (const reader of readers) {
-          reader.setMetricProducer(self instanceof MetricProducerImpl ? self.fork() : self)
-          bound.push(reader)
-        }
-        return Effect.succeed(bound)
-      } catch (error) {
-        // Roll back only the readers bound by this acquisition.
-        return Effect.andThen(Effect.ignoreCause(shutdownReaders(bound, options)), Effect.die(error))
-      }
+      readers.forEach((reader) => reader.setMetricProducer(self instanceof MetricProducerImpl ? self.fork() : self))
+      return readers
     }),
-    (readers) => shutdownReaders(readers, options)
-  )
-
-const shutdownReaders = (
-  readers: ReadonlyArray<MetricReader>,
-  options?: { readonly shutdownTimeout?: Duration.Input | undefined }
-) =>
-  Effect.promise(() => Promise.all(readers.map((reader) => reader.shutdown()))).pipe(
-    Effect.ignore,
-    Effect.interruptible,
-    Effect.timeoutOption(options?.shutdownTimeout ?? 3000)
+    (readers) =>
+      Effect.promise(() =>
+        Promise.all(
+          readers.map((reader) => reader.shutdown())
+        )
+      ).pipe(
+        Effect.ignore,
+        Effect.interruptible,
+        Effect.timeoutOption(options?.shutdownTimeout ?? 3000)
+      )
   )
 
 /**

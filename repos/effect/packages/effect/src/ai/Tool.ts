@@ -115,9 +115,7 @@ export type DynamicTypeId = "~effect/ai/Tool/Dynamic"
  * execution will be returned in the error channel of the calling effect.
  *
  * If set to `"return"`, errors that occur during tool call handler execution
- * will be captured and returned as part of the tool call result. Like
- * `Effect.catch`, only the first typed failure is returned, and a cause
- * containing a defect is raised as a defect.
+ * will be captured and returned as part of the tool call result.
  *
  * @stability unstable
  * @category models
@@ -248,9 +246,7 @@ export interface Tool<
    * effect.
    *
    * If set to `"return"`, errors that occur during tool call handler execution
-   * will be captured and returned as part of the tool call result. Like
-   * `Effect.catch`, only the first typed failure is returned, and a cause
-   * containing a defect is raised as a defect.
+   * will be captured and returned as part of the tool call result.
    */
   readonly failureMode: FailureMode
 
@@ -1299,9 +1295,7 @@ export const make = <
    * execution will be returned in the error channel of the calling effect.
    *
    * If set to `"return"`, errors that occur during tool call handler execution
-   * will be captured and returned as part of the tool call result. Like
-   * `Effect.catch`, only the first typed failure is returned, and a cause
-   * containing a defect is raised as a defect.
+   * will be captured and returned as part of the tool call result.
    */
   readonly failureMode?: Mode
   /**
@@ -1540,9 +1534,7 @@ export const providerDefined = <
          * execution will be returned in the error channel of the calling effect.
          *
          * If set to `"return"`, errors that occur during tool call handler execution
-         * will be captured and returned as part of the tool call result. Like
-         * `Effect.catch`, only the first typed failure is returned, and a cause
-         * containing a defect is raised as a defect.
+         * will be captured and returned as part of the tool call result.
          */
         readonly failureMode?: Mode | undefined
       }

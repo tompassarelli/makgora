@@ -77,9 +77,6 @@ const unquote = (input: string | undefined): string => {
       output += character
     }
   }
-  if (escaped) {
-    output += "\\"
-  }
   return output.trim()
 }
 

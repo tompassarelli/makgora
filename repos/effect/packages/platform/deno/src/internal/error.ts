@@ -37,7 +37,6 @@ export const handleError = (
           break
 
         case "EACCES":
-        case "EPERM":
           tag = "PermissionDenied"
           break
 

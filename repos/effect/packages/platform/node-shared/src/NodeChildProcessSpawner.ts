@@ -16,9 +16,7 @@
  * `all`, or `fdN`) to the destination `stdin` or `fdN`.
  *
  * Scoped release and `kill` wait for the signalled process group. Without
- * `forceKillAfter`, cleanup waits for the leader to exit with no time limit,
- * then gives remaining group members up to one second to exit, without
- * escalating.
+ * `forceKillAfter`, the wait is limited to one second and never escalates.
  * With it, cleanup may take the configured duration plus a final one-second
  * wait after `SIGKILL`. Zombie descendants can consume either full bound. On
  * Windows, `taskkill` terminates the tree while the leader is running, and
@@ -504,7 +502,6 @@ const make = Effect.gen(function*() {
       )
     yield* signalGroup(options?.killSignal ?? "SIGTERM")
     if (Predicate.isUndefined(options?.forceKillAfter)) {
-      yield* Deferred.await(exitSignal)
       yield* awaitProcessExit(childProcess, exitSignal, processGroupGraceMillis)
     } else {
       yield* awaitProcessExit(childProcess, exitSignal, Duration.toMillis(options.forceKillAfter))

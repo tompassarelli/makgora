@@ -29,14 +29,7 @@ export const optional = <S extends Schema.Constraint>(
       encode: SchemaGetter.transformOptional(Option.flatMap(Option.fromUndefinedOr))
     })
   )
-
-/**
- * Object checked one level deep. Payloads come from `JSON.parse` or are serialized
- * through `Schema.toCodecJson`, so deep JSON validation would be redundant.
- *
- * @internal
- */
-export const UnknownObject = Schema.Record(Schema.String, Schema.Unknown)
+const JsonObject = Schema.JsonObject
 
 /**
  * @internal
@@ -72,7 +65,7 @@ export const RequestMeta = Schema.Struct({
     Schema.Struct({
       progressToken: optional(ProgressToken)
     }),
-    [UnknownObject]
+    [Schema.JsonObject]
   ))
 })
 
@@ -80,14 +73,14 @@ export const RequestMeta = Schema.Struct({
  * @internal
  */
 export const NotificationMeta = Schema.Struct({
-  _meta: optional(UnknownObject)
+  _meta: optional(JsonObject)
 })
 
 /**
  * @internal
  */
 export const ResultMeta = Schema.Struct({
-  _meta: optional(UnknownObject)
+  _meta: optional(JsonObject)
 })
 
 /**
@@ -118,21 +111,21 @@ export const Implementation = Schema.Struct({
  * @internal
  */
 export const ClientCapabilities = Schema.Struct({
-  extensions: optional(Schema.Record(Schema.TemplateLiteral([Schema.String, "/", Schema.String]), Schema.Unknown)),
-  experimental: optional(Schema.Record(Schema.String, UnknownObject)),
+  extensions: optional(Schema.Record(Schema.TemplateLiteral([Schema.String, "/", Schema.String]), Schema.Json)),
+  experimental: optional(Schema.Record(Schema.String, JsonObject)),
   roots: optional(Schema.Struct({
     listChanged: optional(Schema.Boolean)
   })),
-  sampling: optional(UnknownObject)
+  sampling: optional(JsonObject)
 })
 
 /**
  * @internal
  */
 export const ServerCapabilities = Schema.Struct({
-  extensions: optional(Schema.Record(Schema.TemplateLiteral([Schema.String, "/", Schema.String]), Schema.Unknown)),
-  experimental: optional(Schema.Record(Schema.String, UnknownObject)),
-  logging: optional(UnknownObject),
+  extensions: optional(Schema.Record(Schema.TemplateLiteral([Schema.String, "/", Schema.String]), Schema.Json)),
+  experimental: optional(Schema.Record(Schema.String, JsonObject)),
+  logging: optional(JsonObject),
   prompts: optional(Schema.Struct({
     listChanged: optional(Schema.Boolean)
   })),
@@ -291,7 +284,7 @@ export const PromptMessage = Schema.Struct({
  */
 export const ToolInputSchema = Schema.Struct({
   type: Schema.Literal("object"),
-  properties: optional(Schema.Record(Schema.String, UnknownObject)),
+  properties: optional(Schema.Record(Schema.String, JsonObject)),
   required: optional(Schema.Array(Schema.String))
 })
 
@@ -589,7 +582,7 @@ export class CallTool extends Rpc.make("tools/call", {
   payload: {
     ...RequestMeta.fields,
     name: Schema.String,
-    arguments: optional(UnknownObject)
+    arguments: optional(JsonObject)
   }
 }) {}
 
@@ -617,7 +610,7 @@ export class CreateMessage extends Rpc.make("sampling/createMessage", {
     temperature: optional(Schema.Finite),
     maxTokens: Schema.Finite,
     stopSequences: optional(Schema.Array(Schema.String)),
-    metadata: optional(UnknownObject)
+    metadata: optional(JsonObject)
   }
 }) {}
 

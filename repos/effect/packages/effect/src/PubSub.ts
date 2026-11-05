@@ -1469,16 +1469,16 @@ export const takeUpTo: {
 } = dual(2, <A>(self: Subscription<A>, max: number): Effect.Effect<Array<A>> =>
   Effect.suspend(() => {
     if (self.shutdownFlag.current) return Effect.interrupt
-    let limit = Count.normalize(max)
+    max = Count.normalize(max)
     let replay: Array<A> | undefined = undefined
-    if (self.replayWindow.remaining >= limit) {
-      return Effect.succeed(self.replayWindow.takeN(limit))
+    if (self.replayWindow.remaining >= max) {
+      return Effect.succeed(self.replayWindow.takeN(max))
     } else if (self.replayWindow.remaining > 0) {
       replay = self.replayWindow.takeAll()
-      limit = limit - replay.length
+      max = max - replay.length
     }
     const as = self.pollers.length === 0
-      ? self.subscription.pollUpTo(limit)
+      ? self.subscription.pollUpTo(max)
       : []
     self.strategy.onPubSubEmptySpaceUnsafe(self.pubsub, self.subscribers)
     return replay ? Effect.succeed(replay.concat(as)) : Effect.succeed(as)
@@ -1537,9 +1537,7 @@ const takeRemainderLoop = <A>(
     return Effect.succeed(acc)
   }
   return Effect.flatMap(takeUpTo(self, max), (bs) => {
-    for (let i = 0; i < bs.length; i++) {
-      acc.push(bs[i])
-    }
+    acc.push(...bs)
     const remaining = min - bs.length
     if (remaining === 1) {
       return Effect.map(take(self), (b) => {
@@ -2937,10 +2935,7 @@ class ReplayBuffer<A> {
     }
     this.tail = this.tail.next
     if (this.size === this.capacity) {
-      const dropped = this.head
-      this.head = dropped.next!
-      dropped.next = null
-      dropped.value = AbsentValue
+      this.head = this.head.next!
     } else {
       this.size += 1
     }

@@ -86,8 +86,7 @@ export class HttpServerError extends Data.TaggedError("HttpServerError")<{
  *
  * **Details**
  *
- * When converted to a response it produces an empty `413` response for
- * `BodyTooLarge`, or an empty `400` response for other parse failures.
+ * When converted to a response it produces an empty `400` response.
  *
  * @stability unstable
  * @category errors
@@ -95,19 +94,17 @@ export class HttpServerError extends Data.TaggedError("HttpServerError")<{
  */
 export class RequestParseError extends Data.TaggedError("RequestParseError")<{
   readonly request: Request.HttpServerRequest
-  readonly reason?: "Parse" | "BodyTooLarge"
   readonly description?: string
   readonly cause?: unknown
 }> implements Respondable.Respondable {
   /**
-   * Converts the request error into a `413 Content Too Large` response for body
-   * size breaches, or a `400 Bad Request` response for other parse failures.
+   * Converts the request error into a `400 Bad Request` response.
    *
    * @stability unstable
    * @since 4.0.0
    */
   [Respondable.symbol]() {
-    return Effect.succeed(Response.empty({ status: this.reason === "BodyTooLarge" ? 413 : 400 }))
+    return Effect.succeed(Response.empty({ status: 400 }))
   }
 
   get methodAndUrl() {

@@ -172,6 +172,21 @@ describe("SchemaRepresentation.toJsonSchemaDocument", () => {
       )
     })
 
+    it("rejects non-finite numeric Enum values", () => {
+      expectError(
+        () =>
+          compile({
+            _tag: "Enum",
+            enums: [
+              ["StringNaN", "NaN"],
+              ["NumberNaN", Number.NaN]
+            ],
+            checks: []
+          }),
+        `Invalid numeric enum value NaN\n  at ["representation"]["enums"][1][1]`
+      )
+    })
+
     it("compiles a TemplateLiteral", () => {
       assert.deepStrictEqual(
         compile({
@@ -225,15 +240,16 @@ describe("SchemaRepresentation.toJsonSchemaDocument", () => {
       )
     })
 
-    it("approximates multiple tuple rest elements", () => {
-      assert.deepStrictEqual(
-        compile({
-          _tag: "Arrays",
-          elements: [],
-          rest: [StringRepresentation, NumberRepresentation],
-          checks: []
-        }),
-        { type: "array", minItems: 1 }
+    it("rejects multiple tuple rest elements", () => {
+      expectError(
+        () =>
+          compile({
+            _tag: "Arrays",
+            elements: [],
+            rest: [StringRepresentation, NumberRepresentation],
+            checks: []
+          }),
+        `Invalid schema representation document\n  at ["representation"]["rest"]`
       )
     })
 
@@ -251,7 +267,7 @@ describe("SchemaRepresentation.toJsonSchemaDocument", () => {
             indexSignatures: [],
             checks: []
           }),
-        `Objects property names must be strings\n  at ["representation"]["propertySignatures"][0]["name"]`
+        `Invalid schema representation document\n  at ["representation"]["propertySignatures"][0]["name"]`
       )
     })
 
@@ -587,36 +603,16 @@ describe("SchemaRepresentation.toJsonSchemaDocument", () => {
       )
     })
 
-    it("compiles a Number index-signature parameter", () => {
-      assert.deepStrictEqual(
-        compile({
-          _tag: "Objects",
-          propertySignatures: [],
-          indexSignatures: [{ parameter: NumberRepresentation, type: StringRepresentation }],
-          checks: []
-        }),
-        {
-          type: "object",
-          patternProperties: {
-            "^(?:[+-]?(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:[Ee][+-]?\\d+)?|Infinity|-Infinity|NaN)$": {
-              type: "string"
-            }
-          },
-          additionalProperties: false
-        }
-      )
-    })
-
-    it("reports an invalid index-signature parameter", () => {
+    it("rejects an unsupported index-signature parameter", () => {
       expectError(
         () =>
           compile({
             _tag: "Objects",
             propertySignatures: [],
-            indexSignatures: [{ parameter: { _tag: "Boolean", checks: [] }, type: StringRepresentation }],
+            indexSignatures: [{ parameter: NumberRepresentation, type: StringRepresentation }],
             checks: []
           }),
-        `Invalid index signature parameter Boolean\n  at ["representation"]["indexSignatures"][0]["parameter"]`
+        `Invalid schema representation document\n  at ["representation"]["indexSignatures"][0]["parameter"]`
       )
     })
 
@@ -988,7 +984,7 @@ describe("SchemaRepresentation.toJsonSchemaDocument", () => {
             },
             references: {}
           }),
-        "Invalid TemplateLiteral part Boolean"
+        "Invalid schema representation document"
       )
     })
   })

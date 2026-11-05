@@ -154,7 +154,7 @@ export class CauseImpl<E> implements Cause.Cause<E> {
   toJSON(): unknown {
     return {
       _id: "Cause",
-      reasons: this.reasons.map((f) => f.toJSON())
+      failures: this.reasons.map((f) => f.toJSON())
     }
   }
   toString() {

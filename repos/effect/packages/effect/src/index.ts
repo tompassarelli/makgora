@@ -82,12 +82,6 @@ export * as Brand from "./Brand.ts"
 
 /**
  * @stability unstable
- * @since 4.0.6
- */
-export * as Bytes from "./Bytes.ts"
-
-/**
- * @stability unstable
  * @since 4.0.0
  */
 export * as ByteSize from "./ByteSize.ts"
@@ -705,18 +699,6 @@ export * as ScopedRef from "./ScopedRef.ts"
 export * as Semaphore from "./Semaphore.ts"
 
 /**
- * @stability unstable
- * @since 4.0.6
- */
-export * as SemVer from "./SemVer.ts"
-
-/**
- * @stability unstable
- * @since 4.0.6
- */
-export * as SemVerRange from "./SemVerRange.ts"
-
-/**
  * @stability stable
  * @since 2.0.0
  */
@@ -781,12 +763,6 @@ export * as Take from "./Take.ts"
  * @since 4.0.0
  */
 export * as Terminal from "./Terminal.ts"
-
-/**
- * @stability experimental
- * @since 4.0.6
- */
-export * as TextDiff from "./TextDiff.ts"
 
 /**
  * @stability stable

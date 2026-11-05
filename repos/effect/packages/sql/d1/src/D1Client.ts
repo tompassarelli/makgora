@@ -342,7 +342,6 @@ export const make = (
     let client!: D1Client
     client = Object.assign(
       (yield* Client.make({
-        driver: "d1",
         acquirer,
         compiler,
         transactionAcquirer,
@@ -363,7 +362,6 @@ export const make = (
 
     if (options.transformQueryNames !== undefined || transformRows !== undefined) {
       const clientWithoutTransformsBase = yield* Client.make({
-        driver: "d1",
         acquirer: Effect.succeed(connection),
         compiler: compiler.withoutTransform,
         transactionAcquirer,

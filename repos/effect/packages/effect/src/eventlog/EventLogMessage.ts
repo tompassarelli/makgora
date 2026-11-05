@@ -11,18 +11,16 @@
  */
 import type { NonEmptyArray, NonEmptyReadonlyArray } from "../Array.ts"
 import type { Brand } from "../Brand.ts"
-import * as Effect from "../Effect.ts"
 import * as SchemaBinary from "../encoding/SchemaBinary.ts"
 import * as Predicate from "../Predicate.ts"
 import * as Rpc from "../rpc/Rpc.ts"
 import * as RpcGroup from "../rpc/RpcGroup.ts"
 import * as RpcMiddleware from "../rpc/RpcMiddleware.ts"
 import * as Schema from "../Schema.ts"
-import type * as SchemaAST from "../SchemaAST.ts"
 import * as Transferable from "../workers/Transferable.ts"
-import { Entry, EntryFields, entryFromFields, EntryId, RemoteEntry, RemoteId } from "./EventJournal.ts"
+import { Entry, RemoteEntry, RemoteId } from "./EventJournal.ts"
 import type { Identity } from "./EventLog.ts"
-import { EncryptedBatch, EncryptedRemoteBatch } from "./EventLogEncryption.ts"
+import { EncryptedEntry, EncryptedRemoteEntry } from "./EventLogEncryption.ts"
 
 /**
  * Type-level identifier used to brand event-log store ids.
@@ -111,8 +109,8 @@ export class EventLogAuthentication extends RpcMiddleware.Service<EventLogAuthen
  *
  * **Details**
  *
- * Contains the remote id, a challenge for the client to sign, and the lowest
- * assigned sequence (default 0) for initializing acknowledgement cursors.
+ * It contains the server remote id and a challenge that must be signed by the
+ * client.
  *
  * @stability unstable
  * @category protocols
@@ -120,8 +118,7 @@ export class EventLogAuthentication extends RpcMiddleware.Service<EventLogAuthen
  */
 export class HelloResponse extends Schema.Class<HelloResponse>("effect/eventlog/EventLogRemote/HelloResponse")({
   remoteId: RemoteId,
-  challenge: Transferable.Uint8Array,
-  firstSequence: Schema.optional(Schema.Natural)
+  challenge: Transferable.Uint8Array
 }) {}
 
 /**
@@ -275,36 +272,7 @@ export class ChunkedMessage
 }
 
 /**
- * Schema for a written entry's id and a sequence at which the server stores
- * it. Entries the server already held keep their stored sequence. When a write
- * stores an entry again, as part of a partly known batch, it is acknowledged at
- * its new position.
- *
- * @stability unstable
- * @category protocols
- * @since 4.0.6
- */
-export const WriteAck = Schema.Struct({
-  entryId: EntryId,
-  sequence: Schema.Natural
-})
-
-/**
- * Acknowledgement of one written entry.
- *
- * @stability unstable
- * @category protocols
- * @since 4.0.6
- */
-export type WriteAck = typeof WriteAck.Type
-
-/**
  * RPC used to send one chunk of a large encoded write payload.
- *
- * **Details**
- *
- * The completing chunk returns acknowledgements in request order; earlier
- * chunks return an empty array.
  *
  * @stability unstable
  * @category protocols
@@ -312,7 +280,6 @@ export type WriteAck = typeof WriteAck.Type
  */
 export class WriteChunkedRpc extends Rpc.make("EventLog.WriteChunked", {
   payload: ChunkedMessage,
-  success: Schema.Array(WriteAck),
   error: EventLogProtocolError
 }).middleware(EventLogAuthentication) {}
 
@@ -321,8 +288,8 @@ export class WriteChunkedRpc extends Rpc.make("EventLog.WriteChunked", {
  *
  * **Details**
  *
- * It includes the client public key, target store id, and the entries
- * encrypted as batches.
+ * It includes the client public key, target store id, and encrypted entries
+ * with their AES-GCM initialization vectors.
  *
  * @stability unstable
  * @category protocols
@@ -331,7 +298,7 @@ export class WriteChunkedRpc extends Rpc.make("EventLog.WriteChunked", {
 export class WriteEntries extends Schema.Class<WriteEntries>("effect/eventlog/EventLogRemote/WriteEntries")({
   publicKey: Schema.String,
   storeId: StoreId,
-  batches: Schema.Array(EncryptedBatch)
+  encryptedEntries: Schema.Array(EncryptedEntry)
 }) {
   static FromSchemaBinary = SchemaBinary.toCodec(WriteEntries)
   static encode = Schema.encodeEffect(this.FromSchemaBinary)
@@ -357,31 +324,14 @@ export class WriteEntriesUnencrypted
 {
   static FromSchemaBinary = SchemaBinary.toCodec(WriteEntriesUnencrypted)
   static encode = Schema.encodeEffect(this.FromSchemaBinary)
-  static decode = (
-    data: Uint8Array<ArrayBuffer>,
-    options?: SchemaAST.ParseOptions
-  ): Effect.Effect<WriteEntriesUnencrypted, Schema.SchemaError> =>
-    Effect.map(
-      decodeWriteEntriesUnencryptedFields(data, options),
-      (fields) =>
-        Schema.makeClassTrusted(WriteEntriesUnencrypted, { ...fields, entries: fields.entries.map(entryFromFields) })
-    )
+  static decode = Schema.decodeEffect(this.FromSchemaBinary)
   get encoded() {
     return WriteEntriesUnencrypted.encode(this)
   }
 }
 
-const decodeWriteEntriesUnencryptedFields = Schema.decodeEffect(SchemaBinary.toCodec(Schema.Struct({
-  ...WriteEntriesUnencrypted.fields,
-  entries: Schema.Array(EntryFields)
-})))
-
 /**
  * RPC used to send an encoded write payload that fits in one message.
- *
- * **Details**
- *
- * The response acknowledges every written entry, in request order.
  *
  * @stability unstable
  * @category protocols
@@ -391,7 +341,6 @@ export class WriteSingleRpc extends Rpc.make("EventLog.WriteSingle", {
   payload: {
     data: Transferable.Uint8Array
   },
-  success: Schema.Array(WriteAck),
   error: EventLogProtocolError
 }).middleware(EventLogAuthentication) {}
 
@@ -402,7 +351,7 @@ export class WriteSingleRpc extends Rpc.make("EventLog.WriteSingle", {
  * **Details**
  *
  * Responses are encoded as either `SingleMessage` values or `ChunkedMessage`
- * parts. Entries written on this connection are acknowledged, not echoed.
+ * parts.
  *
  * @stability unstable
  * @category protocols
@@ -418,7 +367,7 @@ export class ChangesRpc extends Rpc.make("EventLog.Changes", {
   error: EventLogProtocolError,
   stream: true
 }).middleware(EventLogAuthentication) {
-  static EncryptedFromSchemaBinary = SchemaBinary.toCodec(Schema.NonEmptyArray(EncryptedRemoteBatch))
+  static EncryptedFromSchemaBinary = SchemaBinary.toCodec(Schema.NonEmptyArray(EncryptedRemoteEntry))
   static UnencryptedFromSchemaBinary = SchemaBinary.toCodec(Schema.NonEmptyArray(RemoteEntry))
   static encodeEncrypted = Schema.encodeEffect(ChangesRpc.EncryptedFromSchemaBinary)
   static decodeEncrypted = Schema.decodeEffect(ChangesRpc.EncryptedFromSchemaBinary)

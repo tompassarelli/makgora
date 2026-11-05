@@ -19,8 +19,8 @@ export * from "./v2025_06_18.ts"
 export const protocolVersion = "2025-11-25"
 
 const optional = Previous.optional
-const UnknownObject = Previous.UnknownObject
-const Meta = optional(UnknownObject)
+const JsonObject = Schema.JsonObject
+const Meta = optional(JsonObject)
 
 /**
  * @internal
@@ -48,12 +48,12 @@ export const Implementation = Schema.Struct({
 export const ClientCapabilities = Schema.Struct({
   ...Previous.ClientCapabilities.fields,
   sampling: optional(Schema.Struct({
-    context: optional(UnknownObject),
-    tools: optional(UnknownObject)
+    context: optional(JsonObject),
+    tools: optional(JsonObject)
   })),
   elicitation: optional(Schema.Struct({
-    form: optional(UnknownObject),
-    url: optional(UnknownObject)
+    form: optional(JsonObject),
+    url: optional(JsonObject)
   }))
 })
 
@@ -182,7 +182,7 @@ export const ToolUseContent = Schema.Struct({
   type: Schema.Literal("tool_use"),
   id: Schema.String,
   name: Schema.String,
-  input: UnknownObject,
+  input: JsonObject,
   _meta: Meta
 })
 
@@ -193,7 +193,7 @@ export const ToolResultContent = Schema.Struct({
   type: Schema.Literal("tool_result"),
   toolUseId: Schema.String,
   content: Schema.Array(ContentBlock),
-  structuredContent: optional(UnknownObject),
+  structuredContent: optional(JsonObject),
   isError: optional(Schema.Boolean),
   _meta: Meta
 })

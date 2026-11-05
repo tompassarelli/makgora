@@ -19,8 +19,8 @@ export * from "./v2025_03_26.ts"
 export const protocolVersion = "2025-06-18"
 
 const optional = Previous.optional
-const UnknownObject = Previous.UnknownObject
-const Meta = optional(UnknownObject)
+const JsonObject = Schema.JsonObject
+const Meta = optional(JsonObject)
 
 /**
  * @internal
@@ -218,10 +218,10 @@ export class Initialize extends Rpc.make("initialize", {
 const ToolJsonSchema = Schema.StructWithRest(
   Schema.Struct({
     type: Schema.Literal("object"),
-    properties: optional(Schema.Record(Schema.String, Schema.Union([UnknownObject, Schema.Boolean]))),
+    properties: optional(Schema.Record(Schema.String, JsonObject)),
     required: optional(Schema.Array(Schema.String))
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 
 /**
@@ -243,7 +243,7 @@ export const Tool = Schema.Struct({
 export const CallToolResult = Schema.Struct({
   ...Previous.ResultMeta.fields,
   content: Schema.Array(ContentBlock),
-  structuredContent: optional(UnknownObject),
+  structuredContent: optional(JsonObject),
   isError: optional(Schema.Boolean)
 })
 
@@ -273,7 +273,7 @@ export class CreateMessage extends Rpc.make("sampling/createMessage", {
     temperature: optional(Schema.Finite),
     maxTokens: Schema.Finite,
     stopSequences: optional(Schema.Array(Schema.String)),
-    metadata: optional(UnknownObject)
+    metadata: optional(JsonObject)
   }
 }) {}
 
@@ -433,7 +433,7 @@ export class CallTool extends Rpc.make("tools/call", {
   payload: {
     ...Previous.RequestMeta.fields,
     name: Schema.String,
-    arguments: optional(UnknownObject)
+    arguments: optional(JsonObject)
   }
 }) {}
 

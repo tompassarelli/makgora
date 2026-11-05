@@ -563,13 +563,12 @@ export const TracerSpanLinks: Context.Reference<ReadonlyArray<SpanLink>> = refer
 export const TracerTimingEnabled: Context.Reference<boolean> = references.TracerTimingEnabled
 
 /**
- * Context reference for the log severity used to report errors that have no
- * caller to receive them, such as pool finalizer failures or defects in
- * background callbacks.
+ * Context reference for the log severity used when a pool finalizer reports an
+ * unhandled error.
  *
  * **When to use**
  *
- * Use to choose whether and at which severity these unhandled errors are
+ * Use to choose whether and at which severity pool finalizer failures are
  * reported.
  *
  * **Details**
@@ -578,7 +577,7 @@ export const TracerTimingEnabled: Context.Reference<boolean> = references.Tracer
  *
  * **Gotchas**
  *
- * Providing `undefined` suppresses these reports; it does not fall back to
+ * Providing `undefined` suppresses this report; it does not fall back to
  * `CurrentLogLevel`.
  *
  * @see {@link CurrentLogLevel} for the default severity used by ordinary `Effect.log` calls

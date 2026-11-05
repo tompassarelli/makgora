@@ -1068,7 +1068,6 @@ const prepareMessages = Effect.fnUntraced(
           for (let j = 0; j < group.messages.length; j++) {
             const message = group.messages[j]
             const isLastMessage = j === group.messages.length - 1
-            const messageStart = content.length
 
             for (let k = 0; k < message.content.length; k++) {
               const part = message.content[k]
@@ -1078,7 +1077,17 @@ const prepareMessages = Effect.fnUntraced(
               }
 
               const isLastPart = k === message.content.length - 1
-              const partStart = content.length
+
+              // Attempt to get the cache control from the part first. If
+              // the part does not have cache control defined and we are
+              // evaluating the last part for this message, also check the
+              // message for cache control.
+              const cacheControl = getCacheControl(part) ?? (
+                isLastPart ? getCacheControl(message) : undefined
+              )
+
+              // TODO: use cache_control in content blocks
+              void cacheControl
 
               switch (part.type) {
                 case "text": {
@@ -1281,11 +1290,7 @@ const prepareMessages = Effect.fnUntraced(
                   break
                 }
               }
-
-              setLastCacheControl(content, partStart, getCacheControl(part))
             }
-
-            setLastCacheControl(content, messageStart, getCacheControl(message))
           }
 
           messages.push({ role: "assistant", content })
@@ -2989,28 +2994,6 @@ const getCacheControl = (
     | Prompt.AssistantMessagePart
     | Prompt.ToolMessagePart
 ): typeof Generated.CacheControlEphemeral.Encoded | null => part.options.anthropic?.cacheControl ?? null
-
-// Skip thinking blocks without crossing the part/message boundary.
-// Preserve existing part-level breakpoints over message-level ones.
-const setLastCacheControl = (
-  content: Array<typeof Generated.BetaInputContentBlock.Encoded>,
-  start: number,
-  cacheControl: typeof Generated.CacheControlEphemeral.Encoded | null
-): void => {
-  if (cacheControl === null) {
-    return
-  }
-  for (let i = content.length - 1; i >= start; i--) {
-    const block = content[i]
-    if (block.type === "thinking" || block.type === "redacted_thinking") {
-      continue
-    }
-    if (Predicate.isNullish(block.cache_control)) {
-      content[i] = { ...block, cache_control: cacheControl }
-    }
-    return
-  }
-}
 
 const getDocumentMetadata = (part: Prompt.FilePart): {
   readonly title: string | null

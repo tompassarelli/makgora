@@ -112,10 +112,10 @@ const projectContent = Effect.fnUntraced(function*(content: PublicMcpSchema.Cont
 })
 
 const projectStructuredContent = (
-  content: unknown
-): Readonly<Record<string, unknown>> | undefined => content === undefined || isObject(content) ? content : undefined
+  content: Schema.Json | undefined
+): Schema.JsonObject | undefined => content === undefined || isJsonObject(content) ? content : undefined
 
-const isObject = (value: unknown): value is Readonly<Record<string, unknown>> => Predicate.isReadonlyObject(value)
+const isJsonObject = (value: Schema.Json): value is Schema.JsonObject => Predicate.isReadonlyObject(value)
 
 /**
  * @internal

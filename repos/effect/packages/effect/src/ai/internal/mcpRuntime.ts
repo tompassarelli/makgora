@@ -31,6 +31,7 @@ const MCP_METHOD_HEADER = "mcp-method"
 const MCP_NAME_HEADER = "mcp-name"
 const PROTOCOL_VERSION_METADATA_KEY = "io.modelcontextprotocol/protocolVersion"
 const CLIENT_CAPABILITIES_METADATA_KEY = "io.modelcontextprotocol/clientCapabilities"
+const UNSUPPORTED_PROTOCOL_VERSION_ERROR_CODE = -32022
 
 const asRecord = (input: unknown): Record<string, unknown> | undefined =>
   typeof input === "object" && input !== null ? input as Record<string, unknown> : undefined
@@ -235,7 +236,7 @@ export const make = Effect.fnUntraced(function*(
   const registry = yield* McpProtocolRegistry.make(protocols)
   const sessionTerminationListeners = new Set<(binding: RequestBinding) => Effect.Effect<void>>()
   const unsupportedProtocolVersion = (requested: string) => ({
-    code: PublicMcpSchema.UNSUPPORTED_PROTOCOL_VERSION_ERROR_CODE,
+    code: UNSUPPORTED_PROTOCOL_VERSION_ERROR_CODE,
     message: `Unsupported protocol version '${requested}'`,
     data: { supported: protocolVersions, requested }
   })
@@ -344,7 +345,7 @@ export const make = Effect.fnUntraced(function*(
         const selected = selectStatefulProtocol(registry.protocols, offeredVersion)
         if (selected === undefined) {
           return yield* new McpProtocol.ProtocolError({
-            code: PublicMcpSchema.UNSUPPORTED_PROTOCOL_VERSION_ERROR_CODE,
+            code: UNSUPPORTED_PROTOCOL_VERSION_ERROR_CODE,
             message: `initialize is not supported by the configured MCP protocols (requested '${offeredVersion}')`
           })
         }
@@ -567,7 +568,7 @@ export const make = Effect.fnUntraced(function*(
                 const sessionId = crypto.randomUUID()
                 stateful.registerHttp(sessionId, registration)
                 appendPreResponseHandlerUnsafe(
-                  fiber.context,
+                  httpRequest,
                   (_request, response) =>
                     Effect.succeed(HttpServerResponse.setHeaders(response, {
                       [MCP_SESSION_ID_HEADER]: sessionId,

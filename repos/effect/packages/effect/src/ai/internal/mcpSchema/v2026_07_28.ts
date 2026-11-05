@@ -16,9 +16,7 @@ export * from "./v2025_11_25.ts"
 export const protocolVersion = "2026-07-28"
 
 const optional = Previous.optional
-
-const UnknownObject = Previous.UnknownObject
-const Meta = optional(UnknownObject)
+const Meta = optional(Schema.JsonObject)
 
 /**
  * @internal
@@ -46,19 +44,19 @@ export const Implementation = Previous.Implementation
  */
 export const ClientCapabilities = Schema.StructWithRest(
   Schema.Struct({
-    experimental: optional(Schema.Record(Schema.String, UnknownObject)),
+    experimental: optional(Schema.Record(Schema.String, Schema.JsonObject)),
     roots: optional(Schema.Struct({})),
     sampling: optional(Schema.Struct({
-      context: optional(UnknownObject),
-      tools: optional(UnknownObject)
+      context: optional(Schema.JsonObject),
+      tools: optional(Schema.JsonObject)
     })),
     elicitation: optional(Schema.Struct({
-      form: optional(UnknownObject),
-      url: optional(UnknownObject)
+      form: optional(Schema.JsonObject),
+      url: optional(Schema.JsonObject)
     })),
-    extensions: optional(Schema.Record(Schema.String, UnknownObject))
+    extensions: optional(Schema.Record(Schema.String, Schema.JsonObject))
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 
 /**
@@ -66,18 +64,18 @@ export const ClientCapabilities = Schema.StructWithRest(
  */
 export const ServerCapabilities = Schema.StructWithRest(
   Schema.Struct({
-    experimental: optional(Schema.Record(Schema.String, UnknownObject)),
-    logging: optional(UnknownObject),
-    completions: optional(UnknownObject),
+    experimental: optional(Schema.Record(Schema.String, Schema.JsonObject)),
+    logging: optional(Schema.JsonObject),
+    completions: optional(Schema.JsonObject),
     prompts: optional(Schema.Struct({ listChanged: optional(Schema.Boolean) })),
     resources: optional(Schema.Struct({
       subscribe: optional(Schema.Boolean),
       listChanged: optional(Schema.Boolean)
     })),
     tools: optional(Schema.Struct({ listChanged: optional(Schema.Boolean) })),
-    extensions: optional(Schema.Record(Schema.String, UnknownObject))
+    extensions: optional(Schema.Record(Schema.String, Schema.JsonObject))
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 
 /**
@@ -91,7 +89,7 @@ export const RequestMetaObject = Schema.StructWithRest(
     "io.modelcontextprotocol/clientCapabilities": ClientCapabilities,
     "io.modelcontextprotocol/logLevel": optional(LoggingLevel)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 
 /**
@@ -106,7 +104,7 @@ export const NotificationMetaObject = Schema.StructWithRest(
   Schema.Struct({
     "io.modelcontextprotocol/subscriptionId": optional(RequestId)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -118,15 +116,15 @@ export const NotificationParams = Schema.Struct({ _meta: optional(NotificationMe
  */
 export const ResultMetaObject = Schema.StructWithRest(
   Schema.Struct({
-    "io.modelcontextprotocol/serverInfo": optional(Implementation)
+    "io.modelcontextprotocol/serverInfo": Implementation
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
  */
 export const ResultMeta = {
-  _meta: optional(ResultMetaObject),
+  _meta: ResultMetaObject,
   resultType: Schema.Literal("complete")
 }
 /**
@@ -135,7 +133,7 @@ export const ResultMeta = {
 export const McpError = Schema.Struct({
   code: Schema.Int,
   message: Schema.String,
-  data: optional(Schema.Unknown)
+  data: optional(Schema.Json)
 })
 /**
  * @internal
@@ -222,11 +220,11 @@ const ToolInputSchema = Schema.StructWithRest(
     $schema: optional(Schema.String),
     type: Schema.Literal("object")
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 const ToolOutputSchema = Schema.StructWithRest(
   Schema.Struct({ $schema: optional(Schema.String) }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -253,7 +251,7 @@ export const ToolResultContent = Schema.Struct({
   type: Schema.Literal("tool_result"),
   toolUseId: Schema.String,
   content: Schema.Array(ContentBlock),
-  structuredContent: optional(Schema.Unknown),
+  structuredContent: optional(Schema.Json),
   isError: optional(Schema.Boolean),
   _meta: Meta
 })
@@ -280,7 +278,7 @@ export const SamplingMessage = Schema.Struct({
  */
 export const ModelHint = Schema.StructWithRest(
   Schema.Struct({ name: optional(Schema.String) }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 const ModelPriority = Schema.Finite.check(Schema.isBetween({ minimum: 0, maximum: 1 }))
 /**
@@ -311,7 +309,7 @@ export const CreateMessageRequest = Schema.Struct({
     temperature: optional(Schema.Finite),
     maxTokens: Schema.Int,
     stopSequences: optional(Schema.Array(Schema.String)),
-    metadata: optional(UnknownObject),
+    metadata: optional(Schema.JsonObject),
     tools: optional(Schema.Array(Tool)),
     toolChoice: optional(ToolChoice)
   })
@@ -446,7 +444,7 @@ export const InputRequests = Schema.Record(Schema.String, InputRequest)
  */
 export const InputResponses = Schema.Record(Schema.String, InputResponse)
 const InputRequiredResultMeta = {
-  _meta: optional(ResultMetaObject),
+  _meta: ResultMetaObject,
   resultType: Schema.Literal("input_required")
 }
 /**
@@ -459,7 +457,7 @@ export const InputRequiredResult = Schema.Union([
       inputRequests: InputRequests,
       requestState: optional(Schema.String)
     }),
-    [UnknownObject]
+    [Schema.JsonObject]
   ),
   Schema.StructWithRest(
     Schema.Struct({
@@ -467,7 +465,7 @@ export const InputRequiredResult = Schema.Union([
       inputRequests: optional(InputRequests),
       requestState: Schema.String
     }),
-    [UnknownObject]
+    [Schema.JsonObject]
   )
 ])
 /**
@@ -512,7 +510,7 @@ export const DiscoverResult = Schema.StructWithRest(
     capabilities: ServerCapabilities,
     instructions: optional(Schema.String)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -532,7 +530,7 @@ export const ListResourcesResult = Schema.StructWithRest(
     ...CacheableResult,
     resources: Schema.Array(Resource)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -552,7 +550,7 @@ export const ListResourceTemplatesResult = Schema.StructWithRest(
     ...CacheableResult,
     resourceTemplates: Schema.Array(ResourceTemplate)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -571,7 +569,7 @@ export const ReadResourceResult = Schema.StructWithRest(
     ...CacheableResult,
     contents: Schema.Array(ResourceContents)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -591,7 +589,7 @@ export const ListPromptsResult = Schema.StructWithRest(
     ...CacheableResult,
     prompts: Schema.Array(Prompt)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -611,7 +609,7 @@ export const GetPromptResult = Schema.StructWithRest(
     description: optional(Schema.String),
     messages: Schema.Array(PromptMessage)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -635,7 +633,7 @@ export const ListToolsResult = Schema.StructWithRest(
     ...CacheableResult,
     tools: Schema.Array(Tool)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -653,10 +651,10 @@ export const CallToolResult = Schema.StructWithRest(
   Schema.Struct({
     ...ResultMeta,
     content: Schema.Array(ContentBlock),
-    structuredContent: optional(Schema.Unknown),
+    structuredContent: optional(Schema.Json),
     isError: optional(Schema.Boolean)
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -667,7 +665,7 @@ export class CallTool extends Rpc.make("tools/call", {
   payload: {
     ...InputResponseRequestParams,
     name: Schema.String,
-    arguments: optional(UnknownObject)
+    arguments: optional(Schema.JsonObject)
   }
 }) {}
 
@@ -691,7 +689,7 @@ export const CompleteResult = Schema.StructWithRest(
       hasMore: optional(Schema.Boolean)
     })
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -723,10 +721,10 @@ export const SubscriptionFilter = Schema.Struct({
  */
 export const SubscriptionsListenResultMetaObject = Schema.StructWithRest(
   Schema.Struct({
-    "io.modelcontextprotocol/serverInfo": optional(Implementation),
+    "io.modelcontextprotocol/serverInfo": Implementation,
     "io.modelcontextprotocol/subscriptionId": RequestId
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -736,7 +734,7 @@ export const SubscriptionsListenResult = Schema.StructWithRest(
     _meta: SubscriptionsListenResultMetaObject,
     resultType: Schema.Literal("complete")
   }),
-  [UnknownObject]
+  [Schema.JsonObject]
 )
 /**
  * @internal
@@ -777,7 +775,7 @@ export class LoggingMessageNotification extends Rpc.make("notifications/message"
     ...NotificationParams.fields,
     level: LoggingLevel,
     logger: optional(Schema.String),
-    data: Schema.Unknown
+    data: Schema.Json
   }
 }) {}
 /**

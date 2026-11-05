@@ -430,15 +430,7 @@ function fromFileUrl(url: URL): Effect.Effect<string, BadArgument> {
       }
     }
   }
-  return Effect.try({
-    try: () => decodeURIComponent(pathname),
-    catch: (cause) =>
-      new BadArgument({
-        module: "Path",
-        method: "fromFileUrl",
-        cause
-      })
-  })
+  return Effect.succeed(decodeURIComponent(pathname))
 }
 
 const resolve: Path["resolve"] = function resolve() {

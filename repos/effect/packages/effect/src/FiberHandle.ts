@@ -62,8 +62,6 @@ export interface FiberHandle<out A = unknown, out E = unknown> extends Pipeable,
   state: {
     readonly _tag: "Open"
     fiber: Fiber.Fiber<A, E> | undefined
-    /** Every fiber the handle still owns: the current one plus replaced fibers that are still interrupting. */
-    readonly fibers: Set<Fiber.Fiber<A, E>>
   } | {
     readonly _tag: "Closed"
   }
@@ -107,7 +105,7 @@ const Proto = {
 
 const makeUnsafe = <A = unknown, E = unknown>(): FiberHandle<A, E> => {
   const self = Object.create(Proto)
-  self.state = { _tag: "Open", fiber: undefined, fibers: new Set() }
+  self.state = { _tag: "Open", fiber: undefined }
   self.deferred = Deferred.makeUnsafe()
   return self
 }
@@ -156,7 +154,12 @@ export const make = <A = unknown, E = unknown>(): Effect.Effect<FiberHandle<A, E
       const state = handle.state
       if (state._tag === "Closed") return Effect.void
       handle.state = { _tag: "Closed" }
-      return Deferred.into(Fiber.interruptAllAs(state.fibers, internalFiberId), handle.deferred)
+      return state.fiber ?
+        Deferred.into(
+          Effect.asVoid(Fiber.interruptAs(state.fiber, internalFiberId)),
+          handle.deferred
+        ) :
+        Deferred.done(handle.deferred, Exit.void)
     }
   )
 
@@ -349,14 +352,10 @@ export const setUnsafe: {
 
   // Install the replacement before interruption can re-enter the handle through a finalizer.
   self.state.fiber = fiber
-  self.state.fibers.add(fiber)
   previous?.interruptUnsafe(internalFiberId)
   fiber.addObserver((exit) => {
-    if (self.state._tag === "Open") {
-      self.state.fibers.delete(fiber)
-      if (fiber === self.state.fiber) {
-        self.state.fiber = undefined
-      }
+    if (self.state._tag === "Open" && fiber === self.state.fiber) {
+      self.state.fiber = undefined
     }
     if (
       Exit.isFailure(exit) &&

@@ -1,4 +1,4 @@
-import { DenoClusterSocket, DenoSocketServer } from "@effect/platform-deno"
+import { DenoClusterSocket } from "@effect/platform-deno"
 import { assert, describe, it } from "@effect/vitest"
 import { BigDecimal, Cause, Deferred, Effect, Exit, Fiber, Layer, Option, PrimaryKey, Schema } from "effect"
 import type { Sharding } from "effect/cluster"
@@ -13,7 +13,6 @@ import {
   SocketRunner
 } from "effect/cluster"
 import { Rpc, RpcSerialization } from "effect/rpc"
-import * as SocketServer from "effect/socket/SocketServer"
 
 class TestPayload extends Schema.Class<TestPayload>("TestPayload")({
   id: Schema.String,
@@ -37,6 +36,7 @@ const TestEntity = Entity
   ])
   .annotateRpcs(ClusterSchema.Uninterruptible, true)
 
+const RUNNER_PORT = 50_125
 const SharedStorage = Layer.mergeAll(
   RunnerStorage.layerMemory,
   MessageStorage.layerMemory
@@ -44,16 +44,11 @@ const SharedStorage = Layer.mergeAll(
   Layer.provide(ShardingConfig.layerDefaults)
 )
 
-const startRunner = Effect.fnUntraced(function*(entities: Layer.Layer<never, never, Sharding.Sharding>) {
-  const socketServer = yield* DenoSocketServer.make({ host: "127.0.0.1", port: 0 })
-  if (socketServer.address._tag !== "InetAddressV4") {
-    return yield* Effect.die("Expected a TCP socket server")
-  }
-  const port = socketServer.address.port
-  yield* entities.pipe(
+const makeRunnerLayer = (port: number, entities: Layer.Layer<never, never, Sharding.Sharding>) =>
+  entities.pipe(
     Layer.provideMerge(SocketRunner.layer),
     Layer.provide(RunnerHealth.layerNoop),
-    Layer.provide(Layer.succeed(SocketServer.SocketServer, socketServer)),
+    Layer.provide(DenoClusterSocket.layerSocketServer),
     Layer.provide(DenoClusterSocket.layerClientProtocol),
     Layer.provide(ShardingConfig.layer({
       runnerAddress: Option.some(RunnerAddress.make("127.0.0.1", port)),
@@ -61,11 +56,8 @@ const startRunner = Effect.fnUntraced(function*(entities: Layer.Layer<never, nev
       entityMessagePollInterval: 5000,
       sendRetryInterval: 100
     })),
-    Layer.provide(RpcSerialization.layerSchemaBinary()),
-    Layer.build
+    Layer.provide(RpcSerialization.layerSchemaBinary())
   )
-  return port
-})
 
 const makeClientLayer = (port: number) =>
   SocketRunner.layerClientOnly.pipe(
@@ -92,6 +84,8 @@ const IsolationEntity = Entity
   ])
   .annotateRpcs(ClusterSchema.Persisted, false)
 
+const ISOLATION_PORT = 50_126
+
 // BigDecimal.normalize creates a circular `normalized` self-reference.
 // When a persisted message is sent with discard: true, the notify path in Runners.makeRpc
 // passes the raw envelope (with circular BigDecimal payload) to the runner,
@@ -116,9 +110,13 @@ describe("SocketRunner", () => {
           })
         )
 
-        const port = yield* startRunner(TestEntityLayer)
+        yield* Layer.launch(makeRunnerLayer(RUNNER_PORT, TestEntityLayer)).pipe(Effect.forkScoped)
+
+        yield* Effect.sleep("2 seconds")
         yield* Effect.gen(function*() {
+          yield* Effect.sleep("2 seconds")
           const makeClient = yield* TestEntity.client
+          yield* Effect.sleep("3 seconds")
           const client = makeClient("entity-1")
 
           const amount = BigDecimal.fromStringUnsafe("123.45")
@@ -132,12 +130,7 @@ describe("SocketRunner", () => {
             { discard: true }
           ).pipe(Effect.forkChild)
 
-          yield* Deferred.await(volatileStarted).pipe(
-            Effect.timeoutOrElse({
-              duration: "5 seconds",
-              orElse: () => Effect.die("the volatile request never reached its handler")
-            })
-          )
+          yield* Deferred.await(volatileStarted)
           yield* Fiber.join(volatileFiber).pipe(
             Effect.timeoutOrElse({
               duration: "1 second",
@@ -146,7 +139,7 @@ describe("SocketRunner", () => {
           )
           yield* Deferred.succeed(releaseVolatile, void 0)
         }).pipe(
-          Effect.provide(makeClientLayer(port)),
+          Effect.provide(makeClientLayer(RUNNER_PORT)),
           Effect.scoped
         )
       }).pipe(Effect.provide(SharedStorage)),
@@ -158,35 +151,27 @@ describe("SocketRunner", () => {
     () =>
       Effect.gen(function*() {
         const slowStarted = yield* Deferred.make<void>()
-        const releaseSlow = yield* Deferred.make<void>()
         const IsolationEntityLayer = IsolationEntity.toLayer(
           Effect.succeed({
             BadReply: () => Effect.succeed(1.5),
             Slow: () =>
               Deferred.succeed(slowStarted, void 0).pipe(
-                Effect.andThen(Deferred.await(releaseSlow)),
-                Effect.as("done")
+                Effect.andThen(Effect.as(Effect.sleep("2 seconds"), "done"))
               )
           })
         )
 
-        const port = yield* startRunner(IsolationEntityLayer)
+        yield* Layer.launch(makeRunnerLayer(ISOLATION_PORT, IsolationEntityLayer)).pipe(Effect.forkScoped)
+        yield* Effect.sleep("2 seconds")
 
         yield* Effect.gen(function*() {
           const makeClient = yield* IsolationEntity.client
+          yield* Effect.sleep("3 seconds")
 
           const slowFiber = yield* makeClient("slow-entity").Slow().pipe(Effect.forkChild)
-          yield* Deferred.await(slowStarted).pipe(
-            Effect.timeoutOrElse({
-              duration: "5 seconds",
-              orElse: () => Effect.die("the Slow request never reached its handler")
-            })
-          )
+          yield* Deferred.await(slowStarted)
 
-          const badExit = yield* makeClient("bad-entity").BadReply({ id: 1 }).pipe(
-            Effect.exit,
-            Effect.ensuring(Deferred.succeed(releaseSlow, void 0))
-          )
+          const badExit = yield* makeClient("bad-entity").BadReply({ id: 1 }).pipe(Effect.exit)
           assert.isTrue(Exit.isFailure(badExit), "the unencodable reply must fail the request")
           const failure = Exit.isFailure(badExit) ? String(Cause.squash(badExit.cause)) : ""
           assert.include(failure, "MalformedMessage", "the caller must receive the real encode error")
@@ -205,7 +190,7 @@ describe("SocketRunner", () => {
             assert.strictEqual(slowExit.value, "done")
           }
         }).pipe(
-          Effect.provide(makeClientLayer(port)),
+          Effect.provide(makeClientLayer(ISOLATION_PORT)),
           Effect.scoped
         )
       }).pipe(Effect.provide(SharedStorage)),

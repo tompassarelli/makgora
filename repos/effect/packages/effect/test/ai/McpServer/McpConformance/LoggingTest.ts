@@ -26,18 +26,19 @@ const effectLevels = {
   emergency: "Fatal"
 } as const
 
-const setLevel = Effect.fnUntraced(function*(level: string) {
-  const test = yield* McpConformance
-  const initialized = yield* test.initialize({ server: "features" })
-  yield* test.notifyInitialized(initialized)
-  const response = yield* test.send(initialized, {
-    jsonrpc: "2.0",
-    id: 2,
-    method: "logging/setLevel",
-    params: { level }
+const setLevel = (level: string) =>
+  Effect.gen(function*() {
+    const test = yield* McpConformance
+    const initialized = yield* test.initialize({ server: "features" })
+    yield* test.notifyInitialized(initialized)
+    const response = yield* test.send(initialized, {
+      jsonrpc: "2.0",
+      id: 2,
+      method: "logging/setLevel",
+      params: { level }
+    })
+    return { initialized, response, test }
   })
-  return { initialized, response, test }
-})
 
 export const suite = (protocol: McpProtocol.ProtocolAdapter, layer: McpConformanceLayer) =>
   it.layer(layer)(`Mcp Conformance (${protocol.protocolVersion})`, (it) => {
@@ -70,11 +71,12 @@ export const suite = (protocol: McpProtocol.ProtocolAdapter, layer: McpConforman
                   yield* server.addTool({
                     tool: new McpSchema.Tool({ name: "Wait", inputSchema: { type: "object" } }),
                     annotations: Context.empty(),
-                    handle: Effect.fnUntraced(function*() {
-                      yield* server.notifications["notifications/message"]({ level: "emergency", data: "ready" })
-                      yield* Deferred.await(release)
-                      return new McpSchema.CallToolResult({ content: [] })
-                    })
+                    handle: () =>
+                      Effect.gen(function*() {
+                        yield* server.notifications["notifications/message"]({ level: "emergency", data: "ready" })
+                        yield* Deferred.await(release)
+                        return new McpSchema.CallToolResult({ content: [] })
+                      })
                   })
                   yield* Deferred.succeed(serverReady, server)
                 })).pipe(Layer.provideMerge(makeServerLayer({ name: "BackgroundLogging", protocols: [protocol] })))
@@ -137,11 +139,12 @@ export const suite = (protocol: McpProtocol.ProtocolAdapter, layer: McpConforman
                 yield* server.addTool({
                   tool: new McpSchema.Tool({ name: "Wait", inputSchema: { type: "object" } }),
                   annotations: Context.empty(),
-                  handle: Effect.fnUntraced(function*() {
-                    yield* server.notifications["notifications/message"]({ level: "emergency", data: "ready" })
-                    yield* Deferred.await(release)
-                    return new McpSchema.CallToolResult({ content: [] })
-                  })
+                  handle: () =>
+                    Effect.gen(function*() {
+                      yield* server.notifications["notifications/message"]({ level: "emergency", data: "ready" })
+                      yield* Deferred.await(release)
+                      return new McpSchema.CallToolResult({ content: [] })
+                    })
                 })
                 yield* Deferred.succeed(serverReady, server)
               })).pipe(

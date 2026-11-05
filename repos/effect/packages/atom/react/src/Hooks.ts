@@ -244,13 +244,6 @@ export const useAtomMount = <A>(atom: Atom.Atom<A>): void => {
  * accepts a write value or updater function; for `AsyncResult` atoms, `promise`
  * and `promiseExit` modes return a promise for the success value or full `Exit`.
  *
- * **Gotchas**
- *
- * In `promise` and `promiseExit` modes, the setter observes the atom's next
- * settled result, not a result correlated with that write. Overlapping writes
- * can resolve with another write's result. Serialize writes when each caller
- * needs its own result.
- *
  * @see {@link useAtom} for reading and updating the same writable atom
  *
  * @stability unstable
@@ -315,13 +308,6 @@ export const useAtomRefresh = <A>(atom: Atom.Atom<A>): () => void => {
  *
  * Use when a React component needs both to render the current value of a
  * writable atom and update it from the same component.
- *
- * **Gotchas**
- *
- * In `promise` and `promiseExit` modes, the setter observes the atom's next
- * settled result, not a result correlated with that write. Overlapping writes
- * can resolve with another write's result. Serialize writes when each caller
- * needs its own result.
  *
  * @see {@link useAtomValue} for subscribing to an atom without a setter
  * @see {@link useAtomSet} for updating a writable atom without subscribing to its value

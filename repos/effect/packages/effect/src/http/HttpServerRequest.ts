@@ -35,7 +35,6 @@ import * as HttpIncomingMessage from "./HttpIncomingMessage.ts"
 import { hasBody, type HttpMethod } from "./HttpMethod.ts"
 import { HttpServerError, type RequestError, RequestParseError } from "./HttpServerError.ts"
 import * as bodyInternal from "./internal/httpBody.ts"
-import * as lazyStream from "./internal/lazyStream.ts"
 import * as Multipart from "./Multipart.ts"
 import * as UrlParams from "./UrlParams.ts"
 
@@ -73,11 +72,8 @@ export const TypeId = "~effect/http/HttpServerRequest"
  * **Details**
  *
  * It extends `HttpIncomingMessage` with request metadata, parsed cookies,
- * multipart accessors, connection upgrades, and a `modify` method for
- * creating adjusted request views. `upgrade` completes a WebSocket handshake
- * for `Upgrade: websocket`. Platforms that can hand over the connection, such
- * as Node, answer other protocols with `101 Switching Protocols` and expose
- * the raw connection.
+ * multipart accessors, WebSocket upgrade support, and a `modify` method for
+ * creating adjusted request views.
  *
  * @stability unstable
  * @category models
@@ -100,26 +96,11 @@ export interface HttpServerRequest extends HttpIncomingMessage.HttpIncomingMessa
 
   readonly upgrade: Effect.Effect<Socket.Socket, HttpServerError>
 
-  /**
-   * Address of the directly connected peer. Trusted proxy middleware replaces
-   * `remoteAddress` with the forwarded client address and keeps the previous
-   * value here; otherwise it equals `remoteAddress`.
-   */
-  readonly peerAddress: Option.Option<string>
-
-  /**
-   * Scheme validated by trusted proxy middleware. `toURL` prefers it over the
-   * scheme of the transport connection.
-   */
-  readonly protocol: "http" | "https" | undefined
-
   readonly modify: (
     options: {
       readonly url?: string
       readonly headers?: Headers.Headers
       readonly remoteAddress?: Option.Option<string>
-      readonly peerAddress?: Option.Option<string>
-      readonly protocol?: "http" | "https"
     }
   ) => HttpServerRequest
 }
@@ -512,16 +493,12 @@ class ServerRequestImpl extends Inspectable.Class implements HttpServerRequest {
   readonly url: string
   public headersOverride?: Headers.Headers | undefined
   private remoteAddressOverride?: Option.Option<string> | undefined
-  private peerAddressOverride?: Option.Option<string> | undefined
-  readonly protocol: "http" | "https" | undefined
 
   constructor(
     source: Request,
     url: string,
     headersOverride?: Headers.Headers,
-    remoteAddressOverride?: Option.Option<string>,
-    peerAddressOverride?: Option.Option<string>,
-    protocol?: "http" | "https"
+    remoteAddressOverride?: Option.Option<string>
   ) {
     super()
     this[TypeId] = TypeId
@@ -530,8 +507,6 @@ class ServerRequestImpl extends Inspectable.Class implements HttpServerRequest {
     this.url = url
     this.headersOverride = headersOverride
     this.remoteAddressOverride = remoteAddressOverride
-    this.peerAddressOverride = peerAddressOverride
-    this.protocol = protocol
   }
   toJSON(): unknown {
     return HttpIncomingMessage.inspect(this, {
@@ -545,17 +520,13 @@ class ServerRequestImpl extends Inspectable.Class implements HttpServerRequest {
       readonly url?: string | undefined
       readonly headers?: Headers.Headers | undefined
       readonly remoteAddress?: Option.Option<string> | undefined
-      readonly peerAddress?: Option.Option<string> | undefined
-      readonly protocol?: "http" | "https" | undefined
     }
   ) {
     return new ServerRequestImpl(
       this.source,
       options.url ?? this.url,
       options.headers ?? this.headersOverride,
-      "remoteAddress" in options ? options.remoteAddress : this.remoteAddressOverride,
-      options.peerAddress ?? this.peerAddressOverride,
-      options.protocol ?? this.protocol
+      "remoteAddress" in options ? options.remoteAddress : this.remoteAddressOverride
     )
   }
   get method(): HttpMethod {
@@ -566,9 +537,6 @@ class ServerRequestImpl extends Inspectable.Class implements HttpServerRequest {
   }
   get remoteAddress(): Option.Option<string> {
     return this.remoteAddressOverride ?? Option.none()
-  }
-  get peerAddress(): Option.Option<string> {
-    return this.peerAddressOverride ?? this.remoteAddress
   }
   get headers(): Headers.Headers {
     this.headersOverride ??= Headers.fromInput(this.source.headers as any)
@@ -720,8 +688,6 @@ class ClientRequestImpl extends Inspectable.Class implements HttpServerRequest {
   public originalUrl: string
   public headersOverride?: Headers.Headers | undefined
   private remoteAddressOverride?: Option.Option<string> | undefined
-  private peerAddressOverride?: Option.Option<string> | undefined
-  readonly protocol: "http" | "https" | undefined
   private urlOverride?: string | undefined
 
   constructor(
@@ -729,9 +695,7 @@ class ClientRequestImpl extends Inspectable.Class implements HttpServerRequest {
     originalUrl: string,
     urlOverride?: string,
     headersOverride?: Headers.Headers,
-    remoteAddressOverride?: Option.Option<string>,
-    peerAddressOverride?: Option.Option<string>,
-    protocol?: "http" | "https"
+    remoteAddressOverride?: Option.Option<string>
   ) {
     super()
     this[TypeId] = TypeId
@@ -741,8 +705,6 @@ class ClientRequestImpl extends Inspectable.Class implements HttpServerRequest {
     this.urlOverride = urlOverride
     this.headersOverride = headersOverride
     this.remoteAddressOverride = remoteAddressOverride
-    this.peerAddressOverride = peerAddressOverride
-    this.protocol = protocol
   }
 
   toJSON(): unknown {
@@ -758,8 +720,6 @@ class ClientRequestImpl extends Inspectable.Class implements HttpServerRequest {
       readonly url?: string | undefined
       readonly headers?: Headers.Headers | undefined
       readonly remoteAddress?: Option.Option<string> | undefined
-      readonly peerAddress?: Option.Option<string> | undefined
-      readonly protocol?: "http" | "https" | undefined
     }
   ) {
     return new ClientRequestImpl(
@@ -767,9 +727,7 @@ class ClientRequestImpl extends Inspectable.Class implements HttpServerRequest {
       this.originalUrl,
       options.url ?? this.url,
       options.headers ?? this.headersOverride,
-      "remoteAddress" in options ? options.remoteAddress : this.remoteAddressOverride,
-      options.peerAddress ?? this.peerAddressOverride,
-      options.protocol ?? this.protocol
+      "remoteAddress" in options ? options.remoteAddress : this.remoteAddressOverride
     )
   }
 
@@ -783,10 +741,6 @@ class ClientRequestImpl extends Inspectable.Class implements HttpServerRequest {
 
   get remoteAddress(): Option.Option<string> {
     return this.remoteAddressOverride ?? Option.none()
-  }
-
-  get peerAddress(): Option.Option<string> {
-    return this.peerAddressOverride ?? this.remoteAddress
   }
 
   get headers(): Headers.Headers {
@@ -1085,13 +1039,9 @@ const textDecoder = new TextDecoder()
  *
  * **Details**
  *
- * Uses `host` (defaulting to `localhost`) and the request `protocol` set by
- * trusted proxy middleware. Otherwise, infers HTTPS from a case-insensitive
- * `https:` prefix in `originalUrl`, defaulting to HTTP. Forwarding headers such
- * as `x-forwarded-proto` are never read directly; use
- * `HttpMiddleware.xForwardedHeaders` behind a TLS-terminating proxy. An
- * absolute `url` keeps its own protocol and host. Invalid URLs return
- * `Option.none`.
+ * The host comes from the `host` header, defaulting to `localhost`, and the
+ * protocol is `https` only when `x-forwarded-proto` is `https`; invalid URLs
+ * return `Option.none`.
  *
  * @stability unstable
  * @category converting
@@ -1099,10 +1049,9 @@ const textDecoder = new TextDecoder()
  */
 export const toURL = (self: HttpServerRequest): Option.Option<URL> => {
   const host = self.headers.host ?? "localhost"
-  const protocol = self.protocol ?? (/^https:/i.test(self.originalUrl) ? "https" : "http")
+  const protocol = self.headers["x-forwarded-proto"] === "https" ? "https" : "http"
   try {
-    // Prefix paths with `.` so leading `//` cannot replace the host.
-    return Option.some(new URL(self.url.startsWith("/") ? `.${self.url}` : self.url, `${protocol}://${host}`))
+    return Option.some(new URL(self.url, `${protocol}://${host}`))
   } catch {
     return Option.none()
   }
@@ -1145,15 +1094,7 @@ export const toWebResult = (self: HttpServerRequest, options?: {
     requestInit.signal = options.signal
   }
   if (hasBody(self.method)) {
-    // Opening on the first pull with a zero high-water mark reads the body only
-    // when the Web body is read, so converting a request leaves it readable.
-    requestInit.body = Stream.toReadableStreamWith(
-      lazyStream.openOnFirstPull(self.stream),
-      options?.context ?? Context.empty(),
-      {
-        strategy: { highWaterMark: 0 }
-      }
-    )
+    requestInit.body = Stream.toReadableStreamWith(self.stream, options?.context ?? Context.empty())
     ;(requestInit as any).duplex = "half"
   }
   return Result.succeed(new Request(url.value, requestInit))

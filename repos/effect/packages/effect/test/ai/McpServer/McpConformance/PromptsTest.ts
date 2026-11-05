@@ -10,23 +10,25 @@ import { McpConformance, type McpConformanceLayer } from "./McpConformance.ts"
 const decodePrompts = Schema.decodeUnknownEffect(McpSchema.ListPromptsResult)
 const decodeGetPrompt = Schema.decodeUnknownEffect(McpSchema.GetPromptResult)
 
-const getPrompt = Effect.fnUntraced(function*(name: string) {
-  const message = yield* getPromptWire(name)
-  return yield* decodeGetPrompt(message.result)
-})
-
-const getPromptWire = Effect.fnUntraced(function*(name: string) {
-  const test = yield* McpConformance
-  const initialized = yield* test.initialize({ server: "features" })
-  yield* test.notifyInitialized(initialized)
-  const response = yield* test.send(initialized, {
-    jsonrpc: "2.0",
-    id: 2,
-    method: "prompts/get",
-    params: { name }
+const getPrompt = (name: string) =>
+  Effect.gen(function*() {
+    const message = yield* getPromptWire(name)
+    return yield* decodeGetPrompt(message.result)
   })
-  return yield* test.decodeResult(response)
-})
+
+const getPromptWire = (name: string) =>
+  Effect.gen(function*() {
+    const test = yield* McpConformance
+    const initialized = yield* test.initialize({ server: "features" })
+    yield* test.notifyInitialized(initialized)
+    const response = yield* test.send(initialized, {
+      jsonrpc: "2.0",
+      id: 2,
+      method: "prompts/get",
+      params: { name }
+    })
+    return yield* test.decodeResult(response)
+  })
 
 export const suite = (
   protocol: McpProtocol.ProtocolAdapter,

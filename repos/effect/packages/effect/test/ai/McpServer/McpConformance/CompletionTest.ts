@@ -7,40 +7,42 @@ import { McpConformance, type McpConformanceLayer } from "./McpConformance.ts"
 
 const decodeCompletion = Schema.decodeUnknownEffect(McpSchema.CompleteResult)
 
-const complete = Effect.fnUntraced(function*(
+const complete = (
   ref: { readonly type: "ref/prompt"; readonly name: string } | {
     readonly type: "ref/resource"
     readonly uri: string
   },
   argument: { readonly name: string; readonly value: string },
   context?: { readonly arguments?: Readonly<Record<string, string>> | undefined }
-) {
-  const response = yield* completeRaw(ref, argument, context)
-  const test = yield* McpConformance
-  return yield* test.decodeResult(response).pipe(
-    Effect.flatMap((message) => decodeCompletion(message.result))
-  )
-})
-
-const completeRaw = Effect.fnUntraced(function*(
-  ref: { readonly type: "ref/prompt"; readonly name: string } | {
-    readonly type: "ref/resource"
-    readonly uri: string
-  },
-  argument: { readonly name: string; readonly value: string },
-  context?: { readonly arguments?: Readonly<Record<string, string>> | undefined }
-) {
-  const test = yield* McpConformance
-  const initialized = yield* test.initialize({ server: "features" })
-  yield* test.notifyInitialized(initialized)
-  const response = yield* test.send(initialized, {
-    jsonrpc: "2.0",
-    id: 2,
-    method: "completion/complete",
-    params: { ref, argument, ...(context === undefined ? {} : { context }) }
+) =>
+  Effect.gen(function*() {
+    const response = yield* completeRaw(ref, argument, context)
+    const test = yield* McpConformance
+    return yield* test.decodeResult(response).pipe(
+      Effect.flatMap((message) => decodeCompletion(message.result))
+    )
   })
-  return response
-})
+
+const completeRaw = (
+  ref: { readonly type: "ref/prompt"; readonly name: string } | {
+    readonly type: "ref/resource"
+    readonly uri: string
+  },
+  argument: { readonly name: string; readonly value: string },
+  context?: { readonly arguments?: Readonly<Record<string, string>> | undefined }
+) =>
+  Effect.gen(function*() {
+    const test = yield* McpConformance
+    const initialized = yield* test.initialize({ server: "features" })
+    yield* test.notifyInitialized(initialized)
+    const response = yield* test.send(initialized, {
+      jsonrpc: "2.0",
+      id: 2,
+      method: "completion/complete",
+      params: { ref, argument, ...(context === undefined ? {} : { context }) }
+    })
+    return response
+  })
 
 export const suite = (protocol: McpProtocol.ProtocolAdapter, layer: McpConformanceLayer) =>
   it.layer(layer)(`Mcp Conformance (${protocol.protocolVersion})`, (it) => {

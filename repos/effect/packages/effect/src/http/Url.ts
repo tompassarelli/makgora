@@ -68,12 +68,7 @@ const baseUrl = (): string | undefined => {
     globalThis.location.origin !== undefined &&
     globalThis.location.pathname !== undefined
   ) {
-    const base = location.origin + location.pathname
-    try {
-      return new URL(base).href
-    } catch {
-      return undefined
-    }
+    return location.origin + location.pathname
   }
   return undefined
 }

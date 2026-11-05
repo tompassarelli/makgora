@@ -84,14 +84,6 @@ const classifyError = (
   return fallback === "connection" ? new ConnectionError(props) : new UnknownError(props)
 }
 
-const killQuery = (client: Clickhouse.ClickHouseClient, queryId: string) =>
-  Effect.promise(() =>
-    client.command({
-      query: "KILL QUERY WHERE query_id = {queryId:String}",
-      query_params: { queryId }
-    })
-  )
-
 /**
  * Unique runtime identifier used to tag `ClickhouseClient` values.
  *
@@ -112,9 +104,8 @@ export type TypeId = "~@effect/sql-clickhouse/ClickhouseClient"
 
 /**
  * ClickHouse-specific `SqlClient` extension with access to its configuration,
- * the underlying `@clickhouse/client` instance, typed parameter fragments,
- * command-mode execution, insert queries, and per-effect query ID and
- * ClickHouse settings.
+ * typed parameter fragments, command-mode execution, insert queries, and
+ * per-effect query ID and ClickHouse settings.
  *
  * @stability unstable
  * @category services
@@ -123,14 +114,6 @@ export type TypeId = "~@effect/sql-clickhouse/ClickhouseClient"
 export interface ClickhouseClient extends Client.SqlClient {
   readonly [TypeId]: TypeId
   readonly config: ClickhouseClientConfig
-  /**
-   * The `@clickhouse/client` instance behind this client, for driver features
-   * the SQL client does not wrap, such as `exec()` with raw output formats.
-   * Requests made on it bypass `withQueryId`, `withClickhouseSettings` and
-   * interruption handling; pass `query_id`, `clickhouse_settings` and
-   * `abort_signal` directly. It is closed with the client's scope.
-   */
-  readonly client: Clickhouse.ClickHouseClient
   readonly param: (dataType: string, value: unknown) => Statement.Fragment
   readonly asCommand: <A, E, R>(effect: Effect.Effect<A, E, R>) => Effect.Effect<A, E, R>
   readonly insertQuery: <T = unknown>(options: {
@@ -284,7 +267,12 @@ export const make = (
             }
             return Effect.suspend(() => {
               controller.abort()
-              return killQuery(this.conn, queryId)
+              return Effect.promise(() =>
+                this.conn.command({
+                  query: "KILL QUERY WHERE query_id = {queryId:String}",
+                  query_params: { queryId }
+                })
+              )
             })
           })
         })
@@ -331,30 +319,16 @@ export const make = (
         params: ReadonlyArray<unknown>,
         transformRows: (<A extends object>(row: ReadonlyArray<A>) => ReadonlyArray<A>) | undefined
       ) {
-        const conn = this.conn
-        return Effect.withFiber((fiber) => {
-          const queryId = fiber.getRef(QueryId) ?? Crypto.randomUUID()
-          return this.runRaw(sql, params, "JSONEachRow").pipe(
-            Effect.provideService(QueryId, queryId),
-            Effect.map((result) => {
-              if (!("stream" in result)) {
-                return Stream.empty
-              }
-              // Closing the socket does not stop a query the server is still
-              // computing, so kill it unless the response was read to the end.
-              let done = false
-              return NodeStream.fromReadable<ReadonlyArray<Clickhouse.Row<any, "JSONEachRow">>, SqlError>({
-                evaluate: () => result.stream() as any,
-                onError: (cause) => new SqlError({ reason: classifyError(cause, "Failed to execute stream", "stream") })
-              }).pipe(
-                Stream.onEnd(Effect.sync(() => {
-                  done = true
-                })),
-                Stream.ensuring(Effect.suspend(() => done ? Effect.void : Effect.ignoreCause(killQuery(conn, queryId))))
-              )
+        return this.runRaw(sql, params, "JSONEachRow").pipe(
+          Effect.map((result) => {
+            if (!("stream" in result)) {
+              return Stream.empty
+            }
+            return NodeStream.fromReadable<ReadonlyArray<Clickhouse.Row<any, "JSONEachRow">>, SqlError>({
+              evaluate: () => result.stream() as any,
+              onError: (cause) => new SqlError({ reason: classifyError(cause, "Failed to execute stream", "stream") })
             })
-          )
-        }).pipe(
+          }),
           Stream.unwrap,
           Stream.chunks,
           Stream.mapEffect((chunk) => {
@@ -378,7 +352,6 @@ export const make = (
 
     return Object.assign(
       yield* Client.make({
-        driver: "clickhouse",
         acquirer: Effect.succeed(connection),
         compiler,
         spanAttributes: [
@@ -392,7 +365,6 @@ export const make = (
       {
         [TypeId]: TypeId as TypeId,
         config: options,
-        client,
         param(dataType: string, value: unknown) {
           return Statement.fragment([clickhouseParam(dataType, value)])
         },
@@ -423,7 +395,12 @@ export const make = (
             )
             return Effect.suspend(() => {
               controller.abort()
-              return killQuery(client, queryId)
+              return Effect.promise(() =>
+                client.command({
+                  query: "KILL QUERY WHERE query_id = {queryId:String}",
+                  query_params: { queryId }
+                })
+              )
             })
           })
         },
@@ -543,7 +520,7 @@ const typeFromUnknown = (value: unknown): string => {
       return "Bool"
     case "object":
       if (value instanceof Date) {
-        return "DateTime"
+        return "DateTime()"
       }
       return "String"
     default:

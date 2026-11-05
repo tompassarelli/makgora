@@ -18,16 +18,16 @@ vi.mock("mysql2", () => ({
   })
 }))
 
-const connectFailureReason = Effect.fnUntraced(
-  function*(cause: unknown) {
+const connectFailureReason = (cause: unknown) =>
+  Effect.gen(function*() {
     state.connectCause = cause
     const { MysqlClient } = yield* Effect.promise(() => import("@effect/sql-mysql2"))
     const error = yield* Effect.flip(MysqlClient.make({}))
     return error.reason
-  },
-  (_) => Effect.scoped(_),
-  Effect.provide(Reactivity.layer)
-)
+  }).pipe(
+    Effect.scoped,
+    Effect.provide(Reactivity.layer)
+  )
 
 const connectFailureReasonTag = (errno: number) => Effect.map(connectFailureReason({ errno }), (reason) => reason._tag)
 

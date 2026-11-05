@@ -5,8 +5,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#AddUploadPartRequest":
-  replacement: "Generated.AddUploadPartRequestMultipart"
-  note: "Renamed for multipart requests; file fields now accept File or Blob. Re-check the current Type/Encoded shape."
+  replacement: "Generated.AddUploadPartRequest"
+  note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#AdminApiKey":
   replacement: "Generated.AdminApiKey"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -29,17 +29,17 @@
   replacement: "Generated.ApiKeyList"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#ApplyPatchCallOutputStatus":
-  replacement: "Generated.ApplyPatchCallOutputStatus"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ApplyPatchCallOutputStatusParam":
-  replacement: "Generated.ApplyPatchCallOutputStatusParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ApplyPatchCallStatus":
-  replacement: "Generated.ApplyPatchCallStatus"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ApplyPatchCallStatusParam":
-  replacement: "Generated.ApplyPatchCallStatusParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ApplyPatchCreateFileOperation":
   replacement: "Generated.ApplyPatchCreateFileOperation"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -65,8 +65,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ApplyPatchOperationParam":
-  replacement: "Generated.ApplyPatchOperationParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ApplyPatchToolCall":
   replacement: "Generated.ApplyPatchToolCall"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -110,8 +110,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ApproximateLocation":
-  replacement: "Generated.ApproximateLocation"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ApproximateLocationType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -179,14 +179,14 @@
   replacement: "Generated.Attachment"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#AttachmentType":
-  replacement: "Generated.AttachmentType"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#AudioResponseFormat":
   replacement: "Generated.AudioResponseFormat"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#AudioTranscription":
-  replacement: "Generated.AudioTranscription"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#AudioTranscriptionModel":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -218,20 +218,20 @@
   replacement: "Generated.AuditLogEventType"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#AutoChunkingStrategyRequestParam":
-  replacement: "Generated.AutoChunkingStrategyRequestParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#AutoChunkingStrategyRequestParamType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#AutomaticThreadTitlingParam":
-  replacement: "Generated.AutomaticThreadTitlingParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#Batch":
   replacement: "Generated.Batch"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#BatchError":
-  replacement: "Generated.BatchError"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#BatchFileExpirationAfter":
   replacement: "Generated.BatchFileExpirationAfter"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -242,8 +242,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#BatchRequestCounts":
-  replacement: "Generated.BatchRequestCounts"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#BatchStatus":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -428,32 +428,32 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatkitConfigurationParam":
-  replacement: "Generated.ChatkitConfigurationParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatkitWorkflow":
-  replacement: "Generated.ChatkitWorkflow"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatkitWorkflowTracing":
-  replacement: "Generated.ChatkitWorkflowTracing"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatModel":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatSessionAutomaticThreadTitling":
-  replacement: "Generated.ChatSessionAutomaticThreadTitling"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatSessionChatkitConfiguration":
-  replacement: "Generated.ChatSessionChatkitConfiguration"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatSessionFileUpload":
-  replacement: "Generated.ChatSessionFileUpload"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatSessionHistory":
-  replacement: "Generated.ChatSessionHistory"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatSessionRateLimits":
-  replacement: "Generated.ChatSessionRateLimits"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatSessionResource":
   replacement: "Generated.ChatSessionResource"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -461,8 +461,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChatSessionStatus":
-  replacement: "Generated.ChatSessionStatus"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ChunkingStrategyRequestParam":
   replacement: "Generated.ChunkingStrategyRequestParam"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -470,8 +470,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ClickButtonType":
-  replacement: "Generated.ClickButtonType"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ClickParam":
   replacement: "Generated.ClickParam"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -494,8 +494,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ClientToolCallStatus":
-  replacement: "Generated.ClientToolCallStatus"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ClosedStatus":
   replacement: "Generated.ClosedStatus"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -569,8 +569,8 @@
   replacement: "Generated.ComputerCallSafetyCheckParam"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#ComputerEnvironment":
-  replacement: "Generated.ComputerEnvironment"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ComputerScreenshotContent":
   replacement: "Generated.ComputerScreenshotContent"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -623,8 +623,8 @@
   replacement: "Generated.ContainerListResource"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#ContainerMemoryLimit":
-  replacement: "Generated.ContainerMemoryLimit"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ContainerResource":
   replacement: "Generated.ContainerResource"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -662,8 +662,8 @@
   replacement: "Generated.CreateAssistantRequest"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateBatchRequest":
-  replacement: "Generated.CreateBatchRequest"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateBatchRequestCompletionWindow":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -740,8 +740,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateEvalCompletionsRunDataSource":
-  replacement: "Generated.CreateEvalCompletionsRunDataSource"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateEvalCompletionsRunDataSourceInputMessagesEnumType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -749,8 +749,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateEvalCustomDataSourceConfig":
-  replacement: "Generated.CreateEvalCustomDataSourceConfig"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateEvalCustomDataSourceConfigType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -758,8 +758,8 @@
   replacement: "Generated.CreateEvalItem"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateEvalJsonlRunDataSource":
-  replacement: "Generated.CreateEvalJsonlRunDataSource"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateEvalJsonlRunDataSourceType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -770,8 +770,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateEvalLogsDataSourceConfig":
-  replacement: "Generated.CreateEvalLogsDataSourceConfig"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateEvalLogsDataSourceConfigType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -779,8 +779,8 @@
   replacement: "Generated.CreateEvalRequest"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateEvalResponsesRunDataSource":
-  replacement: "Generated.CreateEvalResponsesRunDataSource"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateEvalResponsesRunDataSourceInputMessagesEnumType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -791,14 +791,14 @@
   replacement: "Generated.CreateEvalRunRequest"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateEvalStoredCompletionsDataSourceConfig":
-  replacement: "Generated.CreateEvalStoredCompletionsDataSourceConfig"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateEvalStoredCompletionsDataSourceConfigType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateFileRequest":
-  replacement: "Generated.CreateFileRequestMultipart"
-  note: "Renamed for multipart requests; file fields now accept File or Blob. Re-check the current Type/Encoded shape."
+  replacement: "Generated.CreateFileRequest"
+  note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateFineTuningCheckpointPermissionRequest":
   replacement: "Generated.CreateFineTuningCheckpointPermissionRequest"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -824,8 +824,8 @@
   replacement: "Generated.CreateGroupUserBody"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateImageEditRequest":
-  replacement: "Generated.CreateImageEditRequestMultipart"
-  note: "Renamed for multipart requests; file fields now accept File or Blob. Re-check the current Type/Encoded shape. JSON image edits instead use Generated.CreateImageEditRequestJson."
+  replacement: "Generated.CreateImageEditRequest"
+  note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateImageEditRequestBackground":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -872,8 +872,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#CreateImageVariationRequest":
-  replacement: "Generated.CreateImageVariationRequestMultipart"
-  note: "Renamed for multipart requests; file fields now accept File or Blob. Re-check the current Type/Encoded shape."
+  replacement: "Generated.CreateImageVariationRequest"
+  note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateImageVariationRequestModelEnum":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -962,8 +962,8 @@
   replacement: "Generated.CreateTranscription200"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateTranscriptionRequest":
-  replacement: "Generated.CreateTranscriptionRequestMultipart"
-  note: "Renamed for multipart requests; file fields now accept File or Blob. Re-check the current Type/Encoded shape."
+  replacement: "Generated.CreateTranscriptionRequest"
+  note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateTranscriptionRequestModelEnum":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -983,8 +983,8 @@
   replacement: "Generated.CreateTranslation200"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateTranslationRequest":
-  replacement: "Generated.CreateTranslationRequestMultipart"
-  note: "Renamed for multipart requests; file fields now accept File or Blob. Re-check the current Type/Encoded shape."
+  replacement: "Generated.CreateTranslationRequest"
+  note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#CreateTranslationRequestModelEnum":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -1136,8 +1136,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#DetailEnum":
-  replacement: "Generated.DetailEnum"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#DoubleClickAction":
   replacement: "Generated.DoubleClickAction"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -1145,8 +1145,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#DownloadFile200":
-  replacement: "none"
-  note: "The standalone response schema was removed. The generated client's downloadFile method returns Uint8Array, optionally paired with the HTTP response according to its config; downloadFileStream streams Uint8Array chunks."
+  replacement: "Generated.DownloadFile200"
+  note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#Drag":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -1187,8 +1187,8 @@
   replacement: "Generated.EvalApiError"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#EvalCustomDataSourceConfig":
-  replacement: "Generated.EvalCustomDataSourceConfig"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#EvalCustomDataSourceConfigType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -1259,8 +1259,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#EvalLogsDataSourceConfig":
-  replacement: "Generated.EvalLogsDataSourceConfig"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#EvalLogsDataSourceConfigType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -1301,8 +1301,8 @@
   replacement: "Generated.EvalRunOutputItemResult"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#EvalStoredCompletionsDataSourceConfig":
-  replacement: "Generated.EvalStoredCompletionsDataSourceConfig"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#EvalStoredCompletionsDataSourceConfigType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -1313,8 +1313,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ExpiresAfterParam":
-  replacement: "Generated.ExpiresAfterParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ExpiresAfterParamAnchor":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -1322,8 +1322,8 @@
   replacement: "Generated.FileAnnotation"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#FileAnnotationSource":
-  replacement: "Generated.FileAnnotationSource"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FileAnnotationSourceType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -1373,11 +1373,11 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FileUploadParam":
-  replacement: "Generated.FileUploadParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#Filters":
-  replacement: "Generated.Filters"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FineTuneDPOHyperparameters":
   replacement: "Generated.FineTuneDPOHyperparameters"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -1496,8 +1496,8 @@
   replacement: "Generated.FunctionAndCustomToolCallOutput"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#FunctionCallItemStatus":
-  replacement: "Generated.FunctionCallItemStatus"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FunctionCallOutputItemParam":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -1511,11 +1511,11 @@
   replacement: "Generated.FunctionParameters"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#FunctionShellAction":
-  replacement: "Generated.FunctionShellAction"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FunctionShellActionParam":
-  replacement: "Generated.FunctionShellActionParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FunctionShellCall":
   replacement: "Generated.FunctionShellCall"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -1526,8 +1526,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FunctionShellCallItemStatus":
-  replacement: "Generated.FunctionShellCallItemStatus"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FunctionShellCallOutput":
   replacement: "Generated.FunctionShellCallOutput"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -1556,8 +1556,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FunctionShellCallOutputOutcomeParam":
-  replacement: "Generated.FunctionShellCallOutputOutcomeParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#FunctionShellCallOutputTimeoutOutcome":
   replacement: "Generated.FunctionShellCallOutputTimeoutOutcome"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -1658,8 +1658,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#GraderMulti":
-  replacement: "Generated.GraderMulti"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#GraderMultiType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -1694,8 +1694,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#GrammarSyntax1":
-  replacement: "Generated.GrammarSyntax1"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#Group":
   replacement: "Generated.Group"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -1739,17 +1739,17 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#HistoryParam":
-  replacement: "Generated.HistoryParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#HybridSearchOptions":
-  replacement: "Generated.HybridSearchOptions"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#Image":
   replacement: "Generated.Image"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#ImageDetail":
-  replacement: "Generated.ImageDetail"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ImageGenInputUsageDetails":
   replacement: "Generated.ImageGenInputUsageDetails"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -1808,8 +1808,8 @@
   replacement: "Generated.IncludeEnum"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#InferenceOptions":
-  replacement: "Generated.InferenceOptions"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#InputAudio":
   replacement: "Generated.InputAudio"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -2303,8 +2303,8 @@
   replacement: "Generated.MCPToolCall"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#MCPToolCallStatus":
-  replacement: "Generated.MCPToolCallStatus"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#MCPToolCallType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -2390,8 +2390,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#MessageRole":
-  replacement: "Generated.MessageRole"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#MessageStatus":
   replacement: "OpenAiSchema.MessageStatus"
   note: "Use the focused v4 OpenAiSchema definition; the old generated export was removed when the OpenAI specification client was regenerated."
@@ -2468,8 +2468,8 @@
   replacement: "Generated.OrderEnum"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#OtherChunkingStrategyResponseParam":
-  replacement: "Generated.OtherChunkingStrategyResponseParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#OtherChunkingStrategyResponseParamType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -2675,14 +2675,14 @@
   replacement: "Generated.PublicUpdateOrganizationRoleBody"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#RankerVersionType":
-  replacement: "Generated.RankerVersionType"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RankingOptions":
-  replacement: "Generated.RankingOptions"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RateLimitsParam":
-  replacement: "Generated.RateLimitsParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RealtimeAudioFormats":
   replacement: "Generated.RealtimeAudioFormats"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -2975,8 +2975,8 @@
   replacement: "Generated.RunStepCompletionUsage"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#RunStepDetailsMessageCreationObject":
-  replacement: "Generated.RunStepDetailsMessageCreationObject"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RunStepDetailsMessageCreationObjectType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -2990,14 +2990,14 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RunStepDetailsToolCallsCodeOutputImageObject":
-  replacement: "Generated.RunStepDetailsToolCallsCodeOutputImageObject"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RunStepDetailsToolCallsCodeOutputImageObjectType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RunStepDetailsToolCallsCodeOutputLogsObject":
-  replacement: "Generated.RunStepDetailsToolCallsCodeOutputLogsObject"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RunStepDetailsToolCallsCodeOutputLogsObjectType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -3020,8 +3020,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RunStepDetailsToolCallsObject":
-  replacement: "Generated.RunStepDetailsToolCallsObject"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#RunStepDetailsToolCallsObjectType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -3059,14 +3059,14 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#SearchContextSize":
-  replacement: "Generated.SearchContextSize"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#ServiceTier":
   replacement: "Generated.ServiceTier"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#ServiceTierEnum":
-  replacement: "Generated.ServiceTierEnum"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#SpecificApplyPatchParam":
   replacement: "Generated.SpecificApplyPatchParam"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -3083,14 +3083,14 @@
   replacement: "Generated.StaticChunkingStrategy"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#StaticChunkingStrategyRequestParam":
-  replacement: "Generated.StaticChunkingStrategyRequestParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#StaticChunkingStrategyRequestParamType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#StaticChunkingStrategyResponseParam":
-  replacement: "Generated.StaticChunkingStrategyResponseParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#StaticChunkingStrategyResponseParamType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -3131,8 +3131,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#TaskType":
-  replacement: "Generated.TaskType"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#TextAnnotation":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -3269,8 +3269,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#TruncationEnum":
-  replacement: "Generated.TruncationEnum"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#Type":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -3335,8 +3335,8 @@
   replacement: "Generated.UrlAnnotation"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#UrlAnnotationSource":
-  replacement: "Generated.UrlAnnotationSource"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#UrlAnnotationSourceType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -3614,8 +3614,8 @@
   replacement: "Generated.VideoListResource"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
 "@effect/ai-openai/Generated#VideoModel":
-  replacement: "Generated.VideoModel"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#VideoResource":
   replacement: "Generated.VideoResource"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -3623,14 +3623,14 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#VideoSeconds":
-  replacement: "Generated.VideoSeconds"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#VideoSize":
-  replacement: "Generated.VideoSize"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#VideoStatus":
-  replacement: "Generated.VideoStatus"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#VoiceIdsShared":
   replacement: "Generated.VoiceIdsShared"
   note: "Still generated in v4 from the current OpenAI specification; re-check the schema's Type/Encoded shape because the generated definition changed."
@@ -3644,20 +3644,20 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#WebSearchActionFind":
-  replacement: "Generated.WebSearchActionFind"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#WebSearchActionFindType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#WebSearchActionOpenPage":
-  replacement: "Generated.WebSearchActionOpenPage"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#WebSearchActionOpenPageType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#WebSearchActionSearch":
-  replacement: "Generated.WebSearchActionSearch"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#WebSearchActionSearchType":
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
@@ -3707,8 +3707,8 @@
   replacement: "none"
   note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#WorkflowParam":
-  replacement: "Generated.WorkflowParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."
 "@effect/ai-openai/Generated#WorkflowTracingParam":
-  replacement: "Generated.WorkflowTracingParam"
-  note: "Available again in the regenerated v4 OpenAI client; re-check the schema's Type/Encoded shape against the current specification."
+  replacement: "none"
+  note: "Removed when the OpenAI specification client was regenerated; use the current Generated or OpenAiSchema request/response schema for the relevant endpoint instead of this old snapshot helper."

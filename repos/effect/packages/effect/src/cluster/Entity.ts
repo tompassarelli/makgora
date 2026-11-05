@@ -147,7 +147,6 @@ export interface Entity<
       readonly maxIdleTime?: Duration.Input | undefined
       readonly concurrency?: number | "unbounded" | undefined
       readonly mailboxCapacity?: number | "unbounded" | undefined
-      readonly mailboxMetrics?: boolean | undefined
       readonly disableFatalDefects?: boolean | undefined
       readonly defectRetryPolicy?: Schedule.Schedule<any, unknown> | undefined
       readonly spanAttributes?: Record<string, string> | undefined
@@ -192,7 +191,6 @@ export interface Entity<
     options?: {
       readonly maxIdleTime?: Duration.Input | undefined
       readonly mailboxCapacity?: number | "unbounded" | undefined
-      readonly mailboxMetrics?: boolean | undefined
       readonly disableFatalDefects?: boolean | undefined
       readonly defectRetryPolicy?: Schedule.Schedule<any, unknown> | undefined
       readonly spanAttributes?: Record<string, string> | undefined
@@ -289,7 +287,6 @@ const Proto = {
       readonly maxIdleTime?: Duration.Input | undefined
       readonly concurrency?: number | "unbounded" | undefined
       readonly mailboxCapacity?: number | "unbounded" | undefined
-      readonly mailboxMetrics?: boolean | undefined
       readonly disableFatalDefects?: boolean | undefined
       readonly defectRetryPolicy?: Schedule.Schedule<any, unknown> | undefined
       readonly spanAttributes?: Record<string, string> | undefined
@@ -338,7 +335,6 @@ const Proto = {
     options?: {
       readonly maxIdleTime?: Duration.Input | undefined
       readonly mailboxCapacity?: number | "unbounded" | undefined
-      readonly mailboxMetrics?: boolean | undefined
       readonly disableFatalDefects?: boolean | undefined
       readonly defectRetryPolicy?: Schedule.Schedule<any, unknown> | undefined
       readonly spanAttributes?: Record<string, string> | undefined

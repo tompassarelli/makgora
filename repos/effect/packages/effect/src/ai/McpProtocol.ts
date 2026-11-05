@@ -106,9 +106,9 @@ export interface TransportPolicy {
  */
 export interface StatelessRuntimeProfile {
   readonly protocolVersion: string
-  readonly clientCapabilities: Readonly<Record<string, unknown>>
+  readonly clientCapabilities: Schema.JsonObject
   readonly clientInfo?: McpSchema.Implementation | undefined
-  readonly requestMetadata: Readonly<Record<string, unknown>>
+  readonly requestMetadata: Schema.JsonObject
 }
 
 /**

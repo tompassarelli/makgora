@@ -184,7 +184,7 @@ describe("OpenAiLanguageModel", () => {
 
   describe("generateText", () => {
     describe("message preparation", () => {
-      it.effect("forwards prompt cache, safety configuration and text breakpoints", () =>
+      it.effect("forwards prompt cache configuration and text breakpoints", () =>
         Effect.gen(function*() {
           const breakpoint = { mode: "explicit" } as const
           yield* LanguageModel.generateText({
@@ -203,9 +203,7 @@ describe("OpenAiLanguageModel", () => {
           }).pipe(
             Effect.provide(OpenAiLanguageModel.model("gpt-5.6", {
               prompt_cache_key: "assistant:v1",
-              prompt_cache_options: { mode: "explicit", ttl: "30m", comparison_response_id: "resp_baseline" },
-              prompt_cache_retention: "24h",
-              safety_identifier: "user-hash-123"
+              prompt_cache_options: { mode: "explicit", ttl: "30m", comparison_response_id: "resp_baseline" }
             }))
           )
 
@@ -213,8 +211,6 @@ describe("OpenAiLanguageModel", () => {
           const body = yield* getRequestBody(requests[0])
 
           strictEqual(body.prompt_cache_key, "assistant:v1")
-          strictEqual(body.prompt_cache_retention, "24h")
-          strictEqual(body.safety_identifier, "user-hash-123")
           deepStrictEqual(body.prompt_cache_options, {
             mode: "explicit",
             ttl: "30m",
@@ -232,46 +228,6 @@ describe("OpenAiLanguageModel", () => {
             content: [{
               type: "input_text",
               text: "Stable context",
-              prompt_cache_breakpoint: breakpoint
-            }]
-          }])
-        }).pipe(Effect.provide(makeTestLayer({ body: { model: "gpt-5.6" as any } }))))
-
-      it.effect("forwards image and file breakpoints", () =>
-        Effect.gen(function*() {
-          const breakpoint = { mode: "explicit" } as const
-          yield* LanguageModel.generateText({
-            prompt: Prompt.make([
-              Prompt.userMessage({
-                content: [
-                  Prompt.filePart({
-                    mediaType: "image/png",
-                    data: new URL("https://example.com/image.png"),
-                    options: { openai: { promptCacheBreakpoint: breakpoint } }
-                  }),
-                  Prompt.filePart({
-                    mediaType: "application/pdf",
-                    data: new URL("https://example.com/document.pdf"),
-                    options: { openai: { promptCacheBreakpoint: breakpoint } }
-                  })
-                ]
-              })
-            ])
-          }).pipe(Effect.provide(OpenAiLanguageModel.model("gpt-5.6")))
-
-          const requests = yield* MockHttpClient.requests
-          const body = yield* getRequestBody(requests[0])
-
-          deepStrictEqual(body.input, [{
-            role: "user",
-            content: [{
-              type: "input_image",
-              image_url: "https://example.com/image.png",
-              detail: "auto",
-              prompt_cache_breakpoint: breakpoint
-            }, {
-              type: "input_file",
-              file_url: "https://example.com/document.pdf",
               prompt_cache_breakpoint: breakpoint
             }]
           }])
@@ -2798,14 +2754,15 @@ const makeTestLayer = (options: {
     }))
   )
 
-const getRequestBody = Effect.fnUntraced(function*(request: HttpClientRequest.HttpClientRequest) {
-  const body = request.body
-  if (body._tag === "Uint8Array") {
-    const text = new TextDecoder().decode(body.body)
-    return JSON.parse(text)
-  }
-  return yield* Effect.die(new Error("Expected Uint8Array body"))
-})
+const getRequestBody = (request: HttpClientRequest.HttpClientRequest) =>
+  Effect.gen(function*() {
+    const body = request.body
+    if (body._tag === "Uint8Array") {
+      const text = new TextDecoder().decode(body.body)
+      return JSON.parse(text)
+    }
+    return yield* Effect.die(new Error("Expected Uint8Array body"))
+  })
 
 const decodeToolParamsFromStream = (
   parts: ReadonlyArray<any>,

@@ -102,16 +102,17 @@ class CancelRequestGate {
   }
 }
 
-const lateCancelPoolConfig = Effect.fnUntraced(function*(gate: CancelRequestGate) {
-  const container = yield* PgContainer
-  const host = container.getHost()
-  const port = container.getMappedPort(5432)
-  return {
-    ...(yield* poolConfig),
-    maxConnections: 1,
-    stream: () => new LateCancelProxy(host, port, gate)
-  }
-})
+const lateCancelPoolConfig = (gate: CancelRequestGate) =>
+  Effect.gen(function*() {
+    const container = yield* PgContainer
+    const host = container.getHost()
+    const port = container.getMappedPort(5432)
+    return {
+      ...(yield* poolConfig),
+      maxConnections: 1,
+      stream: () => new LateCancelProxy(host, port, gate)
+    }
+  })
 
 const blockedStream = `
   SELECT n FROM generate_series(1, 1000) AS g(n)

@@ -91,9 +91,7 @@ export const make: <
   })
   const inMemory = yield* Cache.makeWith(
     Effect.fnUntraced(function*(key: K) {
-      const exit = yield* (store.get(key).pipe(
-        Effect.catchTag("SchemaError", () => Effect.undefined)
-      ) as Effect.Effect<Exit<Persistable.Success<K>, Persistable.Error<K>> | undefined>)
+      const exit = yield* (store.get(key) as Effect.Effect<Exit<Persistable.Success<K>, Persistable.Error<K>>>)
       if (exit) {
         return yield* exit
       }

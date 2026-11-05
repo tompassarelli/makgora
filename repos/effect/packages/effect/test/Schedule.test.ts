@@ -614,22 +614,23 @@ const run = Effect.fnUntraced(function*<A, E, R>(effect: Effect.Effect<A, E, R>)
   return yield* Fiber.join(fiber)
 })
 
-const runDelays = Effect.fnUntraced(function*<Output, Input, Error, Env>(
+const runDelays = <Output, Input, Error, Env>(
   schedule: Schedule.Schedule<Output, Input, Error, Env>,
   input: Iterable<Input>
-) {
-  const step = yield* Schedule.toStepWithMetadata(schedule)
-  const out: Array<Duration.Duration> = []
-  yield* Effect.gen(function*() {
-    for (const value of input) {
-      out.push((yield* step(value)).duration)
-    }
-  }).pipe(Pull.catchDone(() => {
-    out.push(Duration.zero)
-    return Effect.void
-  }))
-  return out
-}, (_) => run(_))
+) =>
+  Effect.gen(function*() {
+    const step = yield* Schedule.toStepWithMetadata(schedule)
+    const out: Array<Duration.Duration> = []
+    yield* Effect.gen(function*() {
+      for (const value of input) {
+        out.push((yield* step(value)).duration)
+      }
+    }).pipe(Pull.catchDone(() => {
+      out.push(Duration.zero)
+      return Effect.void
+    }))
+    return out
+  }).pipe(run)
 
 const format = (timestamp: number | string | Date): string => {
   const date = new Date(timestamp)

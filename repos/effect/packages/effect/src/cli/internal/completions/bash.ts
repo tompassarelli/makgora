@@ -7,7 +7,7 @@
  * @internal
  */
 import type * as Completions from "../../Completions.ts"
-import { negatedName, takesSeparateValue } from "./descriptor.ts"
+import { takesSeparateValue } from "./descriptor.ts"
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -22,9 +22,8 @@ const flagNamesForWordlist = (flag: Completions.FlagDescriptor): Array<string> =
   for (const alias of flag.aliases) {
     names.push(alias.length === 1 ? `-${alias}` : `--${alias}`)
   }
-  const negation = negatedName(flag)
-  if (negation !== undefined) {
-    names.push(`--${negation}`)
+  if (flag.type._tag === "Boolean") {
+    names.push(`--no-${flag.name}`)
   }
   return names
 }

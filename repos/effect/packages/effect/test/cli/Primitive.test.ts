@@ -25,26 +25,28 @@ const TestLayer = Layer.mergeAll(
 )
 
 // Helper functions to reduce repetition
-const expectValidValues = Effect.fnUntraced(function*<A>(
+const expectValidValues = <A>(
   primitive: Primitive.Primitive<A>,
   cases: Array<[string, A]>
-) {
-  for (const [input, expected] of cases) {
-    const result = yield* primitive.parse(input)
-    assert.strictEqual(result, expected)
-  }
-})
+) =>
+  Effect.gen(function*() {
+    for (const [input, expected] of cases) {
+      const result = yield* primitive.parse(input)
+      assert.strictEqual(result, expected)
+    }
+  })
 
-const expectInvalidValues = Effect.fnUntraced(function*<A>(
+const expectInvalidValues = <A>(
   primitive: Primitive.Primitive<A>,
   inputs: ReadonlyArray<string>,
   messages: ReadonlyArray<string>
-) {
-  for (let i = 0; i < inputs.length; i++) {
-    const error = yield* Effect.flip(primitive.parse(inputs[i]))
-    assert.strictEqual(error, messages[i])
-  }
-})
+) =>
+  Effect.gen(function*() {
+    for (let i = 0; i < inputs.length; i++) {
+      const error = yield* Effect.flip(primitive.parse(inputs[i]))
+      assert.strictEqual(error, messages[i])
+    }
+  })
 
 const expectValidDates = (
   primitive: Primitive.Primitive<Date>,

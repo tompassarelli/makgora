@@ -28,7 +28,7 @@ import { HttpServerRequest } from "./HttpServerRequest.ts"
 import * as Request from "./HttpServerRequest.ts"
 import type { HttpServerResponse } from "./HttpServerResponse.ts"
 import * as Response from "./HttpServerResponse.ts"
-import * as requestState from "./internal/requestState.ts"
+import * as preResponseHandler from "./internal/preResponseHandler.ts"
 
 /**
  * Runs an HTTP server effect, sends the produced response with the supplied handler, and converts failures into HTTP responses.
@@ -55,7 +55,7 @@ export const toHandled = <E, R, EH, RH>(
     return Effect.flatMapEager(causeResponse(cause), ([response, cause]) => {
       const fiber = Fiber.getCurrent()!
       reportCauseUnsafe(fiber, cause)
-      const handler = frame.preResponseHandler
+      const handler = preResponseHandler.requestPreResponseHandlers.get(request.source)
       const cont = cause.reasons.length === 0 ? Effect.succeed(response) : Effect.failCause(cause)
       if (handler === undefined) {
         ;(request as any)[handledSymbol] = true
@@ -78,11 +78,10 @@ export const toHandled = <E, R, EH, RH>(
   // Writes the response, applying any registered pre-response handler first.
   // Returns an `Exit` when the write completes synchronously.
   const sendResponse = (
-    frame: RequestFrame,
+    request: HttpServerRequest,
     response: HttpServerResponse
   ): Effect.Effect<HttpServerResponse, EH | HttpServerError, RH> => {
-    const request = frame.request
-    const handler = frame.preResponseHandler
+    const handler = preResponseHandler.requestPreResponseHandlers.get(request.source)
     if (handler === undefined) {
       ;(request as any)[handledSymbol] = true
       return Effect.mapEager(
@@ -106,7 +105,7 @@ export const toHandled = <E, R, EH, RH>(
   > => {
     const request = frame.request
     const responded = Effect.matchCauseEffect(self, {
-      onSuccess: (response) => sendResponse(frame, response),
+      onSuccess: (response) => sendResponse(request, response),
       onFailure: (cause) => handleCause(frame, cause)
     })
     return middleware === undefined ?
@@ -153,19 +152,18 @@ export const toHandled = <E, R, EH, RH>(
       return Scope.closeUnsafe(frame.scope, frame.cause === undefined ? exit : Exit.failCause(frame.cause))
     }, true)
 
-  class RequestFrame extends requestState.RequestState {
+  class RequestFrame {
     readonly scope: Scope.Closeable
     readonly prev: Context.Context<never>
     readonly request: HttpServerRequest
     cause: Cause.Cause<E | EH | HttpServerError> | undefined
     constructor(scope: Scope.Closeable, prev: Context.Context<never>, request: HttpServerRequest) {
-      super()
       this.scope = scope
       this.prev = prev
       this.request = request
     }
     [contA](response: HttpServerResponse, fiber: Fiber.Fiber<unknown, unknown>) {
-      const sent = sendResponse(this, response)
+      const sent = sendResponse(this.request, response)
       // Most response writes complete synchronously.
       if (effectIsExit(sent) && sent._tag === "Success") {
         fiber.setContext(this.prev)
@@ -184,7 +182,7 @@ export const toHandled = <E, R, EH, RH>(
     fiberEnterUninterruptibleUnsafe(fiber)
     const scope = Scope.makeUnsafe()
     const frame = new RequestFrame(scope, fiber.context, Context.getUnsafe(fiber.context, HttpServerRequest))
-    fiber.setContext(Context.add(Context.add(frame.prev, Scope.Scope, scope), requestState.CurrentRequestState, frame))
+    fiber.setContext(Context.add(frame.prev, Scope.Scope, scope))
     // The native tracer has no backend, so its spans are unobservable.
     const currentTracer = fiber.cache.tracer
     if (
@@ -264,20 +262,22 @@ export type PreResponseHandler = (
  * @since 4.0.0
  */
 export const appendPreResponseHandler = (handler: PreResponseHandler): Effect.Effect<void, never, HttpServerRequest> =>
-  withPreResponseHandler(Effect.void, handler)
+  HttpServerRequest.use((request) => {
+    appendPreResponseHandlerUnsafe(request, handler)
+    return Effect.void
+  })
 
 /**
- * Registers a pre-response handler for the HTTP server request that owns the
- * supplied fiber context. Does nothing outside a server request.
+ * Registers a pre-response handler for the supplied HTTP server request.
  *
  * @stability unstable
  * @category unsafe
  * @since 4.0.0
  */
 export const appendPreResponseHandlerUnsafe: (
-  context: Context.Context<never>,
+  request: HttpServerRequest,
   handler: PreResponseHandler
-) => void = requestState.appendPreResponseHandlerUnsafe
+) => void = preResponseHandler.appendPreResponseHandlerUnsafe
 
 /**
  * Runs an effect after registering a pre-response handler for the current HTTP server request.
@@ -295,8 +295,8 @@ export const withPreResponseHandler: {
   ) => <A, E, R>(self: Effect.Effect<A, E, R>) => Effect.Effect<A, E, R | HttpServerRequest>,
   <A, E, R>(self: Effect.Effect<A, E, R>, handler: PreResponseHandler) => Effect.Effect<A, E, R | HttpServerRequest>
 >(2, (self, handler) =>
-  Effect.withFiber((fiber) => {
-    appendPreResponseHandlerUnsafe(fiber.context, handler)
+  HttpServerRequest.use((request) => {
+    appendPreResponseHandlerUnsafe(request, handler)
     return self
   }))
 
@@ -372,9 +372,6 @@ export const toWebHandler: <E>(
  *
  * **Details**
  *
- * Every call to `dispose` returns the same promise, which resolves once the
- * layer resources have been released.
- *
  * The layer is built immediately, so the cost is paid when the handler is
  * created rather than on the first request. A layer that performs asynchronous
  * work while building may still be in progress when the first request arrives,
@@ -412,8 +409,7 @@ export const toWebHandlerLayerWith = <
     ) => Promise<globalThis.Response>
 } => {
   const scope = Scope.makeUnsafe()
-  let disposing: Promise<void> | undefined
-  const dispose = () => disposing ??= Effect.runPromise(Scope.close(scope, Exit.void))
+  const dispose = () => Effect.runPromise(Scope.close(scope, Exit.void))
 
   let handlerCache:
     | ((request: Request, context?: Context.Context<ReqR> | undefined) => Promise<globalThis.Response>)

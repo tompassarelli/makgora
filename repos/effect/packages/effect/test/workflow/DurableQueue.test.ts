@@ -8,17 +8,18 @@ const PersistedQueueLayer = PersistedQueue.layer.pipe(
   Layer.provideMerge(PersistedQueue.layerStoreMemory)
 )
 
-const pollUntilComplete = Effect.fnUntraced(function*<A, E, R>(
+const pollUntilComplete = <A, E, R>(
   poll: Effect.Effect<Option.Option<Workflow.Result<A, E>>, never, R>
-) {
-  let polled = yield* poll
-  for (let i = 0; i < 10 && (Option.isNone(polled) || polled.value._tag !== "Complete"); i++) {
-    yield* Effect.yieldNow
-    yield* Effect.sleep("10 millis").pipe(TestClock.withLive)
-    polled = yield* poll
-  }
-  return polled
-})
+) =>
+  Effect.gen(function*() {
+    let polled = yield* poll
+    for (let i = 0; i < 10 && (Option.isNone(polled) || polled.value._tag !== "Complete"); i++) {
+      yield* Effect.yieldNow
+      yield* Effect.sleep("10 millis").pipe(TestClock.withLive)
+      polled = yield* poll
+    }
+    return polled
+  })
 
 describe("DurableQueue", () => {
   const SuccessQueue = DurableQueue.make({

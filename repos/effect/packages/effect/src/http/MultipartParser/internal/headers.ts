@@ -1,4 +1,3 @@
-import * as Bytes from "../../../Bytes.ts"
 import type { Continue, FailureReason, ReturnValue } from "../HeadersParser.ts"
 
 const constMaxPairs = 100
@@ -56,6 +55,13 @@ export function make() {
     return value
   }
 
+  function concatUint8Array(a: Uint8Array, b: Uint8Array): Uint8Array {
+    const newUint8Array = new Uint8Array(a.length + b.length)
+    newUint8Array.set(a)
+    newUint8Array.set(b, a.length)
+    return newUint8Array
+  }
+
   function error(reason: FailureReason) {
     return reset({ _tag: "Failure", reason, headers: state.headers })
   }
@@ -67,8 +73,11 @@ export function make() {
       endOffset = state.previousChunk.length
       previousCursor = endOffset
 
-      chunk = Bytes.concat([state.previousChunk, chunk])
+      const newChunk = new Uint8Array(chunk.length + endOffset)
+      newChunk.set(state.previousChunk)
+      newChunk.set(chunk, endOffset)
       state.previousChunk = undefined
+      chunk = newChunk
     }
     const end = chunk.length
 
@@ -173,7 +182,10 @@ export function make() {
             } else if (state.crlf >= 2) {
               state.value = state.value === undefined
                 ? chunk.subarray(start, i - state.crlf)
-                : Bytes.concat([state.value, chunk.subarray(start, i - state.crlf)])
+                : concatUint8Array(
+                  state.value,
+                  chunk.subarray(start, i - state.crlf)
+                )
               const value = decoder.decode(state.value)
               if (state.headers[state.key] === undefined) {
                 state.headers[state.key] = value
@@ -217,7 +229,7 @@ export function make() {
         if (i === end) {
           state.value = state.value === undefined
             ? chunk.subarray(start, end)
-            : Bytes.concat([state.value, chunk.subarray(start, end)])
+            : concatUint8Array(state.value, chunk.subarray(start, end))
           return constContinue
         }
       }

@@ -2282,22 +2282,21 @@ export const dedupeAdjacentWith: {
     let first = true
     let last: A
     function next(): IteratorResult<A> {
-      while (true) {
-        const result = iterator.next()
-        if (result.done) {
-          return { done: true, value: undefined }
-        }
-        if (first) {
-          first = false
-          last = result.value
-          return result
-        }
-        const current = result.value
-        if (!isEquivalent(last, current)) {
-          last = current
-          return result
-        }
+      const result = iterator.next()
+      if (result.done) {
+        return { done: true, value: undefined }
       }
+      if (first) {
+        first = false
+        last = result.value
+        return result
+      }
+      const current = result.value
+      if (isEquivalent(last, current)) {
+        return next()
+      }
+      last = current
+      return result
     }
     return { next }
   }

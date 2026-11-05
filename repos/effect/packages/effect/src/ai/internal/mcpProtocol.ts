@@ -19,10 +19,8 @@ import * as PublicMcpSchema from "../McpSchema.ts"
 import * as McpCore from "./mcpCore.ts"
 
 const LEGACY_RESOURCE_NOT_FOUND_ERROR_CODE = -32002
-/** @internal */
-export const BASE64_SENTINEL_PREFIX = "=?base64?"
-/** @internal */
-export const BASE64_SENTINEL_SUFFIX = "?="
+const BASE64_SENTINEL_PREFIX = "=?base64?"
+const BASE64_SENTINEL_SUFFIX = "?="
 // A leading U+FEFF belongs to the header value and must survive comparison with the JSON body.
 const routingHeaderDecoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true })
 
@@ -121,24 +119,6 @@ export const requireCompleteOperation = <A>(
   outcome._tag === "Complete"
     ? Effect.succeed(outcome.value)
     : Effect.fail(new McpCore.UnsupportedByProtocol({ protocolVersion, feature: "Client input" }))
-
-/**
- * Projects boolean property schemas to equivalent objects for pre-June adapters.
- * Their dated tool descriptors require object-valued direct property schemas.
- *
- * @internal
- */
-export const projectLegacyToolInputSchema = (inputSchema: PublicMcpSchema.ToolJson) => ({
-  ...inputSchema,
-  properties: inputSchema.properties === undefined
-    ? undefined
-    : Object.fromEntries<Readonly<Record<string, unknown>>>(
-      Object.entries(inputSchema.properties).map(([name, schema]) => [
-        name,
-        typeof schema === "boolean" ? schema ? {} : { not: {} } : schema
-      ])
-    )
-})
 
 /**
  * Unquotes an exact text mirror when the protocol drops string `structuredContent`.

@@ -22,20 +22,27 @@ import * as HttpClient from "../http/HttpClient.ts"
 import * as HttpClientError from "../http/HttpClientError.ts"
 import * as HttpClientRequest from "../http/HttpClientRequest.ts"
 import * as Layer from "../Layer.ts"
-import * as Result from "../Result.ts"
+import * as Num from "../Number.ts"
+import * as Option from "../Option.ts"
 import * as Schedule from "../Schedule.ts"
 import * as Scope from "../Scope.ts"
 import * as Version from "../Version.ts"
 
-// A missing or invalid Retry-After falls back to a fixed delay.
 const retryAfterDelay = (value: string | undefined): Effect.Effect<Duration.Duration> => {
-  const retryAfter = value === undefined ? undefined : Headers.parseRetryAfter(value)
-  if (retryAfter === undefined || Result.isFailure(retryAfter)) {
+  const seconds = Option.fromUndefinedOr(value).pipe(Option.flatMap(Num.parse))
+  if (Option.isSome(seconds)) {
+    return Effect.succeed(Duration.seconds(seconds.value))
+  }
+  if (value === undefined) {
+    return Effect.succeed(Duration.seconds(5))
+  }
+  const timestamp = Date.parse(value)
+  if (Number.isNaN(timestamp)) {
     return Effect.succeed(Duration.seconds(5))
   }
   return Effect.map(
     Clock,
-    (clock) => Headers.retryAfterDelay(retryAfter.success, clock.currentTimeMillisUnsafe())
+    (clock) => Duration.millis(Math.max(timestamp - clock.currentTimeMillisUnsafe(), 1))
   )
 }
 

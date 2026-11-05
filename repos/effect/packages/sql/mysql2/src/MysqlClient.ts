@@ -418,7 +418,6 @@ export const make = (
 
     return Object.assign(
       yield* Client.make({
-        driver: "mysql2",
         acquirer: Effect.succeed(poolConnection),
         transactionAcquirer,
         releaseSavepoint: (name) => `RELEASE SAVEPOINT ${name}`,

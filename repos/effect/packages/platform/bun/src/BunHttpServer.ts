@@ -5,11 +5,9 @@
  * `Request` values into `HttpServerRequest` values and Effect
  * `HttpServerResponse` values back into Web `Response` values. The server
  * supports streaming bodies, multipart requests, file responses through
- * `BunHttpPlatform`, and WebSocket upgrades. `Bun.serve` cannot hand over the
- * connection for other protocols, so other upgrades fail. This module also
- * provides layers for the server alone, the Bun HTTP support services, the
- * combined server, configurable server options, and a test server with an
- * HTTP client.
+ * `BunHttpPlatform`, and WebSocket upgrades. This module also provides layers
+ * for the server alone, the Bun HTTP support services, the combined server,
+ * configurable server options, and a test server with an HTTP client.
  *
  * @stability unstable
  * @since 4.0.0
@@ -17,7 +15,6 @@
 import type { Server as BunServer, ServerWebSocket } from "bun"
 import type * as Arr from "effect/Array"
 import * as Cause from "effect/Cause"
-import * as Channel from "effect/Channel"
 import * as Config from "effect/Config"
 import type { ConfigError } from "effect/Config"
 import * as Context from "effect/Context"
@@ -197,14 +194,11 @@ export const make = Effect.fnUntraced(
         const httpEffect = HttpEffect.toHandled(httpApp, (request, response) =>
           Effect.sync(() => {
             const bunRequest = request as BunServerRequest
-            bunRequest.resolve(makeResponse(bunRequest, response, services, scope))
+            bunRequest.resolve(makeResponse(request, response, services, scope))
             if (upgradedSources.has(bunRequest.source)) return upgradedResponse
           }), middleware)
 
         function handler(request: Request, server: BunServer<WebSocketContext>) {
-          if (request.method === "CONNECT") {
-            return Promise.resolve(new Response(null, { status: 501 }))
-          }
           return new Promise<Response>((resolve, _reject) => {
             const context = Context.add(
               services,
@@ -213,8 +207,6 @@ export const make = Effect.fnUntraced(
             )
             const fiber = Fiber.runIn(Effect.runForkWith(context)(httpEffect), scope)
             request.signal.addEventListener("abort", () => {
-              // Bun aborts the signal when an upgraded WebSocket closes, which is not a client abort.
-              if (upgradedSources.has(request)) return
               fiber.interruptUnsafe(parent.id, Error.ClientAbort.annotation)
             }, { once: true })
           })
@@ -247,13 +239,8 @@ const upgradedResponse = ServerResponse.empty({ status: 101 })
 // Keyed by source so request copies from `modify` share the upgrade state.
 const upgradedSources = new WeakSet<Request>()
 
-const isRawUpgrade = (request: Request): boolean => {
-  const protocol = request.headers.get("upgrade")
-  return protocol !== null && protocol.toLowerCase() !== "websocket"
-}
-
 const makeResponse = (
-  request: BunServerRequest,
+  request: ServerRequest.HttpServerRequest,
   response: ServerResponse.HttpServerResponse,
   context: Context.Context<never>,
   scope: Scope.Scope
@@ -291,7 +278,10 @@ const makeResponse = (
     }
     case "Raw": {
       if (body.body instanceof Response) {
-        return ServerResponse.toWeb(response)
+        for (const [key, value] of fields.headers.entries()) {
+          body.body.headers.set(key, value)
+        }
+        return body.body
       }
       return new Response(body.body as any, fields)
     }
@@ -301,15 +291,11 @@ const makeResponse = (
     case "Stream": {
       return new Response(
         Stream.toReadableStreamWith(
-          // Attach before transforming: startup can suspend. Register the request finalizer before the first pull.
-          Stream.fromChannel(Channel.fromTransform((upstream, streamScope) =>
-            Effect.withFiber((fiber) => {
-              Fiber.runIn(fiber, scope)
-              return Channel.toTransform(body.stream.channel)(upstream, streamScope)
-            })
-          )),
-          context,
-          { signal: request.source.signal }
+          Stream.unwrap(Effect.withFiber((fiber) => {
+            Fiber.runIn(fiber, scope)
+            return Effect.succeed(body.stream)
+          })),
+          context
         ),
         fields
       )
@@ -436,8 +422,6 @@ class BunServerRequest extends Inspectable.Class implements ServerRequest.HttpSe
   private compressionThreshold: number
   public headersOverride?: Headers.Headers | undefined
   private remoteAddressOverride?: Option.Option<string> | undefined
-  private peerAddressOverride?: Option.Option<string> | undefined
-  readonly protocol: "http" | "https" | undefined
 
   constructor(
     source: Request,
@@ -446,9 +430,7 @@ class BunServerRequest extends Inspectable.Class implements ServerRequest.HttpSe
     bunServer: BunServer<WebSocketContext>,
     compressionThreshold: number,
     headersOverride?: Headers.Headers,
-    remoteAddressOverride?: Option.Option<string>,
-    peerAddressOverride?: Option.Option<string>,
-    protocol?: "http" | "https"
+    remoteAddressOverride?: Option.Option<string>
   ) {
     super()
     this[ServerRequest.TypeId] = ServerRequest.TypeId
@@ -460,8 +442,6 @@ class BunServerRequest extends Inspectable.Class implements ServerRequest.HttpSe
     this.compressionThreshold = compressionThreshold
     this.headersOverride = headersOverride
     this.remoteAddressOverride = remoteAddressOverride
-    this.peerAddressOverride = peerAddressOverride
-    this.protocol = protocol
   }
   toJSON(): unknown {
     return IncomingMessage.inspect(this, {
@@ -475,8 +455,6 @@ class BunServerRequest extends Inspectable.Class implements ServerRequest.HttpSe
       readonly url?: string | undefined
       readonly headers?: Headers.Headers | undefined
       readonly remoteAddress?: Option.Option<string> | undefined
-      readonly peerAddress?: Option.Option<string> | undefined
-      readonly protocol?: "http" | "https" | undefined
     }
   ) {
     return new BunServerRequest(
@@ -486,9 +464,7 @@ class BunServerRequest extends Inspectable.Class implements ServerRequest.HttpSe
       this.bunServer,
       this.compressionThreshold,
       options.headers ?? this.headersOverride,
-      "remoteAddress" in options ? options.remoteAddress : this.remoteAddressOverride,
-      options.peerAddress ?? this.peerAddressOverride,
-      options.protocol ?? this.protocol
+      "remoteAddress" in options ? options.remoteAddress : this.remoteAddressOverride
     )
   }
   get method(): HttpMethod {
@@ -499,9 +475,6 @@ class BunServerRequest extends Inspectable.Class implements ServerRequest.HttpSe
   }
   get remoteAddress(): Option.Option<string> {
     return this.remoteAddressOverride ?? Option.fromNullishOr(this.bunServer.requestIP(this.source)?.address)
-  }
-  get peerAddress(): Option.Option<string> {
-    return this.peerAddressOverride ?? this.remoteAddress
   }
   get headers(): Headers.Headers {
     this.headersOverride ??= Headers.fromInput(this.source.headers)
@@ -651,9 +624,7 @@ class BunServerRequest extends Inspectable.Class implements ServerRequest.HttpSe
           new Error.HttpServerError({
             reason: new Error.RequestParseError({
               request: this,
-              description: isRawUpgrade(this.source)
-                ? "Bun.serve only supports WebSocket upgrades"
-                : "Not an upgradeable ServerRequest"
+              description: "Not an upgradeable ServerRequest"
             })
           })
         ))

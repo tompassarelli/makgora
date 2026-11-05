@@ -58,12 +58,8 @@ const lexTokens = (args: ReadonlyArray<string>): ReadonlyArray<Token> => {
       const equalIndex = arg.indexOf("=")
       if (equalIndex !== -1) {
         const name = arg.slice(2, equalIndex)
-        if (name === "") {
-          tokens.push({ _tag: "Value", value: arg })
-        } else {
-          const value = arg.slice(equalIndex + 1)
-          tokens.push({ _tag: "LongOption", name, raw: arg, value })
-        }
+        const value = arg.slice(equalIndex + 1)
+        tokens.push({ _tag: "LongOption", name, raw: arg, value })
       } else {
         tokens.push({ _tag: "LongOption", name: arg.slice(2), raw: arg })
       }
@@ -71,12 +67,9 @@ const lexTokens = (args: ReadonlyArray<string>): ReadonlyArray<Token> => {
       const flags = arg.slice(1)
       const equalIndex = flags.indexOf("=")
       if (equalIndex !== -1) {
-        const chars = Array.from(flags.slice(0, equalIndex))
-        const flag = chars.pop() ?? ""
-        for (const ch of chars) {
-          tokens.push({ _tag: "ShortOption", flag: ch, raw: `-${ch}` })
-        }
-        tokens.push({ _tag: "ShortOption", flag, raw: `-${flag}`, value: flags.slice(equalIndex + 1) })
+        const flag = flags.slice(0, equalIndex)
+        const value = flags.slice(equalIndex + 1)
+        tokens.push({ _tag: "ShortOption", flag, raw: `-${flag}`, value })
       } else {
         for (const ch of flags) {
           tokens.push({ _tag: "ShortOption", flag: ch, raw: `-${ch}` })

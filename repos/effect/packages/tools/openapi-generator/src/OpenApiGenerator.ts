@@ -42,20 +42,6 @@ export class OpenApiGenerator extends Context.Service<
 /**
  * Output targets supported by the OpenAPI generator.
  *
- * **Details**
- *
- * The `httpclient` and `httpclient-type-only` formats support non-security
- * cookie parameters with primitive schemas, which generated clients send in
- * the request `Cookie` header. Cookie parameters with structured schemas, such
- * as objects or arrays, are dropped with a `cookie-parameter-dropped` warning.
- * The `httpapi` format drops all non-security cookie parameters.
- *
- * The `Cookie` header is set before the request reaches the supplied
- * `HttpClient`, so it is subject to that client's request transformations.
- * Browsers manage the `Cookie` header themselves and ignore explicit values,
- * and `HttpClient.withCookiesRef` replaces the header whenever its cookie jar
- * is non-empty.
- *
  * @category models
  * @since 4.0.0
  */
@@ -76,7 +62,6 @@ export type OpenApiGeneratorWarningCode =
   | "default-response-remapped"
   | "security-and-downgraded"
   | "no-body-method-request-body-skipped"
-  | "streaming-request-body-skipped"
   | "naming-collision"
 
 /**
@@ -165,10 +150,9 @@ export const make = Effect.gen(function*() {
         return current
       }
 
-      const multipart = makeMultipartSchemas(spec, options.format, resolveRef)
+      const multipart = makeMultipartSchemas(spec.components?.schemas ?? {}, options.format, resolveRef)
 
       const parsed = parseOpenApi(spec, generator, resolveRef, options.format, emitWarning, multipart.transform)
-      multipart.finish(generator.schemas)
 
       // TODO: make a CLI option ?
       const importName = "Schema"
@@ -305,7 +289,6 @@ const parseOpenApi = (
         Array.isArray(operation.parameters) ? operation.parameters : undefined,
         resolveRef
       )
-      const droppedCookies = new Set<OpenApiParameter>()
       for (const parameter of parameters) {
         const parsedParameter: ParsedOperation.ParsedOperationParameter = {
           name: parameter.name,
@@ -321,9 +304,6 @@ const parseOpenApi = (
           }
           case "query": {
             op.parameters.query.push(parsedParameter)
-            if ((parameter.style ?? "form") === "form" && parameter.explode === false) {
-              op.commaUrlParams.push(parameter.name)
-            }
             break
           }
           case "header": {
@@ -332,18 +312,11 @@ const parseOpenApi = (
           }
           case "cookie": {
             op.parameters.cookie.push(parsedParameter)
-            const dropReason = isHttpApi
-              ? "non-security cookie parameters are not supported"
-              : isPrimitiveSchema(parameter.schema, resolveRef)
-              ? undefined
-              : "only primitive cookie parameter schemas are supported"
-            if (dropReason !== undefined) {
-              droppedCookies.add(parameter)
-              warnForOperation(emitWarning, op, {
-                code: "cookie-parameter-dropped",
-                message: `Cookie parameter "${parameter.name}" was dropped because ${dropReason}.`
-              })
-            }
+            warnForOperation(emitWarning, op, {
+              code: "cookie-parameter-dropped",
+              message:
+                `Cookie parameter "${parameter.name}" was dropped because non-security cookie parameters are not supported.`
+            })
             break
           }
         }
@@ -377,9 +350,7 @@ const parseOpenApi = (
         continue
       }
 
-      const validParameters = parameters.filter((parameter) =>
-        parameter.in !== "path" && !droppedCookies.has(parameter)
-      )
+      const validParameters = parameters.filter((parameter) => parameter.in !== "path" && parameter.in !== "cookie")
 
       const combinedParameterSchema = buildParameterSchema(validParameters, (parameter, added) => {
         if (parameter.in === "query") {
@@ -436,10 +407,7 @@ const parseOpenApi = (
           requestSchemaNames.set("application/json", op.payload)
         }
 
-        if (
-          Predicate.isNotUndefined(content["multipart/form-data"]?.schema) &&
-          !(isHttpApi && getEffectStreamEncoding(content["multipart/form-data"]) === "ndjson")
-        ) {
+        if (Predicate.isNotUndefined(content["multipart/form-data"]?.schema)) {
           op.payload = addSchema(
             `${schemaId}RequestFormData`,
             transformMultipart(content["multipart/form-data"].schema),
@@ -462,43 +430,7 @@ const parseOpenApi = (
         if (isHttpApi) {
           const representableRequestBody: Array<ParsedOperation.ParsedOperationMediaTypeSchema> = []
           for (const [contentType, mediaType] of Object.entries(content)) {
-            if (!Predicate.isObject(mediaType)) {
-              continue
-            }
-            const streamEncoding = getEffectStreamEncoding(mediaType)
-            if (
-              streamEncoding !== "ndjson" &&
-              unsupportedStreamingRequestMediaTypes.has(normalizeMediaType(contentType))
-            ) {
-              warnForOperation(emitWarning, op, {
-                code: "streaming-request-body-skipped",
-                message: `Request body media type ${contentType} was skipped because HttpApi cannot stream it.`
-              })
-              continue
-            }
-            if (streamEncoding === "uint8array") {
-              representableRequestBody.push({
-                contentType,
-                encoding: "binary",
-                effectStream: "uint8array"
-              })
-              continue
-            }
-            const ndjsonSchema = getNdjsonElementSchema(contentType, mediaType)
-            if (Predicate.isNotUndefined(ndjsonSchema)) {
-              representableRequestBody.push({
-                contentType,
-                encoding: "json",
-                effectStream: "ndjson",
-                schema: requestSchemaNames.get(contentType) ?? addSchema(
-                  `${schemaId}Request${mediaTypeToSuffix(contentType)}`,
-                  ndjsonSchema,
-                  op
-                )
-              })
-              continue
-            }
-            if (Predicate.isUndefined(mediaType.schema)) {
+            if (!Predicate.isObject(mediaType) || Predicate.isUndefined(mediaType.schema)) {
               continue
             }
             const encoding = getRequestMediaTypeEncoding(contentType)
@@ -560,8 +492,7 @@ const parseOpenApi = (
           const jsonResponseEntries = Object.entries(content ?? {}).filter(([contentType, mediaType]) =>
             isJsonMediaType(normalizeMediaType(contentType)) &&
             Predicate.isObject(mediaType) &&
-            Predicate.isNotUndefined(mediaType.schema) &&
-            !(isSuccessStatus(parsedStatus) && getEffectStreamEncoding(mediaType) === "ndjson")
+            Predicate.isNotUndefined(mediaType.schema)
           )
           const jsonResponseEntry = jsonResponseEntries.find(([contentType]) =>
             normalizeMediaType(contentType) === "application/json"
@@ -610,22 +541,6 @@ const parseOpenApi = (
                 contentType,
                 encoding: "binary",
                 effectStream: "uint8array"
-              })
-              continue
-            }
-            const ndjsonSchema = isSuccessStatus(parsedStatus)
-              ? getNdjsonElementSchema(contentType, mediaType)
-              : undefined
-            if (Predicate.isNotUndefined(ndjsonSchema)) {
-              representable.push({
-                contentType,
-                encoding: "json",
-                effectStream: "ndjson",
-                schema: addSchema(
-                  `${schemaId}${status}${mediaTypeToSuffix(contentType)}`,
-                  ndjsonSchema,
-                  op
-                )
               })
               continue
             }
@@ -782,8 +697,6 @@ interface OpenApiParameter {
   readonly required: boolean
   readonly schema: {}
   readonly description?: string | undefined
-  readonly style?: string | undefined
-  readonly explode?: boolean | undefined
 }
 
 const isOpenApiParameter = (parameter: unknown): parameter is OpenApiParameter => {
@@ -907,11 +820,10 @@ const mediaTypeToSuffix = (contentType: string): string => {
 }
 
 const makeMultipartSchemas = (
-  spec: OpenAPISpec,
+  definitions: JsonSchema.Definitions,
   format: OpenApiGeneratorFormat,
   resolveRef: (ref: string) => unknown
 ) => {
-  const definitions = spec.components?.schemas ?? {}
   const names = new Set(Object.keys(definitions))
   const allocate = (base: string): string => {
     let candidate = base
@@ -924,25 +836,40 @@ const makeMultipartSchemas = (
     return candidate
   }
   const output = { ...definitions }
-  const refs: MultipartSchemaRefs = format === "httpapi"
-    ? {
+  if (format === "httpapi") {
+    const refs: HttpApiMultipartSchemaRefs = {
       kind: "httpapi",
       singleFile: allocate("__HttpApiMultipartSingleFile"),
       files: allocate("__HttpApiMultipartFiles")
     }
-    : { kind: "client", singleFile: allocate("__ClientMultipartFile") }
-  const singleFileRef = toDefinitionRef(refs.singleFile)
-  const filesRef = refs.kind === "httpapi" ? toDefinitionRef(refs.files) : undefined
-  Rec.assignProperty(output, refs.singleFile, { type: "string", format: "binary" })
-  if (refs.kind === "httpapi") {
-    Rec.assignProperty(output, refs.files, { type: "array", items: { $ref: singleFileRef } })
+    const transform = (schema: JsonSchema.JsonSchema) => transformMultipartSchema(schema, refs, resolveRef)
+    Rec.assignProperty(output, refs.singleFile, { type: "string", format: "binary" })
+    for (const [name, schema] of Object.entries(definitions)) {
+      Rec.assignProperty(output, name, transform(schema))
+    }
+    Rec.assignProperty(output, refs.files, { type: "array", items: { $ref: toDefinitionRef(refs.singleFile) } })
+    return { refs, definitions: output, transform }
   }
+  const refs: MultipartSchemaRefs = { kind: "client", singleFile: allocate("__ClientMultipartFile") }
+  Rec.assignProperty(output, refs.singleFile, { type: "string", format: "binary" })
+  // The client transform adds `*Multipart` copies to `output` while parsing, so render schemas after parseOpenApi.
+  return {
+    refs,
+    definitions: output,
+    transform: makeClientMultipartTransformer(output, refs.singleFile, allocate, resolveRef)
+  }
+}
 
+const toDefinitionRef = (name: string): string => `#/$defs/${name.replaceAll("~", "~0").replaceAll("/", "~1")}`
+
+const makeClientMultipartTransformer = (
+  definitions: JsonSchema.Definitions,
+  singleFile: string,
+  allocate: (base: string) => string,
+  resolveRef: (ref: string) => unknown
+) => {
   const binaryComponents = new Map<string, boolean>()
   const copies = new Map<string, string>()
-  const inlining = new Set<string>()
-  // Components reachable from a schema that is not a multipart body, filled in by `finish`.
-  let shared: ReadonlySet<string> = new Set()
 
   const hasBinary = (value: unknown, seen: Set<string>): boolean => {
     if (Array.isArray(value)) return value.some((item) => hasBinary(item, seen))
@@ -970,120 +897,83 @@ const makeMultipartSchemas = (
     if (name === undefined) {
       name = allocate(`${JsonPointer.unescapeToken($ref.slice(componentRefPrefix.length))}Multipart`)
       copies.set($ref, name)
-      Rec.assignProperty(output, name, visit(resolveRef($ref)))
+      Rec.assignProperty(definitions, name, visit(resolveRef($ref)))
     }
     return name
-  }
-
-  // The httpapi format inlines components that only multipart bodies use; reference siblings still apply.
-  const inlineComponent = (value: Record<string, unknown>, $ref: string): unknown => {
-    const { $ref: _, ...siblings } = value
-    inlining.add($ref)
-    const inlined = visit(resolveRef($ref))
-    inlining.delete($ref)
-    return Object.keys(siblings).length === 0 ? inlined : { allOf: [inlined, visit(siblings)] }
-  }
-
-  // Follows component aliases so a reference to a binary string maps to the file schema too.
-  const isBinaryFile = (value: unknown, seen: Set<string> = new Set()): boolean => {
-    if (isMultipartBinaryFile(value)) return true
-    if (!Predicate.isObject(value) || !isComponentRef(value.$ref) || seen.has(value.$ref)) return false
-    seen.add(value.$ref)
-    return isBinaryFile(resolveRef(value.$ref), seen)
   }
 
   const visit = (value: unknown): unknown => {
     if (Array.isArray(value)) return value.map(visit)
     if (!Predicate.isObject(value)) return value
-    if (isBinaryFile(value)) return { $ref: singleFileRef }
-    if (
-      filesRef !== undefined && isComponentRef(value.$ref) && !shared.has(value.$ref) && !inlining.has(value.$ref)
-    ) {
-      return inlineComponent(value, value.$ref)
-    }
+    if (isMultipartBinaryFile(value)) return { $ref: toDefinitionRef(singleFile) }
     const out = Rec.map(value, visit)
     if (isComponentRef(value.$ref) && isBinaryComponent(value.$ref)) {
       out.$ref = toDefinitionRef(copyComponent(value.$ref))
     }
-    if (filesRef !== undefined && isMultipartBinaryFiles(out, singleFileRef)) return { $ref: filesRef }
     return out
   }
 
-  // Whether a component is shared is only known once every schema is registered, so `transform` hands
-  // out a placeholder that `finish` fills in after parsing.
-  const pending = new Map<JsonSchema.JsonSchema, JsonSchema.JsonSchema>()
-  const transform = (schema: JsonSchema.JsonSchema): JsonSchema.JsonSchema => {
-    const placeholder: JsonSchema.JsonSchema = {}
-    pending.set(placeholder, schema)
-    return placeholder
-  }
-  const finish = (schemas: Readonly<Record<string, JsonSchema.JsonSchema>>): void => {
-    shared = collectComponentRefs(Object.values(schemas).filter((schema) => !pending.has(schema)), resolveRef)
-    for (const [placeholder, schema] of pending) {
-      Object.assign(placeholder, visit(schema))
-    }
-  }
-
-  return { refs, definitions: output, transform, finish }
+  return (schema: JsonSchema.JsonSchema) => visit(schema) as JsonSchema.JsonSchema
 }
-
-const toDefinitionRef = (name: string): string => `#/$defs/${name.replaceAll("~", "~0").replaceAll("/", "~1")}`
-
-// Collects every component reachable from the schemas, following references through other components.
-// Only JSON Schema keywords that hold subschemas are walked, so a `$ref` inside `default`, `const` or
-// `examples` is treated as data.
-const collectComponentRefs = (
-  schemas: ReadonlyArray<JsonSchema.JsonSchema>,
-  resolveRef: (ref: string) => unknown
-): ReadonlySet<string> => {
-  const seen = new Set<string>()
-  const visit = (schema: unknown): void => {
-    if (Array.isArray(schema)) {
-      for (const item of schema) visit(item)
-      return
-    }
-    if (!Predicate.isObject(schema)) return
-    if (isComponentRef(schema.$ref) && !seen.has(schema.$ref)) {
-      seen.add(schema.$ref)
-      visit(resolveRef(schema.$ref))
-    }
-    for (const key of subschemaKeywords) {
-      visit(schema[key])
-    }
-    for (const key of subschemaMapKeywords) {
-      const map = schema[key]
-      if (Predicate.isObject(map)) visit(Object.values(map))
-    }
-  }
-  for (const schema of schemas) visit(schema)
-  return seen
-}
-
-const subschemaKeywords = [
-  "items",
-  "prefixItems",
-  "additionalItems",
-  "additionalProperties",
-  "unevaluatedItems",
-  "unevaluatedProperties",
-  "contains",
-  "propertyNames",
-  "contentSchema",
-  "allOf",
-  "anyOf",
-  "oneOf",
-  "not",
-  "if",
-  "then",
-  "else"
-] as const
-
-const subschemaMapKeywords = ["properties", "patternProperties", "dependentSchemas", "$defs", "definitions"] as const
 
 const componentRefPrefix = "#/components/schemas/"
 
 const isComponentRef = (value: unknown): value is string =>
   typeof value === "string" && value.startsWith(componentRefPrefix)
+
+const transformMultipartSchema = (
+  schema: JsonSchema.JsonSchema,
+  multipartSchemaRefs: HttpApiMultipartSchemaRefs,
+  resolveRef: (ref: string) => unknown
+): JsonSchema.JsonSchema => {
+  const singleFileRef = toDefinitionRef(multipartSchemaRefs.singleFile)
+  const cache = new Map<string, unknown>()
+  const stack = new Set<string>()
+
+  const visit = (value: unknown): unknown => {
+    if (Array.isArray(value)) {
+      return value.map(visit)
+    }
+    if (!Predicate.isObject(value)) {
+      return value
+    }
+
+    if (isComponentRef(value.$ref)) {
+      const { $ref, ...siblings } = value
+      const withSiblings = (schema: unknown): unknown =>
+        Object.keys(siblings).length === 0 ? schema : { allOf: [schema, visit(siblings)] }
+      const cached = cache.get($ref)
+      if (cached !== undefined) {
+        return withSiblings(cached)
+      }
+      if (stack.has($ref)) {
+        return value
+      }
+      stack.add($ref)
+      const transformed = visit(resolveRef($ref))
+      stack.delete($ref)
+      cache.set($ref, transformed)
+      return withSiblings(transformed)
+    }
+
+    if (isMultipartBinaryFile(value)) {
+      return { $ref: singleFileRef }
+    }
+
+    const out: Record<string, unknown> = {}
+    for (const [key, current] of Object.entries(value)) {
+      Rec.assignProperty(out, key, visit(current))
+    }
+
+    if (isMultipartBinaryFiles(out, singleFileRef)) {
+      return { $ref: toDefinitionRef(multipartSchemaRefs.files) }
+    }
+
+    return out
+  }
+
+  return visit(schema) as JsonSchema.JsonSchema
+}
 
 const isMultipartBinaryFile = (value: unknown): boolean =>
   Predicate.isObject(value) &&
@@ -1183,35 +1073,12 @@ const getResponseMediaTypeEncoding = (
   return
 }
 
-const getEffectStreamEncoding = (mediaType: object): "uint8array" | "sse" | "ndjson" | undefined => {
+const getEffectStreamEncoding = (mediaType: object): "uint8array" | "sse" | undefined => {
   const stream = (mediaType as Record<string, unknown>)["x-effect-stream"]
   if (!Predicate.isObject(stream)) {
     return
   }
-  return stream.encoding === "uint8array" || stream.encoding === "sse" || stream.encoding === "ndjson"
-    ? stream.encoding
-    : undefined
-}
-
-const ndjsonMediaTypes = new Set(["application/x-ndjson", "application/jsonl"])
-
-const unsupportedStreamingRequestMediaTypes = new Set(["application/json-seq", "text/event-stream"])
-
-// Effect specs mark NDJSON with x-effect-stream on any content type. Other specs
-// use an OpenAPI 3.2 itemSchema on an NDJSON or JSONL content type.
-const getNdjsonElementSchema = (contentType: string, mediaType: object): JsonSchema.JsonSchema | undefined => {
-  const record = mediaType as Record<string, unknown>
-  if (getEffectStreamEncoding(mediaType) === "ndjson") {
-    return Predicate.isObject(record.schema) ? record.schema as JsonSchema.JsonSchema : undefined
-  }
-  if (
-    Predicate.isUndefined(record["x-effect-stream"]) &&
-    ndjsonMediaTypes.has(normalizeMediaType(contentType)) &&
-    Predicate.isObject(record.itemSchema)
-  ) {
-    return record.itemSchema as JsonSchema.JsonSchema
-  }
-  return
+  return stream.encoding === "uint8array" || stream.encoding === "sse" ? stream.encoding : undefined
 }
 
 const getEffectStreamErrorSchema = (mediaType: object): JsonSchema.JsonSchema | undefined => {
@@ -1273,42 +1140,6 @@ const normalizeSseEventSchema = (input: JsonSchema.JsonSchema): JsonSchema.JsonS
     schema.required = schema.required.filter((name: unknown) => name !== "id")
   }
   return schema as JsonSchema.JsonSchema
-}
-
-const primitiveSchemaTypes = new Set(["string", "number", "integer", "boolean", "null"])
-
-const isPrimitiveValue = (value: unknown): boolean =>
-  value === null || typeof value === "string" || typeof value === "number" || typeof value === "boolean"
-
-// Cookie values are serialized with `String(value)`, so only schemas whose
-// values are always primitives can be represented.
-const isPrimitiveSchema = (
-  input: unknown,
-  resolveRef: (ref: string) => unknown,
-  ancestors: Set<unknown> = new Set()
-): boolean => {
-  const schema = resolveReference(input, resolveRef)
-  if (!Predicate.isObject(schema) || ancestors.has(schema)) {
-    return false
-  }
-  ancestors.add(schema)
-  const members = [schema.anyOf, schema.oneOf, schema.allOf].filter(Array.isArray).flat()
-  const membersArePrimitive = members.every((member) => isPrimitiveSchema(member, resolveRef, ancestors))
-  ancestors.delete(schema)
-  if (!membersArePrimitive) {
-    return false
-  }
-  if (schema.type !== undefined) {
-    const types: ReadonlyArray<unknown> = Array.isArray(schema.type) ? schema.type : [schema.type]
-    return types.every((type) => primitiveSchemaTypes.has(type as string))
-  }
-  if (Array.isArray(schema.enum)) {
-    return schema.enum.every(isPrimitiveValue)
-  }
-  if ("const" in schema) {
-    return isPrimitiveValue(schema.const)
-  }
-  return members.length > 0
 }
 
 const resolveReference = (input: unknown, resolveRef: (ref: string) => unknown): any => {
@@ -1450,7 +1281,7 @@ const hasUnsupportedSuccessfulSseResponse = (
         }
         continue
       }
-      if (contentType === "text/event-stream" && streamEncoding !== "ndjson") {
+      if (contentType === "text/event-stream") {
         return true
       }
     }

@@ -125,8 +125,6 @@ type FlagRegistry = {
   readonly params: ReadonlyArray<FlagParam>
   /** Maps canonical names and aliases → flag param */
   readonly index: Map<string, FlagParam>
-  /** Maps negated names of boolean flags → flag param */
-  readonly negations: Map<string, FlagParam>
 }
 
 /**
@@ -232,21 +230,11 @@ const makeCursor = (tokens: ReadonlyArray<Token>): TokenCursor => {
 /* ========================================================================== */
 
 /**
- * Long name that sets a boolean flag to `false`, or `undefined` when the flag
- * has no negated form.
- */
-const negatedName = (param: FlagParam): string | undefined =>
-  !Primitive.isBoolean(param.primitiveType) || param.negation === false
-    ? undefined
-    : param.negation ?? `no-${param.name}`
-
-/**
  * Creates a registry for O(1) flag lookup by name or alias.
  * @internal
  */
 export const createFlagRegistry = (params: ReadonlyArray<FlagParam>): FlagRegistry => {
   const index = new Map<string, FlagParam>()
-  const negations = new Map<string, FlagParam>()
 
   for (const param of params) {
     if (index.has(param.name)) {
@@ -262,19 +250,9 @@ export const createFlagRegistry = (params: ReadonlyArray<FlagParam>): FlagRegist
       }
       index.set(alias, param)
     }
-
-    const negation = negatedName(param)
-    if (negation !== undefined) {
-      if (negations.has(negation)) {
-        throw new Error(
-          `Duplicate negation "${negation}" in command definition (conflicts with "${negations.get(negation)!.name}")`
-        )
-      }
-      negations.set(negation, param)
-    }
   }
 
-  return { params, index, negations }
+  return { params, index }
 }
 
 const buildSubcommandIndex = (
@@ -384,11 +362,14 @@ const resolveFlag = (
     }
   }
 
-  const negated = token._tag === "LongOption" ? registry.negations.get(token.name) : undefined
-  if (negated) {
-    return {
-      param: negated,
-      negated: true
+  if (token._tag === "LongOption" && token.name.startsWith("no-")) {
+    const canonicalName = token.name.slice(3)
+    const param = registry.index.get(canonicalName)
+    if (param && param.name === canonicalName && Primitive.isBoolean(param.primitiveType)) {
+      return {
+        param,
+        negated: true
+      }
     }
   }
 
@@ -759,9 +740,8 @@ const createUnrecognizedFlagError = (
     // that was intentionally kept out of --help.
     if (p.hidden) continue
     validNames.push(p.name)
-    const negation = negatedName(p)
-    if (negation !== undefined) {
-      validNames.push(negation)
+    if (Primitive.isBoolean(p.primitiveType)) {
+      validNames.push(`no-${p.name}`)
     }
     for (const alias of p.aliases) {
       validNames.push(alias)

@@ -5,12 +5,10 @@ were memoized / deduplicated within a single `Effect.provide` call, but would
 **not** be shared across separate calls — so two `Effect.provide` calls with
 overlapping layers would silently build those layers twice.
 
-In v4, a layer already built by an enclosing `Effect.provide` or runtime is
-reused by nested `Effect.provide` calls. Each call forks the ambient `MemoMap`: it
-can reuse parent entries, but newly built layers are not written back to the
-parent. Sibling `Effect.provide` calls therefore build their own copies, just as
-in v3. Use `{ local: true }` to build a fresh layer subtree without reusing the
-enclosing memo map.
+In v4, the underlying `MemoMap` data structure which facilitates memoization of
+`Layer`s is shared between `Effect.provide` calls (unless explicitly disabled
+via the `{ local: true }` option). Thus, layers are automatically memoized /
+deduplicated across `Effect.provide` calls.
 
 ## Example
 
@@ -32,7 +30,7 @@ const program = Effect.gen(function*() {
   return a.value
 })
 
-// Same layer provided twice in nested provide calls
+// Same layer provided twice in separate provide calls
 const main = program.pipe(
   Effect.provide(MyServiceLayer),
   Effect.provide(MyServiceLayer)
@@ -43,23 +41,10 @@ const main = program.pipe(
 Effect.runPromise(main)
 ```
 
-The calls above are nested, not siblings. In contrast, the following builds
-`MyServiceLayer` twice in v4 when no enclosing provide or runtime has already
-built it:
+## Prefer Layer Composition Over Multipl Provides
 
-```ts
-const siblings = Effect.gen(function*() {
-  yield* program.pipe(Effect.provide(MyServiceLayer))
-  yield* program.pipe(Effect.provide(MyServiceLayer))
-})
-
-Effect.runPromise(siblings) // "Building MyService" is logged TWICE
-```
-
-## Prefer Layer Composition Over Multiple Provides
-
-Even though nested v4 `provide` calls reuse already-built layers, **composing
-layers before providing is still the recommended pattern**. Layer composition makes your
+Even though v4 memoizes across `provide` calls, **composing layers before
+providing is still the recommended pattern**. Layer composition makes your
 dependency graph explicit and lets you see the full structure in one place:
 
 ```ts
@@ -67,8 +52,9 @@ dependency graph explicit and lets you see the full structure in one place:
 const main = program.pipe(Effect.provide(MyServiceLayer))
 ```
 
-Reusing enclosing layers is **not** a substitute for proper layer composition
-and does not deduplicate independent sibling builds.
+The auto-memoization feature is a safety net to avoid the footguns associated
+with multiple `Effect.provide` calls present in v3. It is **NOT** a substitute
+for proper layer composition.
 
 ## Opting Out of Shared Memoization
 
@@ -94,16 +80,15 @@ const main = program.pipe(
 ### `Effect.provide` with `{ local: true }`
 
 New in v4. Builds the provided layer with a **local memo map** instead of the
-fiber's ambient one. The layer and all its sublayers are built from scratch,
-without reusing layers built by an enclosing `provide` or runtime. Nested
-`provide` calls can still reuse layers built in this local map.
+fiber's shared one. The layer and all its sublayers are built from scratch and
+are not shared with other `provide` calls.
 
 ```ts
 import { Effect } from "effect"
 
 const main = program.pipe(
-  Effect.provide(MyServiceLayer, { local: true }),
-  Effect.provide(MyServiceLayer)
+  Effect.provide(MyServiceLayer),
+  Effect.provide(MyServiceLayer, { local: true })
 )
 // "Building MyService" is logged TWICE — local creates its own memo map
 ```

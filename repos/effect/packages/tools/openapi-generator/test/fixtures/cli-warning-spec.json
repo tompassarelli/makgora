@@ -16,10 +16,18 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "default": {
+          "200": {
             "description": "User response",
             "content": {
               "application/json": {

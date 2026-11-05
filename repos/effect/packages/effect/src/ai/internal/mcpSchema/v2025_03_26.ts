@@ -21,8 +21,6 @@ export const protocolVersion = "2025-03-26"
 
 const optional = Previous.optional
 
-const UnknownObject = Previous.UnknownObject
-
 /**
  * @internal
  */
@@ -188,7 +186,7 @@ export class CallTool extends Rpc.make("tools/call", {
   payload: {
     ...Previous.RequestMeta.fields,
     name: Schema.String,
-    arguments: optional(UnknownObject)
+    arguments: optional(Schema.JsonObject)
   }
 }) {}
 
@@ -207,7 +205,7 @@ export class CreateMessage extends Rpc.make("sampling/createMessage", {
     temperature: optional(Schema.Finite),
     maxTokens: Schema.Finite,
     stopSequences: optional(Schema.Array(Schema.String)),
-    metadata: optional(UnknownObject)
+    metadata: optional(Schema.JsonObject)
   }
 }) {}
 

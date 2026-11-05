@@ -886,10 +886,11 @@ describe("Pool", () => {
         strategy: {
           run: () => Effect.void,
           reclaim: () => Effect.undefined,
-          onAcquire: Effect.fnUntraced(function*(item) {
-            callbacks++
-            if (Exit.isSuccess(item.exit)) yield* Deferred.succeed(replacementAcquired, undefined)
-          })
+          onAcquire: (item) =>
+            Effect.gen(function*() {
+              callbacks++
+              if (Exit.isSuccess(item.exit)) yield* Deferred.succeed(replacementAcquired, undefined)
+            })
         }
       })
       yield* Effect.addFinalizer(() => Deferred.succeed(resumeCleanup, undefined))

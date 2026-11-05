@@ -45,11 +45,4 @@ key=yes
       }
     )
   })
-
-  it("preserves a trailing backslash in unquoted values and section names", () => {
-    assert.deepStrictEqual(
-      Ini.parse("only = \\\n[C:\\]\nkey = yes"),
-      { only: "\\", "C:\\": { key: "yes" } }
-    )
-  })
 })

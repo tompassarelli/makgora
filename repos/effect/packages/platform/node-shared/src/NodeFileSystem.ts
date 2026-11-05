@@ -558,7 +558,7 @@ const readLink = (() => {
 
 const realPath = (() => {
   const nodeRealPath = effectify(
-    process.platform === "win32" ? NFS.realpath.native : NFS.realpath,
+    NFS.realpath,
     handleErrnoException("FileSystem", "realPath"),
     handleBadArgument("realPath")
   )
@@ -578,10 +578,7 @@ const rename = (() => {
 
 // == stat
 
-const makeFileInfo = (
-  stat: NFS.BigIntStats,
-  method = "stat"
-): Effect.Effect<FileSystem.File.Info, Error.PlatformError> =>
+const makeFileInfo = (stat: NFS.BigIntStats): Effect.Effect<FileSystem.File.Info, Error.PlatformError> =>
   Effect.try({
     try: (): FileSystem.File.Info => ({
       type: stat.isFile() ?
@@ -613,18 +610,16 @@ const makeFileInfo = (
       blksize: stat.blksize !== undefined ? Option.some(ByteSize.bytes(stat.blksize)) : Option.none(),
       blocks: Option.fromNullishOr(stat.blocks)
     }),
-    catch: handleBadArgument(method)
+    catch: handleBadArgument("stat")
   })
-const statFactory = (method: string, nodeStatFn: typeof NFS.stat) => {
+const stat = (() => {
   const nodeStat = effectify(
-    nodeStatFn,
-    handleErrnoException("FileSystem", method),
-    handleBadArgument(method)
+    NFS.stat,
+    handleErrnoException("FileSystem", "stat"),
+    handleBadArgument("stat")
   )
-  return (path: string) => Effect.flatMap(nodeStat(path, { bigint: true }), (stat) => makeFileInfo(stat, method))
-}
-const stat = statFactory("stat", NFS.stat)
-const lstat = statFactory("lstat", NFS.lstat)
+  return (path: string) => Effect.flatMap(nodeStat(path, { bigint: true }), makeFileInfo)
+})()
 
 // == symlink
 
@@ -752,7 +747,6 @@ const makeFileSystem = Effect.map(Effect.serviceOption(FileSystem.WatchBackend),
     copyFile,
     glob,
     link,
-    lstat,
     makeDirectory,
     makeTempDirectory,
     makeTempDirectoryScoped,

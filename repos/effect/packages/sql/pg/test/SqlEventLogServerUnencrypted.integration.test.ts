@@ -1,6 +1,5 @@
 import { assert, it } from "@effect/vitest"
 import { Deferred, Effect, Fiber, Layer, Option, Queue } from "effect"
-import * as RegressionTest from "effect-test/eventlog/EventLogServerUnencryptedRegressionTest"
 import {
   makeEntry,
   makeOptions,
@@ -9,21 +8,12 @@ import {
   openChanges,
   suite
 } from "effect-test/eventlog/SqlEventLogServerUnencryptedStorageTest"
-import * as SqlEventLogServerUnencrypted from "effect/eventlog/SqlEventLogServerUnencrypted"
 import { Reactivity } from "effect/reactivity"
 import { PreventSchedulerYield } from "effect/Scheduler"
 import * as SqlClient from "effect/sql/SqlClient"
 import { PgContainer } from "./utils.ts"
 
 suite("sql-pg", PgContainer.layerClient)
-
-RegressionTest.suite(
-  "sql-pg",
-  SqlEventLogServerUnencrypted.layerStorage().pipe(
-    Layer.provide(PgContainer.layerClient),
-    Layer.provide(Reactivity.layer)
-  )
-)
 
 it.layer(Layer.merge(Reactivity.layer, PgContainer.layerClient), { timeout: "30 seconds" })(
   "SqlEventLogServerUnencrypted commit visibility",

@@ -1,38 +1,14 @@
 /**
  * Node.js implementation of the Effect `HttpServer`.
  *
- * This module adapts a supplied Node `http.Server` or `node:http2` server into
- * Effect's platform-independent HTTP server service. It starts the server with
- * Node `listen` options, converts `request` events into `HttpServerRequest`
- * values, writes `HttpServerResponse` bodies through Node's `ServerResponse`,
- * and handles `upgrade` events by exposing the upgraded socket through
+ * This module adapts a supplied Node `http.Server` into Effect's
+ * platform-independent HTTP server service. It starts the server with Node
+ * `listen` options, converts `request` events into `HttpServerRequest` values,
+ * writes `HttpServerResponse` bodies through Node's `ServerResponse`, and
+ * handles `upgrade` events by exposing the upgraded socket through
  * `HttpServerRequest.upgrade`. It also exports request and upgrade handler
  * constructors plus layers for the server alone, HTTP support services, the
  * combined server, configurable options, and tests.
- *
- * **HTTP/2**
- *
- * Pass `Http2.createServer()` for cleartext HTTP/2 (h2c), or
- * `Http2.createSecureServer({ key, cert, allowHTTP1: true })` to negotiate
- * HTTP/2 over TLS and fall back to HTTP/1.1 for clients that do not support
- * it. The protocol is detected per request, so the application sees the same
- * `HttpServerRequest` either way:
- *
- * - pseudo-headers are removed from `headers`, and `host` is taken from
- *   `:authority`
- * - `originalUrl` and `HttpServerRequest.toURL` use the `:scheme` the client
- *   sent, which a client can set as freely as `x-forwarded-proto`
- * - connection-specific response headers that HTTP/2 forbids, such as
- *   `connection`, `keep-alive` and `transfer-encoding`, are dropped silently
- * - a response that fails after its headers were sent resets the stream with
- *   `INTERNAL_ERROR`, so clients do not mistake a truncated body for a
- *   complete one
- *
- * WebSockets and other upgrades only work over HTTP/1.1, which needs
- * `allowHTTP1` on a TLS server. Trailers are only available through the Node
- * objects from `NodeHttpServerRequest`. Tune HTTP/2 limits, such as
- * `maxSessionMemory` and `settings.maxConcurrentStreams`, through the Node
- * server options.
  *
  * @stability unstable
  * @since 4.0.0
@@ -80,21 +56,16 @@ import type * as Record from "effect/Record"
 import * as Scope from "effect/Scope"
 import * as Socket from "effect/socket/Socket"
 import * as Stream from "effect/Stream"
-import type * as Http from "node:http"
-import type * as Http2 from "node:http2"
+import * as Http from "node:http"
 import type * as Net from "node:net"
 import type { Duplex } from "node:stream"
-import { Readable, Transform } from "node:stream"
+import { Readable } from "node:stream"
 import { pipeline } from "node:stream/promises"
-import type * as Tls from "node:tls"
-import { http } from "./internal/http.ts"
-import * as Upgrade from "./internal/upgrade.ts"
 import { NodeHttpIncomingMessage } from "./NodeHttpIncomingMessage.ts"
 import * as NodeHttpPlatform from "./NodeHttpPlatform.ts"
 import * as NodeMultipart from "./NodeMultipart.ts"
 import * as NodeServices from "./NodeServices.ts"
 import { NodeWS } from "./NodeSocket.ts"
-import * as NodeStream from "./NodeStream.ts"
 
 /**
  * Options accepted by the Node `HttpServer` constructors and layers.
@@ -120,34 +91,20 @@ export interface Options extends Net.ListenOptions {
 }
 
 /**
- * Creates a scoped `HttpServer` from a Node `http.Server` or `node:http2`
- * server, starts listening with the supplied options, registers request and
- * upgrade handling, and closes the server during scope finalization with
- * optional graceful-shutdown control.
+ * Creates a scoped `HttpServer` from a Node `http.Server`, starts listening
+ * with the supplied options, registers request and upgrade handling, and closes
+ * the server during scope finalization with optional graceful-shutdown control.
  *
  * @stability unstable
  * @category constructors
  * @since 4.0.0
  */
 export const make = Effect.fnUntraced(function*(
-  evaluate: LazyArg<Http.Server | Http2.Http2Server | Http2.Http2SecureServer>,
+  evaluate: LazyArg<Http.Server>,
   options: Options
 ) {
   const scope = yield* Effect.scope
-  // The members used here exist on every server kind, with listener types that differ per kind.
-  const server = evaluate() as Http.Server
-
-  // Node 22 `close` waits for idle HTTP/2 sessions, and no version closes a session whose TLS
-  // handshake finishes after `close`. Closing them still lets open streams finish.
-  let closing = false
-  const sessions = new Set<Http2.ServerHttp2Session>()
-  server.on("session", (session: Http2.ServerHttp2Session) => {
-    if (closing) {
-      return session.close()
-    }
-    sessions.add(session)
-    session.once("close", () => sessions.delete(session))
-  })
+  const server = evaluate()
 
   const shutdown = yield* Effect.callback<void>((resume) => {
     if (!server.listening) {
@@ -160,10 +117,6 @@ export const make = Effect.fnUntraced(function*(
         resume(Effect.void)
       }
     })
-    closing = true
-    for (const session of sessions) {
-      session.close()
-    }
   }).pipe(Effect.cached)
 
   const preemptiveShutdown = options.disablePreemptiveShutdown ?
@@ -218,21 +171,15 @@ export const make = Effect.fnUntraced(function*(
         middleware: middleware as any,
         scope
       })
-      const checkContinueHandler = (request: Http.IncomingMessage, response: Http.ServerResponse) => {
-        pendingContinue.add(request)
-        handler(request, response)
-      }
       yield* Scope.addFinalizerExit(serveScope, () =>
         Effect.ensuring(
           preemptiveShutdown,
           Effect.sync(() => {
             server.off("request", handler)
-            server.off("checkContinue", checkContinueHandler)
             server.off("upgrade", upgradeHandler)
           })
         ))
       server.on("request", handler)
-      server.on("checkContinue", checkContinueHandler)
       server.on("upgrade", upgradeHandler)
     })
   })
@@ -241,8 +188,7 @@ export const make = Effect.fnUntraced(function*(
 /**
  * Creates a Node `request` event handler for an Effect HTTP application,
  * injecting a `HttpServerRequest` and interrupting the request fiber if the
- * client closes the response before it finishes. It accepts both HTTP/1.1 and
- * HTTP/2 compatibility requests.
+ * client closes the response before it finishes.
  *
  * @stability unstable
  * @category handlers
@@ -259,10 +205,7 @@ export const makeHandler = <
     readonly middleware?: Middleware.HttpMiddleware.Applied<App, E, R> | undefined
   }
 ): Effect.Effect<
-  (
-    nodeRequest: Http.IncomingMessage | Http2.Http2ServerRequest,
-    nodeResponse: Http.ServerResponse | Http2.Http2ServerResponse
-  ) => void,
+  (nodeRequest: Http.IncomingMessage, nodeResponse: Http.ServerResponse) => void,
   never,
   Exclude<Effect.Services<App>, HttpServerRequest | Scope.Scope>
 > => {
@@ -270,16 +213,9 @@ export const makeHandler = <
   return Effect.withFiber((parent) => {
     const services = parent.context
     return Effect.succeed(function handler(
-      request: Http.IncomingMessage | Http2.Http2ServerRequest,
-      response: Http.ServerResponse | Http2.Http2ServerResponse
+      nodeRequest: Http.IncomingMessage,
+      nodeResponse: Http.ServerResponse
     ) {
-      // The HTTP/2 compatibility API mirrors the members the adapter uses.
-      const nodeRequest = request as Http.IncomingMessage
-      const nodeResponse = response as Http.ServerResponse
-      if (nodeRequest.httpVersionMajor === 1) {
-        // Prepended so it runs before Node's own `finish` listener drains or destroys.
-        nodeResponse.prependListener("finish", () => teardownBody(nodeRequest, nodeResponse))
-      }
       const context = Context.add(services, HttpServerRequest, new ServerRequestImpl(nodeRequest, nodeResponse))
       const fiber = Fiber.runIn(Effect.runForkWith(context as Context.Context<any>)(handled), options.scope)
       if (fiber.pollUnsafe() === undefined) {
@@ -295,17 +231,8 @@ export const makeHandler = <
 
 /**
  * Creates a Node `upgrade` event handler for an Effect HTTP application,
- * exposing the upgraded connection as the request's `upgrade` effect and
+ * exposing the upgraded WebSocket as the request's `upgrade` effect and
  * interrupting the request fiber when the socket closes early.
- *
- * **Details**
- *
- * `Upgrade: websocket` requests complete the WebSocket handshake. Any other
- * protocol answers `101 Switching Protocols` with the requested protocol and
- * exposes the raw connection, with bytes the client sent after the request
- * head first on the reader. Either response is sent when the socket's reader
- * is acquired. A handler that never asks for `upgrade` answers with its
- * response as usual.
  *
  * @stability unstable
  * @category handlers
@@ -338,7 +265,7 @@ export const makeUpgradeHandler = <
       let nodeResponse_: Http.ServerResponse | undefined = undefined
       const nodeResponse = () => {
         if (nodeResponse_ === undefined) {
-          nodeResponse_ = new http.ServerResponse(nodeRequest)
+          nodeResponse_ = new Http.ServerResponse(nodeRequest)
           if (request.upgraded || socket.destroyed) {
             // End without assigning the socket so handleResponse skips HTTP writes.
             nodeResponse_.end()
@@ -351,7 +278,7 @@ export const makeUpgradeHandler = <
         }
         return nodeResponse_
       }
-      const webSocketUpgrade = Socket.fromWebSocket(Effect.flatMap(
+      const upgradeEffect = Socket.fromWebSocket(Effect.flatMap(
         lazyWss,
         (wss) =>
           Effect.acquireRelease(
@@ -377,16 +304,6 @@ export const makeUpgradeHandler = <
             (ws, exit) => Effect.sync(() => ws.close(closeCode(exit)))
           )
       ))
-      const protocol = nodeRequest.headers.upgrade
-      const upgradeEffect = protocol === undefined || protocol.toLowerCase() === "websocket" ?
-        webSocketUpgrade :
-        Upgrade.toSocket(socket, () => {
-          if (request.upgraded) return
-          request.upgraded = true
-          if (head.length > 0) socket.unshift(head)
-          // Node rejects CR/LF in header values, so protocol cannot inject response headers.
-          socket.write(`HTTP/1.1 101 Switching Protocols\r\nConnection: Upgrade\r\nUpgrade: ${protocol}\r\n\r\n`)
-        })
       const request = new ServerRequestImpl(nodeRequest, nodeResponse, upgradeEffect)
       const context = Context.add(services, HttpServerRequest, request)
       const fiber = Fiber.runIn(Effect.runForkWith(context as Context.Context<any>)(handledApp), options.scope)
@@ -400,96 +317,34 @@ export const makeUpgradeHandler = <
   })
 }
 
-const isHttp2 = (request: Http.IncomingMessage | undefined): boolean => request?.httpVersionMajor === 2
-
-// HTTP/2 sends the authority as `:authority`, which takes precedence over a Host header.
-// Pseudo-headers are not valid header names elsewhere, such as in a web `Request`.
-const requestHeaders = (source: Http.IncomingMessage): Http.IncomingHttpHeaders => {
-  if (!isHttp2(source)) {
-    return source.headers
-  }
-  const headers: Http.IncomingHttpHeaders = {}
-  for (const name in source.headers) {
-    if (name[0] !== ":") headers[name] = source.headers[name]
-  }
-  const authority = source.headers[":authority"]
-  if (typeof authority === "string") headers.host = authority
-  return headers
-}
-
-const absoluteTarget = (url: string): URL | undefined => {
-  if (!/^https?:\/\//i.test(url)) {
-    return undefined
-  }
-  try {
-    return new URL(url)
-  } catch {
-    return undefined
-  }
-}
-
-// Requests dispatched by our checkContinue listener that have not been
-// acknowledged yet. Standalone makeHandler users leave acknowledgement to Node
-// or their own listener. Keyed by the Node request so modified requests share
-// the entry and body readers acknowledge only once.
-const pendingContinue = new WeakSet<Http.IncomingMessage>()
-
-// Body bytes pulled through `stream`, shared by modified requests.
-const bodyBytesRead = new WeakMap<Http.IncomingMessage, number>()
-
 class ServerRequestImpl extends NodeHttpIncomingMessage<HttpServerError> implements HttpServerRequest {
-  protected override readonly destroyOnOverflow = false
-  // The adapter tears the body down after the response instead.
-  protected override readonly closeOnDone = false
   readonly [Request.TypeId]: typeof Request.TypeId
   readonly response: Http.ServerResponse | LazyArg<Http.ServerResponse>
   private upgradeEffect?: Effect.Effect<Socket.Socket, HttpServerError> | undefined
   upgraded = false
   readonly url: string
   private headersOverride?: Headers.Headers | undefined
-  private peerAddressOverride?: Option.Option<string> | undefined
-  readonly protocol: "http" | "https" | undefined
 
   constructor(
     source: Http.IncomingMessage,
     response: Http.ServerResponse | LazyArg<Http.ServerResponse>,
     upgradeEffect?: Effect.Effect<Socket.Socket, HttpServerError>,
-    url?: string,
+    url = source.url!,
     headersOverride?: Headers.Headers,
-    remoteAddressOverride?: Option.Option<string>,
-    peerAddressOverride?: Option.Option<string>,
-    protocol?: "http" | "https"
+    remoteAddressOverride?: Option.Option<string>
   ) {
     super(source, (cause) =>
       new HttpServerError({
         reason: new RequestParseError({
           request: this,
-          reason: cause instanceof NodeStream.MaxBytesError ? "BodyTooLarge" : "Parse",
           cause
         })
       }), remoteAddressOverride)
     this[Request.TypeId] = Request.TypeId
     this.response = response
     this.upgradeEffect = upgradeEffect
-    if (url === undefined) {
-      const target = absoluteTarget(source.url!)
-      if (target === undefined) {
-        url = source.url!
-      } else {
-        // RFC 9112 §3.2.2: the request-target authority takes precedence over Host.
-        url = target.pathname + target.search
-        const headers: Http.IncomingHttpHeaders = { ...requestHeaders(source), host: target.host }
-        headersOverride = headers as Headers.Headers
-      }
-    }
     this.url = url
     this.headersOverride = headersOverride
-    this.peerAddressOverride = peerAddressOverride
-    this.protocol = protocol
-  }
-
-  get peerAddress(): Option.Option<string> {
-    return this.peerAddressOverride ?? this.remoteAddress
   }
 
   private cachedCookies: Record.ReadonlyRecord<string, string> | undefined
@@ -504,39 +359,11 @@ class ServerRequestImpl extends NodeHttpIncomingMessage<HttpServerError> impleme
     return typeof this.response === "function" ? this.response() : this.response
   }
 
-  private writeContinue(): void {
-    if (pendingContinue.delete(this.source) && !this.resolvedResponse.headersSent) {
-      this.resolvedResponse.writeContinue()
-    }
-  }
-
-  override get stream(): Stream.Stream<Uint8Array, HttpServerError> {
-    return Stream.suspend(() => {
-      this.writeContinue()
-      const source = this.source
-      return Stream.mapArray(super.stream, (chunk) => {
-        let bytes = bodyBytesRead.get(source) ?? 0
-        for (const item of chunk) bytes += item.length
-        bodyBytesRead.set(source, bytes)
-        return chunk
-      })
-    })
-  }
-
-  override get arrayBuffer(): Effect.Effect<ArrayBuffer, HttpServerError> {
-    return Effect.suspend(() => {
-      this.writeContinue()
-      return super.arrayBuffer
-    })
-  }
-
   modify(
     options: {
       readonly url?: string | undefined
       readonly headers?: Headers.Headers | undefined
       readonly remoteAddress?: Option.Option<string> | undefined
-      readonly peerAddress?: Option.Option<string> | undefined
-      readonly protocol?: "http" | "https" | undefined
     }
   ) {
     return new ServerRequestImpl(
@@ -545,24 +372,12 @@ class ServerRequestImpl extends NodeHttpIncomingMessage<HttpServerError> impleme
       this.upgradeEffect,
       options.url ?? this.url,
       options.headers ?? this.headersOverride,
-      "remoteAddress" in options ? options.remoteAddress : this.remoteAddressOverride,
-      options.peerAddress ?? this.peerAddressOverride,
-      options.protocol ?? this.protocol
+      "remoteAddress" in options ? options.remoteAddress : this.remoteAddressOverride
     )
   }
 
   get originalUrl(): string {
-    const url = this.source.url!
-    const headers = this.source.headers as Http2.IncomingHttpHeaders
-    const http2 = isHttp2(this.source)
-    const host = (http2 ? headers[":authority"] : undefined) ?? headers.host
-    if (url[0] !== "/" || host === undefined) {
-      return url
-    }
-    // `:scheme` is the target URI scheme, which also covers h2c behind a TLS terminator
-    const scheme = http2 ? headers[":scheme"] : undefined
-    const encrypted = (this.source.socket as Tls.TLSSocket | undefined)?.encrypted
-    return `${scheme ?? (encrypted ? "https" : "http")}://${host}${url}`
+    return this.source.url!
   }
 
   private cachedMethod: HttpMethod | undefined
@@ -571,7 +386,7 @@ class ServerRequestImpl extends NodeHttpIncomingMessage<HttpServerError> impleme
   }
 
   override get headers(): Headers.Headers {
-    this.headersOverride ??= requestHeaders(this.source) as Headers.Headers
+    this.headersOverride ??= this.source.headers as Headers.Headers
     return this.headersOverride
   }
 
@@ -591,19 +406,13 @@ class ServerRequestImpl extends NodeHttpIncomingMessage<HttpServerError> impleme
       return this.multipartEffect
     }
     this.multipartEffect = Effect.runSync(Effect.cached(
-      Effect.suspend(() => {
-        this.writeContinue()
-        return NodeMultipart.persisted(this.source, this.source.headers)
-      })
+      NodeMultipart.persisted(this.source, this.source.headers)
     ))
     return this.multipartEffect
   }
 
   get multipartStream(): Stream.Stream<Multipart.Part, Multipart.MultipartError> {
-    return Stream.suspend(() => {
-      this.writeContinue()
-      return NodeMultipart.stream(this.source, this.source.headers)
-    })
+    return NodeMultipart.stream(this.source, this.source.headers)
   }
 
   get upgrade(): Effect.Effect<Socket.Socket, HttpServerError> {
@@ -632,15 +441,14 @@ class ServerRequestImpl extends NodeHttpIncomingMessage<HttpServerError> impleme
 
 /**
  * Provides an `HttpServer` by creating and managing a scoped Node
- * `http.Server` or `node:http2` server with the supplied listen and shutdown
- * options.
+ * `http.Server` with the supplied listen and shutdown options.
  *
  * @stability unstable
  * @category layers
  * @since 4.0.0
  */
 export const layerServer: (
-  evaluate: LazyArg<Http.Server | Http2.Http2Server | Http2.Http2SecureServer>,
+  evaluate: LazyArg<Http.Server<typeof Http.IncomingMessage, typeof Http.ServerResponse>>,
   options: Options
 ) => Layer.Layer<HttpServer.HttpServer, ServeError> = flow(make, Layer.effect(HttpServer.HttpServer))
 
@@ -669,7 +477,7 @@ export const layerHttpServices: Layer.Layer<
  * @since 4.0.0
  */
 export const layer = (
-  evaluate: LazyArg<Http.Server | Http2.Http2Server | Http2.Http2SecureServer>,
+  evaluate: LazyArg<Http.Server>,
   options: Options
 ): Layer.Layer<
   HttpServer.HttpServer | NodeServices.NodeServices | HttpPlatform.HttpPlatform | Etag.Generator,
@@ -690,7 +498,7 @@ export const layer = (
  * @since 4.0.0
  */
 export const layerConfig = (
-  evaluate: LazyArg<Http.Server | Http2.Http2Server | Http2.Http2SecureServer>,
+  evaluate: LazyArg<Http.Server>,
   options: Config.Wrap<Options>
 ): Layer.Layer<
   HttpServer.HttpServer | NodeServices.NodeServices | HttpPlatform.HttpPlatform | Etag.Generator,
@@ -726,7 +534,7 @@ export const layerTest: Layer.Layer<
       Layer.provide(Layer.succeed(FetchHttpClient.RequestInit)({ keepalive: false }))
     )
   ),
-  Layer.provideMerge(layer(http.createServer, { port: 0 }))
+  Layer.provideMerge(layer(Http.createServer, { port: 0 }))
 )
 
 // -----------------------------------------------------------------------------
@@ -752,10 +560,6 @@ const handleResponse = (
   }
 
   let headers: Record<string, string | Array<string>> = response.headers
-  if (response.status === 204 || response.status === 205) {
-    const { "content-length": _, ...rest } = headers
-    headers = rest
-  }
   if (!Cookies.isEmpty(response.cookies)) {
     headers = { ...headers }
     const toSet = Cookies.toSetCookieHeaders(response.cookies)
@@ -765,25 +569,8 @@ const handleResponse = (
     headers["set-cookie"] = toSet
   }
 
-  try {
-    return writeResponse(request, response, nodeResponse, headers)
-  } catch (defect) {
-    // `writeHead` throws synchronously on headers Node rejects and on statuses outside 200-599
-    return Effect.andThen(
-      cancelResponseBody(response.body),
-      handleCause(nodeResponse, response)(Cause.die(defect))
-    )
-  }
-}
-
-const writeResponse = (
-  request: HttpServerRequest,
-  response: HttpServerResponse,
-  nodeResponse: Http.ServerResponse,
-  headers: Record<string, string | Array<string>>
-): Effect.Effect<unknown, HttpServerError> => {
   if (request.method === "HEAD") {
-    writeHead(nodeResponse, response, headers)
+    nodeResponse.writeHead(response.status, response.statusText, headers)
     return Effect.andThen(
       cancelResponseBody(response.body),
       Effect.callback<void>((resume) => {
@@ -799,25 +586,21 @@ const writeResponse = (
       })
     )
   }
-  if (Response.omitsBody(response)) {
-    writeHead(nodeResponse, response, headers)
-    nodeResponse.end()
-    return cancelResponseBody(response.body)
-  }
-  nodeResponse.strictContentLength = true
   const body = response.body
   switch (body._tag) {
     case "Empty": {
-      writeHead(nodeResponse, response, headers)
-      return end(nodeResponse, response)
+      nodeResponse.writeHead(response.status, response.statusText, headers)
+      nodeResponse.end()
+      return Effect.void
     }
     case "Raw": {
-      const piped = typeof body.body === "object" && body.body !== null && "pipe" in body.body &&
+      nodeResponse.writeHead(response.status, response.statusText, headers)
+      if (
+        typeof body.body === "object" && body.body !== null && "pipe" in body.body &&
         typeof body.body.pipe === "function"
-      writeHead(nodeResponse, response, headers, piped)
-      if (piped) {
+      ) {
         return Effect.tryPromise({
-          try: (signal) => pipeTo(body.body as Readable, nodeResponse, headers, signal),
+          try: (signal) => pipeline(body.body as any, nodeResponse, { signal, end: true }),
           catch: (cause) =>
             new HttpServerError({
               reason: new ResponseError({
@@ -834,41 +617,53 @@ const writeResponse = (
       }
       return Effect.callback<void>((resume) => {
         nodeResponse.end(body.body, () => resume(Effect.void))
-      }).pipe(Effect.tapCause(handleCause(nodeResponse, response)))
+      })
     }
     case "Uint8Array": {
-      writeHead(nodeResponse, response, headers)
+      nodeResponse.writeHead(response.status, response.statusText, headers)
       // If the body is less than 1MB, we skip the callback
       if (body.contentLength < 1024 * 1024) {
         // Writing text directly lets Node flush headers and body together.
-        return end(nodeResponse, response, body.text ?? body.body)
+        nodeResponse.end(body.text ?? body.body)
+        return Effect.void
       }
       return Effect.callback<void>((resume) => {
         nodeResponse.end(body.text ?? body.body, () => resume(Effect.void))
-      }).pipe(Effect.tapCause(handleCause(nodeResponse, response)))
+      })
     }
     case "FormData": {
-      const r = new globalThis.Response(body.formData)
-      const formHeaders = { ...headers, ...Object.fromEntries(r.headers) }
-      writeHead(nodeResponse, response, formHeaders)
-      return Effect.tryPromise({
-        try: (signal) => pipeTo(Readable.fromWeb(r.body as any), nodeResponse, formHeaders, signal),
-        catch: (cause) =>
-          new HttpServerError({
-            reason: new ResponseError({
-              request,
-              response,
-              description: "Error writing FormData response",
-              cause
+      return Effect.suspend(() => {
+        const r = new globalThis.Response(body.formData)
+        nodeResponse.writeHead(response.status, response.statusText, {
+          ...headers,
+          ...Object.fromEntries(r.headers)
+        })
+        return Effect.callback<void, HttpServerError>((resume, signal) => {
+          Readable.fromWeb(r.body as any, { signal })
+            .pipe(nodeResponse)
+            .on("error", (cause) => {
+              resume(Effect.fail(
+                new HttpServerError({
+                  reason: new ResponseError({
+                    request,
+                    response,
+                    description: "Error writing FormData response",
+                    cause
+                  })
+                })
+              ))
             })
-          })
-      }).pipe(
-        Effect.interruptible,
-        Effect.tapCause(handleCause(nodeResponse, response))
-      )
+            .once("finish", () => {
+              resume(Effect.void)
+            })
+        }).pipe(
+          Effect.interruptible,
+          Effect.tapCause(handleCause(nodeResponse, response))
+        )
+      })
     }
     case "Stream": {
-      writeHead(nodeResponse, response, headers, true)
+      nodeResponse.writeHead(response.status, response.statusText, headers)
       const drainLatch = Latch.makeUnsafe()
       nodeResponse.on("drain", () => drainLatch.openUnsafe())
       return body.stream.pipe(
@@ -881,127 +676,12 @@ const writeResponse = (
         }),
         Effect.interruptible,
         Effect.matchCauseEffect({
-          onSuccess: () => end(nodeResponse, response),
+          onSuccess: () => Effect.sync(() => nodeResponse.end()),
           onFailure: handleCause(nodeResponse, response)
         })
       )
     }
   }
-}
-
-// On HTTP/1.1 Node sends a 1xx as an interim response, so the client never gets a final one
-const isFinalStatus = (status: number): boolean => status >= 200 && status <= 599
-
-const internalServerError = Response.empty({ status: 500 })
-
-const invalidStatusError = (status: number) => new RangeError(`Invalid final response status: ${status}`)
-
-const writeHead = (
-  nodeResponse: Http.ServerResponse,
-  response: HttpServerResponse,
-  headers: Record<string, string | Array<string>>,
-  streaming = false
-): void => {
-  if (!isFinalStatus(response.status)) {
-    throw invalidStatusError(response.status)
-  }
-  if (isHttp2(nodeResponse.req)) {
-    // HTTP/2 has no status message
-    nodeResponse.writeHead(response.status, withoutConnectionHeaders(headers))
-    return
-  }
-  nodeResponse.writeHead(
-    response.status,
-    response.statusText,
-    closesConnection(nodeResponse.req, streaming) ? { ...headers, connection: "close" } : headers
-  )
-}
-
-// RFC 9113 §8.2.2: HTTP/2 forbids connection-specific headers, and Node rejects them. They
-// mostly come from proxied HTTP/1.1 responses, so they are dropped rather than failing the response.
-const connectionHeaders = new Set([
-  "connection",
-  "keep-alive",
-  "proxy-connection",
-  "transfer-encoding",
-  "upgrade",
-  "http2-settings"
-])
-
-const withoutConnectionHeaders = (
-  headers: Record<string, string | Array<string>>
-): Record<string, string | Array<string>> => {
-  let result: Record<string, string | Array<string>> | undefined
-  for (const name in headers) {
-    if (connectionHeaders.has(name) || (name === "te" && headers[name] !== "trailers")) {
-      result ??= { ...headers }
-      delete result[name]
-    }
-  }
-  return result ?? headers
-}
-
-// Unread request body discarded after the response to keep the connection alive. Past this it closes.
-const maxDrainBytes = 256 * 1024
-
-// Time the client gets to read the response after the FIN, before a destroy can reset the connection.
-const closeGracePeriod = 500
-
-// Decided when the headers are written, while `Connection: close` can still be sent. A streaming
-// response may still read the body, so only a pending 100 Continue closes it here.
-const closesConnection = (request: Http.IncomingMessage | undefined, streaming: boolean): boolean => {
-  if (request === undefined || request.httpVersionMajor !== 1 || request.complete) {
-    return false
-  }
-  if (pendingContinue.has(request)) {
-    return true
-  }
-  const contentLength = request.headers["content-length"]
-  return !streaming && contentLength !== undefined &&
-    Number(contentLength) - (bodyBytesRead.get(request) ?? 0) > maxDrainBytes
-}
-
-// Node internals read by its own `finish` listener, which runs right after `teardownBody`.
-interface IncomingMessageInternals {
-  _consuming: boolean
-}
-interface ServerResponseInternals {
-  _last: boolean
-}
-
-// Node drains an untouched body in full, leaves a partly read one unread, and
-// destroys a closing socket as soon as the response is flushed, which resets the
-// connection while body bytes are queued and can lose the response.
-const teardownBody = (request: Http.IncomingMessage, response: Http.ServerResponse): void => {
-  if (request.complete || request.destroyed) {
-    return
-  }
-  const socket = request.socket
-  if ((response as unknown as ServerResponseInternals)._last) {
-    // Skips Node's `_dump`. Unlike `_dumped`, it keeps the parser applying backpressure.
-    ;(request as unknown as IncomingMessageInternals)._consuming = true
-    ;(response as unknown as ServerResponseInternals)._last = false
-    return closeSocket(socket)
-  }
-  let bytes = 0
-  request.on("data", (chunk: Buffer) => {
-    bytes += chunk.length
-    if (bytes > maxDrainBytes) {
-      // Pausing stops further `data` events, so this runs once.
-      request.pause()
-      closeSocket(socket)
-    }
-  })
-  request.resume()
-}
-
-const closeSocket = (socket: Net.Socket): void => {
-  if (socket.destroyed) {
-    return
-  }
-  socket.end()
-  const timer = setTimeout(() => socket.destroy(), closeGracePeriod)
-  socket.once("close", () => clearTimeout(timer))
 }
 
 const cancelResponseBody = (body: HttpServerResponse["body"]): Effect.Effect<void> => {
@@ -1012,48 +692,6 @@ const cancelResponseBody = (body: HttpServerResponse["body"]): Effect.Effect<voi
   return Effect.void
 }
 
-const end = (
-  nodeResponse: Http.ServerResponse,
-  response: HttpServerResponse,
-  chunk?: string | Uint8Array
-): Effect.Effect<void> => {
-  try {
-    nodeResponse.end(chunk)
-    return Effect.void
-  } catch (defect) {
-    return handleCause(nodeResponse, response)(Cause.die(defect))
-  }
-}
-
-// Check lengths before writing: Node's strictContentLength throws uncaught inside pipeline.
-const pipeTo = (
-  readable: Readable,
-  nodeResponse: Http.ServerResponse,
-  headers: Record<string, string | Array<string>>,
-  signal: AbortSignal
-): Promise<void> => {
-  const contentLength = headers["content-length"]
-  if (typeof contentLength !== "string") {
-    return pipeline(readable, nodeResponse, { signal })
-  }
-  let remaining = Number(contentLength)
-  const mismatch = () => new Error(`Response body doesn't match content-length of ${contentLength}`)
-  return pipeline(
-    readable,
-    new Transform({
-      transform(chunk: Buffer, _encoding, callback) {
-        remaining -= chunk.length
-        callback(remaining < 0 ? mismatch() : null, chunk)
-      },
-      flush(callback) {
-        callback(remaining > 0 ? mismatch() : null)
-      }
-    }),
-    nodeResponse,
-    { signal }
-  )
-}
-
 const handleCause = (
   nodeResponse: Http.ServerResponse,
   originalResponse: HttpServerResponse
@@ -1061,28 +699,11 @@ const handleCause = (
 <E>(originalCause: Cause.Cause<E>) =>
   Effect.flatMap(causeResponse(originalCause), ([response, cause]) => {
     const headersSent = nodeResponse.headersSent
-    let abort = headersSent
     if (!headersSent) {
-      if (!isFinalStatus(response.status)) {
-        cause = Cause.combine(cause, Cause.die(invalidStatusError(response.status)))
-        response = internalServerError
-      }
-      try {
-        writeHead(nodeResponse, response, {})
-      } catch {
-        // HTTP/2 keeps the headers of a rejected `writeHead`, so the fallback can throw too
-        abort = true
-      }
+      nodeResponse.writeHead(response.status, response.statusText)
     }
     if (!nodeResponse.writableEnded) {
-      // Ending a started response normally would make a partial body look complete
-      if (abort) {
-        // An error resets an HTTP/2 stream with INTERNAL_ERROR rather than NO_ERROR. On
-        // HTTP/1.1 it could reach `clientError` listeners, and the socket closes either way.
-        nodeResponse.destroy(isHttp2(nodeResponse.req) ? new Error("The response was aborted") : undefined)
-      } else {
-        nodeResponse.end()
-      }
+      nodeResponse.end()
     }
     return Effect.failCause(
       headersSent

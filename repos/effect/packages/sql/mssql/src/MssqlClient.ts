@@ -20,12 +20,11 @@ import * as Duration from "effect/Duration"
 import * as Effect from "effect/Effect"
 import { identity } from "effect/Function"
 import * as Layer from "effect/Layer"
-import * as Option from "effect/Option"
 import * as Pool from "effect/Pool"
 import * as Reactivity from "effect/reactivity/Reactivity"
 import * as Rec from "effect/Record"
 import * as Redacted from "effect/Redacted"
-import type * as Scope from "effect/Scope"
+import * as Scope from "effect/Scope"
 import * as Client from "effect/sql/SqlClient"
 import type { Connection } from "effect/sql/SqlConnection"
 import {
@@ -608,19 +607,15 @@ export const make = (
     )
 
     const transactionService = TransactionConnection(clientIdCounter++)
-    // Inside `withTransaction`, statements and procedures use its connection.
-    const getConnection = Effect.flatMap(
-      Effect.serviceOption(transactionService),
-      Option.match({
-        onNone: () => acquireConnection,
-        onSome: ([conn]) => Effect.succeed(conn)
-      })
-    )
 
     const withTransaction = Client.makeWithTransaction({
       transactionService,
       spanAttributes,
-      acquireConnection: (restore) => restore(acquireConnection),
+      acquireConnection: Effect.gen(function*() {
+        const scope = Scope.makeUnsafe()
+        const conn = yield* Scope.provide(acquireConnection, scope)
+        return [scope, conn] as const
+      }),
       begin: (conn) => conn.begin,
       savepoint: (conn, id) => conn.savepoint(`effect_sql_${id}`),
       commit: (conn) => conn.commit,
@@ -630,7 +625,6 @@ export const make = (
 
     return identity<MssqlClient>(Object.assign(
       yield* Client.make({
-        driver: "mssql",
         acquirer: acquireConnection,
         compiler,
         transactionService: transactionService as any,
@@ -652,9 +646,9 @@ export const make = (
           A
         >(
           procedure: Procedure.ProcedureWithValues<I, O, A>
-        ) => Effect.scoped(Effect.flatMap(getConnection, (_) => _.call(procedure, transformRows))),
+        ) => Effect.scoped(Effect.flatMap(acquireConnection, (_) => _.call(procedure, transformRows))),
         withoutTransforms() {
-          const statement = Statement.make(getConnection, compiler.withoutTransform, spanAttributes, undefined)
+          const statement = Statement.make(acquireConnection, compiler.withoutTransform, spanAttributes, undefined)
           const client = Object.assign(
             statement,
             this,
@@ -666,7 +660,7 @@ export const make = (
                 A
               >(
                 procedure: Procedure.ProcedureWithValues<I, O, A>
-              ) => Effect.scoped(Effect.flatMap(getConnection, (_) => _.call(procedure, undefined)))
+              ) => Effect.scoped(Effect.flatMap(acquireConnection, (_) => _.call(procedure, undefined)))
             }
           )
           ;(client as any).safe = client
