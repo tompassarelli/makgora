@@ -4,13 +4,15 @@ import { f32 } from "wisp/src/sim/f32";
 import type { FighterOriginalClip } from "./fighterOriginalClip";
 
 export const clips: readonly FighterOriginalClip[] = [
-  { modelPath: "war3mapImported\\OnyxiaTimelineBody-59939e4609904547eb80e141341df52c44df41c8fa3f8efcb4c604d4238212fd.mdx", startSeconds: f32(3.333), endSeconds: f32(4.667), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaTimelineBody-59939e4609904547eb80e141341df52c44df41c8fa3f8efcb4c604d4238212fd.mdx", startSeconds: f32(5.333), endSeconds: f32(8.333), looping: true, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaTimelineBody-59939e4609904547eb80e141341df52c44df41c8fa3f8efcb4c604d4238212fd.mdx", startSeconds: f32(17.333), endSeconds: f32(18.733), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaTimelineBody-59939e4609904547eb80e141341df52c44df41c8fa3f8efcb4c604d4238212fd.mdx", startSeconds: f32(19.9), endSeconds: f32(22.633), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaTimelineBody-59939e4609904547eb80e141341df52c44df41c8fa3f8efcb4c604d4238212fd.mdx", startSeconds: f32(45.167), endSeconds: f32(48.667), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaTimelineBody-59939e4609904547eb80e141341df52c44df41c8fa3f8efcb4c604d4238212fd.mdx", startSeconds: f32(170.31), endSeconds: f32(172.31), looping: false, timeline: true },
-  { modelPath: "war3mapImported\\OnyxiaTimelineBody-59939e4609904547eb80e141341df52c44df41c8fa3f8efcb4c604d4238212fd.mdx", startSeconds: f32(172.61), endSeconds: f32(174.61), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaTimelineBody-0073fbc25949b923a2ba6207149c8c4e7df1d8e0680bfa190ca888765f6f3e69.mdx", startSeconds: f32(3.333), endSeconds: f32(4.667), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaTimelineBody-0073fbc25949b923a2ba6207149c8c4e7df1d8e0680bfa190ca888765f6f3e69.mdx", startSeconds: f32(5.333), endSeconds: f32(8.333), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaTimelineBody-0073fbc25949b923a2ba6207149c8c4e7df1d8e0680bfa190ca888765f6f3e69.mdx", startSeconds: f32(17.333), endSeconds: f32(18.733), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaTimelineBody-0073fbc25949b923a2ba6207149c8c4e7df1d8e0680bfa190ca888765f6f3e69.mdx", startSeconds: f32(19.9), endSeconds: f32(22.633), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaTimelineBody-0073fbc25949b923a2ba6207149c8c4e7df1d8e0680bfa190ca888765f6f3e69.mdx", startSeconds: f32(45.167), endSeconds: f32(48.667), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaTimelineBody-0073fbc25949b923a2ba6207149c8c4e7df1d8e0680bfa190ca888765f6f3e69.mdx", startSeconds: f32(170.31), endSeconds: f32(172.31), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaTimelineBody-0073fbc25949b923a2ba6207149c8c4e7df1d8e0680bfa190ca888765f6f3e69.mdx", startSeconds: f32(172.61), endSeconds: f32(174.61), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaTimelineBody-0073fbc25949b923a2ba6207149c8c4e7df1d8e0680bfa190ca888765f6f3e69.mdx", startSeconds: f32(174.71), endSeconds: f32(174.893), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\OnyxiaTimelineBody-0073fbc25949b923a2ba6207149c8c4e7df1d8e0680bfa190ca888765f6f3e69.mdx", startSeconds: f32(174.993), endSeconds: f32(175.26), looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
@@ -21,6 +23,8 @@ export const names: ReadonlyMap<string, number> = new Map<string, number>([
   ["death", 4],
   ["dissipate", 5],
   ["walk", 6],
+  ["movement run", 7],
+  ["movement walk", 8],
   ["stand", 0],
   ["attack", 2],
 ]);

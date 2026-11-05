@@ -43,3 +43,15 @@ test("each grounded fighter's walk, run and dash play the clip its stride was me
   expect(GAITS.map(({ motion }) => groundLocomotionClip(Character.demonHunter, motion)?.index)).toEqual([ILLIDAN_STOCK_WALK, ILLIDAN_STOCK_RUN, ILLIDAN_STOCK_RUN]);
   expect(GAITS.map(({ motion }) => groundLocomotionClip(Character.warden, motion)?.index)).toEqual([MAIEV_AUTHORED_RUN, MAIEV_STOCK_WALK, MAIEV_STOCK_WALK]);
 });
+
+const PRESTOR_AUTHORED_RATE_CAP = 2.0;
+const PRESTOR_AUTHORED_CLIPS: Readonly<Record<number, number>> = { [IllidanLocomotion.walk]: 8, [IllidanLocomotion.run]: 7, [IllidanLocomotion.dash]: 7 };
+
+test("Prestor walks on her authored Movement walk and runs and dashes on her authored Movement run, each at a play rate of 2x or less with feet within 15% of the body", () => {
+  for (const gait of GAITS) {
+    const { clip, rate, feet, body, slides } = measure(Character.onyxia, gait);
+    expect(clip?.index, `onyxia ${gait.motion}: authored clip`).toBe(PRESTOR_AUTHORED_CLIPS[gait.motion]);
+    expect(rate, `onyxia ${gait.motion} rate`).toBeLessThanOrEqual(PRESTOR_AUTHORED_RATE_CAP);
+    expect(slides, `onyxia ${gait.motion}: feet ${feet.toFixed(1)} against body ${body.toFixed(1)}`).toBe(false);
+  }
+});

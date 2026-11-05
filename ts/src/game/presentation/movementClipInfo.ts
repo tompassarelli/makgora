@@ -38,4 +38,9 @@ export const MOVEMENT_CLIPS = {
     run: { index: 84, seconds: f32(0.5833333) },
     dash: { index: 84, seconds: f32(0.5833333) },
   },
+  35: {
+    run: { index: 7, seconds: f32(0.18333334) },
+    dash: { index: 7, seconds: f32(0.18333334) },
+    walk: { index: 8, seconds: f32(0.26666668) },
+  },
 } as const satisfies Readonly<Record<number, HeroClipTable>>;

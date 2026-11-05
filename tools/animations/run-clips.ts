@@ -22,11 +22,14 @@ const [inputArg, outputArg, ...options] = process.argv.slice(2);
 const input = resolve(inputArg ?? ""), output = resolve(outputArg ?? "");
 const project = resolve(import.meta.dir, "../..");
 const character = Number(options[options.indexOf("--character") + 1]) as Character;
-ensure(inputArg && outputArg && relative(project, output).startsWith("..") && options.includes("--character"), "usage: bun tools/animations/run-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID [--walk]");
+ensure(inputArg && outputArg && relative(project, output).startsWith("..") && options.includes("--character"), "usage: bun tools/animations/run-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID [--walk] [--gait walk|run] [--rate X]");
 const fighter = fighters.get(character), rig = FIGHTER_RIGS.get(character);
 ensure(fighter && rig, `no fighter or canonical rig for character ${character}`);
 
-const DUTY = 0.46, RATE_TARGET = 4.4, REACH = 0.97, CROUCH = 0.1, BOB = 0.05, LIFT = 0.22, LEAN = 9, ELBOW = 62, ARM_SWING = 28;
+const option = (flag: string) => options.includes(flag) ? options[options.indexOf(flag) + 1] : undefined;
+const gait = option("--gait") ?? "run", RATE_TARGET = Number(option("--rate") ?? 4.4);
+ensure((gait === "walk" || gait === "run") && RATE_TARGET > 0, "--gait is walk or run and --rate is positive");
+const DUTY = 0.46, REACH = Number(option("--reach") ?? 0.97), CROUCH = Number(option("--crouch") ?? 0.1), SURGE = Number(option("--surge") ?? 0), BOB = 0.05, LIFT = 0.22, LEAN = 9, ELBOW = 62, ARM_SWING = 28;
 const rad = (degrees: number) => degrees * Math.PI / 180;
 const lateral = (degrees: number) => quat.setAxisAngle(quat.create(), [0, 1, 0], rad(degrees));
 const ms = (frame: number) => Math.round(frame * 1000 / 60);
@@ -55,7 +58,7 @@ const reach = REACH * Math.min(...legs.map((l) => lengthsOf(l)[0] + lengthsOf(l)
 const standHeight = at(leg.hip)[1] - groundZ, crouch = CROUCH * standHeight, bob = BOB * standHeight, lift = LIFT * standHeight;
 const contactHeight = standHeight - crouch;
 const step = 2 * Math.sqrt(Math.max(0, reach * reach - contactHeight * contactHeight));
-const scale = characterModelScale(character), runSpeed = createFighter(character, 0.0, 1).tuning.physics.runSpeed * 60;
+const scale = characterModelScale(character), physics = createFighter(character, 0.0, 1).tuning.physics, runSpeed = (gait === "walk" ? physics.walkSpeed : physics.runSpeed) * 60;
 ensure(runSpeed > 0 && step > 0, `${fighter.name}: no run speed or no stride`);
 const speed = runSpeed / scale / RATE_TARGET;
 const frames = Math.round(2 * step / speed * 60);
@@ -119,7 +122,7 @@ const depth = (node: number): number => { const parent = model.Nodes[node]?.Pare
 const order = source.Nodes.map((node) => node.ObjectId).sort((a, b) => depth(a) - depth(b));
 
 const start = Math.max(...source.Sequences.map((s) => s.Interval[1])) + 100, end = start + ms(frames), index = model.Sequences.length;
-model.Sequences.push({ ...stand, Name: "Movement run", Interval: new Uint32Array([start, end]), NonLooping: false, MoveSpeed: 0, Rarity: 0,
+model.Sequences.push({ ...stand, Name: `Movement ${gait}`, Interval: new Uint32Array([start, end]), NonLooping: false, MoveSpeed: 0, Rarity: 0,
   MinimumExtent: new Float32Array([-300, -300, -250]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
 
 const locals = Array.from({ length: frames + 1 }, (_, frame) => {
@@ -152,7 +155,7 @@ tracks(model, (track, path) => {
 });
 keys(helper.Rotation!, () => new Float32Array([0, 0, 0, 1]));
 if (helper.Scaling) keys(helper.Scaling, () => new Float32Array([1, 1, 1]));
-keys(helper.Translation!, (frame) => new Float32Array([0, 0, -hipDrop((frame % frames) / frames)]));
+keys(helper.Translation!, (frame) => new Float32Array([SURGE * Math.sin(2 * Math.PI * (frame % frames) / frames), 0, -hipDrop((frame % frames) / frames)]));
 
 const bytes = encodeVerified(parseSource(generateMDX(model))), after = new DrawnModel(bytes, 1);
 for (const [i, sequence] of source.Sequences.entries()) for (const fraction of [0, 0.5, 1]) {
@@ -171,13 +174,14 @@ if (!process.env.RUN_DEBUG) ensure(drawnRate <= groundLocomotionRateCap(characte
 mkdirSync(dirname(join(output, fighter.source)), { recursive: true });
 await Bun.write(join(output, fighter.source), bytes); chmodSync(join(output, fighter.source), 0o644);
 const moments = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875].map((t) => Math.round(frames * t));
-await Bun.write(join(output, `${fighter.name}-run.png`), sheet(`${fighter.name} run`, drawn,
+await Bun.write(join(output, `${fighter.name}-${gait}.png`), sheet(`${fighter.name} ${gait}`, drawn,
   [1, -1].flatMap((facing) => moments.map((frame) => ({ frame, facing, clip: index, seconds: frame / 60, phase: AttackPhase.none, x: 0, z: 0, parts: [], strikes: [] }))), moments.length).png);
 
 const tables: Record<number, Partial<Record<string, HeroClip>>> = { ...(MOVEMENT_CLIPS as Readonly<Record<number, HeroClipTable>>) };
 const bound = { index, seconds: Math.fround(duration) };
-const { walk: _walk, run: _run, dash: _dash, ...kept } = tables[character] ?? {};
-tables[character] = { ...kept, ...(options.includes("--walk") ? { walk: bound } : { run: bound, dash: bound }) };
+const bindings = gait === "walk" || options.includes("--walk") ? { walk: bound } : { run: bound, dash: bound };
+const kept = Object.fromEntries(Object.entries(tables[character] ?? {}).filter(([pose]) => !(pose in bindings)));
+tables[character] = { ...kept, ...bindings };
 const entries = Object.entries(tables).sort(([a], [b]) => Number(a) - Number(b)).flatMap(([key, table]) => Object.keys(table).length === 0 ? [] : [`  ${key}: {`,
   ...Object.entries(table).map(([pose, clip]) => `    ${pose}: { index: ${clip!.index}, seconds: ${seconds(Math.fround(clip!.seconds))} },`), "  },"]);
 await Bun.write(join(project, "ts/src/game/presentation/movementClipInfo.ts"), [

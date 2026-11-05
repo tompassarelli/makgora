@@ -624,11 +624,11 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Alchemist | ledge-get-up | 4: Walk 1 | 112.9 | 31.1 | up; 58.6/52.2 |
 | Alchemist | ledge-roll | 4: Walk 1 | 114.2 | 31.2 | forward; 107.3/108.7 |
 | Alchemist | ledge-attack | 3: attack one -1 NEW | 140.2 | 38.2 | both; 73.2/135.7 |
-| Onyxia | walk | 6: Walk | 64.1 | 35.7 | forward; 58.2/63.6 |
-| Onyxia | dash | 6: Walk | 61.6 | 34.9 | forward; 58.2/61.3 |
-| Onyxia | run | 6: Walk | 56.9 | 26.6 | forward; 51.9/56.8 |
-| Onyxia | turn | 6: Walk | 25.7 | 10.0 | back; 17.1/20.5 |
-| Onyxia | brake | 6: Walk | 25.8 | 10.4 | in place; 21.3/17.9 |
+| Onyxia | walk | 8: Movement walk | 46.9 | 22.0 | forward; 35.2/42.4 |
+| Onyxia | dash | 7: Movement run | 41.6 | 19.6 | forward; 32.0/37.6 |
+| Onyxia | run | 7: Movement run | 56.4 | 27.5 | forward; 47.7/28.9 |
+| Onyxia | turn | 8: Movement walk | 41.6 | 21.3 | back; 0.0/34.7 |
+| Onyxia | brake | 8: Movement walk | 41.2 | 21.1 | in place; 34.5/2.0 |
 | Onyxia | jump-squat | 0: Stand - 1 | 0.0 | 0.0 | down; 0.0/0.0 |
 | Onyxia | roll-forward | 6: Walk | 64.6 | 35.7 | forward; 58.2/64.2 |
 | Onyxia | roll-back | 6: Walk | 64.6 | 35.7 | back; 64.2/58.2 |
@@ -664,26 +664,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Sally Whitemane | ledge-get-up | 6: Walk | 102.3 | 34.9 | up; 36.4/40.6 |
 | Sally Whitemane | ledge-roll | 6: Walk | 103.7 | 34.5 | forward; 92.9/102.3 |
 | Sally Whitemane | ledge-attack | 9: Attack - 1 | 150.5 | 40.6 | both; 108.3/107.3 |
-| Valeera Sanguinar | walk | 29: Walk 1 | 77.8 | 10.1 | forward; 77.6/75.0 |
-| Valeera Sanguinar | dash | 29: Walk 1 | 75.0 | 9.9 | forward; 74.6/74.7 |
-| Valeera Sanguinar | run | 29: Walk 1 | 82.0 | 9.6 | forward; 81.7/78.9 |
-| Valeera Sanguinar | turn | 29: Walk 1 | 30.6 | 5.9 | back; 30.5/21.2 |
-| Valeera Sanguinar | brake | 29: Walk 1 | 35.1 | 6.5 | in place; 25.6/35.1 |
-| Valeera Sanguinar | jump-squat | 22: Stand 1 | 0.0 | 0.0 | down; 0.0/0.0 |
-| Valeera Sanguinar | roll-forward | 29: Walk 1 | 78.4 | 10.1 | forward; 78.2/75.0 |
-| Valeera Sanguinar | roll-back | 29: Walk 1 | 78.4 | 10.1 | back; 75.0/78.2 |
-| Valeera Sanguinar | spot-dodge | 26: Stand Ready 1 | 27.4 | 3.5 | in place; 27.2/4.7 |
-| Valeera Sanguinar | air-dodge | 26: Stand Ready 1 | 27.5 | 3.5 | in place; 27.3/4.7 |
-| Valeera Sanguinar | tech | 22: Stand 1 | 26.2 | 2.2 | in place; 26.2/2.9 |
-| Valeera Sanguinar | tech-forward | 22: Stand 1 | 26.3 | 2.2 | forward; 26.3/2.9 |
-| Valeera Sanguinar | tech-back | 22: Stand 1 | 26.3 | 2.2 | back; 2.9/26.3 |
-| Valeera Sanguinar | get-up | 26: Stand Ready 1 | 27.5 | 3.5 | up; 1.9/5.7 |
-| Valeera Sanguinar | get-up-forward | 22: Stand 1 | 26.3 | 2.2 | forward; 26.3/2.9 |
-| Valeera Sanguinar | get-up-back | 22: Stand 1 | 26.3 | 2.2 | back; 2.9/26.3 |
-| Valeera Sanguinar | get-up-attack | 28: Attack 2 | 102.7 | 58.1 | both; 92.0/77.9 |
-| Valeera Sanguinar | ledge-get-up | 29: Walk 1 | 80.0 | 10.1 | up; 24.4/31.9 |
-| Valeera Sanguinar | ledge-roll | 29: Walk 1 | 79.4 | 10.1 | forward; 79.2/75.0 |
-| Valeera Sanguinar | ledge-attack | 27: Attack 1 | 121.3 | 49.6 | both; 116.8/30.1 |
+| Valeera | walk | 29: Walk 1 | 77.8 | 10.1 | forward; 77.6/75.0 |
+| Valeera | dash | 29: Walk 1 | 75.0 | 9.9 | forward; 74.6/74.7 |
+| Valeera | run | 29: Walk 1 | 82.0 | 9.6 | forward; 81.7/78.9 |
+| Valeera | turn | 29: Walk 1 | 30.6 | 5.9 | back; 30.5/21.2 |
+| Valeera | brake | 29: Walk 1 | 35.1 | 6.5 | in place; 25.6/35.1 |
+| Valeera | jump-squat | 22: Stand 1 | 0.0 | 0.0 | down; 0.0/0.0 |
+| Valeera | roll-forward | 29: Walk 1 | 78.4 | 10.1 | forward; 78.2/75.0 |
+| Valeera | roll-back | 29: Walk 1 | 78.4 | 10.1 | back; 75.0/78.2 |
+| Valeera | spot-dodge | 26: Stand Ready 1 | 8.0 | 2.8 | in place; 6.7/6.1 |
+| Valeera | air-dodge | 26: Stand Ready 1 | 8.0 | 2.8 | in place; 6.8/6.1 |
+| Valeera | tech | 22: Stand 1 | 6.4 | 1.9 | in place; 6.4/6.0 |
+| Valeera | tech-forward | 22: Stand 1 | 6.4 | 1.9 | forward; 6.4/6.0 |
+| Valeera | tech-back | 22: Stand 1 | 6.4 | 1.9 | back; 6.0/6.4 |
+| Valeera | get-up | 26: Stand Ready 1 | 8.0 | 2.8 | up; 1.9/5.7 |
+| Valeera | get-up-forward | 22: Stand 1 | 6.4 | 1.9 | forward; 6.4/6.0 |
+| Valeera | get-up-back | 22: Stand 1 | 6.4 | 1.9 | back; 6.0/6.4 |
+| Valeera | get-up-attack | 28: Attack 2 | 102.7 | 58.1 | both; 92.0/77.9 |
+| Valeera | ledge-get-up | 29: Walk 1 | 80.0 | 10.1 | up; 24.4/31.9 |
+| Valeera | ledge-roll | 29: Walk 1 | 79.4 | 10.1 | forward; 79.2/75.0 |
+| Valeera | ledge-attack | 27: Attack 1 | 121.3 | 49.6 | both; 116.8/30.1 |
 | Onyxia | walk | 6: Walk 1 | 159.1 | 36.8 | forward; 68.8/56.6 |
 | Onyxia | dash | 6: Walk 1 | 158.7 | 36.5 | forward; 68.5/56.1 |
 | Onyxia | run | 6: Walk 1 | 267.6 | 37.6 | forward; 88.7/51.8 |
@@ -705,4 +705,4 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Onyxia | ledge-roll | 6: Walk 1 | 159.6 | 36.8 | forward; 69.2/57.1 |
 | Onyxia | ledge-attack | 0: Attack 1 | 196.4 | 79.3 | both; 153.4/98.2 |
 
-Walking/running cadence uses grounded vertices' horizontal excursion twice per gait cycle, times the cycles the widest-swinging vertices draw in the clip, because a stock Walk may loop more than once: Jaina's and Prestor's 2 s Walk loop three times and the Warden model's 1.166 s Walk twice, and the measure read one loop until 2026-11-01. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floater Lady Vashj. Firelord (Ragnaros) floats too, but his stock Walk raises and drops his body 22.6 units twice a loop, so at the 5x cap his walk, run and dash bobbed 10 times a second, 453 units of vertical travel a second against a median of 229 over the roster's runs; Tom saw it in a playtest on 2026-11-01 as his run bobbing too much and asked for a lower cap like Jaina's, so his cap is 2.5x (FIRELORD_BOB_RATE_CAP), 5 bobs and 226 units a second, the roster median. Tyrande runs on an authored `Movement run` (tools/animations/run-clips.ts, #834) whose stride is measured over the grounded vertices that move, leaving the hem and pelvis out. Warden walks on that clip (`--walk`) at 3.38x and runs and dashes on her stock Walk at 3.08x and 2.68x (Tom asked for this split on 2026-10-31; the one-loop reading had played it at 6.17x and 5.36x under a 6.25x cap, feet at twice the body). Jaina walks, runs and dashes on her stock Walk at 1.33x, 1.83x and 1.67x with body to feet 1.00. The one-loop reading had played the clip at 4.18x, 5x and 5x, feet drawing 3.1, 2.7 and 3.0 times the ground she covered (body to feet 0.32, 0.37 and 0.33), which Tom saw in a playtest on 2026-11-01 as her legs churning while she barely moved and asked to be capped lower like Ragnaros. Prestor walks at 3.76x and runs at the 5x cap with her feet 7% behind the body.
+Walking/running cadence uses grounded vertices' horizontal excursion twice per gait cycle, times the cycles the widest-swinging vertices draw in the clip, because a stock Walk may loop more than once: Jaina's and Prestor's 2 s Walk loop three times and the Warden model's 1.166 s Walk twice, and the measure read one loop until 2026-11-01. The Lich floats and uses the stock sequence's movement speed. Both measurements use the fighter's displayed model scale. Ground clips play at body speed over drawn stride, capped at 5x (GROUND_LOCOMOTION_RATE_CAP in fighterLocomotion.ts), so past it the body outruns the feet. That reads well on the floater Lady Vashj. Firelord (Ragnaros) floats too, but his stock Walk raises and drops his body 22.6 units twice a loop, so at the 5x cap his walk, run and dash bobbed 10 times a second, 453 units of vertical travel a second against a median of 229 over the roster's runs; Tom saw it in a playtest on 2026-11-01 as his run bobbing too much and asked for a lower cap like Jaina's, so his cap is 2.5x (FIRELORD_BOB_RATE_CAP), 5 bobs and 226 units a second, the roster median. Tyrande runs on an authored `Movement run` (tools/animations/run-clips.ts, #834) whose stride is measured over the grounded vertices that move, leaving the hem and pelvis out. Warden walks on that clip (`--walk`) at 3.38x and runs and dashes on her stock Walk at 3.08x and 2.68x (Tom asked for this split on 2026-10-31; the one-loop reading had played it at 6.17x and 5.36x under a 6.25x cap, feet at twice the body). Jaina walks, runs and dashes on her stock Walk at 1.33x, 1.83x and 1.67x with body to feet 1.00. The one-loop reading had played the clip at 4.18x, 5x and 5x, feet drawing 3.1, 2.7 and 3.0 times the ground she covered (body to feet 0.32, 0.37 and 0.33), which Tom saw in a playtest on 2026-11-01 as her legs churning while she barely moved and asked to be capped lower like Ragnaros. Prestor's robe hides her feet and the stock Walk's hem swings only 54 units a loop, so she walks on an authored `Movement walk` (clip 8) at 1.91x and runs and dashes on an authored `Movement run` (clip 7) at 1.90x and 1.65x, feet equal to the body at each (#901, 2026-11-05). Both come from tools/animations/run-clips.ts with `--rate 1.9 --surge 20` (`--gait walk` for the walk): the two-bone leg solve alone moves her hem 14 units, so each clip also rocks the whole body 20 units fore and aft once a cycle, which is what the drawn-stride measure counts on a robed model. At her speeds that is 7 and 10 cycles a second drawn, the same cadence the 3.76x and 5x stock Walk showed.
