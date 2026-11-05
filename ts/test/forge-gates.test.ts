@@ -7,6 +7,7 @@ import { FORGE_FIGHTERS, FORGE_STAGES, gatedFighters, gatedSlugs, isFeatured, se
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/roster/kits";
 
 const ROOT = join(import.meta.dir, "..");
+const WORKFLOWS = "../.github/workflows";
 const ROSTER_LIST = /\b(?:SELECTABLE_CHARACTERS|PLAYABLE_CHARACTERS)\b/;
 const GATE_HELPER = /\b(?:gatedFighters|gatedSlugs)\b/;
 
@@ -68,12 +69,12 @@ const CORRECTNESS: Readonly<Record<string, string>> = {
 
 function sources(): string[] {
   const files = readdirSync(ROOT, { recursive: true, encoding: "utf8" }).filter(file => !file.includes("node_modules") && file.endsWith(".ts"));
-  return files.filter(file => file.startsWith("scripts/") || file.startsWith("test/") || (file.startsWith("src/") && file.endsWith(".tests.ts"))).map(file => relative(".", file)).sort();
+  return files.filter(file => file.startsWith("scripts/") || file.startsWith("test/") || (file.startsWith("src/") && file.endsWith(".tests.ts"))).map(file => relative(".", file)).concat(readdirSync(join(ROOT, WORKFLOWS)).filter(file => file.endsWith(".yml")).map(file => join(WORKFLOWS, file))).sort();
 }
 
 const text = (file: string): string => readFileSync(join(ROOT, file), "utf8");
 
-test("every balance and quality script or test that lists the whole roster uses the gated helper or is a named correctness tool [k1 scenario]", () => {
+test("every balance and quality script, test or workflow that lists the whole roster uses the gated helper or is a named correctness tool [k1 scenario]", () => {
   const wholeRoster = sources().filter(file => ROSTER_LIST.test(text(file.replace(/^\.\//, "")))).filter(file => !file.endsWith("forge-gates.test.ts"));
   const ungated = wholeRoster.filter(file => !GATE_HELPER.test(text(file)) && CORRECTNESS[file] === undefined);
   expect(ungated).toEqual([]);
