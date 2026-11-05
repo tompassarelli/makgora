@@ -6,7 +6,6 @@ struct Preset {
     settings: ControllerSettings,
     fight: BTreeMap<Control, Vec<String>>,
     menus: BTreeMap<Control, Vec<String>>,
-    map_rows: Vec<serde_json::Value>,
 }
 
 fn contract() -> &'static [Preset] {
@@ -36,19 +35,15 @@ fn contract() -> &'static [Preset] {
         PadPreset::ALL.into_iter().flat_map(|pad_preset| RightStick::ALL.map(|right_stick| (pad_preset, right_stick))).map(|(pad_preset, right_stick)| {
             let settings = ControllerSettings { pad_preset, right_stick, ..ControllerSettings::default() };
             let mut fight = BTreeMap::new();
-            let mut map_rows = Vec::new();
             for binding in settings.bindings(PadKind::Xbox) {
-                let action = labels.get(&binding.action).unwrap_or_else(|| panic!("contract lacks {}", binding.action)).as_str().unwrap();
+                labels.get(&binding.action).unwrap_or_else(|| panic!("contract lacks {}", binding.action)).as_str().unwrap();
                 let mut keys = outputs(binding.press);
-                for key in &keys {
-                    map_rows.push(serde_json::json!({ "preset": pad_preset.name(), "control": binding.control.name(), "key": key, "label": binding.action, "action": action }));
-                }
                 if right_stick == RightStick::Tilt && matches!(binding.control, Control::RightLeft | Control::RightRight | Control::RightUp | Control::RightDown) { keys.push(padbridge::model::pad_key::TILT.to_string()); }
                 fight.insert(binding.control, keys);
             }
             let menus = padbridge::service::any_map::menu_bindings(true).into_iter()
                 .map(|binding| (binding.control, outputs(binding.press))).collect();
-            Preset { name: format!("{} right-stick {}", pad_preset.name(), right_stick.name()), settings, fight, menus, map_rows }
+            Preset { name: format!("{} right-stick {}", pad_preset.name(), right_stick.name()), settings, fight, menus }
         }).collect()
     })
 }

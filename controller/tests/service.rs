@@ -102,7 +102,7 @@ fn the_service_follows_a_fake_session_through_new_sessions_and_game_restarts() {
     menu(&data, 0, "CHARACTER");
 
     let _service = Service::start(service::Config {
-        pads: pads.clone(), headless: Some(documents.clone()), status_file: Some(status.clone()),
+        pads, headless: Some(documents.clone()), status_file: Some(status.clone()),
         settings_file: root.join("settings.json"), poll: Duration::from_millis(50), interface: None,
         ..service::Config::default()
     });
@@ -153,7 +153,7 @@ fn start_presses_y_at_character_select_when_the_keys_session_appears_after_the_m
     menu(&data, 0, "CHARACTER");
 
     let _service = Service::start(service::Config {
-        pads: pads.clone(), headless: Some(documents.clone()), status_file: Some(status.clone()),
+        pads, headless: Some(documents.clone()), status_file: Some(status.clone()),
         settings_file: root.join("settings.json"), poll: Duration::from_millis(50), interface: None,
         ..service::Config::default()
     });

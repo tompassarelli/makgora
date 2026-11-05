@@ -340,3 +340,11 @@ producer = "ts/scripts/wisp/commands/ledger.ts"
 [ignore]
 paths = ["repos/**", "evidence/**", "ts/vendor/**", "ts/node_modules/**", "**/fixtures/**", "ts/test/corpus/**", "ts/test/native/pads/**",
          "ts/scripts/wisp/model-facts/**", "controller/target/**", "tools/makgora-tools/target/**", "tools/slippi/node_modules/**", "ts/src/game/ui/opponentSettingsFrames.ts"]
+
+[rust_habits]
+checks = ["shared-mutability", "single-impl-trait"]
+
+[[rust_habits.allow]]
+rule = "shared-mutability"
+path = "tools/makgora-tools/src/procedure.rs"
+reason = "The held keys and the xdotool child pid are shared between the sending thread and the ctrlc signal handler thread, which must release the keys before exiting."

@@ -404,10 +404,10 @@ mod linux {
             for step in 0..900 {
                 let draining = step >= 450;
                 let now = start + Duration::from_millis(ms);
-                if !draining && sample(&mut seed) % 2 == 0 && sender.queued.frame_credit() {
+                if !draining && sample(&mut seed).is_multiple_of(2) && sender.queued.frame_credit() {
                     let rows: Vec<String> = (0..2).map(|_| {
                         let mut state = State { sources: sample(&mut seed) % 3 * ATTACK / 2, ..State::default() };
-                        if sample(&mut seed) % 4 == 0 { state.x = (sample(&mut seed) % 65_535) as i16; state.cy = (sample(&mut seed) % 65_535) as i16; }
+                        if sample(&mut seed).is_multiple_of(4) { state.x = (sample(&mut seed) % 65_535) as i16; state.cy = (sample(&mut seed) % 65_535) as i16; }
                         encode_row(state, 0, Edges { pressed: sample(&mut seed) % 2 * SPECIAL, ..Edges::default() })
                     }).collect();
                     let before = sender.queued.records.len();
@@ -426,12 +426,12 @@ mod linux {
                         group = Some((frame, rows));
                     }
                     frame += 2;
-                    if sample(&mut seed) % 8 == 0 {
+                    if sample(&mut seed).is_multiple_of(8) {
                         sender.enqueue(format!("ACK1|{}|PREPARE|{frame}", sample(&mut seed) % 9)).unwrap();
                         group = None;
                     }
                 }
-                if !draining && sample(&mut seed) % 40 == 0 {
+                if !draining && sample(&mut seed).is_multiple_of(40) {
                     sender.text_window.suspend();
                     immediate = acked < highest_sent;
                     recovering = highest_sent;
@@ -471,8 +471,8 @@ mod linux {
                         native_received = sequence;
                     }
                 }
-                if ms >= stall_until && (draining || sample(&mut seed) % 3 == 0) {
-                    if !draining && sample(&mut seed) % 20 == 0 {
+                if ms >= stall_until && (draining || sample(&mut seed).is_multiple_of(3)) {
+                    if !draining && sample(&mut seed).is_multiple_of(20) {
                         stall_until = ms + u64::from(sample(&mut seed) % 2_000);
                     }
                     native_consumed += sample(&mut seed) % (native_received - native_consumed + 1);
@@ -513,13 +513,13 @@ mod linux {
                 if output.frame_credit() {
                     assert!(records + 2 <= OUTPUT_RECORD_LIMIT && bytes + (59 + 1) + (32 + 1) <= OUTPUT_BYTE_LIMIT);
                 }
-                let fits = records < OUTPUT_RECORD_LIMIT && bytes + wire.len() + 1 <= OUTPUT_BYTE_LIMIT;
+                let fits = records < OUTPUT_RECORD_LIMIT && bytes + wire.len() < OUTPUT_BYTE_LIMIT;
                 assert_eq!(output.push(wire).is_ok(), fits);
                 if !fits {
                     assert_eq!((output.records.len(), output.bytes), (records, bytes));
                     break;
                 }
-                if sample(&mut seed) % 5 == 0 {
+                if sample(&mut seed).is_multiple_of(5) {
                     output.pop();
                 }
                 assert_eq!(output.bytes, output.records.iter().map(|record| record.len() + 1).sum::<usize>());
@@ -531,8 +531,8 @@ mod linux {
     /// a file a headless client reads, one line per typing.
     enum Typist {
         Window {
-            output: Enigo,
-            gate: padbridge::focus::Gate,
+            output: Box<Enigo>,
+            gate: Box<padbridge::focus::Gate>,
             window: u32,
         },
         File(fs::File),
@@ -549,7 +549,7 @@ mod linux {
                 ..Settings::default()
             };
             let output = Enigo::new(&settings).map_err(|error| error.to_string())?;
-            Ok(Self::Window { output, gate, window })
+            Ok(Self::Window { output: Box::new(output), gate: Box::new(gate), window })
         }
 
         fn file(path: &Path) -> Result<Self, String> {
@@ -853,14 +853,14 @@ mod linux {
                 )? {
                     return Ok(());
                 }
-                if self.trace {
-                    if let Some(emitted_at) = self.emitted_at.take() {
-                        eprintln!(
-                            "mailbox_ack chunk={} wait_us={}",
-                            self.next_chunk,
-                            emitted_at.elapsed().as_micros()
-                        );
-                    }
+                if self.trace
+                    && let Some(emitted_at) = self.emitted_at.take()
+                {
+                    eprintln!(
+                        "mailbox_ack chunk={} wait_us={}",
+                        self.next_chunk,
+                        emitted_at.elapsed().as_micros()
+                    );
                 }
                 fs::remove_file(self.ack_path())?;
                 self.awaiting_ack = false;
@@ -898,8 +898,8 @@ mod linux {
             // Change payload and framing while the old commit toggle remains
             // stable. Flip that key last so the game never samples a partial
             // chunk as committed.
-            for signal in 0..MAILBOX_SIGNAL_COUNT - 1 {
-                if !self.set_signal(signal, signals[signal])? {
+            for (signal, &value) in signals.iter().enumerate().take(MAILBOX_SIGNAL_COUNT - 1) {
+                if !self.set_signal(signal, value)? {
                     return Ok(());
                 }
             }
@@ -1417,9 +1417,9 @@ mod linux {
             let mut input = PauseInput::default();
             let (mut armed, mut previous, mut next_motion, mut now) = (false, 0u32, 0u128, 0u128);
             for _ in 0..60 {
-                let active = sample(&mut seed) % 8 != 0;
+                let active = !sample(&mut seed).is_multiple_of(8);
                 let physical = sample_pad(&mut seed);
-                now += if sample(&mut seed) % 3 == 0 { 33_333_334 } else { u128::from(sample(&mut seed) % 50_000_000) };
+                now += if sample(&mut seed).is_multiple_of(3) { 33_333_334 } else { u128::from(sample(&mut seed) % 50_000_000) };
                 let (x, y) = melee_stick(physical.cx, physical.cy);
                 let (_, menu_y) = melee_stick(physical.x, physical.y);
                 let buttons: Vec<char> = [(physical.sources & 1 != 0, 'c'), (physical.sources & 4 != 0, 'v'), (physical.sources & 32 != 0, 'h'), (menu_y < 0, ';'), (menu_y > 0, '\'')]
@@ -1458,15 +1458,15 @@ mod linux {
             let (mut physical, mut start, mut now) = (State::default(), false, 0u128);
             for _ in 0..80 {
                 now += u128::from(sample(&mut seed) % 20);
-                if sample(&mut seed) % 6 == 0 {
+                if sample(&mut seed).is_multiple_of(6) {
                     let next = phases[(sample(&mut seed) % 5) as usize];
                     input.observe(next, physical, start, now);
                     if next != phase { phase = next; armed = false; since = now; }
                     armed = next.is_some() && (armed || (action_state(physical) == 0 && !start));
                     continue;
                 }
-                let after = if sample(&mut seed) % 3 == 0 { State::default() } else { sample_pad(&mut seed) };
-                let start_after = sample(&mut seed) % 5 == 0;
+                let after = if sample(&mut seed).is_multiple_of(3) { State::default() } else { sample_pad(&mut seed) };
+                let start_after = sample(&mut seed).is_multiple_of(5);
                 let at = now - u128::from(sample(&mut seed) % 4 / 3) * now.min(5);
                 let pressed = menu_buttons(after, start_after) & !menu_buttons(physical, start);
                 let expected = if phase.is_none() || at < since {
@@ -1613,10 +1613,10 @@ mod linux {
             let Some((key, value)) = token.split_once('=') else {
                 continue;
             };
-            if let Some(previous) = fields.insert(key.into(), value.into()) {
-                if previous != value {
-                    return Err(format!("conflicting {key} values in readiness receipt"));
-                }
+            if let Some(previous) = fields.insert(key.into(), value.into())
+                && previous != value
+            {
+                return Err(format!("conflicting {key} values in readiness receipt"));
             }
         }
         let value = |key: &str| {
@@ -1835,10 +1835,10 @@ mod linux {
         }
 
         fn pop(&mut self, paused: bool, discard_before_ns: u128) -> Result<Option<Capture>, String> {
-            if let Some(capture) = self.events.front() {
-                if !paused || capture.timestamp()? < discard_before_ns {
-                    return Ok(self.events.pop_front());
-                }
+            if let Some(capture) = self.events.front()
+                && (!paused || capture.timestamp()? < discard_before_ns)
+            {
+                return Ok(self.events.pop_front());
             }
             Ok(None)
         }
@@ -2199,7 +2199,7 @@ mod linux {
             let Capture::Event(event, before, after) = capture else { panic!("unexpected recovery boundary") };
             if input.accepts_in_segment(&[None; 6], event, before, after, true, segment).unwrap() {
                 accepted.push(event);
-                apply_event(&[None; 6], &mut state, event, &mut edges, &mut snapshots, 91, segment, false).unwrap();
+                apply_event(&[None; 6], &mut state, event, &mut edges, &mut snapshots, FrameWindow { earliest_unwritten: 91, segment, trace: false }).unwrap();
             }
         }
         assert_eq!(accepted, vec![down, up]);
@@ -2633,16 +2633,23 @@ mod linux {
 
     /// Start asks every client to pause before the frame it was pressed in, so
     /// the pause frame follows the press, not the network round trip (#206).
-    fn pause_request_wire(
-        event: &evdev::InputEvent,
-        start_held: &mut bool,
+    struct PauseView {
         epoch: u32,
         sequence: u32,
         paused: bool,
         pause_pending: bool,
         blocked: bool,
         frame: u32,
-    ) -> Option<String> {
+    }
+
+    impl PauseView {
+        fn new(epoch: u32, sequence: u32, paused: bool, pause_pending: bool, blocked: bool, frame: u32) -> Self {
+            Self { epoch, sequence, paused, pause_pending, blocked, frame }
+        }
+    }
+
+    fn pause_request_wire(event: &evdev::InputEvent, start_held: &mut bool, view: PauseView) -> Option<String> {
+        let PauseView { epoch, sequence, paused, pause_pending, blocked, frame } = view;
         let EventSummary::Key(_, Key::BTN_START, value) = event.destructure() else {
             return None;
         };
@@ -2675,26 +2682,26 @@ mod linux {
         let up = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, 0);
         let mut held = false;
         assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 1, false, false, false, 168).as_deref(),
+            pause_request_wire(&down, &mut held, PauseView::new(7, 1, false, false, false, 168)).as_deref(),
             Some("JP100000000070000000001P0000000168")
         );
         assert_eq!(
-            pause_request_wire(&repeat, &mut held, 7, 1, false, false, false, 168),
+            pause_request_wire(&repeat, &mut held, PauseView::new(7, 1, false, false, false, 168)),
             None
         );
         assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 3, true, false, false, 168),
+            pause_request_wire(&down, &mut held, PauseView::new(7, 3, true, false, false, 168)),
             None
         );
-        assert_eq!(pause_request_wire(&up, &mut held, 7, 3, true, false, false, 168), None);
+        assert_eq!(pause_request_wire(&up, &mut held, PauseView::new(7, 3, true, false, false, 168)), None);
         assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 3, true, false, false, 168).as_deref(),
+            pause_request_wire(&down, &mut held, PauseView::new(7, 3, true, false, false, 168)).as_deref(),
             Some("JP100000000070000000003R")
         );
-        pause_request_wire(&up, &mut held, 7, 3, true, false, true, 168);
-        assert_eq!(pause_request_wire(&down, &mut held, 7, 3, true, false, true, 168), None);
+        pause_request_wire(&up, &mut held, PauseView::new(7, 3, true, false, true, 168));
+        assert_eq!(pause_request_wire(&down, &mut held, PauseView::new(7, 3, true, false, true, 168)), None);
         assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 3, true, false, false, 168),
+            pause_request_wire(&down, &mut held, PauseView::new(7, 3, true, false, false, 168)),
             None
         );
     }
@@ -2706,12 +2713,12 @@ mod linux {
         let mut held = false;
         // Sealed before the map's PREPARE, then prepared before its commit.
         assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 1, false, true, false, 200).as_deref(),
+            pause_request_wire(&down, &mut held, PauseView::new(7, 1, false, true, false, 200)).as_deref(),
             Some("JP100000000070000000001R")
         );
-        pause_request_wire(&up, &mut held, 7, 1, false, true, false, 200);
+        pause_request_wire(&up, &mut held, PauseView::new(7, 1, false, true, false, 200));
         assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 2, true, true, false, 200).as_deref(),
+            pause_request_wire(&down, &mut held, PauseView::new(7, 2, true, true, false, 200)).as_deref(),
             Some("JP100000000070000000002R")
         );
     }
@@ -2783,7 +2790,7 @@ mod linux {
                         code,
                         value: if down { pressed_value } else { 0 },
                     }.into();
-                    apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, 1, segment, false).unwrap();
+                    apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, FrameWindow { earliest_unwritten: 1, segment, trace: false }).unwrap();
                     let frame = frame_at(ns, segment).unwrap();
                     assert_eq!(action_state(snapshots[&frame]) & JUMP != 0, step < 3,
                         "sources {first}/{second}, step {step}");
@@ -2813,7 +2820,7 @@ mod linux {
                 code: Abs::ABS_Y.0,
                 value,
             }.into();
-            apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, 1, segment, false).unwrap();
+            apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, FrameWindow { earliest_unwritten: 1, segment, trace: false }).unwrap();
             let frame = frame_at(ns, segment).unwrap();
             assert_eq!(action_state(snapshots[&frame]), if value < 0 { MOVE_UP } else { 0 }, "step {step}");
             assert_eq!((edges[&frame].pressed | edges[&frame].released) & JUMP, 0, "step {step}");
@@ -2854,7 +2861,7 @@ mod linux {
                 code: Abs::ABS_Y.0,
                 value,
             }.into();
-            apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, 1, segment, false).unwrap();
+            apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, FrameWindow { earliest_unwritten: 1, segment, trace: false }).unwrap();
             let frame = frame_at(ns, segment).unwrap();
             assert_eq!(action_state(snapshots[&frame]), held, "step {step}");
             let edge = edges.get(&frame).map_or((0, 0), |e| (e.pressed, e.released));
@@ -3076,7 +3083,7 @@ mod linux {
             let mut snapshots = BTreeMap::new();
             while let Some(capture) = input.pop_for_output(output.frame_credit(), false, 0).unwrap() {
                 let Capture::Event(event, ..) = capture else { panic!("unexpected boundary") };
-                apply_event(&[None; 6], &mut state, event, &mut edges, &mut snapshots, 1, segment, false).unwrap();
+                apply_event(&[None; 6], &mut state, event, &mut edges, &mut snapshots, FrameWindow { earliest_unwritten: 1, segment, trace: false }).unwrap();
             }
             assert!(input.events.is_empty());
             assert_eq!(edges.len(), 1);
@@ -3156,7 +3163,7 @@ mod linux {
             let mut unobserved = false;
             for tick in 1..2_500u128 {
                 let now = tick * ms;
-                if sample(&mut seed) % 120 == 0 {
+                if sample(&mut seed).is_multiple_of(120) {
                     eligible = !eligible;
                     if eligible && unobserved {
                         grace.observe(true, now);
@@ -3164,7 +3171,7 @@ mod linux {
                         unobserved = false;
                         continue;
                     }
-                    unobserved = !eligible && sample(&mut seed) % 4 == 0;
+                    unobserved = !eligible && sample(&mut seed).is_multiple_of(4);
                 }
                 if unobserved {
                     if !eligible && away_since.is_none() {
@@ -3195,9 +3202,9 @@ mod linux {
                     assert_eq!(edges[&frame].released & releasing, releasing);
                     assert_eq!((action_state(state), snapshots[&frame]), (0, state));
                 }
-                let gameplay = sample(&mut seed) % 10 != 0;
-                let start = sample(&mut seed) % 25 == 0;
-                if sample(&mut seed) % 15 == 0 {
+                let gameplay = !sample(&mut seed).is_multiple_of(10);
+                let start = sample(&mut seed).is_multiple_of(25);
+                if sample(&mut seed).is_multiple_of(15) {
                     let at = now.saturating_sub(u128::from(sample(&mut seed) % 3) * ms);
                     input.rearm(at, start, gameplay);
                     if !gameplay { ok = false; }
@@ -3208,12 +3215,12 @@ mod linux {
                     }
                     continue;
                 }
-                if sample(&mut seed) % 2 == 0 { continue; }
+                if sample(&mut seed).is_multiple_of(2) { continue; }
                 let at = now.saturating_sub(u128::from(sample(&mut seed) % 4 / 3) * 30 * ms);
-                let event = if sample(&mut seed) % 2 == 0 {
+                let event = if sample(&mut seed).is_multiple_of(2) {
                     timed_stick_x(at, [0, 32_767, -32_767][(sample(&mut seed) % 3) as usize])
                 } else {
-                    timed_button(at, sample(&mut seed) % 2 == 0)
+                    timed_button(at, sample(&mut seed).is_multiple_of(2))
                 };
                 let accepted = input.accepts(&ranges, event, start, gameplay).unwrap();
                 let current = at >= boundary;
@@ -3271,16 +3278,21 @@ mod linux {
         Ok(frame)
     }
 
+    struct FrameWindow {
+        earliest_unwritten: u32,
+        segment: FrameSegment,
+        trace: bool,
+    }
+
     fn apply_event(
         ranges: &[Option<evdev::AbsInfo>; 6],
         state: &mut State,
         event: evdev::InputEvent,
         edges: &mut BTreeMap<u32, Edges>,
         snapshots: &mut BTreeMap<u32, State>,
-        earliest_unwritten: u32,
-        segment: FrameSegment,
-        trace: bool,
+        window: FrameWindow,
     ) -> Result<(), String> {
+        let FrameWindow { earliest_unwritten, segment, trace } = window;
         let summary = event.destructure();
         if matches!(
             &summary,
@@ -3493,16 +3505,21 @@ mod linux {
         publish_vocabulary(&base, &format!("ACK1|{sequence}|{state}|{frame}"))
     }
 
-    fn submit_control_ack(
-        dir: &Path,
-        build: &str,
+    struct AckTarget<'a> {
+        dir: &'a Path,
+        build: &'a str,
         epoch: u32,
         slot: u32,
+    }
+
+    fn submit_control_ack(
+        target: AckTarget,
         sequence: u32,
         state: ControlState,
         frame: u32,
         mailbox: &mut Option<MailboxSender>,
     ) -> io::Result<()> {
+        let AckTarget { dir, build, epoch, slot } = target;
         if let Some(mailbox) = mailbox.as_mut() {
             let state = match state {
                 ControlState::Started => "START",
@@ -3820,7 +3837,7 @@ mod linux {
         let mut release = None;
         while let Some(capture) = queue.pop(false, 0).unwrap() {
             match capture {
-                Capture::Event(event, ..) => apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, 1, segment, false).unwrap(),
+                Capture::Event(event, ..) => apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, FrameWindow { earliest_unwritten: 1, segment, trace: false }).unwrap(),
                 Capture::Disconnected(ns) => release = Some(release_for_focus_loss(&mut state, &mut edges, &mut snapshots, 1, segment, ns).unwrap()),
                 Capture::Reconnected { .. } => panic!("unexpected reconnect"),
             }
@@ -3858,7 +3875,7 @@ mod linux {
         menu.observe(Some(MenuPhase::Character), State::default(), false, 12_000_000);
         assert_eq!(menu.press(State::default(), held, false, false, 13_000_000), Some("c"));
         let start_down = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, 1);
-        assert!(pause_request_wire(&start_down, &mut false, 7, 3, true, false, !recovery.ready, 168).is_some());
+        assert!(pause_request_wire(&start_down, &mut false, PauseView::new(7, 3, true, false, !recovery.ready, 168)).is_some());
         // Recovery of neutral state also permits the first genuinely new tap.
         input.restore(State::default(), false, 20_000_000, true);
         assert!(input.accepts(&ranges, timed_button(21_000_000, true), false, true).unwrap());
@@ -4191,12 +4208,14 @@ mod linux {
                     if let Some(wire) = pause_request_wire(
                         &event,
                         &mut start_held,
-                        o.epoch,
-                        control_sequence,
-                        paused,
-                        pause_pending,
-                        stop_capture || waiting_ready || waiting_start || !eligible || !recovery_ready,
-                        frame,
+                        PauseView::new(
+                            o.epoch,
+                            control_sequence,
+                            paused,
+                            pause_pending,
+                            stop_capture || waiting_ready || waiting_start || !eligible || !recovery_ready,
+                            frame,
+                        ),
                     ) {
                         if pause_pending {
                             if o.trace {
@@ -4236,10 +4255,10 @@ mod linux {
                     pending_input.push(event, start_before, start_held)?;
                 }
             }
-            if editbox && !waiting_ready && !waiting_start && !ended {
-                if let Some(wire) = moment_hold.request(monotonic_ns().map_err(|e| e.to_string())?, o.epoch) {
-                    mailbox.as_mut().expect("editbox sender").enqueue(wire).map_err(|error| format!("controller moment request: {error}"))?;
-                }
+            if editbox && !waiting_ready && !waiting_start && !ended
+                && let Some(wire) = moment_hold.request(monotonic_ns().map_err(|e| e.to_string())?, o.epoch)
+            {
+                mailbox.as_mut().expect("editbox sender").enqueue(wire).map_err(|error| format!("controller moment request: {error}"))?;
             }
             let mut start_discard_before_ns = 0;
             if waiting_start {
@@ -4340,10 +4359,7 @@ mod linux {
                     paused = false;
                     focus_input.gameplay_armed = false;
                     submit_control_ack(
-                        &o.out,
-                        &o.build,
-                        o.epoch,
-                        o.slot,
+                        AckTarget { dir: &o.out, build: &o.build, epoch: o.epoch, slot: o.slot },
                         command.sequence,
                         command.state,
                         command.requested_frame,
@@ -4410,9 +4426,7 @@ mod linux {
                         event,
                         &mut edges,
                         &mut snapshots,
-                        next_frame,
-                        segment,
-                        o.trace,
+                        FrameWindow { earliest_unwritten: next_frame, segment, trace: o.trace },
                     )?;
                 } else if o.trace
                     && matches!(
@@ -4520,10 +4534,7 @@ mod linux {
                     pause_request_ns = None;
                     start_seal = None;
                     submit_control_ack(
-                        &o.out,
-                        &o.build,
-                        o.epoch,
-                        o.slot,
+                        AckTarget { dir: &o.out, build: &o.build, epoch: o.epoch, slot: o.slot },
                         command.sequence,
                         ControlState::PausePrepare,
                         next_frame,
@@ -4555,10 +4566,7 @@ mod linux {
                     }
                     paused = true;
                     submit_control_ack(
-                        &o.out,
-                        &o.build,
-                        o.epoch,
-                        o.slot,
+                        AckTarget { dir: &o.out, build: &o.build, epoch: o.epoch, slot: o.slot },
                         control_sequence - 1,
                         ControlState::Paused,
                         barrier,
@@ -4590,7 +4598,7 @@ mod linux {
                 if let Some(sender) = mailbox.as_mut() {
                     let marker = format!("JE1{}", o.epoch);
                     if sender.queued.records.len() < OUTPUT_RECORD_LIMIT
-                        && sender.queued.bytes + marker.len() + 1 <= OUTPUT_BYTE_LIMIT {
+                        && sender.queued.bytes + marker.len() < OUTPUT_BYTE_LIMIT {
                         sender.enqueue(marker).map_err(|e| e.to_string())?;
                         end_marker_sent = true;
                     }

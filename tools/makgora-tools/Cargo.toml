@@ -10,3 +10,12 @@ description = "Mak'gora's host tools: Warcraft III menu observation and input pr
 [dependencies]
 ctrlc = { version = "3.5", features = ["termination"] }
 libc = "0.2"
+
+[lints.clippy]
+redundant_clone = "warn"
+implicit_clone = "warn"
+unnecessary_to_owned = "warn"
+redundant_allocation = "warn"
+rc_buffer = "warn"
+rc_mutex = "warn"
+cloned_instead_of_copied = "warn"
