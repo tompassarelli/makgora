@@ -74,7 +74,7 @@ without a window. Run it under an exclusive capacity lease.
 read without case, spaces or punctuation (`--stage tomb-of-sargeras`).
 `--rollback N` runs the last N frames again after every step, from the state
 kept before them, as a rollback match at N frames of delay does; the frame
-digests stay those of the straight run (test/forcedReplay.test.ts). With
+digests stay those of the straight run. With
 `--window native`, `DIR/standalone.json` carries `stageMs.sim` (the map's
 step), `stageMs.rollback` (zero without `--rollback`), `stageMs.scene` (the
 headless client to the scene), `encodeMs`, `parseMs`, `cpuEncodeMs` and

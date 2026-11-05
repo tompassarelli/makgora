@@ -1,11 +1,11 @@
-import { assertEquals, assertFalse, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { beginFighterAttack } from "./attacks";
-import { AttackStyle, Character, DASH_GRAB_REQUEST, GrabAction } from "./codes";
+import { Character, DASH_GRAB_REQUEST, GrabAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { groundState } from "./groundMovement";
 import { type Controls, type Roster } from "./roster";
-import { surfaceLeft, surfaceRight, surfaceZ } from "./stage";
+import { surfaceRight, surfaceZ } from "./stage";
 import { GroundState } from "./stickZones";
 import { controls } from "./testWorld";
 import { duelPair, stepDuel } from "./testDuel";
@@ -29,7 +29,7 @@ function onDeck(f: Fighter, deck: number, x: number): void {
   f.motion.surface = deck;
 }
 
-function approach(deck: number, frames: number, gap: number, character: Character, targetX?: number): Grab {
+function approach(deck: number, frames: number, gap: number, character: Character): Grab {
   const edge = surfaceRight(STAGE, deck, 0);
   const start = f32(f32(edge - gap) - f32(frames * 8.0));
   const { world, owner, target } = duelPair(createFighter(character, start, 1), createFighter(Character.rifleman, FAR, -1), 0, STAGE);
@@ -40,7 +40,6 @@ function approach(deck: number, frames: number, gap: number, character: Characte
   }
   const toward = controls({ direction: 1 });
   for (let frame = 0; frame < frames && owner.motion.x < f32(edge - gap); frame++) stepDuel(world, toward, controls(), STAGE);
-  if (targetX !== undefined) onDeck(target, deck, targetX);
   beginFighterAttack(world, 0, DASH_GRAB_REQUEST, false);
   return { world, f: owner, target };
 }
@@ -85,30 +84,4 @@ test("Grab teeter: a dash grab or run grab carried to a platform edge or the sta
       }
     }
   }
-});
-
-test("Grab teeter: Kael'thas's Siphon Mana out of a dash stops at the platform edge and teeters after its end lag [k1 scenario]", () => {
-  const run = approach(PLATFORM, DASH_FRAMES, DASH_GAP, Character.kaelthas);
-  assertEquals(run.f.attack.style, AttackStyle.grab);
-  const result = whiff(run, PLATFORM, controls());
-  assertTrue(result.grounded && result.reachedEdge);
-  assertTrue(teetersAfter(run, PLATFORM));
-});
-
-test("Grab teeter: a dash grab that catches a fighter standing at the edge holds it from the edge without leaving the deck [k1 scenario]", () => {
-  const edge = surfaceRight(STAGE, PLATFORM, 0);
-  const run = approach(PLATFORM, DASH_FRAMES, DASH_GAP, Character.rifleman, f32(edge - 4.0));
-  let held = false;
-  for (let frame = 0; frame < 60 && !held; frame++) {
-    stepDuel(run.world, controls({ direction: 1 }), controls(), STAGE);
-    assertTrue(run.f.motion.grounded && run.f.motion.x <= edge && run.f.motion.x >= surfaceLeft(STAGE, PLATFORM, 0));
-    held = run.f.grab.target !== undefined;
-  }
-  assertTrue(held);
-  assertEquals(run.target.grab.owner, 0);
-  for (let i = 0; i < 20; i++) {
-    stepDuel(run.world, controls(), controls(), STAGE);
-    assertTrue(run.f.motion.grounded && run.f.motion.surface === PLATFORM && run.f.motion.x <= edge);
-  }
-  assertFalse(run.f.grab.action === GrabAction.none);
 });

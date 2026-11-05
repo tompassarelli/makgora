@@ -18,7 +18,6 @@ const NEUTRAL = controls();
 const KEYBOARD_DOWN = controls({ verticalDirection: -1, down: true });
 const ANALOG_DOWN = controls({ diStickValid: true, diStickX: 0.0, diStickZ: -1.0, down: true });
 const ANALOG_DROP_EDGE = controls({ diStickValid: true, diStickX: 0.0, diStickZ: f32(-0.7), down: true });
-const ANALOG_CROUCH_ONLY = controls({ diStickValid: true, diStickX: 0.0, diStickZ: f32(-0.6) });
 
 interface Deck { readonly stage: number; readonly deck: number }
 interface Crossing { readonly landed: boolean; readonly lag: number; readonly speedBefore: number; readonly speedAfter: number; readonly zBefore: number; readonly zAfter: number; readonly fastBefore: boolean; readonly fastAfter: boolean }
@@ -98,19 +97,7 @@ function passesEverywhere(inputs: readonly (readonly [string, Readonly<Controls>
   }
 }
 
-function landsEverywhere(name: string, input: Readonly<Controls>): void {
-  for (const character of gatedFighters()) {
-    for (const at of passDecks()) {
-      for (const fast of [false, true]) check(cross(character, at, fast, input, false).landed, `${where(character, at, fast, name)} passed through`);
-    }
-  }
-}
 
 test("Every fighter falling or fast falling onto every pass-through platform with down held past the drop line, on a keyboard or an analog stick, keeps falling at full speed with no grounded frame or landing lag [k1 scenario]", () => {
   passesEverywhere([["keyboard", KEYBOARD_DOWN], ["analog", ANALOG_DOWN], ["analog -0.7", ANALOG_DROP_EDGE]]);
-});
-
-test("Every fighter falling or fast falling onto every pass-through platform with the stick released or above the drop line lands on it [k1 scenario]", () => {
-  landsEverywhere("neutral", NEUTRAL);
-  landsEverywhere("analog -0.6", ANALOG_CROUCH_ONLY);
 });

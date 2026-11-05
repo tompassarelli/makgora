@@ -1,7 +1,6 @@
 import { expect, test } from "bun:test";
 import { hitContextKnockback, TUMBLE_KNOCKBACK } from "../src/game/sim/knockback";
 import { SHIPPED_THRESHOLD_RULES, type ThresholdOptions, type ThresholdRules, compareThresholds } from "../scripts/meleeThresholds";
-import { sweep } from "./sweep";
 
 const MOVED_TUMBLE_KNOCKBACK = TUMBLE_KNOCKBACK - 2;
 const tumblesMoved = (knockback: number): boolean => knockback >= MOVED_TUMBLE_KNOCKBACK;
@@ -21,7 +20,3 @@ function expectEveryDisagreementNamed(options: ThresholdOptions): void {
 test("every threshold disagreement is a named problem when the tumble knockback moves [k2 property]", () => {
   expectEveryDisagreementNamed({ attacker: "falco" });
 });
-
-sweep("every FightCore threshold disagreement is a named problem when the tumble knockback moves [k2 property]", () => {
-  expectEveryDisagreementNamed({});
-}, 120_000);

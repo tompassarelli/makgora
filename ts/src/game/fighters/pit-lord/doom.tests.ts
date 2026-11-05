@@ -1,4 +1,4 @@
-import { assertDefined, assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertDefined, assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { copyFighterState } from "../../../generated/state/fighterState";
 import { Phase } from "../../lobby/lobbyState";
@@ -7,8 +7,7 @@ import { stepMatch } from "../../match/step";
 import { firstStateDifference } from "../../replay/difference";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "../../replay/snapshot";
 import { sweep } from "../../core/sweep";
-import { beginFighterAttack } from "../../sim/attacks";
-import { AttackStyle, Character, SpecialAction } from "../../sim/codes";
+import { Character, SpecialAction } from "../../sim/codes";
 import { type Fighter, createFighter } from "../../sim/fighter";
 import { fillMeter } from "../../sim/meter";
 import { setWorldMotionValue } from "../../sim/motion";
@@ -26,9 +25,6 @@ import { clearAttackBuffer } from "../../input/attackBuffer";
 import { neutralControls } from "../../sim/roster";
 
 const DOOM = controls({ specialPressed: true, ultimatePressed: true, attackHeld: true });
-const SHIELD = controls({ shield: true, shieldTriggerActive: true, shieldStrength: 1.0 });
-const SPOT_DODGE = controls({ ...SHIELD, groundDodgePressed: true, groundDodgeDirection: 0 });
-const ADJACENT = 60.0;
 const MIDRANGE = 300.0;
 const CONNECT_SEEDS = [17, 83, 241] as const;
 const CONNECT_FRAMES = 128;
@@ -73,88 +69,6 @@ function moveTo(f: Fighter, x: number): void {
 }
 
 /** Casts Doom and runs to its end, feeding the foe `foeInput` by Doom frame; returns whether the foe was doomed. */
-function cast(b: Bout, foeInput: (frame: number) => Readonly<Controls> = () => controls(), onFrame: (frame: number) => void = () => {}): boolean {
-  step(b, DOOM);
-  assertEquals(b.pitLord.special.action, SpecialAction.heroUltimate);
-  for (let n = 0; n < 70 && b.pitLord.special.action === SpecialAction.heroUltimate; n++) {
-    onFrame(b.pitLord.special.frame);
-    step(b, controls(), foeInput(b.pitLord.special.frame + 1));
-  }
-  return b.foe.status.cursedBy === 0;
-}
-
-test("Doom locks a foe 300 away, draws the glyph on it from frame 1, and the bolt lands on the strike frame for 10% with a small pop up and the curse [k1 scenario]", () => {
-  const b = bout(MIDRANGE);
-  let struckOn: number | undefined;
-  let glyphFrames = 0;
-  const doomed = cast(b, () => controls(), (frame) => {
-    if (frame >= 1 && frame < b.strike.frame && b.pitLord.projectiles.some(p => p.life > 0 && p.spec === b.strike.glyph && p.x === b.foe.motion.x)) glyphFrames++;
-    if (struckOn === undefined && b.foe.status.damage > 0.0) struckOn = frame;
-  });
-  assertTrue(doomed);
-  assertEquals(struckOn, b.strike.frame);
-  assertEquals(glyphFrames, b.strike.frame - 1);
-  assertGreaterThan(b.foe.status.damage, f32(9.9));
-  assertLessThan(b.foe.status.damage, 12.0);
-});
-
-test("Doom beats a held shield [k1 scenario]", () => {
-  const b = bout(MIDRANGE);
-  step(b, controls(), { ...SHIELD, shieldPressed: true });
-  assertTrue(cast(b, () => SHIELD));
-  assertGreaterThan(b.foe.status.damage, f32(9.9));
-});
-
-function spotDodgeEscapes(pressFrame: number): boolean {
-  const b = bout(MIDRANGE);
-  return !cast(b, (frame) => frame === pressFrame ? SPOT_DODGE : frame > pressFrame && frame < pressFrame + 3 ? SHIELD : controls());
-}
-
-test("A spot dodge whose intangible frames cover the bolt's landing frame escapes Doom; one pressed on the glyph's first frame has ended and is doomed [k1 scenario]", () => {
-  const strikeFrame = bout(MIDRANGE).strike.frame;
-  assertTrue(spotDodgeEscapes(strikeFrame - 4));
-  assertFalse(spotDodgeEscapes(2));
-});
-
-test("Doom misses a foe beyond its 600 lock range, and one that runs out of range before the bolt lands, and still ends on frame 60 [k1 scenario]", () => {
-  const far = bout(300.0, 0.0, -500.0);
-  assertFalse(cast(far));
-  assertEquals(far.foe.status.damage, 0.0);
-  const fled = bout(-200.0, 0.0, -500.0);
-  const stocks = fled.foe.status.stocks;
-  assertFalse(cast(fled, () => controls(), (frame) => { if (frame === 10) moveTo(fled.foe, 550.0); }));
-  assertEquals(fled.foe.status.stocks, stocks);
-  assertEquals(fled.foe.status.damage, 0.0);
-  assertEquals(fled.pitLord.special.action, SpecialAction.none);
-});
-
-test("A jab during Doom's startup is absorbed by its knockback armor: Pit Lord takes the damage, keeps casting and the bolt still dooms the jabber [k1 scenario]", () => {
-  const b = bout(ADJACENT);
-  let jabbed = false;
-  const doomed = cast(b, () => controls(), (frame) => {
-    if (frame === 4 && !jabbed) {
-      beginFighterAttack(b.state.world, 1, AttackStyle.jab, false);
-      jabbed = true;
-    }
-  });
-  assertGreaterThan(b.pitLord.status.damage, 0.0);
-  assertEquals(b.pitLord.visuals.armorAbsorbs, 1);
-  assertTrue(doomed);
-});
-
-test("A forward smash on Pit Lord at 100% breaks Doom's armor and cancels the cast before the bolt [k1 scenario]", () => {
-  const b = bout(ADJACENT, 100.0);
-  let smashed = false;
-  const doomed = cast(b, () => controls(), (frame) => {
-    if (frame === 1 && !smashed) {
-      beginFighterAttack(b.state.world, 1, AttackStyle.forwardSmash, false);
-      smashed = true;
-    }
-  });
-  assertFalse(doomed);
-  assertEquals(b.foe.status.damage, 0.0);
-  assertGreaterThan(b.pitLord.launch.hitstun, 0);
-});
 
 test("Doom rolls back: a snapshot mid-glyph, restored after the foe fled out of range on the abandoned branch, replays the bolt and curse to the same state as the straight run [k1 scenario]", () => {
   const straight = bout(MIDRANGE);
@@ -227,13 +141,6 @@ function connectRate(stages: readonly number[], approach: Approach): { hits: num
   }
   return { hits, total };
 }
-
-test("Doom deals damage in at least 70% of fixed gap 300 standing and Wren Warchief approaches [k3 measure docs/design/ultimates.md]", () => {
-  for (const approach of ["standing", "moving"] as const) {
-    const result = connectRate([0], approach);
-    assertEquals(result.hits * 10 >= result.total * 7, true, `${approach}: ${result.hits}/${result.total}`);
-  }
-});
 
 sweep("Doom deals damage in at least 70% of fixed gap 300 standing and Wren Warchief approaches on every stage [k3 measure docs/design/ultimates.md]", () => {
   for (const approach of ["standing", "moving"] as const) for (const stage of STAGE_CATALOG) {

@@ -882,7 +882,7 @@ then carried every slide off the edge, so a forward wavedash with no input fell 
 wrong for Melee. Tom corrected it on 2026-10-30 to the rule above (`teeters` in
 makgora:ts/src/game/sim/step.ts, `teeterAtEdge` in makgora:ts/src/game/sim/teeter.ts,
 `wavedashLedgeSide` in makgora:ts/src/game/sim/ledge.ts, tests in
-makgora:ts/src/game/sim/edgeSlide.tests.ts and makgora:ts/src/game/sim/teeter.tests.ts).
+makgora:ts/src/game/sim/edgeSlide.tests.ts).
 
 ### What a lagged landing flows into
 

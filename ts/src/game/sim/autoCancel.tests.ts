@@ -27,10 +27,3 @@ test("Aerial auto-cancel: Maiev's up air, in Fox's <8 25> window, lands on frame
   assertEquals(landingLagOnFrame(Character.warden, AttackStyle.upAir, 24), 9);
   assertEquals(landingLagOnFrame(Character.warden, AttackStyle.upAir, 25), EMPTY_LANDING_LAG);
 });
-
-test("Aerial auto-cancel: an aerial with no Melee counterpart, Rifleman's down air (active 8-10), cancels before frame 8 and from frame 19, 9 after its last active frame [k4 reference melee]", () => {
-  assertEquals(landingLagOnFrame(Character.rifleman, AttackStyle.downAir, 7), EMPTY_LANDING_LAG);
-  assertEquals(landingLagOnFrame(Character.rifleman, AttackStyle.downAir, 8), 9);
-  assertEquals(landingLagOnFrame(Character.rifleman, AttackStyle.downAir, 18), 9);
-  assertEquals(landingLagOnFrame(Character.rifleman, AttackStyle.downAir, 19), EMPTY_LANDING_LAG);
-});

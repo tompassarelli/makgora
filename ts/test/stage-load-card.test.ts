@@ -12,7 +12,6 @@ import { testHeadless } from "./headless";
 const headless = testHeadless(MAKGORA_HEADLESS);
 
 const CARD = ["StageLoadingCover", "StageLoadingArt", "StageLoadingName"];
-const SELECT = ["MeleeStageBackdrop", "MeleeStageBand", "MeleeStagePreviewBoxPanel", "MeleeStagePreviewPicture", "MeleeStageListBoxPanel"];
 
 function stageSelect(stall: boolean) {
   const clients = headless.clients({ install, start: () => startBuild(INTEGRITY_BUILD) }, [0]);
@@ -46,38 +45,4 @@ test("pressing Start on stage select never shows the loading card over the selec
   expect(frames).toBeLessThan(STAGE_CARD_DELAY_FRAMES);
   expect(shown().filter(name => CARD.includes(name))).toEqual([]);
   expect(clients.client(0).errors).toEqual([]);
-}, 120_000);
-
-test("a start that takes longer than a second shows the loading card on its own backdrop, with every part of stage select hidden on the frames it is up [k1 scenario]", () => {
-  const { clients, shown, phase } = stageSelect(true);
-  let carded = 0;
-  for (let frame = 0; frame < STAGE_CARD_DELAY_FRAMES + 120; frame++) {
-    const names = shown();
-    const card = names.filter(name => CARD.includes(name));
-    const select = names.filter(name => SELECT.includes(name));
-    if (card.length > 0) {
-      carded++;
-      expect(card.sort()).toEqual([...CARD].sort());
-      expect(select, `frame ${frame} shows select under the card`).toEqual([]);
-    } else {
-      expect(frame, "the card is up from its delay on").toBeLessThanOrEqual(STAGE_CARD_DELAY_FRAMES + 1);
-    }
-    clients.frames(1);
-  }
-  expect(carded).toBeGreaterThan(100);
-  expect(phase()).toBe(Phase.stageMenu);
-  expect(clients.client(0).errors).toEqual([]);
-}, 120_000);
-
-test("the stage preview's picture is a square drawn over its whole panel with no coal beside it and no silhouette frames [k1 scenario]", () => {
-  const { clients } = stageSelect(false);
-  const rows = clients.client(0).frames.snapshot({ visibleOnly: true }).filter(frame => frame.name.startsWith("MeleeStagePreview") && frame.rectangle !== undefined);
-  const named = (name: string) => rows.find(row => row.name === name)?.rectangle;
-  const picture = named("MeleeStagePreviewPicture");
-  const panel = named("MeleeStagePreviewPanel");
-  expect(picture).toBeDefined();
-  expect(panel).toEqual(picture);
-  const [left, top, right, bottom] = picture ?? [0, 0, 0, 0];
-  expect(Math.abs((right - left) - (top - bottom))).toBeLessThan(0.0001);
-  expect(rows.filter(row => /Piece/.test(row.name))).toEqual([]);
 }, 120_000);

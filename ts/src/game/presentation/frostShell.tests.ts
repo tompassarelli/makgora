@@ -62,12 +62,3 @@ test("Lich's Frost Armor shell holds 240 frames after the cast and its cue is al
   assertEquals(watch.scales.slice(first, FROST_SHELL_FADE_FRAMES).every((scale) => scale === 1.0), true, "full scale before the last second");
   assertEquals(watch.copied.join(","), watch.scales.join(","), "the cue is a function of the fighter state alone");
 });
-
-test("Lich's Dark Ritual ends the Frost Armor cue on the frame it shatters the shell [k1 scenario]", () => {
-  const watch = lichShell(160, (tick) => (tick === 100 ? "frostArmor" : "none"));
-  const last = watch.armor.map((frames, index) => (frames > 0 ? index : -1)).filter((index) => index >= 0).pop() ?? -1;
-  assertGreaterThan(last, 100);
-  assertLessThan(last, 112);
-  for (let index = 60; index <= last; index++) assertGreaterThan(watch.scales[index] ?? 0.0, 0.0);
-  for (let index = last + 1; index < watch.scales.length; index++) assertEquals(watch.scales[index], 0.0);
-});

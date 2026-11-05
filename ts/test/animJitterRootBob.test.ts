@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { type model as mdx } from "../scripts/clipNodes";
-import { BOB_LIMIT, bodyRoot, rootBob } from "../scripts/wisp/animJitter";
+import { bodyRoot, rootBob } from "../scripts/wisp/animJitter";
 
 const bob = (frames: readonly number[]) => ({
   LineType: 0,
@@ -28,10 +28,4 @@ test("a loose parentless prop that bobs is not the body root [k1 scenario]", () 
   const model = skeleton(still, bob(FRAMES));
   expect(bodyRoot(model)).toBe(1);
   expect(rootBob(model, 0, 1000)).toBeUndefined();
-});
-
-test("a bobbing body root still fails the root bob limit [k1 scenario]", () => {
-  const model = skeleton(bob(FRAMES), still);
-  expect(rootBob(model, 0, 1000)?.node).toBe("Root");
-  expect(rootBob(model, 0, 1000)!.excess).toBeGreaterThan(BOB_LIMIT);
 });

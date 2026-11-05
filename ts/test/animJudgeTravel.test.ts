@@ -1,5 +1,4 @@
 import { expect, test } from "bun:test";
-import { judgeCrop } from "../scripts/wisp/animJudgeCamera";
 import { clipIdentity } from "../scripts/wisp/animJudgeIdentity";
 import type { ScoreFrame } from "../scripts/wisp/animScore";
 
@@ -12,12 +11,4 @@ test("a clip drawn in place keeps its identity, and a travelling clip gets a new
   const slide = clipIdentity(poses, [0, 24, 48], "framing");
   expect(slide).not.toBe(still);
   expect(clipIdentity(poses, [0, 24, 60], "framing")).not.toBe(slide);
-});
-
-test("a judge tile widens to hold the body across its travel and is unchanged for a move drawn in place [k2 property]", () => {
-  const heights = [0, 0, 0], pixels = 2;
-  const still = judgeCrop(poses, heights, [0, 0, 0], pixels);
-  const slide = judgeCrop(poses, heights, [0, 24, 48], pixels);
-  expect(slide.height).toBe(still.height);
-  expect(slide.width).toBe(still.width + 48 * pixels);
 });

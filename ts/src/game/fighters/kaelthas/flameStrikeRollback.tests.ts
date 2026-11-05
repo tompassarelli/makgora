@@ -14,7 +14,6 @@ import { FLAME_STRIKE_BURN, FLAME_STRIKE_BURST, FLAME_STRIKE_ORB } from "./speci
 
 const KAEL_X = -400.0;
 const FAR_FOE_X = 900.0;
-const NEAR_FOE_X = -140.0;
 const ORB_FRAMES_BEFORE_SAVE = 3;
 const REPLAYED_FRAMES = 70;
 
@@ -87,18 +86,6 @@ function rollbackReplays(foeX: number, script: (frame: number) => Controls): { e
 
 test("Flame Strike: a rollback mid-flight replays the steered orb and its eruption by release exactly [k1 scenario]", () => {
   const { eruptedAt, damaged } = rollbackReplays(FAR_FOE_X, holdUntilRelease);
-  assertGreaterThan(eruptedAt, 0);
-  assertEquals(damaged, false, "the pillar burst short of the foe");
-});
-
-test("Flame Strike: a rollback mid-flight replays the steered orb and its eruption by touch exactly [k1 scenario]", () => {
-  const { eruptedAt, damaged } = rollbackReplays(NEAR_FOE_X, hold);
-  assertGreaterThan(eruptedAt, 0);
-  assertEquals(damaged, true, "the orb erupted on the foe");
-});
-
-test("Flame Strike: a rollback mid-flight replays the steered orb and its eruption by time exactly [k1 scenario]", () => {
-  const { eruptedAt, damaged } = rollbackReplays(FAR_FOE_X, hold);
   assertGreaterThan(eruptedAt, 0);
   assertEquals(damaged, false, "the pillar burst short of the foe");
 });

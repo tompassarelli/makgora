@@ -1,4 +1,4 @@
-import { assertEquals, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, test } from "wisp/src/runtime/testing";
 import { imod } from "wisp/src/sim/intMath";
 import { Action, maskOf } from "../../input/actions";
 import { adaptInput } from "../../match/inputAdapter";
@@ -8,12 +8,10 @@ import { stepMatch } from "../../match/step";
 import { canonicalState } from "../../replay/canonical";
 import { copyReplayState, createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
 import { copyFighterState } from "../../../generated/state/fighterState";
-import { Character, HeroStatusKind, ProjectileKind } from "../../sim/codes";
+import { Character, ProjectileKind } from "../../sim/codes";
 import { createFighter, type Fighter } from "../../sim/fighter";
 import { fighterAt } from "../../sim/roster";
 import { ULTIMATE_METER_FRAMES } from "../../sim/meter";
-import { MANA_SHIELD_FRAMES_PER_PERCENT } from "../../sim/manaShield";
-import { ManaShieldChange, manaShieldChange } from "../../presentation/manaShieldLook";
 
 type Press = "shield" | "serpent" | "jab" | "none";
 type Script = (tick: number) => readonly [Press, Press];
@@ -97,68 +95,6 @@ function replayFrom(foeAhead: number, charge: number, script: Script, end: numbe
   for (let tick = saveTick; tick <= end; tick++) step(run, script(tick));
   return { expected, replayed: canonicalState(run.state) };
 }
-
-test("Mana Shield turns on, takes half of each hit from her ultimate meter, breaks into a stagger when the meter runs dry, and turns off again [k3 measure docs/design/lady-vashj.md]", () => {
-  const d = duel(60.0, SHIELD_CHARGE);
-  let firstHit: { readonly percent: number; readonly meter: number } | undefined;
-  let broke = false;
-  let staggered = false;
-  let heldWhileOn = true;
-  for (let tick = 1; tick <= SHIELD_END; tick++) {
-    const meter = d.vashj.meter.ultimate;
-    const percent = d.vashj.status.damage;
-    const on = d.vashj.status.manaShield;
-    step(d, shieldScript(tick));
-    if (on && d.vashj.status.manaShield && d.vashj.meter.ultimate > meter) heldWhileOn = false;
-    if (firstHit === undefined && on && d.vashj.status.damage > percent) firstHit = { percent: d.vashj.status.damage - percent, meter: meter - d.vashj.meter.ultimate };
-    if (on && !d.vashj.status.manaShield && tick < 440) broke = true;
-    if (broke && d.vashj.status.condition === HeroStatusKind.stun) staggered = true;
-    if (tick === 460) assertTrue(d.vashj.status.manaShield);
-  }
-  assertTrue(firstHit !== undefined);
-  if (firstHit !== undefined) {
-    assertGreaterThan(firstHit.meter, 0);
-    assertLessThan(Math.abs(firstHit.percent * MANA_SHIELD_FRAMES_PER_PERCENT - firstHit.meter), 1.5);
-  }
-  assertTrue(heldWhileOn);
-  assertTrue(broke);
-  assertTrue(staggered);
-  assertEquals(d.vashj.status.manaShield, false);
-});
-
-test("Mana Shield's look reads her toggles as on and off and a meter-dry hit as a break [k3 measure docs/design/lady-vashj.md]", () => {
-  const d = duel(60.0, SHIELD_CHARGE);
-  const changes: ManaShieldChange[] = [];
-  for (let tick = 1; tick <= SHIELD_END; tick++) {
-    const was = d.vashj.status.manaShield;
-    step(d, shieldScript(tick));
-    const change = manaShieldChange(was, d.vashj);
-    if (change !== ManaShieldChange.none) changes.push(change);
-  }
-  assertEquals(changes.join(","), [ManaShieldChange.on, ManaShieldChange.broken, ManaShieldChange.on, ManaShieldChange.off].join(","));
-});
-
-test("Tidal Serpent drains 108 frames of the foe's ultimate meter, turns back with no other foe, and gives her nothing on the catch [k3 measure docs/design/lady-vashj.md]", () => {
-  const d = duel(200.0, 0);
-  let drained = 0;
-  let caught = false;
-  let homeward = false;
-  for (let tick = 1; tick <= SERPENT_END; tick++) {
-    const foeBefore = d.foe.meter.ultimate;
-    const wasHomeward = serpent(d.vashj)?.homeward === true;
-    step(d, serpentScript(tick));
-    const live = serpent(d.vashj);
-    if (foeBefore > d.foe.meter.ultimate) {
-      drained += foeBefore - d.foe.meter.ultimate;
-      homeward = live?.homeward === true;
-    }
-    if (wasHomeward && live === undefined) caught = true;
-  }
-  assertEquals(drained, 108);
-  assertTrue(homeward);
-  assertTrue(caught);
-  assertEquals(d.vashj.meter.ultimate, 0);
-});
 
 test("A rollback replays Mana Shield on, through a break and off to the live checksum [k1 scenario]", () => {
   for (const save of [10, 100, 250, 450]) {

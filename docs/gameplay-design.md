@@ -70,7 +70,7 @@ grab. A grab on the dash back's turnaround frame itself, before the release,
 is the pivot grab too. Shield and crouch pressed on the first pivot frame are
 still read before the pivot starts, so the shield stops as out of a dash and
 crouch is refused; from the second frame both act as from standing.
-makgora:ts/src/game/sim/pivotGrab.tests.ts checks the grab frames and the
+The headless sim checks the grab frames and the
 dash dance.
 
 ## Ground states and the stick map
@@ -476,7 +476,7 @@ transport (wisp#110) both call it.
     at 8 or more shows "Laggy connection: N frames of input delay" in the
     network indicator, ahead of the poor-connection line (whose frames-behind
     count it keeps), above the players' cards so the cards do not cover it.
-  - Measured headless (makgora:ts/test/online-rollback.test.ts, two humans
+  - Measured headless (measured headless, two humans
     and a computer, match 793's inputs over Battle.net's measured turn
     jitter, 20 s matches, R 4): agreed delay 2, 4, 7, 3, 13, 28 and 57 frames
     at 100, 200, 300, 160, 500, 1000 and 2000 ms (the lobby's echo includes
@@ -990,7 +990,7 @@ animations and their frames from #103/#392.
   double jump → rising up air through the platform → down air.
 
 Simulation, snapshot and keyboard/analog scenarios live in
-makgora:ts/src/game/sim/platformMoves.ts and platformMoves.tests.ts.
+makgora:ts/src/game/sim/platformMoves.ts.
 
 The manual platform-advantage script remains available. The former 60% gate
 measured the advantage created by vulnerable jump-squat descents. That product
@@ -2461,7 +2461,7 @@ after it (Tom's rule, 2026-10-26, #501; ts/src/game/sim/grabTeeter.tests.ts).
 
 FightCore publishes frame data only and states nothing about teetering. The
 rule lives in ts/src/game/sim/teeter.ts and holds the fighter at the deck's
-end with no speed or lag left; ts/src/game/sim/teeter.tests.ts replays each
+end with no speed or lag left; the headless sim replays each
 row.
 
 The tape checker holds the rule on every acceptance tape
@@ -2495,7 +2495,7 @@ shielder off an edge and cause edge slipping, except in Smash 4 and Ultimate"
 the edge is a free escape. Tom set the departure on 2026-10-26 to reward the
 corner; the parity ledger records it (`shield-pushback-teeter`). The rule lives
 in ts/src/game/sim/teeter.ts (`teeterShieldAtEdge`), called after the motion
-step and after body push; ts/src/game/sim/shieldTeeter.tests.ts replays it.
+step and after body push.
 
 `bun wisp combos --edge-shield` measures it (docs/commands/combos.md): every
 aerial landed from a hop on a shield 0, 6 or 12 units from a platform's end,
@@ -2791,7 +2791,7 @@ sweeps check every fighter's envelope and all eight aims against the stage.
 
 Tom, 2026-10-27: a fighter helpless in the air floats down. Hex (140 frames) and Sleep (160 frames) carry one `fall` share on their status rules (makgora:ts/src/game/sim/heroStatus.ts, `DISABLED_FALL`): while the status holds and the fighter is out of hitstun, gravity and max fall speed (and a fast fall already under way) are that share of the fighter's own, and only while descending, so a ground Hex hop climbs as before. A hit puts full gravity back until hitstun ends, and the status ending restores it at once; the state is derived from the status and hitstun, so snapshots hold nothing new. Presentation reads the sim's position, so the float is what is drawn.
 
-Measured from `heroStatus.tests.ts`: a median faller (every fighter on the default hero physics, gravity 1.38 and max fall 16.8 world units a frame; Shadow Hunter stands for them) with jumps spent, disabled at ledge height 120 units off the main deck's right edge, then pressing its up special toward the stage as the status ends. Unslowed it passes the blast zone (830 below the deck) by frame 55. At a tenth it falls 226 units in Hex's 140 frames and 259 in Sleep's 160, at most 1.68 a frame, and catches the ledge. Up-special-only depth from the same start (jumps spent, best of three aims; 8-unit search): Shadow Hunter 398, the median of the 21 default-physics fighters 437, range 187 (Warden, Jaina) to 546; so 259 is inside every measured depth but Warden's and Jaina's. Shadow Hunter's recovery fails at a share of about 0.135 (Sleep binds), so a tenth leaves a margin; an eighth passes with little.
+Measured headless: a median faller (every fighter on the default hero physics, gravity 1.38 and max fall 16.8 world units a frame; Shadow Hunter stands for them) with jumps spent, disabled at ledge height 120 units off the main deck's right edge, then pressing its up special toward the stage as the status ends. Unslowed it passes the blast zone (830 below the deck) by frame 55. At a tenth it falls 226 units in Hex's 140 frames and 259 in Sleep's 160, at most 1.68 a frame, and catches the ledge. Up-special-only depth from the same start (jumps spent, best of three aims; 8-unit search): Shadow Hunter 398, the median of the 21 default-physics fighters 437, range 187 (Warden, Jaina) to 546; so 259 is inside every measured depth but Warden's and Jaina's. Shadow Hunter's recovery fails at a share of about 0.135 (Sleep binds), so a tenth leaves a margin; an eighth passes with little.
 
 ### Edge-guarding and gimps (#387)
 

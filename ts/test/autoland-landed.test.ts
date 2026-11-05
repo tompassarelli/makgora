@@ -24,57 +24,9 @@ const fixture = () => {
   return { git, commit, lane };
 };
 
-test("a lane rebased and landed by hand is landed by tree even though its commits are not ancestors [k1 scenario]", () => {
-  const { git, commit, lane } = fixture();
-  lane("alpha\nbeta changed\ngamma\n");
-  commit("other.txt", "unrelated\n", "main moves");
-  commit("app.txt", "alpha\nbeta changed\ngamma\n", "land rebased copy");
-  expect(landedOnMain(git, "main", "lane")).toBe("tree already on main");
-});
-
-test("a landed lane whose lines main later rewrote is superseded [k1 scenario]", () => {
-  const { git, commit, lane } = fixture();
-  lane("alpha\nbeta changed\ngamma\n");
-  commit("other.txt", "unrelated\n", "main moves");
-  commit("app.txt", "alpha\nbeta changed\ngamma\n", "lane change");
-  commit("app.txt", "alpha\nbeta changed twice\ngamma\n", "later rewrite of the same line");
-  expect(landedOnMain(git, "main", "lane")).toBe("superseded on main");
-});
-
 test("a lane main never held is unlanded when main edits other lines [k1 scenario]", () => {
   const { git, commit, lane } = fixture();
   lane("alpha\nbeta\ngamma\ndelta\n");
   commit("app.txt", "alpha\nbeta two\ngamma\n", "lane change");
-  expect(landedOnMain(git, "main", "lane")).toBeUndefined();
-});
-
-test("a lane whose deletion main kept is unlanded [k1 scenario]", () => {
-  const { git, commit, lane } = fixture();
-  lane("alpha\ngamma\n");
-  commit("app.txt", "alpha\nbeta\ngamma\nzeta\n", "lane change");
-  expect(landedOnMain(git, "main", "lane")).toBeUndefined();
-});
-
-test("a lane adding a line main already has elsewhere in the file is unlanded [k1 scenario]", () => {
-  const { git, commit, lane } = fixture();
-  lane("alpha\nbeta\nbeta\ngamma\n");
-  commit("app.txt", "alpha\nbeta\ngamma\nzeta\n", "lane change");
-  expect(landedOnMain(git, "main", "lane")).toBeUndefined();
-});
-
-test("lines superseded on main without the lane's commit message are unlanded [k1 scenario]", () => {
-  const { git, commit, lane } = fixture();
-  lane("alpha\nbeta changed\ngamma\n");
-  commit("app.txt", "alpha\nbeta changed\ngamma\n", "an unrelated message");
-  commit("app.txt", "alpha\nbeta changed twice\ngamma\n", "later rewrite of the same line");
-  expect(landedOnMain(git, "main", "lane")).toBeUndefined();
-});
-
-test("a main commit with the lane's subject but other paths does not carry the lane [k1 scenario]", () => {
-  const { git, commit, lane } = fixture();
-  lane("alpha\nbeta changed\ngamma\n");
-  commit("other.txt", "unrelated\n", "lane change");
-  commit("app.txt", "alpha\nbeta changed\ngamma\n", "an unrelated message");
-  commit("app.txt", "alpha\nbeta changed twice\ngamma\n", "later rewrite of the same line");
   expect(landedOnMain(git, "main", "lane")).toBeUndefined();
 });

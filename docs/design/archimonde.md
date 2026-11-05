@@ -229,8 +229,7 @@ for a hurt capsule of radius 34.8 leaves the visible bodies overlapping. A
 normal's gap for a fighter wider than 30 now grows by 4/3 (jab 107 to 142,
 forward smash 160 to 213, back air -100 to -134). A headless test strikes the
 dummy staged for his jab, forward smash, forward tilt, down smash, neutral air
-and back air in both facings, clear of his body (`showcaseDummyReach.test.ts`;
-reverting the scale makes the jab rows fail). Landed at f470015537.
+and back air in both facings, clear of his body. Landed at f470015537.
 
 Still open for the native-check box: recapture the failing rows at that commit,
 shorten or shrink the contact flash on up smash, Bash and down air, give the

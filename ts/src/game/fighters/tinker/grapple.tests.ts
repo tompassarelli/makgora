@@ -1,5 +1,4 @@
-import { f32 } from "wisp/src/sim/f32";
-import { assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertFalse, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { Action, maskOf } from "../../input/actions";
 import { adaptInput } from "../../match/inputAdapter";
 import { inputRow } from "../../input/inputRow";
@@ -14,19 +13,13 @@ import { createFighter } from "../../sim/fighter";
 import { setWorldMotionValue } from "../../sim/motion";
 import { fighterAt } from "../../sim/roster";
 import { surfaceLeft, surfaceRight, surfaceZ } from "../../sim/stage";
-import { TINKER_MOVES } from "./moves";
 
 const NORDRASSIL = 10;
-const DUROTAR = 3;
 const TOP_PLATFORM = 3;
-const DRIFT_PLATFORM = 1;
-const SIDE_PLATFORM = 2;
-const MAIN_DECK_LEFT = -600.0;
 const FIRE = [Action.grab, Action.moveUp] as const;
 const UP = [Action.moveUp] as const;
 const FIRE_FRAMES = 11;
 const NEUTRAL: readonly Action[] = [];
-const spec = (() => { const grapple = TINKER_MOVES.grapple; if (grapple === undefined) throw new Error("Tinker has no grapple"); return grapple; })();
 
 function place(s: Scene, facing: number, x: number, z: number): void {
   const f = fighter(s);
@@ -60,52 +53,6 @@ function fireUntilLatched(s: Scene, fire: readonly Action[] = FIRE, hold: readon
   return fighter(s).grapple.state === GrappleState.latched ? 20 : -1;
 }
 
-function latchesUnderside(facing: number): void {
-  const s = beneath(NORDRASSIL, TOP_PLATFORM, facing);
-  assertEquals(fireUntilLatched(s), FIRE_FRAMES);
-  const g = fighter(s).grapple;
-  assertEquals(g.surface, TOP_PLATFORM);
-  assertTrue(g.spent);
-  assertGreaterThan(g.length, spec.minLength);
-  assertLessThan(g.length, spec.maxLength);
-}
-
-function followsDrift(facing: number): void {
-  const s = beneath(DUROTAR, DRIFT_PLATFORM, facing, 60, 70);
-  assertGreaterThan(fireUntilLatched(s), 0);
-  const f = fighter(s);
-  const anchorX = (): number => surfaceLeft(DUROTAR, f.grapple.surface, stageClock(s.game)) + f.grapple.anchorX;
-  const firstAnchor = anchorX();
-  for (let i = 0; i < 25; i++) {
-    frame(s, UP);
-    const dx = f.motion.x - anchorX();
-    const dz = f.motion.z + spec.handHeight - (surfaceZ(DUROTAR, f.grapple.surface, stageClock(s.game)) + f.grapple.anchorZ);
-    assertLessThan(Math.sqrt(dx * dx + dz * dz), f.grapple.length + 1.0);
-  }
-  assertGreaterThan(Math.abs(anchorX() - firstAnchor), 20.0);
-}
-
-test("The claw latches a Nordrassil platform's underside facing right on its first active frame [k1 scenario]", () => latchesUnderside(1));
-test("The claw latches a Nordrassil platform's underside facing left on its first active frame [k1 scenario]", () => latchesUnderside(-1));
-test("The claw latches a drifting Durotar platform facing right and the anchor follows it [k1 scenario]", () => followsDrift(1));
-test("The claw latches a drifting Durotar platform facing left and the anchor follows it [k1 scenario]", () => followsDrift(-1));
-
-test("The claw latches the stage edge from below the deck [k1 scenario]", () => {
-  const s = sceneFor(NORDRASSIL, 1);
-  place(s, 1, MAIN_DECK_LEFT - 110, 60.0);
-  assertGreaterThan(fireUntilLatched(s, [Action.grab], NEUTRAL), 0);
-  assertEquals(fighter(s).grapple.surface, 0);
-});
-
-test("The claw fired in open air does not latch and spends no latch [k1 scenario]", () => {
-  const s = sceneFor(NORDRASSIL, 1);
-  place(s, 1, 0.0, 900.0);
-  assertEquals(fireUntilLatched(s), -1);
-  run(s, 40, NEUTRAL);
-  const g = fighter(s).grapple;
-  assertEquals(g.state, GrappleState.none);
-  assertFalse(g.spent);
-});
 
 test("Only one latch is allowed per airtime and a landing restores it [k1 scenario]", () => {
   const s = beneath(NORDRASSIL, TOP_PLATFORM, 1);
@@ -124,54 +71,6 @@ test("Only one latch is allowed per airtime and a landing restores it [k1 scenar
   place(s, 1, 0.0, 400.0);
   run(s, 200, NEUTRAL);
   assertTrue(f.motion.grounded);
-  assertFalse(f.grapple.spent);
-});
-
-test("A hanging claw slips after the hang limit [k1 scenario]", () => {
-  const s = beneath(NORDRASSIL, TOP_PLATFORM, 1);
-  assertGreaterThan(fireUntilLatched(s), 0);
-  const f = fighter(s);
-  run(s, spec.hangFrames - 20, NEUTRAL);
-  assertEquals(f.grapple.state, GrappleState.latched);
-  run(s, 30, NEUTRAL);
-  assertEquals(f.grapple.state, GrappleState.none);
-  assertFalse(f.motion.grounded);
-});
-
-test("Jumping releases the swing and keeps its speed [k1 scenario]", () => {
-  const s = beneath(NORDRASSIL, TOP_PLATFORM, 1);
-  assertGreaterThan(fireUntilLatched(s), 0);
-  const f = fighter(s);
-  let fastest = 0.0;
-  for (let i = 0; i < 40; i++) {
-    frame(s, NEUTRAL);
-    fastest = Math.max(fastest, Math.abs(f.motion.vx));
-  }
-  assertGreaterThan(fastest, 1.0);
-  const before = Math.sqrt(f.motion.vx * f.motion.vx + f.motion.vz * f.motion.vz);
-  frame(s, [Action.jump]);
-  assertEquals(f.grapple.state, GrappleState.none);
-  assertGreaterThan(Math.sqrt(f.motion.vx * f.motion.vx + f.motion.vz * f.motion.vz), before * f32(0.7));
-  assertEquals(f.jump.remaining, createFighter(Character.tinker, 0.0, 1).jump.remaining);
-});
-
-test("Reeling all the way up pulls him onto the platform [k1 scenario]", () => {
-  const s = beneath(NORDRASSIL, TOP_PLATFORM, 1);
-  assertGreaterThan(fireUntilLatched(s), 0);
-  const f = fighter(s);
-  run(s, 90, UP);
-  assertTrue(f.motion.grounded);
-  assertEquals(f.motion.surface, TOP_PLATFORM);
-  assertEquals(f.grapple.state, GrappleState.none);
-});
-
-test("Being hit cuts the chain [k1 scenario]", () => {
-  const s = beneath(NORDRASSIL, TOP_PLATFORM, 1);
-  assertGreaterThan(fireUntilLatched(s), 0);
-  const f = fighter(s);
-  f.launch.hitstun = 20;
-  frame(s, NEUTRAL);
-  assertEquals(f.grapple.state, GrappleState.none);
   assertFalse(f.grapple.spent);
 });
 

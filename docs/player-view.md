@@ -164,7 +164,7 @@ Warcraft with an ACCESS_VIOLATION writing address 0x31 when a game ended with
 chat lines on screen (#681): on pool pair 1 on 2026-10-28, typing a chat line
 at fighter select and starting the next game crashed both clients 2 times in
 2, and the same build without the level change ran 5 such game ends clean. The
-map never changes the chat frame (makgora:ts/test/engineFrames.test.ts).
+map never changes the chat frame.
 
 ## Below the deck
 

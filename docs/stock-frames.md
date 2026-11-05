@@ -36,7 +36,7 @@ button is clicked natively across its width; headless tests cannot show this.
 | `ConsoleUIBackdrop` | our full-window backdrops, the pause screen, the fighter markers | removes all of them |
 | game UI (`ORIGIN_FRAME_GAME_UI`) | panel content in the 4:3 area, the status text | removes the panels |
 | world frame (`ORIGIN_FRAME_WORLD_FRAME`) | the 3D view | blacks the world |
-| chat box (`ORIGIN_FRAME_CHAT_MSG`) | Warcraft's chat lines and entry box | chat stops working; its level and place must not change either (makgora:ts/test/engineFrames.test.ts) |
+| chat box (`ORIGIN_FRAME_CHAT_MSG`) | Warcraft's chat lines and entry box | chat stops working; its level and place must not change either |
 
 Rule: never hide, disable or destroy a stock frame as a group, only a named
 frame, and test the all-hidden state before shipping. The first draft of this

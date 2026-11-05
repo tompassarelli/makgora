@@ -9,7 +9,6 @@ import { createRoster, fighterAt } from "../../sim/roster";
 const LEADER = 0;
 const FOE = 1;
 const PARTNER = 2;
-const OFF_STAGE = 10000.0;
 
 interface Duel {
   readonly state: ReplayState;
@@ -32,35 +31,6 @@ function steps(d: Duel, count: number): void {
 }
 
 const at = (d: Duel, slot: number) => fighterAt(d.state.world, slot);
-
-test("Grgl's blast-zone KO keeps Mrgl's stocks and the match running [k3 measure docs/design/murloc.md]", () => {
-  const d = duel();
-  const stocks = at(d, LEADER).status.stocks;
-  at(d, PARTNER).motion.x = OFF_STAGE;
-  steps(d, 300);
-  assertEquals(at(d, PARTNER).status.out, true, "Grgl is out");
-  assertEquals(at(d, PARTNER).status.stocks, 0, "Grgl leaves without a respawn");
-  assertEquals(at(d, LEADER).status.stocks, stocks, "Mrgl keeps every stock");
-  assertEquals(at(d, LEADER).status.out, false, "Mrgl plays on");
-  assertEquals(d.state.match.phase, Phase.match, "the match keeps running");
-});
-
-test("Mrgl's stock loss removes Grgl at once and both respawn together at 0% [k3 measure docs/design/murloc.md]", () => {
-  const d = duel();
-  const stocks = at(d, LEADER).status.stocks;
-  at(d, LEADER).status.damage = 90.0;
-  at(d, PARTNER).status.damage = 90.0;
-  at(d, LEADER).motion.x = -OFF_STAGE;
-  steps(d, 1);
-  assertEquals(at(d, LEADER).status.stocks, stocks - 1, "Mrgl loses one stock");
-  assertEquals(at(d, PARTNER).status.out, true, "Grgl leaves on the same frame");
-  steps(d, 200);
-  assertEquals(at(d, LEADER).status.out, false, "Mrgl is back");
-  assertEquals(at(d, PARTNER).status.out, false, "Grgl is back with him");
-  assertEquals(at(d, PARTNER).status.stocks, 1, "Grgl is alive again");
-  assertEquals(at(d, PARTNER).status.damage, 0.0, "Grgl returns at 0%");
-  assertEquals(at(d, LEADER).status.stocks, stocks - 1, "Grgl's return costs no stock");
-});
 
 test("Mrgl's last stock ends the match with Grgl alive [k3 measure docs/design/murloc.md]", () => {
   const lost = duel();

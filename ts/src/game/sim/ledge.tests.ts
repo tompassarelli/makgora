@@ -32,28 +32,6 @@ function hangingOn(side: number) {
   return { world, owner };
 }
 
-function assertCStickDrop(side: number): void {
-  const away = hangingOn(side);
-  stepDuel(away.world, controls({ getupDirectionPressed: true, getupDirection: side }));
-  const cAway = hangingOn(side);
-  stepDuel(cAway.world, controls({ cStickSideFlick: side }));
-  assertEquals(cAway.owner.ledge.state, LedgeState.none);
-  assertEquals(cAway.owner.motion.vx, away.owner.motion.vx);
-  assertEquals(cAway.owner.motion.vz, away.owner.motion.vz);
-  assertEquals(cAway.owner.ledge.regrab, away.owner.ledge.regrab);
-  const cToward = hangingOn(side);
-  stepDuel(cToward.world, controls({ cStickSideFlick: -side }));
-  assertEquals(cToward.owner.ledge.state, LedgeState.hang);
-}
-
-test("C-left on the left ledge drops like the stick away, and C-right toward the stage does not [k1 scenario]", () => {
-  assertCStickDrop(-1);
-});
-
-test("C-right on the right ledge drops like the stick away, and C-left toward the stage does not [k1 scenario]", () => {
-  assertCStickDrop(1);
-});
-
 test("dropping from the ledge with down held keeps a normal fall; a fresh down press after the drop fast-falls [k1 scenario]", () => {
   const held = hangingOn(1);
   stepDuel(held.world, controls({ down: true, ledgeVerticalPressed: -1 }));

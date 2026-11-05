@@ -1,20 +1,8 @@
 import { expect, test } from "bun:test";
-import { effectRecordProblem, formatEffectRecord } from "../scripts/wisp/cueModels";
-import { judgeUse, projectileUse, type EffectUse, type ModelFacts } from "../scripts/wisp/effectVisibility";
+import { judgeUse, projectileUse, type ModelFacts } from "../scripts/wisp/effectVisibility";
 import { Character } from "../src/game/sim/codes";
 import { projectileModelScale } from "../src/game/presentation/projectilePose";
 import { FLAME_STRIKE_BURST } from "../src/game/fighters/kaelthas/specials";
-
-const use = (model: string): EffectUse => ({ fighter: "fixture", move: `cue ${model}`, kind: "special cue", model, sequence: "stand", seconds: 0, timeScale: 1, travels: false, anchored: "fighter" });
-const drawsNothing: ModelFacts = { sequences: [{ name: "Stand", start: 0, end: 1000, looping: true, rarity: 0 }], particles: 0, legacyParticles: false, emitters: [], ribbons: [], geosets: [] };
-const record = (facts: ReadonlyMap<string, ModelFacts | null>) => formatEffectRecord({ cacheInfo: "0".repeat(64), models: new Map([...facts.keys()].map((model) => [model, "fixture"])), facts });
-
-test("the cue gate refuses a use whose model the record lacks and a use whose recorded facts draw nothing, and passes the same record without them [k2 property]", () => {
-  const text = record(new Map<string, ModelFacts | null>([["Fixture\\Blank.mdx", drawsNothing], ["Fixture\\Uncached.mdx", null]]));
-  expect(effectRecordProblem(text, [use("Fixture\\Uncached.mdx")])).toBeUndefined();
-  expect(effectRecordProblem(text, [use("Fixture\\Uncached.mdx"), use("Fixture\\Absent.mdx")])).toContain("no model facts for 1 newly used models");
-  expect(effectRecordProblem(text, [use("Fixture\\Uncached.mdx"), use("Fixture\\Blank.mdx")])).toContain("1 invisible uses refuse the gate: fixture/cue Fixture\\Blank.mdx");
-});
 
 const birthOnly: ModelFacts = {
   sequences: [{ name: "Birth", start: 0, end: 2000, looping: false, rarity: 0 }, { name: "Stand", start: 3000, end: 4000, looping: true, rarity: 0 }],

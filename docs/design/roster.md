@@ -10,7 +10,7 @@
 
 > **First names (1 November 2026):** Tom asked after a playtest for Tyrande and Archimonde to show as their first names only; the match HUD plate had wrapped "Tyrande Whisperwind" over two lines. The select card, the roster tile and the HUD plate all read `displayName` through `fighterName` in `ts/src/game/roster/kits.ts`, so the kits now say "Tyrande" and "Archimonde" and the HUD matches the select card for every fighter. The section titles below keep their full names; Muradin Bronzebeard and Maiev Shadowsong keep theirs because Tom named only these two.
 
-> **Select grid order (30 October 2026):** the character select grid lists the fighters by faction in reading order, Human, Orc, Undead, Night Elf, Burning Legion, then Neutral, with the Random tile last; `SELECT_GRID_ORDER` in `ts/src/game/ui/selectionLayout.ts` holds the order and `selectionFrames.tests.ts` pins it. Chen sits with the Neutral fighters (Tom, 30 October 2026).
+> **Select grid order (30 October 2026):** the character select grid lists the fighters by faction in reading order, Human, Orc, Undead, Night Elf, Burning Legion, then Neutral, with the Random tile last; `SELECT_GRID_ORDER` in `ts/src/game/ui/selectionLayout.ts` holds the order. Chen sits with the Neutral fighters (Tom, 30 October 2026).
 
 > **Select grid order (31 October 2026):** the grid now ends with Mannoroth (Pit Lord) and Archimonde, just before the Random tile, after the Neutral fighters; Onyxia takes the place between them when she replaces the Goblin Alchemist ([onyxia.md](onyxia.md); Tom, 31 October 2026).
 

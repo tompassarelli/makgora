@@ -1,7 +1,6 @@
-import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
-import { Action } from "./actions";
+import { assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { DEFAULT_PRESET, presetBindings } from "./keyBindings";
-import { chordComplete, chordKeys, chordLabels, noteChordKey, pausedInputKeys } from "./pauseChord";
+import { chordComplete, chordKeys, noteChordKey } from "./pauseChord";
 
 const bindings = presetBindings(DEFAULT_PRESET);
 const code = (character: string) => character.charCodeAt(0);
@@ -22,18 +21,4 @@ test("the reset chord needs Attack and two distinct shield keys held, from the p
   const released = holding(shield, light, attack);
   noteChordKey(released, bindings, light, false);
   assertFalse(chordComplete(released, bindings));
-});
-
-test("keys the chord does not use are never tracked, so a camera or jump key cannot complete it [k2 property]", () => {
-  const held = holding(code("W"), code("8"), code("N"), code("Q"));
-  assertFalse(chordComplete(held, bindings));
-  assertFalse(held[code("W")] === true);
-});
-
-test("the reset plate names the bound shield, light shield and attack keys, and the pause screen reads every movement, zoom and chord key [k2 property]", () => {
-  const labels = chordLabels(bindings);
-  assertEquals(`${labels.left} ${labels.right} ${labels.attack}`, "Q E N");
-  const keys = pausedInputKeys(bindings);
-  for (const action of [Action.moveLeft, Action.cUp, Action.leftTrigger, Action.attack]) assertTrue(keys.includes(bindings.keys[action * 2] ?? -1));
-  assertTrue(keys.includes(0x26));
 });

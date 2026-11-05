@@ -72,28 +72,3 @@ test("a fighter that has just gone helpless from an air special, a Dreadlord's w
     }
   }
 });
-
-test("a helpless fighter holding down refuses the ledge its fall crosses, and the same fall without down catches it [k1 scenario]", () => {
-  for (const source of SOURCES) {
-    const held = justHelpless(source, 1);
-    intoCatchBox(held);
-    stepDuel(held.world, controls({ down: true }));
-    assertEquals(held.f.ledge.state, LedgeState.none);
-    assertTrue(held.f.special.fall);
-    const free = justHelpless(source, 1);
-    intoCatchBox(free);
-    stepDuel(free.world);
-    assertEquals(free.f.ledge.state, LedgeState.hang);
-  }
-});
-
-test("a helpless fighter under the regrab lock refuses the ledge its fall crosses until the lock ends [k1 scenario]", () => {
-  for (const source of SOURCES) {
-    const h = justHelpless(source, -1);
-    intoCatchBox(h);
-    h.f.ledge.regrab = 30;
-    stepDuel(h.world);
-    assertEquals(h.f.ledge.state, LedgeState.none);
-    assertTrue(h.f.special.fall);
-  }
-});

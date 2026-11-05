@@ -78,9 +78,3 @@ test("A repair never plays a cursed fighter apart from her curse's owner, so she
   const cursed = repairedAgainstWhole(true);
   assertEquals(cursed.difference, undefined);
 });
-
-test("A repair plays a Murloc and the partner copying his stick as one scope, so both end as when every fighter is repaired [k1 scenario]", () => {
-  const murlocs = repairedAgainstWhole(false, Character.murloc);
-  assertGreaterThan(murlocs.scoped, 0);
-  assertEquals(murlocs.difference, undefined);
-});

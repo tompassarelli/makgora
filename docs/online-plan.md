@@ -198,7 +198,7 @@ figure is one catch-up callback at 9.56 ms against the 10 ms budget.
 ### Computers at delay 0
 
 `computerLead` = max(0, 2 − delay) = 2: every tier answers the same cue two
-frames sooner than at 2 (computerLead.tests.ts, Bun and Lua32). The lowest
+frames sooner than at 2. The lowest
 reaction any tier draws is 14 frames (Warchief's floor and the curve's
 minimum; Grunt ≥ 16, Peon ≥ 30), so the lead never takes a reaction below 12,
 and nothing clamps. The tiers stay as tuned.
@@ -207,6 +207,6 @@ and nothing clamps. The tiers stay as tuned.
 
 `--dev "delay 0"` on `bun wisp play --standalone` and the native-window
 launcher plays offline at 0: a development delay is any fixed delay from 0, and
-the build's floor bounds only Auto and peer proposals. inputFlash.test.ts
-shows the flash lighting one frame sooner at 0 than at 1. `--dev "delay 0"`
+the build's floor bounds only Auto and peer proposals. The input flash
+lights one frame sooner at 0 than at 1. `--dev "delay 0"`
 and the default (1) can be played back to back.

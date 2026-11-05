@@ -1,4 +1,4 @@
-import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { sweep } from "../core/sweep";
 import { gatedFighters } from "../roster/forge";
@@ -68,10 +68,6 @@ function checkDashAttack(fighter: Character, side: 1 | -1, gap: number): void {
   assertEquals(run.fullAnimation, true, `fighter ${fighter} facing ${side} from ${gap} cut its dash attack short`);
   if (gap <= GAPS[1]) assertEquals(run.endX, run.edge);
 }
-
-test("Dash attack ledge: Blademaster's dash attack from a full run 2 units short of the right ledge, stick held toward it, plays its whole animation and stops at the ledge on stage [k1 scenario]", () => {
-  checkDashAttack(Character.blademaster, 1, GAPS[0]);
-});
 
 sweep("Dash attack ledge: every fighter's dash attack from a full run toward either ledge at 2, 30, 90 and 180 units, stick held toward it, plays its whole animation and ends on stage, at the ledge from the two nearest [k1 scenario]", () => {
   for (const fighter of gatedFighters()) {

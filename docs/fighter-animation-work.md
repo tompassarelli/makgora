@@ -669,7 +669,7 @@ cursed run (2026-10-28), so no walk plays it. Tom
 asked for the run back as it was before the walk work (2026-10-28): it plays
 `Locomotion Run` (sequence 120, 0.6 s) at its drawn stride of 332.739 units a
 second, its keys byte-identical to the model of ed12325435^.
-ts/test/illidan-gait.test.ts pins both clips and both rates. `Locomotion Initial Dash Burst`
+Both clips and both rates are fixed in the authored data. `Locomotion Initial Dash Burst`
 compresses into a push-off, then feeds the run. The ten authored burst frames
 are retimed over the simulation's thirteen dash frames; run starts on frame 14.
 The simulation still supplies all movement speeds and frame data.

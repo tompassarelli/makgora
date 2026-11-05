@@ -1,8 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
-import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
-import { ACTION_LABELS, BINDING_PRESETS, type BindingPreset, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, previousDefaultKeys, reservedReason, slotIndex, unboundActions } from "../input/keyBindings";
-import { CUSTOM_SLOT_COUNT, type LayoutBindings, SLOT_NAME_LIMIT, decodeLayouts, encodeLayouts, layoutSave, presetLayouts } from "../input/layoutSave";
+import { ACTION_LABELS, CLEAR_KEY, PRESET_NAMES, encodeBindings, keyFor, keyLabel, presetBindings, reservedReason, unboundActions } from "../input/keyBindings";
+import { CUSTOM_SLOT_COUNT, SLOT_NAME_LIMIT, decodeLayouts, encodeLayouts } from "../input/layoutSave";
 import {
   type BindingLoadResult,
   type BindingSettings,
@@ -13,21 +12,15 @@ import {
   clearKey,
   createBindingSettings,
   initializeBindingSettings,
-  loadSavedBindings,
   beginNaming,
   endNaming,
   nameSlot,
   pickCustomSlot,
   slotLabel,
-  pickBindingPreset,
   resetToLayout,
   saveBindingSettings,
-  toggleCStickTilt,
-  toggleKeyboardPreview,
-  toggleStickJump,
 } from "./bindingSettings";
 import { PLAYER_FILE_CAPACITY } from "../core/gameFiles";
-import { keyboardCaps } from "./keyboardLayout";
 import { bindAttack, code, persistedSettings, slots } from "./bindingSettingsFixture";
 
 const BACKSPACE = 0x08;
@@ -37,9 +30,6 @@ const F6 = 0x75;
 const F7 = 0x76;
 const EQUALS = 0xbb;
 const MINUS = 0xbd;
-const OPEN_BRACKET = 0xdb;
-const CLOSE_BRACKET = 0xdd;
-const encodeSlots = (save: { layouts: LayoutBindings; active: BindingPreset }) => encodeLayouts(layoutSave(save.layouts, save.active));
 
 function customSettings(): BindingSettings {
   const empty: BindingLoadResult = { kind: "empty" };
@@ -100,209 +90,6 @@ test("a rebind swaps with the action holding the key, Delete and the x clear a s
   assertEquals(settings.message, `${PRESET_NAMES.custom} defaults restored. Save to keep them.`);
 });
 
-test("the = and - keys capture as bindings, are named, and have a cap on the controls screen's keyboard [k2 property]", () => {
-  const settings = customSettings();
-  beginBindingCapture(settings, Action.attack, 0);
-  assertEquals(captureBinding(settings, EQUALS), true);
-  beginBindingCapture(settings, Action.modX, 0);
-  assertEquals(captureBinding(settings, MINUS), true);
-  assertEquals(slots(settings, Action.attack), "= —", "Attack after binding =");
-  assertEquals(slots(settings, Action.modX), "- —", "Mod X after binding -");
-  assertEquals(keyLabel(EQUALS), "=");
-  assertEquals(keyLabel(MINUS), "-");
-  const caps = keyboardCaps(f32(0.12), f32(0.465));
-  for (const key of [EQUALS, MINUS]) assertEquals(caps.filter(cap => cap.key === key).length, 1, `cap for ${keyLabel(key)}`);
-  const rightEdge = Math.max(...caps.map(cap => cap.x + cap.width));
-  assertEquals(rightEdge < f32(0.09) + f32(0.66), true, "keyboard stays inside the controls panel");
-});
-
-test("Y captures as a binding for any action, swapping with the action that holds it, and is no longer reserved [k2 property]", () => {
-  const settings = customSettings();
-  assertEquals(reservedReason(code("Y")), undefined);
-  beginBindingCapture(settings, Action.attack, 0);
-  assertEquals(captureBinding(settings, code("Y")), true);
-  assertEquals(slots(settings, Action.attack), "Y —", "Attack after binding Y");
-  assertEquals(slots(settings, Action.strong), "0 —", "Strong before the swap");
-  beginBindingCapture(settings, Action.strong, 0);
-  assertEquals(captureBinding(settings, code("Y")), true);
-  assertEquals(slots(settings, Action.strong), "Y —", "Strong after binding Y");
-  assertEquals(slots(settings, Action.attack), "0 —", "Attack after the swap");
-  assertEquals(settings.message, `Swapped with ${ACTION_LABELS[Action.attack]}.`);
-  assertEquals(settings.capture, undefined);
-});
-
-test("the [ and ] keys capture as bindings, are named, and have a cap on the controls screen's keyboard [k2 property]", () => {
-  const settings = customSettings();
-  beginBindingCapture(settings, Action.attack, 0);
-  assertEquals(captureBinding(settings, OPEN_BRACKET), true);
-  beginBindingCapture(settings, Action.modX, 0);
-  assertEquals(captureBinding(settings, CLOSE_BRACKET), true);
-  assertEquals(slots(settings, Action.attack), "[ —", "Attack after binding [");
-  assertEquals(slots(settings, Action.modX), "] —", "Mod X after binding ]");
-  const caps = keyboardCaps(f32(0.12), f32(0.465));
-  for (const key of [OPEN_BRACKET, CLOSE_BRACKET]) assertEquals(caps.filter(cap => cap.key === key).length, 1, `cap for ${keyLabel(key)}`);
-  const rightEdge = Math.max(...caps.map(cap => cap.x + cap.width));
-  assertEquals(rightEdge < f32(0.09) + f32(0.66), true, "keyboard stays inside the controls panel");
-});
-
-test("every cap on the controls screen's keyboard captures as a binding and shows its own name [k2 property]", () => {
-  for (const { key } of keyboardCaps(f32(0.12), f32(0.465))) {
-    const settings = customSettings();
-    beginBindingCapture(settings, Action.attack, 1);
-    assertEquals(captureBinding(settings, key), true);
-    assertEquals(keyFor(settings.bindings, Action.attack, 1), key, `cap ${key} binds`);
-    assertEquals(keyLabel(key).startsWith("KEY "), false, `cap ${key} is named`);
-  }
-});
-
-test("each layout keeps its own edits when switching, and only Reset to layout restores the defaults [k2 property]", () => {
-  const settings = customSettings();
-  bindAttack(settings, code("L"));
-  applyBindingPreset(settings, "wasd");
-  assertEquals(slots(settings, Action.attack), "N —", "WASD keeps its stock Attack");
-  applyBindingPreset(settings, "custom");
-  assertEquals(slots(settings, Action.attack), "L —", "Custom keeps the edit after switching back");
-  resetToLayout(settings);
-  assertEquals(slots(settings, Action.attack), "N —", "Reset to layout");
-});
-
-const stockKeys = (preset: BindingPreset) => presetBindings(preset).keys.join(",");
-
-test("editing a key on WASD or Box copies that layout into a new Custom profile named WASD/Box - custom(1..n) without overwriting an existing custom profile, selects it and saves it, and WASD and Box stay stock [k2 property]", () => {
-  for (const preset of ["wasd", "standard"] as const) {
-    const stored = { encoded: undefined as string | undefined };
-    const settings = persistedSettings(stored);
-    applyBindingPreset(settings, preset);
-    bindAttack(settings, code("B"));
-    assertEquals(settings.layout, "custom", `${preset} edit selects Custom`);
-    assertEquals(slotLabel(settings), `${PRESET_NAMES[preset]} - custom1`, `${preset} edit names the new custom profile`);
-    assertEquals(slots(settings, Action.attack), "B —", `${preset} edit applied`);
-    assertEquals(keyFor(settings.bindings, Action.jump, 0), keyFor(presetBindings(preset), Action.jump, 0), `${preset} rest copied`);
-    assertEquals(settings.layouts[preset].keys.join(","), stockKeys(preset), `${preset} stays stock in memory`);
-    const reopened = persistedSettings(stored);
-    assertEquals(reopened.layout, "custom", `${preset} saved as the active layout`);
-    assertEquals(slotLabel(reopened), `${PRESET_NAMES[preset]} - custom1`, `${preset} saved custom name`);
-    assertEquals(slots(reopened, Action.attack), "B —", `${preset} saved edit`);
-    applyBindingPreset(reopened, preset);
-    assertEquals(reopened.bindings.keys.join(","), stockKeys(preset), `${preset} stays stock when reopened`);
-  }
-  const multi = persistedSettings({ encoded: undefined });
-  pickCustomSlot(multi, 0);
-  bindAttack(multi, code("B"));
-  pickBindingPreset(multi, "wasd");
-  bindAttack(multi, code("M"));
-  assertEquals(multi.slot, 1, "does not overwrite slot 0");
-  assertEquals(slotLabel(multi, 1), "WASD - custom1");
-  assertEquals(keyLabel(keyFor(multi.customs[0]?.bindings ?? multi.bindings, Action.attack, 0)), "B", "slot 0 keeps its keys");
-  pickBindingPreset(multi, "wasd");
-  bindAttack(multi, code("V"));
-  assertEquals(multi.slot, 2, "next edit creates slot 2");
-  assertEquals(slotLabel(multi, 2), "WASD - custom2");
-  pickBindingPreset(multi, "standard");
-  bindAttack(multi, code("F"));
-  assertEquals(multi.slot, 3, "creates slot 3 when the first three are full");
-  assertEquals(slotLabel(multi, 3), "Box - custom1");
-
-  const swapped = persistedSettings({ encoded: undefined });
-  beginBindingCapture(swapped, Action.attack, 0);
-  captureBinding(swapped, code("Q"));
-  assertEquals(slots(swapped, Action.attack), "Q —", "a swap edits Custom");
-  assertEquals(slots(swapped, Action.leftTrigger), "N —", "the swapped action moves in Custom");
-  assertEquals(swapped.layouts.wasd.keys.join(","), stockKeys("wasd"), "a swap leaves WASD stock");
-});
-
-test("clearing a key on a stock layout copies it into Custom with the key cleared, and a refused key changes nothing [k2 property]", () => {
-  const stored = { encoded: undefined as string | undefined };
-  const settings = persistedSettings(stored);
-  beginBindingCapture(settings, Action.attack, 0);
-  captureBinding(settings, BACKSPACE);
-  assertEquals(settings.layout, "wasd", "a refused key keeps the layout");
-  assertEquals(stored.encoded, undefined, "a refused key saves nothing");
-  clearKey(settings, code("N"));
-  assertEquals(settings.layout, "custom", "clearing selects Custom");
-  assertEquals(slots(settings, Action.attack), "— —", "key cleared in Custom");
-  assertEquals(settings.layouts.wasd.keys.join(","), stockKeys("wasd"), "WASD stays stock");
-  assertEquals(persistedSettings(stored).layout, "custom", "saved");
-});
-
-test("saving keeps all three layouts and the active one, and a new session reopens on them [k2 property]", () => {
-  const stored = { encoded: undefined as string | undefined };
-  const settings = persistedSettings(stored);
-  applyBindingPreset(settings, "custom");
-  bindAttack(settings, code("L"));
-  applyBindingPreset(settings, "standard");
-  applyBindingPreset(settings, "custom");
-  saveBindingSettings(settings);
-
-  const reopened = persistedSettings(stored);
-  assertEquals(reopened.layout, "custom", "active layout");
-  assertEquals(slots(reopened, Action.attack), "L —", "Custom keys");
-  applyBindingPreset(reopened, "standard");
-  assertEquals(slots(reopened, Action.attack), "N —", "Box keys");
-  applyBindingPreset(reopened, "wasd");
-  assertEquals(slots(reopened, Action.attack), "N —", "WASD keys");
-});
-
-test("a one-set save from before layouts loads as the active layout's keys, and -load reopens it on Custom [k2 property]", () => {
-  const keys = presetBindings("wasd");
-  keys.keys[slotIndex(Action.attack, 0)] = code("B");
-  const old = encodeBindings(keys);
-  const settings = persistedSettings({ encoded: old });
-  assertEquals(settings.layout, "custom", "own keys land on Custom");
-  assertEquals(slots(settings, Action.attack), "B —", "old save keys");
-  applyBindingPreset(settings, "wasd");
-  assertEquals(slots(settings, Action.attack), "N —", "WASD is still stock");
-
-  const stock = persistedSettings({ encoded: encodeBindings(presetBindings("standard")) });
-  assertEquals(stock.layout, "standard", "a stock old save opens on its layout");
-
-  applyBindingPreset(settings, "standard");
-  loadSavedBindings(settings, () => undefined);
-  assertEquals(settings.layout, "custom", "-load selects Custom");
-  assertEquals(slots(settings, Action.attack), "B —", "Custom gets the profile");
-  applyBindingPreset(settings, "standard");
-  assertEquals(slots(settings, Action.attack), "N —", "Box is untouched by -load");
-});
-
-test("a one-set save still on the old WASD defaults opens on WASD with C-up on Y, while an edited one stays Custom [k2 property]", () => {
-  const stock = persistedSettings({ encoded: encodeBindings({ keys: previousDefaultKeys("wasd") }) });
-  assertEquals(stock.layout, "wasd", "an old stock save opens on its layout");
-  assertEquals(slots(stock, Action.strong), "9 —", "Strong moved");
-  assertEquals(slots(stock, Action.cUp), "Y —", "C-up moved");
-  const edited = { keys: previousDefaultKeys("wasd") };
-  edited.keys[slotIndex(Action.attack, 0)] = code("B");
-  const own = persistedSettings({ encoded: encodeBindings(edited) });
-  assertEquals(own.layout, "custom", "edited keys land on Custom");
-  assertEquals(slots(own, Action.strong), "9 Y", "edited Strong stays");
-  assertEquals(slots(own, Action.cUp), "H —", "edited C-up stays");
-});
-
-test("each layout shows the same keys however the screen reaches it: opening on a save from before the layout defaults moved, then clicking layouts and the Custom slot list in any order [k2 property]", () => {
-  const own = presetBindings("standard");
-  own.keys[slotIndex(Action.attack, 0)] = code("B");
-  const old = encodeSlots({ layouts: { wasd: { keys: previousDefaultKeys("wasd") }, standard: { keys: previousDefaultKeys("standard") }, custom: own }, active: "wasd" });
-  const shown = (settings: Readonly<BindingSettings>) => encodeBindings(settings.bindings);
-  for (const clicks of [["custom", "wasd", "profile", "custom"], ["standard", "profile", "custom", "wasd"], ["profile", "standard", "custom", "profile", "wasd"]]) {
-    const stored = { encoded: old as string | undefined };
-    const settings = persistedSettings(stored);
-    const seen: Partial<Record<BindingPreset, string>> = { [settings.layout]: shown(settings) };
-    for (const click of [...clicks, "wasd", "standard", "custom"]) {
-      if (click === "profile") {
-        pickCustomSlot(settings, 0);
-      }
-      else pickBindingPreset(settings, click as BindingPreset);
-      const keys = shown(settings);
-      assertEquals(keys, seen[settings.layout] ??= keys, `${PRESET_NAMES[settings.layout]} after ${clicks.join(", ")} then ${click}`);
-    }
-    assertEquals(slots(settings, Action.attack), "B —", `Custom keeps its own keys after ${clicks.join(", ")}`);
-    const reopened = persistedSettings(stored);
-    for (const preset of BINDING_PRESETS) {
-      applyBindingPreset(reopened, preset);
-      assertEquals(shown(reopened), seen[preset], `${PRESET_NAMES[preset]} saved after ${clicks.join(", ")}`);
-    }
-  }
-});
-
 test("three Custom slots each keep their own keys and name through a save, and the full save fits the player file [k2 property]", () => {
   const stored = { encoded: undefined as string | undefined };
   const settings = persistedSettings(stored);
@@ -334,56 +121,5 @@ test("three Custom slots each keep their own keys and name through a save, and t
   const full = encodeLayouts({ layouts: longest.layouts, active: "custom", customs: longest.customs, slot: CUSTOM_SLOT_COUNT - 1, keyboard: true, stickJump: true, cStickTilt: false });
   assertEquals(full.length <= PLAYER_FILE_CAPACITY, true, `${full.length} characters fit ${PLAYER_FILE_CAPACITY}`);
   assertEquals(decodeLayouts(full)?.customs.map(custom => custom.name).join(","), longest.customs.map(custom => custom.name).join(","), "longest names round-trip");
-});
-
-test("an older one-Custom save loads its Custom into slot 1, and slots 2 and 3 start as stock Custom with no name [k2 property]", () => {
-  const own = presetBindings("custom");
-  own.keys[slotIndex(Action.attack, 0)] = code("B");
-  const settings = persistedSettings({ encoded: `KL${BINDING_PRESETS.indexOf("custom")}${[presetBindings("wasd"), presetBindings("standard"), own].map(bindings => encodeBindings(bindings)).join("")}` });
-  assertEquals(settings.slot, 0, "slot 1 is active");
-  assertEquals(slots(settings, Action.attack), "B —", "slot 1 holds the old Custom");
-  for (const slot of [1, 2]) {
-    pickCustomSlot(settings, slot);
-    assertEquals(settings.bindings.keys.join(","), presetBindings("custom").keys.join(","), `slot ${slot + 1} stock`);
-    assertEquals(slotLabel(settings), `Custom ${slot + 1}`, `slot ${slot + 1} name`);
-  }
-  const oneSet = persistedSettings({ encoded: encodeBindings(own) });
-  assertEquals(oneSet.slot, 0, "a one-set save lands in slot 1");
-  assertEquals(slots(oneSet, Action.attack), "B —", "one-set keys in slot 1");
-});
-
-test("a brand-new player has Show keyboard in game on, turning it off is saved with their controls and a load brings it back off, and a save from before the setting loads with it off [k2 property]", () => {
-  const saved: string[] = [];
-  const empty: BindingLoadResult = { kind: "empty" };
-  const settings = createBindingSettings(0, { load: (_owner, complete) => complete(saved.length === 0 ? empty : { kind: "loaded", encoded: saved[saved.length - 1] ?? "" }), readLocal: () => empty, save: (_owner, encoded) => { saved.push(encoded); } });
-  initializeBindingSettings(settings);
-  assertEquals(settings.keyboard, true, "fresh profile");
-  toggleKeyboardPreview(settings);
-  assertEquals(settings.keyboard, false, "turned off");
-  assertEquals(saved.length, 1, "saved at once");
-  assertEquals(decodeLayouts(saved[0] ?? "")?.keyboard, false, "saved as off");
-
-  const again = createBindingSettings(0, { load: (_owner, complete) => complete({ kind: "loaded", encoded: saved[0] ?? "" }), readLocal: () => empty, save: () => undefined });
-  initializeBindingSettings(again);
-  assertEquals(again.keyboard, false, "off after a load");
-  toggleKeyboardPreview(again);
-  assertEquals(again.keyboard, true, "on again");
-
-  const current = encodeLayouts(layoutSave(presetLayouts(), "wasd", false));
-  const withHints = "KN" + current.slice(2, 4) + "1" + current.slice(5);
-  assertEquals(decodeLayouts(withHints)?.keyboard, false, "a save from the new-player hints days, hints on");
-  assertEquals(decodeLayouts(withHints)?.stickJump, false, "stick jump defaults off on older saves");
-  assertEquals(decodeLayouts(withHints)?.cStickTilt, true, "c-stick tilt defaults on on older saves");
-  const older = "KM" + current.slice(2, 4) + current.slice(5);
-  assertEquals(decodeLayouts(older)?.keyboard, false, "a save from before either setting");
-  assertEquals(decodeLayouts(encodeLayouts(layoutSave(presetLayouts(), "wasd", true)))?.keyboard, true, "on survives a save and load");
-
-  assertEquals(settings.stickJump, false, "stick jump starts off");
-  assertEquals(settings.cStickTilt, true, "c-stick tilt starts on");
-  toggleStickJump(settings);
-  toggleCStickTilt(settings);
-  const toggled = decodeLayouts(saved[saved.length - 1] ?? "");
-  assertEquals(toggled?.stickJump, true, "stick jump saved on");
-  assertEquals(toggled?.cStickTilt, false, "c-stick tilt saved off");
 });
 

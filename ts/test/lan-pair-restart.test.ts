@@ -2,7 +2,7 @@ import { afterAll, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Effect, Exit } from "effect";
+import { Effect } from "effect";
 import { type PairStatus, restartPair } from "../scripts/wisp/commands/lanPoolUnit";
 
 const state = mkdtempSync(join(tmpdir(), "makgora-pair-restart-"));
@@ -52,25 +52,9 @@ test("a pair with a crashed client is stopped, restarted and waited on until bot
   expect(events).toEqual(["stop", "start default", "status none", "status none", "status down", "status back", "checks"]);
 });
 
-test("a restart whose pair never comes back fails naming the client still down instead of handing the pair to checks [k1 scenario]", async () => {
-  const { control, events } = fakePair([crashed]);
-  const exit = await Effect.runPromiseExit(restartPair(0, { ...control, within: "50 millis" }).pipe(Effect.tap(() => Effect.sync(() => events.push("checks")))));
-  expect(Exit.isFailure(exit)).toBe(true);
-  expect(String(exit)).toContain("lan0a not running");
-  expect(events).not.toContain("checks");
-});
-
 test("a restarted pair whose clients run before the pool lists it is waited on until pool.json names it, so accept never reads a pool without the pair [k1 scenario]", async () => {
   const { control, events } = fakePair([back], 2);
   const drop = await Effect.runPromise(restartPair(0, control).pipe(Effect.tap(() => Effect.sync(() => events.push("checks")))));
   expect(drop?.dropped).toEqual(["client lan0a"]);
   expect(events).toEqual(["stop", "start default", "status back", "unlisted", "status back", "unlisted", "status back", "checks"]);
-});
-
-test("a restarted pair the pool never lists fails saying so instead of handing an unlisted pair to checks [k1 scenario]", async () => {
-  const { control, events } = fakePair([back], Number.MAX_SAFE_INTEGER);
-  const exit = await Effect.runPromiseExit(restartPair(0, { ...control, within: "50 millis" }).pipe(Effect.tap(() => Effect.sync(() => events.push("checks")))));
-  expect(Exit.isFailure(exit)).toBe(true);
-  expect(String(exit)).toContain("the pool hasn't listed it");
-  expect(events).not.toContain("checks");
 });

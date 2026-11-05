@@ -66,7 +66,7 @@ set the timing relations; every region, damage and angle is original.
   short-hop up air, two more short-hop up airs, a full-hop up air and a
   full-hop forward air sweetspot each land in hitstun and take the stock
   (68% before the knee). The string is found by search over jump timing and
-  aerials and replayed in aerials.tests.ts; it checks no victim input, so DI
+  aerials and replayed headless; it checks no victim input, so DI
   escape is untested.
 
 ## Sources and decisions

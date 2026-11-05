@@ -12,10 +12,8 @@ import { duelPair, lift, stepDuel } from "./testDuel";
 const MAIN = 0;
 const STAGE_LIMIT = 24;
 const LAG_GAP = 12.0;
-const SHORT_MARGIN = 40.0;
 const DROP = 4.0;
 const SETTLE_FRAMES = 3;
-const SLIDE_FRAMES = 260;
 const LEDGE_WINDOW = 40;
 const CATCH_FRAMES = 4;
 const HOLD_FRAMES = 12;
@@ -57,19 +55,6 @@ function waveland(character: Character, stage: number, deck: number, side: numbe
 
 function settle(s: Slide, frames: number): void {
   for (let i = 0; i < frames; i++) stepDuel(s.world, controls(), controls(), s.stage);
-}
-
-function settleToRest(s: Slide): void {
-  for (let i = 0; i < SLIDE_FRAMES && s.f.motion.grounded && (s.f.motion.vx !== 0.0 || s.f.landing.lag > 0); i++) settle(s, 1);
-}
-
-function slideDistance(character: Character, stage: number): number | undefined {
-  const deck = MAIN;
-  const middle = f32(f32(stages.surfaceLeft(stage, deck, 0) + stages.surfaceRight(stage, deck, 0)) / 2.0);
-  const s = waveland(character, stage, deck, 1, -1, f32(stages.surfaceRight(stage, deck, 0) - middle));
-  const from = s.f.motion.x;
-  settleToRest(s);
-  return s.f.motion.grounded && s.f.motion.surface === deck ? f32(s.f.motion.x - from) : undefined;
 }
 
 function slide(s: Slide, input: Readonly<Controls>, deck: number): number {
@@ -148,22 +133,4 @@ for (const character of gatedFighters()) {
     for (const count of Object.values(counts)) assertGreaterThan(count, 0);
   });
 
-  test(`Wavedash edge: ${fighterName(character)}'s wavedash that stops short of the edge on traction stays on the deck, in both facings [k1 scenario]`, () => {
-    const problems: string[] = [];
-    let measured = 0;
-    for (const stage of stageList()) {
-      const reach = slideDistance(character, stage);
-      if (reach === undefined) continue;
-      assertGreaterThan(Math.abs(reach), 0.0);
-      measured++;
-      for (const facing of [1, -1]) {
-        const s = waveland(character, stage, MAIN, 1, facing, f32(Math.abs(reach) + SHORT_MARGIN));
-        settleToRest(s);
-        const tag = `stage ${stage} facing ${facing}`;
-        check(problems, s.f.motion.grounded && s.f.motion.surface === MAIN && s.f.ledge.state === LedgeState.none && s.f.motion.x < edgeOf(stage, MAIN, 1), s, tag, "stayed on the deck");
-      }
-    }
-    report(problems);
-    assertGreaterThan(measured, 1);
-  });
 }

@@ -47,8 +47,7 @@ window (parity rows `pivot-grab` and `pivot-window`). Tom's playtest on
 2026-11-01 found a grab on the pivot frame gave a still standing grab with no
 reach bonus, because only Turn-run gave the pivot grab; he asked for the
 Melee-style sliding pivot grab out of a dash with the pivot box, and for the
-pivot to last two frames as an easier window. Tests:
-makgora:ts/src/game/sim/pivotGrab.tests.ts.
+pivot to last two frames as an easier window. 
 
 A grab pressed while holding shield stays buffered through hitlag and
 shield stun and starts on the first free frame, without shield release.

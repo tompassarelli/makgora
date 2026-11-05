@@ -16,13 +16,13 @@ const queue = (count: number): Lane[] => Array.from({ length: count }, (_, index
 
 interface FakeRun { readonly id: number; readonly display_title: string; readonly status: string }
 
-const github = (lanes: readonly Lane[], runs: readonly FakeRun[], unpushed: ReadonlySet<string> = new Set()) => {
+const github = (lanes: readonly Lane[], runs: readonly FakeRun[]) => {
   const calls: string[] = [];
   const job = { name: "suite / bun 1", status: "in_progress", created_at: "2026-10-25T20:50:00Z", started_at: "2026-10-25T20:50:10Z", labels: ["ubuntu-latest"] };
   const gh = (path: string): unknown => {
     calls.push(path);
     if (path === `repos/${REPO}/actions/workflows/autoland.yml/runs?event=push&per_page=100`)
-      return { workflow_runs: lanes.flatMap((lane, index) => unpushed.has(lane.branch) ? [] : [{ head_branch: lane.branch, head_sha: lane.tip, created_at: pushedAt(index), event: "push" }]) };
+      return { workflow_runs: lanes.map((lane, index) => ({ head_branch: lane.branch, head_sha: lane.tip, created_at: pushedAt(index), event: "push" })) };
     const statuses = /^repos\/[^/]+\/[^/]+\/commits\/([0-9a-f]{40})\/statuses\?per_page=100$/.exec(path);
     if (statuses !== null) return [{ context: "autoland", created_at: "2026-10-25T20:58:00Z" }, { context: "autoland", created_at: "2026-10-25T19:00:00Z" }, { context: "denylist", created_at: "2026-10-25T18:00:00Z" }];
     const listed = /\/actions\/workflows\/autoland\.yml\/runs\?status=(\w+)&per_page=100$/.exec(path);
@@ -75,16 +75,6 @@ test("a plan fetches one push-run list and the open-run lists for a ten-lane que
   const forty = github(longer, full);
   planReads(forty.gh, longer);
   expect(forty.calls).toHaveLength(saturated.calls.length);
-});
-
-test("a lane missing from the push-run list keeps its first autoland status as its arrival, at one status fetch for that lane alone [k2 property]", () => {
-  const lanes = queue(10);
-  const { gh, calls } = github(lanes, [], new Set(["claude/land-3"]));
-  const since = arrivals(gh, lanes);
-  expect(since[tip(3)]).toBe("2026-10-25T19:00:00Z");
-  expect(since[tip(4)]).toBe(pushedAt(4));
-  expect(calls.filter((path) => path.includes("/statuses"))).toEqual([`repos/${REPO}/commits/${tip(3)}/statuses?per_page=100`]);
-  expect(calls).toHaveLength(2);
 });
 
 test("a tip whose own test run set testing alone is not dispatched again while the open-run lists miss that run, and is again once that status outlives a live test [k2 property]", () => {

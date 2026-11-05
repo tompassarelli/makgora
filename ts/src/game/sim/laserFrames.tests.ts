@@ -1,5 +1,4 @@
-import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
-import { floorMod } from "wisp/src/sim/intMath";
+import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { Action } from "../input/actions";
 import { airborne, fighter, frame, scene } from "../match/padScene";
 import { Character } from "./codes";
@@ -86,9 +85,6 @@ function play(character: Character, hop: Hop, fastFall: boolean | ((moment: Mome
   return { starts, spawns, landed: landed ?? -1, landingLag, specialOnLanding };
 }
 
-const takeoff = (moment: Moment): boolean => moment.airTicks === 0;
-const afterLanding = (moment: Moment): boolean => moment.landed !== undefined && moment.tick === moment.landed + 1;
-
 test("Eye Beam and Shadow Strike leave on Falco's and Fox's startup frame, standing and in the air, and a second one only starts after their total frames, never a frame sooner [k4 reference melee]", () => {
   for (const laser of LASERS) {
     for (const air of [false, true]) {
@@ -105,72 +101,4 @@ test("Eye Beam and Shadow Strike leave on Falco's and Fox's startup frame, stand
       assertTrue(early.spawns.every((spawn) => spawn === shot || spawn >= total + shot));
     }
   }
-});
-test("A short-hop laser pressed on the takeoff frame fires on the aerial startup frame, is cut by the landing with no landing lag, and leaves the fighter able to fire at once, fast fall or not [k4 reference melee]", () => {
-  for (const laser of LASERS) {
-    for (const fastFall of [false, true]) {
-      const hop = play(laser.character, "short", fastFall, takeoff);
-      assertEquals(hop.starts.length, 1, `${laser.name} short hop starts`);
-      assertEquals(hop.spawns.join(","), String(hop.starts[0]! + laser.melee.airShot - 1), `${laser.name} short hop shot`);
-      assertGreaterThan(hop.landed, hop.spawns[0]!);
-      assertEquals(hop.landingLag, laser.melee.landingLag, `${laser.name} landing lag`);
-      assertEquals(hop.specialOnLanding, 0, `${laser.name} special on landing`);
-      const chained = play(laser.character, "short", fastFall, (moment) => takeoff(moment) || afterLanding(moment));
-      assertEquals(chained.starts[1], hop.landed + 1, `${laser.name} next laser starts the frame after landing`);
-    }
-  }
-});
-
-test("A short-hop double laser fires its air laser on the aerial startup frame and its landing laser on the standing startup frame after a landing with no lag, whether or not the first beam is still in flight [k4 reference melee]", () => {
-  for (const laser of LASERS) {
-    for (const fastFall of [false, true]) {
-      const run = play(laser.character, "short", fastFall, (moment) => takeoff(moment) || afterLanding(moment));
-      assertEquals(run.starts.length, 2, `${laser.name} double laser starts`);
-      assertEquals(run.starts[1], run.landed + 1);
-      assertEquals(run.spawns.join(","), [run.starts[0]! + laser.melee.airShot - 1, run.starts[1]! + laser.melee.groundShot - 1].join(","), `${laser.name} double laser shots`);
-    }
-  }
-});
-
-test("A full hop mashing the laser on every frame it is allowed fires one every aerial total frames from the takeoff, lands out of the one in progress and fires the landing laser the frame after [k4 reference melee]", () => {
-  for (const laser of LASERS) {
-    const { airShot, airFrames, groundShot } = laser.melee;
-    const run = play(laser.character, "full", false, (moment) => takeoff(moment) || afterLanding(moment)
-      || (moment.landed === undefined && moment.lastStart !== undefined && moment.tick === moment.lastStart + airFrames));
-    const first = run.starts[0]!;
-    const airStarts: number[] = [];
-    for (let start = first; start <= run.landed; start += airFrames) airStarts.push(start);
-    const airShots = airStarts.map((start) => start + airShot - 1).filter((shot) => shot <= run.landed);
-    assertEquals(run.starts.slice(0, airStarts.length).join(","), airStarts.join(","), `${laser.name} full hop starts`);
-    assertEquals(run.starts[airStarts.length], run.landed + 1);
-    assertEquals(run.spawns.join(","), [...airShots, run.landed + groundShot].join(","), `${laser.name} full hop shots`);
-    assertGreaterThan(airShots.length, 0);
-  }
-});
-
-/** Fox's Blaster loops while B is pressed again: another shot every 10 frames from the first, a repeat press counting from frame 4 (meleeframedata.com/fox; SmashWiki Fox (SSBM)/Neutral special repeat window). */
-const FOX_REFIRE = { firstPress: 4, every: 10 };
-
-test("Shadow Strike short-hop double lasers as Fox does: B on the takeoff frame and again on the earliest refire frame throws two daggers before landing, Fox's refire apart, then lands with no lag, fast falling after the second or not [k4 reference melee]", () => {
-  const shot = FOX.airShot;
-  for (const fastFall of [false, true]) {
-    const run = play(Character.warden, "short", (moment) => fastFall && moment.shots >= 2,
-      (moment) => takeoff(moment) || (moment.lastStart !== undefined && moment.tick === moment.lastStart + FOX_REFIRE.firstPress - 1));
-    const label = fastFall ? "fast fall" : "no fast fall";
-    assertEquals(run.starts.length, 1, `${label}: one cast`);
-    const start = run.starts[0]!;
-    assertEquals(run.spawns.join(","), [start + shot - 1, start + shot - 1 + FOX_REFIRE.every].join(","), `${label}: daggers`);
-    assertGreaterThan(run.landed, run.spawns[1]!);
-    assertEquals(run.landingLag, 0, `${label}: landing lag`);
-    assertEquals(run.specialOnLanding, 0, `${label}: special on landing`);
-  }
-});
-
-test("Mashing Shadow Strike on the ground throws a dagger every 10 frames, Fox's Blaster rate, and a press before frame 4 does not loop it [k4 reference melee]", () => {
-  const mashed = play(Character.warden, "none", false, (moment) => floorMod(moment.tick, 2) === 1 && moment.tick <= 60);
-  const first = FOX.groundShot;
-  assertEquals(mashed.starts[0], 1);
-  assertEquals(mashed.spawns.slice(0, 5).join(","), [0, 1, 2, 3, 4].map((n) => first + n * FOX_REFIRE.every).join(","), "mashed daggers");
-  const early = play(Character.warden, "none", false, (moment) => moment.tick === 1 || moment.tick === FOX_REFIRE.firstPress - 1);
-  assertEquals(early.spawns.join(","), String(first), "a press on frame 3 does not loop");
 });

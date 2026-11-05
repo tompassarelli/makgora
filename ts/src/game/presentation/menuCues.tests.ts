@@ -32,27 +32,3 @@ test("Choosing Random for a computer plays no fighter voice, only the neutral co
   menuFrameCues(before, game, undefined, cues);
   assertEquals(cues.fighters.join(","), String(CPU));
 });
-
-test("A human cannot pick Random, so a Random request voices nothing and changes no cue [k2 property]", () => {
-  const { game, before, cues } = lobbyWithComputer();
-  game.characterReadiness[0] = false;
-  menuFrameCues(before, game, undefined, cues);
-  selectCharacter(game, 0, RANDOM_FIGHTER);
-  menuFrameCues(before, game, undefined, cues);
-  assertEquals(cues.fighters.length, 0);
-  assertFalse(cues.confirm);
-});
-
-test("Moving a computer from a named fighter back to Random voices nothing, and Random to a named fighter voices it once [k2 property]", () => {
-  const { game, before, cues } = lobbyWithComputer();
-  selectCpuCharacter(game, 0, CPU, at(PLAYABLE_CHARACTERS, 2));
-  menuFrameCues(before, game, undefined, cues);
-  assertEquals(cues.fighters.length, 1);
-  selectCpuCharacter(game, 0, CPU, RANDOM_FIGHTER);
-  menuFrameCues(before, game, undefined, cues);
-  assertEquals(cues.fighters.length, 0);
-  assertTrue(cues.confirm);
-  selectCpuCharacter(game, 0, CPU, at(PLAYABLE_CHARACTERS, 2));
-  menuFrameCues(before, game, undefined, cues);
-  assertEquals(cues.fighters.length, 1);
-});

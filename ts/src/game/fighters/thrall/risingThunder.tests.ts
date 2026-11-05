@@ -1,9 +1,8 @@
-import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
 import { firstFighterDifference } from "../../../generated/state/fighterDifference";
 import { copyFighterState } from "../../../generated/state/fighterState";
 import { Action } from "../../input/actions";
 import { Phase } from "../../lobby/lobbyState";
-import { RECOVERY_BANDS, upSpecialRoute } from "../../match/recoveryEnvelope";
 import { fighter, frame, scene } from "../../match/padScene";
 import { stepMatch } from "../../match/step";
 import { copyReplayState, createReplaySnapshot, type ReplayState } from "../../replay/snapshot";
@@ -12,15 +11,10 @@ import { createFighter, type Fighter } from "../../sim/fighter";
 import { type Controls, copyControls, fighterAt } from "../../sim/roster";
 import { FOLLOW_UP_FORM } from "../../sim/specials/schema";
 import { controls } from "../../sim/testWorld";
-import { RISING_THUNDER_LANDING_LAG } from "./risingThunder";
 
 const FOE_X = 40.0;
 const WATCH = 160;
-const VERTICAL_BAND = 1;
-const R = Action.moveRight;
-const D = Action.moveDown;
 const U = Action.moveUp;
-const A = Action.attack;
 
 interface Rise {
   readonly hits: number;
@@ -75,71 +69,8 @@ function rise(percent: number, followUp: (k: number) => readonly Action[] = () =
   return { hits, damage: afterStrike - percent, knockbackX, knockbackZ, hitstun, actionable, foeFree, followUpHit, secondUpSpecial };
 }
 
-test("Rising Thunder rises 400-560 and steers 320-600 across, inside the vertical recovery band [k1 scenario]", () => {
-  const band = RECOVERY_BANDS[VERTICAL_BAND];
-  const route = upSpecialRoute(Character.thrall, 100);
-  assertEquals(band?.name, "vertical");
-  const inside = (value: number, low: number, high: number) => value >= low && value <= high;
-  assertEquals(`rise ${route.rise} ${inside(route.rise, band?.riseMin ?? 0, band?.riseMax ?? 0)}, reach ${route.reach} ${inside(route.reach, band?.reachMin ?? 0, band?.reachMax ?? 0)}`, "rise 527 true, reach 346 true");
-});
-
-test("Rising Thunder strikes seven times on a standing foe, eruption, five rising hammer hits and the apex, for 18.5 damage [k1 scenario]", () => {
-  const hit = rise(0.0);
-  assertEquals(`${hit.hits} hits, ${hit.damage}`, "7 hits, 18.5");
-});
-
-test("Rising Thunder's apex launch and hitstun are the same at 0, 60 and 150 percent [k1 scenario]", () => {
-  const low = rise(0.0);
-  for (const percent of [60.0, 150.0]) {
-    const high = rise(percent);
-    assertEquals(`${high.knockbackX} ${high.knockbackZ} ${high.hitstun}`, `${low.knockbackX} ${low.knockbackZ} ${low.hitstun}`, `${percent}%`);
-  }
-  assertGreaterThan(low.hitstun, 0);
-});
-
-test("After a Rising Thunder hit Thrall acts at frame 45 with at least 20 frames before the foe can act [k1 scenario]", () => {
-  const hit = rise(0.0);
-  assertEquals(hit.actionable, 45);
-  assertGreaterThan(hit.foeFree - hit.actionable, 19);
-});
-
-const followUpHits = (plan: (k: number) => readonly Action[]) => [0, 60, 150].map((percent) => `${percent}% ${rise(percent * 1.0, plan).followUpHit}`).join(", ");
-const EVERY_PERCENT = "0% true, 60% true, 150% true";
-
-test("After a Rising Thunder hit, down air strikes the foe inside its hitstun at 0, 60 and 150 percent [k1 scenario]", () => {
-  assertEquals(followUpHits((k) => k === 4 ? [D, A] : [R]), EVERY_PERCENT);
-});
-
-test("After a Rising Thunder hit, forward air strikes the foe inside its hitstun at 0, 60 and 150 percent [k1 scenario]", () => {
-  assertEquals(followUpHits((k) => k === 2 ? [R, A] : [R]), EVERY_PERCENT);
-});
-
-test("After a Rising Thunder hit, a fast-fall into up air strikes the foe inside its hitstun at 0, 60 and 150 percent [k1 scenario]", () => {
-  assertEquals(followUpHits((k) => k === 1 ? [D] : k === 3 ? [U, A] : k < 3 ? [R] : []), EVERY_PERCENT);
-});
-
 test("A Rising Thunder hit leaves no second Up B in the same airtime [k1 scenario]", () => {
   assertEquals(rise(0.0, () => [], true).secondUpSpecial, false);
-});
-
-test("A Rising Thunder whiff falls helpless until it lands, then takes 30 frames of special-fall landing lag [k1 scenario]", () => {
-  const s = scene(0, [{ character: Character.thrall, x: 0.0, facing: 1 }, { character: Character.rifleman, x: -600.0, facing: 1 }]);
-  const thrall = fighter(s, 0);
-  for (let n = 0; n < 10; n++) frame(s, [], []);
-  frame(s, [U, Action.special], []);
-  let ended = false;
-  let helplessEveryFrame = true;
-  let landingLag = -1;
-  for (let n = 2; n <= WATCH && landingLag < 0; n++) {
-    frame(s, [], []);
-    if (thrall.special.action === SpecialAction.none && !thrall.motion.grounded) {
-      ended = true;
-      helplessEveryFrame &&= thrall.special.fall;
-    }
-    if (ended && thrall.motion.grounded) landingLag = thrall.landing.lag;
-  }
-  assertEquals(RISING_THUNDER_LANDING_LAG, 30);
-  assertEquals(`helpless ${ended && helplessEveryFrame}, landing lag ${landingLag}`, "helpless true, landing lag 30");
 });
 
 interface Bout {

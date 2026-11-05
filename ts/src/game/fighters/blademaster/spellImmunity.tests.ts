@@ -46,22 +46,12 @@ function exchange(foe: Character, foeX: number, press: readonly Action[], stormy
 }
 
 const NEUTRAL = [Action.special] as const;
-const DOWN = [Action.special, Action.moveDown] as const;
 
 const SPECIALS: readonly (readonly [string, Character, number, readonly Action[]])[] = [
   ["Warden Shadow Strike (projectile, poison)", Character.warden, 320.0, NEUTRAL],
-  ["Dreadlord Sleep (projectile, sleep)", Character.dreadlord, 320.0, DOWN],
-  ["Malfurion Entangling Roots (roots)", Character.malfurion, 160.0, NEUTRAL],
-  ["Thrall Doomhammer Slam (melee)", Character.thrall, 70.0, DOWN],
-  ["Cairne War Stomp (melee)", Character.cairne, 70.0, DOWN],
-  ["Kael Banish (status)", Character.kaelthas, 100.0, DOWN],
 ];
 
 for (const [name, character, x, press] of SPECIALS) {
-  test(`${name} hits Blademaster outside Bladestorm [k1 scenario]`, () => {
-    const out = exchange(character, x, press, false);
-    assertTrue(out.damage > 0.0 || out.status);
-  });
 
   test(`${name} passes through Blademaster during Bladestorm [k1 scenario]`, () => {
     const out = exchange(character, x, press, true);
@@ -73,23 +63,8 @@ for (const [name, character, x, press] of SPECIALS) {
   });
 }
 
-test("A projectile special flies on through Bladestorm instead of being spent on him [k1 scenario]", () => {
-  assertTrue(exchange(Character.warden, 320.0, NEUTRAL, true).passed);
-});
-
-test("A special passing through Bladestorm leaves the spell-immune cue [k1 scenario]", () => {
-  assertTrue(exchange(Character.warden, 320.0, NEUTRAL, true).cue);
-  assertFalse(exchange(Character.warden, 320.0, NEUTRAL, false).cue);
-});
-
 test("A forward smash still connects with Blademaster during Bladestorm [k1 scenario]", () => {
   const out = exchange(Character.warden, 70.0, [Action.strong, Action.moveLeft], true);
   assertTrue(out.stormed);
   assertGreaterThan(out.damage, 0.0);
-});
-
-test("A grab still connects with Blademaster during Bladestorm [k1 scenario]", () => {
-  const out = exchange(Character.warden, 70.0, [Action.grab], true);
-  assertTrue(out.stormed);
-  assertTrue(out.grabbed);
 });

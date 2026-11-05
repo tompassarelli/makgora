@@ -143,8 +143,7 @@ shield. Reward: a second position to threaten from, a disengage that keeps
 pressure, an edge-guard (leave the image at the ledge, swap there), and one
 length of sideways travel offstage before an angled Rising Whirlwind. The
 computer recovers with both: from 700 units past the ledge at deck height
-with no jump left, the step is what gets him back
-(makgora:ts/src/game/fighters/blademaster/recovery.tests.ts).
+with no jump left, the step is what gets him back.
 
 Rejected: an image that attacks on its own (an autonomous clone is a second
 fighter's worth of pressure for 15 mana; the roster forbids autonomous clone
@@ -194,8 +193,7 @@ guard by frame 46 (makgora:tools/animations/blademaster-clips.ts,
 countered, so the kick also meets an attacker that was falling fast.
 
 Counterplay: the fade is the cue. Wait it out: every fighter's dash attack or
-running grab pressed the frame after the window closes lands before he can act
-(makgora:ts/src/game/fighters/blademaster/specials.tests.ts). Grabs and
+running grab pressed the frame after the window closes lands before he can act. Grabs and
 shields beat it outright, since only a strike is countered.
 
 Rejected for #523 and later replaced: the dash through the opponent (no hit,

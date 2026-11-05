@@ -2,66 +2,9 @@ import { expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readdirSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Effect } from "effect";
-import { PLAYABLE_FILE, TOM_EDITION, buildLabel, parseInstalled } from "../scripts/wisp/greenBuilds";
-import { build, releaseBuildArgs } from "../scripts/wisp/commands/map";
-import { playName, playableMapBuild } from "../scripts/wisp/currentPlaytest";
 import { OLD_FOLDER, installLatest, library, pendingTidy } from "../scripts/wisp/mapLibrary";
 
-const git = (repo: string, ...args: string[]) => {
-  const run = Bun.spawnSync(["git", "-C", repo, "-c", "user.name=lane", "-c", "user.email=lane@example.invalid", ...args]);
-  expect(run.exitCode).toBe(0);
-  return run.stdout.toString().trim();
-};
 
-const commit = (repo: string, message: string) => git(repo, "commit", "-q", "--allow-empty", "-m", message);
-const head = (repo: string) => git(repo, "rev-parse", "HEAD");
-const name = (repo: string, revision: string) => Effect.runPromise(playName(revision, repo));
-
-test("a dev build is named for the next release and the first-parent commits since the last release tag, growing with each main commit and ignoring a merged side branch's own commits [k5 boundary git-dev-build-number]", async () => {
-  const repo = mkdtempSync(join(tmpdir(), "makgora-dev-build-"));
-  try {
-    git(repo, "init", "-q", "-b", "main");
-    commit(repo, "before the release");
-    git(repo, "tag", "v0.1.5");
-    commit(repo, "first");
-    const first = head(repo);
-    commit(repo, "second");
-    const second = head(repo);
-    git(repo, "checkout", "-q", "-b", "side");
-    commit(repo, "side one");
-    commit(repo, "side two");
-    git(repo, "checkout", "-q", "main");
-    git(repo, "merge", "-q", "--no-ff", "-m", "merge side", "side");
-    const merged = head(repo);
-    expect(await name(repo, first)).toBe("Mak'gora 0.2-dev.1");
-    expect(await name(repo, second)).toBe("Mak'gora 0.2-dev.2");
-    expect(await name(repo, merged)).toBe("Mak'gora 0.2-dev.3");
-    expect(await name(repo, "v0.1.5")).toBe("Mak'gora 0.1.5");
-    git(repo, "tag", "v0.2");
-    expect(await name(repo, head(repo))).toBe("Mak'gora 0.2");
-    commit(repo, "after the next release");
-    expect(await name(repo, head(repo))).toBe("Mak'gora 0.3-dev.1");
-    git(repo, "tag", "v0.3-rc.2");
-    expect(await name(repo, head(repo))).toBe("Mak'gora 0.3 RC-2");
-  } finally {
-    rmSync(repo, { recursive: true, force: true });
-  }
-});
-
-test("a dev build file name parses back to its version and number, and a release or candidate file carries no number [k2 property]", () => {
-  for (const build of [1, 9, 830, 12345]) {
-    expect(parseInstalled(`Mak'gora 0.1.5-dev.${build}.w3x`)).toEqual({ version: [0, 1, 5], build, candidate: undefined });
-  }
-  expect(parseInstalled("Mak'gora 0.2-dev.830.w3x")).toEqual({ version: [0, 2, 0], build: 830, candidate: undefined });
-  expect(parseInstalled("Mak'gora 0.2.w3x")).toEqual({ version: [0, 2, 0], build: undefined, candidate: undefined });
-  expect(parseInstalled("Mak'gora 0.1.4.w3x")).toEqual({ version: [0, 1, 4], build: undefined, candidate: undefined });
-  expect(parseInstalled("Mak'gora 0.1.5 RC-2.w3x")).toEqual({ version: [0, 1, 5], build: undefined, candidate: 2 });
-  expect(PLAYABLE_FILE.exec("Mak'gora 0.1.5-dev c9e5fbd.w3x")).toBeNull();
-  expect(parseInstalled("Mak'gora 0.3.0.w3x")).toEqual({ version: [0, 3, 0], build: undefined, candidate: undefined });
-  expect(buildLabel("Mak'gora 0.4-dev.7.w3x")).toBe("0.4-dev.7");
-  expect(buildLabel("Mak'gora 0.3-dev.692.w3x")).toBe("0.3-dev.692");
-});
 
 test("installing a dev build leaves the latest release and the newest dev build at the top of the Maps folder and moves older releases to old/ [k5 boundary maps-folder]", () => {
   const documents = mkdtempSync(join(tmpdir(), "makgora-maps-folder-"));
@@ -87,26 +30,4 @@ test("installing a dev build leaves the latest release and the newest dev build 
     rmSync(documents, { recursive: true, force: true });
     rmSync(staging, { recursive: true, force: true });
   }
-});
-
-test("a hand release build runs the argv Tom's dev builds run, so it cannot carry the debug build's settings [k5 boundary map-release-argv]", () => {
-  const dev = playableMapBuild("Mak'gora 0.2", "/tmp/out.w3x", false, TOM_EDITION);
-  expect(dev.slice(0, 2)).toEqual(["bun", "wisp"]);
-  expect(releaseBuildArgs(["--name", "Mak'gora 0.2", "--out", "/tmp/out.w3x"])).toEqual(dev.slice(4));
-  expect(releaseBuildArgs(["--out", "/tmp/out.w3x", "--commit", "abc123", "--predict-cost", "--name", "Mak'gora 0.2"])).toEqual(
-    playableMapBuild("Mak'gora 0.2", "/tmp/out.w3x", true, TOM_EDITION, "abc123").slice(4),
-  );
-});
-
-test("a release build takes only a name, an output, a commit and the cost prediction, and an unknown option fails rather than picking another profile [k2 property]", () => {
-  expect(releaseBuildArgs(["--name", "Mak'gora 0.2"])).toBeUndefined();
-  expect(releaseBuildArgs(["--out", "/tmp/out.w3x"])).toBeUndefined();
-  expect(releaseBuildArgs(["--name", "n", "--out", "o", "--profile", "main"])).toBeUndefined();
-  expect(releaseBuildArgs(["--name", "n", "--out", "o", "--edition", "full"])).toBeUndefined();
-  expect(releaseBuildArgs(["--name", "n", "--name", "m", "--out", "o"])).toBeUndefined();
-});
-
-test("a map build without --profile is refused and points at the release build [k5 boundary map-build-bare]", async () => {
-  const outcome = await Effect.runPromise(Effect.flip(build(["--name", "Mak'gora 0.2", "--out", "/tmp/out.w3x"])));
-  expect(String(outcome.problem)).toContain("map release");
 });

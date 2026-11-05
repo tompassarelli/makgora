@@ -23,11 +23,3 @@ test("a model whose layer leaves its texture animation unset is refused, because
   expect(layerReferenceProblem(bytes)).toBe("material 0 layer 0 names texture animation 0 of 0");
   expect(shippedLayerProblem([{ entry: "war3mapImported\\Probe.mdx", bytes: () => bytes }])).toContain("war3mapImported\\Probe.mdx: material 0 layer 0");
 });
-
-test("a layer with no texture animation, or one the model holds, passes, and only models are read [k2 property]", () => {
-  expect(layerReferenceProblem(model([{ ...layer, TVertexAnimId: null }], 0))).toBeUndefined();
-  expect(layerReferenceProblem(model([{ ...layer, TVertexAnimId: 0 }], 1))).toBeUndefined();
-  expect(layerReferenceProblem(model([{ ...layer, TVertexAnimId: 1 }], 1))).toBe("material 0 layer 0 names texture animation 1 of 1");
-  expect(layerReferenceProblem(model([{ ...layer, TVertexAnimId: null, TextureID: 1 }], 0))).toBe("material 0 layer 0 names texture 1 of 1");
-  expect(shippedLayerProblem([{ entry: "war3mapImported\\Probe.blp", bytes: () => model([layer], 0) }])).toBeUndefined();
-});

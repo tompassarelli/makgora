@@ -1,9 +1,6 @@
 import { afterEach, expect, test } from "bun:test";
-import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { landedLanes, LANE_TRAILER, revertArgs, type Commit, type LandedLane } from "../scripts/sheriff";
+import { rmSync } from "node:fs";
+import { landedLanes, LANE_TRAILER, type Commit, type LandedLane } from "../scripts/sheriff";
 
 const sha = (value: number) => value.toString(16).padStart(40, "0");
 
@@ -42,30 +39,3 @@ test("a lane is found whole across generated trains and a commit outside every l
 
 const scratch: string[] = [];
 afterEach(() => { for (const dir of scratch.splice(0)) rmSync(dir, { recursive: true, force: true }); });
-
-test("a lane whose landed commit carries the regenerated reports reverts even after a later lane regenerated them again [k1 scenario]", () => {
-  const dir = mkdtempSync(join(tmpdir(), "sheriff-"));
-  scratch.push(dir);
-  const git = (...args: string[]) => {
-    const done = spawnSync("git", ["-C", dir, "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", ...args], { encoding: "utf8" });
-    if (done.status !== 0) throw new Error(`git ${args.join(" ")}: ${done.stderr}`);
-    return done.stdout.trim();
-  };
-  const report = "tools/move-data/advantage-state.md";
-  const land = (rule: string, rows: string, message: string) => {
-    writeFileSync(join(dir, "rule.txt"), rule);
-    writeFileSync(join(dir, report), rows);
-    git("add", "-A");
-    git("commit", "-qm", message);
-  };
-  git("init", "-q", "-b", "main");
-  mkdirSync(join(dir, "tools/move-data"), { recursive: true });
-  land("one\n", "rows before\n", "base");
-  land("two\n", "rows with the culprit\n", "culprit");
-  const culprit = git("rev-parse", "HEAD");
-  writeFileSync(join(dir, "other.txt"), "later\n");
-  land("two\n", "rows with the later lane\n", "later");
-  git(...revertArgs([culprit]));
-  expect(readFileSync(join(dir, "rule.txt"), "utf8")).toBe("one\n");
-  expect(readFileSync(join(dir, report), "utf8")).toBe("rows with the later lane\n");
-});

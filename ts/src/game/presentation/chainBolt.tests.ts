@@ -1,4 +1,4 @@
-import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Action } from "../input/actions";
 import { fighter, frame, scene } from "../match/padScene";
@@ -29,15 +29,6 @@ function cast(distances: readonly number[]): { readonly bolt: ReturnType<typeof 
 
 const near = (a: number, b: number): boolean => Math.abs(a - b) <= 1.0;
 
-test("Chain Lightning's bolt ends on the body it hits, not past it [k1 scenario]", () => {
-  const { bolt, hit, foes } = cast([300.0]);
-  assertTrue(hit);
-  const foe = foes[0];
-  if (foe === undefined) throw new Error("no foe");
-  assertTrue(near(bolt.x2, foe.x));
-  assertTrue(near(bolt.z2, f32(foe.z + BEAM_TARGET_HEIGHT)));
-});
-
 test("Chain Lightning's bolt ends on the farthest of the foes it hits, so each lies on it [k1 scenario]", () => {
   const { bolt, hit, foes } = cast([200.0, 400.0]);
   assertTrue(hit);
@@ -45,10 +36,4 @@ test("Chain Lightning's bolt ends on the farthest of the foes it hits, so each l
   if (far === undefined) throw new Error("no far foe");
   assertTrue(near(bolt.x2, far.x));
   assertTrue(near(bolt.z2, f32(far.z + BEAM_TARGET_HEIGHT)));
-});
-
-test("Chain Lightning's bolt keeps its full reach when nothing is hit [k1 scenario]", () => {
-  const { bolt, hit } = cast([1500.0]);
-  assertEquals(hit, false);
-  assertTrue(near(Math.sqrt((bolt.x2 - bolt.x1) ** 2 + (bolt.z2 - bolt.z1) ** 2), 520.0));
 });

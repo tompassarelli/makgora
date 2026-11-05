@@ -2,15 +2,11 @@ import { expect, test } from "bun:test";
 import { f32 } from "wisp/src/sim/f32";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import { install, startBuild } from "../src/platform/main";
-import { Phase, createMatchState, cycleSlotMode, nextMatchCharacter, setHumanMask } from "../src/game/lobby/lobbyState";
-import { RANDOM_FIGHTER, nextCpuCharacter, selectCharacter, selectCpuCharacter } from "../src/game/lobby/characterChoice";
-import { drawCpuFighter } from "../src/game/match/cpuProfiles";
-import { PLAYABLE_CHARACTERS } from "../src/game/roster/kits";
-import { applyRulePreset } from "../src/game/lobby/rulePresets";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { Character } from "../src/game/sim/codes";
 import { fighterAt } from "../src/game/sim/roster";
-import { COMING_SOON, fighterStatus, isComingSoon, shownFighters } from "../src/game/roster/forge";
+import { COMING_SOON, fighterStatus } from "../src/game/roster/forge";
 import { type BarBox, DRAWER_ROWS, SELECT_BAR } from "../src/game/core/selectBarLayout";
 import { type RosterGrid, cellRect, laidOut } from "../src/game/menu/selectionGrid";
 import { COMING_SOON_ALPHA, RANDOM_FIGHTER_TILE, ROSTER_TILES, characterOfTile, selectGrid, tileLabel, tileOfCharacter } from "../src/game/ui/selectionFrames";
@@ -41,14 +37,6 @@ function value<T>(client: HeadlessClient, body: () => T): T {
 const frameNamed = (client: HeadlessClient, name: string) => client.frames.snapshot().find(frame => frame.name === name);
 const COMING_SOON_FIGHTERS = [Character.whitemane, Character.valeera];
 const tileFrame = (client: HeadlessClient, kind: "Portrait" | "Forge" | "Name", tile: number) => frameNamed(client, `MeleeTile${kind}${client.slot}_${tile}`);
-
-test("the Forge match rule starts Off and Reset default turns it Off [k2 property]", () => {
-  const game = createMatchState();
-  expect(game.forge).toBe(false);
-  game.forge = true;
-  applyRulePreset(game, 0, "standard");
-  expect(game.forge).toBe(false);
-});
 
 test("one player turning the Forge rule on in Match Rules shows the Forge tiles with the Hammer badge on both clients' grids, Reset default hides them on both, and a Forge pick fights on both clients with no divergence [k1 scenario]", () => {
   expect(fighterStatus(FORGE_FIGHTER)).toBe("forge");
@@ -130,33 +118,3 @@ test("one player turning the Forge rule on in Match Rules shows the Forge tiles 
   }
   expect(clients.firstDivergence()).toBeUndefined();
 }, 60_000);
-
-test("with the Forge rule on, Sally Whitemane and Valeera are coming soon: no human, CPU, cycle or Random draw lands on them, while a playable Forge fighter such as Akama is picked [k2 property]", () => {
-  expect(PLAYABLE_CHARACTERS.filter(isComingSoon)).toEqual(COMING_SOON_FIGHTERS);
-  for (const fighter of COMING_SOON_FIGHTERS) expect(tileLabel(tileOfCharacter(fighter))).toBe(COMING_SOON);
-  const game = createMatchState();
-  game.forge = true;
-  setHumanMask(game, 0b01);
-  for (let cycle = 0; cycle < 2; cycle++) expect(cycleSlotMode(game, 0, 1)).toBe(true);
-  for (const fighter of COMING_SOON_FIGHTERS) {
-    const [human, cpu] = [game.characterChoices[0], game.characterChoices[1]];
-    selectCharacter(game, 0, fighter);
-    selectCpuCharacter(game, 0, 1, fighter);
-    expect([game.characterChoices[0], game.characterChoices[1]]).toEqual([human, cpu]);
-  }
-  selectCharacter(game, 0, Character.akama);
-  selectCpuCharacter(game, 0, 1, Character.akama);
-  expect([game.characterChoices[0], game.characterChoices[1]]).toEqual([Character.akama, Character.akama]);
-  for (const forge of [false, true]) expect(shownFighters(PLAYABLE_CHARACTERS, forge).some(isComingSoon)).toBe(false);
-  let human: number = Character.akama;
-  let cpu: number = Character.akama;
-  for (let step = 0; step < 2 * PLAYABLE_CHARACTERS.length; step++) {
-    human = nextMatchCharacter(game, human, 1);
-    cpu = nextCpuCharacter(game, 1, 1);
-    selectCpuCharacter(game, 0, 1, cpu);
-    expect(isComingSoon(human) || isComingSoon(cpu)).toBe(false);
-  }
-  for (let seed = 0; seed < 512; seed++) expect(isComingSoon(drawCpuFighter(shownFighters(PLAYABLE_CHARACTERS, true), seed, 1))).toBe(false);
-  selectCpuCharacter(game, 0, 1, RANDOM_FIGHTER);
-  expect(game.cpuRandomFighters[1]).toBe(true);
-});

@@ -4,13 +4,13 @@ import { stepMatch } from "./step";
 import { AttackStyle, Character } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
 import { createRoster } from "../sim/roster";
-import { Action, bit, maskOf } from "../input/actions";
+import { Action, bit } from "../input/actions";
 import { adaptInput } from "./inputAdapter";
 import { hasPendingAttack } from "../input/attackBuffer";
 import { commitEdges, keyboardCapture, sampleKeys } from "../input/keyboardCapture";
 
 
-export const A = bit(Action.attack), S = bit(Action.strong), B = bit(Action.special), G = bit(Action.grab), W = maskOf(Action.modX, Action.modY), T = bit(Action.leftTrigger), J = bit(Action.jump);
+export const A = bit(Action.attack), S = bit(Action.strong);
 export const R = bit(Action.moveRight), L = bit(Action.moveLeft), U = bit(Action.moveUp), D = bit(Action.moveDown);
 
 export interface Keyboard {

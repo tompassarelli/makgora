@@ -18,7 +18,6 @@ export const MAKGORA_DEV: DevProject = {
     preload: ["test/host-natives.ts"],
     reads: {
       "test/clean-room.test.ts": ["../docs/hive-post.md", "src/game/ui/credits.ts", "src/game/ui/community.ts"],
-      "test/frame-tint.test.ts": ["src/**"],
       "test/sheriff.test.ts": ["scripts/sheriff.ts"],
     },
 
