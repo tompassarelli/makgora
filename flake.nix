@@ -13,8 +13,7 @@
         shellHook = ''
           export WC3_MDL_ADDON="$HOME/.local/share/makgora-build-inputs/store/mdl-exporter4/${addonPin}"
           if [ ! -d "$WC3_MDL_ADDON" ]; then
-            echo "Missing pinned mdl-exporter4 input: $WC3_MDL_ADDON" >&2
-            exit 1
+            echo "Missing pinned mdl-exporter4 input: $WC3_MDL_ADDON; build-animation-assets will refuse to run" >&2
           fi
         '';
       };

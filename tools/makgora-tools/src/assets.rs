@@ -262,8 +262,29 @@ pub fn extract_animation_assets_cli(arguments: &[String]) -> Outcome {
     Ok(())
 }
 
+fn mdl_addon(setting: Option<OsString>) -> Result<PathBuf, Stop> {
+    let addon = setting
+        .filter(|value| !value.is_empty())
+        .map(PathBuf::from)
+        .ok_or_else(|| {
+            Stop::err(
+                1,
+                "Missing pinned mdl-exporter4 input: WC3_MDL_ADDON is unset; run inside nix develop",
+            )
+        })?;
+    if addon.is_dir() {
+        Ok(addon)
+    } else {
+        Err(Stop::err(
+            1,
+            format!("Missing pinned mdl-exporter4 input: {}", addon.display()),
+        ))
+    }
+}
+
 pub fn build_animation_assets_cli(arguments: &[String]) -> Outcome {
     no_arguments("build-animation-assets", arguments)?;
+    mdl_addon(env::var_os("WC3_MDL_ADDON"))?;
     let sources = Sources::from_environment();
     execute(&sources.extract_animation_assets())?;
     println!(
@@ -379,6 +400,15 @@ mod tests {
             fresh[0],
             "bun /p/tools/animations/package-lichking.ts /in/src/LichKing2.mdx /in/LichKingFighter.mdx --replace Stand"
         );
+    }
+
+    #[test]
+    fn authoring_refuses_a_missing_mdl_addon_by_name() {
+        let missing = mdl_addon(Some("/nonexistent/mdl-exporter4/pin".into())).unwrap_err();
+        assert_eq!(missing.code(), 1);
+        assert!(format!("{missing:?}").contains("mdl-exporter4 input: /nonexistent/mdl-exporter4/pin"));
+        assert!(format!("{:?}", mdl_addon(None).unwrap_err()).contains("WC3_MDL_ADDON is unset"));
+        assert!(mdl_addon(Some(env::temp_dir().into())).is_ok());
     }
 
     #[test]
