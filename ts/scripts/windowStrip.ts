@@ -4,6 +4,7 @@ import { dirname, join, resolve } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
+import { CAPACITY_HOST } from "./capacityHost";
 import { pollUntil } from "./hostPoll";
 import { runProcess } from "./hostProcess";
 import { captureRoute, runOnCaptureHost } from "./nativeCaptureHost";
@@ -39,13 +40,12 @@ const main = Effect.gen(function*() {
     console.log(out);
     return;
   }
-  const helper = yield* skillScript("machine-capacity", "scripts/machine-capacity.mjs");
   const desktop = yield* skillScript("private-desktop-development", "scripts/private-desktop.sh");
   const frames = join(dirname(out), `${out.replace(/^.*\//, "").replace(/\.[^.]*$/, "")}-frames`);
   rmSync(frames, { recursive: true, force: true });
   mkdirSync(frames, { recursive: true });
   const play = [process.execPath, "scripts/wisp.ts", "play", "--standalone", "--window", "native", "--script", pad];
-  const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + QUEUE_SECONDS), "--", process.execPath, helper, "run", "--class", "gpu", "--owner", owner, "--timeout-seconds", String(RUN_SECONDS), "--", ...play];
+  const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + QUEUE_SECONDS), "--", ...CAPACITY_HOST, "run", "--class", "gpu", "--owner", owner, "--timeout-seconds", String(RUN_SECONDS), "--", ...play];
   let runProblem = "";
   const wanted = rows.flat();
   const lastFrame = join(frames, frameName(Math.max(...wanted)));

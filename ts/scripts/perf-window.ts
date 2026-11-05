@@ -4,6 +4,7 @@ import { dirname, join, resolve } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Schema, Stream } from "effect";
 import { ChildProcess, type ChildProcessSpawner } from "effect/process";
+import { CAPACITY_HOST } from "./capacityHost";
 import { ProcessFailure, runProcess } from "./hostProcess";
 import { captureRoute, runOnCaptureHost } from "./nativeCaptureHost";
 import { type OnlineRun, PERF_PRESETS, PERF_STAGES, type PerfPreset, type Pressure, type StageRun, type StandaloneFigures, logFigures, onlineFigures, onlineTable, presetTable } from "./perfWindowTable";
@@ -59,7 +60,7 @@ const GAME_LEASE = ["--class", "gpu", "--memory-gib", "4", "--cpus", "4"];
 const ONLINE_LEASE = ["--class", "gpu", "--memory-gib", "8", "--cpus", "8"];
 const ONLINE_WINDOWS = ["host", "join"] as const;
 
-const probeGpu = (helper: string) => runProcess(ChildProcess.make(process.execPath, [helper, "probe", ...GAME_LEASE, "--owner", PLAYER])).pipe(
+const probeGpu = runProcess(ChildProcess.make(CAPACITY_HOST[0], [...CAPACITY_HOST.slice(1), "probe", ...GAME_LEASE, "--owner", PLAYER])).pipe(
   Effect.flatMap((text) => Schema.decodeEffect(Schema.fromJsonString(Probe))(text.split("\n").at(-1) ?? "")),
   Effect.mapError((cause) => new PerfWindowFailure({ problem: `machine-capacity probe gave no decision: ${cause.message}` })),
   Effect.filterOrFail((probe) => probe.reason !== "DEFER_GAMING", () => new PerfWindowFailure({ problem: "DEFER_GAMING: the gpu lease is held for gaming; perf-window starts when `north capacity gaming status` reads off" })),
@@ -97,12 +98,11 @@ const main = Effect.gen(function*() {
     console.log(readFileSync(join(out, "perf-window.md"), "utf8"));
     return;
   }
-  const helper = yield* skillScript("machine-capacity", "scripts/machine-capacity.mjs");
   const desktop = yield* skillScript("private-desktop-development", "scripts/private-desktop.sh");
   if (!inside) {
-    yield* probeGpu(helper);
+    yield* probeGpu;
     const seconds = presets.length * stages.length * (online?.length ?? 1) * RUN_ESTIMATE_SECONDS + DRAIN_SECONDS;
-    process.exitCode = yield* runInherited([process.execPath, helper, "session", "--class", "native", "--new-clients", "0", "--quiet", "--quiet-seconds", String(seconds), "--latency", "--owner", PLAYER, "--", process.execPath, "scripts/perf-window.ts", "--inside", ...process.argv.slice(2)]);
+    process.exitCode = yield* runInherited([...CAPACITY_HOST, "session", "--class", "native", "--new-clients", "0", "--quiet", "--quiet-seconds", String(seconds), "--latency", "--owner", PLAYER, "--", process.execPath, "scripts/perf-window.ts", "--inside", ...process.argv.slice(2)]);
     return;
   }
   const began = Date.now();
@@ -122,7 +122,7 @@ const main = Effect.gen(function*() {
       const dir = join(out, preset, stage.replace(/[^A-Za-z0-9]+/g, "-"), `online-${rtt}ms${inputDelay === undefined ? "" : `-delay${inputDelay}`}`);
       const path = rtt === 0 ? [] : ["--rtt", String(rtt), "--jitter", String(jitter)];
       const pair = ["env", "BUN_JSC_logGC=1", `WISP_WINDOW_WARMUP_FRAMES=${warmup}`, ...(inputDelay === undefined ? [] : [`MAKGORA_ONLINE_INPUT_DELAY=${inputDelay}`]), process.execPath, "scripts/wisp.ts", "net", "pair", "--relay", "local", "--humans", "2", "--window", "native", "--out", dir, "--four-fighters", "--stage", stage, "--frames", String(frames + warmup), ...path];
-      const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + 30), "--", process.execPath, helper, "run", ...ONLINE_LEASE, "--beside-native", PLAYER, "--owner", PLAYER, "--timeout-seconds", String(RUN_SECONDS), "--", ...pair];
+      const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + 30), "--", ...CAPACITY_HOST, "run", ...ONLINE_LEASE, "--beside-native", PLAYER, "--owner", PLAYER, "--timeout-seconds", String(RUN_SECONDS), "--", ...pair];
       const loadStart = loadavg()[0] ?? 0;
       console.error(`perf-window: ${preset} ${stage} online ${rtt} ms → ${dir}`);
       const ran = yield* runLogged(command, { XDG_CONFIG_HOME: config, WISP_PLAYER: PLAYER });
@@ -140,7 +140,7 @@ const main = Effect.gen(function*() {
       const psiStart = hostPsi();
       const dir = join(out, preset, stage.replace(/[^A-Za-z0-9]+/g, "-"));
       const play = ["env", "BUN_JSC_logGC=1", `WISP_WINDOW_WARMUP_FRAMES=${warmup}`, process.execPath, "scripts/wisp.ts", "play", "--standalone", "--window", "native", "--four-fighters", "--stage", stage, "--frames", String(frames + warmup), "--out", dir, "--emulated-calls", join(dir, "emulated-calls.json"), ...(rollback === undefined ? [] : ["--rollback", String(rollback)])];
-      const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + 30), "--", process.execPath, helper, "run", ...GAME_LEASE, "--beside-native", PLAYER, "--owner", PLAYER, "--timeout-seconds", String(RUN_SECONDS), "--", ...play];
+      const command = ["bash", desktop, "start", "--resolution", resolution, "--seconds", String(RUN_SECONDS + 30), "--", ...CAPACITY_HOST, "run", ...GAME_LEASE, "--beside-native", PLAYER, "--owner", PLAYER, "--timeout-seconds", String(RUN_SECONDS), "--", ...play];
       const loadStart = loadavg()[0] ?? 0;
       console.error(`perf-window: ${preset} ${stage} → ${dir}`);
       const ran = yield* runLogged(command, { XDG_CONFIG_HOME: config, WISP_PLAYER: PLAYER });
