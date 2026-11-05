@@ -61,7 +61,6 @@ permissions:
 
 env:
   SWEEP_PLACEMENT: gate
-  FARM_GROUPS: boot perf rollback parity-0 parity-1 parity-2 parity-3 lua corpus computer-0 computer-1 types clean-room static
 
 jobs:
   route:
@@ -344,35 +343,16 @@ jobs:
         with:
           pattern: farm-test-*
           path: ts/farm
-      - name: Merge the results and check the Lua32 instruction and allocation budget
+      - name: Merge the check results
         working-directory: ts
         timeout-minutes: 5
         env:
           PLAN_RESULT: ${{ needs.plan.result }}
           CHECKS: ${{ inputs.checks }}
-          LUA_TEST_COST_DIR: farm
         run: |
-          set +e
-          fallback() { echo "{\"bun\":$1,\"lua\":$1,\"failures\":[],\"problems\":[$2]}" > summary.json; }
           zero='{"passed":0,"failed":0,"skipped":0,"shards":0,"slowestShardSeconds":0}'
-          fallback "$zero" '"the merge step did not finish: see its log"'
-          : > problems.txt
-          for group in $FARM_GROUPS; do
-            [ -z "$CHECKS" ] || jq -e --arg group "$group" 'index($group)' <<< "$CHECKS" > /dev/null || continue
-            [ -n "$(find farm \( -name "result-check-$group.json" -o -name "skipped-check-$group.txt" \))" ] || echo "check group $group neither ran nor was filtered out: it left no result" >> problems.txt
-          done
-          [ "$PLAN_RESULT" = success ] || echo "the plan job ended $PLAN_RESULT, so no shard ran: see its log" >> problems.txt
-          bun node_modules/wisp/host/farm/farmShards.ts merge --plan farm/farm-test-plan/plan.json --timings farm-timings.json --out summary.json $(find farm -name 'result*.json') 2> merge.log
-          merged=$?
-          cat merge.log
-          if [ "$merged" != 0 ]; then
-            fallback "$zero" ""
-            echo "merging the shard results failed: $(tail -n 3 merge.log | tr '\n' ' ')" >> problems.txt
-          fi
-                  find farm -name 'problems-*.txt' -exec sh -c 'for f; do cat "$f"; echo; done' _ {} + >> problems.txt
-          jq --rawfile extra problems.txt '.problems = ($extra | split("\n") | map(select(test("\\S")))) + .problems' summary.json > summary.next && mv summary.next summary.json
-          cat summary.json
-          [ "$merged" = 0 ]
+          echo "{\"bun\":$zero,\"lua\":$zero,\"failures\":[],\"problems\":[\"the merge step did not finish: see its log\"]}" > summary.json
+          bun scripts/farmMerge.ts --folder farm --plan farm/farm-test-plan/plan.json --timings farm-timings.json --out summary.json --checks "$CHECKS" --plan-result "$PLAN_RESULT"
       - if: always()
         uses: actions/upload-artifact@v4
         with:
