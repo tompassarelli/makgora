@@ -47,17 +47,16 @@ function drawDuos(table: Readonly<ArcadeTable>, draws: RunDraws): readonly [Elit
 
 const featuredArenas = (): readonly StageTile[] => STAGE_CATALOG.filter(info => isFeaturedStage(info.id)).map(info => info.id);
 
-function drawArena(arenas: readonly StageTile[], draws: RunDraws, previous: StageTile | undefined): StageTile {
+function drawArena(draws: RunDraws, previous: StageTile | undefined): StageTile {
+  const arenas = featuredArenas();
   const fresh = arenas.filter(arena => arena !== previous);
   return draws.pick(fresh.length > 0 ? fresh : arenas);
 }
 
-function homeAmong(arenas: readonly StageTile[], character: Character): StageTile {
+export function homeArena(character: Character): StageTile {
   const home = HOME_STAGES.find(entry => entry.character === character)?.stage;
-  return arenas.find(arena => arena === home) ?? at(arenas, 0);
+  return featuredArenas().find(arena => arena === home) ?? at(featuredArenas(), 0);
 }
-
-export const homeArena = (character: Character): StageTile => homeAmong(featuredArenas(), character);
 
 /**
  * The eight stages of a run for one fighter, all drawn from the run seed: no fighter appears twice,
@@ -67,7 +66,6 @@ export function arcadePlan(fighter: Character, seed: number): readonly StagePlan
   const table = arcadeTable(fighter);
   if (table === undefined) return [];
   const draws = new RunDraws(seed);
-  const arenas = featuredArenas();
   const duos = drawDuos(table, draws);
   const taken: Character[] = [fighter, table.ally, table.rival, ...duos.flatMap(duo => duo.members)];
   let hallway = ARCADE_CHARACTERS.filter(character => isFeatured(character) && !taken.includes(character));
@@ -77,17 +75,17 @@ export function arcadePlan(fighter: Character, seed: number): readonly StagePlan
   for (let index = 0; index < ARCADE_STAGES; index++) {
     const kind = at(ARCADE_SPINE, index).kind;
     if (kind === StageKind.rival) {
-      plans.push({ kind, opponents: [table.rival], arena: homeAmong(arenas, table.rival), line: table.line });
+      plans.push({ kind, opponents: [table.rival], arena: homeArena(table.rival), line: table.line });
       continue;
     }
-    if (kind !== StageKind.bonus) arena = drawArena(arenas, draws, arena);
+    if (kind !== StageKind.bonus) arena = drawArena(draws, arena);
     let opponents: readonly Character[] = [];
     if (kind === StageKind.hallway) {
       const chosen = draws.pick(hallway);
       hallway = hallway.filter(character => character !== chosen);
       opponents = [chosen];
     } else if (kind === StageKind.elite) opponents = at(duos, elites++).members;
-    plans.push({ kind, opponents, arena: arena ?? homeAmong(arenas, fighter), line: "" });
+    plans.push({ kind, opponents, arena: arena ?? homeArena(fighter), line: "" });
   }
   return plans;
 }
