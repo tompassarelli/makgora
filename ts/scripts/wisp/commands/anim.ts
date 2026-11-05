@@ -1,5 +1,3 @@
-
-
 import { existsSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, relative, resolve } from "node:path";
