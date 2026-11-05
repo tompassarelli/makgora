@@ -47,7 +47,7 @@ test("each grounded fighter's walk, run and dash play the clip its stride was me
 const PRESTOR_AUTHORED_RATE_CAP = 2.0;
 const PRESTOR_AUTHORED_CLIPS: Readonly<Record<number, number>> = { [IllidanLocomotion.walk]: 8, [IllidanLocomotion.run]: 7, [IllidanLocomotion.dash]: 7 };
 
-test("Prestor walks on her authored Movement walk and runs and dashes on her authored Movement run, each at a play rate of 2x or less with feet within 15% of the body", () => {
+test("Prestor walks on her authored Movement walk and runs and dashes on her authored Movement run, each at a play rate of 2x or less with feet within 15% of the body [k3 measure #901]", () => {
   for (const gait of GAITS) {
     const { clip, rate, feet, body, slides } = measure(Character.onyxia, gait);
     expect(clip?.index, `onyxia ${gait.motion}: authored clip`).toBe(PRESTOR_AUTHORED_CLIPS[gait.motion]);
