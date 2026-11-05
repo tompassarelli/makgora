@@ -57,7 +57,7 @@ back to its author with `Follows:` (north:docs/rationale/landing-train.md).
    locomotion lock, strike moments, animation jitter, map-build inputs) cannot
    run on a hosted runner, so they run on the landing machine beside the farm
    run; the log names each with the reason (`landing local:`), and each farm
-   result with its groups and run (`landing farm:`). A failing check turns the after run red, printing the summary's failing tests and checks, and the lander reverts the first red lane. A group that
+   result with its groups and run (`landing farm:`). A failing check turns the after run red, printing the summary's failing tests and checks, and the lander reverts the first red lane. A GitHub rate limit (HTTP 403 or 429), a 5xx answer or a cancelled run is not a failing check: landingFarm.ts retries the poll for 10 minutes and exits 75, which the lander treats as transient (2026-11-06, after the first after-push runs hit the rate limit and reverted two innocent landings). A group that
    passed is remembered by the hash of its inputs (makgora:ts/scripts/landingInputs.ts:
    the group, the checks it runs and the blob of every tracked file their reach
    rules match), in the pre-push cache here and as a `farm-pass-GROUP-HASH`
@@ -391,7 +391,7 @@ any run where:
 - a test run waited more than 5 minutes for its slot, or another run waited
   more than 5 minutes with nothing running in its concurrency group.
 
-The sweep and heartbeat also list unfinished Farm test runs (each requested or finished one starts a sweep) and cancel them on the same job, run and pending bounds without requeueing, so a farm run that safe-push's landing gate watches ends within a minute and the gate refuses the landing, naming the cancelled groups, instead of holding the landing lock.
+The sweep and heartbeat also list unfinished Farm test runs (each requested or finished one starts a sweep) and cancel them on the same job, run and pending bounds without requeueing, so a farm run that the after-push check watches ends within a minute and landingFarm.ts exits 75 (GitHub cancelled the run), which the lander counts as transient and does not revert.
 
 Once the cancelled runs finish, and on every sweep while lanes are pending,
 no plan is unfinished and a test slot holds no run (each test run ends in a
