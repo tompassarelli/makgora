@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { install, startBuild } from "../src/platform/main";
 import { Action } from "../src/game/input/actions";
 import { LEFT_SHIFT, RIGHT_SHIFT, keyFor } from "../src/game/input/keyBindings";
-import { beginBindingCapture, bindFirstUnbound, clearKey } from "../src/game/ui/bindingSettings";
+import { beginBindingCapture, clearKey } from "../src/game/ui/bindingSettings";
 import { keyboardCaps } from "../src/game/ui/keyboardLayout";
 import { Phase } from "../src/game/lobby/lobbyState";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
@@ -32,7 +32,8 @@ test("Y pressed during a rebind on the controls screen binds to Strong, and stil
   expect(controlsGreeted(host)).toBe(true);
   host.run(() => {
     for (const slot of [1, 0] as const) clearKey(settings(), keyFor(settings().bindings, Action.strong, slot) ?? 0);
-    bindFirstUnbound(settings());
+    clearKey(settings(), Key.y);
+    beginBindingCapture(settings(), Action.strong, 0);
   });
   expect(read(() => settings().capture?.action)).toBe(Action.strong);
   clients.press(0, Key.y);

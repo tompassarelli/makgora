@@ -87,9 +87,10 @@ export const CENSUS_MOVES: readonly CensusMove[] = [
 ];
 
 
-// Murlocs: Down B orders and revives only on the ground, so the air press plays its keys and frames but never starts
+// Murlocs: Down B orders and revives only on the ground; Firelord: Summon Lava Spawn and Submerge are ground-only. The air press plays its keys and frames but never starts
 const GROUNDED_ONLY: Readonly<Partial<Record<Character, readonly string[]>>> = {
   [Character.murloc]: ["air down special"],
+  [Character.firelord]: ["air neutral special", "air side special"],
 };
 
 const MOVE_FRAMES = 150;
