@@ -122,11 +122,11 @@ export const reportRun = (runId: string) => Effect.gen(function*() {
   const body = redIssueBody(run.headBranch, tests, index === -1 ? completed : completed.slice(index), nameWithOwner);
   const [issue] = open;
   if (issue === undefined) {
-    const url = yield* gh("issue", "create", "--title", title, "--body", body, "--label", "bug", "--label", "priority:now", "--label", "evidence:code");
+    const url = yield* gh("issue", "create", "--title", title, "--body", body, "--label", "bug", "--label", "priority:now", "--label", "main-red", "--label", "evidence:code");
     yield* summary(`${run.headBranch} is red: opened ${url.trim()}, ${tests.length} failing`);
     return yield* Console.log(`opened ${url.trim()}: ${tests.length} failing`);
   }
-  yield* gh("issue", "edit", String(issue.number), "--body", body);
+  yield* gh("issue", "edit", String(issue.number), "--add-label", "main-red", "--body", body);
   yield* summary(`${run.headBranch} is still red: updated #${issue.number}, ${tests.length} failing`);
   yield* Console.log(`updated #${issue.number}: ${tests.length} failing`);
 });
