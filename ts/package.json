@@ -10,7 +10,7 @@
     "typescript-native": "npm:typescript@7.0.2",
     "typescript-to-lua": "1.37.1",
     "war3-model": "4.0.1",
-    "wisp": "file:vendor/wisp-537fde2bf0c9c83693c2701906f81bec6dbfa517.tgz"
+    "wisp": "file:vendor/wisp-65523b22b5014cf07b3f1fbce47a5722c7417914.tgz"
   },
   "name": "makgora",
   "private": true,

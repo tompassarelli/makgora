@@ -108,6 +108,9 @@ export const validateClients = (clients: readonly ClientEntry[], exists: (path: 
   }
 });
 
+export const toolEnvironment = (tools: Readonly<Record<string, string>>): Record<string, string> =>
+  Object.fromEntries(Object.entries(tools).map(([name, path]) => [`WISP_${name.toUpperCase()}`, path]));
+
 /** The clients file with its stored tools replaced by this run's resolved ones. */
 export const withRuntimeTools = (clientsJson: string, tools: Readonly<Record<string, string>>): string => {
   const parsed: unknown = JSON.parse(clientsJson);

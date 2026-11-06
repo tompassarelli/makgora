@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { Effect, Exit, Fiber, Schema, Scope } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
-import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
+import { resolveTools, toolEnvironment, withRuntimeTools } from "./wisp/nativeTools";
 import { attachedPoolReady, attachExistingPool, pairClientCount } from "./wisp/nativePool";
 import { alive, pairEntryFile, poolHolder } from "wisp/scripts/wisp/lan/pool";
 import { pollUntil } from "./hostPoll";
@@ -125,12 +125,12 @@ const chunkComplete = (out: string, row: { readonly name: string; readonly mapSh
   catch: cause => new CaptureBatchFailure({ problem: `read ${row.name} checkpoint: ${String(cause)}` }),
 });
 
-const runChunk = (args: { readonly pair: number; readonly pool: PairPool; readonly row: { readonly name: string; readonly map: string; readonly manifest: string; readonly mapSha256: string; readonly frames: readonly number[] }; readonly out: string; readonly sourceRevision: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly build: string; readonly minutes: number; readonly solo: boolean; readonly expected: number }) => Effect.gen(function*() {
+const runChunk = (args: { readonly pair: number; readonly pool: PairPool; readonly row: { readonly name: string; readonly map: string; readonly manifest: string; readonly mapSha256: string; readonly frames: readonly number[] }; readonly out: string; readonly sourceRevision: string; readonly clientsFile: string; readonly client: string; readonly install: string; readonly build: string; readonly minutes: number; readonly solo: boolean; readonly expected: number; readonly tools: Readonly<Record<string, string>> }) => Effect.gen(function*() {
   const rowOut = join(args.out, args.row.name);
   yield* Effect.try({ try: () => mkdirSync(rowOut, { recursive: true }), catch: cause => new CaptureBatchFailure({ problem: `create ${rowOut}: ${String(cause)}` }) });
   const run = Effect.acquireUseRelease(
     Effect.try({
-      try: () => Bun.spawn([process.execPath, "scripts/nativeCapture.ts", "run", "--clients-file", args.clientsFile, "--client", args.client, "--install", args.install, "--offline-build", args.build, "--manifest", args.row.manifest, "--out", rowOut, "--no-audio", "--minutes", String(args.minutes)], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
+      try: () => Bun.spawn([process.execPath, "scripts/nativeCapture.ts", "run", "--clients-file", args.clientsFile, "--client", args.client, "--install", args.install, "--offline-build", args.build, "--manifest", args.row.manifest, "--out", rowOut, "--no-audio", "--minutes", String(args.minutes)], { cwd: tsDirectory, env: { ...process.env, ...toolEnvironment(args.tools) }, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
       catch: cause => new CaptureBatchFailure({ problem: `start collector: ${String(cause)}` }),
     }),
     child => Effect.promise(() => child.exited).pipe(Effect.flatMap(code => code === 0 ? Effect.succeed({ kind: "complete" as const }) : Effect.fail(new CaptureBatchFailure({ problem: `collector exited ${code}` })))),
@@ -192,7 +192,7 @@ export const nativeCaptureBatch = (args: readonly string[], beforePoolCloses: Ef
         yield* closePool(pool);
         pool = yield* acquirePool();
       }
-      const result = yield* runChunk({ pair, pool, row, out, sourceRevision: plan.sourceRevision, clientsFile: runtimeClients, client, install, build, minutes, solo, expected }).pipe(Effect.result);
+      const result = yield* runChunk({ pair, pool, row, out, sourceRevision: plan.sourceRevision, clientsFile: runtimeClients, client, install, build, minutes, solo, expected, tools }).pipe(Effect.result);
       stale = solo;
       if (result._tag === "Success" && result.success.kind === "complete" && (yield* chunkComplete(out, row, plan.sourceRevision, expected))) {
         finished = true;
