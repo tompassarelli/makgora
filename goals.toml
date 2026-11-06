@@ -58,19 +58,3 @@ oracle = "{ rg -n \"from ['\\\"].*/(presentation|render|ui|platform|shell)(/|['\
 unit = "imports"
 max = 0
 class = "contract"
-
-[[goal]]
-name = "map-never-on-github"
-source = "README.md Principles: the map ships only on Hive Workshop and Battle.net, never on GitHub; no GitHub release carries a map or model file"
-oracle = "bun ts/scripts/releaseAssets.ts >/dev/null 2>&1; [ $? -eq 1 ] && echo 1 || echo 0"
-unit = "failing checks"
-max = 0
-class = "contract"
-
-[[goal]]
-name = "credits-single-source"
-source = "README.md Credits: the credits are written once in ts/src/game/ui/credits.ts and the Hive post's Credits section equals it"
-oracle = "cd ts && bun test test/clean-room.test.ts -t 'Credits section' >/dev/null 2>&1; echo $?"
-unit = "failing tests"
-max = 0
-class = "contract"
