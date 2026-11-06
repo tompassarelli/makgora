@@ -81,7 +81,7 @@ Where to look next:
 ## Credits
 
 The credits are written once, in [ts/src/game/ui/credits.ts](ts/src/game/ui/credits.ts):
-the in-game Credits screen shows it, the credits-single-source goal holds the release post's credits equal to it, and
+the in-game Credits screen shows it, a test holds the release post's credits equal to it, and
 it names every author of the community models the map imports. The source terms
 behind each model are in [model credits](docs/design/roster.md#credits).
 
