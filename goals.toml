@@ -14,7 +14,7 @@ unit = "ms"
 max = 10
 class = "debt"
 ceiling = 14
-owner = "tompassarelli/makgora#168"
+owner = "tompassarelli/makgora#889"
 revisit = "a landing raises the playable-bot-four worst frame, or the record is older than a week"
 
 [[goal]]
@@ -25,7 +25,7 @@ unit = "hours"
 max = 30
 class = "debt"
 ceiling = 168
-owner = "tompassarelli/makgora#168"
+owner = "tompassarelli/makgora#14"
 revisit = "the record is older than a week, which is when frame-worst's revisit trigger fires"
 
 [[goal]]
