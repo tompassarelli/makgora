@@ -31,7 +31,7 @@ revisit = "the record is older than a week, which is when frame-worst's revisit 
 [[goal]]
 name = "target-debt-due"
 source = "AGENTS.md: a worst frame over 10 ms lands with a Target-debt trailer; docs/rationale/targets.md in north"
-oracle = "north provenance debt --due | awk -F'\\t' '$1==\"makgora\"' | wc -l"
+oracle = "north check provenance debt --due | awk -F'\\t' '$1==\"makgora\"' | wc -l"
 unit = "records"
 max = 0
 class = "debt"
