@@ -25,7 +25,7 @@ unit = "hours"
 max = 30
 class = "debt"
 ceiling = 168
-owner = "tompassarelli/makgora#14"
+owner = "tompassarelli/makgora#889"
 revisit = "the record is older than a week, which is when frame-worst's revisit trigger fires"
 
 [[goal]]
@@ -36,7 +36,7 @@ unit = "records"
 max = 0
 class = "debt"
 ceiling = 5
-owner = "tompassarelli/makgora#168"
+owner = "tompassarelli/makgora#14"
 revisit = "a Target-debt record sits unpaid past its trigger for a week"
 
 [[goal]]
