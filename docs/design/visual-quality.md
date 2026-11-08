@@ -101,7 +101,7 @@ fails line 1.
 Tom's Rivals of Aether 2 match captures (kept local in
 ~/.local/state/makgora/shots/roa2-refs, added 2026-10-31) are look targets
 for the next three lines, as the Smash references are for the filled frame
-above; nothing is copied from them (game-ip).
+above; nothing is copied from them (clean-room).
 
 | | Line | Fails when |
 | --- | --- | --- |

@@ -11,7 +11,7 @@ Warcraft terms.
 
 This is a plan. Every number below is an original, provisional Mak'gora
 value to tune, not copied frame data. Melee anchors are cited for role and
-trade-off relations only, from public frame data, under the `game-ip` rule.
+trade-off relations only, from public frame data, under the `clean-room` rule.
 
 The roster goes from 26 to 29 fighters. Tom asked for the additions in his
 own words, so when the first new fighter lands, AGENTS.md's "holds at 26" line
