@@ -154,7 +154,7 @@ and makgora:typescript-toolchain.lock pins `@effect/platform-bun` (its
 north's `effect-kit check` enforces these rules: CI clones north's main and
 runs it (makgora:.github/workflows/ci.yml), and the pre-push gate
 (makgora:ts/scripts/prePush.ts) runs the same script from the machine's
-north main checkout, `~/code/north/main/agent-machinery/scripts/effect-kit.mjs`,
+north main checkout, `~/code/north/main/harness/skills/effect-development/scripts/effect-kit.mjs`,
 before every landing that touches `ts/`, `contracts/`, `repos/effect`,
 effect-kit.json or typescript-toolchain.lock. Both run north's main, so keep
 that checkout pulled; when it is missing the gate refuses with the clone

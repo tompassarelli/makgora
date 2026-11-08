@@ -23,7 +23,7 @@ Effect runtime with a local imitation to evade an unsupported target.
 
 ## Upgrades
 
-`effect-kit` (north:agent-machinery) owns the vendored source and its version
+`effect-kit` (north:harness/skills/effect-development) owns the vendored source and its version
 gate; makgora:effect-kit.json configures it. CI runs `effect-kit check`,
 which fails when repos/effect differs from the locked `effect` version, on any
 Effect diagnostic, or on a host-tool rule break. The weekly
