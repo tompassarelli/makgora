@@ -13,6 +13,19 @@
 	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: clippy builds makgora-tools in a nix shell, minutes per lane :: cd tools/makgora-tools && RUSTC_WRAPPER= nix-shell -I nixpkgs=flake:nixpkgs/e1d7762c24208983d0e55130ad215501883d608b -p cargo clippy rustc stdenv.cc --run 'cargo clippy --all-targets --locked -- -D warnings'"
 	after-only = "it compares the sim with the native recording of the release presentation, which judges the landed main a release ships from :: cd ts && bun wisp parity standalone test/native/pads/cpu-expert.pad --presentation native || { echo 'This landing moved the sim off the native recording of test/native/pads/cpu-expert.pad at the first divergent frame above. If the landing was an intended gameplay change, re-record the pad in the native client on a LAN pair and replace its native recording in ts/test/corpus with bun wisp parity corpus keep; if not, fix the drift.'; exit 1; }"
 	after-only = it builds the release assets of the landed main, which a release ships from :: cd ts && bun scripts/releaseAssets.ts
+	after-only = it ticks, comments on and closes the issues a landed commit references, which exist only once it is on main :: .github/workflows/autoclose.yml:close
+	after-only = it only picks the runner the background sweeps use and judges nothing :: .github/workflows/background-sweeps.yml:routing
+	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: the full test suite, Lua tests and census shards take minutes per landing on a background runner :: .github/workflows/background-sweeps.yml:sweeps"
+	after-only = it compares each fighter pair's worst frame with main's last green census, which judges the landed main against earlier landings :: .github/workflows/background-sweeps.yml:census
+	after-only = it runs only on a dispatch of main, never on a push, and only starts main-red.yml :: .github/workflows/background-sweeps.yml:main-red
+	after-only = it only posts the sweeps' result as a commit status and judges nothing :: .github/workflows/background-sweeps.yml:status
+	after-only = it measures the landed main's frame cost against the previous landed main's and records its metrics, which judges landings in order :: .github/workflows/ci.yml:smoke
+	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: the landing farm runs these farm-test groups after the push, and this copy reruns them on hosted runners :: .github/workflows/ci.yml:farm"
+	after-only = "north's built-in code-health lane gate runs this check on the lane at enqueue and at the lander's pick (north#892) :: .github/workflows/ci.yml:code-health"
+	after-only = it runs only on a dispatch of main, never on a push, and only starts main-red.yml :: .github/workflows/ci.yml:main-red
+	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: it builds and tests the controller plugin on a clean runner with the udev and xkbcommon libraries, minutes per lane, and the controller clippy runs after the push too :: .github/workflows/controller.yml:plugin"
+	after-only = it packages the player for Linux and Windows on their own runners and runs it where Bun is not on the path, which no lander or offload host is :: .github/workflows/player.yml:package
+	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: it builds, lints and tests makgora-tools on a clean runner, minutes per lane, and the makgora-tools clippy runs after the push too :: .github/workflows/tools.yml:host-tools"
 [ci]
 	budget = farm-test.yml 600
 [mutant]
