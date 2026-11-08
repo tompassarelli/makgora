@@ -48,7 +48,7 @@ const SUITE_INPUTS = [".github/workflows/farm-test.yml", ".github/workflows/auto
 const SCRIPT_INPUTS = ["ts/scripts", "ts/src", "ts/package.json", "ts/bunfig.toml"];
 const EFFECT_KIT_INPUTS = /^(ts\/|contracts\/|repos\/effect|effect-kit\.json$|typescript-toolchain\.lock$)/;
 export const NORTH = join(homedir(), "code/north/main");
-export const EFFECT_KIT = join(NORTH, "agent-machinery/scripts/effect-kit.mjs");
+export const EFFECT_KIT = join(NORTH, "harness/skills/effect-development/scripts/effect-kit.mjs");
 
 export function cueInputs(): Set<string> {
   return new Set([CUE_MODEL_RECORD, ...effectPlaybackInputs(root), ...importClosure(CUE_CHECK)]);

@@ -141,7 +141,7 @@ export const CHECKS: readonly LandingCheck[] = [
   // Reads the type-check output the check before it saved, so the static group type-checks once.
   {
     name: "effect-kit check",
-    command: ["sh", "-c", "log=$PWD/build/typecheck.log && curl -fsS -o \"$RUNNER_TEMP/effect-kit.mjs\" https://raw.githubusercontent.com/tompassarelli/north/main/agent-machinery/scripts/effect-kit.mjs && cd .. && EFFECT_KIT_TYPECHECK_LOG=\"$log\" bun \"$RUNNER_TEMP/effect-kit.mjs\" check"],
+    command: ["sh", "-c", "log=$PWD/build/typecheck.log && curl -fsS -o \"$RUNNER_TEMP/effect-kit.mjs\" https://raw.githubusercontent.com/tompassarelli/north/main/harness/skills/effect-development/scripts/effect-kit.mjs && cd .. && EFFECT_KIT_TYPECHECK_LOG=\"$log\" bun \"$RUNNER_TEMP/effect-kit.mjs\" check"],
     reaches: [shared, pattern(TYPES, "read by effect-kit")], farm: ["static"], outputs: "typecheck",
   },
   {
