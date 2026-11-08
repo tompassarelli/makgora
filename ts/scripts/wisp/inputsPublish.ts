@@ -114,3 +114,27 @@ export const publishPins = (remote: Remote, entries: readonly Entry[], store = I
 });
 
 export const isThisHost = (host: string) => hostname() === host;
+
+const STAGE_CARDS = "stage-cards";
+
+export const absentStageCards = (remote: Remote, shas: readonly string[]) => Effect.gen(function*() {
+  if (shas.length === 0) return [];
+  const listed = shas.map((sha) => quoted(`${STAGE_CARDS}/${sha}`)).join(" ");
+  const stdout = yield* remoteStep(remote, "list stored stage cards", `for card in ${listed}; do [ -f ${quoted(remote.store)}/"$card" ] || echo "$card"; done`);
+  const absent = new Set(stdout.split("\n").filter((line) => line !== ""));
+  return shas.filter((sha) => absent.has(`${STAGE_CARDS}/${sha}`));
+});
+
+export const publishStageCards = (remote: Remote, shas: readonly string[], store = INPUTS_STORE) => Effect.gen(function*() {
+  const absent = yield* absentStageCards(remote, shas.filter((sha) => HASH.test(sha)));
+  yield* Effect.forEach(absent, (sha) => Effect.gen(function*() {
+    const path = `${remote.name}:${STAGE_CARDS}/${sha}`, source = join(store, STAGE_CARDS, sha);
+    const fail = (operation: string, cause: string) => new MapBuildFailure({ operation, path, cause });
+    if (!existsSync(source)) return yield* fail("find stage card", `neither this host nor ${remote.name} stores it; regenerate it with bun scripts/stageThumbnails.ts`);
+    const transfer = yield* execute(["rsync", "-a", "--checksum", ...remote.rsyncShell, "--mkpath", source, remote.target(`${remote.store}/${STAGE_CARDS}/`)], path);
+    if (transfer.code !== 0) return yield* fail("publish stage card", `rsync to ${remote.name} exited ${transfer.code}: ${transfer.stderr.trim()}`);
+    const copied = (yield* remoteStep(remote, "hash published stage card", `sha256sum ${quoted(`${remote.store}/${STAGE_CARDS}/${sha}`)}`)).slice(0, 64);
+    if (copied !== sha) return yield* fail("verify published stage card", `${remote.name}'s copy hashes to ${copied}`);
+  }), { concurrency: 4, discard: true });
+  return absent;
+});

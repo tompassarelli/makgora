@@ -19,7 +19,7 @@ import { measureStrikeMoments, staleStrikeFighters } from "../strikeMoments";
 import { heroModelSource } from "../../heroModelSource";
 import { FAMILIES, FAMILY_NAMES, type Family, INPUTS_STORE, MANIFEST, checkoutInputs, isSharded, readManifest, readPins, storeFamily, storeShards, unstoredPins, writePin, writeShardPins } from "../buildInputs";
 import { fetchEntry } from "../inputsFetch";
-import { isThisHost, pinnedEntries, publishPins, sshRemote } from "../inputsPublish";
+import { isThisHost, pinnedEntries, publishPins, publishStageCards, sshRemote } from "../inputsPublish";
 
 const isFamily = (name: string): name is Family => name in FAMILIES;
 
@@ -116,14 +116,22 @@ const fetch = (hosts: readonly string[]) => Effect.gen(function*() {
   console.log(`fetched ${missing.length} entries, each verified by its hash`);
 });
 
+const stageCardHashes = () => Effect.tryPromise({
+  try: async () => ((await Bun.file(join(projectRoot, "ts/stage-thumbnails.json")).json()) as { readonly stages: readonly { readonly sha256: string }[] }).stages.map(({ sha256 }) => sha256),
+  catch: (cause) => new MapBuildFailure({ operation: "read stage cards", path: "ts/stage-thumbnails.json", cause: String(cause) }),
+});
+
 const publish = (hosts: readonly string[]) => Effect.gen(function*() {
   const [host] = hosts;
   if (host === undefined || hosts.length !== 1 || host.startsWith("-")) return yield* new UsageFailure({ problem: "inputs publish takes HOST, the ssh host to copy every pinned entry it lacks to" });
   if (isThisHost(host)) return console.log(`this is ${host}, whose own store the private map-build inputs check verifies`);
-  const published = yield* publishPins(sshRemote(host), pinnedEntries(yield* readManifest()));
-  if (published.length === 0) return console.log(`${host} stores every entry ${MANIFEST} pins`);
+  const remote = sshRemote(host);
+  const published = yield* publishPins(remote, pinnedEntries(yield* readManifest()));
+  const cards = yield* publishStageCards(remote, yield* stageCardHashes());
+  if (published.length === 0 && cards.length === 0) return console.log(`${host} stores every entry ${MANIFEST} pins and every stage card ts/stage-thumbnails.json names`);
   for (const { family, hash } of published) console.log(`published ${family} ${hash} to ${host}`);
-  console.log(`published ${published.length} entries to ${host}, each verified by its hash there`);
+  for (const sha of cards) console.log(`published stage card ${sha} to ${host}`);
+  console.log(`published ${published.length} entries and ${cards.length} stage cards to ${host}, each verified by its hash there`);
 });
 
 export const inputs: Command = (args) => Effect.gen(function*() {

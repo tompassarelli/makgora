@@ -61,6 +61,7 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   staging folder beside gex45's store, hard-linking files that match its 20 newest
   entries of the family, rehashed there, sealed and renamed into place; a pin whose
   entry neither host stores, or a gex45 that cannot be reached, refuses the landing.
+  The same command copies every stage card ts/stage-thumbnails.json names that the host lacks, so an offload host that runs the private map-build inputs check finds them (a landing whose changed paths reach that check failed on an offload host with no stage cards, 2026-11-08).
   On gex45 itself the private map-build inputs check already reads the store. The store is licensed art: it moves only between
   your own hosts over ssh, never through Git or a public service.
 - **Play.** `bun wisp play` builds main from main's manifest. Builders of a
