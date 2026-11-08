@@ -76,6 +76,7 @@
   captures, the four-fighter measurement and net-accept) with a full three-stock Illidan against Wren Warchief Rifleman. `--script FILE`
   runs the native driver's exact pad inputs; `--headless --frames N --out DIR`
   saves frame checksums, and with `--window chrome` captures (`--capture-frames N,N` picks their frames).
+  `--sound` plays the native window's sound through the default output device; without it every run mixes sound into nothing and `standalone.json` still records each cue (Tom's `makgora-native` launch and the player pass it).
   `--presentation native|pool-confirmed|pool-predicted` selects fighter presentation;
   live play defaults to `pool-predicted`, scripts to `native`.
   `--window chrome --four-fighters --frames 7200 --out DIR` is wisp#48's 60 FPS measurement

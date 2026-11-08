@@ -17,7 +17,7 @@ export function playerMap(args: readonly string[], folders: readonly string[]): 
 }
 
 /** The play command's own arguments for the native window over the player's own art. */
-export const playerArguments = (map: string, rest: readonly string[]) => ["--standalone", "--window", "native", "--player-assets-only", "--map", map, ...rest];
+export const playerArguments = (map: string, rest: readonly string[]) => ["--standalone", "--window", "native", "--sound", "--player-assets-only", "--map", map, ...rest];
 
 /** What `--version` prints: the build name the build stamped in (the name play-current gives the same commit), else the product name alone for a source run. */
 export const playerVersion = (stamped: string | undefined) => stamped ?? `${PRODUCT} dev`;
