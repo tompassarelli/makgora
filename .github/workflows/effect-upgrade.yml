@@ -40,7 +40,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          bun "$RUNNER_TEMP/north/harness/skills/effect-development/scripts/effect-kit.mjs" upgrade | tee "$RUNNER_TEMP/upgrade.log"
+          bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" upgrade | tee "$RUNNER_TEMP/upgrade.log"
           if git diff --cached --quiet; then
             echo "Effect packages are already at the latest stable versions." >> "$GITHUB_STEP_SUMMARY"
             exit 0
@@ -59,7 +59,7 @@ jobs:
         if: steps.upgrade.outputs.issue != ''
         run: |
           set +e
-          bun "$RUNNER_TEMP/north/harness/skills/effect-development/scripts/effect-kit.mjs" check > "$RUNNER_TEMP/check.log" 2>&1
+          bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check > "$RUNNER_TEMP/check.log" 2>&1
           echo "code=$?" >> "$GITHUB_OUTPUT"
           tail -n 60 "$RUNNER_TEMP/check.log"
       - name: Land or report
