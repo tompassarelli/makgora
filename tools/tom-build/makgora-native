@@ -27,4 +27,4 @@ else
 fi
 flock -s 9
 cd "$tree/ts" || fail "No $tree/ts"
-bun wisp play --standalone --sound --start select "$@" || fail "The game exited with an error"
+bun wisp play --standalone --start select "$@" || fail "The game exited with an error"

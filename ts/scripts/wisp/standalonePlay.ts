@@ -13,13 +13,12 @@ import { createStandaloneSession } from "./standalone";
 const NATIVE_GAME_MODULE = join(import.meta.dir, import.meta.path.endsWith(".ts") ? "nativeGame.ts" : "nativeGame.js");
 
 export const standalonePlay: Command = (args) => Effect.gen(function*() {
-  const { runStandalone, standaloneEmulatedCallsArgument, standaloneNetArguments, standaloneSoundArgument, standaloneWindowArgument } = yield* Effect.tryPromise({ try: () => import("wisp/scripts/wisp/standalone"), catch: (cause) => new RenderFailure({ cause }) });
+  const { runStandalone, standaloneEmulatedCallsArgument, standaloneNetArguments, standaloneWindowArgument } = yield* Effect.tryPromise({ try: () => import("wisp/scripts/wisp/standalone"), catch: (cause) => new RenderFailure({ cause }) });
   const net = standaloneNetArguments(args);
   if (typeof net === "string") return yield* new UsageFailure({ problem: net });
   const windowed = standaloneWindowArgument(net.rest);
   if (typeof windowed === "string") return yield* new UsageFailure({ problem: windowed });
-  const heard = standaloneSoundArgument(windowed.rest);
-  const counted = standaloneEmulatedCallsArgument(heard.rest);
+  const counted = standaloneEmulatedCallsArgument(windowed.rest);
   if (typeof counted === "string") return yield* new UsageFailure({ problem: counted });
   const options = yield* Effect.try({ try: () => standaloneArguments(counted.rest, windowed.window), catch: (cause) => new UsageFailure({ problem: String(cause) }) });
   const { playerAssets, start, chosen, digests, storage, stage, rollback, fourFighters, noTutorialOffer, devCommands, ...run } = options;
@@ -48,7 +47,6 @@ export const standalonePlay: Command = (args) => Effect.gen(function*() {
     ...(counted.emulatedCalls === undefined ? {} : { emulatedCalls: counted.emulatedCalls }),
     ...(net.net === undefined ? {} : { net: net.net }),
     window: windowed.window,
-    ...(heard.sound ? { sound: true } : {}),
     ...(windowed.window === "native" ? { nativeGame: { module: nativeModule, export: "MAKGORA_NATIVE_GAME" } } : {}),
   });
 });
