@@ -9,13 +9,13 @@ import { prefixOf } from "./nativeTools";
 import { clientState } from "./project";
 
 const ACCOUNTS: Readonly<Record<string, string>> = { c: "c", b: "b" };
-const SECRETS = join(homedir(), "code/nixos-config/main/secrets/bnet.yaml");
+const SECRETS = join(process.env.SOUTH_SECRETS ?? join(homedir(), "code/south/main/secrets"), "bnet.yaml");
 
 export const accountField = (account: string, field: "username" | "password") => {
   const runtime = `/run/secrets/bnet-${account}-${field}`;
   return existsSync(runtime)
     ? ["cat", runtime]
-    : ["sudo", "-n", "env", "SOPS_AGE_KEY_FILE=/var/lib/sops-nix/key.txt", "sops", "--decrypt", "--extract", `["${account}"]["${field}"]`, SECRETS];
+    : ["sops", "--decrypt", "--extract", `["${account}"]["${field}"]`, SECRETS];
 };
 
 const ClientsFile = Schema.Struct({ clients: Schema.Array(Schema.Struct({ name: Schema.String, run: Schema.String,
