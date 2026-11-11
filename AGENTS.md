@@ -20,7 +20,7 @@
 - Controller actions, keys and thresholds are defined once in `ts/src/game/input/` and `sim/stickZones.ts`; the plug-in and padbridge read them, never restate them.
 - A new finding goes onto its existing epic (#7, #8, #9, #13 under the 0.1.1 root #66) or the After 0.1 issue (#14) as a checkbox or comment, and a new issue is opened only for a new ship-blocker or when Tom files it.
 
-- Keep the goals in `goals.toml` true: each is a named check with an oracle and a class, contract or debt-allowed; run them with `north goals check makgora`, and a worst frame in the debt-allowed band lands with its `Target-debt:` trailer.
+- Keep the concerns in `concerns.toml` true: each is a named check with an oracle and a class, contract or debt-allowed; run them with `north concerns check makgora`, and a worst frame in the debt-allowed band lands with its `Target-debt:` trailer.
 
 Commands: from ts/, run bun wisp help.
 Docs: [docs/README.md](docs/README.md), topic → file; source layout: [docs/architecture.md](docs/architecture.md).

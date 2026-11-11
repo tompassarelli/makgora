@@ -1,4 +1,4 @@
-[[goal]]
+[[concern]]
 name = "frame-p99"
 source = "AGENTS.md: every frame must sustain 60 fps; the map's own work gates at p99 at most 10 ms"
 oracle = "cd ts && bun wisp perf budget \"$HOME/.local/state/makgora/goals/classic.perf\" | awk '/predicted ms per frame/ {for (i = 1; i <= NF; i++) if ($i == \"p99,\") {print $(i - 1); break}}' | sort -n | tail -1"
@@ -6,7 +6,7 @@ unit = "ms"
 max = 10
 class = "contract"
 
-[[goal]]
+[[concern]]
 name = "frame-worst"
 source = "AGENTS.md: worst frame at most 14 ms; over 10 ms and up to 14 ms is a soft target that lands with a Target-debt trailer"
 oracle = "cd ts && bun wisp perf budget \"$HOME/.local/state/makgora/goals/classic.perf\" | awk '/predicted ms per frame/ {for (i = 1; i <= NF; i++) if ($i == \"worst\") {print $(i - 1); break}}' | sort -n | tail -1"
@@ -17,7 +17,7 @@ ceiling = 14
 owner = "tompassarelli/makgora#889"
 revisit = "a landing raises the playable-bot-four worst frame, or the record is older than a week"
 
-[[goal]]
+[[concern]]
 name = "frame-record-age"
 source = "AGENTS.md: the frame goals read main's own playable-bot-four run, which the makgora-goals-perf timer re-records daily into ~/.local/state/makgora/goals/classic.perf"
 oracle = "f=\"$HOME/.local/state/makgora/goals/classic.perf\"; if [ -f \"$f\" ]; then echo $(( ($(date +%s) - $(stat -c %Y \"$f\")) / 3600 )); else echo 9999; fi"
@@ -28,7 +28,7 @@ ceiling = 168
 owner = "tompassarelli/makgora#889"
 revisit = "the record is older than a week, which is when frame-worst's revisit trigger fires"
 
-[[goal]]
+[[concern]]
 name = "target-debt-due"
 source = "AGENTS.md: a worst frame over 10 ms lands with a Target-debt trailer; docs/rationale/targets.md in north"
 oracle = "north check provenance debt --due | awk -F'\\t' '$1==\"makgora\"' | wc -l"
@@ -39,7 +39,7 @@ ceiling = 5
 owner = "tompassarelli/makgora#14"
 revisit = "a Target-debt record sits unpaid past its trigger for a week"
 
-[[goal]]
+[[concern]]
 name = "main-green"
 source = "README.md: the map plays inside Warcraft III; AGENTS.md: a change lands once with its checks passing"
 oracle = "gh issue list --repo tompassarelli/makgora --search 'in:title \"main is red\"' --state open --json title --jq '[.[] | select(.title == \"main is red\")] | length'"
@@ -47,14 +47,14 @@ unit = "issues"
 max = 0
 class = "contract"
 
-[[goal]]
+[[concern]]
 name = "no-blizzard-files"
 source = "README.md Principles: the repositories contain no Blizzard files: models, textures, sounds, data, scripts or in-game text"
 oracle = "bun ts/node_modules/wisp/host/checks/cleanRoom.ts . >/dev/null 2>&1; echo $?"
 max = 0
 class = "contract"
 
-[[goal]]
+[[concern]]
 name = "classic-only"
 source = "AGENTS.md: Classic models only; never add Definitive Edition support, code, assets, checks or docs"
 oracle = "{ rg -il definitive ts/src || [ $? -eq 1 ]; } | wc -l"
@@ -62,7 +62,7 @@ unit = "files"
 max = 0
 class = "contract"
 
-[[goal]]
+[[concern]]
 name = "sim-isolated"
 source = "AGENTS.md: sim code never imports presentation, render, ui, platform or shell"
 oracle = "{ rg -n \"from ['\\\"].*/(presentation|render|ui|platform|shell)(/|['\\\"])\" ts/src/game/sim || [ $? -eq 1 ]; } | wc -l"
@@ -70,7 +70,7 @@ unit = "imports"
 max = 0
 class = "contract"
 
-[[goal]]
+[[concern]]
 name = "map-never-on-github"
 source = "README.md Principles: the map ships only on Hive Workshop and Battle.net, never on GitHub; no GitHub release carries a map or model file"
 oracle = "bun ts/scripts/releaseAssets.ts >/dev/null 2>&1; [ $? -eq 1 ] && echo 1 || echo 0"
@@ -78,7 +78,7 @@ unit = "failing checks"
 max = 0
 class = "contract"
 
-[[goal]]
+[[concern]]
 name = "credits-single-source"
 source = "README.md Credits: the credits are written once in ts/src/game/ui/credits.ts and the Hive post's Credits section equals it"
 oracle = "{ awk '/^## Credits/{f=1;next} /^## /{f=0} f && /^- /{sub(/^- /,\"\");print}' docs/hive-post.md | grep -v '^Source:' | while IFS= read -r l; do grep -qF -- \"$l\" ts/src/game/ui/credits.ts || echo x; done; sed -n 's/^  \"\\(.*\\)\",$/\\1/p' ts/src/game/ui/credits.ts | while IFS= read -r l; do grep -qF -- \"- $l\" docs/hive-post.md || echo x; done; } | wc -l"
