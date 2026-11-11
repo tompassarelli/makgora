@@ -85,9 +85,6 @@ main checkout, which plays from its own detached worktree `~/code/makgora/worktr
 - Unless a game from it is already running, it moves the worktree to `origin/main` and runs
   `bun install`, so each launch plays the newest main and a running game never has its tree
   moved, by the watcher's checkout or by a second launch. Offline it plays the tree it has.
-- It runs the first `bun` on PATH that is Bun itself rather than a host wrapper, linked first on
-  its own PATH so nested `bun` calls find it too, because a wrapped `bun` may not see the
-  Warcraft III install and the window then stops with "No install found".
 - It logs each launch to `~/.local/state/makgora/native-play.log` and shows a desktop
   notification naming that log when the worktree, the install or the game fails.
 
