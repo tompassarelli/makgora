@@ -8,6 +8,16 @@ fail() {
   notify-send -a "Mak'gora Native" "Mak'gora Native didn't start" "$1. Log: $log"
   exit 1
 }
+real=
+IFS=:
+for dir in $PATH; do
+  if [ -z "$real" ] && [ -x "$dir/bun" ] && ! grep -qs 'north capacity gate shim' "$dir/bun"; then real="$dir/bun"; fi
+done
+unset IFS
+[ -n "$real" ] || fail "No bun outside the north capacity shims on PATH"
+mkdir -p "$state/native-play-bin" && ln -sf "$real" "$state/native-play-bin/bun" || fail "Could not link $real"
+PATH="$state/native-play-bin:$PATH"
+export PATH
 exec 9>"$state/native-play.lock"
 if flock -n -x 9; then
   exec >"$log" 2>&1

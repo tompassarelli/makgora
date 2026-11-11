@@ -1,11 +1,11 @@
-import { mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { availableParallelism, homedir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Effect, ManagedRuntime, Schema, Semaphore } from "effect";
 import { ChildProcess } from "effect/process";
-import { INPUTS_STORE, type Manifest, assetsView, readManifest } from "./buildInputs";
+import { type Manifest, assetsView, readManifest } from "./buildInputs";
 import { ProcessFailure, runProcess } from "../hostProcess";
 import { POST_PROCESSING_FILE } from "../postProcessing";
 import { resolveRenderAsset, type Graphics, type ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
@@ -13,6 +13,8 @@ import { discoverInstall, ReforgedRequired } from "wisp/scripts/wisp/reforgedIns
 
 export const key = (path: string) => path.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx");
 const PRIVATE = join(homedir(), ".local/share/makgora-render-assets");
+const CHECKOUT = resolve(import.meta.dir, "../../..");
+const BUILT_EXTRACTOR = "build/animation-assets/casc-extract";
 const NOT_IN_STORAGE = "open asset failed: 2";
 const ABSENT_SUFFIX = ".absent";
 const EXTRACT_TIMEOUT = "60 seconds";
@@ -76,7 +78,7 @@ export const readStockBuild = (storage: string) => attempt("read the stock build
 });
 
 export const findExtractor = (options: Pick<RenderAssetOptions, "extractor"> = {}) => options.extractor ?? process.env.CASC_EXTRACTOR ?? Bun.which("casc-extract")
-      ?? Array.from(new Bun.Glob("*/build/animation-assets/casc-extract").scanSync({ cwd: dirname(INPUTS_STORE), absolute: true }))[0];
+      ?? [join(CHECKOUT, BUILT_EXTRACTOR), ...[dirname(CHECKOUT), dirname(dirname(CHECKOUT))].filter((root) => existsSync(root)).flatMap((root) => Array.from(new Bun.Glob(`*/${BUILT_EXTRACTOR}`).scanSync({ cwd: root, absolute: true })))].find((path) => existsSync(path));
 
 const mapSources = (options: RenderAssetOptions, mapImports: ((assets: string, manifest: Manifest) => Effect.Effect<MapImports, { readonly message: string }>) | undefined) => Effect.gen(function*() {
   const imports = options.imports ?? (mapImports === undefined ? yield* new RenderAssetFailure({ problem: "no map imports given" }) : yield* Effect.gen(function*() {
