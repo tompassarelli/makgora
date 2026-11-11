@@ -153,7 +153,7 @@ code:
    the move list and the anim-score tables are generated and untracked, and
    makgora:.gitattributes merges the map size and Bun test cost baselines per row
    through makgora:ts/scripts/mergeGenerated.ts, which `bun install` (from ts/)
-   registers in the repository's git config (#401).
+   registers in the repository's git config (#401) only when it differs from what the config holds, so an install in a checkout whose .git is read-only (the land check's sandbox) succeeds once the config is set.
 
 `bun wisp map build --profile playable --edition classic --inputs-only` runs
 the build's private input, import and cue resolution checks without compiling
