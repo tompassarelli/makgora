@@ -18,6 +18,14 @@ unset IFS
 mkdir -p "$state/native-play-bin" && ln -sf "$real" "$state/native-play-bin/bun" || fail "Could not link $real"
 PATH="$state/native-play-bin:$PATH"
 export PATH
+if [ -z "$CASC_EXTRACTOR" ] && ! command -v casc-extract >/dev/null 2>&1; then
+  for built in "$repo/main/build/animation-assets/casc-extract" "$repo"/worktrees/*/build/animation-assets/casc-extract; do
+    if [ -x "$built" ]; then
+      ln -sf "$built" "$state/native-play-bin/casc-extract"
+      break
+    fi
+  done
+fi
 exec 9>"$state/native-play.lock"
 if flock -n -x 9; then
   exec >"$log" 2>&1

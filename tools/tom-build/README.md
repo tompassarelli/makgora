@@ -88,6 +88,9 @@ main checkout, which plays from its own detached worktree `~/code/makgora/worktr
 - It runs the first `bun` on PATH that is Bun itself rather than a host wrapper, linked first on
   its own PATH so nested `bun` calls find it too, because a wrapped `bun` may not see the
   Warcraft III install and the window then stops with "No install found".
+- Unless `CASC_EXTRACTOR` is set or `casc-extract` is already on PATH, it links a checkout's built
+  `build/animation-assets/casc-extract` (the main checkout's, else a worktree's) beside that `bun`,
+  so the game can extract a stock texture that no render has cached yet instead of exiting on it.
 - It logs each launch to `~/.local/state/makgora/native-play.log` and shows a desktop
   notification naming that log when the worktree, the install or the game fails.
 
