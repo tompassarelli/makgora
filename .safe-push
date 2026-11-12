@@ -2,12 +2,12 @@
 	publish = farm/
 	check-local = true
 	check = .github/workflows/farm-test.yml,.github/workflows/autoland.yml,ts/scripts/suiteParity.ts,ts/scripts/prePush.ts :: cd ts && bun scripts/suiteParity.ts
-	after = . :: cd ts && bun install --frozen-lockfile && bun scripts/landingFarm.ts
-	host-input = ~/.local/share/makgora-build-inputs/store :: cd ts && bun install --frozen-lockfile && bun scripts/landingFarm.ts
+	after = . :: north land dispatch farm
+	host-input = ~/.local/share/makgora-build-inputs/store@build-inputs :: north land dispatch farm
 	after = controller/,tools/makgora-tools/,structure.toml :: north code-health habits --repo .
 	after = controller/ :: cd controller && RUSTC_WRAPPER= nix-shell -I nixpkgs=flake:nixpkgs/e1d7762c24208983d0e55130ad215501883d608b -p cargo clippy rustc stdenv.cc cmake pkg-config libxkbcommon udev --run 'cargo clippy --all-targets --locked -- -D warnings'
 	after = tools/makgora-tools/ :: cd tools/makgora-tools && RUSTC_WRAPPER= nix-shell -I nixpkgs=flake:nixpkgs/e1d7762c24208983d0e55130ad215501883d608b -p cargo clippy rustc stdenv.cc --run 'cargo clippy --all-targets --locked -- -D warnings'
-	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: the landing farm runs the farm-test groups with the private-store checks (Lua32 parity, boot, determinism, clean room), which need the private map-build store and take minutes :: cd ts && bun install --frozen-lockfile && bun scripts/landingFarm.ts"
+	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: the landing farm runs the farm-test groups with the private-store checks (Lua32 parity, boot, determinism, clean room), which need the private map-build store and take minutes, and the lander dispatches and judges the farm run itself (north#1148) :: north land dispatch farm"
 	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names, keeping the 0.1 s suite parity check as its one check before the push :: north code-health habits --repo ."
 	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: clippy builds the controller in a nix shell, minutes per lane :: cd controller && RUSTC_WRAPPER= nix-shell -I nixpkgs=flake:nixpkgs/e1d7762c24208983d0e55130ad215501883d608b -p cargo clippy rustc stdenv.cc cmake pkg-config libxkbcommon udev --run 'cargo clippy --all-targets --locked -- -D warnings'"
 	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: clippy builds makgora-tools in a nix shell, minutes per lane :: cd tools/makgora-tools && RUSTC_WRAPPER= nix-shell -I nixpkgs=flake:nixpkgs/e1d7762c24208983d0e55130ad215501883d608b -p cargo clippy rustc stdenv.cc --run 'cargo clippy --all-targets --locked -- -D warnings'"
@@ -26,6 +26,15 @@
 	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: it builds and tests the controller plugin on a clean runner with the udev and xkbcommon libraries, minutes per lane, and the controller clippy runs after the push too :: .github/workflows/controller.yml:plugin"
 	after-only = it packages the player for Linux and Windows on their own runners and runs it where Bun is not on the path, which no lander or offload host is :: .github/workflows/player.yml:package
 	after-only = "north#633 lands makgora first and checks it after the push, reverting only the lane a red run names: it builds, lints and tests makgora-tools on a clean runner, minutes per lane, and the makgora-tools clippy runs after the push too :: .github/workflows/tools.yml:host-tools"
+[dispatch "farm"]
+	command = cd ts && bun scripts/landingFarm.ts
+	fetch = cd ts && bun install --frozen-lockfile
+	workflow = farm-test.yml
+	repository = tompassarelli/makgora
+	ref = main
+	input = "checks \\[\"[a-z0-9-]+\"(,\"[a-z0-9-]+\")*\\]"
+	input = full 1
+	deadline = 1800
 [ci]
 	budget = farm-test.yml 600
 [mutant]

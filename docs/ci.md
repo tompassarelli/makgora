@@ -41,26 +41,28 @@ to its first red lane, which the lander reverts through its queue and hands
 back to its author with `Follows:` (north:docs/rationale/landing-train.md).
 
 1. **After the push.** The suite parity check (makgora:ts/scripts/suiteParity.ts, a tenth of a second)
-   is the one `land.check` before the push. The `land.after` line for everything else runs
-   makgora:ts/scripts/landingFarm.ts on the landed batch, in place of the
-   pre-push hook, and it picks the farm-test.yml
+   is the one `land.check` before the push. The `land.after` line for everything else is
+   `north land dispatch farm`, in place of the pre-push hook. The lander reads `[dispatch "farm"]`
+   from origin main's makgora:.safe-push, never the lane's, installs the packages and runs
+   makgora:ts/scripts/landingFarm.ts with the store entries `build-inputs/` pins
+   (`land.host-input`; north#1148). The script picks the farm-test.yml
    groups the lane's diff against main reaches (`landingGroups` in
    makgora:ts/scripts/landingChecks.ts, which names every check, its command
    and the paths that reach it; the Lua parity checks and the frame budgets wait
-   for main's CI unless a shared root reaches them), dispatches Farm test with the groups and the
-   base on the `farm/SHA` branch safe-push published after its secret scan
-   (`land.publish`, `SAFE_PUSH_LAND_REF`; without one it pushes the lane there
-   itself), and passes once every check job has passed, polling the run every
-   3 s. The `clean-room` group holds the clean room and the `static` group holds
+   for main's CI unless a shared root reaches them), runs the checks that read the private stores
+   (fighter art, stored models, locomotion lock, strike moments, animation jitter, map-build
+   inputs), which cannot run on a hosted runner, and prints one
+   `north land dispatch: {"checks":...}` line. The lander checks that line against the input
+   patterns main declares, dispatches Farm test once with it and the ref and base it is checking,
+   follows the run that dispatch returned and judges it by its conclusion. An empty diff, which
+   the lander's rerun of a base commit has, selects every group with `full`, so that run cannot
+   pass on no check. The `clean-room` group holds the clean room and the `static` group holds
    the cue models, the kind-tag, ledger and type check, and the Autoland suite parity
-   check. The checks that read the private stores (fighter art, stored models,
-   locomotion lock, strike moments, animation jitter, map-build inputs) cannot
-   run on a hosted runner, so they run on the landing machine beside the farm
-   run; the log names each with the reason (`landing local:`), and each farm
-   result with its groups and run (`landing farm:`). A failing check turns the after run red, printing the summary's failing tests and checks, and the lander reverts the first red lane. A GitHub rate limit (HTTP 403 or 429), a 5xx answer or a cancelled run is not a failing check: landingFarm.ts retries the poll for 10 minutes and exits 75, which the lander treats as transient (2026-11-06, after the first after-push runs hit the rate limit and reverted two innocent landings). A group that
+   check. The log names each local check with the reason (`landing local:`) and the groups
+   (`landing farm:`). A failing local check or farm run turns the after run red and the lander reverts the first red lane. A refused or failed dispatch, a cancelled run or one past the declared deadline reaches no verdict (exit 75), which the lander treats as transient and reverts nothing for (2026-11-06, after the first after-push runs hit the rate limit and reverted two innocent landings). A group that
    passed is remembered by the hash of its inputs (makgora:ts/scripts/landingInputs.ts:
    the group, the checks it runs and the blob of every tracked file their reach
-   rules match), in the pre-push cache here and as a `farm-pass-GROUP-HASH`
+   rules match) as a `farm-pass-GROUP-HASH`
    Actions cache entry and artifact kept 7 days that every Farm test job looks up first (the cache first, since it spends no REST quota and main's entries reach every ref; the artifact for passes on farm/ scratch refs, whose cache entries only that ref sees; a failed lookup warns and runs the group) (so Autoland's
    suite and main's CI reuse it too, logging "GROUP reused: it passed before on inputs HASH"), so a retry or a
    rebase onto a moved main reruns only the groups whose files changed. The
@@ -393,7 +395,7 @@ any run where:
 - a test run waited more than 5 minutes for its slot, or another run waited
   more than 5 minutes with nothing running in its concurrency group.
 
-The sweep and heartbeat also list unfinished Farm test runs (each requested or finished one starts a sweep) and cancel them on the same job, run and pending bounds without requeueing, so a farm run that the after-push check watches ends within a minute and landingFarm.ts exits 75 (GitHub cancelled the run), which the lander counts as transient and does not revert.
+The sweep and heartbeat also list unfinished Farm test runs (each requested or finished one starts a sweep) and cancel them on the same job, run and pending bounds without requeueing, so a farm run that the after-push check watches ends within a minute and `north land dispatch` exits 75 (the run concluded cancelled), which the lander counts as transient and does not revert.
 
 Once the cancelled runs finish, and on every sweep while lanes are pending,
 no plan is unfinished and a test slot holds no run (each test run ends in a
