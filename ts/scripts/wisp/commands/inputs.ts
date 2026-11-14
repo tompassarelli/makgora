@@ -12,7 +12,8 @@ import { DERIVED_PATHS, buildFighterArt, planFighters, withStepLocks } from "../
 import { deriveAdmission } from "../fighterArtPlan";
 import * as fighterArtData from "../../../codegen/fighterArtData";
 import { syncGenerated } from "../../../codegen/sync";
-import { DERIVE_LEASE_SECONDS, openPaths, pruneInputs } from "../inputsPrune";
+import { playCurrentBuilds, revisionLock } from "../currentPlaytest";
+import { DERIVE_LEASE_SECONDS, openPaths, pruneCurrentPlaytests, pruneInputs } from "../inputsPrune";
 import { projectRoot } from "../project";
 import { HERO_STRIKE_MOMENTS } from "../../../src/generated/strikes/heroStrikeMomentInfo";
 import { measureStrikeMoments, staleStrikeFighters } from "../strikeMoments";
@@ -89,15 +90,25 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
 
 const prune = (args: readonly string[]) => Effect.gen(function*() {
   const scratch = flagValues(args, "scratch"), root = dirname(INPUTS_STORE);
-  if (args.length !== scratch.length * 2) return yield* new UsageFailure({ problem: "inputs prune takes [--scratch NAME]..." });
+  const playCurrent = args.includes("--play-current"), dryRun = args.includes("--dry-run");
+  if (args.length !== scratch.length * 2 + (playCurrent ? 1 : 0) + (dryRun ? 1 : 0) || (dryRun && !playCurrent)) return yield* new UsageFailure({ problem: "inputs prune takes [--scratch NAME]... [--play-current [--dry-run]]" });
   const worktrees = (yield* git("worktree", "list", "--porcelain")).split("\n").filter((line) => line.startsWith("worktree ")).map((line) => ({ path: line.slice("worktree ".length), reason: "holds a git worktree" }));
-  const { removed, refused } = yield* Effect.try({
+  if (playCurrent) {
+    const main = yield* git("rev-parse", "origin/main");
+    const pruned = yield* Effect.try({
+      try: () => pruneCurrentPlaytests(playCurrentBuilds, revisionLock, main, [...openPaths(), ...worktrees], dryRun),
+      catch: (cause) => new MapBuildFailure({ operation: "prune play-current", path: playCurrentBuilds, cause: String(cause) }),
+    });
+    for (const path of pruned.removed) console.log(`${dryRun ? "would remove" : "removed"} ${path}`);
+    console.log(`${dryRun ? "would keep" : "kept"} ${pruned.kept} play-current folders`);
+  }
+  const { removed, refused } = dryRun ? { removed: [], refused: [] } : yield* Effect.try({
     try: () => pruneInputs(root, scratch, [...openPaths(), ...worktrees]),
     catch: (cause) => new MapBuildFailure({ operation: "prune build inputs", path: root, cause: String(cause) }),
   });
   for (const path of removed) console.log(`removed ${path}`);
   if (refused.length > 0) return yield* new MapBuildFailure({ operation: "prune build inputs", path: root, cause: refused.map(({ path, reason }) => `kept ${path}: it ${reason}`).join("\n") });
-  console.log(removed.length === 0 ? "nothing to prune" : `removed ${removed.length} folders`);
+  if (!playCurrent || removed.length > 0) console.log(removed.length === 0 ? "nothing to prune" : `removed ${removed.length} folders`);
 });
 
 const fetch = (hosts: readonly string[]) => Effect.gen(function*() {
@@ -155,5 +166,5 @@ export const inputs: Command = (args) => Effect.gen(function*() {
     if (name === "base" || name === "container" || name === "assets" || name === "summon") return console.log(paths[name]);
     return yield* new UsageFailure({ problem: "inputs path takes base, container, assets or summon" });
   }
-  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH [--fighter SHARD]... [--all] | derive [--fighter NAME]... [--rebuild | --check] | fetch HOST... | publish HOST | prune [--scratch NAME]... | check | path [base|container|assets|summon]" });
+  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH [--fighter SHARD]... [--all] | derive [--fighter NAME]... [--rebuild | --check] | fetch HOST... | publish HOST | prune [--scratch NAME]... [--play-current [--dry-run]] | check | path [base|container|assets|summon]" });
 });

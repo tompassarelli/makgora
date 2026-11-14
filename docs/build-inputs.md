@@ -141,10 +141,13 @@ code:
    pin, the measurement's imports (move data, clip tables, looks) or the tables themselves
    (makgora:ts/scripts/prePush.ts, `strikeInputs`).
    A derive that fails keeps its step logs in derive/run-*/ beside the store;
-   `bun wisp inputs prune [--scratch NAME]...` removes the runs older than the
+   `bun wisp inputs prune [--scratch NAME]... [--play-current [--dry-run]]` removes the runs older than the
    derive lease, and each named scratch folder under the build-inputs root,
    skipping any folder a process has open or a git worktree lives in and never
-   touching the store (makgora:ts/scripts/wisp/inputsPrune.ts).
+   touching the store (makgora:ts/scripts/wisp/inputsPrune.ts). `--play-current`
+   also removes every play-current/REVISION folder and its .version file except the
+   newest ten, main's revision and any a process has open, under that revision's
+   build lock; `--dry-run` lists what it would remove.
 3. `bun wisp map build --profile playable --edition full --name NAME --out OUT.w3x` from the lane
    checks the change; commit build-inputs/FAMILY with the code that needs it and
    land it. Lanes that changed different families, or different fighters' shards

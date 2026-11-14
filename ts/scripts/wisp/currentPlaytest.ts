@@ -21,7 +21,7 @@ import { MAP_FOLDER } from "./mapLibrary";
 import { projectRoot } from "./project";
 
 const inputsRoot = join(homedir(), ".local/share/makgora-build-inputs");
-const builds = join(inputsRoot, "play-current");
+export const playCurrentBuilds = join(inputsRoot, "play-current");
 const locks = join(inputsRoot, "locks");
 const playProblem = (cause: unknown) => new PlayProblem({ problem: String(cause) });
 
@@ -79,7 +79,7 @@ const resolveRevision = (revision: string) => Effect.gen(function*() {
 });
 
 
-const revisionLock = (revision: string) => join(locks, `play-${revision}.lock`);
+export const revisionLock = (revision: string) => join(locks, `play-${revision}.lock`);
 
 
 
@@ -184,7 +184,7 @@ export const playableMapBuild = (title: string, out: string, predictCost = false
 export const currentPlaytest = ({ revision: wanted, helper: wantsHelper = true, predictCost = false, edition = "full" }: PlaytestOptions = {}) => Effect.gen(function*() {
   const { revision, controller, mainCheckout } = yield* (wanted === undefined ? resolveMain : resolveRevision(wanted));
   const title = yield* playName(revision);
-  const final = join(builds, edition === "full" ? revision : `${revision}-${edition}`);
+  const final = join(playCurrentBuilds, edition === "full" ? revision : `${revision}-${edition}`);
   const map = { folder: MAP_FOLDER, file: `${title}.w3x`, title, source: join(final, `${title}.w3x`) };
   const helper = helperPath(controller);
   const stages: BuildStage[] = [];

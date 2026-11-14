@@ -1,6 +1,7 @@
-import { existsSync, lstatSync, readdirSync, readlinkSync } from "node:fs";
+import { closeSync, existsSync, lstatSync, readdirSync, readlinkSync, rmSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
 import { removeTree } from "./buildInputs";
+import { tryLock } from "./fileLock";
 
 export const DERIVE_LEASE_SECONDS = 3600;
 
@@ -45,4 +46,32 @@ export function pruneInputs(root: string, scratch: readonly string[], holds: rea
     removed.push(path);
   }
   return { removed, refused };
+}
+
+export const GUESSED_NEWEST_PLAYTESTS_KEPT = 10;
+
+const revisionOf = (name: string) => /^[0-9a-f]{40}/.exec(name)?.[0] ?? name;
+
+export interface PlaytestPruning { readonly removed: readonly string[]; readonly kept: number }
+
+export function pruneCurrentPlaytests(builds: string, lockOf: (revision: string) => string, mainRevision: string, holds: readonly Hold[], dryRun: boolean): PlaytestPruning {
+  if (!existsSync(builds)) return { removed: [], kept: 0 };
+  const entries = readdirSync(builds).filter((name) => !name.endsWith(".version") && basename(name) === name)
+    .map((name) => ({ name, path: join(builds, name), mtime: lstatSync(join(builds, name)).mtimeMs }))
+    .sort((a, b) => b.mtime - a.mtime);
+  const removed: string[] = [];
+  entries.forEach(({ name, path }, rank) => {
+    if (rank < GUESSED_NEWEST_PLAYTESTS_KEPT || name.includes(mainRevision) || holds.some((hold) => inside(path, hold.path))) return;
+    if (dryRun) return void removed.push(path);
+    const lock = tryLock(lockOf(revisionOf(name)));
+    if (lock === undefined) return;
+    try {
+      removeTree(path);
+      rmSync(`${path}.version`, { force: true });
+      removed.push(path);
+    } finally {
+      closeSync(lock);
+    }
+  });
+  return { removed, kept: entries.length - removed.length };
 }
