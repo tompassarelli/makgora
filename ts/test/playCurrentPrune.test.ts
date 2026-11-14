@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { GUESSED_NEWEST_PLAYTESTS_KEPT, pruneCurrentPlaytests } from "../scripts/wisp/inputsPrune";
 
-test("a prune keeps the map a running playtest has open and the main revision, and removes older maps", () => {
+test("a prune keeps the map a running playtest has open and the main revision, and removes older maps [k2 property]", () => {
   const root = mkdtempSync(join(tmpdir(), "play-current-prune-"));
   const builds = join(root, "play-current"), locks = join(root, "locks");
   const revision = (index: number) => index.toString(16).padStart(40, "0");
