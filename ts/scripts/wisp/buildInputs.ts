@@ -283,9 +283,18 @@ export function mergeShards(shards: readonly string[], target: string): void {
       continue;
     }
     mkdirSync(dirname(to), { recursive: true });
-    linkSync(from, to);
+    linkOrClone(from, to);
   }
   seal(target);
+}
+
+function linkOrClone(from: string, to: string): void {
+  try {
+    linkSync(from, to);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "EXDEV") throw error;
+    copyFileSync(from, to, constants.COPYFILE_FICLONE);
+  }
 }
 
 export function assetsView(manifest: Manifest, store = INPUTS_STORE): string {
